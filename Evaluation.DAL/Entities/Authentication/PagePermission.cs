@@ -1,0 +1,13 @@
+﻿using Evaluation.DAL.Entities.AdminPanel;
+
+namespace Evaluation.DAL.Entities.Authentication;
+
+// if this change module i suggset to be ModulePermission
+public class PagePermission : BaseEntities
+{
+    public Guid PageId { get; set; }
+    public Page? Page { get; set; }
+
+    public Guid PermissionId { get; set; }
+    public Permission? Permission { get; set; }
+}
