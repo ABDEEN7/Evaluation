@@ -1,11 +1,10 @@
 ﻿using Evaluation.DAL.Entities.AdminPanel;
-using Evaluation.DAL.Entities.OrganizationTree;
 
 namespace Evaluation.DAL.Entities.Planing;
 
-public class OrganizationType : BaseEntities
+public class ChangeRequestType : BaseEntities
 {
     public string NameAr { get; set; } = null!;
     public string NameEn { get; set; } = null!;
-    public ICollection<Organization> Organizations { get; set; } = new List<Organization>();
+    public ICollection<ChangeRequest>? ChangeRequests { get; set; }
 }

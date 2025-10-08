@@ -1,0 +1,12 @@
+﻿using Evaluation.DAL.Entities.AdminPanel;
+using Evaluation.DAL.Entities.OrganizationTree;
+
+namespace Evaluation.DAL.Entities.Planing;
+
+public class PlanSchedule : BaseEntities
+{
+    public int PlanId { get; set; }
+    public int SchoolId { get; set; }
+    public School? School { get; set; }
+    public Plan? Plan { get; set; }
+}

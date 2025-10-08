@@ -5,8 +5,8 @@ namespace Evaluation.DAL.Entities.FormsModules;
 // i change the name of FormScopeItem to Item to more clearly 
 public class Item : BaseEntities
 {
-    public required string NameAr { get; set; }
-    public required string NameEn { get; set; }
+    public string NameAr { get; set; } = null!;
+    public string NameEn { get; set; } = null!;
     public decimal Min { get; set; }
     public decimal Max { get; set; }
     public bool IsEvaluation{ get; set; }// I see that Weight alone is sufficient without the need for ApplyEvaluation

@@ -2,8 +2,8 @@
 
 namespace Evaluation.DAL.Entities.Planing;
 
-public class PlanStatus : BaseEntities
+public class ChangeRequestStatus : BaseEntities
 {
     public string NameAr { get; set; } = null!;
-    public string NameEN { get; set; } = null!;
+    public string NameEn { get; set; } = null!;
 }
