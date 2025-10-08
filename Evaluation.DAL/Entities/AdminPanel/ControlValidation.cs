@@ -8,7 +8,7 @@ public class ControlValidation
 
     public Permission Permission { get; set; } = new();
 
-    public string Name { get; set; }
+    public string? Name { get; set; }
 
     public string? ControlType { get; set; }
 

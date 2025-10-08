@@ -1,4 +1,6 @@
-﻿namespace Evaluation.DAL.Entities.Generic;
+﻿using Evaluation.DAL.Entities.Authentication;
+
+namespace Evaluation.DAL.Entities.Generic;
 
 public interface IEntity
 {

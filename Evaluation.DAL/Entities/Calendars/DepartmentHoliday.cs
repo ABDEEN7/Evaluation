@@ -1,6 +1,7 @@
 ﻿using Evaluation.DAL.Entities.AdminPanel;
+using Evaluation.DAL.Entities.Planing;
 
-namespace Evaluation.DAL.Entities;
+namespace Evaluation.DAL.Entities.Calendars;
 
 public class DepartmentHoliday : BaseEntities // i change DepartmentDayOff to DepartmentHolidays
 {

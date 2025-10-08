@@ -1,4 +1,5 @@
-﻿using Evaluation.DAL.Entities.Generic;
+﻿using Evaluation.DAL.Entities.Authentication;
+using Evaluation.DAL.Entities.Generic;
 
 namespace Evaluation.DAL.Entities.AdminPanel;
 

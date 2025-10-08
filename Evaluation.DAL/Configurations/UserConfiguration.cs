@@ -1,4 +1,4 @@
-﻿using Evaluation.DAL.Entities;
+﻿using Evaluation.DAL.Entities.Authentication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
