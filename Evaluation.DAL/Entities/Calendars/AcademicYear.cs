@@ -1,4 +1,5 @@
 ﻿using Evaluation.DAL.Entities.AdminPanel;
+using Evaluation.DAL.Entities.Planing;
 
 namespace Evaluation.DAL.Entities.Calendars;
 
@@ -10,4 +11,5 @@ public class AcademicYear : BaseEntities
     public DateTime EndDate { get; set; }
     public int Year { get; set; }
     public int DepartmentId { get; set; }
+    public Department Department { get; set; }
 }

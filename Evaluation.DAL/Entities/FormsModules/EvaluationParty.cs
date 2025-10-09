@@ -1,6 +1,6 @@
 ﻿using Evaluation.DAL.Entities.AdminPanel;
 
-namespace Evaluation.DAL.Entities;
+namespace Evaluation.DAL.Entities.FormsModules;
 
 public class EvaluationParty : BaseEntities
 {

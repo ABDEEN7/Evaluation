@@ -4,7 +4,7 @@ using Evaluation.DAL.Entities.Authentication;
 
 namespace Evaluation.DAL.Entities.FormsModules;
 //هذا التايبل يخزن قيمة المستخدم والبند المقييم
-internal class ItemValue : BaseEntities
+public class ItemValue : BaseEntities
 {
     public int ItemId { get; set; }
     public int UserId { get; set; }

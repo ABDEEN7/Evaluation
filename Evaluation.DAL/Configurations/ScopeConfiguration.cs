@@ -1,4 +1,4 @@
-﻿using Evaluation.DAL.Entities;
+﻿using Evaluation.DAL.Entities.FormsModules;
 using Evaluation.DAL.Entities.Planing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -19,5 +19,10 @@ public class ScopeConfiguration : IEntityTypeConfiguration<Scope>
             .HasForeignKey(x => x.ParentId)
             .OnDelete(DeleteBehavior.Restrict)
             .IsRequired(false);
+
+        builder.HasOne<ScopeType>()
+            .WithMany()
+            .HasForeignKey(x => x.ScopeTypeId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace Evaluation.DAL.Entities.Planing;
+﻿namespace Evaluation.DAL.Entities.Planing.TeamsModule;
 
 public class Team //I chaneg the name of DepEvalTeams to team
 {
