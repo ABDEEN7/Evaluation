@@ -1,4 +1,4 @@
-﻿using Evaluation.DAL.Entities.OrganizationTree;
+﻿using Evaluation.DAL.Entities.OrganizationTrees;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

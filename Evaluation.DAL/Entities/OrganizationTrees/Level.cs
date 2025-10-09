@@ -1,6 +1,6 @@
 ﻿using Evaluation.DAL.Entities.AdminPanel;
 
-namespace Evaluation.DAL.Entities.OrganizationTree;
+namespace Evaluation.DAL.Entities.OrganizationTrees;
 
 public class Level : BaseEntities
 {

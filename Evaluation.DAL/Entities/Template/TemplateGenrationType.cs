@@ -4,7 +4,7 @@ namespace Evaluation.DAL.Entities.Template;
 
 public class TemplateGenrationType : BaseEntities
 {
-    public string TitleAr { get; set; }
-    public string TitleEn { get; set; }
-    public string BackendName { get; set; }
+    public string TitleAr { get; set; } = null!;
+    public string TitleEn { get; set; } = null!;
+    public string BackendName { get; set; } = null!;
 }

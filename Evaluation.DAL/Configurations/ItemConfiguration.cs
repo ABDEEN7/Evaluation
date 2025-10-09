@@ -24,8 +24,11 @@ public class ItemConfiguration : IEntityTypeConfiguration<Item>
         builder.Property(i => i.Min)
             .HasColumnType("decimal(18,2)");
 
+
         builder.Property(i => i.Max)
             .HasColumnType("decimal(18,2)");
+
+        builder.ToTable(tb => tb.HasCheckConstraint("CK_Item_MinLessOrEqualMax", "[Min] <= [Max]"));
 
         builder.Property(i => i.Weight)
             .IsRequired();

@@ -23,5 +23,10 @@ internal class ScopeTypeConfiguration : IEntityTypeConfiguration<ScopeType>
             .HasForeignKey(x => x.DepartmentId)
             .OnDelete(DeleteBehavior.Restrict);
 
+        builder
+           .HasOne(x => x.Parent)
+           .WithMany()
+           .HasForeignKey(x => x.ParentId)
+           .OnDelete(DeleteBehavior.Restrict);
     }
 }

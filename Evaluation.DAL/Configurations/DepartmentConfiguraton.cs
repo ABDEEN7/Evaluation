@@ -1,4 +1,4 @@
-﻿using Evaluation.DAL.Entities.OrganizationTree;
+﻿using Evaluation.DAL.Entities.OrganizationTrees;
 using Evaluation.DAL.Entities.Planing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -20,7 +20,7 @@ public class DepartmentConfiguraton : IEntityTypeConfiguration<Department>
             .HasMaxLength(200);
 
         builder
-            .HasMany<DepartmentOrganizationUnit>()
+            .HasMany<DepartmentOrganizationTree>()
             .WithOne(x => x.Department)
             .HasForeignKey(x => x.DepartmentId);
 
