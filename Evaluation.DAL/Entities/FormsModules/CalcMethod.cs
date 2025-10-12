@@ -6,6 +6,8 @@ public class CalcMethod : BaseEntities
 {
     public string NameAr { get; set; } = null!;
     public string NameEn { get; set; } = null!;
-    public decimal Min { get; set; }
-    public decimal Max { get; set; }
+    public decimal MinPercentage { get; set; }
+    public decimal MaxPercentage { get; set; }
+    public decimal MinWeight { get; set; }
+    public decimal MaxWeight { get; set; }
 }
