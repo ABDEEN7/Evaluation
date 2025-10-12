@@ -5,7 +5,7 @@ using Evaluation.DAL.Entities.Planing;
 
 namespace Evaluation.DAL.Entities.FormsModules;
 
-public class AcademicYearScope : BaseEntities
+public class ScopeAcademicYear : BaseEntities
 {
     public Guid DepartmentId { get; set; }
     public Department? Department { get; set; }

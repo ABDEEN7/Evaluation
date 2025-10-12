@@ -5,9 +5,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Evaluation.DAL.Configurations;
 
-public class AcademicYearScopeConfiguration : IEntityTypeConfiguration<AcademicYearScope>
+public class AcademicYearScopeConfiguration : IEntityTypeConfiguration<ScopeAcademicYear>
 {
-    public void Configure(EntityTypeBuilder<AcademicYearScope> builder)
+    public void Configure(EntityTypeBuilder<ScopeAcademicYear> builder)
     {
         builder
             .HasOne(x => x.Department)

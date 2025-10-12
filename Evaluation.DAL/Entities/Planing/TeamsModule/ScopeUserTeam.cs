@@ -10,5 +10,4 @@ public class ScopeUserTeam : BaseEntities
     public Guid EvaluationFieldId { get; set; }
     public User? User { get; set; }
     public Team? Team { get; set; }
-    public EvaluationDomain? EvaluationField { get; set; }
 }
