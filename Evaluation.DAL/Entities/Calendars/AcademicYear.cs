@@ -3,7 +3,7 @@ using Evaluation.DAL.Entities.Planing;
 using Microsoft.EntityFrameworkCore;
 
 namespace Evaluation.DAL.Entities.Calendars;
-//[Index(nameof(Department,Year), IsUnique = true)]
+[Index(nameof(Department), nameof(Year), IsUnique = true)]
 
 public class AcademicYear : BaseEntities
 {
