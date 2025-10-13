@@ -10,7 +10,7 @@ using Evaluation.DAL.Models.Base;
 using Evaluation.DAL.Models.Audit;
 
 
-namespace Scholarship.DAL.Repositories;
+namespace Evaluation.DAL.Repositories;
 
 public class Repository<T>(DbContext context, UserInfo userInfo) : RepositoryBase<T>(context, userInfo) where T : class, IEntity<Guid>
 {

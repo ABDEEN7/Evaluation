@@ -4,7 +4,7 @@ using System;
 using System.Linq.Expressions;
 using Evaluation.SharedHelper.Helper;
 
-namespace Scholarship.DAL.Repositories
+namespace Evaluation.DAL.Repositories
 {
     public abstract class RepositoryBase<T>(DbContext context, UserInfo userInfo) where T : class
     {

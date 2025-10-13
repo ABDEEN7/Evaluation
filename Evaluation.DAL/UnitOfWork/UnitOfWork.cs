@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Evaluation.DAL.Data;
-using Scholarship.DAL.Repositories;
+using Evaluation.DAL.Repositories;
 using Evaluation.DAL.Models.Base;
 using System.Data;
 using Evaluation.SharedHelper.Helper;

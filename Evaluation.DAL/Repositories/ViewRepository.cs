@@ -2,7 +2,7 @@
 using Evaluation.SharedHelper.Helper;
 using Microsoft.EntityFrameworkCore;
 using System;
-namespace Scholarship.DAL.Repositories
+namespace Evaluation.DAL.Repositories
 
 {
     public class ViewRepository<T>(DbContext context, UserInfo userInfo)
