@@ -1,4 +1,4 @@
-﻿using Evaluation.DAL.Entities.AdminPanel;
+﻿using Evaluation.DAL.Entities.BaseModule;
 using Microsoft.EntityFrameworkCore;
 
 namespace Evaluation.DAL.Entities.Template;

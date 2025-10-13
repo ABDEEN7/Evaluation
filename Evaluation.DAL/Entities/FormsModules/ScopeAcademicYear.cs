@@ -1,5 +1,5 @@
 ﻿using System.Reflection.PortableExecutable;
-using Evaluation.DAL.Entities.AdminPanel;
+using Evaluation.DAL.Entities.BaseModule;
 using Evaluation.DAL.Entities.Calendars;
 using Evaluation.DAL.Entities.Planing;
 

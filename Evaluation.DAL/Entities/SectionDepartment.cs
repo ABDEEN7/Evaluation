@@ -1,4 +1,4 @@
-﻿using Evaluation.DAL.Entities.AdminPanel;
+﻿using Evaluation.DAL.Entities.BaseModule;
 
 namespace Evaluation.DAL.Entities;
 

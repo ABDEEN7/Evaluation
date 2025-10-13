@@ -1,7 +1,7 @@
 ﻿using Evaluation.DAL.Entities.Authentication;
 using Evaluation.DAL.Entities.Generic;
 
-namespace Evaluation.DAL.Entities.AdminPanel;
+namespace Evaluation.DAL.Entities.BaseModule;
 
 public abstract class BaseEntities : IEntity
 {

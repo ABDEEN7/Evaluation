@@ -1,4 +1,4 @@
-﻿using Evaluation.DAL.Entities.AdminPanel;
+﻿using Evaluation.DAL.Entities.BaseModule;
 using Evaluation.DAL.Entities.Calendars;
 
 namespace Evaluation.DAL.Entities.Planing;

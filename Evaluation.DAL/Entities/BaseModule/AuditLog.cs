@@ -1,4 +1,4 @@
-﻿namespace Evaluation.DAL.Entities.AdminPanel;
+﻿namespace Evaluation.DAL.Entities.BaseModule;
 
 public class AuditLog : BaseEntities
 {
