@@ -4,7 +4,7 @@ namespace Evaluation.DAL.Entities;
 
 public class DepartmentRoleAttributeValue : BaseEntities
 {
-    public int DepartmentId { get; set; }
-    public int RoleAttributeId { get; set; }
-    public string Value { get; set; }
+    public Guid DepartmentId { get; set; }
+    public Guid RoleAttributeId { get; set; }
+    public string Value { get; set; } = string.Empty;
 }

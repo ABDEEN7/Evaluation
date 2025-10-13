@@ -6,9 +6,9 @@ namespace Evaluation.DAL.Entities;
 
 public class UserDeparment : BaseEntities // i change the name of DepUser to this name 
 {
-    public int DepartmentId { get; set; }
-    public int UserId { get; set; }
+    public Guid DepartmentId { get; set; }
     public Department? Department { get; set; }
+    public Guid UserId { get; set; }
     public User? User { get; set; }
     
 }

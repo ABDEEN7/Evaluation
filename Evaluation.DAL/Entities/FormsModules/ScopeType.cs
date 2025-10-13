@@ -9,6 +9,6 @@ public class ScopeType
     public int DepartmentId { get; set; }
     public int ParentId { get; set; }
     public int Order { get; set; }
-    public ScopeType Parent { get; set; } = new();
-    public Department Department { get; set; } = new();
+    public ScopeType? Parent { get; set; }
+    public Department? Department { get; set; }
 }

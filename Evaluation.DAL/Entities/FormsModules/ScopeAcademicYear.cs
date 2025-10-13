@@ -13,6 +13,6 @@ public class ScopeAcademicYear : BaseEntities
     public Scope? Scope { get; set; }
     public Guid ParentId { get; set; }
     public Scope? Parent { get; set; }
-    public int AcademicYearId { get; set; }
+    public Guid AcademicYearId { get; set; }
     public AcademicYear AcademicYear { get; set; } = null!;
 }

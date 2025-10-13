@@ -12,7 +12,7 @@ public class DepartmentHoliday : BaseEntities // i change DepartmentDayOff to De
     public bool IsCronExpression { get; set; }
     public string CronExpression { get; set; } = string.Empty;
     public Guid DepartmentId { get; set; }
-    public Guid AcademicYearId { get; set; }
     public Department Department { get; set; } = null!;
+    public Guid AcademicYearId { get; set; }
     public AcademicYear AcademicYear { get; set; } = null!;
 }
