@@ -57,5 +57,4 @@ public class EvaluationDbContext : DbContext
     public DbSet<TemplateDocument> TemplateDocuments { get; set; }
     public DbSet<TemplateGenrationType> TemplateGenrationTypies { get; set; }
     public DbSet<ScopeAcademicYear> ScopeAcademicYears { get; set; }
-
 }
