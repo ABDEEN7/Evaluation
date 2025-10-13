@@ -9,19 +9,19 @@ namespace Evaluation.SharedHelper
     public static class ServiceCollectionExtensions
     {
         #region UnitOfWork Scoped Extensions
-        public static ScopedUnitOfWork CreateScopedUow(this IServiceProvider serviceProvider)
+        public static UnitOfWork CreateScopedUow(this IServiceProvider serviceProvider)
         {
             var scope = serviceProvider.CreateScope();
             return new ScopedUnitOfWork(scope);
         }
 
-        public static ScopedUnitOfWork CreateScopedUow(this IServiceScopeFactory factory)
+        public static UnitOfWork CreateScopedUow(this IServiceScopeFactory factory)
         {
             var scope = factory.CreateScope();
             return new ScopedUnitOfWork(scope);
         }
 
-        public static ScopedUnitOfWork CreateScopedUow(this IServiceScope scope)
+        public static UnitOfWork CreateScopedUow(this IServiceScope scope)
         {
             return new ScopedUnitOfWork(scope);
         }
