@@ -1,5 +1,7 @@
-﻿namespace Evaluation.DAL.Entities.Template;
+﻿using Microsoft.EntityFrameworkCore;
 
+namespace Evaluation.DAL.Entities.Template;
+[Index(nameof(BackendName), IsUnique = true)]
 public class NotificationTemplate
 {
    public string? SubjectAr { get; set; }

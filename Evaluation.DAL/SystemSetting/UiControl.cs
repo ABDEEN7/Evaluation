@@ -1,7 +1,8 @@
 ﻿using Evaluation.DAL.Entities.AdminPanel;
+using Microsoft.EntityFrameworkCore;
 
 namespace Evaluation.DAL.SystemSetting;
-
+[Index(nameof(BackendName), IsUnique = true)]
 public class UiControl : BaseEntities
 {
     public string PageName { get; set; } = null!;

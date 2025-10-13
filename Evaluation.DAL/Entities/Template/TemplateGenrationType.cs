@@ -1,7 +1,8 @@
 ﻿using Evaluation.DAL.Entities.AdminPanel;
+using Microsoft.EntityFrameworkCore;
 
 namespace Evaluation.DAL.Entities.Template;
-
+[Index(nameof(BackendName), IsUnique = true)]
 public class TemplateGenrationType : BaseEntities
 {
     public string TitleAr { get; set; } = null!;
