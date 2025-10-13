@@ -1,7 +1,9 @@
 ﻿using Evaluation.DAL.Entities.AdminPanel;
 using Evaluation.DAL.Entities.Planing;
+using Microsoft.EntityFrameworkCore;
 
 namespace Evaluation.DAL.Entities.Calendars;
+//[Index(nameof(Department,Year), IsUnique = true)]
 
 public class AcademicYear : BaseEntities
 {
@@ -10,6 +12,6 @@ public class AcademicYear : BaseEntities
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
     public int Year { get; set; }
-    public int DepartmentId { get; set; }
+    public Guid DepartmentId { get; set; }
     public Department Department { get; set; } = new();
 }

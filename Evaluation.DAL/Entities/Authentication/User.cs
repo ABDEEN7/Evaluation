@@ -1,6 +1,8 @@
 ﻿using Evaluation.DAL.Entities.AdminPanel;
+using Microsoft.EntityFrameworkCore;
 
 namespace Evaluation.DAL.Entities.Authentication;
+[Index(nameof(QID), IsUnique = true)]
 
 public class User : BaseEntities
 {
@@ -13,6 +15,10 @@ public class User : BaseEntities
     public DateTime? LastLoginDate { get; set; }
     public string PreferredLanguage { get; set; } = null!;
     public string? Mobile { get; set; }
-    public  ICollection<UserPartyType>? UserPartTypes { get; set; } = new List<UserPartyType>();
-    public  ICollection<UserRole>? UserRoles { get; set; } = new List<UserRole>();
+    public string JobTitleEn { get; set; } = null!;
+    public string JobTitleAr { get; set; } = null!;
+    public string JobTitleCode { get; set; } = string.Empty;
+    public string DirectManagerQId { get; set; } = string.Empty;
+    public ICollection<UserPartyType>? UserPartTypes { get; set; } = new List<UserPartyType>();
+    public ICollection<UserRole>? UserRoles { get; set; } = new List<UserRole>();
 }

@@ -12,7 +12,7 @@ public class Plan : BaseEntities
     public Department? Department { get; set; }
     public AcademicYear? AcademicYear { get; set; }
     public DateOnly StartDate { get; set; }
-    public DateOnly EndDateDate { get; set; }
+    public DateOnly EndDate { get; set; }
     public string? ExpectedListJson { get; set; }
     public int PlanStatusId { get; set; }
     public int PlanScheduleId { get; set; }

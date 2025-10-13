@@ -6,8 +6,8 @@ namespace Evaluation.DAL.Entities.FormsModules;
 //هذا التايبل يخزن قيمة المستخدم والبند المقييم
 public class ItemValue : BaseEntities
 {
-    public int ItemId { get; set; }
-    public int UserId { get; set; }
+    public Guid ItemId { get; set; }
+    public Guid UserId { get; set; }
     public Item? Item { get; set; }
     public User? User { get; set; }
     public decimal Value { get; set; }

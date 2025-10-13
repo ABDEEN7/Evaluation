@@ -1,10 +1,13 @@
 ﻿using Evaluation.DAL.Entities.AdminPanel;
+using Microsoft.EntityFrameworkCore;
 
 namespace Evaluation.DAL.Entities.Authentication;
 
+
+[Index(nameof(BackendName), IsUnique = true)]
 public class Permission : BaseEntities
 {
-    public string BackEndName { get; set; }
+    public string BackendName { get; set; } = null!;
     public string? NameAr { get; set; }
     public string? NameEn { get; set; }
     public string? Description { get; set; }

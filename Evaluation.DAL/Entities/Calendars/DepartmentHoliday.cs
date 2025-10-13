@@ -9,6 +9,7 @@ public class DepartmentHoliday : BaseEntities // i change DepartmentDayOff to De
     public string NameEn { get; set; } = null!;
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
+    public bool IsCronExpression { get; set; }
     public string CronExpression { get; set; } = string.Empty;
     public Guid DepartmentId { get; set; }
     public Guid AcademicYearId { get; set; }
