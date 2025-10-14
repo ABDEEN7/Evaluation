@@ -4,7 +4,6 @@ using Evaluation.DAL.Entities.BaseModule;
 using Evaluation.DAL.Entities.Calendars;
 using Evaluation.DAL.Entities.FormsModules;
 using Evaluation.DAL.Entities.Org;
-using Evaluation.DAL.Entities.OrganizationTrees;
 using Evaluation.DAL.Entities.Planing;
 using Evaluation.DAL.Entities.Template;
 using Microsoft.EntityFrameworkCore;
@@ -15,7 +14,7 @@ public partial class EvaluationDbContext : DbContext
 {
     public EvaluationDbContext()
     {
-            
+
     }
     public EvaluationDbContext(DbContextOptions<EvaluationDbContext> options)
         : base(options)
@@ -25,12 +24,7 @@ public partial class EvaluationDbContext : DbContext
     //{
     //    builder.ApplyConfigurationsFromAssembly(typeof(EvaluationDbContext).Assembly);
     //}
-    //protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
-    //{
-    //    configurationBuilder
-    //    .Properties<decimal>()
-    //    .HavePrecision(18, 4);
-    //}
+
     public virtual DbSet<AuditLog> AuditLogs { get; set; }
 
     public virtual DbSet<ControlValidation> ControlValidations { get; set; }
@@ -53,11 +47,10 @@ public partial class EvaluationDbContext : DbContext
     public virtual DbSet<ItemValue> ItemValues { get; set; }
     public virtual DbSet<Scope> Scopes { get; set; }
     public virtual DbSet<ScopeType> ScopeTypes { get; set; }
-    public virtual DbSet<DepartmentOrganizationTree> DepartmentOrganizationTrees { get; set; }
+    public virtual DbSet<DepartmentOrgTree> DepartmentOrgTrees { get; set; }
     public virtual DbSet<Employee> Employees { get; set; }
-    public virtual DbSet<Level> Levels { get; set; }
     public virtual DbSet<Organization> Organizations { get; set; }
-    public virtual DbSet<OrganizationTree> OrganizationTrees { get; set; }
+    public virtual DbSet<OrgTree> OrgTree { get; set; }
     public virtual DbSet<School> Schools { get; set; }
     public virtual DbSet<SchoolType> SchoolTypes { get; set; }
     public virtual DbSet<Department> Departments { get; set; }
@@ -74,4 +67,17 @@ public partial class EvaluationDbContext : DbContext
     public virtual DbSet<TemplateDocument> TemplateDocuments { get; set; }
     public virtual DbSet<TemplateGenrationType> TemplateGenrationTypies { get; set; }
     public virtual DbSet<ScopeAcademicYear> ScopeAcademicYears { get; set; }
+    public virtual DbSet<OrgAcademicYear> OrgAcademicYears { get; set; }
+
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        optionsBuilder.UseSqlServer("Server=DCDCSQL2DNET01;Database=Evaluation;Trust Server Certificate=true;User id=t-m.fatouh-dev;Integrated Security=SSPI;");
+    }
+    protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+    {
+        configurationBuilder
+        .Properties<decimal>()
+        .HavePrecision(18, 4);
+    }
 }

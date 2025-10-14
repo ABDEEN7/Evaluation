@@ -2,7 +2,7 @@
 
 namespace Evaluation.DAL.Entities.Org;
 
-public class Organization : EntityBase
+public class Organization : OrgTree
 {
 
 }

@@ -2,10 +2,8 @@
 
 namespace Evaluation.DAL.Entities.Org;
 
-public class School : EntityBase
+public class School : OrgTree
 {
-    public string NameAr { get; set; } = null!;
-    public string NameEn { get; set; } = null!;
     public DateTime EstablishmentDate { get; set; }
     public string? Address { get; set; }
     public string Code { get; set; } = null!;
