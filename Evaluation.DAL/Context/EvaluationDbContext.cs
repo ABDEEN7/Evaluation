@@ -3,6 +3,7 @@ using Evaluation.DAL.Entities.Authentication;
 using Evaluation.DAL.Entities.BaseModule;
 using Evaluation.DAL.Entities.Calendars;
 using Evaluation.DAL.Entities.FormsModules;
+using Evaluation.DAL.Entities.Org;
 using Evaluation.DAL.Entities.OrganizationTrees;
 using Evaluation.DAL.Entities.Planing;
 using Evaluation.DAL.Entities.Template;
