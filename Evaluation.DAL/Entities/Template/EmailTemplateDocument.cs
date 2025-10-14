@@ -2,7 +2,7 @@
 
 namespace Evaluation.DAL.Entities.Template;
 
-public class EmailTemplateDocument : BaseEntities
+public class EmailTemplateDocument : EntityBase
 {
     public Guid EmailTemplateId { get; set; }
     public EmailTemplate? EmailTemplate { get; set; }

@@ -3,7 +3,7 @@ using Evaluation.DAL.Entities.Authentication;
 
 namespace Evaluation.DAL.Entities.Planing.TeamsModule;
 
-public class ScopeUserTeam : BaseEntities
+public class ScopeUserTeam : EntityBase
 {
     public Guid UserId { get; set; }
     public Guid TeamId { get; set; }

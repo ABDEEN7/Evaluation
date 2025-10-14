@@ -3,7 +3,7 @@ using Evaluation.DAL.Entities.Authentication;
 
 namespace Evaluation.DAL.Entities.Planing;
 
-public class ChangeRequest : BaseEntities
+public class ChangeRequest : EntityBase
 {
     public string NameAr { get; set; } = null!;
     public string NameEn { get; set; } = null!;

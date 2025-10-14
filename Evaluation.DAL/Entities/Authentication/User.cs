@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Evaluation.DAL.Entities.Authentication;
 [Index(nameof(QID), IsUnique = true)]
 
-public class User : BaseEntities
+public class User : EntityBase
 {
     public string QID { get; set; } = null!;
     public string Type { get; set; } = null!;

@@ -2,7 +2,7 @@
 
 namespace Evaluation.DAL.Entities.Authentication;
 
-public class UserRole : BaseEntities
+public class UserRole : EntityBase
 {
     public Guid UserId { get; set; }
     public User? User { get; set; }

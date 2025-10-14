@@ -3,7 +3,7 @@ using Evaluation.DAL.Entities.OrganizationTrees;
 
 namespace Evaluation.DAL.Entities.Planing;
 
-public class ChangeRequestDetail : BaseEntities
+public class ChangeRequestDetail : EntityBase
 {
     public int ChangeRequestId { get; set; }
     public ChangeRequest ChangeRequest { get; set; } = new();

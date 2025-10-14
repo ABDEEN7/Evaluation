@@ -3,7 +3,7 @@ using Evaluation.DAL.Entities.Calendars;
 
 namespace Evaluation.DAL.Entities.Planing;
 
-public class Plan : BaseEntities
+public class Plan : EntityBase
 {
     public required string NameAr { get; set; }
     public required string NameEn { get; set; }

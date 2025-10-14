@@ -2,7 +2,7 @@
 
 namespace Evaluation.DAL.Entities.OrganizationTrees;
 
-public class OrganizationTree : BaseEntities
+public class OrganizationTree : EntityBase
 {
     public string NameAr { get; set; } = null!;
     public string NameEn { get; set; } = null!;

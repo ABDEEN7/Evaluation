@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Evaluation.DAL.SystemSetting;
 [Index(nameof(BackendName), IsUnique = true)]
-public class UiControl : BaseEntities
+public class UiControl : EntityBase
 {
     public string PageName { get; set; } = null!;
     public string UserUiname { get; set; } = null!;

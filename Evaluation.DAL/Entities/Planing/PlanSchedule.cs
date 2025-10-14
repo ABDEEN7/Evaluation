@@ -3,7 +3,7 @@ using Evaluation.DAL.Entities.OrganizationTrees;
 
 namespace Evaluation.DAL.Entities.Planing;
 
-public class PlanSchedule : BaseEntities
+public class PlanSchedule : EntityBase
 {
     public int PlanId { get; set; }
     public int SchoolId { get; set; }

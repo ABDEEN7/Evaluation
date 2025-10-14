@@ -3,7 +3,7 @@ using Evaluation.DAL.Entities.Planing;
 
 namespace Evaluation.DAL.Entities.Calendars;
 
-public class PlanTypeDepartment : BaseEntities
+public class PlanTypeDepartment : EntityBase
 {
     public Guid PlanTypeId { get; set; }
     public PlanType? PlanType { get; set; }

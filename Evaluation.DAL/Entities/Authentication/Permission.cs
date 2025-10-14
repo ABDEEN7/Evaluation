@@ -5,7 +5,7 @@ namespace Evaluation.DAL.Entities.Authentication;
 
 
 [Index(nameof(BackendName), IsUnique = true)]
-public class Permission : BaseEntities
+public class Permission : EntityBase
 {
     public string BackendName { get; set; } = null!;
     public string? NameAr { get; set; }

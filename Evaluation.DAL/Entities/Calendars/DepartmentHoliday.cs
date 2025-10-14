@@ -3,7 +3,7 @@ using Evaluation.DAL.Entities.Planing;
 
 namespace Evaluation.DAL.Entities.Calendars;
 
-public class DepartmentHoliday : BaseEntities // i change DepartmentDayOff to DepartmentHolidays
+public class DepartmentHoliday : EntityBase // i change DepartmentDayOff to DepartmentHolidays
 {
     public string NameAr { get; set; } = null!;
     public string NameEn { get; set; } = null!;

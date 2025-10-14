@@ -3,7 +3,7 @@ using Evaluation.DAL.Entities.Generic;
 
 namespace Evaluation.DAL.Entities.BaseModule;
 
-public abstract class BaseEntities : IEntity
+public abstract class EntityBase : IEntity
 {
     public Guid Id { get; set; } = Guid.NewGuid();
     public bool? IsActive { get; set; }

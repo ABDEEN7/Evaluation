@@ -2,7 +2,7 @@
 
 namespace Evaluation.DAL.Entities.FormsModules;
 
-public class FormScope : BaseEntities
+public class FormScope : EntityBase
 {
     public Guid FormId { get; set; }
     public Guid ScopeId { get; set; }

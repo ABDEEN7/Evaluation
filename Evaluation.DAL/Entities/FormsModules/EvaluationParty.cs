@@ -3,7 +3,7 @@ using Evaluation.DAL.Entities.Planing;
 
 namespace Evaluation.DAL.Entities.FormsModules;
 
-public class EvaluationParty : BaseEntities
+public class EvaluationParty : EntityBase
 {
     public string NameAr { get; set; } = null!;
     public string NameEn { get; set; } = null!;

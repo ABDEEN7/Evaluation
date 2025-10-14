@@ -3,7 +3,7 @@ using Evaluation.DAL.Entities.Planing;
 
 namespace Evaluation.DAL.Entities.OrganizationTrees;
 
-public class DepartmentOrganizationTree : BaseEntities
+public class DepartmentOrganizationTree : EntityBase
 {
     public Guid DepartmentId { get; set; }
     public Guid OrganizationTreeId { get; set; }

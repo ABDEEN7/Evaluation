@@ -2,7 +2,7 @@
 
 namespace Evaluation.DAL.Entities.Authentication;
 
-public class Role : BaseEntities
+public class Role : EntityBase
 {
     public required string NameAr { get; set; }
     public required string NameEn { get; set; }

@@ -2,7 +2,7 @@
 
 namespace Evaluation.DAL.Entities.Authentication;
 
-public class RolePermission : BaseEntities
+public class RolePermission : EntityBase
 {
     public Guid RoleId { get; set; }
     public Role? Role { get; set; }

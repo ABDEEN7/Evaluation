@@ -2,7 +2,7 @@
 
 namespace Evaluation.DAL.Entities.OrganizationTrees;
 
-public class SchoolLevel : BaseEntities
+public class SchoolLevel : EntityBase
 {
     public int SchoolId { get; set; }
     public School School { get; set; } = null!;

@@ -2,7 +2,7 @@
 
 namespace Evaluation.DAL.Entities;
 
-public class DepartmentRoleAttributeValue : BaseEntities
+public class DepartmentRoleAttributeValue : EntityBase
 {
     public Guid DepartmentId { get; set; }
     public Guid RoleAttributeId { get; set; }

@@ -2,7 +2,7 @@
 
 namespace Evaluation.DAL.Entities;
 
-public class SectionDepartment : BaseEntities
+public class SectionDepartment : EntityBase
 {
     public int SectionId { get; set; }
     public int DepartmentId { get; set; }

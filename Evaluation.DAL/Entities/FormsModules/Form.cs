@@ -2,7 +2,7 @@
 
 namespace Evaluation.DAL.Entities.FormsModules;
 
-public class Form : BaseEntities
+public class Form : EntityBase
 {
     public string NameAr { get; set; } = null!;
     public  string NameEn { get; set; } = null!;

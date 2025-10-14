@@ -2,7 +2,7 @@
 
 namespace Evaluation.DAL.Entities.Planing;
 
-public class Department : BaseEntities
+public class Department : EntityBase
 {
     public string NameAr { get; set; } = null!;
     public string NameEn { get; set; } = null!;

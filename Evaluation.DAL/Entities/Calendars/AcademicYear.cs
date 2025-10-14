@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Evaluation.DAL.Entities.Calendars;
 [Index(nameof(Department), nameof(Year), IsUnique = true)]
 
-public class AcademicYear : BaseEntities
+public class AcademicYear : EntityBase
 {
     public string NameAr { get; set; } = null!;
     public string NameEn { get; set; } = null!;

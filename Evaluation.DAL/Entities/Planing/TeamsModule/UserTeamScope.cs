@@ -2,7 +2,7 @@
 
 namespace Evaluation.DAL.Entities.Planing.TeamsModule;
 
-public class UserTeamScope : BaseEntities
+public class UserTeamScope : EntityBase
 {
     public Guid TeamId { get; set; }
     public Guid UserId { get; set; }
