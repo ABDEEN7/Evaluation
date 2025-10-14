@@ -1,5 +1,5 @@
 ﻿using Evaluation.DAL.Entities.BaseModule;
-using Evaluation.DAL.Entities.OrganizationTrees;
+using Evaluation.DAL.Entities.Org;
 
 namespace Evaluation.DAL.Entities.Planing;
 

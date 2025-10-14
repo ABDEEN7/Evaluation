@@ -1,7 +1,7 @@
 ﻿using Evaluation.DAL.Entities.BaseModule;
 using Evaluation.DAL.Entities.Planing;
 
-namespace Evaluation.DAL.Entities.OrganizationTrees;
+namespace Evaluation.DAL.Entities.Org;
 
 public class DepartmentOrganizationTree : EntityBase
 {
