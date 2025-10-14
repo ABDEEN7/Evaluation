@@ -1,5 +1,5 @@
-﻿using Evaluation.DAL.Entities.BaseModule;
-using Evaluation.DAL.Entities.Authentication;
+﻿using Evaluation.DAL.Entities.Authentication;
+using Evaluation.DAL.Entities.BaseModule;
 using Evaluation.DAL.Entities.Calendars;
 using Evaluation.DAL.Entities.FormsModules;
 using Evaluation.DAL.Entities.OrganizationTrees;
@@ -14,6 +14,12 @@ public class EvaluationDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder builder)
     {
         builder.ApplyConfigurationsFromAssembly(typeof(EvaluationDbContext).Assembly);
+    }
+    protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+    {
+        configurationBuilder
+        .Properties<decimal>()
+        .HavePrecision(18, 4);
     }
     public DbSet<AuditLog> AuditLogs { get; set; }
     public DbSet<ControlValidation> ControlValidations { get; set; }
