@@ -1,4 +1,5 @@
-﻿using Evaluation.DAL.Entities.Authentication;
+﻿using Evaluation.DAL.Entities.Audit;
+using Evaluation.DAL.Entities.Authentication;
 using Evaluation.DAL.Entities.BaseModule;
 using Evaluation.DAL.Entities.Calendars;
 using Evaluation.DAL.Entities.FormsModules;
@@ -9,58 +10,67 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Evaluation.DAL.Context;
 
-public class EvaluationDbContext : DbContext
+public partial class EvaluationDbContext : DbContext
 {
-    protected override void OnModelCreating(ModelBuilder builder)
+    public EvaluationDbContext()
     {
-        builder.ApplyConfigurationsFromAssembly(typeof(EvaluationDbContext).Assembly);
+            
     }
-    protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+    public EvaluationDbContext(DbContextOptions<EvaluationDbContext> options)
+        : base(options)
     {
-        configurationBuilder
-        .Properties<decimal>()
-        .HavePrecision(18, 4);
     }
-    public DbSet<AuditLog> AuditLogs { get; set; }
-    public DbSet<ControlValidation> ControlValidations { get; set; }
-    public DbSet<Page> Pages { get; set; }
-    public DbSet<PagePermission> PagePermissions { get; set; }
-    public DbSet<PartyType> PartyTypes { get; set; }
-    public DbSet<Permission> Permissions { get; set; }
-    public DbSet<Role> Roles { get; set; }
-    public DbSet<RolePermission> RolePermissions { get; set; }
-    public DbSet<User> Users { get; set; }
-    public DbSet<UserPartyType> UserPartyTypes { get; set; }
-    public DbSet<UserPartyTypeSignature> UserPartyTypeSignatures { get; set; }
-    public DbSet<UserRole> UserRoles { get; set; }
-    public DbSet<AcademicYear> AcademicYears { get; set; }
-    public DbSet<CalcMethod> CalcMethods { get; set; }
-    public DbSet<EvaluationParty> EvaluationParties { get; set; }
-    public DbSet<Form> Forms { get; set; }
-    public DbSet<FormScope> FormScopes { get; set; }
-    public DbSet<Item> Items { get; set; }
-    public DbSet<ItemValue> ItemValues { get; set; }
-    public DbSet<Scope> Scopes { get; set; }
-    public DbSet<ScopeType> ScopeTypes { get; set; }
-    public DbSet<DepartmentOrganizationTree> DepartmentOrganizationTrees { get; set; }
-    public DbSet<Employee> Employees { get; set; }
-    public DbSet<Level> Levels { get; set; }
-    public DbSet<Organization> Organizations { get; set; }
-    public DbSet<OrganizationTree> OrganizationTrees { get; set; }
-    public DbSet<School> Schools { get; set; }
-    public DbSet<SchoolType> SchoolTypes { get; set; }
-    public DbSet<Department> Departments { get; set; }
-    public DbSet<OrganizationType> OrganizationTypes { get; set; }
-    public DbSet<Plan> Plans { get; set; }
-    public DbSet<PlanSchedule> PlanSchedules { get; set; }
-    public DbSet<PlanStatus> PlanStatuses { get; set; }
-    public DbSet<EmailTemplate> EmailTemplates { get; set; }
-    public DbSet<EmailTemplateDocument> EmailTemplateDocuments { get; set; }
-    public DbSet<Notification> Notifications { get; set; }
-    public DbSet<NotificationTemplate> NotificationTemplates { get; set; }
-    public DbSet<SMSProfile> SMSProfiles { get; set; }
-    public DbSet<SMSTemplate> SMSTemplates { get; set; }
-    public DbSet<TemplateDocument> TemplateDocuments { get; set; }
-    public DbSet<TemplateGenrationType> TemplateGenrationTypies { get; set; }
-    public DbSet<ScopeAcademicYear> ScopeAcademicYears { get; set; }
+    //protected override void OnModelCreating(ModelBuilder builder)
+    //{
+    //    builder.ApplyConfigurationsFromAssembly(typeof(EvaluationDbContext).Assembly);
+    //}
+    //protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+    //{
+    //    configurationBuilder
+    //    .Properties<decimal>()
+    //    .HavePrecision(18, 4);
+    //}
+    public virtual DbSet<AuditLog> AuditLogs { get; set; }
+
+    public virtual DbSet<ControlValidation> ControlValidations { get; set; }
+    public virtual DbSet<Page> Pages { get; set; }
+    public virtual DbSet<PagePermission> PagePermissions { get; set; }
+    public virtual DbSet<PartyType> PartyTypes { get; set; }
+    public virtual DbSet<Permission> Permissions { get; set; }
+    public virtual DbSet<Role> Roles { get; set; }
+    public virtual DbSet<RolePermission> RolePermissions { get; set; }
+    public virtual DbSet<User> Users { get; set; }
+    public virtual DbSet<UserPartyType> UserPartyTypes { get; set; }
+    public virtual DbSet<UserPartyTypeSignature> UserPartyTypeSignatures { get; set; }
+    public virtual DbSet<UserRole> UserRoles { get; set; }
+    public virtual DbSet<AcademicYear> AcademicYears { get; set; }
+    public virtual DbSet<CalcMethod> CalcMethods { get; set; }
+    public virtual DbSet<EvaluationParty> EvaluationParties { get; set; }
+    public virtual DbSet<Form> Forms { get; set; }
+    public virtual DbSet<FormScope> FormScopes { get; set; }
+    public virtual DbSet<Item> Items { get; set; }
+    public virtual DbSet<ItemValue> ItemValues { get; set; }
+    public virtual DbSet<Scope> Scopes { get; set; }
+    public virtual DbSet<ScopeType> ScopeTypes { get; set; }
+    public virtual DbSet<DepartmentOrganizationTree> DepartmentOrganizationTrees { get; set; }
+    public virtual DbSet<Employee> Employees { get; set; }
+    public virtual DbSet<Level> Levels { get; set; }
+    public virtual DbSet<Organization> Organizations { get; set; }
+    public virtual DbSet<OrganizationTree> OrganizationTrees { get; set; }
+    public virtual DbSet<School> Schools { get; set; }
+    public virtual DbSet<SchoolType> SchoolTypes { get; set; }
+    public virtual DbSet<Department> Departments { get; set; }
+    public virtual DbSet<OrganizationType> OrganizationTypes { get; set; }
+    public virtual DbSet<Plan> Plans { get; set; }
+    public virtual DbSet<PlanSchedule> PlanSchedules { get; set; }
+    public virtual DbSet<PlanStatus> PlanStatuses { get; set; }
+    public virtual DbSet<EmailTemplate> EmailTemplates { get; set; }
+    public virtual DbSet<EmailTemplateDocument> EmailTemplateDocuments { get; set; }
+    public virtual DbSet<Notification> Notifications { get; set; }
+    public virtual DbSet<NotificationTemplate> NotificationTemplates { get; set; }
+    public virtual DbSet<SMSProfile> SMSProfiles { get; set; }
+    public virtual DbSet<SMSTemplate> SMSTemplates { get; set; }
+    public virtual DbSet<TemplateDocument> TemplateDocuments { get; set; }
+    public virtual DbSet<TemplateGenrationType> TemplateGenrationTypies { get; set; }
+    public virtual DbSet<ScopeAcademicYear> ScopeAcademicYears { get; set; }
 }
