@@ -12,10 +12,7 @@ namespace Evaluation.DAL.Context;
 
 public partial class EvaluationDbContext : DbContext
 {
-    public EvaluationDbContext()
-    {
 
-    }
     public EvaluationDbContext(DbContextOptions<EvaluationDbContext> options)
         : base(options)
     {
