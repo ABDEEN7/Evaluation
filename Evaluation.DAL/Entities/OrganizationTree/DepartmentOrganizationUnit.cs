@@ -1,5 +1,5 @@
-﻿using Evaluation.DAL.Entities.AdminPanel;
-using Evaluation.DAL.Entities.Planing;
+﻿using Evaluation.DAL.Entities.Base;
+using Evaluation.DAL.Entities.DepartementEntites;
 
 namespace Evaluation.DAL.Entities.OrganizationTree;
 

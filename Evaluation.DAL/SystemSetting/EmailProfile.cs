@@ -1,9 +1,12 @@
-﻿namespace Evaluation.DAL.SystemSetting;
+﻿using Microsoft.EntityFrameworkCore;
 
+namespace Evaluation.DAL.SystemSetting;
+
+[Index(nameof(BackendName), IsUnique = true)]
 public class EmailProfile
 {
-    public string SenderAddress { get; set; }
-    public string SenderDisplayName { get; set; }
+    public string SenderAddress { get; set; } = null!;
+    public string SenderDisplayName { get; set; } = string.Empty;
     public string UserName { get; set; } = null!;
     public string Password { get; set; } = null!;
     public string Host { get; set; } = null!;

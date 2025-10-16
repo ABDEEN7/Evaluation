@@ -1,8 +1,8 @@
-﻿using Evaluation.DAL.Entities.AdminPanel;
+﻿using Evaluation.DAL.Entities.Base;
 
 namespace Evaluation.DAL.SystemSetting;
 
-public class SystemSetting : BaseEntities
+public class SystemSetting : EntityBase
 {
     public string SettingGroup { get; set; } = null!;
     public string SettingKey { get; set; } = null!;

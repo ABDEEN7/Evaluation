@@ -1,10 +1,10 @@
-﻿using Evaluation.DAL.Entities.AdminPanel;
+﻿using Evaluation.DAL.Entities.Base;
 
 namespace Evaluation.DAL.Entities.Template;
-
-public class TemplateGenrationType : BaseEntities
+[Index(nameof(BackendName), IsUnique = true)]
+public class TemplateGenrationType : EntityBase
 {
-    public string TitleAr { get; set; }
-    public string TitleEn { get; set; }
-    public string BackendName { get; set; }
+    public string TitleAr { get; set; } = null!;
+    public string TitleEn { get; set; } = null!;
+    public string BackendName { get; set; } = null!;
 }

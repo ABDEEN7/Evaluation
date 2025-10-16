@@ -1,5 +1,7 @@
-﻿namespace Evaluation.DAL.Entities.Template;
+﻿using Microsoft.EntityFrameworkCore;
 
+namespace Evaluation.DAL.Entities.Template;
+[Index(nameof(BackendName), IsUnique = true)]
 public class EmailTemplate
 {
     public string TitleAr { get; set; } = null!;
@@ -15,5 +17,5 @@ public class EmailTemplate
     //public Service? Service { get; set; }
 
     public string? FielsFromRequest { get; set; }
-    public string? FielsFromScholarship { get; set; }
+    public string? FielsFromEvaluation { get; set; }
 }

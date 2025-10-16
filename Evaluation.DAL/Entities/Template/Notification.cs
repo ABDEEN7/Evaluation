@@ -19,7 +19,7 @@ public class Notification
 
 
     public Guid UserId { get; set; }
-    public User User { get; set; }
+    public User? User { get; set; }
     public DateTime? FirstReadDate { get; set; }
     public DateTime? LastReadDate { get; set; }
 }

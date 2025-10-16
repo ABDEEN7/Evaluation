@@ -1,4 +1,7 @@
-﻿namespace Evaluation.DAL.SystemSetting;
+﻿using Microsoft.EntityFrameworkCore;
+
+namespace Evaluation.DAL.SystemSetting;
+[Index(nameof(BackendName), IsUnique = true)]
 
 public class SMSProfile
 {
