@@ -9,7 +9,7 @@ public class Scope : EntityBase
     public string NameEn { get; set; } = null!;
     public Guid DepartmentId { get; set; }
     public Department? Department { get; set; }
-    public Guid ScopeClassId { get; set; }
-    public ScopeClass? ScopeType { get; set; }
+    public Guid ScopeTypeId { get; set; }
+    public ScopeType? ScopeType { get; set; }
     public int OrderNo { get; set; }
 }

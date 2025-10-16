@@ -2,8 +2,9 @@
 
 namespace Evaluation.DAL.Entities.Planing.TeamsModule;
 
-public class UserTeam : EntityBase
+public class RequestAssign: EntityBase
 {
-    public Guid TeamId { get; set; }
+    public Guid RequestId { get; set; }
     public Guid UserId { get; set; }
+    public bool IsLeader { get; set; }
 }

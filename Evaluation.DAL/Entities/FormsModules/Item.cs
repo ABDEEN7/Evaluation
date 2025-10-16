@@ -2,7 +2,6 @@
 
 namespace Evaluation.DAL.Entities.FormsModules;
 
-// i change the name of FormScopeItem to Item to more clearly 
 public class Item : EntityBase
 {
     public string NameAr { get; set; } = null!;

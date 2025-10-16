@@ -14,4 +14,7 @@ public class Form : EntityBase
     public bool HasEvaluation { get; set; }
     public Guid CalcMethodId { get; set; }
     public CalcMethod? CalcMethod { get; set; }
+    public FormStatus? FormStatus { get; set; } 
+    public Guid FormStatusId { get; set; }
+
 }

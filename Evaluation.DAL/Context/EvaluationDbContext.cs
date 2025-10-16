@@ -43,7 +43,7 @@ public partial class EvaluationDbContext : DbContext
     public virtual DbSet<Item> Items { get; set; }
     public virtual DbSet<ItemValue> ItemValues { get; set; }
     public virtual DbSet<Scope> Scopes { get; set; }
-    public virtual DbSet<ScopeClass> ScopeTypes { get; set; }
+    public virtual DbSet<ScopeType> ScopeTypes { get; set; }
     public virtual DbSet<DepartmentOrgTree> DepartmentOrgTrees { get; set; }
     public virtual DbSet<Employee> Employees { get; set; }
     public virtual DbSet<Organization> Organizations { get; set; }
