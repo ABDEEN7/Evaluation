@@ -1,5 +1,6 @@
-﻿using Evaluation.DAL.Models.Audit;
-using Evaluation.DAL.Models.Exceptions;
+﻿
+using Evaluation.DAL.Entities.Audit;
+using Evaluation.DAL.Entities.Exception;
 using Evaluation.SharedHelper;
 using Evaluation.SharedHelper.Enums;
 using Microsoft.Extensions.DependencyInjection;

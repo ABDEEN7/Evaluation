@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Evaluation.DAL.Data;
 using Evaluation.DAL.Repositories;
-using Evaluation.DAL.Models.Base;
+using Evaluation.DAL.Entities.BaseModule;
 using System.Data;
 using Evaluation.SharedHelper.Helper;
 using Evaluation.DAL.Exceptions;

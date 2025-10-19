@@ -1,4 +1,4 @@
-﻿using Evaluation.DAL.Models.Base;
+﻿using Evaluation.DAL.Entities.BaseModule;
 using Evaluation.DAL.UnitOfWork;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Enums;

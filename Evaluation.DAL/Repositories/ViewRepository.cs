@@ -1,4 +1,5 @@
-﻿using Evaluation.DAL.Models.Base;
+﻿
+using Evaluation.DAL.Entities.BaseModule;
 using Evaluation.SharedHelper.Helper;
 using Microsoft.EntityFrameworkCore;
 using System;

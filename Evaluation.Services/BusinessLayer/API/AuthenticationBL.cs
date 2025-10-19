@@ -1,8 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Runtime.Intrinsics.Arm;
 using System.Security.Claims;
-using Evaluation.DAL.Models.Authentication;
-using Evaluation.DAL.Models.Base;
+using Evaluation.DAL.Entities.Authentication;
 using Evaluation.DAL.UnitOfWork;
 using Evaluation.Services.BusinessLayer.API;
 using Evaluation.Services.Special;
@@ -65,7 +64,7 @@ public class AuthenticationBL : ApiBase
 
         // 3. Verify user exists in the MinistryUser table
         using var uow = serviceScopeFactory.CreateScopedUow();
-        var ministryUser = await uow.GetRepository<MinistryUser>()
+        var ministryUser = await uow.GetRepository<User>()
             .GetAllActiveNonDeleted(x => x.Email == email)
             .FirstOrDefaultAsync()
             ?? throw new BusinessException(ConstantKeys.ExceptionMessage.NoMinistryUserFound);
@@ -103,7 +102,7 @@ public class AuthenticationBL : ApiBase
         using var uow = serviceScopeFactory.CreateScopedUow();
 
         // 2. Find the user
-        var ministryUser = await uow.GetRepository<MinistryUser>()
+        var ministryUser = await uow.GetRepository<User>()
             .GetAllActiveNonDeleted(x => x.Email == email)
             .FirstOrDefaultAsync()
             ?? throw new BusinessException(ConstantKeys.ExceptionMessage.NoMinistryUserFound);
@@ -128,7 +127,7 @@ public class AuthenticationBL : ApiBase
 
         var entity = new UserToken
         {
-            UserProfileId = userId,
+            UserId = userId,
             Token = token,
             UserAgent = _requestInfo.UserAgent,
             IP = _requestInfo.UserIp,
@@ -150,7 +149,7 @@ public class AuthenticationBL : ApiBase
 
         var entity = await uow.GetRepository<UserToken>()
             .GetAllActiveNonDeleted()
-            .Where(x => x.Token == token && x.UserProfileId == userInfo.UserId)
+            .Where(x => x.Token == token && x.UserId == userInfo.UserId)
             .FirstOrDefaultAsync();
 
         if (entity != null)
@@ -190,24 +189,24 @@ public class AuthenticationBL : ApiBase
     {
         using var uow = serviceScopeFactory.CreateScopedUow();
 
-        var log = new UserProfileLoginLog
+        var log = new UserLoginLog
         {
-            UserProfileId = userId,
+            UserId = userId,
             IP = _requestInfo.UserIp,
             UserAgent = _requestInfo.UserAgent,
             CreateById = userId
         };
 
-        await uow.GetRepository<UserProfileLoginLog>().InsertAsync(log);
+        await uow.GetRepository<UserLoginLog>().InsertAsync(log);
 
-        var profile = await uow.GetRepository<UserProfile>()
+        var profile = await uow.GetRepository<User>()
             .GetAllActiveNonDeleted(x => x.Id == userId)
             .FirstOrDefaultAsync();
 
         if (profile != null)
         {
             profile.LastLoginDate = DateTime.Now;
-            uow.GetRepository<UserProfile>().Update(profile);
+            uow.GetRepository<User>().Update(profile);
         }
 
         await uow.CommitAsync();
@@ -217,15 +216,15 @@ public class AuthenticationBL : ApiBase
 
     #region ?? Helpers
 
-    private Dictionary<string, string> GenerateClaimsForUserProfile(UserProfile user, UserType userType)
+    private Dictionary<string, string> GenerateClaimsForUserProfile(User user, UserType userType)
     {
         return new()
         {
             [UserProfileClaim.UserType.ToString()] = userType.ToString(),
             [UserProfileClaim.UserId.ToString()] = user.Id.ToString(),
             [UserProfileClaim.Email.ToString()] = user.Email ?? "",
-            [UserProfileClaim.FullNameAr.ToString()] = user.FullNameAr ?? "",
-            [UserProfileClaim.FullNameEn.ToString()] = user.FullNameEn ?? "",
+            [UserProfileClaim.FullNameAr.ToString()] = user.NameAr ?? "",
+            [UserProfileClaim.FullNameEn.ToString()] = user.NameEn ?? "",
             [UserProfileClaim.Mobile.ToString()] = user.Mobile ?? "",
             [UserProfileClaim.PreferredLang.ToString()] = user.PreferredLanguage ?? "",
             [UserProfileClaim.LastLogin.ToString()] = user.LastLoginDate?.ToString() ?? "",

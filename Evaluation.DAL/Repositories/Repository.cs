@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Evaluation.SharedHelper.Helper;
-using Evaluation.DAL.Models.Base;
-using Evaluation.DAL.Models.Audit;
+using Evaluation.DAL.Entities.Audit;
+using Evaluation.DAL.Entities.BaseModule;
+
 
 
 namespace Evaluation.DAL.Repositories;
