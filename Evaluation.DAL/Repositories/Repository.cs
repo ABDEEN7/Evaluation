@@ -1,18 +1,20 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System;
-using System.Linq.Expressions;
-using System.Threading.Tasks;
+﻿using Evaluation.DAL.Entities.Audit;
+using Evaluation.DAL.Entities.BaseModule;
+using Evaluation.DAL.Entities.Generic;
+using Evaluation.SharedHelper.Helper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Evaluation.SharedHelper.Helper;
-using Evaluation.DAL.Models.Base;
-using Evaluation.DAL.Models.Audit;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Threading.Tasks;
+
 
 
 namespace Evaluation.DAL.Repositories;
 
-public class Repository<T>(DbContext context, UserInfo userInfo) : RepositoryBase<T>(context, userInfo) where T : class, IEntity<Guid>
+public class Repository<T>(DbContext context, UserInfo userInfo) : RepositoryBase<T>(context, userInfo) where T : class, IEntity
 {
     #region Get Methods
     public IQueryable<T> GetAllActiveNonDeleted(Expression<Func<T, bool>>? filter = null,

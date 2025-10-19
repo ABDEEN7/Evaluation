@@ -34,7 +34,7 @@ public partial class EvaluationDbContext : DbContext
     public virtual DbSet<Permission> Permissions { get; set; }
     public virtual DbSet<Role> Roles { get; set; }
     public virtual DbSet<RolePermission> RolePermissions { get; set; }
-    public virtual DbSet<User> Users { get; set; }
+    public virtual DbSet<MinistryUser> MinistryUsers { get; set; }
     public virtual DbSet<UserPartyType> UserPartyTypes { get; set; }
     public virtual DbSet<UserPartyTypeSignature> UserPartyTypeSignatures { get; set; }
     public virtual DbSet<UserRole> UserRoles { get; set; }
@@ -68,6 +68,7 @@ public partial class EvaluationDbContext : DbContext
     public virtual DbSet<TemplateGenrationType> TemplateGenrationTypies { get; set; }
     public virtual DbSet<ScopeAcademicYear> ScopeAcademicYears { get; set; }
     public virtual DbSet<OrgAcademicYear> OrgAcademicYears { get; set; }
+    public virtual DbSet<UserLoginLog> UserLoginLogs { get; set; }
 
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

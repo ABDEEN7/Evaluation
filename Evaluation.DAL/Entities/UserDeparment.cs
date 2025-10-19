@@ -11,6 +11,6 @@ public class UserDeparment : EntityBase // i change the name of DepUser to this 
     public Guid DepartmentId { get; set; }
     public Department? Department { get; set; }
     public Guid UserId { get; set; }
-    public User? User { get; set; }
+    public MinistryUser? User { get; set; }
     
 }

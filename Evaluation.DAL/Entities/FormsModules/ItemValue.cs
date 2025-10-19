@@ -10,6 +10,6 @@ public class ItemValue : EntityBase
     public Guid ItemId { get; set; }
     public Guid UserId { get; set; }
     public Item? Item { get; set; }
-    public User? User { get; set; }
+    public MinistryUser? User { get; set; }
     public decimal Value { get; set; }
 }

@@ -17,6 +17,6 @@ namespace Evaluation.DAL.Entities.Authentication
         public string? UserAgent { get; set; }
         public string? IP { get; set; }
         public Guid UserId { get; set; }
-        public User? User { get; set; }
+        public MinistryUser? User { get; set; }
     }
 }
