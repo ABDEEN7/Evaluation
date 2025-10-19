@@ -1,9 +1,13 @@
-﻿namespace Evaluation.DAL.Entities.Planing.TeamsModule;
+﻿using System.ComponentModel;
+using Evaluation.DAL.Entities.BaseModule;
+using Evaluation.DAL.Entities.DepartementEntites;
 
-public class Team //I chaneg the name of DepEvalTeams to team
+namespace Evaluation.DAL.Entities.Planing.TeamsModule;
+
+public class Team : EntityBase
 {
-    public int Id { get; set; }
     public string NameAr { get; set; } = null!;
     public string NameEn { get; set; } = null!;
     public Guid DepartmentId { get; set; }
+    public Department? Department { get; set; }
 }
