@@ -1,4 +1,5 @@
-﻿using Evaluation.DAL.Entities.Base;
+﻿using Evaluation.DAL.Entities.BaseModule;
+using Microsoft.EntityFrameworkCore;
 
 namespace Evaluation.DAL.Entities.Template;
 [Index(nameof(BackendName), IsUnique = true)]

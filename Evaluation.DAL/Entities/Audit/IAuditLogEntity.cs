@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Evaluation.DAL.Entities.Audit
 {
-    public interface IAuditLogEntity
-    {
+public interface IAuditLogEntity
+{
 
-    }
+}
 
 }

@@ -1,4 +1,5 @@
 ﻿using System.Reflection.PortableExecutable;
+using Evaluation.DAL.Entities.BaseModule;
 using Evaluation.DAL.Entities.Authentication;
 using Evaluation.DAL.Entities.Base;
 

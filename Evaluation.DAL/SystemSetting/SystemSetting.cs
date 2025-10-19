@@ -1,4 +1,4 @@
-﻿using Evaluation.DAL.Entities.Base;
+﻿using Evaluation.DAL.Entities.BaseModule;
 
 namespace Evaluation.DAL.SystemSetting;
 

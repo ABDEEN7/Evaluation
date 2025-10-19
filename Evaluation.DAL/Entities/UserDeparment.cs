@@ -1,4 +1,6 @@
-﻿using Evaluation.DAL.Entities.Authentication;
+﻿using Evaluation.DAL.Entities.BaseModule;
+using Evaluation.DAL.Entities.Authentication;
+using Evaluation.DAL.Entities.Planing;
 using Evaluation.DAL.Entities.Base;
 using Evaluation.DAL.Entities.DepartementEntites;
 

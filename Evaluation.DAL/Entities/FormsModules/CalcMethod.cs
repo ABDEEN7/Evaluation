@@ -1,11 +1,16 @@
-﻿using Evaluation.DAL.Entities.Base;
+﻿using Evaluation.DAL.Entities.BaseModule;
+using Evaluation.DAL.Entities.Planing;
 
 namespace Evaluation.DAL.Entities.FormsModules;
 
-public class CalcMethod : BaseEntities
+public class CalcMethod : EntityBase
 {
     public string NameAr { get; set; } = null!;
     public string NameEn { get; set; } = null!;
-    public decimal Min { get; set; }
-    public decimal Max { get; set; }
+    public decimal MinPercentage { get; set; }
+    public decimal MaxPercentage { get; set; }
+    public decimal MinWeight { get; set; }
+    public decimal MaxWeight { get; set; }
+    public Guid DepartmentId { get; set; }
+    public Department? Department { get; set; }
 }

@@ -3,6 +3,9 @@ using Evaluation.DAL.Entities.Base;
 
 namespace Evaluation.DAL.Entities.Authentication;
 
+namespace Evaluation.DAL.Entities.Authentication;
+[Index(nameof(BackendName), IsUnique = true)]
+
 public class PartyType : BaseEntities, IAuditLogEntity
 {
     public string NameAr { get; set; } = null!;
