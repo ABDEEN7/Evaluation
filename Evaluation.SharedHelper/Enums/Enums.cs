@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -47,5 +48,14 @@ namespace Evaluation.SharedHelper.Enums
         CoreColumn = 16,
         SameRecord = 17,
         CustomField = 17,
+    }
+
+    public enum StorageContainerType
+    {
+        [Description("evaluation")]
+        evaluation = 0,
+        [Description("website")]
+        website = 1,
+
     }
 }
