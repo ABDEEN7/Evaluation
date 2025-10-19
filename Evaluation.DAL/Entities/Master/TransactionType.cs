@@ -1,10 +1,4 @@
-﻿using  Evaluation.DAL.Entities.BaseModule;
-using Evaluation.DAL.Entities.Logs;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Evaluation.DAL.Entities.BaseModule;
 
 namespace Evaluation.DAL.Entities.Masters
 {
