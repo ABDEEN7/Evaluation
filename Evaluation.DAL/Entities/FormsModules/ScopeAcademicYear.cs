@@ -1,6 +1,7 @@
 ﻿using System.Reflection.PortableExecutable;
-using Evaluation.DAL.Entities.BaseModule;
+using  Evaluation.DAL.Entities.BaseModule;
 using Evaluation.DAL.Entities.Calendars;
+using Evaluation.DAL.Entities.DepartementEntites;
 using Evaluation.DAL.Entities.Planing;
 
 namespace Evaluation.DAL.Entities.FormsModules;

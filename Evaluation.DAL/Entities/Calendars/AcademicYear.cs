@@ -1,7 +1,7 @@
-﻿using Evaluation.DAL.Entities.BaseModule;
-using Evaluation.DAL.Entities.Planing;
+﻿using Evaluation.DAL.Entities.Planing;
 using Microsoft.EntityFrameworkCore;
-using Evaluation.DAL.Entities.Base;
+using Evaluation.DAL.Entities.DepartementEntites;
+using Evaluation.DAL.Entities.BaseModule;
 
 namespace Evaluation.DAL.Entities.Calendars;
 [Index(nameof(Department), nameof(Year), IsUnique = true)]

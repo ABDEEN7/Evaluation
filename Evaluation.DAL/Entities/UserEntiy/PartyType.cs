@@ -1,12 +1,12 @@
 ﻿using Evaluation.DAL.Entities.Audit;
-using Evaluation.DAL.Entities.Base;
+using  Evaluation.DAL.Entities.BaseModule;
+using Microsoft.EntityFrameworkCore;
 
 namespace Evaluation.DAL.Entities.Authentication;
 
-namespace Evaluation.DAL.Entities.Authentication;
 [Index(nameof(BackendName), IsUnique = true)]
 
-public class PartyType : BaseEntities, IAuditLogEntity
+public class PartyType : EntityBase, IAuditLogEntity
 {
     public string NameAr { get; set; } = null!;
     public string NameEn { get; set; } = null!;

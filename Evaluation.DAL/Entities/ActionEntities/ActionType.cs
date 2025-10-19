@@ -1,12 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Evaluation.DAL.Entities.Audit;
-using Evaluation.DAL.Entities.Base;
+using  Evaluation.DAL.Entities.BaseModule;
 
 namespace Evaluation.DAL.Entities.ActionEntities
 {
     [Index(nameof(BackendName), IsUnique = true)]
 
-    public class ActionType : BaseEntities, IAuditLogEntity
+    public class ActionType : EntityBase, IAuditLogEntity
     {
         public string TitleAr { get; set; } = null!;
         public string TitleEn { get; set; } = null!;

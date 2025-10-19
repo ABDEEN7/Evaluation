@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Evaluation.DAL.Entities.Audit;
-using Evaluation.DAL.Entities.Base;
+using  Evaluation.DAL.Entities.BaseModule;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace Evaluation.DAL.Entities.FormBuilder
 {
     [Index(nameof(BackendName), IsUnique = true)]
-    public class DropDownType : BaseEntities, IAuditLogEntity
+    public class DropDownType : EntityBase, IAuditLogEntity
     {
         public string BackendName { get; set; } = null!;
         public string TitleAr { get; set; } = null!;

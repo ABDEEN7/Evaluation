@@ -1,4 +1,4 @@
-﻿using Evaluation.DAL.Entities.Base;
+﻿using  Evaluation.DAL.Entities.BaseModule;
 using Evaluation.DAL.Entities.Logs;
 using System;
 using System.Collections.Generic;
@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Evaluation.DAL.Entities.Masters
 {
-    public class TransactionType : BaseEntities
+    public class TransactionType : EntityBase
     {
         public string BackendName { get; set; } = null!;
         public string NameAr { get; set; } = null!;

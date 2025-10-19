@@ -1,9 +1,8 @@
-﻿using Evaluation.DAL.Entities.Base;
+﻿using  Evaluation.DAL.Entities.BaseModule;
+using Microsoft.EntityFrameworkCore;
 
 namespace Evaluation.DAL.Entities.PermissionEntity;
 
-public class Page : BaseEntities
-namespace Evaluation.DAL.Entities.Authentication;
 [Index(nameof(BackendName), IsUnique = true)]
 public class Page : EntityBase
 {

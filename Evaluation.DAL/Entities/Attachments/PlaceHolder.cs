@@ -1,11 +1,11 @@
 ﻿using Evaluation.DAL.Entities.Audit;
-using Evaluation.DAL.Entities.Base;
+using  Evaluation.DAL.Entities.BaseModule;
 using Evaluation.DAL.Entities.FormBuilder;
 using Evaluation.DAL.Entities.ServicesEntities;
 
 namespace Evaluation.DAL.Entities.Attachments
 {
-    public class PlaceHolder : BaseEntities, IAuditLogEntity
+    public class PlaceHolder : EntityBase, IAuditLogEntity
     {
         public Guid ServiceId { get; set; }
         public Service? Service { get; set; }

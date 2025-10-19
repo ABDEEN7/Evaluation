@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Evaluation.DAL.Entities.Audit;
-using Evaluation.DAL.Entities.Base;
+using  Evaluation.DAL.Entities.BaseModule;
 using Evaluation.DAL.Entities.FormBuilder;
 using Evaluation.DAL.Entities.ServicesEntities;
 
@@ -8,7 +8,7 @@ using Evaluation.DAL.Entities.ServicesEntities;
 namespace Evaluation.DAL.Entities.ActionEntities
 {
     [Index(nameof(BackendName), IsUnique = true)]
-    public class ServiceAction : BaseEntities, IAuditLogEntity
+    public class ServiceAction : EntityBase, IAuditLogEntity
     {
         public string? NameAr { get; set; }
         public string? NameEn { get; set; }

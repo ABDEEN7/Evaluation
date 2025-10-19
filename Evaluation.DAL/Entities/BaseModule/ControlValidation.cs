@@ -1,6 +1,6 @@
 ﻿using Evaluation.DAL.Entities.PermissionEntity;
 
-namespace Evaluation.DAL.Entities.BaseModule;
+namespace  Evaluation.DAL.Entities.BaseModule;
 
 public class ControlValidation
 {

@@ -5,13 +5,13 @@ using System.Text;
 using System.Threading.Tasks;
 using Evaluation.DAL.Entities.SystemModulesEntities;
 using Evaluation.DAL.Entities.FormBuilder;
-using Evaluation.DAL.Entities.Base;
+using  Evaluation.DAL.Entities.BaseModule;
 using Evaluation.DAL.Entities.StatusEntities;
 using Evaluation.DAL.Entities.Audit;
 
 namespace Evaluation.DAL.Entities.ServicesEntities
 {
-    public class Service : BaseEntities, IAuditLogEntity, ILocalized
+    public class Service : EntityBase, IAuditLogEntity, ILocalized
     {
 
         public Guid SystemModuleId { get; set; }

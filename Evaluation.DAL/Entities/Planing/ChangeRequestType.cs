@@ -1,9 +1,7 @@
-<<<<<<< HEAD
-﻿using Evaluation.DAL.Entities.Base;
-=======
-﻿using Evaluation.DAL.Entities.BaseModule;
+﻿using  Evaluation.DAL.Entities.BaseModule;
+﻿using  Evaluation.DAL.Entities.BaseModule;
 using Evaluation.DAL.Entities.Calendars;
->>>>>>> 4feb881e9f32991d7c3842ef37c79f5bfee0a8b5
+using Evaluation.DAL.Entities.DepartementEntites;
 
 namespace Evaluation.DAL.Entities.Planing;
 

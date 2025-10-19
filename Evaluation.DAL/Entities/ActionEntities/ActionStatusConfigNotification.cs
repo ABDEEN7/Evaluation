@@ -1,5 +1,5 @@
 ﻿using Evaluation.DAL.Entities.Audit;
-using Evaluation.DAL.Entities.Base;
+using  Evaluation.DAL.Entities.BaseModule;
 using Evaluation.DAL.Entities.Authentication;
 using Evaluation.DAL.Entities.Template;
 using System;
@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Evaluation.DAL.Entities.ActionEntities
 {
-    public class ActionStatusConfigNotification : BaseEntities, IAuditLogEntity
+    public class ActionStatusConfigNotification : EntityBase, IAuditLogEntity
     {
         public Guid ActionStatusConfigurationId { get; set; }
         public ActionStatusConfiguration? ActionStatusConfiguration { get; set; }

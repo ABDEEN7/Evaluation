@@ -1,5 +1,5 @@
 ﻿using Evaluation.DAL.Entities.Audit;
-using Evaluation.DAL.Entities.Base;
+using  Evaluation.DAL.Entities.BaseModule;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Evaluation.DAL.Entities.Authentication
 {
-    public class UserToken : BaseEntities, IAuditLogEntity
+    public class UserToken : EntityBase, IAuditLogEntity
     {
         public string Token { get; set; } = null!;
         public bool Deprecated { get; set; }

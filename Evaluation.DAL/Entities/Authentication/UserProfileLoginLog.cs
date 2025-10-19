@@ -1,5 +1,5 @@
 ﻿using Evaluation.DAL.Entities.Audit;
-using Evaluation.DAL.Entities.Base;
+using  Evaluation.DAL.Entities.BaseModule;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Evaluation.DAL.Entities.Authentication
 {
-    public class UserLoginLog : BaseEntities, IAuditLogEntity
+    public class UserLoginLog : EntityBase, IAuditLogEntity
     {
         public string IP { get; set; } = null!;
         public string? UserAgent { get; set; }

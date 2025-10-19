@@ -1,9 +1,9 @@
 ﻿using Evaluation.DAL.Entities.Audit;
-using Evaluation.DAL.Entities.Base;
+using  Evaluation.DAL.Entities.BaseModule;
 
 namespace Evaluation.DAL.Entities.Authentication;
 
-public class UserPartyType : BaseEntities, IAuditLogEntity
+public class UserPartyType : EntityBase, IAuditLogEntity
 {
     public Guid UserId { get; set; }
     public User? User { get; set; }

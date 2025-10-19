@@ -1,4 +1,4 @@
-﻿using Evaluation.DAL.Entities.Base;
+﻿using  Evaluation.DAL.Entities.BaseModule;
 using Evaluation.DAL.Entities.DepartementEntites;
 
 namespace Evaluation.DAL.Entities.Calendars;

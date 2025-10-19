@@ -1,8 +1,8 @@
-﻿using Evaluation.DAL.Entities.Base;
+﻿using  Evaluation.DAL.Entities.BaseModule;
 
 namespace Evaluation.DAL.Entities.FormsModules;
 
-public class AcademicYearScope : BaseEntities
+public class AcademicYearScope : EntityBase
 {
     public Guid ScopeId { get; set; }
     public Guid ParentId { get; set; }

@@ -1,6 +1,7 @@
 ﻿using Evaluation.DAL.Entities.Audit;
 using Evaluation.DAL.Entities.Authentication;
-using Evaluation.DAL.Entities.BaseModule;
+using  Evaluation.DAL.Entities.BaseModule;
+using Evaluation.DAL.Entities.PermissionEntity;
 
 
 namespace Evaluation.DAL.Entities.Website;

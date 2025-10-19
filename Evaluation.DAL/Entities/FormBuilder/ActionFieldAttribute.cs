@@ -1,10 +1,10 @@
 ﻿using Evaluation.DAL.Entities.Audit;
-using Evaluation.DAL.Entities.Base;
+using  Evaluation.DAL.Entities.BaseModule;
 using Evaluation.DAL.Entities.FormBuilder;
 
 namespace Evaluation.DAL.Entities.ActionEntities
 {
-    public class ActionFieldAttribute : BaseEntities, IAuditLogEntity
+    public class ActionFieldAttribute : EntityBase, IAuditLogEntity
     {
         public Guid FieldId { get; set; }
         public Field? Field { get; set; }

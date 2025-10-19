@@ -1,5 +1,5 @@
 ﻿using Evaluation.DAL.Entities.Audit;
-using Evaluation.DAL.Entities.Base;
+using  Evaluation.DAL.Entities.BaseModule;
 using Evaluation.DAL.Entities.FormBuilder;
 using System;
 using System.Collections.Generic;
@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Evaluation.DAL.Entities.ActionEntities
 {
-	public class ActionCondition:BaseEntities, IAuditLogEntity
+	public class ActionCondition:EntityBase, IAuditLogEntity
 	{
 		public Guid ServiceActionId { get; set; }
         public ServiceAction? ServiceAction { get; set; }

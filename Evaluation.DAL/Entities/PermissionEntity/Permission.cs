@@ -1,10 +1,6 @@
-<<<<<<< HEAD:Evaluation.DAL/Entities/PermissionEntity/Permission.cs
-﻿using Evaluation.DAL.Entities.AdminPanel;
-using Evaluation.DAL.Entities.Base;
-=======
-﻿using Evaluation.DAL.Entities.BaseModule;
+﻿using  Evaluation.DAL.Entities.BaseModule;
+using Evaluation.DAL.Entities.BaseModule;
 using Microsoft.EntityFrameworkCore;
->>>>>>> 4feb881e9f32991d7c3842ef37c79f5bfee0a8b5:Evaluation.DAL/Entities/Authentication/Permission.cs
 
 namespace Evaluation.DAL.Entities.PermissionEntity;
 

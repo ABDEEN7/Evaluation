@@ -1,5 +1,5 @@
 ﻿using Evaluation.DAL.Entities.Audit;
-using Evaluation.DAL.Entities.Base;
+using  Evaluation.DAL.Entities.BaseModule;
 using Evaluation.DAL.Entities.Authentication;
 using System;
 using System.Collections.Generic;
@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Evaluation.DAL.Entities.StatusEntities
 {
-    public class ServiceStatusPreventPartyType : BaseEntities, IAuditLogEntity
+    public class ServiceStatusPreventPartyType : EntityBase, IAuditLogEntity
     {
         public Guid StatusId { get; set; }
         public  ServiceStatus Status { get; set; }

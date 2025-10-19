@@ -1,5 +1,5 @@
 ﻿using Evaluation.DAL.Entities.Audit;
-using Evaluation.DAL.Entities.Base;
+using  Evaluation.DAL.Entities.BaseModule;
 using Evaluation.DAL.Entities.FormBuilder;
 using Evaluation.DAL.Entities.Logs;
 using System;
@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Evaluation.DAL.Entities.Attachments
 {
-    public class Attachment : BaseEntities, IAuditLogEntity
+    public class Attachment : EntityBase, IAuditLogEntity
     {
       
         public Guid? ActionTransactionsLogId { get; set; }

@@ -1,6 +1,6 @@
 ﻿using Evaluation.DAL.Entities.ActionEntities;
 using Evaluation.DAL.Entities.Audit;
-using Evaluation.DAL.Entities.Base;
+using  Evaluation.DAL.Entities.BaseModule;
 using Evaluation.DAL.Entities.FormBuilder;
 using Evaluation.DAL.Entities.ServicesEntities;
 using System;
@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Evaluation.DAL.Entities.StatusEntities
 {
-    public class ServiceStatus : BaseEntities, IAuditLogEntity
+    public class ServiceStatus : EntityBase, IAuditLogEntity
     {
         public string NameAr { get; set; }
         public string NameEn { get; set; }

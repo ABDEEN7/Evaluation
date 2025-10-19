@@ -1,9 +1,9 @@
 ﻿using Evaluation.DAL.Entities.Audit;
-using Evaluation.DAL.Entities.Base;
+using  Evaluation.DAL.Entities.BaseModule;
 
 namespace Evaluation.DAL.Entities.FormBuilder
 {
-    public class CssClass : BaseEntities, IAuditLogEntity
+    public class CssClass : EntityBase, IAuditLogEntity
     {
         public string ClassName { get; set; } = null!;
         public string Styles { get; set; } = null!;

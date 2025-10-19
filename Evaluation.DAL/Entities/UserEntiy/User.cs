@@ -1,5 +1,6 @@
-﻿using Evaluation.DAL.Entities.Base;
+﻿using  Evaluation.DAL.Entities.BaseModule;
 using Evaluation.DAL.Entities.UserEntiy;
+using Microsoft.EntityFrameworkCore;
 
 namespace Evaluation.DAL.Entities.Authentication;
 [Index(nameof(QID), IsUnique = true)]

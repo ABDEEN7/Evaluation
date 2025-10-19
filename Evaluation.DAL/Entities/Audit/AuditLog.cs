@@ -1,4 +1,4 @@
-﻿using Evaluation.DAL.Entities.Base;
+﻿using  Evaluation.DAL.Entities.BaseModule;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Evaluation.DAL.Entities.Audit
 {
-    public class AuditLog : BaseEntities
+    public class AuditLog : EntityBase
 {
     public string TableName { get; set; } = null!;
     public string RefId { get; set; } = null!;

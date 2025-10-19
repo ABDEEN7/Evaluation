@@ -1,4 +1,4 @@
-﻿using Evaluation.DAL.Entities.Base;
+﻿using  Evaluation.DAL.Entities.BaseModule;
 using Evaluation.DAL.Entities.Planing;
 
 namespace Evaluation.DAL.Entities.DepartementEntites;
