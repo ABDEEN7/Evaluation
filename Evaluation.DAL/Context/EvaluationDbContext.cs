@@ -9,13 +9,15 @@ using Evaluation.DAL.Entities.PermissionEntity;
 using Evaluation.DAL.Entities.Planing;
 using Evaluation.DAL.Entities.Template;
 using Evaluation.DAL.Entities.UserEntiy;
+using Evaluation.DAL.Extensions;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection;
 
 namespace Evaluation.DAL.Context;
 
 public partial class EvaluationDbContext : DbContext
 {
-
+    public EvaluationDbContext() { }
     public EvaluationDbContext(DbContextOptions<EvaluationDbContext> options)
         : base(options)
     {
@@ -75,10 +77,85 @@ public partial class EvaluationDbContext : DbContext
     {
         optionsBuilder.UseSqlServer("Server=DCDCSQL2DNET01;Database=Evaluation;Trust Server Certificate=true;User id=t-m.fatouh-dev;Integrated Security=SSPI;");
     }
-    protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        configurationBuilder
-        .Properties<decimal>()
-        .HavePrecision(18, 4);
+
+
+        base.OnModelCreating(modelBuilder);
+        var typesToRegister = Assembly.GetExecutingAssembly().GetTypes();
+        foreach (var type in typesToRegister)
+        {
+            if (type.GetInterfaces().Any(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IEntityTypeConfiguration<>)))
+            {
+                dynamic configurationInstance = Activator.CreateInstance(type);
+                modelBuilder.ApplyConfiguration(configurationInstance);
+            }
+        }
+        ApplyGeneralConfigurations(modelBuilder);
+
+        OnModelCreatingPartial(modelBuilder);
     }
+
+
+
+    private void ApplyGeneralConfigurations(ModelBuilder modelBuilder)
+    {
+
+        foreach (var relationship in modelBuilder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys()))
+        {
+            relationship.DeleteBehavior = DeleteBehavior.Restrict;
+        }
+
+        var entityBaseType = typeof(EntityBase);
+        var entityTypes = Assembly.GetExecutingAssembly().GetTypes()
+            .Where(t => entityBaseType.IsAssignableFrom(t) && t != entityBaseType);
+
+
+        var excludedTypeFromGlobalQuery = new List<Type>
+        {
+            //typeof(MinistryUser),
+            
+        };
+
+        foreach (var entityType in entityTypes)
+        {
+
+            // Set the default value for "CreateDate" property
+            modelBuilder.Entity(entityType)
+                .Property<DateTime>(nameof(EntityBase.CreateDate))
+                .HasDefaultValueSql("getdate()");
+            modelBuilder.Entity(entityType)
+                .Property<bool?>(nameof(EntityBase.IsActive))
+                .HasDefaultValueSql("1");
+            modelBuilder.Entity(entityType)
+                .Property<bool?>(nameof(EntityBase.IsDeleted))
+                .HasDefaultValueSql("0");
+            modelBuilder.Entity(entityType)
+                .Property<Guid>(nameof(EntityBase.CreateById));
+            //.HasDefaultValueSql("'1'");
+
+            if (!excludedTypeFromGlobalQuery.Contains(entityType))
+            {
+                var method = typeof(ModelBuilderExtensions).GetMethod(nameof(ModelBuilderExtensions.AddGlobalQueryFilter));
+                var genericMethod = method.MakeGenericMethod(entityType);
+                genericMethod.Invoke(null, [modelBuilder, entityType]);
+            }
+        }
+        modelBuilder.Ignore<EntityBase>();
+
+        // Use reflection to find all the entity types derived from EntityBase
+
+
+    }
+    partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
+
+
+
+    //protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+    //{
+    //    configurationBuilder
+    //    .Properties<decimal>()
+    //    .HavePrecision(18, 4);
+    //}
 }
