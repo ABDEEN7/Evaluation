@@ -11,8 +11,8 @@ public class ServiceRequest : EntityBase
     public Plan? Plan { get; set; }
     public Guid StatusId { get; set; }
     public StatusService? Status{ get; set; }
+    public Guid ServiceId { get; set; }
     public Service? Service { get; set; }
-    public Service? ServiceId { get; set; }
     public Guid OrganizationId { get; set; }
     public Organization? Organization { get; set; }
     public DateTime? StartDate { get; set; }

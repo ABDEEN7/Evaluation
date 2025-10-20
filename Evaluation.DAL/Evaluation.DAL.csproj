@@ -7,6 +7,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="FormBuilderConfiguration\ActionTypeConfiguration.cs" />
+    <Compile Remove="FormBuilderConfiguration\AttributeConfiguration.cs" />
+    <Compile Remove="FormBuilderConfiguration\CssConfiguration.cs" />
+    <Compile Remove="FormBuilderConfiguration\FieldConfiguration.cs" />
+    <Compile Remove="FormBuilderConfiguration\FieldTypeConfiguration.cs" />
+    <Compile Remove="FormBuilderConfiguration\FieldTypeShowConfiguration.cs" />
+    <Compile Remove="FormBuilderConfiguration\FormGroupConfiguration.cs" />
+    <Compile Remove="FormBuilderConfiguration\FormGroupTypeConfiguration.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.9" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.9">
       <PrivateAssets>all</PrivateAssets>
