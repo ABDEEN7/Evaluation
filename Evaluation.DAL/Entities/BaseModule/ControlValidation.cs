@@ -2,7 +2,7 @@
 
 namespace  Evaluation.DAL.Entities.BaseModule;
 
-public class ControlValidation
+public class ControlValidation : EntityBase
 {
     public Guid PermissionId { get; set; }
 

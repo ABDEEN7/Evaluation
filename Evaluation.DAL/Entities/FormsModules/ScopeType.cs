@@ -1,9 +1,9 @@
-﻿using Evaluation.DAL.Entities.DepartementEntites;
-using Evaluation.DAL.Entities.Planing;
+﻿using Evaluation.DAL.Entities.BaseModule;
+using Evaluation.DAL.Entities.DepartementEntites;
 
 namespace Evaluation.DAL.Entities.FormsModules;
 
-public class ScopeType
+public class ScopeType: EntityBase
 {
     public string NameAr { get; set; } = null!;
     public string NameEn { get; set; } = null!;

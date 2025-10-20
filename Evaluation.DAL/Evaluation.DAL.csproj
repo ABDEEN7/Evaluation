@@ -7,14 +7,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="FormBuilderConfiguration\ActionTypeConfiguration.cs" />
-    <Compile Remove="FormBuilderConfiguration\AttributeConfiguration.cs" />
-    <Compile Remove="FormBuilderConfiguration\CssConfiguration.cs" />
-    <Compile Remove="FormBuilderConfiguration\FieldConfiguration.cs" />
-    <Compile Remove="FormBuilderConfiguration\FieldTypeConfiguration.cs" />
-    <Compile Remove="FormBuilderConfiguration\FieldTypeShowConfiguration.cs" />
-    <Compile Remove="FormBuilderConfiguration\FormGroupConfiguration.cs" />
-    <Compile Remove="FormBuilderConfiguration\FormGroupTypeConfiguration.cs" />
+    <Compile Remove="EFConfiguration\FormBuilderConfiguration\ActionTypeConfiguration.cs" />
+    <Compile Remove="EFConfiguration\FormBuilderConfiguration\AttributeConfiguration.cs" />
+    <Compile Remove="EFConfiguration\FormBuilderConfiguration\CssConfiguration.cs" />
+    <Compile Remove="EFConfiguration\FormBuilderConfiguration\FieldConfiguration.cs" />
+    <Compile Remove="EFConfiguration\FormBuilderConfiguration\FieldTypeConfiguration.cs" />
+    <Compile Remove="EFConfiguration\FormBuilderConfiguration\FieldTypeShowConfiguration.cs" />
+    <Compile Remove="EFConfiguration\FormBuilderConfiguration\FormGroupConfiguration.cs" />
+    <Compile Remove="EFConfiguration\FormBuilderConfiguration\FormGroupTypeConfiguration.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -33,6 +33,7 @@
 
   <ItemGroup>
     <Folder Include="Data\" />
+    <Folder Include="Migrations\" />
   </ItemGroup>
 
 </Project>

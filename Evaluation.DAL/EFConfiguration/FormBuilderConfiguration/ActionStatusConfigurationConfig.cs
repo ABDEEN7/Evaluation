@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Evaluation.DAL.Entities.ActionEntities;
 
-namespace Evaluation.DAL.FormBuilderConfiguration
+namespace Evaluation.DAL.EFConfiguration.FormBuilderConfiguration
 {
     internal class ActionStatusConfigurationConfig : IEntityTypeConfiguration<ActionStatusConfiguration>
     {

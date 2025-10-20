@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Evaluation.DAL.Entities.SystemModulesEntities;
+﻿using Evaluation.DAL.Entities.SystemModulesEntities;
 using Evaluation.DAL.Entities.FormBuilder;
 using  Evaluation.DAL.Entities.BaseModule;
 using Evaluation.DAL.Entities.StatusEntities;

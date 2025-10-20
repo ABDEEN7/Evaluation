@@ -7,6 +7,8 @@ using Evaluation.DAL.Entities.FormsModules;
 using Evaluation.DAL.Entities.Org;
 using Evaluation.DAL.Entities.PermissionEntity;
 using Evaluation.DAL.Entities.Planing;
+using Evaluation.DAL.Entities.ServicesEntities;
+using Evaluation.DAL.Entities.SystemModulesEntities;
 using Evaluation.DAL.Entities.Template;
 using Evaluation.DAL.Entities.UserEntiy;
 using Evaluation.DAL.Extensions;
@@ -71,6 +73,9 @@ public partial class EvaluationDbContext : DbContext
     public virtual DbSet<ScopeAcademicYear> ScopeAcademicYears { get; set; }
     public virtual DbSet<OrgAcademicYear> OrgAcademicYears { get; set; }
     public virtual DbSet<UserLoginLog> UserLoginLogs { get; set; }
+    public virtual DbSet<ServiceRequest> ServiceRequests { get; set; }
+    public virtual DbSet<Service> Services { get; set; }
+    public virtual DbSet<SystemModule> SystemModules { get; set; }
 
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -114,7 +119,9 @@ public partial class EvaluationDbContext : DbContext
 
         var excludedTypeFromGlobalQuery = new List<Type>
         {
-            //typeof(MinistryUser),
+            typeof(Organization),
+            typeof(Employee),
+            typeof(School),
             
         };
 

@@ -1,4 +1,7 @@
-﻿namespace Evaluation.DAL.Entities.Org;
+﻿using Evaluation.DAL.Entities.BaseModule;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+
+namespace Evaluation.DAL.Entities.Org;
 
 public class Employee : OrgTree
 {
@@ -8,6 +11,6 @@ public class Employee : OrgTree
     public string Nationality { get; set; }=null!;
     public DateTime JoinDate { get; set; }
     public string JobTitle { get; set; } = null!;
-    public int OrganizationId { get; set; }
-    public int SubOrganizationId { get; set; }
+    //public Guid OrganizationId { get; set; }
+    //public Organization? Organization { get; set; }
 }
