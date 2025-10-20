@@ -1,8 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Evaluation.DAL.Entities.BaseModule;
+using Microsoft.EntityFrameworkCore;
 
 namespace Evaluation.DAL.Entities.Template;
 [Index(nameof(BackendName), IsUnique = true)]
-public class EmailTemplate
+public class EmailTemplate: EntityBase
 {
     public string TitleAr { get; set; } = null!;
     public string TitleEn { get; set; } = null!;

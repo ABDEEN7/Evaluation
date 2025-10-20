@@ -1,8 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Evaluation.DAL.Entities.BaseModule;
+using Evaluation.DAL.Entities.SystemModulesEntities;
+using Microsoft.EntityFrameworkCore;
 
 namespace Evaluation.DAL.Entities.Template;
 [Index(nameof(BackendName), IsUnique = true)]
-public class NotificationTemplate
+public class NotificationTemplate : EntityBase
 {
    public string? SubjectAr { get; set; }
     public string? SubjectEn { get; set; }
