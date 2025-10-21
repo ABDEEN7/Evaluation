@@ -6,7 +6,7 @@ public interface IEntity
 {
     public Guid Id { get; set; }
     public bool? IsActive { get; set; }
-    public Guid CreateById { get; set; }
+    public Guid? CreateById { get; set; }
     public MinistryUser? CreateBy { get; set; }
     public DateTime CreateDate { get; set; }
     public Guid? UpdateById { get; set; }

@@ -12,6 +12,7 @@ using Evaluation.DAL.Entities.SystemModulesEntities;
 using Evaluation.DAL.Entities.Template;
 using Evaluation.DAL.Entities.UserEntiy;
 using Evaluation.DAL.Extensions;
+using Evaluation.DAL.SystemSetting;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 
@@ -76,11 +77,12 @@ public partial class EvaluationDbContext : DbContext
     public virtual DbSet<ServiceRequest> ServiceRequests { get; set; }
     public virtual DbSet<Service> Services { get; set; }
     public virtual DbSet<SystemModule> SystemModules { get; set; }
-
+    public virtual DbSet<ModuleType> ModuleTypes { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.UseSqlServer("Server=DCDCSQL2DNET01;Database=Evaluation;Trust Server Certificate=true;User id=t-m.fatouh-dev;Integrated Security=SSPI;");
+        //optionsBuilder.UseSqlServer("Server=DCDCSQL2DNET01;Database=Evaluation;Trust Server Certificate=true;User id=t-m.fatouh-dev;Integrated Security=SSPI;");
+        optionsBuilder.UseSqlServer("Server=DCDCSQL2DNET01;Database=Evaluation;Trust Server Certificate=true;User id=Eval_User; Password=Abc@1234;");
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -139,7 +141,7 @@ public partial class EvaluationDbContext : DbContext
                 .Property<bool?>(nameof(EntityBase.IsDeleted))
                 .HasDefaultValueSql("0");
             modelBuilder.Entity(entityType)
-                .Property<Guid>(nameof(EntityBase.CreateById));
+                .Property<Guid?>(nameof(EntityBase.CreateById));
             //.HasDefaultValueSql("'1'");
 
             if (!excludedTypeFromGlobalQuery.Contains(entityType))

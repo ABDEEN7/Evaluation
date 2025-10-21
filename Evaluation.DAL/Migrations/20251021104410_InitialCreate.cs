@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Evaluation.DAL.Migrations
 {
     /// <inheritdoc />
-    public partial class Init : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -32,7 +32,7 @@ namespace Evaluation.DAL.Migrations
                     EmployeeNo = table.Column<int>(type: "int", nullable: false),
                     OrganizationNo = table.Column<int>(type: "int", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -74,7 +74,7 @@ namespace Evaluation.DAL.Migrations
                     OrderNo = table.Column<int>(type: "int", nullable: true),
                     IsRequiredValidation = table.Column<bool>(type: "bit", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -113,7 +113,7 @@ namespace Evaluation.DAL.Migrations
                     Key = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -128,8 +128,7 @@ namespace Evaluation.DAL.Migrations
                         name: "FK_Attribute_MinistryUsers_CreateById",
                         column: x => x.CreateById,
                         principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Attribute_MinistryUsers_DeleteById",
                         column: x => x.DeleteById,
@@ -153,7 +152,7 @@ namespace Evaluation.DAL.Migrations
                     OldValue = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     NewValue = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -216,7 +215,7 @@ namespace Evaluation.DAL.Migrations
                     Target = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     OrderNo = table.Column<int>(type: "int", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -231,8 +230,7 @@ namespace Evaluation.DAL.Migrations
                         name: "FK_Banner_MinistryUsers_CreateById",
                         column: x => x.CreateById,
                         principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Banner_MinistryUsers_DeleteById",
                         column: x => x.DeleteById,
@@ -253,7 +251,7 @@ namespace Evaluation.DAL.Migrations
                     NameAr = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     NameEn = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -292,7 +290,7 @@ namespace Evaluation.DAL.Migrations
                     NameAr = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     NameEn = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -307,8 +305,7 @@ namespace Evaluation.DAL.Migrations
                         name: "FK_ChangeRequestStatus_MinistryUsers_CreateById",
                         column: x => x.CreateById,
                         principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_ChangeRequestStatus_MinistryUsers_DeleteById",
                         column: x => x.DeleteById,
@@ -330,7 +327,7 @@ namespace Evaluation.DAL.Migrations
                     NameEn = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     BackendName = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -345,8 +342,7 @@ namespace Evaluation.DAL.Migrations
                         name: "FK_CssApplyType_MinistryUsers_CreateById",
                         column: x => x.CreateById,
                         principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_CssApplyType_MinistryUsers_DeleteById",
                         column: x => x.DeleteById,
@@ -368,7 +364,7 @@ namespace Evaluation.DAL.Migrations
                     NameAr = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     NameEn = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -383,8 +379,7 @@ namespace Evaluation.DAL.Migrations
                         name: "FK_DepartmentEvaluationParty_MinistryUsers_CreateById",
                         column: x => x.CreateById,
                         principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_DepartmentEvaluationParty_MinistryUsers_DeleteById",
                         column: x => x.DeleteById,
@@ -406,7 +401,7 @@ namespace Evaluation.DAL.Migrations
                     RoleAttributeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Value = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -421,8 +416,7 @@ namespace Evaluation.DAL.Migrations
                         name: "FK_DepartmentRoleAttributeValue_MinistryUsers_CreateById",
                         column: x => x.CreateById,
                         principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_DepartmentRoleAttributeValue_MinistryUsers_DeleteById",
                         column: x => x.DeleteById,
@@ -446,7 +440,7 @@ namespace Evaluation.DAL.Migrations
                     DataSourceTable = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ParentId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -496,7 +490,7 @@ namespace Evaluation.DAL.Migrations
                     Sent = table.Column<bool>(type: "bit", nullable: false),
                     Note = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -511,8 +505,7 @@ namespace Evaluation.DAL.Migrations
                         name: "FK_EmailLog_MinistryUsers_CreateById",
                         column: x => x.CreateById,
                         principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_EmailLog_MinistryUsers_DeleteById",
                         column: x => x.DeleteById,
@@ -540,7 +533,7 @@ namespace Evaluation.DAL.Migrations
                     FielsFromRequest = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     FielsFromEvaluation = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -583,7 +576,7 @@ namespace Evaluation.DAL.Migrations
                     JsonParameter = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Context = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -598,8 +591,7 @@ namespace Evaluation.DAL.Migrations
                         name: "FK_ExceptionLog_MinistryUsers_CreateById",
                         column: x => x.CreateById,
                         principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_ExceptionLog_MinistryUsers_DeleteById",
                         column: x => x.DeleteById,
@@ -622,7 +614,7 @@ namespace Evaluation.DAL.Migrations
                     BackendName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -663,7 +655,7 @@ namespace Evaluation.DAL.Migrations
                     BackendName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Schema = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -704,7 +696,7 @@ namespace Evaluation.DAL.Migrations
                     BackendName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -743,7 +735,7 @@ namespace Evaluation.DAL.Migrations
                     NameAr = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     NameEn = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -782,7 +774,7 @@ namespace Evaluation.DAL.Migrations
                     NameAr = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     NameEn = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -797,8 +789,7 @@ namespace Evaluation.DAL.Migrations
                         name: "FK_Level_MinistryUsers_CreateById",
                         column: x => x.CreateById,
                         principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Level_MinistryUsers_DeleteById",
                         column: x => x.DeleteById,
@@ -812,15 +803,15 @@ namespace Evaluation.DAL.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ModuleType",
+                name: "ModuleTypes",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     NameAr = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     NameEn = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ParentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ParentId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -830,29 +821,31 @@ namespace Evaluation.DAL.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ModuleType", x => x.Id);
+                    table.PrimaryKey("PK_ModuleTypes", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ModuleType_MinistryUsers_CreateById",
+                        name: "FK_ModuleTypes_MinistryUsers_CreateById",
                         column: x => x.CreateById,
                         principalTable: "MinistryUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_ModuleType_MinistryUsers_DeleteById",
+                        name: "FK_ModuleTypes_MinistryUsers_DeleteById",
                         column: x => x.DeleteById,
                         principalTable: "MinistryUsers",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_ModuleType_MinistryUsers_UpdateById",
+                        name: "FK_ModuleTypes_MinistryUsers_UpdateById",
                         column: x => x.UpdateById,
                         principalTable: "MinistryUsers",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_ModuleType_ModuleType_ParentId",
-                        column: x => x.ParentId,
-                        principalTable: "ModuleType",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_ModuleTypes_ModuleTypes_ParentId",
+                        column: x => x.ParentId,
+                        principalTable: "ModuleTypes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -863,7 +856,7 @@ namespace Evaluation.DAL.Migrations
                     NameAr = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     NameEn = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -904,7 +897,7 @@ namespace Evaluation.DAL.Migrations
                     NameEn = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     BackendName = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -949,7 +942,7 @@ namespace Evaluation.DAL.Migrations
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     BackendName = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -994,7 +987,7 @@ namespace Evaluation.DAL.Migrations
                     CanViewEntityEvaluation = table.Column<bool>(type: "bit", nullable: false),
                     SystemModuleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -1035,7 +1028,7 @@ namespace Evaluation.DAL.Migrations
                     NameEn = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -1074,7 +1067,7 @@ namespace Evaluation.DAL.Migrations
                     NameAr = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     NameEN = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -1115,7 +1108,7 @@ namespace Evaluation.DAL.Migrations
                     OrderNo = table.Column<int>(type: "int", nullable: false),
                     BackendName = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -1157,7 +1150,7 @@ namespace Evaluation.DAL.Migrations
                     DescAr = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     DescEn = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -1172,8 +1165,7 @@ namespace Evaluation.DAL.Migrations
                         name: "FK_RelatedFieldsGroup_MinistryUsers_CreateById",
                         column: x => x.CreateById,
                         principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_RelatedFieldsGroup_MinistryUsers_DeleteById",
                         column: x => x.DeleteById,
@@ -1195,7 +1187,7 @@ namespace Evaluation.DAL.Migrations
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     IsLeader = table.Column<bool>(type: "bit", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -1210,8 +1202,7 @@ namespace Evaluation.DAL.Migrations
                         name: "FK_RequestAssign_MinistryUsers_CreateById",
                         column: x => x.CreateById,
                         principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_RequestAssign_MinistryUsers_DeleteById",
                         column: x => x.DeleteById,
@@ -1232,7 +1223,7 @@ namespace Evaluation.DAL.Migrations
                     NameAr = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     NameEn = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -1271,7 +1262,7 @@ namespace Evaluation.DAL.Migrations
                     NameAr = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     NameEn = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -1310,7 +1301,7 @@ namespace Evaluation.DAL.Migrations
                     SectionId = table.Column<int>(type: "int", nullable: false),
                     DepartmentId = table.Column<int>(type: "int", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -1325,8 +1316,7 @@ namespace Evaluation.DAL.Migrations
                         name: "FK_SectionDepartment_MinistryUsers_CreateById",
                         column: x => x.CreateById,
                         principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_SectionDepartment_MinistryUsers_DeleteById",
                         column: x => x.DeleteById,
@@ -1356,7 +1346,7 @@ namespace Evaluation.DAL.Migrations
                     FileName_Size = table.Column<long>(type: "bigint", nullable: false),
                     ViewCount = table.Column<int>(type: "int", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -1371,8 +1361,7 @@ namespace Evaluation.DAL.Migrations
                         name: "FK_SiteDocument_MinistryUsers_CreateById",
                         column: x => x.CreateById,
                         principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_SiteDocument_MinistryUsers_DeleteById",
                         column: x => x.DeleteById,
@@ -1396,7 +1385,7 @@ namespace Evaluation.DAL.Migrations
                     Sent = table.Column<bool>(type: "bit", nullable: false),
                     RefID = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -1411,8 +1400,7 @@ namespace Evaluation.DAL.Migrations
                         name: "FK_SMSLog_MinistryUsers_CreateById",
                         column: x => x.CreateById,
                         principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_SMSLog_MinistryUsers_DeleteById",
                         column: x => x.DeleteById,
@@ -1426,7 +1414,7 @@ namespace Evaluation.DAL.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "SMSProfile",
+                name: "SMSProfiles",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -1436,42 +1424,7 @@ namespace Evaluation.DAL.Migrations
                     Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsDefault = table.Column<bool>(type: "bit", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
-                    UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeleteById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    DeleteDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "0")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_SMSProfile", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_SMSProfile_MinistryUsers_CreateById",
-                        column: x => x.CreateById,
-                        principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_SMSProfile_MinistryUsers_DeleteById",
-                        column: x => x.DeleteById,
-                        principalTable: "MinistryUsers",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_SMSProfile_MinistryUsers_UpdateById",
-                        column: x => x.UpdateById,
-                        principalTable: "MinistryUsers",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "SMSProfiles",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -1510,7 +1463,7 @@ namespace Evaluation.DAL.Migrations
                     NameAr = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     NameEn = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -1551,7 +1504,7 @@ namespace Evaluation.DAL.Migrations
                     BackendName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ParentModuleTypeId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -1566,8 +1519,7 @@ namespace Evaluation.DAL.Migrations
                         name: "FK_SystemModuleType_MinistryUsers_CreateById",
                         column: x => x.CreateById,
                         principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_SystemModuleType_MinistryUsers_DeleteById",
                         column: x => x.DeleteById,
@@ -1595,7 +1547,7 @@ namespace Evaluation.DAL.Migrations
                     SettingValue = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -1610,8 +1562,7 @@ namespace Evaluation.DAL.Migrations
                         name: "FK_SystemSetting_MinistryUsers_CreateById",
                         column: x => x.CreateById,
                         principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_SystemSetting_MinistryUsers_DeleteById",
                         column: x => x.DeleteById,
@@ -1630,7 +1581,7 @@ namespace Evaluation.DAL.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -1670,7 +1621,7 @@ namespace Evaluation.DAL.Migrations
                     TitleEn = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     BackendName = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -1710,7 +1661,7 @@ namespace Evaluation.DAL.Migrations
                     NameAr = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     NameEn = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -1725,8 +1676,7 @@ namespace Evaluation.DAL.Migrations
                         name: "FK_TransactionType_MinistryUsers_CreateById",
                         column: x => x.CreateById,
                         principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_TransactionType_MinistryUsers_DeleteById",
                         column: x => x.DeleteById,
@@ -1752,7 +1702,7 @@ namespace Evaluation.DAL.Migrations
                     ValueAr = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Url = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -1767,8 +1717,7 @@ namespace Evaluation.DAL.Migrations
                         name: "FK_UiControl_MinistryUsers_CreateById",
                         column: x => x.CreateById,
                         principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_UiControl_MinistryUsers_DeleteById",
                         column: x => x.DeleteById,
@@ -1790,7 +1739,7 @@ namespace Evaluation.DAL.Migrations
                     UserAgent = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -1838,9 +1787,9 @@ namespace Evaluation.DAL.Migrations
                     DeprecatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     UserAgent = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IP = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -1855,8 +1804,7 @@ namespace Evaluation.DAL.Migrations
                         name: "FK_UserToken_MinistryUsers_CreateById",
                         column: x => x.CreateById,
                         principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_UserToken_MinistryUsers_DeleteById",
                         column: x => x.DeleteById,
@@ -1871,8 +1819,7 @@ namespace Evaluation.DAL.Migrations
                         name: "FK_UserToken_MinistryUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -1888,7 +1835,7 @@ namespace Evaluation.DAL.Migrations
                     FileSize = table.Column<long>(type: "bigint", nullable: false),
                     Note = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -1903,8 +1850,7 @@ namespace Evaluation.DAL.Migrations
                         name: "FK_WebsiteAttachment_MinistryUsers_CreateById",
                         column: x => x.CreateById,
                         principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_WebsiteAttachment_MinistryUsers_DeleteById",
                         column: x => x.DeleteById,
@@ -1926,7 +1872,7 @@ namespace Evaluation.DAL.Migrations
                     Styles = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ApplyTypeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -1947,8 +1893,7 @@ namespace Evaluation.DAL.Migrations
                         name: "FK_CssClass_MinistryUsers_CreateById",
                         column: x => x.CreateById,
                         principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_CssClass_MinistryUsers_DeleteById",
                         column: x => x.DeleteById,
@@ -1973,7 +1918,7 @@ namespace Evaluation.DAL.Migrations
                     ParentDropDownId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     OrderNo = table.Column<int>(type: "int", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -1999,8 +1944,7 @@ namespace Evaluation.DAL.Migrations
                         name: "FK_FieldDropDownValue_MinistryUsers_CreateById",
                         column: x => x.CreateById,
                         principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_FieldDropDownValue_MinistryUsers_DeleteById",
                         column: x => x.DeleteById,
@@ -2024,7 +1968,7 @@ namespace Evaluation.DAL.Migrations
                     OrderNo = table.Column<int>(type: "int", nullable: true),
                     ShowTypeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -2071,7 +2015,7 @@ namespace Evaluation.DAL.Migrations
                     OrganizationTypeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CategoryId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -2123,7 +2067,7 @@ namespace Evaluation.DAL.Migrations
                     PartyTypeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     SignaturePlaceHolder = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -2138,8 +2082,7 @@ namespace Evaluation.DAL.Migrations
                         name: "FK_UserPartyTypes_MinistryUsers_CreateById",
                         column: x => x.CreateById,
                         principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_UserPartyTypes_MinistryUsers_DeleteById",
                         column: x => x.DeleteById,
@@ -2190,7 +2133,7 @@ namespace Evaluation.DAL.Migrations
                     ControlJsonConfig = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ControlAttribute = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -2243,7 +2186,7 @@ namespace Evaluation.DAL.Migrations
                     IsAuthorized = table.Column<bool>(type: "bit", nullable: false),
                     PermissionId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -2258,8 +2201,7 @@ namespace Evaluation.DAL.Migrations
                         name: "FK_Navbar_MinistryUsers_CreateById",
                         column: x => x.CreateById,
                         principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Navbar_MinistryUsers_DeleteById",
                         column: x => x.DeleteById,
@@ -2290,7 +2232,7 @@ namespace Evaluation.DAL.Migrations
                     PageId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     PermissionId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -2346,7 +2288,7 @@ namespace Evaluation.DAL.Migrations
                     RoutingPath = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     OrderNo = table.Column<int>(type: "int", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -2361,8 +2303,7 @@ namespace Evaluation.DAL.Migrations
                         name: "FK_SideBar_MinistryUsers_CreateById",
                         column: x => x.CreateById,
                         principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_SideBar_MinistryUsers_DeleteById",
                         column: x => x.DeleteById,
@@ -2393,7 +2334,7 @@ namespace Evaluation.DAL.Migrations
                     RoleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     PermissionId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -2444,7 +2385,7 @@ namespace Evaluation.DAL.Migrations
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     RoleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -2459,8 +2400,7 @@ namespace Evaluation.DAL.Migrations
                         name: "FK_UserRoles_MinistryUsers_CreateById",
                         column: x => x.CreateById,
                         principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_UserRoles_MinistryUsers_DeleteById",
                         column: x => x.DeleteById,
@@ -2513,7 +2453,7 @@ namespace Evaluation.DAL.Migrations
                     TypeId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     SchoolTypeId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -2579,7 +2519,7 @@ namespace Evaluation.DAL.Migrations
                     BackendName = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     SMSProfileId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -2625,7 +2565,7 @@ namespace Evaluation.DAL.Migrations
                     TemplateDocId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     TemplateDocumentId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -2680,7 +2620,7 @@ namespace Evaluation.DAL.Migrations
                     Year = table.Column<int>(type: "int", nullable: false),
                     DepartmentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -2730,7 +2670,7 @@ namespace Evaluation.DAL.Migrations
                     MaxWeight = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     DepartmentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -2777,7 +2717,7 @@ namespace Evaluation.DAL.Migrations
                     OrderNo = table.Column<int>(type: "int", nullable: false),
                     DepartmentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -2823,7 +2763,7 @@ namespace Evaluation.DAL.Migrations
                     OrderNo = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     DepartmentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -2844,8 +2784,7 @@ namespace Evaluation.DAL.Migrations
                         name: "FK_PlanTypeDepartment_MinistryUsers_CreateById",
                         column: x => x.CreateById,
                         principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_PlanTypeDepartment_MinistryUsers_DeleteById",
                         column: x => x.DeleteById,
@@ -2875,7 +2814,7 @@ namespace Evaluation.DAL.Migrations
                     DepartmentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     OrderNo = table.Column<int>(type: "int", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -2936,7 +2875,7 @@ namespace Evaluation.DAL.Migrations
                     ButtonEn = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     OrderNo = table.Column<int>(type: "int", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -2982,7 +2921,7 @@ namespace Evaluation.DAL.Migrations
                     NameEn = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     DepartmentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -3003,8 +2942,7 @@ namespace Evaluation.DAL.Migrations
                         name: "FK_Team_MinistryUsers_CreateById",
                         column: x => x.CreateById,
                         principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Team_MinistryUsers_DeleteById",
                         column: x => x.DeleteById,
@@ -3025,7 +2963,7 @@ namespace Evaluation.DAL.Migrations
                     DepartmentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -3046,8 +2984,7 @@ namespace Evaluation.DAL.Migrations
                         name: "FK_UserDeparment_MinistryUsers_CreateById",
                         column: x => x.CreateById,
                         principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_UserDeparment_MinistryUsers_DeleteById",
                         column: x => x.DeleteById,
@@ -3074,7 +3011,7 @@ namespace Evaluation.DAL.Migrations
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     DepartmentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -3095,8 +3032,7 @@ namespace Evaluation.DAL.Migrations
                         name: "FK_UserDepartment_MinistryUsers_CreateById",
                         column: x => x.CreateById,
                         principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_UserDepartment_MinistryUsers_DeleteById",
                         column: x => x.DeleteById,
@@ -3123,7 +3059,7 @@ namespace Evaluation.DAL.Migrations
                     UserPartyTypeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Signature = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -3184,7 +3120,7 @@ namespace Evaluation.DAL.Migrations
                     FileNameEn_Size = table.Column<long>(type: "bigint", nullable: true),
                     OrderNo = table.Column<int>(type: "int", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -3199,8 +3135,7 @@ namespace Evaluation.DAL.Migrations
                         name: "FK_SiteContent_MinistryUsers_CreateById",
                         column: x => x.CreateById,
                         principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_SiteContent_MinistryUsers_DeleteById",
                         column: x => x.DeleteById,
@@ -3232,7 +3167,7 @@ namespace Evaluation.DAL.Migrations
                     OrganizationTreeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     OrgTreeId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -3285,7 +3220,7 @@ namespace Evaluation.DAL.Migrations
                     LevelId = table.Column<int>(type: "int", nullable: false),
                     LevelId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -3306,8 +3241,7 @@ namespace Evaluation.DAL.Migrations
                         name: "FK_SchoolLevel_MinistryUsers_CreateById",
                         column: x => x.CreateById,
                         principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_SchoolLevel_MinistryUsers_DeleteById",
                         column: x => x.DeleteById,
@@ -3338,7 +3272,7 @@ namespace Evaluation.DAL.Migrations
                     AcademicYearId = table.Column<int>(type: "int", nullable: false),
                     AcademicYearId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -3395,7 +3329,7 @@ namespace Evaluation.DAL.Migrations
                     DepartmentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     AcademicYearId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -3422,8 +3356,7 @@ namespace Evaluation.DAL.Migrations
                         name: "FK_DepartmentHoliday_MinistryUsers_CreateById",
                         column: x => x.CreateById,
                         principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_DepartmentHoliday_MinistryUsers_DeleteById",
                         column: x => x.DeleteById,
@@ -3446,7 +3379,7 @@ namespace Evaluation.DAL.Migrations
                     ParentId = table.Column<int>(type: "int", nullable: false),
                     AcademicYearId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -3515,7 +3448,7 @@ namespace Evaluation.DAL.Migrations
                     PlanTypeId = table.Column<int>(type: "int", nullable: false),
                     PlanTypeId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -3587,7 +3520,7 @@ namespace Evaluation.DAL.Migrations
                     DropDownType = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CalcMethodId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -3639,7 +3572,7 @@ namespace Evaluation.DAL.Migrations
                     CalcMethodId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     FormStatusId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -3699,7 +3632,7 @@ namespace Evaluation.DAL.Migrations
                     ScopeTypeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     OrderNo = table.Column<int>(type: "int", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -3754,7 +3687,7 @@ namespace Evaluation.DAL.Migrations
                     BackendName = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     SystemModuleId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -3817,7 +3750,7 @@ namespace Evaluation.DAL.Migrations
                     UrlEn = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ShowInWebSite = table.Column<bool>(type: "bit", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -3869,7 +3802,7 @@ namespace Evaluation.DAL.Migrations
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     Notes = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -3927,7 +3860,7 @@ namespace Evaluation.DAL.Migrations
                     SchoolId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     PlanId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -3985,7 +3918,7 @@ namespace Evaluation.DAL.Migrations
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Value = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -4033,10 +3966,11 @@ namespace Evaluation.DAL.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ScopeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ParentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ScopeId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    ParentId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    AcademicYearId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -4048,11 +3982,15 @@ namespace Evaluation.DAL.Migrations
                 {
                     table.PrimaryKey("PK_AcademicYearScope", x => x.Id);
                     table.ForeignKey(
+                        name: "FK_AcademicYearScope_AcademicYears_AcademicYearId",
+                        column: x => x.AcademicYearId,
+                        principalTable: "AcademicYears",
+                        principalColumn: "Id");
+                    table.ForeignKey(
                         name: "FK_AcademicYearScope_MinistryUsers_CreateById",
                         column: x => x.CreateById,
                         principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_AcademicYearScope_MinistryUsers_DeleteById",
                         column: x => x.DeleteById,
@@ -4067,14 +4005,12 @@ namespace Evaluation.DAL.Migrations
                         name: "FK_AcademicYearScope_Scopes_ParentId",
                         column: x => x.ParentId,
                         principalTable: "Scopes",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_AcademicYearScope_Scopes_ScopeId",
                         column: x => x.ScopeId,
                         principalTable: "Scopes",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -4086,7 +4022,7 @@ namespace Evaluation.DAL.Migrations
                     ScopeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Wegiht = table.Column<int>(type: "int", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -4138,7 +4074,7 @@ namespace Evaluation.DAL.Migrations
                     ScopeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     AcademicYearId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -4196,7 +4132,7 @@ namespace Evaluation.DAL.Migrations
                     ScopeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     TeamId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -4211,8 +4147,7 @@ namespace Evaluation.DAL.Migrations
                         name: "FK_ScopeUserTeam_MinistryUsers_CreateById",
                         column: x => x.CreateById,
                         principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_ScopeUserTeam_MinistryUsers_DeleteById",
                         column: x => x.DeleteById,
@@ -4252,7 +4187,7 @@ namespace Evaluation.DAL.Migrations
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ScopeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -4267,8 +4202,7 @@ namespace Evaluation.DAL.Migrations
                         name: "FK_UserTeamScope_MinistryUsers_CreateById",
                         column: x => x.CreateById,
                         principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_UserTeamScope_MinistryUsers_DeleteById",
                         column: x => x.DeleteById,
@@ -4314,7 +4248,7 @@ namespace Evaluation.DAL.Migrations
                     FirstReadDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     LastReadDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -4370,7 +4304,7 @@ namespace Evaluation.DAL.Migrations
                     FormGroupTypeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     FormGroupCustomListId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -4432,7 +4366,7 @@ namespace Evaluation.DAL.Migrations
                     Type = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ColumnName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -4447,8 +4381,7 @@ namespace Evaluation.DAL.Migrations
                         name: "FK_PlaceHolder_MinistryUsers_CreateById",
                         column: x => x.CreateById,
                         principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_PlaceHolder_MinistryUsers_DeleteById",
                         column: x => x.DeleteById,
@@ -4487,7 +4420,7 @@ namespace Evaluation.DAL.Migrations
                     AllowDraft = table.Column<bool>(type: "bit", nullable: false),
                     NewStatusId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -4538,7 +4471,7 @@ namespace Evaluation.DAL.Migrations
                     serviceId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     PartyTypeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -4553,8 +4486,7 @@ namespace Evaluation.DAL.Migrations
                         name: "FK_ServiceInitiatorPartyType_MinistryUsers_CreateById",
                         column: x => x.CreateById,
                         principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_ServiceInitiatorPartyType_MinistryUsers_DeleteById",
                         column: x => x.DeleteById,
@@ -4592,7 +4524,7 @@ namespace Evaluation.DAL.Migrations
                     StartDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     EndDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -4655,7 +4587,7 @@ namespace Evaluation.DAL.Migrations
                     serviceId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     PartyTypeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -4713,7 +4645,7 @@ namespace Evaluation.DAL.Migrations
                     ServiceId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     StatusGroupId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -4762,7 +4694,7 @@ namespace Evaluation.DAL.Migrations
                     Reason = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     EvidenceDocument = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -4783,8 +4715,7 @@ namespace Evaluation.DAL.Migrations
                         name: "FK_ChangeRequestDetail_MinistryUsers_CreateById",
                         column: x => x.CreateById,
                         principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_ChangeRequestDetail_MinistryUsers_DeleteById",
                         column: x => x.DeleteById,
@@ -4826,7 +4757,7 @@ namespace Evaluation.DAL.Migrations
                     DropDownTypeId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     FormGroupCustomListId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -4920,7 +4851,7 @@ namespace Evaluation.DAL.Migrations
                     PartyTypeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     MaximumAssignedUser = table.Column<int>(type: "int", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -4935,8 +4866,7 @@ namespace Evaluation.DAL.Migrations
                         name: "FK_ActionAssignPartyType_MinistryUsers_CreateById",
                         column: x => x.CreateById,
                         principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_ActionAssignPartyType_MinistryUsers_DeleteById",
                         column: x => x.DeleteById,
@@ -4972,7 +4902,7 @@ namespace Evaluation.DAL.Migrations
                     operators = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     FieldValue = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -4987,8 +4917,7 @@ namespace Evaluation.DAL.Migrations
                         name: "FK_ActionCondition_MinistryUsers_CreateById",
                         column: x => x.CreateById,
                         principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_ActionCondition_MinistryUsers_DeleteById",
                         column: x => x.DeleteById,
@@ -5017,7 +4946,7 @@ namespace Evaluation.DAL.Migrations
                     Priority = table.Column<int>(type: "int", nullable: false),
                     ActionPartyTypeSettings = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -5032,8 +4961,7 @@ namespace Evaluation.DAL.Migrations
                         name: "FK_ActionPartyType_MinistryUsers_CreateById",
                         column: x => x.CreateById,
                         principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_ActionPartyType_MinistryUsers_DeleteById",
                         column: x => x.DeleteById,
@@ -5066,7 +4994,7 @@ namespace Evaluation.DAL.Migrations
                     ServiceActionId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     PartytypeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -5117,7 +5045,7 @@ namespace Evaluation.DAL.Migrations
                     ServiceActionId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     TemplateDocId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -5172,7 +5100,7 @@ namespace Evaluation.DAL.Migrations
                     NextStatusId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Remarks = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -5187,8 +5115,7 @@ namespace Evaluation.DAL.Migrations
                         name: "FK_ActionTransactionsLog_MinistryUsers_CreateById",
                         column: x => x.CreateById,
                         principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_ActionTransactionsLog_MinistryUsers_DeleteById",
                         column: x => x.DeleteById,
@@ -5223,7 +5150,7 @@ namespace Evaluation.DAL.Migrations
                     TransactionsTypeId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     ServiceActionId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -5238,8 +5165,7 @@ namespace Evaluation.DAL.Migrations
                         name: "FK_FieldValueTransactionsLog_MinistryUsers_CreateById",
                         column: x => x.CreateById,
                         principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_FieldValueTransactionsLog_MinistryUsers_DeleteById",
                         column: x => x.DeleteById,
@@ -5283,7 +5209,7 @@ namespace Evaluation.DAL.Migrations
                     OrderNo = table.Column<int>(type: "int", nullable: false),
                     ShowIsDefaultAssigner = table.Column<bool>(type: "bit", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -5342,7 +5268,7 @@ namespace Evaluation.DAL.Migrations
                     StatusId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     PartyTypeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -5393,7 +5319,7 @@ namespace Evaluation.DAL.Migrations
                     StatusId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     PartyTypeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -5447,7 +5373,7 @@ namespace Evaluation.DAL.Migrations
                     IsUpdateOnModule = table.Column<bool>(type: "bit", nullable: false),
                     OrderNo = table.Column<int>(type: "int", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -5502,7 +5428,7 @@ namespace Evaluation.DAL.Migrations
                     MessageEn = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -5547,7 +5473,7 @@ namespace Evaluation.DAL.Migrations
                     PartyTypeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     FieldId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -5602,7 +5528,7 @@ namespace Evaluation.DAL.Migrations
                     FieldDropDownValueIds = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ParentFieldId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -5655,7 +5581,7 @@ namespace Evaluation.DAL.Migrations
                     ServiceStatusId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     IsShow = table.Column<bool>(type: "bit", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -5676,8 +5602,7 @@ namespace Evaluation.DAL.Migrations
                         name: "FK_FieldVisabilityConfig_MinistryUsers_CreateById",
                         column: x => x.CreateById,
                         principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_FieldVisabilityConfig_MinistryUsers_DeleteById",
                         column: x => x.DeleteById,
@@ -5718,7 +5643,7 @@ namespace Evaluation.DAL.Migrations
                     ChildFieldId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     Index = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -5748,8 +5673,7 @@ namespace Evaluation.DAL.Migrations
                         name: "FK_Attachment_MinistryUsers_CreateById",
                         column: x => x.CreateById,
                         principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Attachment_MinistryUsers_DeleteById",
                         column: x => x.DeleteById,
@@ -5776,7 +5700,7 @@ namespace Evaluation.DAL.Migrations
                     IsNotificationSend = table.Column<bool>(type: "bit", nullable: false),
                     NotificationTemplateId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -5852,7 +5776,7 @@ namespace Evaluation.DAL.Migrations
                     ActionStepFieldId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     ActionFieldId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
                     UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -5921,6 +5845,11 @@ namespace Evaluation.DAL.Migrations
                 name: "IX_AcademicYears_UpdateById",
                 table: "AcademicYears",
                 column: "UpdateById");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AcademicYearScope_AcademicYearId",
+                table: "AcademicYearScope",
+                column: "AcademicYearId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AcademicYearScope_CreateById",
@@ -7188,23 +7117,23 @@ namespace Evaluation.DAL.Migrations
                 column: "UpdateById");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ModuleType_CreateById",
-                table: "ModuleType",
+                name: "IX_ModuleTypes_CreateById",
+                table: "ModuleTypes",
                 column: "CreateById");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ModuleType_DeleteById",
-                table: "ModuleType",
+                name: "IX_ModuleTypes_DeleteById",
+                table: "ModuleTypes",
                 column: "DeleteById");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ModuleType_ParentId",
-                table: "ModuleType",
+                name: "IX_ModuleTypes_ParentId",
+                table: "ModuleTypes",
                 column: "ParentId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ModuleType_UpdateById",
-                table: "ModuleType",
+                name: "IX_ModuleTypes_UpdateById",
+                table: "ModuleTypes",
                 column: "UpdateById");
 
             migrationBuilder.CreateIndex(
@@ -8147,25 +8076,10 @@ namespace Evaluation.DAL.Migrations
                 column: "UpdateById");
 
             migrationBuilder.CreateIndex(
-                name: "IX_SMSProfile_BackendName",
-                table: "SMSProfile",
+                name: "IX_SMSProfiles_BackendName",
+                table: "SMSProfiles",
                 column: "BackendName",
                 unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_SMSProfile_CreateById",
-                table: "SMSProfile",
-                column: "CreateById");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_SMSProfile_DeleteById",
-                table: "SMSProfile",
-                column: "DeleteById");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_SMSProfile_UpdateById",
-                table: "SMSProfile",
-                column: "UpdateById");
 
             migrationBuilder.CreateIndex(
                 name: "IX_SMSProfiles_CreateById",
@@ -8673,7 +8587,7 @@ namespace Evaluation.DAL.Migrations
                 name: "ItemValues");
 
             migrationBuilder.DropTable(
-                name: "ModuleType");
+                name: "ModuleTypes");
 
             migrationBuilder.DropTable(
                 name: "Notifications");
@@ -8740,9 +8654,6 @@ namespace Evaluation.DAL.Migrations
 
             migrationBuilder.DropTable(
                 name: "SMSLog");
-
-            migrationBuilder.DropTable(
-                name: "SMSProfile");
 
             migrationBuilder.DropTable(
                 name: "SystemModuleType");

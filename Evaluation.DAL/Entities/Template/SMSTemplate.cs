@@ -1,4 +1,5 @@
 ﻿using Evaluation.DAL.Entities.BaseModule;
+using Evaluation.DAL.SystemSetting;
 using Microsoft.EntityFrameworkCore;
 
 namespace Evaluation.DAL.Entities.Template;
