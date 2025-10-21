@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Evaluation.DAL.Migrations
 {
     [DbContext(typeof(EvaluationDbContext))]
-    [Migration("20251020121001_Init")]
-    partial class Init
+    [Migration("20251021104410_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -31,7 +31,7 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -91,7 +91,7 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -171,7 +171,7 @@ namespace Evaluation.DAL.Migrations
                     b.Property<string>("AttributeValue")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -242,7 +242,7 @@ namespace Evaluation.DAL.Migrations
                     b.Property<string>("ActionPartyTypeSettings")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -302,7 +302,7 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -362,7 +362,7 @@ namespace Evaluation.DAL.Migrations
                     b.Property<Guid>("ActionStatusConfigurationId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -446,7 +446,7 @@ namespace Evaluation.DAL.Migrations
                     b.Property<string>("AttachmentLabelEn")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -535,7 +535,7 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -596,7 +596,7 @@ namespace Evaluation.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -682,7 +682,7 @@ namespace Evaluation.DAL.Migrations
                     b.Property<string>("ConfirmationTitleEn")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -763,7 +763,7 @@ namespace Evaluation.DAL.Migrations
                     b.Property<Guid?>("ChildFieldId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -849,7 +849,7 @@ namespace Evaluation.DAL.Migrations
                     b.Property<string>("ColumnName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -917,7 +917,7 @@ namespace Evaluation.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -978,7 +978,7 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -1096,7 +1096,7 @@ namespace Evaluation.DAL.Migrations
                     b.Property<bool>("CanViewEntityEvaluation")
                         .HasColumnType("bit");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -1160,7 +1160,7 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -1219,7 +1219,7 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -1279,7 +1279,7 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -1335,7 +1335,7 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -1384,7 +1384,7 @@ namespace Evaluation.DAL.Migrations
                     b.Property<string>("UserAgent")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<Guid?>("UserId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
@@ -1418,7 +1418,7 @@ namespace Evaluation.DAL.Migrations
                     b.Property<string>("ControlType")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -1515,7 +1515,7 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -1588,7 +1588,7 @@ namespace Evaluation.DAL.Migrations
                     b.Property<Guid>("AcademicYearId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -1667,7 +1667,7 @@ namespace Evaluation.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -1728,7 +1728,7 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -1791,7 +1791,7 @@ namespace Evaluation.DAL.Migrations
                     b.Property<Guid>("CategoryId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -1853,7 +1853,7 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -1913,7 +1913,7 @@ namespace Evaluation.DAL.Migrations
                     b.Property<string>("Context")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -1978,7 +1978,7 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -2044,7 +2044,7 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -2103,7 +2103,7 @@ namespace Evaluation.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -2168,7 +2168,7 @@ namespace Evaluation.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -2225,7 +2225,7 @@ namespace Evaluation.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -2301,7 +2301,7 @@ namespace Evaluation.DAL.Migrations
                     b.Property<int>("Column")
                         .HasColumnType("int");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -2420,7 +2420,7 @@ namespace Evaluation.DAL.Migrations
                     b.Property<string>("AttributeValue")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -2481,7 +2481,7 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -2552,7 +2552,7 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -2613,7 +2613,7 @@ namespace Evaluation.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -2680,7 +2680,7 @@ namespace Evaluation.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -2739,7 +2739,7 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -2810,7 +2810,7 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -2878,7 +2878,7 @@ namespace Evaluation.DAL.Migrations
                     b.Property<string>("BackendName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -2955,7 +2955,7 @@ namespace Evaluation.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -3018,7 +3018,7 @@ namespace Evaluation.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -3081,7 +3081,7 @@ namespace Evaluation.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -3142,7 +3142,10 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("AcademicYearId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -3166,10 +3169,10 @@ namespace Evaluation.DAL.Migrations
                         .HasColumnType("bit")
                         .HasDefaultValueSql("0");
 
-                    b.Property<Guid>("ParentId")
+                    b.Property<Guid?>("ParentId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("ScopeId")
+                    b.Property<Guid?>("ScopeId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid?>("UpdateById")
@@ -3179,6 +3182,8 @@ namespace Evaluation.DAL.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AcademicYearId");
 
                     b.HasIndex("CreateById");
 
@@ -3199,7 +3204,7 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -3271,7 +3276,7 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -3337,7 +3342,7 @@ namespace Evaluation.DAL.Migrations
                     b.Property<Guid>("CalcMethodId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -3416,7 +3421,7 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -3476,7 +3481,7 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -3534,7 +3539,7 @@ namespace Evaluation.DAL.Migrations
                     b.Property<Guid>("CalcMethodId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -3615,7 +3620,7 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -3675,7 +3680,7 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -3746,7 +3751,7 @@ namespace Evaluation.DAL.Migrations
                     b.Property<Guid>("AcademicYearId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -3805,7 +3810,7 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -3873,7 +3878,7 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -3949,7 +3954,7 @@ namespace Evaluation.DAL.Migrations
                     b.Property<string>("CCc")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -4013,7 +4018,7 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -4079,7 +4084,7 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -4147,7 +4152,7 @@ namespace Evaluation.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -4202,7 +4207,7 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -4262,7 +4267,7 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -4320,7 +4325,7 @@ namespace Evaluation.DAL.Migrations
                     b.Property<Guid>("AcademicYearId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -4382,7 +4387,7 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -4472,7 +4477,7 @@ namespace Evaluation.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -4535,7 +4540,7 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -4598,7 +4603,7 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -4657,7 +4662,7 @@ namespace Evaluation.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -4710,7 +4715,7 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -4771,7 +4776,7 @@ namespace Evaluation.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -4830,7 +4835,7 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -4885,7 +4890,7 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -4942,7 +4947,7 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -5000,7 +5005,7 @@ namespace Evaluation.DAL.Migrations
                     b.Property<Guid?>("ChangeRequestTypeId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -5085,7 +5090,7 @@ namespace Evaluation.DAL.Migrations
                     b.Property<Guid>("ChangeRequestId1")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -5149,7 +5154,7 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -5210,7 +5215,7 @@ namespace Evaluation.DAL.Migrations
                     b.Property<Guid?>("AcademicYearId1")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -5275,7 +5280,7 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -5333,7 +5338,7 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -5394,7 +5399,7 @@ namespace Evaluation.DAL.Migrations
                     b.Property<Guid?>("AcademicYearId1")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -5487,7 +5492,7 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -5551,7 +5556,7 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -5606,7 +5611,7 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -5662,7 +5667,7 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -5724,7 +5729,7 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -5784,7 +5789,7 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -5846,7 +5851,7 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -5903,7 +5908,7 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -5960,7 +5965,7 @@ namespace Evaluation.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -6070,7 +6075,7 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -6127,7 +6132,7 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -6191,7 +6196,7 @@ namespace Evaluation.DAL.Migrations
                     b.Property<string>("ColorCode")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -6263,7 +6268,7 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -6328,7 +6333,7 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -6395,7 +6400,7 @@ namespace Evaluation.DAL.Migrations
                     b.Property<string>("ButtonEn")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -6482,7 +6487,7 @@ namespace Evaluation.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -6546,7 +6551,7 @@ namespace Evaluation.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -6624,7 +6629,7 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -6684,7 +6689,7 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -6716,7 +6721,7 @@ namespace Evaluation.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("ParentId")
+                    b.Property<Guid?>("ParentId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid?>("UpdateById")
@@ -6735,7 +6740,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("ModuleType");
+                    b.ToTable("ModuleTypes");
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Entities.Template.Notification", b =>
@@ -6744,7 +6749,7 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -6836,7 +6841,7 @@ namespace Evaluation.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -6891,53 +6896,6 @@ namespace Evaluation.DAL.Migrations
                     b.ToTable("NotificationTemplates");
                 });
 
-            modelBuilder.Entity("Evaluation.DAL.Entities.Template.SMSProfile", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("CreateById")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreateDate")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("getdate()");
-
-                    b.Property<Guid?>("DeleteById")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("DeleteDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool?>("IsActive")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValueSql("1");
-
-                    b.Property<bool?>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValueSql("0");
-
-                    b.Property<Guid?>("UpdateById")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("UpdateDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreateById");
-
-                    b.HasIndex("DeleteById");
-
-                    b.HasIndex("UpdateById");
-
-                    b.ToTable("SMSProfiles");
-                });
-
             modelBuilder.Entity("Evaluation.DAL.Entities.Template.SMSTemplate", b =>
                 {
                     b.Property<Guid>("Id")
@@ -6948,7 +6906,7 @@ namespace Evaluation.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -7015,7 +6973,7 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -7091,7 +7049,7 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -7146,7 +7104,7 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -7197,7 +7155,7 @@ namespace Evaluation.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -7255,7 +7213,7 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -7312,7 +7270,7 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -7375,7 +7333,7 @@ namespace Evaluation.DAL.Migrations
                     b.Property<string>("BtnNameEn")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -7498,7 +7456,7 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -7583,7 +7541,7 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -7658,7 +7616,7 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -7768,7 +7726,7 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -7855,7 +7813,7 @@ namespace Evaluation.DAL.Migrations
                     b.Property<string>("BlobUrl")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -7931,7 +7889,7 @@ namespace Evaluation.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -7983,7 +7941,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("SMSProfile");
+                    b.ToTable("SMSProfiles");
                 });
 
             modelBuilder.Entity("Evaluation.DAL.SystemSetting.SystemSetting", b =>
@@ -7992,7 +7950,7 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -8062,7 +8020,7 @@ namespace Evaluation.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("CreateById")
+                    b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateDate")
@@ -8196,9 +8154,7 @@ namespace Evaluation.DAL.Migrations
                 {
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
-                        .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CreateById");
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -8235,9 +8191,7 @@ namespace Evaluation.DAL.Migrations
                 {
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
-                        .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CreateById");
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -8272,8 +8226,7 @@ namespace Evaluation.DAL.Migrations
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
                         .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -8311,9 +8264,7 @@ namespace Evaluation.DAL.Migrations
                 {
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
-                        .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CreateById");
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -8351,8 +8302,7 @@ namespace Evaluation.DAL.Migrations
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
                         .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -8398,8 +8348,7 @@ namespace Evaluation.DAL.Migrations
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
                         .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -8454,8 +8403,7 @@ namespace Evaluation.DAL.Migrations
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
                         .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Entities.StatusEntities.ServiceStatus", "CurrentStatus")
                         .WithMany("CurrentStatusConfigurations")
@@ -8503,8 +8451,7 @@ namespace Evaluation.DAL.Migrations
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
                         .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -8544,8 +8491,7 @@ namespace Evaluation.DAL.Migrations
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
                         .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -8575,8 +8521,7 @@ namespace Evaluation.DAL.Migrations
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
                         .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -8617,9 +8562,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
-                        .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CreateById");
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -8650,9 +8593,7 @@ namespace Evaluation.DAL.Migrations
                 {
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
-                        .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CreateById");
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -8682,8 +8623,7 @@ namespace Evaluation.DAL.Migrations
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
                         .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -8731,8 +8671,7 @@ namespace Evaluation.DAL.Migrations
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
                         .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -8756,8 +8695,7 @@ namespace Evaluation.DAL.Migrations
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
                         .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -8788,9 +8726,7 @@ namespace Evaluation.DAL.Migrations
                 {
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
-                        .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CreateById");
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -8828,8 +8764,7 @@ namespace Evaluation.DAL.Migrations
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
                         .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -8860,9 +8795,7 @@ namespace Evaluation.DAL.Migrations
                 {
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
-                        .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CreateById");
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -8874,9 +8807,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "User")
                         .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("UserId");
 
                     b.Navigation("CreateBy");
 
@@ -8892,8 +8823,7 @@ namespace Evaluation.DAL.Migrations
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
                         .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -8925,8 +8855,7 @@ namespace Evaluation.DAL.Migrations
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
                         .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -8963,9 +8892,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
-                        .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CreateById");
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -8997,8 +8924,7 @@ namespace Evaluation.DAL.Migrations
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
                         .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -9021,9 +8947,7 @@ namespace Evaluation.DAL.Migrations
                 {
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
-                        .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CreateById");
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -9067,8 +8991,7 @@ namespace Evaluation.DAL.Migrations
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
                         .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -9101,9 +9024,7 @@ namespace Evaluation.DAL.Migrations
                 {
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
-                        .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CreateById");
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -9124,9 +9045,7 @@ namespace Evaluation.DAL.Migrations
                 {
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
-                        .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CreateById");
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -9148,8 +9067,7 @@ namespace Evaluation.DAL.Migrations
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
                         .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -9188,9 +9106,7 @@ namespace Evaluation.DAL.Migrations
                 {
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
-                        .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CreateById");
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -9211,9 +9127,7 @@ namespace Evaluation.DAL.Migrations
                 {
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
-                        .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CreateById");
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -9240,9 +9154,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
-                        .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CreateById");
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -9266,8 +9178,7 @@ namespace Evaluation.DAL.Migrations
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
                         .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -9298,8 +9209,7 @@ namespace Evaluation.DAL.Migrations
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
                         .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -9389,8 +9299,7 @@ namespace Evaluation.DAL.Migrations
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
                         .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -9421,9 +9330,7 @@ namespace Evaluation.DAL.Migrations
                 {
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
-                        .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CreateById");
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -9459,8 +9366,7 @@ namespace Evaluation.DAL.Migrations
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
                         .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -9500,8 +9406,7 @@ namespace Evaluation.DAL.Migrations
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
                         .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -9533,8 +9438,7 @@ namespace Evaluation.DAL.Migrations
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
                         .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -9558,8 +9462,7 @@ namespace Evaluation.DAL.Migrations
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
                         .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -9597,9 +9500,7 @@ namespace Evaluation.DAL.Migrations
                 {
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
-                        .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CreateById");
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -9645,8 +9546,7 @@ namespace Evaluation.DAL.Migrations
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
                         .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -9693,8 +9593,7 @@ namespace Evaluation.DAL.Migrations
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
                         .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -9718,8 +9617,7 @@ namespace Evaluation.DAL.Migrations
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
                         .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -9742,9 +9640,7 @@ namespace Evaluation.DAL.Migrations
                 {
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
-                        .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CreateById");
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -9763,11 +9659,13 @@ namespace Evaluation.DAL.Migrations
 
             modelBuilder.Entity("Evaluation.DAL.Entities.FormsModules.AcademicYearScope", b =>
                 {
+                    b.HasOne("Evaluation.DAL.Entities.Calendars.AcademicYear", "AcademicYear")
+                        .WithMany()
+                        .HasForeignKey("AcademicYearId");
+
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
-                        .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CreateById");
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -9775,19 +9673,17 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasOne("Evaluation.DAL.Entities.FormsModules.Scope", "Parent")
                         .WithMany()
-                        .HasForeignKey("ParentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ParentId");
 
                     b.HasOne("Evaluation.DAL.Entities.FormsModules.Scope", "Scope")
                         .WithMany()
-                        .HasForeignKey("ScopeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ScopeId");
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "UpdateBy")
                         .WithMany()
                         .HasForeignKey("UpdateById");
+
+                    b.Navigation("AcademicYear");
 
                     b.Navigation("CreateBy");
 
@@ -9805,8 +9701,7 @@ namespace Evaluation.DAL.Migrations
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
                         .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -9838,8 +9733,7 @@ namespace Evaluation.DAL.Migrations
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
                         .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -9877,8 +9771,7 @@ namespace Evaluation.DAL.Migrations
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
                         .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -9920,8 +9813,7 @@ namespace Evaluation.DAL.Migrations
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
                         .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -9961,8 +9853,7 @@ namespace Evaluation.DAL.Migrations
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
                         .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -9992,8 +9883,7 @@ namespace Evaluation.DAL.Migrations
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
                         .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -10019,8 +9909,7 @@ namespace Evaluation.DAL.Migrations
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
                         .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -10060,8 +9949,7 @@ namespace Evaluation.DAL.Migrations
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
                         .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -10107,8 +9995,7 @@ namespace Evaluation.DAL.Migrations
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
                         .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -10150,8 +10037,7 @@ namespace Evaluation.DAL.Migrations
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
                         .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -10190,9 +10076,7 @@ namespace Evaluation.DAL.Migrations
                 {
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
-                        .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CreateById");
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -10227,9 +10111,7 @@ namespace Evaluation.DAL.Migrations
                 {
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
-                        .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CreateById");
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -10250,9 +10132,7 @@ namespace Evaluation.DAL.Migrations
                 {
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
-                        .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CreateById");
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -10287,9 +10167,7 @@ namespace Evaluation.DAL.Migrations
                 {
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
-                        .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CreateById");
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -10310,9 +10188,7 @@ namespace Evaluation.DAL.Migrations
                 {
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
-                        .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CreateById");
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -10334,8 +10210,7 @@ namespace Evaluation.DAL.Migrations
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
                         .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -10373,9 +10248,7 @@ namespace Evaluation.DAL.Migrations
                 {
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
-                        .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CreateById");
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -10403,8 +10276,7 @@ namespace Evaluation.DAL.Migrations
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
                         .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -10445,8 +10317,7 @@ namespace Evaluation.DAL.Migrations
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
                         .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -10485,8 +10356,7 @@ namespace Evaluation.DAL.Migrations
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
                         .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -10517,9 +10387,7 @@ namespace Evaluation.DAL.Migrations
                 {
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
-                        .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CreateById");
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -10557,8 +10425,7 @@ namespace Evaluation.DAL.Migrations
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
                         .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -10582,8 +10449,7 @@ namespace Evaluation.DAL.Migrations
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
                         .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -10607,8 +10473,7 @@ namespace Evaluation.DAL.Migrations
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
                         .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -10648,8 +10513,7 @@ namespace Evaluation.DAL.Migrations
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
                         .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -10673,8 +10537,7 @@ namespace Evaluation.DAL.Migrations
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
                         .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -10698,8 +10561,7 @@ namespace Evaluation.DAL.Migrations
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
                         .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -10739,8 +10601,7 @@ namespace Evaluation.DAL.Migrations
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
                         .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -10769,8 +10630,7 @@ namespace Evaluation.DAL.Migrations
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
                         .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -10815,9 +10675,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
-                        .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CreateById");
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -10846,9 +10704,7 @@ namespace Evaluation.DAL.Migrations
                 {
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
-                        .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CreateById");
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -10875,8 +10731,7 @@ namespace Evaluation.DAL.Migrations
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
                         .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -10908,9 +10763,7 @@ namespace Evaluation.DAL.Migrations
                 {
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
-                        .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CreateById");
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -10932,8 +10785,7 @@ namespace Evaluation.DAL.Migrations
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
                         .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -10962,8 +10814,7 @@ namespace Evaluation.DAL.Migrations
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
                         .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -11010,8 +10861,7 @@ namespace Evaluation.DAL.Migrations
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
                         .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -11056,8 +10906,7 @@ namespace Evaluation.DAL.Migrations
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
                         .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -11080,9 +10929,7 @@ namespace Evaluation.DAL.Migrations
                 {
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
-                        .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CreateById");
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -11103,9 +10950,7 @@ namespace Evaluation.DAL.Migrations
                 {
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
-                        .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CreateById");
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -11150,9 +10995,7 @@ namespace Evaluation.DAL.Migrations
                 {
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
-                        .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CreateById");
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -11181,9 +11024,7 @@ namespace Evaluation.DAL.Migrations
                 {
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
-                        .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CreateById");
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -11228,9 +11069,7 @@ namespace Evaluation.DAL.Migrations
                 {
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
-                        .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CreateById");
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -11267,9 +11106,7 @@ namespace Evaluation.DAL.Migrations
                 {
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
-                        .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CreateById");
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -11291,8 +11128,7 @@ namespace Evaluation.DAL.Migrations
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
                         .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -11323,9 +11159,7 @@ namespace Evaluation.DAL.Migrations
                 {
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
-                        .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CreateById");
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -11363,8 +11197,7 @@ namespace Evaluation.DAL.Migrations
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
                         .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -11404,8 +11237,7 @@ namespace Evaluation.DAL.Migrations
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
                         .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -11437,8 +11269,7 @@ namespace Evaluation.DAL.Migrations
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
                         .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -11478,8 +11309,7 @@ namespace Evaluation.DAL.Migrations
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
                         .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -11519,8 +11349,7 @@ namespace Evaluation.DAL.Migrations
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
                         .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -11551,9 +11380,7 @@ namespace Evaluation.DAL.Migrations
                 {
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
-                        .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CreateById");
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -11581,8 +11408,7 @@ namespace Evaluation.DAL.Migrations
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
                         .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -11606,8 +11432,7 @@ namespace Evaluation.DAL.Migrations
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
                         .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -11646,22 +11471,22 @@ namespace Evaluation.DAL.Migrations
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
                         .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
-                        .HasForeignKey("DeleteById");
+                        .HasForeignKey("DeleteById")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Entities.Template.ModuleType", "Parent")
                         .WithMany()
                         .HasForeignKey("ParentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "UpdateBy")
                         .WithMany()
-                        .HasForeignKey("UpdateById");
+                        .HasForeignKey("UpdateById")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("CreateBy");
 
@@ -11677,8 +11502,7 @@ namespace Evaluation.DAL.Migrations
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
                         .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -11717,8 +11541,7 @@ namespace Evaluation.DAL.Migrations
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
                         .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -11744,45 +11567,19 @@ namespace Evaluation.DAL.Migrations
                     b.Navigation("UpdateBy");
                 });
 
-            modelBuilder.Entity("Evaluation.DAL.Entities.Template.SMSProfile", b =>
-                {
-                    b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
-                        .WithMany()
-                        .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
-                        .WithMany()
-                        .HasForeignKey("DeleteById")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "UpdateBy")
-                        .WithMany()
-                        .HasForeignKey("UpdateById")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("CreateBy");
-
-                    b.Navigation("DeleteBy");
-
-                    b.Navigation("UpdateBy");
-                });
-
             modelBuilder.Entity("Evaluation.DAL.Entities.Template.SMSTemplate", b =>
                 {
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
                         .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
                         .HasForeignKey("DeleteById")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Evaluation.DAL.Entities.Template.SMSProfile", "SMSProfile")
+                    b.HasOne("Evaluation.DAL.SystemSetting.SMSProfile", "SMSProfile")
                         .WithMany()
                         .HasForeignKey("SMSProfileId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -11807,8 +11604,7 @@ namespace Evaluation.DAL.Migrations
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
                         .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -11864,8 +11660,7 @@ namespace Evaluation.DAL.Migrations
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
                         .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -11889,8 +11684,7 @@ namespace Evaluation.DAL.Migrations
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
                         .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -11914,8 +11708,7 @@ namespace Evaluation.DAL.Migrations
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
                         .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -11938,9 +11731,7 @@ namespace Evaluation.DAL.Migrations
                 {
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
-                        .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CreateById");
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -11977,9 +11768,7 @@ namespace Evaluation.DAL.Migrations
                 {
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
-                        .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CreateById");
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -12016,9 +11805,7 @@ namespace Evaluation.DAL.Migrations
                 {
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
-                        .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CreateById");
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -12039,9 +11826,7 @@ namespace Evaluation.DAL.Migrations
                 {
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
-                        .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CreateById");
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -12074,9 +11859,7 @@ namespace Evaluation.DAL.Migrations
                 {
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
-                        .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CreateById");
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -12109,9 +11892,7 @@ namespace Evaluation.DAL.Migrations
                 {
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
-                        .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CreateById");
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -12144,9 +11925,7 @@ namespace Evaluation.DAL.Migrations
                 {
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
-                        .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CreateById");
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -12167,9 +11946,7 @@ namespace Evaluation.DAL.Migrations
                 {
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
-                        .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CreateById");
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -12191,16 +11968,17 @@ namespace Evaluation.DAL.Migrations
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
                         .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
-                        .HasForeignKey("DeleteById");
+                        .HasForeignKey("DeleteById")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "UpdateBy")
                         .WithMany()
-                        .HasForeignKey("UpdateById");
+                        .HasForeignKey("UpdateById")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("CreateBy");
 
@@ -12213,9 +11991,7 @@ namespace Evaluation.DAL.Migrations
                 {
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
-                        .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CreateById");
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()
@@ -12236,9 +12012,7 @@ namespace Evaluation.DAL.Migrations
                 {
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "CreateBy")
                         .WithMany()
-                        .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CreateById");
 
                     b.HasOne("Evaluation.DAL.Entities.Authentication.MinistryUser", "DeleteBy")
                         .WithMany()

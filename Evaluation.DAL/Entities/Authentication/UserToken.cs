@@ -16,7 +16,7 @@ namespace Evaluation.DAL.Entities.Authentication
         public DateTime? DeprecatedDate { get; set; }
         public string? UserAgent { get; set; }
         public string? IP { get; set; }
-        public Guid UserId { get; set; }
+        public Guid? UserId { get; set; }
         public MinistryUser? User { get; set; }
     }
 }
