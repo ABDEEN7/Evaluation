@@ -13,6 +13,6 @@ public class ChangeRequest : EntityBase
     public int PlanId { get; set; }
     public Plan? Plan { get; set; }
     public int RequestedById { get; set; }
-    public User? User { get; set; }
+    public MinistryUser? User { get; set; }
     public string? Notes { get; set; }
 }

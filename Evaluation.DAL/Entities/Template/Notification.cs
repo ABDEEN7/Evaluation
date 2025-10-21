@@ -1,8 +1,9 @@
 ﻿using Evaluation.DAL.Entities.Authentication;
+using Evaluation.DAL.Entities.BaseModule;
 
 namespace Evaluation.DAL.Entities.Template;
 
-public class Notification
+public class Notification : EntityBase
 {
     public Guid? NotificationTemplateId { get; set; }
     public NotificationTemplate? NotificationTemplate { get; set; }
@@ -19,7 +20,7 @@ public class Notification
 
 
     public Guid UserId { get; set; }
-    public User? User { get; set; }
+    public MinistryUser? User { get; set; }
     public DateTime? FirstReadDate { get; set; }
     public DateTime? LastReadDate { get; set; }
 }

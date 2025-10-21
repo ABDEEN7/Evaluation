@@ -4,7 +4,7 @@ using Evaluation.DAL.Entities.DepartementEntites;
 using Evaluation.DAL.Entities.BaseModule;
 
 namespace Evaluation.DAL.Entities.Calendars;
-[Index(nameof(Department), nameof(Year), IsUnique = true)]
+[Index(nameof(DepartmentId), nameof(Year), IsUnique = true)]
 
 public class AcademicYear : EntityBase
 {
@@ -14,5 +14,5 @@ public class AcademicYear : EntityBase
     public DateTime EndDate { get; set; }
     public int Year { get; set; }
     public Guid DepartmentId { get; set; }
-    public Department Department { get; set; } = new();
+    public Department? Department { get; set; }
 }

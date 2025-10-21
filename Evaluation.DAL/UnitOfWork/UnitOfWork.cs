@@ -1,10 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Evaluation.DAL.Data;
+using Evaluation.DAL.Context;
 using Evaluation.DAL.Repositories;
-using Evaluation.DAL.Entities.BaseModule;
 using System.Data;
 using Evaluation.SharedHelper.Helper;
 using Evaluation.DAL.Exceptions;
+using Evaluation.DAL.Entities.Generic;
 
 
 namespace Evaluation.DAL.UnitOfWork
@@ -20,10 +20,10 @@ namespace Evaluation.DAL.UnitOfWork
             _userInfo = userInfo;
         }
 
-        public Repository<T> GetRepository<T>() where T : class, IEntity<Guid>
+        public Repository<T> GetRepository<T>() where T : class, IEntity
             => new Repository<T>(_context, _userInfo);
 
-        public ViewRepository<T> GetViewRepository<T>() where T : class, IViewEntity<Guid>
+        public ViewRepository<T> GetViewRepository<T>() where T : class
             => new ViewRepository<T>(_context, _userInfo);
 
         public async Task CommitAsync()

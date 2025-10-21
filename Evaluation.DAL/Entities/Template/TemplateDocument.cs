@@ -1,5 +1,7 @@
-﻿namespace Evaluation.DAL.Entities.Template;
+﻿using Evaluation.DAL.Entities.BaseModule;
 
-public class TemplateDocument
+namespace Evaluation.DAL.Entities.Template;
+
+public class TemplateDocument:EntityBase
 {
 }

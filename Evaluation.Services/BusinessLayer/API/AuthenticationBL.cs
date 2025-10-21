@@ -2,8 +2,6 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Runtime.Intrinsics.Arm;
 using System.Security.Claims;
 using Evaluation.DAL.Entities.Authentication;
-using Evaluation.DAL.Entities.PermissionEntity;
-using Evaluation.DAL.Entities.UserEntiy;
 using Evaluation.DAL.UnitOfWork;
 using Evaluation.Services.BusinessLayer.API;
 using Evaluation.Services.Special;
@@ -273,14 +271,14 @@ public class AuthenticationBL : ApiBase
 
         await uow.GetRepository<UserLoginLog>().InsertAsync(log);
 
-        var profile = await uow.GetRepository<User>()
+        var profile = await uow.GetRepository<MinistryUser>()
             .GetAllActiveNonDeleted(x => x.Id == userId)
             .FirstOrDefaultAsync();
 
         if (profile != null)
         {
             profile.LastLoginDate = DateTime.Now;
-            uow.GetRepository<User>().Update(profile);
+            uow.GetRepository<MinistryUser>().Update(profile);
         }
 
         await uow.CommitAsync();
@@ -290,7 +288,7 @@ public class AuthenticationBL : ApiBase
 
     #region ?? Helpers
 
-    private Dictionary<string, string> GenerateClaimsForUserProfile(User user, UserType userType)
+    private Dictionary<string, string> GenerateClaimsForUserProfile(MinistryUser user, UserType userType)
     {
         return new()
         {

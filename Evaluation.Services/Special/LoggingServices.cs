@@ -1,5 +1,4 @@
-﻿
-using Evaluation.DAL.Entities.Audit;
+﻿using Evaluation.DAL.Entities.Audit;
 using Evaluation.DAL.Entities.Exception;
 using Evaluation.SharedHelper;
 using Evaluation.SharedHelper.Enums;

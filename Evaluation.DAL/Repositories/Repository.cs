@@ -1,6 +1,12 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using Evaluation.DAL.Entities.Audit;
+using Evaluation.DAL.Entities.BaseModule;
+using Evaluation.DAL.Entities.Generic;
+using Evaluation.SharedHelper.Helper;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -11,9 +17,10 @@ using Evaluation.DAL.Entities.BaseModule;
 
 
 
+
 namespace Evaluation.DAL.Repositories;
 
-public class Repository<T>(DbContext context, UserInfo userInfo) : RepositoryBase<T>(context, userInfo) where T : class, IEntity<Guid>
+public class Repository<T>(DbContext context, UserInfo userInfo) : RepositoryBase<T>(context, userInfo) where T : class, IEntity
 {
     #region Get Methods
     public IQueryable<T> GetAllActiveNonDeleted(Expression<Func<T, bool>>? filter = null,
