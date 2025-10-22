@@ -1,0 +1,39 @@
+/* Colors */
+
+.sub_parent_menu .accordion-item-header,
+.megamenu .dropdown-item .accordion-item-body-content a,
+.dropdown-item{
+  text-align: right;
+}
+.theme-btn-icon > i:after{
+  content: "";
+  border: 6px solid;
+  border-color: transparent var(--color-primary) transparent transparent;
+  position: absolute;
+  top: 11px;
+  left: -11px;
+  right: auto;
+
+}
+
+.theme-btn-icon:hover > i:after {border-color: transparent var(--color-blue) transparent transparent ;}
+
+
+.news-inner{
+  border: 0 !important;
+  border-right: 10px solid var( --color-primary) !important;
+
+}
+.events{
+  border: 0 !important;
+  border-right: 10px solid var( --color-blue) !important;
+}
+
+.statics .col-md-6.col-sm-6.col-6:nth-child(2) h6, 
+.statics .col-md-6.col-sm-6.col-6:nth-child(2) p {
+  text-align: left;
+}
+.search .has-search .form-control-feedback{
+  left: 0;
+  right: auto;
+}

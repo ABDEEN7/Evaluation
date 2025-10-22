@@ -1,6 +1,6 @@
 ﻿
 <!DOCTYPE html>
-<html lang="en" class="">
+<html lang="en" dir="rtl" class="">
 <head>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
@@ -15,13 +15,13 @@
 
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400;500;600;700;800;900;1000&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="https://maxst.icons8.com/vue-static/landings/line-awesome/line-awesome/1.3.0/css/line-awesome.min.css">
 
-    <link rel="stylesheet" href="~/assets/vendor/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="~/assets/vendor/bootstrap/css/bootstrap.rtl.min.css">
 
     <!-- Template Main CSS File -->
     <link href="~/assets/css/style.css" rel="stylesheet">
-
 
 </head>
 
@@ -32,20 +32,21 @@
     <header id="header" class="fixed-top wow slideInDown animated" data-wow-duration="0.75s" data-wow-delay="0s">
         <div class="container">
             <div class="row align-items-center">
-                <div class="col-lg-3 col-md-8 col-7"><div class="d-flex align-items-center"><i class="bi bi-list mobile-nav-toggle"></i><a href="/Home/Index" class="logo"><img src="~/assets/img/logo-en.png" alt="" class="img-fluid"></a></div></div>
+                <div class="col-lg-3 col-md-8 col-7"><div class="d-flex align-items-center"><i class="bi bi-list mobile-nav-toggle"></i><a href="/Home/IndexAr" class="logo"><img src="~/assets/img/logo.png" alt="" class="img-fluid"></a></div></div>
                 <div class="col-lg-9 col-md-4 col-5">
                     <div class="main-navbar d-flex align-items-center justify-content-between">
                         <nav id="navbar" class="navbar">
                             <ul class="px-3">
                                 <li class="nav-item">
-                                    <a class="nav-link" href="/Home/IndexAr"><i class="fa fa-home"></i></a>
+                                    <a class="nav-link" href="/Home/Index"><i class="fa fa-home"></i></a>
                                 </li>
                                 <li><a class="nav-link" href="#">دليل المستخدم</a></li>
+
 
                             </ul>
                         </nav><!-- .navbar -->
                         <div class="social-media px-3">
-                            <a href="/Home/IndexAr" class="btn"> <span class="d-none d-md-block"><i class="fas fa-globe"></i>&nbsp;&nbsp;Arabic</span><span class="d-block d-md-none">Ar</span></a>
+                            <a href="/Home/Index" class="btn"> <span class="d-none d-md-block"><i class="fas fa-globe"></i>&nbsp;&nbsp;English</span><span class="d-block d-md-none">En</span></a>
                             <a id="loginLink" href="/Authentication/Login" class="btn btn-getstarted btn-sm">تسجيل دخول</a>
                         </div>
                     </div>
@@ -98,7 +99,6 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="row">
                     <div class="col-md-12">
                         <!-- Bootstrap Tabs -->
@@ -518,6 +518,8 @@
           });
         });
     </script>
+
+
 
 </body>
 

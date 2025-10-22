@@ -1,0 +1,104 @@
+table.dataTable thead>tr>th.sorting:before, table.dataTable thead>tr>th.sorting:after, table.dataTable thead>tr>th.sorting_asc:before, table.dataTable thead>tr>th.sorting_asc:after, table.dataTable thead>tr>th.sorting_desc:before, table.dataTable thead>tr>th.sorting_desc:after, table.dataTable thead>tr>th.sorting_asc_disabled:before, table.dataTable thead>tr>th.sorting_asc_disabled:after, table.dataTable thead>tr>th.sorting_desc_disabled:before, table.dataTable thead>tr>th.sorting_desc_disabled:after, table.dataTable thead>tr>td.sorting:before, table.dataTable thead>tr>td.sorting:after, table.dataTable thead>tr>td.sorting_asc:before, table.dataTable thead>tr>td.sorting_asc:after, table.dataTable thead>tr>td.sorting_desc:before, table.dataTable thead>tr>td.sorting_desc:after, table.dataTable thead>tr>td.sorting_asc_disabled:before, table.dataTable thead>tr>td.sorting_asc_disabled:after, table.dataTable thead>tr>td.sorting_desc_disabled:before, table.dataTable thead>tr>td.sorting_desc_disabled:after{
+  left: 10px;
+    right: auto;
+}
+table.dataTable thead th, table.dataTable thead td, table.dataTable tfoot th, table.dataTable tfoot td{
+  text-align: right;
+}
+table.dataTable thead>tr>th.sorting, table.dataTable thead>tr>th.sorting_asc, table.dataTable thead>tr>th.sorting_desc, table.dataTable thead>tr>th.sorting_asc_disabled, table.dataTable thead>tr>th.sorting_desc_disabled, table.dataTable thead>tr>td.sorting, table.dataTable thead>tr>td.sorting_asc, table.dataTable thead>tr>td.sorting_desc, table.dataTable thead>tr>td.sorting_asc_disabled, table.dataTable thead>tr>td.sorting_desc_disabled{
+  
+    padding-left: 26px;
+    padding-right: .5rem;
+}
+.sidebar{border-left:1px solid rgba(203, 203, 203, 1)}
+
+
+.datetime input.form-control {
+    border-radius: 0 0.375rem 0.375rem 0 !important;
+    border-left: 0 !important;
+    border-right:1px solid rgba(203, 203, 203, 1);
+}
+
+.datetime .input-group-text{
+  order: 2;
+  background-color: transparent;
+  border-radius: 0.375rem 0 0 0.375rem !important;
+  border-right: 0 !important;
+}
+
+
+#filterOffcanvas .input-group input.form-control {
+    border-radius: 0 0.375rem 0.375rem 0 !important;
+    border-left: 0 !important;
+}
+
+#filterOffcanvas .input-group-text{
+  order: 2;
+  background-color: transparent;
+  border-radius: 0.375rem 0 0 0.375rem !important;
+  border-right: 0 !important;
+}
+
+.notification .btn>.start-100 {
+    right: 0% !important;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__clear{
+    margin-left: 25px;
+}
+
+
+
+
+
+  /* Rounded table wrapper */
+  .table-card {
+    border-radius: 0.6rem;          /* corner radius */
+    background: #fff;
+    border:0;
+  }
+
+  /* Make sure internal table respects the wrapper rounding */
+  .table-card .table-responsive {
+    border-radius: 0 0 0.6rem 0.6rem; /* if you used a card header, round bottom only */
+    overflow: hidden;
+  }
+
+  /* If you want the THEAD to appear as a single rounded top, style the header separately */
+  .table-card thead th:first-child { border-top-right-radius: 0.6rem;     border-top-left-radius: 0;}
+  .table-card thead th:last-child  { border-top-left-radius: 0.6rem;    border-top-right-radius: 0; }
+  .table-bordered.dataTable th:last-child, 
+  .table-bordered.dataTable td:last-child{border-left-width: 1px;}
+  .table-bordered.dataTable tr:last-child td:first-child {border-bottom-right-radius: 0.6rem;border-bottom-left-radius:0;}
+  .table-bordered.dataTable tr:last-child td:last-child {border-bottom-left-radius: 0.6rem;border-bottom-right-radius:0}
+
+#userTable_paginate .page-item:first-child .page-link:before{
+  content: '\f105';
+}
+#userTable_paginate .page-item:last-child .page-link:before{
+  content: '\f104';
+}
+
+
+
+
+
+
+.breadcrumb-item+.breadcrumb-item {
+    padding-right: 1.5rem;
+    position: relative;
+}
+
+  .breadcrumb-item+.breadcrumb-item::before{
+        content: '\f104';
+    font-family: 'Line Awesome Free';
+    font-weight: 900;
+    border: 0;
+    position: absolute;
+    font-size: 15px;
+    color: rgba(102, 103, 102, 1);
+    padding: 0;
+    margin: 0;
+    right: 4%;
+    top: 2px;
+  }
