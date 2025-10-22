@@ -8,6 +8,8 @@ namespace Evaluation.Web.Controllers
         {
             return View();
         }
+
+        //TODO: This action is temp until we add translation
         public IActionResult CreateAr()
         {
             return View();
