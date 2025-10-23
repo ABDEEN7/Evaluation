@@ -3,7 +3,7 @@ using Evaluation.DAL.Entities.Generic;
 
 namespace Evaluation.DAL.Entities.BaseModule;
 
-public abstract class EntityBase : IEntity
+public abstract class EntityBase :  IEntity
 {
     public Guid Id { get; set; } = Guid.NewGuid();
     public bool? IsActive { get; set; }
@@ -17,4 +17,8 @@ public abstract class EntityBase : IEntity
     public MinistryUser? DeleteBy { get; set; }
     public DateTime? DeleteDate { get; set; }
     public bool? IsDeleted { get; set; }
+}
+public interface IViewEntity<T>
+{
+
 }

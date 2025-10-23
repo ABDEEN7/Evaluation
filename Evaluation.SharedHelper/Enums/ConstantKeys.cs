@@ -16,6 +16,8 @@ namespace Evaluation.SharedHelper.Enums
             public static readonly string NoEmailFound = "NoEmailFound";
             public static readonly string NoMinistryUserFound = "NoMinistryUserFound";
             public static readonly string NoTokenFound = "NoTokenFound";
+            public static readonly string EmailIsRequired = "EmailIsRequired";
+            public static readonly string UserDataNotFound = "UserDataNotFound";
         }
 
         public static class AdminSettings

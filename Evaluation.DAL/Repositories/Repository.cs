@@ -1,14 +1,11 @@
-﻿using Evaluation.DAL.Entities.Audit;
+﻿using System.Linq.Expressions;
+using Evaluation.DAL.Entities.Audit;
 using Evaluation.DAL.Entities.BaseModule;
 using Evaluation.DAL.Entities.Generic;
 using Evaluation.SharedHelper.Helper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Threading.Tasks;
+
 
 
 
@@ -33,6 +30,83 @@ public class Repository<T>(DbContext context, UserInfo userInfo) : RepositoryBas
             query = query.Skip(pageNumber!.Value * pageSize!.Value).Take(pageSize!.Value);
         return query;
     }
+
+    public IQueryable<T> GetAllQueryFiltered(Expression<Func<T, bool>>? filter = null,
+     Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null,
+     int? pageNumber = 0, int? pageSize = 0, params Expression<Func<T, object>>?[]? includeProperties)
+    {
+        IQueryable<T> query = _dbSet;
+
+
+        if (includeProperties != null)
+            foreach (var item in includeProperties)
+                if (item != null)
+                    query = query.Include(item);
+
+        if (filter != null)
+            query = query.Where(filter);
+        query = orderBy != null ? orderBy(query) : query;
+
+
+        if (pageNumber != null && pageNumber > 0 && pageSize != null && pageSize > 0)
+            return query.Skip(pageNumber.Value * pageSize.Value).Take(pageSize.Value);
+
+        return query;
+    }
+
+    public IQueryable<T> GetAllNonDeleted(Expression<Func<T, bool>>? filter = null,
+      Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null,
+      int? pageNumber = 0, int? pageSize = 0, params Expression<Func<T, object>>?[]? includeProperties)
+    {
+        IQueryable<T> query = _dbSet.IgnoreQueryFilters().Where(x => x.IsDeleted == false);
+
+        if (includeProperties != null)
+            foreach (var item in includeProperties)
+                if (item != null)
+                    query = query.Include(item);
+
+        if (filter != null)
+            query = query.Where(filter);
+        query = orderBy != null ? orderBy(query) : query;
+
+
+        if (pageNumber != null && pageNumber > 0 && pageSize != null && pageSize > 0)
+            return query.Skip(pageNumber.Value * pageSize.Value).Take(pageSize.Value);
+
+        return query;
+    }
+
+
+    public async Task<T?> GetByIDNonDeleted(Guid id, params Expression<Func<T, object>>[] includeProperties)
+    {
+        var query = _dbSet.IgnoreQueryFilters().Where(x => x.IsDeleted == false);
+
+        query = includeProperties.Aggregate(query, (current, includeProperty) => current.Include(includeProperty));
+
+        var entity = await query.FirstOrDefaultAsync(e => e.Id == id);
+        return entity is { IsDeleted: false } ? entity : null;
+    }
+
+    public async Task<T?> GetByIDActiveNonDeleted(Guid id, params Expression<Func<T, object>>[] includeProperties)
+    {
+        IQueryable<T> query = _dbSet;
+
+        query = includeProperties.Aggregate(query, (current, includeProperty) => current.Include(includeProperty));
+
+        var entity = await query.FirstOrDefaultAsync(e => e.Id == id);
+        return entity is { IsDeleted: false, IsActive: true } ? entity : null;
+    }
+
+    public async Task<T?> GetByIdIncludingDeletedAsync( Guid id, params Expression<Func<T, object>>[] includeProperties)
+    {
+        IQueryable<T> query = _dbSet.IgnoreQueryFilters(); 
+
+        query = includeProperties.Aggregate(query, (current, includeProperty) => current.Include(includeProperty));
+
+        return await query.FirstOrDefaultAsync(e => e.Id == id);
+    }
+
+
     #endregion
 
     #region CRUD

@@ -1,3 +1,4 @@
+using Evaluation.API.Middlewares;
 using Evaluation.DAL.Context;
 using Microsoft.EntityFrameworkCore;
 
@@ -30,4 +31,10 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+app.UseMiddleware<PopulateUserInfoMiddleware>();
+app.UseMiddleware<PopulateRequestInfoMiddleware>();
+
+app.MapControllerRoute(
+                 name: "default",
+                 pattern: "api/{controller=Home}/{action=Index}/{id?}");
 app.Run();
