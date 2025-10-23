@@ -1,0 +1,28 @@
+/* Colors */
+:root {
+  --color-default: #222222;
+  --color-primary: #000000;
+  --color-primary-hover:#773347;
+  --color-secondary: #f85a40;
+  --color-text:#ffffff;
+  --color-blue:#8a1538;
+  --blue-color-translucent: rgba(0, 0, 0, 0.175);
+  --blue-color-translucent1:rgb(0 0 0 / 34%) ;
+  --color-white: #fff;
+  --grey-color-translucent:rgb(183 183 183 / 34%);
+  --color-grey:#0000009c;
+  --color-grey1:#f5f4ef;
+  --color-grey2:#aaa;
+  --color-grey3:#767171;
+  --color-grey4:#3b404c;
+  --color-grey5:rgb(0 0 0 / 52%);
+}
+.section-title h2{
+  color: white !important;
+}
+#hero{
+ background:linear-gradient(0deg, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url("../img/hero-bg.jpg") top center;
+}
+footer a, footer p, footer {
+  color:  var(--color-grey);
+}
