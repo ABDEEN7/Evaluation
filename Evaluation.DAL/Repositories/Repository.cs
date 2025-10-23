@@ -1,19 +1,10 @@
-﻿using Evaluation.DAL.Entities.Audit;
+﻿using System.Linq.Expressions;
+using Evaluation.DAL.Entities.Audit;
 using Evaluation.DAL.Entities.BaseModule;
 using Evaluation.DAL.Entities.Generic;
 using Evaluation.SharedHelper.Helper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Evaluation.SharedHelper.Helper;
-using Evaluation.DAL.Entities.Audit;
-using Evaluation.DAL.Entities.BaseModule;
 
 
 

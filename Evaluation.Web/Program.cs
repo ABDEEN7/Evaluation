@@ -1,10 +1,27 @@
+using Evaluation.Web.Filters;
 using Evaluation.Web.Middlewares;
+using Evaluation.Web.Special;
 using Microsoft.AspNetCore.StaticFiles;
-
+using Evaluation.SharedHelper.Models;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllersWithViews();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<CookieServices>();
+builder.Services.AddScoped<RequestInfo>();
+builder.Services.AddScoped<PopulateRequestInfoFilter>();
+
+builder.Services.AddScoped<ResponseInfo>();
+builder.Services.AddScoped<PopulateResponseInfoFilter>();
+
+
+//builder.Services.AddScoped<HttpClient>();
+
+builder.Services.AddControllersWithViews(options =>
+{
+    options.Filters.Add<PopulateRequestInfoFilter>(); 
+    options.Filters.Add<PopulateResponseInfoFilter>(); 
+});
 
 var app = builder.Build();
 
@@ -32,6 +49,7 @@ app.UseStaticFiles();
 
 
 app.UseMiddleware<LanguageHandlerMiddleware>();
+
 
 app.UseRouting();
 

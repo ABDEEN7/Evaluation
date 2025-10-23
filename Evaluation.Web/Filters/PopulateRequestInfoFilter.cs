@@ -1,4 +1,4 @@
-﻿using Evaluation.SharedHelper.Helper;
+﻿using Evaluation.SharedHelper.Models;
 using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace Evaluation.Web.Filters

@@ -16,7 +16,6 @@ namespace Evaluation.Web.Middlewares
 
         public async Task InvokeAsync(HttpContext context)
         {
-            SetWebApiBaseURL(context);
             SetWebAppBaseURL(context);
             SetLanguage(context);
             await _next(context);
