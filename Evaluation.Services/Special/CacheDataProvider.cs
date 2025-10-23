@@ -1,7 +1,9 @@
-﻿using Evaluation.DAL.UnitOfWork;
+﻿using Evaluation.DAL.SystemSetting;
+using Evaluation.DAL.UnitOfWork;
 using Evaluation.SharedHelper;
 using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Models.Api;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
@@ -94,42 +96,58 @@ namespace Evaluation.Services.Special
 
         // -------------------------- Core Methods -------------------------- //
 
-        //public async Task<string> GetExceptionMessage(string message, string lang)
-        //{
-        //    if (string.IsNullOrEmpty(message)) return "{{#Default Error Message#}}";
+        public async Task<string> GetExceptionMessage(string message, string lang)
+        {
+            if (string.IsNullOrEmpty(message)) return "{{#Default Error Message#}}";
 
-        //    var pageName = "Exceptions";
-        //    var controls = await GetUiControlsByPageNames(new List<string> { pageName }, lang);
+            var pageName = "Exceptions";
+            var controls = await GetUiControlsByPageNames(new List<string> { pageName }, lang);
 
-        //    var control = controls.FirstOrDefault(x => x.BackEndName == message);
-        //    if (control == null)
-        //        return $"Missing [{message}]";
+            var control = controls.FirstOrDefault(x => x.BackEndName == message);
+            if (control == null)
+                return $"Missing [{message}]";
 
-        //    return lang == "ar"
-        //        ? (string.IsNullOrEmpty(control.ArValue) ? $"Missing [{message}]" : control.ArValue)
-        //        : (string.IsNullOrEmpty(control.EnValue) ? $"Missing [{message}]" : control.EnValue);
-        //}
+            return lang == "ar"
+                ? (string.IsNullOrEmpty(control.ArValue) ? $"Missing [{message}]" : control.ArValue)
+                : (string.IsNullOrEmpty(control.EnValue) ? $"Missing [{message}]" : control.EnValue);
+        }
 
-        //public async Task<List<UiControlDTO>> GetUiControlsByPageNames(List<string> pageNames, string lang)
-        //{
-        //    var results = new List<UiControlDTO>();
+        public async Task<List<UiControlDTO>> GetUiControlsByPageNames(List<string> pageNames, string lang)
+        {
+            var results = new List<UiControlDTO>();
 
-        //    foreach (var pageName in pageNames)
-        //    {
-        //        var cacheKey = $"UICONTROLS_{pageName}_{lang}";
-        //        var list = await GetOrSetCacheAsync(cacheKey, async () =>
-        //        {
-        //            var repo = serviceScopeFactory.CreateScopedUow().GetRepository<UiControl>();
-        //            var entities = await repo.GetAllActiveNonDeleted()
-        //                                     .Where(x => x.PageName == pageName)
-        //                                     .ToListAsync();
-        //            return mapper.Map<List<UiControlDTO>>(entities);
-        //        });
-        //        results.AddRange(list);
-        //    }
+            foreach (var pageName in pageNames)
+            {
+                var cacheKey = $"UICONTROLS_{pageName}_{lang}";
 
-        //    return results;
-        //}
+                var list = await GetOrSetCacheAsync(cacheKey, async () =>
+                {
+                    var repo = serviceScopeFactory.CreateScopedUow().GetRepository<UiControl>();
+
+                    var entities = await repo.GetAllActiveNonDeleted()
+                                             .Where(x => x.PageName == pageName)
+                                             .ToListAsync();
+
+                    return entities.Select(x => new UiControlDTO
+                    {
+                        Id = x.Id,
+                        PageName = x.PageName,
+                        UserUiname = x.UserUiname,
+                        ControlName = x.ControlName,
+                        EnValue = x.ValueAr,
+                        ArValue = x.ValueEn,
+                        Url = x.Url,
+                        txtValue = lang == "ar" ? x.ValueAr : x.ValueEn,
+                        
+                    }).ToList();
+                });
+
+                results.AddRange(list);
+            }
+
+            return results;
+        }
+
 
         //public async Task<IList<ActionStatusConfiguration>> GetActionStatusConfiguration()
         //{
@@ -150,7 +168,7 @@ namespace Evaluation.Services.Special
         //    return list.Where(c => c.IsActive && !c.IsDeleted).ToList();
         //}
 
-     
+
 
         // -------------------------------------------------------------------
         // 📨 EMAIL PROFILES

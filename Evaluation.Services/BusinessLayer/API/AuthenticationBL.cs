@@ -2,6 +2,8 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Runtime.Intrinsics.Arm;
 using System.Security.Claims;
 using Evaluation.DAL.Entities.Authentication;
+using Evaluation.DAL.Entities.PermissionEntity;
+using Evaluation.DAL.Entities.UserEntiy;
 using Evaluation.DAL.UnitOfWork;
 using Evaluation.Services.BusinessLayer.API;
 using Evaluation.Services.Special;
@@ -12,6 +14,7 @@ using Evaluation.SharedHelper.Helper;
 using Evaluation.SharedHelper.Models.Api.Authentication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using UserType = Evaluation.SharedHelper.Enums.UserType;
 
 public class AuthenticationBL : ApiBase
 {
@@ -35,6 +38,30 @@ public class AuthenticationBL : ApiBase
 
     #region ?? Microsoft SSO Login
 
+    public async Task<string> CheckUserAuth(string username)
+    {
+
+        if (string.IsNullOrEmpty(username))
+        {
+            throw new BusinessException(ConstantKeys.ExceptionMessage.EmailIsRequired);
+        }
+
+        username = username.Trim();
+       
+        var ministryUser = await serviceScopeFactory.CreateScopedUow().GetRepository<MinistryUser>()
+            .GetAllQueryFiltered(x => x.Email == username)
+            .FirstOrDefaultAsync();
+
+        if (ministryUser != null)
+        {
+           var  SSORedirectUrl = GetMSAuthorizationURL(username);
+            return SSORedirectUrl;
+        }
+        else
+            throw new BusinessException(ConstantKeys.ExceptionMessage.UserDataNotFound);
+      
+
+    }
     /// <summary>
     /// Generate Microsoft OAuth 2.0 authorization URL for login redirection.
     /// </summary>
@@ -64,7 +91,7 @@ public class AuthenticationBL : ApiBase
 
         // 3. Verify user exists in the User table
         using var uow = serviceScopeFactory.CreateScopedUow();
-        var User = await uow.GetRepository<User>()
+        var User = await uow.GetRepository<MinistryUser>()
             .GetAllActiveNonDeleted(x => x.Email == email)
             .FirstOrDefaultAsync()
             ?? throw new BusinessException(ConstantKeys.ExceptionMessage.NoMinistryUserFound);
@@ -73,7 +100,7 @@ public class AuthenticationBL : ApiBase
         await RegisterLoginLog(User.Id);
 
         // 5. Generate claims and create JWT
-        var claims = GenerateClaimsForUserProfile(User, UserType.Ministry);
+        var claims = GenerateClaimsForUserProfile(User, Evaluation.SharedHelper.Enums.UserType.Ministry);
         var token = _msJsonWT.GenerateToken(claims);
 
         // 6. Store token info for audit
@@ -102,7 +129,7 @@ public class AuthenticationBL : ApiBase
         using var uow = serviceScopeFactory.CreateScopedUow();
 
         // 2. Find the user
-        var User = await uow.GetRepository<User>()
+        var User = await uow.GetRepository<MinistryUser>()
             .GetAllActiveNonDeleted(x => x.Email == email)
             .FirstOrDefaultAsync()
             ?? throw new BusinessException(ConstantKeys.ExceptionMessage.NoMinistryUserFound);

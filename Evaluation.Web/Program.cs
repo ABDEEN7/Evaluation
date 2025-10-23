@@ -1,3 +1,6 @@
+using Evaluation.Web.Middlewares;
+using Microsoft.AspNetCore.StaticFiles;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -20,8 +23,30 @@ app.UseRouting();
 
 app.UseAuthorization();
 
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
 
+
+
+// Configure the HTTP request pipeline.
+if (!app.Environment.IsDevelopment()) app.UseExceptionHandler("/Home/Error");
+app.UseStaticFiles();
+
+
+app.UseMiddleware<LanguageHandlerMiddleware>();
+
+app.UseRouting();
+
+
+app.UseMiddleware<CookiesProviderMiddleware>();
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    ContentTypeProvider = new FileExtensionContentTypeProvider
+    {
+        Mappings = { [".css"] = "text/css" }
+    }
+});
+
+app.MapControllerRoute(
+   "default",
+   "{language=ar}/{controller=Home}/{action=Index}/{id?}");
 app.Run();

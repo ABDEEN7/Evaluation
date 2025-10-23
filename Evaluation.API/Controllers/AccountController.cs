@@ -1,6 +1,7 @@
 ﻿using Evaluation.API.Filters;
 using Evaluation.API.Models;
 using Evaluation.Services.BusinessLayer;
+using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Helper;
 using Evaluation.SharedHelper.Models.Api.Authentication;
 using Microsoft.AspNetCore.Authorization;
@@ -37,6 +38,23 @@ namespace Evaluation.API.Controllers
                 Data = data.token,//token
             };
             return response;
+        }
+        [HttpPost]
+        public async Task<IActionResult> CheckUserAuth([FromForm] string username)
+        {
+            try
+            {
+                var redirectUrl = await masterBL.GetApiService<AuthenticationBL>().CheckUserAuth(username);
+                return Ok(redirectUrl);
+            }
+            catch (BusinessException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, "An unexpected error occurred.");
+            }
         }
 
         [Authorize]

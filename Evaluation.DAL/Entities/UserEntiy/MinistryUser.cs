@@ -8,7 +8,8 @@ namespace Evaluation.DAL.Entities.Authentication;
 public class MinistryUser : EntityBase
 {
     public string QID { get; set; } = null!;
-    public string Type { get; set; } = null!;
+    public string UserTypeId { get; set; } = null!;
+    public UserType UserType { get; set; } = null!;
     public string Email { get; set; } = null!;
     public string? NationalityCode { get; set; }
     public string NameAr { get; set; } = null!;
