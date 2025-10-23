@@ -17,11 +17,6 @@ namespace Evaluation.Web.Controllers
         {
             return View();
         }
-        //TODO: This action is temp until we add translation
-        public IActionResult IndexAr()
-        {
-            return View();
-        }
 
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
