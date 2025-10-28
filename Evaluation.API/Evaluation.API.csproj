@@ -17,6 +17,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Evaluation.DAL\Evaluation.DAL.csproj" />
+    <ProjectReference Include="..\Evaluation.Services\Evaluation.Services.csproj" />
+    <ProjectReference Include="..\Evaluation.SharedHelper\Evaluation.SharedHelper.csproj" />
   </ItemGroup>
 
   <ItemGroup>

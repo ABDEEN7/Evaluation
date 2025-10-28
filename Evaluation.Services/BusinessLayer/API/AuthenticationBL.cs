@@ -1,5 +1,4 @@
 using System.IdentityModel.Tokens.Jwt;
-using System.Runtime.Intrinsics.Arm;
 using System.Security.Claims;
 using Evaluation.DAL.Entities.Authentication;
 using Evaluation.DAL.Entities.PermissionEntity;

@@ -16,6 +16,9 @@ namespace Evaluation.SharedHelper.Enums
             public static readonly string NoEmailFound = "NoEmailFound";
             public static readonly string NoMinistryUserFound = "NoMinistryUserFound";
             public static readonly string NoTokenFound = "NoTokenFound";
+            public static readonly string InvalidDraftPlan = "InvalidDraftPlan";
+            public static readonly string DraftPlanWithSameAcademicYearAlreadyExists = "DraftPlanWithSameAcademicYearAlreadyExists";
+            public static readonly string PlanInThePastIsNotAllowed = "PlanInThePastIsNotAllowed";
             public static readonly string EmailIsRequired = "EmailIsRequired";
             public static readonly string UserDataNotFound = "UserDataNotFound";
         }

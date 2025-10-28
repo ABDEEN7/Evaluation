@@ -18,7 +18,7 @@ public class Repository<T>(DbContext context, UserInfo userInfo) : RepositoryBas
         Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null,
         int? pageNumber = 0, int? pageSize = 0, params Expression<Func<T, object>>?[]? includeProperties)
     {
-        IQueryable<T> query = _dbSet.IgnoreQueryFilters().Where(x => x.IsDeleted==false && x.IsActive==true);
+        IQueryable<T> query = _dbSet.IgnoreQueryFilters().Where(x => x.IsDeleted == false && x.IsActive == true);
         if (includeProperties != null)
             foreach (var item in includeProperties)
                 if (item != null)
@@ -153,6 +153,13 @@ public class Repository<T>(DbContext context, UserInfo userInfo) : RepositoryBas
             entity.DeleteById = userInfo.UserId;
         context.Entry(entity).State = EntityState.Modified;
         return true;
+    }
+    public async Task<T?> GetByIdAsync(Guid id)
+    {
+        T? query = await _dbSet.Where(x => x.Id == id).FirstAsync();
+        //if (query is null)
+        //    throw new Exception();
+        return query;
     }
     #endregion
 
