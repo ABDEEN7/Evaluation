@@ -1,4 +1,5 @@
-﻿<!doctype html>
+﻿
+<!doctype html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
@@ -11,6 +12,19 @@
     <link href="~/plan-assets/css/style.css" rel="stylesheet">
 </head>
 <body>
+    <!-- JS -->
+    <script src="~/plan-assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="~/plan-assets/js/jquery.min.js"></script>
+    <script src="~/plan-assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
+    <script src="~/plan-assets/vendor/datatables/js/dataTables.bootstrap5.min.js"></script>
+
+    <!-- Select2 JS -->
+    <script src="~/plan-assets/vendor/select2/js/select2.min.js"></script>
+
+    <!-- Flatpickr JS -->
+    <script src="~/plan-assets/vendor/flatpickr/js/flatpickr.js"></script>
+    <script src="~/plan-assets/js/main.js"></script>
+
     <!-- Header -->
     <header class="topbar">
         <div class="container-fluid">
@@ -245,7 +259,7 @@
                                                     </select>
                                                 </td>
                                                 <td><p class="m-0">10/10/2024</p></td>
-                                                <td><p class="m-0"><a href="#" class="text-dark" type="button" data-bs-toggle="modal" data-bs-target="#exampleModal"><i class="la la-eye"></i></a></p></td>
+                                                <td><p class="m-0"><a href="#" class="text-dark" type="button" data-bs-toggle="modal" data-bs-target="#schoolDetailsModal"><i class="la la-eye"></i></a></p></td>
                                             </tr>
                                             <tr>
                                                 <td>
@@ -277,7 +291,7 @@
                                                     </select>
                                                 </td>
                                                 <td><p class="m-0">10/10/2024</p></td>
-                                                <td><p class="m-0"><a href="#" class="text-dark" type="button" data-bs-toggle="modal" data-bs-target="#exampleModal"><i class="la la-eye"></i></a></p></td>
+                                                <td><p class="m-0"><a href="#" class="text-dark" type="button" data-bs-toggle="modal" data-bs-target="#schoolDetailsModal"><i class="la la-eye"></i></a></p></td>
                                             </tr>
                                             <tr>
                                                 <td>
@@ -309,7 +323,7 @@
                                                     </select>
                                                 </td>
                                                 <td><p class="m-0">10/10/2024</p></td>
-                                                <td><p class="m-0"><a href="#" class="text-dark" type="button" data-bs-toggle="modal" data-bs-target="#exampleModal"><i class="la la-eye"></i></a></p></td>
+                                                <td><p class="m-0"><a href="#" class="text-dark" type="button" data-bs-toggle="modal" data-bs-target="#schoolDetailsModal"><i class="la la-eye"></i></a></p></td>
                                             </tr>
                                             <tr>
                                                 <td>
@@ -341,7 +355,7 @@
                                                     </select>
                                                 </td>
                                                 <td><p class="m-0">10/10/2024</p></td>
-                                                <td><p class="m-0"><a href="#" class="text-dark" type="button" data-bs-toggle="modal" data-bs-target="#exampleModal"><i class="la la-eye"></i></a></p></td>
+                                                <td><p class="m-0"><a href="#" class="text-dark" type="button" data-bs-toggle="modal" data-bs-target="#schoolDetailsModal"><i class="la la-eye"></i></a></p></td>
                                             </tr>
                                             <tr>
                                                 <td>
@@ -373,7 +387,7 @@
                                                     </select>
                                                 </td>
                                                 <td><p class="m-0">10/10/2024</p></td>
-                                                <td><p class="m-0"><a href="#" class="text-dark" type="button" data-bs-toggle="modal" data-bs-target="#exampleModal"><i class="la la-eye"></i></a></p></td>
+                                                <td><p class="m-0"><a href="#" class="text-dark" type="button" data-bs-toggle="modal" data-bs-target="#schoolDetailsModal"><i class="la la-eye"></i></a></p></td>
                                             </tr>
                                             <tr>
                                                 <td>
@@ -405,7 +419,7 @@
                                                     </select>
                                                 </td>
                                                 <td><p class="m-0">10/10/2024</p></td>
-                                                <td><p class="m-0"><a href="#" class="text-dark" type="button" data-bs-toggle="modal" data-bs-target="#exampleModal"><i class="la la-eye"></i></a></p></td>
+                                                <td><p class="m-0"><a href="#" class="text-dark" type="button" data-bs-toggle="modal" data-bs-target="#schoolDetailsModal"><i class="la la-eye"></i></a></p></td>
                                             </tr>
                                             <tr>
                                                 <td>
@@ -437,7 +451,7 @@
                                                     </select>
                                                 </td>
                                                 <td><p class="m-0">10/10/2024</p></td>
-                                                <td><p class="m-0"><a href="#" class="text-dark" type="button" data-bs-toggle="modal" data-bs-target="#exampleModal"><i class="la la-eye"></i></a></p></td>
+                                                <td><p class="m-0"><a href="#" class="text-dark" type="button" data-bs-toggle="modal" data-bs-target="#schoolDetailsModal"><i class="la la-eye"></i></a></p></td>
                                             </tr>
                                             <tr>
                                                 <td>
@@ -469,7 +483,7 @@
                                                     </select>
                                                 </td>
                                                 <td><p class="m-0">10/10/2024</p></td>
-                                                <td><p class="m-0"><a href="#" class="text-dark" type="button" data-bs-toggle="modal" data-bs-target="#exampleModal"><i class="la la-eye"></i></a></p></td>
+                                                <td><p class="m-0"><a href="#" class="text-dark" type="button" data-bs-toggle="modal" data-bs-target="#schoolDetailsModal"><i class="la la-eye"></i></a></p></td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -558,98 +572,8 @@
             </form>
         </div>
     </div>
-    <!-- Modal -->
-    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog  modal-xl modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header align-items-start border-0">
-                    <div>
-                        <h4 class="modal-title fw-semibold mb-2" id="exampleModalLabel">مدرسة الأمير سلطان الثانوية</h4>
-                        <!-- Breadcrumbs -->
-                        <nav aria-label="breadcrumb">
-                            <ol class="breadcrumb">
-                                <li class="breadcrumb-item"><a href="#">الرئيسية</a></li>
-                                <li class="breadcrumb-item"><a href="#">المدارس</a></li>
-                                <li class="breadcrumb-item active" aria-current="page">تحديد المدارس</li>
-                            </ol>
-                        </nav>
-                    </div>
 
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"><i class="la la-close mt-1"></i></button>
-                </div>
-                <div class="modal-body py-0">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="card card-table  mb-4">
-                                <div class="card-body">
-                                    <h5 class="fw-bold text-primary mb-3"> <i class="la la-building"></i> معلومات أساسية</h5>
-                                    <div class="row">
-                                        <div class="col-md-6 mb-3">
-                                            <p class="text-light">المدير</p>
-                                            <h5 class="fw-bold">أ محمد منصور</h5>
-                                        </div>
-                                        <div class="col-md-6 mb-3">
-                                            <p class="text-light">تاريخ الإنشاء</p>
-                                            <h5 class="fw-bold">1999</h5>
-                                        </div>
-                                        <div class="col-md-6 mb-3">
-                                            <p class="text-light">المدرسون</p>
-                                            <h5 class="fw-bold">20</h5>
-                                        </div>
-                                        <div class="col-md-6 mb-3">
-                                            <p class="text-light">الطلاب</p>
-                                            <h5 class="fw-bold">320</h5>
-                                        </div>
-                                    </div>
-                                    <hr class="mt-0">
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <div class=" d-flex gap-2 align-items-center mb-3">
-                                                <div class="social-icon"><i class="la la-phone-volume"></i></div>
-                                                <div><a href="tel:+974112345678" class="text-dark">+974-11-234-5678</a></div>
-                                            </div>
-                                            <div class=" d-flex gap-2 align-items-center mb-3">
-                                                <div class="social-icon"><i class="la la-envelope"></i></div>
-                                                <div><a href="mailto:+info@alnoor.edu.qa" class="text-dark">info@alnoor.edu.qa</a></div>
-                                            </div>
-                                            <div class=" d-flex gap-2 align-items-center mb-3">
-                                                <div class="social-icon"><i class="la la-location-arrow"></i></div>
-                                                <div><p class="text-dark m-0">123 شارع التعليم </p></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="card card-table  mb-4">
-                                <div class="card-body">
-                                    <h5 class="fw-bold text-primary mb-3"> <i class="la la-chart-bar"></i> الوضع الحالي</h5>
-                                    <div class="row">
-                                        <div class="col-md-12 mb-3">
-                                            <div class="bg-secondary p-3 text-center text-white br-8 ">
-                                                <p>التقييم الحالي</p>
-                                                <h3>ممتاز</h3>
-                                                <p>10-02-2025</p>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-12 mb-3">
-                                            <div class="bg-danger  p-3 text-center text-white br-8 ">
-                                                <p>التقييم السابق</p>
-                                                <h3>ضعيف</h3>
-                                                <p>10-02-2025</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="modal fade" id="confirmation-modal" tabindex="-1" aria-labelledby="confirmation-modalLabel" aria-hidden="true">
+ <div class="modal fade" id="confirmation-modal" tabindex="-1" aria-labelledby="confirmation-modalLabel" aria-hidden="true">
         <div class="modal-dialog  modal-dialog-centered">
             <div class="modal-content">
 
@@ -670,18 +594,10 @@
             </div>
         </div>
     </div>
-    <!-- JS -->
-    <script src="~/plan-assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <script src="~/plan-assets/js/jquery.min.js"></script>
-    <script src="~/plan-assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
-    <script src="~/plan-assets/vendor/datatables/js/dataTables.bootstrap5.min.js"></script>
+    
+    @await Component.InvokeAsync("SchoolDetailsModal", new { modalId = "schoolDetailsModal", title = "School Details", body = "Hello from modal body!" })
 
-    <!-- Select2 JS -->
-    <script src="~/plan-assets/vendor/select2/js/select2.min.js"></script>
-
-    <!-- Flatpickr JS -->
-    <script src="~/plan-assets/vendor/flatpickr/js/flatpickr.js"></script>
-    <script src="~/plan-assets/js/main.js"></script>
 
 </body>
 </html>
+
