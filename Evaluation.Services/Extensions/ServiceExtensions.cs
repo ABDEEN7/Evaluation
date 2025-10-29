@@ -1,5 +1,7 @@
-﻿using Evaluation.DAL.UnitOfWork;
+﻿using System.Reflection;
+using Evaluation.DAL.UnitOfWork;
 using Evaluation.Services.BusinessLayer;
+using Evaluation.Services.BusinessLayer.API;
 using Evaluation.Services.Models.JWT;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Models;
@@ -66,6 +68,17 @@ public static class ServiceExtensions
         //    return options.Value;
         //});
 
+        services.Scan(scan => scan
+            .FromAssemblies(typeof(ApiBase).GetTypeInfo().Assembly)
+            .AddClasses(classes => classes.Where(x => x.IsSubclassOf(typeof(ApiBase))))
+            .AsSelf()
+            .WithScopedLifetime());
+
+        //services.Scan(scan => scan
+        //    .FromAssemblies(typeof(ApiServiceBase).GetTypeInfo().Assembly)
+        //    .AddClasses(classes => classes.Where(x => x.IsSubclassOf(typeof(ApiServiceBase))))
+        //    .AsSelf()
+        //    .WithScopedLifetime());
 
         services.AddScoped<MSJsonWT>();
 
