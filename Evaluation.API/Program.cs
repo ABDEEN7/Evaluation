@@ -1,7 +1,8 @@
 using Evaluation.API.Middlewares;
 using Evaluation.DAL.Context;
 using Microsoft.EntityFrameworkCore;
-
+using Evaluation.SharedHelper;
+using Evaluation.Services.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 var config = builder.Configuration;
@@ -11,6 +12,12 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+
+builder.Services.ConfigureUserInfo(config);
+builder.Services.ConfigureRequestInfo(config);
+builder.Services.ConfigureMasterBL(config, builder.Environment.IsDevelopment());
+
 
 
 builder.Services.AddDbContext<EvaluationDbContext>(options =>
@@ -24,6 +31,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
 
 app.UseHttpsRedirection();
 

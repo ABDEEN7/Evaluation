@@ -1,8 +1,9 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Evaluation.DAL.UnitOfWork;
-using System;
+﻿using Evaluation.DAL.UnitOfWork;
+using Evaluation.Services.BusinessLayer;
 using Evaluation.SharedHelper.Helper;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using System;
 
 namespace Evaluation.SharedHelper
 {
@@ -36,6 +37,7 @@ namespace Evaluation.SharedHelper
         public static void ConfigureRequestInfo(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddScoped<RequestInfo>();
+
         }
         #endregion
 
