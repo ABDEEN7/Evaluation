@@ -105,7 +105,25 @@
 <script src="~/js/school/schooldetails.js" asp-append-version="true"></script>
 
 <script type="text/javascript">
-     $(document).ready(async function () {
-            initSchoolDetailsPage();
-         });
+
+      //        function showModal() {
+
+      //                              initSchoolDetailsPage("ecd11007-2ff6-42cb-bca2-b168de94afbc");
+
+      // const modal = document.getElementById('@modalId');
+      // modal.classList.add('show');
+
+      // // Wait until next frame to ensure it's in the DOM and styles applied
+      // requestAnimationFrame(() => {
+      //   console.log('Modal is ready!');
+      //   // your code here
+      // });
+
+
+    //}
+
+        $('#@modalId').on('shown.bs.modal', function () {
+      console.log('Modal is ready!');
+    initSchoolDetailsPage("ecd11007-2ff6-42cb-bca2-b168de94afbc");
+        });
 </script>
