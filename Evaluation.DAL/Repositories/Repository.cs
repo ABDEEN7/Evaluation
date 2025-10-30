@@ -122,6 +122,22 @@ public class Repository<T>(DbContext context, UserInfo userInfo) : RepositoryBas
         _dbSet.Add(entity);
         return entity;
     }
+    public async Task<IEnumerable<T>> InsertRange(IEnumerable<T> entities)
+    {
+        var today = DateTime.Now;
+        var addedentities = entities.ToList();
+        foreach (var entity in addedentities)
+        {
+            entity.Id = Guid.NewGuid();
+            entity.CreateDate = today;
+            entity.IsDeleted = false;
+            if (userInfo.UserId.HasValue)
+                entity.CreateById = userInfo.UserId.Value;
+
+        }
+        await _dbSet.AddRangeAsync(addedentities);
+        return entities;
+    }
 
     public async Task<T> InsertAsync(T entity, bool generateGUID = true)
     {

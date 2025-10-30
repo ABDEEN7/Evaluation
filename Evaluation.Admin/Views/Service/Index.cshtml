@@ -1,0 +1,107 @@
+﻿@using Evaluation.Admin.Extensions
+@using static Evaluation.SharedHelper.Enums.ConstantKeys
+
+@model ServiceVM
+@{
+
+    string Lang = Model.CurrentLanguage;
+    var SearchuiControlItems = Model.UiControlItems.Where(x => x.RowOrder == 0 && x.Constraint.Permission.BackEndName == AdminPermission.ADD_ADMIN_SERVICE).ToList();
+    var uiControlItems = Model.UiControlItems.Where(x => x.RowOrder > 0 && x.Constraint.Permission.BackEndName == AdminPermission.ADD_ADMIN_SERVICE).ToList();
+    var FreezeuiControlItems = Model.UiControlItems.Where(x => x.RowOrder > 0 && x.Constraint.Permission.BackEndName == AdminPermission.FREEZE_ADMIN_SERVICE).ToList();
+    var PlaceholderControlItems = Model.UiControlItems.Where(x => x.RowOrder > 0 && x.Constraint.Permission.BackEndName == AdminPermission.ADD_ADMIN_SERVICE_PLACEHOLDER).ToList();
+    var textDir = Lang == "ar" ? "RTL" : "LTR";
+    var permissionsList = Model.PermissionsList;
+    var controlsList = Model.ControlsList;
+    var settingList = Model.SettingList;
+    var containsOrderNo = Model.containsOrderNo;
+    var columnList = Model.UiControlItems.Where(x => x.Constraint.ShowInGrid == true && x.Constraint.Permission.BackEndName == AdminPermission.ADD_ADMIN_SERVICE).ToList();
+    var PlaceholdercolumnList = Model.UiControlItems.Where(x => x.Constraint.ShowInGrid == true && x.Constraint.Permission.BackEndName == AdminPermission.ADD_ADMIN_SERVICE_PLACEHOLDER).Select(X => X.Constraint).ToList();
+}
+@section Styles {
+    <link href="~/css/admin/service.css" rel="stylesheet" />
+   
+    
+}
+<section id="tbl-template-container" class="section-container">
+    <div class="card app-card">
+        <div class="card-header justify-content-end d-flex align-items-center bg-light">
+            @if (permissionsList.IsPermissionAvailabe(AdminPermission.ADD_ADMIN_SERVICE))
+            {
+                <button id="btn-add-content" type="button" class="btn btn-primary">
+                    <i class="fa fa-plus-circle"></i> &nbsp;@controlsList.GetUiControlText(AdminBackendUI.ADD_RECORD)
+                </button>
+            }
+
+        </div>
+        <div class="card-body">
+            <div class="row">
+                @{
+
+                    @await Component.InvokeAsync("UiControlList", SearchuiControlItems)
+                }
+            </div>
+            <div id="view-container"></div>
+        </div>
+    </div>
+</section>
+
+<section class="display-none" id="form-section">
+    <div class="card app-card">
+        <form enctype="multipart/form-data" id="app-form">
+            <input id="Id" hidden />
+            <div class="card-header justify-content-end d-flex align-items-center bg-light"><div class="closeit">  <i class="fa fa-close"></i></div></div>
+            <div class="card-body">
+                @if (uiControlItems != null)
+                {
+                    <div class="row">
+                        @{
+                            @await Component.InvokeAsync("UiControlList", uiControlItems)
+                        }
+                    </div>
+                }
+
+
+                <div class="btns-group mb-0 mt-3" id="action-container">
+                    <button type="button" id="btn-back" class="btn btn-secondary">@controlsList.GetUiControlText(AdminBackendUI.BACK_BUTTON)</button>
+                    <button type="button" id="btn-submit" class="btn btn-primary">@controlsList.GetUiControlText(AdminBackendUI.SAVE_BUTTON)</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+<div>
+    <input id="serviceid" hidden />
+    <input id="systemmoduleid" hidden />
+</div>
+
+@section Scripts {
+    
+   
+    
+    <script>
+         var controlsList = JSON.parse(`@Html.Raw(Json.Serialize(controlsList))`);
+         var columnList = @Html.Raw(Json.Serialize(columnList));
+         var PlaceholdercolumnList = @Html.Raw(Json.Serialize(PlaceholdercolumnList));
+        const settingList = JSON.parse(`@Html.Raw(Json.Serialize(settingList))`);
+         sharedFn().PopulateUiControl(controlsList);
+         var lang='@Lang';
+        let txtDir = '@textDir';
+        let containsOrderNo='@containsOrderNo';
+          const controlvalidationlist = @Html.Raw(Json.Serialize(uiControlItems));
+          const Freezecontrolvalidationlist = @Html.Raw(Json.Serialize(FreezeuiControlItems));
+          const searchcontrolvalidationlist = @Html.Raw(Json.Serialize(SearchuiControlItems));
+          const Placeholdercontrolvalidationlist = @Html.Raw(Json.Serialize(PlaceholderControlItems));
+        let IsEdit='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.EDIT_ADMIN_SERVICE))';
+        let IsDelete='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.DELETE_ADMIN_SERVICE))';
+         let IsView='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.VIEW_ADMIN_SERVICE))';
+        let IsFreeze='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.FREEZE_ADMIN_SERVICE))';
+        const IsView_Service_PlaceHolder='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.VIEW_ADMIN_SERVICE_PLACEHOLDER))';
+        const IsEdit_Service_PlaceHolder='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.EDIT_ADMIN_SERVICE_PLACEHOLDER))';
+        const IsDelete_Service_PlaceHolder='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.DELETE_ADMIN_SERVICE_PLACEHOLDER))';
+        sharedFn().InitializeControl(controlvalidationlist, settingList);
+        var SearchuiControlItems=@Html.Raw(Json.Serialize(SearchuiControlItems));
+
+   </script>
+    <script src="~/js/admin/Service.js" asp-append-version="true"></script>
+    
+}
