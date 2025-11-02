@@ -2,6 +2,7 @@
 using AutoMapper;
 using Evaluation.DAL.Entities.ServicesEntities;
 using Evaluation.DAL.Entities.SystemModulesEntities;
+using Evaluation.DAL.Helper;
 using Evaluation.DAL.SystemSetting;
 using Evaluation.DAL.UnitOfWork;
 using Evaluation.Services.Special;

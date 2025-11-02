@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Evaluation.DAL.Entities.BaseModule;
+using Evaluation.DAL.Helper;
 using Evaluation.DAL.SystemSetting;
 using Evaluation.DAL.UnitOfWork;
 using Evaluation.Services.Special;

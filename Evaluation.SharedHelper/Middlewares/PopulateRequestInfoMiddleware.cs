@@ -1,7 +1,10 @@
 ﻿using Evaluation.DAL.Helper;
-using Evaluation.SharedHelper.Helper;
+using Evaluation.SharedHelper.Enums;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Routing;
 
-namespace Evaluation.API.Middlewares
+namespace Evaluation.SharedHelper.Middlewares
 {
     public class PopulateRequestInfoMiddleware
     {
@@ -18,9 +21,15 @@ namespace Evaluation.API.Middlewares
         public async Task InvokeAsync(HttpContext context, RequestInfo requestInfo)
         {
             var segments = context.Request.Path.Value.Split('/');
-            requestInfo.Lang = context.Request.Headers?.TryGetValue("lang", out var requestLang) == true
-                ? requestLang.ToString()
-                : "ar";
+            var lang = "ar";
+            if (segments.Length>0)
+            {
+                 lang = segments[1]?? AppSettings.DefaultLanguage;
+            }
+
+
+            // Set language from header, default to "ar"
+            requestInfo.Lang = lang;
 
             // Set page number from body (if POST/PUT) or query string
             if (context.Request.Method == HttpMethods.Post || HttpMethods.Put.Equals(context.Request.Method))
@@ -33,7 +42,7 @@ namespace Evaluation.API.Middlewares
             }
 
             // Set User-Agent from request headers
-            requestInfo.UserAgent = context.Request.Headers?["User-Agent"].FirstOrDefault() ?? "Unknown";
+            requestInfo.UserAgent = context.Request.Headers["User-Agent"].FirstOrDefault() ?? "Unknown";
 
             // Get the user IP address
             requestInfo.UserIp = context.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
@@ -43,7 +52,7 @@ namespace Evaluation.API.Middlewares
             requestInfo.Action = context.GetRouteValue("action")?.ToString() ?? "Unknown";
 
             // Retrieve the Authorization header and check if it exists
-            var authHeader = context.Request.Headers?["Authorization"].FirstOrDefault();
+            var authHeader = context.Request.Headers["Authorization"].FirstOrDefault();
 
             // If the header is null or doesn't start with "Bearer ", handle it appropriately
             if (!string.IsNullOrEmpty(authHeader) && authHeader.StartsWith("Bearer "))
@@ -54,6 +63,7 @@ namespace Evaluation.API.Middlewares
 
             //_logger.LogInformation($"RequestContext: Lang={requestContext.Lang}, Page={requestContext.PageNumber}, UserAgent={requestContext.UserAgent}, UserIp={requestContext.UserIp}");
 
+            // Call the next middleware in the pipeline
             await _next(context);
         }
 
@@ -70,7 +80,14 @@ namespace Evaluation.API.Middlewares
                 using var reader = new StreamReader(context.Request.Body, leaveOpen: true);
                 var body = await reader.ReadToEndAsync();
                 context.Request.Body.Position = 0; // Reset the stream position for next middleware
-                
+                if (!string.IsNullOrEmpty(body))
+                {
+                    //var bodyData = JsonConvert.DeserializeObject<Dictionary<string, object>>(body);
+                    //if (bodyData != null && bodyData.TryGetValue("pageNumber", out var pageValue) && int.TryParse(pageValue.ToString(), out var page))
+                    //{
+                    //    return page;
+                    //}
+                }
             }
             return null;
         }

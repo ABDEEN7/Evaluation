@@ -2,9 +2,9 @@
 using Evaluation.DAL.Context;
 using Evaluation.DAL.Repositories;
 using System.Data;
-using Evaluation.SharedHelper.Helper;
 using Evaluation.DAL.Exceptions;
 using Evaluation.DAL.Entities.Generic;
+using Evaluation.DAL.Helper;
 
 
 namespace Evaluation.DAL.UnitOfWork

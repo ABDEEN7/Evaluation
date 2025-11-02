@@ -3,6 +3,7 @@ using Evaluation.Web.Middlewares;
 using Evaluation.Web.Special;
 using Microsoft.AspNetCore.StaticFiles;
 using Evaluation.SharedHelper.Models;
+using Evaluation.DAL.Helper;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.

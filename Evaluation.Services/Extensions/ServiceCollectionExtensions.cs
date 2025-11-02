@@ -3,6 +3,7 @@ using Evaluation.DAL.UnitOfWork;
 using System;
 using Evaluation.SharedHelper.Helper;
 using Microsoft.Extensions.Configuration;
+using Evaluation.DAL.Helper;
 
 namespace Evaluation.SharedHelper
 {

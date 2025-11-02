@@ -3,6 +3,7 @@ using Evaluation.DAL.Entities.Authentication;
 using Evaluation.DAL.Entities.BaseModule;
 using Evaluation.DAL.Entities.ServicesEntities;
 using Evaluation.DAL.Entities.SystemModulesEntities;
+using Evaluation.DAL.Helper;
 using Evaluation.DAL.SystemSetting;
 using Evaluation.DAL.UnitOfWork;
 using Evaluation.Services.Special;
