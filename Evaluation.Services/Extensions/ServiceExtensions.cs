@@ -74,11 +74,11 @@ public static class ServiceExtensions
             .AsSelf()
             .WithScopedLifetime());
 
-        //services.Scan(scan => scan
-        //    .FromAssemblies(typeof(ApiServiceBase).GetTypeInfo().Assembly)
-        //    .AddClasses(classes => classes.Where(x => x.IsSubclassOf(typeof(ApiServiceBase))))
-        //    .AsSelf()
-        //    .WithScopedLifetime());
+        services.Scan(scan => scan
+            .FromAssemblies(typeof(ApiServiceBase).GetTypeInfo().Assembly)
+            .AddClasses(classes => classes.Where(x => x.IsSubclassOf(typeof(ApiServiceBase))))
+            .AsSelf()
+            .WithScopedLifetime());
 
         services.AddScoped<MSJsonWT>();
 

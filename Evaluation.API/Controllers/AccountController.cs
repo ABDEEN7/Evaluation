@@ -13,7 +13,7 @@ namespace Evaluation.API.Controllers
 
     [ApiController]
     [Route("api/[controller]")]
-    public class AccountController : Controller
+    public class AccountController : ControllerBase
     {
         private readonly MasterBL masterBL;
         private readonly RequestInfo requestInfo;

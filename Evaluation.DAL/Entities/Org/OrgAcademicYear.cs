@@ -9,7 +9,7 @@ public class OrgAcademicYear : EntityBase
     public Organization? Organization { get; set; }
     public Guid? ParentOrgId { get; set; }
     public Organization? ParentOrg { get; set; }
-    public int ParentId { get; set; }
+    public Guid ParentId { get; set; }
     public Guid AcademicYearId { get; set; }
     public AcademicYear? AcademicYear { get; set; }
 }

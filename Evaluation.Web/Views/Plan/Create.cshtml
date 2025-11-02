@@ -1,6 +1,4 @@
-﻿
-<!doctype html>
-<html lang="en">
+﻿<html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -24,7 +22,10 @@
     <!-- Flatpickr JS -->
     <script src="~/plan-assets/vendor/flatpickr/js/flatpickr.js"></script>
     <script src="~/plan-assets/js/main.js"></script>
-
+    <script src="~/js/shared/ajax-setup.js"></script>
+    <script src="~/js/shared/shared-utility.js"></script>
+    <script src="~/js/shared/jq-client-util.js"></script>
+    <script src="~/js/shared/jq-message-util.js"></script>
     <!-- Header -->
     <header class="topbar">
         <div class="container-fluid">
@@ -167,13 +168,15 @@
                                     <div class="col-md-4">
                                         <!-- Select2 Dropdown -->
                                         <div class="mb-4">
-                                            <label for="userRole" class="form-label">نوع الخطة <span class="text-danger">*</span></label>
-                                            <select id="userRole" class="form-select" style="width: 100%;">
+                                            <label for="planType" class="form-label">نوع الخطة <span class="text-danger">*</span></label>
+                                            <select class="form-control" id="ddlPlanType" name="ddlPlanType">
+                                            </select>
+                                            @*   <select id="planType" class="form-select" style="width: 100%;">
                                                 <option value="">اختر الدور</option>
                                                 <option value="admin">شهري</option>
                                                 <option value="editor">محرر</option>
                                                 <option value="viewer">عارض</option>
-                                            </select>
+                                            </select> *@
                                         </div>
                                     </div>
                                     <div class="col-md-4">
@@ -252,7 +255,7 @@
                                                 <td><p class="m-0" id="dateRange"><i class="la la-calendar"></i> اختر تاريخ بداية ونهاية الزيارة </p></td>
                                                 <td><p class="m-0">10/10/2024</p></td>
                                                 <td>
-                                                    <select id="userRole" class="form-select" style="width: 100%;">
+                                                    <select id="planType" class="form-select" style="width: 100%;">
                                                         <option value="">دوري</option>
                                                         <option value="">استثنائي</option>
                                                         <option value="">زيارة</option>
@@ -284,7 +287,7 @@
                                                 <td><p class="m-0" id="dateRange"><i class="la la-calendar"></i> اختر تاريخ بداية ونهاية الزيارة </p></td>
                                                 <td><p class="m-0">10/10/2024</p></td>
                                                 <td>
-                                                    <select id="userRole" class="form-select" style="width: 100%;">
+                                                    <select id="planType" class="form-select" style="width: 100%;">
                                                         <option value="">دوري</option>
                                                         <option value="">استثنائي</option>
                                                         <option value="">زيارة</option>
@@ -316,7 +319,7 @@
                                                 <td><p class="m-0" id="dateRange"><i class="la la-calendar"></i> اختر تاريخ بداية ونهاية الزيارة </p></td>
                                                 <td><p class="m-0">10/10/2024</p></td>
                                                 <td>
-                                                    <select id="userRole" class="form-select" style="width: 100%;">
+                                                    <select id="planType" class="form-select" style="width: 100%;">
                                                         <option value="">دوري</option>
                                                         <option value="">استثنائي</option>
                                                         <option value="">زيارة</option>
@@ -348,7 +351,7 @@
                                                 <td><p class="m-0" id="dateRange"><i class="la la-calendar"></i> اختر تاريخ بداية ونهاية الزيارة </p></td>
                                                 <td><p class="m-0">10/10/2024</p></td>
                                                 <td>
-                                                    <select id="userRole" class="form-select" style="width: 100%;">
+                                                    <select id="planType" class="form-select" style="width: 100%;">
                                                         <option value="">دوري</option>
                                                         <option value="">استثنائي</option>
                                                         <option value="">زيارة</option>
@@ -380,7 +383,7 @@
                                                 <td><p class="m-0" id="dateRange"><i class="la la-calendar"></i> اختر تاريخ بداية ونهاية الزيارة </p></td>
                                                 <td><p class="m-0">10/10/2024</p></td>
                                                 <td>
-                                                    <select id="userRole" class="form-select" style="width: 100%;">
+                                                    <select id="planType" class="form-select" style="width: 100%;">
                                                         <option value="">دوري</option>
                                                         <option value="">استثنائي</option>
                                                         <option value="">زيارة</option>
@@ -412,7 +415,7 @@
                                                 <td><p class="m-0" id="dateRange"><i class="la la-calendar"></i> اختر تاريخ بداية ونهاية الزيارة </p></td>
                                                 <td><p class="m-0">10/10/2024</p></td>
                                                 <td>
-                                                    <select id="userRole" class="form-select" style="width: 100%;">
+                                                    <select id="planType" class="form-select" style="width: 100%;">
                                                         <option value="">دوري</option>
                                                         <option value="">استثنائي</option>
                                                         <option value="">زيارة</option>
@@ -444,7 +447,7 @@
                                                 <td><p class="m-0" id="dateRange"><i class="la la-calendar"></i> اختر تاريخ بداية ونهاية الزيارة </p></td>
                                                 <td><p class="m-0">10/10/2024</p></td>
                                                 <td>
-                                                    <select id="userRole" class="form-select" style="width: 100%;">
+                                                    <select id="planType" class="form-select" style="width: 100%;">
                                                         <option value="">دوري</option>
                                                         <option value="">استثنائي</option>
                                                         <option value="">زيارة</option>
@@ -476,7 +479,7 @@
                                                 <td><p class="m-0" id="dateRange"><i class="la la-calendar"></i> اختر تاريخ بداية ونهاية الزيارة </p></td>
                                                 <td><p class="m-0">10/10/2024</p></td>
                                                 <td>
-                                                    <select id="userRole" class="form-select" style="width: 100%;">
+                                                    <select id="" class="form-select" style="width: 100%;">
                                                         <option value="">دوري</option>
                                                         <option value="">استثنائي</option>
                                                         <option value="">زيارة</option>
@@ -493,7 +496,7 @@
                             <div class="row">
                                 <div class="col-md-6  mt-3">
                                     <div class="d-flex gap-2 align-items-center flex-wrap">
-                                        <a href="#" class="btn btn-primary mw-200" type="button" data-bs-toggle="modal" data-bs-target="#confirmation-modal"> <i class="la la-bookmark"></i> حفظ</a>
+                                        <a href="#" class="btn btn-primary mw-200" type="button" data-bs-toggle="modal" data-bs-target="#confirmation-modal" id="confirmSaveBtn"> <i class="la la-bookmark"></i> حفظ</a>
                                         <a href="#" class=""> عرض الخطط</a>
                                     </div>
 
@@ -573,7 +576,7 @@
         </div>
     </div>
 
- <div class="modal fade" id="confirmation-modal" tabindex="-1" aria-labelledby="confirmation-modalLabel" aria-hidden="true">
+    <div class="modal fade" id="confirmation-modal" tabindex="-1" aria-labelledby="confirmation-modalLabel" aria-hidden="true">
         <div class="modal-dialog  modal-dialog-centered">
             <div class="modal-content">
 
@@ -594,10 +597,13 @@
             </div>
         </div>
     </div>
-    
+
     @await Component.InvokeAsync("SchoolDetailsModal", new { modalId = "schoolDetailsModal", title = "School Details", body = "Hello from modal body!" })
 
-
+    <!-- Flatpickr JS -->
+    <script src="~/plan-assets/vendor/flatpickr/js/flatpickr.js"></script>
+    <script src="~/plan-assets/js/main.js"></script>
+    <script src="~/js/plan/create-plan.js"></script>
 </body>
 </html>
 

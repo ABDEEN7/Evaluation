@@ -15,7 +15,7 @@ namespace Evaluation.DAL.Entities.ActionEntities
         public ServiceAction? ServiceAction { get; set; }
         public Guid PartyTypeId { get; set; }
         public PartyType? PartyType { get; set; }
-        public int Priority { get; set; }
+        public Guid Priority { get; set; }
         public string? ActionPartyTypeSettings { get; set; }
     }
 }

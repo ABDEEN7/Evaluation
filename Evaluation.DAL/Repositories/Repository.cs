@@ -154,7 +154,7 @@ public class Repository<T>(DbContext context, UserInfo userInfo) : RepositoryBas
         context.Entry(entity).State = EntityState.Modified;
         return true;
     }
-    public async Task<T?> GetByIdAsync(Guid id)
+    public async Task<T?> GetByIdAsync(Guid? id)
     {
         T? query = await _dbSet.Where(x => x.Id == id).FirstAsync();
         //if (query is null)
