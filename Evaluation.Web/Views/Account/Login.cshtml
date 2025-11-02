@@ -1,4 +1,5 @@
-﻿
+﻿@using Evaluation.SharedHelper.Enums
+
 <!DOCTYPE html>
 <html lang="en" dir="rtl" class="">
 <head>
@@ -132,3 +133,53 @@
 </body>
 
 </html>
+
+@section Scripts {
+
+	<script src="~/js/account/login.js" asp-append-version="true"></script>
+    <script src="~/js/shared/shared-utility.js"></script>
+	<script type="text/javascript">
+
+		$(document).ready(async function () {
+
+
+			webAppConfigsSetup().Init({
+				pageNames: [
+					'Exceptions',
+					'@nameof(ConstantKeys.WebAppCommon)',
+					'@nameof(ConstantKeys.WebAppLoginPage)'
+				],
+				additional_keys: []
+			}).then(() => {
+				uiControlsSetup().UpdatPageTitle();
+				// debugger
+				if (sharedUtility().ExistingToken()) {
+					let TempMessage = GetLocalStorageValue(LocalStorageKeys.TempMessage);
+					if (TempMessage) {
+						notificationUtil.success(TempMessage);
+						SetLocalStorageValue(LocalStorageKeys.TempMessage, '');
+					}
+
+
+					TempMessage = GetLocalStorageValue(LocalStorageKeys.ErrorTempMessage);
+					if (TempMessage) {
+						notificationUtil.error(TempMessage);
+						SetLocalStorageValue(LocalStorageKeys.ErrorTempMessage, '');
+					}
+
+					sharedUtility().RedirectToUrl(ConstantUrls.Home);
+				}
+
+
+			});
+
+
+
+
+
+		});
+
+
+
+	</script>
+}

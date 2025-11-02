@@ -47,7 +47,7 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
+builder.Services.ConfigureMasterBL(config, builder.Environment.IsDevelopment());
 
 builder.Services.ConfigureUserInfo(config);
 builder.Services.ConfigureRequestInfo(config);
@@ -76,6 +76,8 @@ app.MapControllers();
 
 app.UseMiddleware<PopulateUserInfoMiddleware>();
 app.UseMiddleware<PopulateRequestInfoMiddleware>();
+
+
 
 app.MapControllerRoute(
                  name: "default",

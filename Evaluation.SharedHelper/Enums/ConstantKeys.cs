@@ -25,10 +25,24 @@ public static class ConstantKeys
         public static readonly string EnableCaching = "EnableCaching";
         public static readonly string ClearCacheDuration = "ClearCacheDuration";
 
-        
-    }
-    public static class WebAppSettings
-    {
-    }
+            
+        }
+        public static class WebAppSettings
+        {
+        }
+        public static class WebAppCommon
+        {
+        }
 
+		public static class WebAppLoginPage
+		{
+			public static readonly string lblEmail = "lblEmail";
+			public static readonly string lblPassword = "lblPassword";
+			public static readonly string lblContinue = "lblContinue";
+			public static readonly string lblBackToEmail = "lblBackToEmail";
+			public static readonly string lblLoginBtn = "lblLoginBtn";
+			public static readonly string lblLoginTitle = "lblLoginTitle";
+		}
+
+	}
 }
