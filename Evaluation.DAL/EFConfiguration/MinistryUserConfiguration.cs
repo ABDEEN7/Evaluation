@@ -11,8 +11,6 @@ namespace Evaluation.DAL.EFConfiguration
 			builder.ToTable("MinistryUsers");
 			builder.HasKey(x => x.Id);
 
-
-		
 			builder.HasOne(x => x.UserType).WithMany().HasForeignKey(x => x.UserTypeId);
             builder.HasOne(c => c.CreateBy).WithMany().HasForeignKey(y => y.CreateById).IsRequired(false);
 
