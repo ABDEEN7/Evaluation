@@ -29,13 +29,13 @@ public class PlanServiceRequestServices(
 {
     public async Task<Result<CreateEvaluationPlanDto>> AddEvaulationPlan(CreateEvaluationPlanDto evaluationPlanDto)
     {
-        //await ValidateDraftPlan(evaluationPlanDto);
+        await ValidateDraftPlan(evaluationPlanDto);
         return await ExecuteWithResult(async () =>
         {
             //PlanServiceRequest planDraft = evaluationPlanDto.Adapt<PlanServiceRequest>();
             //var result = await planRepository.CreateServicPlan(evaluationPlanDto);
-            //var result = JsonConvert.SerializeObject(evaluationPlanDto);
             var result = evaluationPlanDto;
+            return result;
         });
     }
     public async Task<Result<PlanServiceRequest>> UpdatePlanDraft(Guid id, string planDto)
