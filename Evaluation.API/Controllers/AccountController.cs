@@ -39,7 +39,7 @@ namespace Evaluation.API.Controllers
             };
             return response;
         }
-        [HttpPost]
+        [HttpPost("CheckUserAuth")]
         public async Task<IActionResult> CheckUserAuth([FromForm] string username)
         {
             try
@@ -51,7 +51,7 @@ namespace Evaluation.API.Controllers
             {
                 return BadRequest(ex.Message);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 return StatusCode(500, "An unexpected error occurred.");
             }

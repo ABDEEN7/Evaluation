@@ -27,79 +27,79 @@ namespace Evaluation.SharedHelper
 			AppSettings.DefaultLanguage = config.GetValue<string>("AppSettings:DefaultLanguage") ?? "en";
 			AppSettings.DateFormat = config.GetValue<string>("AppSettings:DateFormat") ?? "yyyy-MM-dd";
 		}
-		public static void ConfigureMasterBL(this IServiceCollection services, IConfiguration config, bool isDevEnvironment)
-		{
+		//public static void ConfigureMasterBL(this IServiceCollection services, IConfiguration config, bool isDevEnvironment)
+		//{
 
-			services.AddDbContext<EvaluationDbContext>(options =>
-			{
-				options.UseSqlServer(config.GetConnectionString("ScholarshipDBConn"));
-			});
+		//	services.AddDbContext<EvaluationDbContext>(options =>
+		//	{
+		//		options.UseSqlServer(config.GetConnectionString("ScholarshipDBConn"));
+		//	});
 
-			services.AddMemoryCache();
+		//	services.AddMemoryCache();
 
-			object value = services.AddHttpClient<HttpClientServices>()
-				.SetHandlerLifetime(TimeSpan.FromMinutes(5))    // Default is 2 mins
-				.ConfigurePrimaryHttpMessageHandler(() =>
-				{
-					var handler = new HttpClientHandler
-					{
-						AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
-						UseCookies = false,
-						AllowAutoRedirect = false,
-						UseDefaultCredentials = true
-					};
+		//	object value = services.AddHttpClient<HttpClientServices>()
+		//		.SetHandlerLifetime(TimeSpan.FromMinutes(5))    // Default is 2 mins
+		//		.ConfigurePrimaryHttpMessageHandler(() =>
+		//		{
+		//			var handler = new HttpClientHandler
+		//			{
+		//				AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
+		//				UseCookies = false,
+		//				AllowAutoRedirect = false,
+		//				UseDefaultCredentials = true
+		//			};
 
-					// Only bypass SSL certificate validation in development
-					if (isDevEnvironment)
-					{
-						handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true;
-					}
+		//			// Only bypass SSL certificate validation in development
+		//			if (isDevEnvironment)
+		//			{
+		//				handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true;
+		//			}
 
-					return handler;
-				});
+		//			return handler;
+		//		});
 
-			services.AddScoped<LoggingServices>();
+		//	services.AddScoped<LoggingServices>();
 
-			services.AddScoped<ISmsServices, SmsServices>();
-			services.AddScoped<ResponseInfo>();
+		//	services.AddScoped<ISmsServices, SmsServices>();
+		//	services.AddScoped<ResponseInfo>();
 
-			services.Configure<AzureADConfig>(config.GetSection("AzureADConfig"));
-			services.Configure<FormJwtConfig>(config.GetSection("FormJwtConfig"));
-			services.Configure<CenterServicesConfig>(config.GetSection("CenterServicesConfig"));
+		//	services.Configure<AzureADConfig>(config.GetSection("AzureADConfig"));
+		//	services.Configure<FormJwtConfig>(config.GetSection("FormJwtConfig"));
+		//	services.Configure<CenterServicesConfig>(config.GetSection("CenterServicesConfig"));
 
-			services.AddScoped(sp =>
-			{
-				var options = sp.GetRequiredService<IOptions<AzureADConfig>>();
-				return options.Value;
-			});
+		//	services.AddScoped(sp =>
+		//	{
+		//		var options = sp.GetRequiredService<IOptions<AzureADConfig>>();
+		//		return options.Value;
+		//	});
 
-			services.AddScoped(sp =>
-			{
-				var options = sp.GetRequiredService<IOptions<FormJwtConfig>>();
-				return options.Value;
-			});
+		//	services.AddScoped(sp =>
+		//	{
+		//		var options = sp.GetRequiredService<IOptions<FormJwtConfig>>();
+		//		return options.Value;
+		//	});
 
-			//services.AddScoped(sp =>
-			//{
-			//	var options = sp.GetRequiredService<IOptions<CenterServicesConfig>>();
-			//	return options.Value;
-			//});
+		//	//services.AddScoped(sp =>
+		//	//{
+		//	//	var options = sp.GetRequiredService<IOptions<CenterServicesConfig>>();
+		//	//	return options.Value;
+		//	//});
 
-			//services.AddScoped<FromJsonWT>();
-			services.AddScoped<MSJsonWT>();
+		//	//services.AddScoped<FromJsonWT>();
+		//	services.AddScoped<MSJsonWT>();
 
-			services.AddScoped<ISmsServices, SmsServices>();
+		//	services.AddScoped<ISmsServices, SmsServices>();
 
-			services.AddScoped<UnitOfWork>();
-			services.AddScoped<CacheManager>();
-			services.AddScoped<CacheDataProvider>();
-			services.AddScoped<AzureBlobStorageService>();
+		//	services.AddScoped<UnitOfWork>();
+		//	services.AddScoped<CacheManager>();
+		//	services.AddScoped<CacheDataProvider>();
+		//	services.AddScoped<AzureBlobStorageService>();
 
-			services.AddScoped<MasterBL>();
+		//	services.AddScoped<MasterBL>();
 
 
 
-		}
+		//}
 
 		public static UnitOfWork CreateScopedUow(this IServiceProvider serviceProvider)
         {

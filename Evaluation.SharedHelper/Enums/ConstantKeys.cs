@@ -19,7 +19,6 @@ public static class ConstantKeys
         public static readonly string InvalidRequest = "InvalidRequest";
         public static readonly string InvalidApprovePlan = "InvalidApprovePlan";
     }
-
     public static class AdminSettings
     {
         public static readonly string EnableCaching = "EnableCaching";
@@ -27,14 +26,13 @@ public static class ConstantKeys
 
             
         }
-        public static class WebAppSettings
+    public static class WebAppSettings
         {
         }
-        public static class WebAppCommon
+    public static class WebAppCommon
         {
         }
-
-		public static class WebAppLoginPage
+	public static class WebAppLoginPage
 		{
 			public static readonly string lblEmail = "lblEmail";
 			public static readonly string lblPassword = "lblPassword";
@@ -44,5 +42,5 @@ public static class ConstantKeys
 			public static readonly string lblLoginTitle = "lblLoginTitle";
 		}
 
-	}
+	
 }
