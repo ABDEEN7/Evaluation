@@ -159,7 +159,30 @@ public class Repository<T>(DbContext context, UserInfo userInfo) : RepositoryBas
         _dbSet.Update(entity);
         return entity;
     }
+    public IEnumerable<T> UpdateRange(IEnumerable<T> entities)
+    {
+        var today = DateTime.Now;
 
+        foreach (var entity in entities)
+        {
+            if (entity is IAuditLogEntity)
+            {
+                var entry = context.Entry(entity);
+
+                var auditLogs = GenerateAuditLogs(entry);
+
+                // Add audit logs to the context
+                if (auditLogs.Any()) context.Set<AuditLog>().AddRange(auditLogs);
+            }
+
+            entity.UpdateDate = today;
+            entity.IsDeleted = false;
+            if (userInfo.UserId != Guid.Empty) entity.UpdateById = userInfo.UserId;
+        }
+
+        _dbSet.UpdateRange(entities);
+        return entities;
+    }
     public bool Delete(T entity)
     {
         entity.IsDeleted = true;
@@ -167,6 +190,26 @@ public class Repository<T>(DbContext context, UserInfo userInfo) : RepositoryBas
         if (userInfo.UserId != Guid.Empty)
             entity.DeleteById = userInfo.UserId;
         context.Entry(entity).State = EntityState.Modified;
+        return true;
+    }
+
+    public bool DeleteRange(IEnumerable<T> entities)
+    {
+        if (entities == null || !entities.Any()) return false;
+
+        var today = DateTime.Now;
+        var userId = userInfo?.UserId;
+
+        foreach (var entity in entities)
+        {
+            entity.IsDeleted = true;
+            entity.DeleteDate = today;
+            if (userId != Guid.Empty)
+            {
+                entity.DeleteById = userId;
+            }
+        }
+
         return true;
     }
     #endregion

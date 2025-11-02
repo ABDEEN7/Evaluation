@@ -1,0 +1,404 @@
+﻿@model UiControlVM
+
+@if (Model.ControlItem != null)
+{
+
+    var constraint = Model.ControlItem.Constraint;
+    var control = Model.ControlItem.Control;
+    var Lang = Model.Lang;
+    var ControlName = Model.ControlItem.ControlName;
+
+
+    @if (constraint != null)
+    {
+        
+
+        if (constraint.ControlType == "CHECK_BOX" || constraint.ControlType == "CHECK_BOX_HIDDEN" || constraint.ControlType == "CHECK_BOX_DISABLED")
+        {
+            var ControlAttribute = string.Empty;
+            if (!string.IsNullOrEmpty(constraint?.ControlAttribute))
+            {
+
+                var jsonConfig = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, string>>(constraint!.ControlAttribute!);
+                if (jsonConfig != null)
+                {
+                    foreach (var kvp in jsonConfig)
+                    {
+                        ControlAttribute += $"{kvp.Key}=\"{kvp.Value}\" ";
+                    }
+                }
+
+
+
+            }
+
+            <div class="form-check d-flex align-items-center gap-2 ps-0 mb-3">
+
+                <label class="switch-small">
+
+                    <input class="form-check-input" type="checkbox" checked id="@constraint?.UibackendName" name="@constraint?.UibackendName" @Html.Raw(string.IsNullOrEmpty(ControlAttribute) ? "" : ControlAttribute)>
+                    @if (constraint?.ControlType != "CHECK_BOX_HIDDEN")
+                    {
+                        <span class="slider-small round"></span>
+                    }
+                    else
+                    {
+                        <span class="slider-small round" hidden></span>
+                    }
+                </label>
+                <label class="form-check-label" for="@constraint?.UibackendName">
+                    @if (control == null )
+                    {
+                        @if (constraint?.ControlType != "CHECK_BOX_HIDDEN")
+                        {
+                            <span class="alert alert-danger" role="alert">
+                                Missing Label for @ControlName
+                            </span>
+                        }
+
+                    }
+                    else
+                    {
+                        @if (constraint?.ControlType != "CHECK_BOX_HIDDEN")
+                        {
+                            if (!string.IsNullOrEmpty(Lang))
+                            {
+                                if (Lang == "ar")
+                                {
+                                    @control.ArValue
+
+
+                                }
+                                else
+                                {
+                                    @control.EnValue
+
+                                }
+                            }
+                            else
+                            {
+                                @control.EnValue
+
+                            }
+                        }
+
+                    }
+                </label>
+
+            </div>
+        }
+        else
+        {
+            var showingdiv = "";
+            @if (constraint?.ControlType == "DROPDOWN_HIDDEN")
+            {
+                showingdiv = $"Style =display:none"; 
+            }
+
+            <div class="mb-3" @showingdiv>
+                <label class="form-label w-100" id="">
+                    @if (control == null)
+                    {
+                        @if (constraint?.ControlType == "TEXT_BOX_HIDDEN" || constraint?.ControlType == "DROPDOWN_HIDDEN")
+                        {
+                            <span>@Html.Raw("")</span>
+                        }
+                        else
+                        {
+                            <span class="alert alert-danger" role="alert">
+                                Missing Label for @ControlName
+                            </span>
+                        }
+
+                    }
+                    else
+                    {
+                        @if (constraint?.ControlType != "TEXT_BOX_HIDDEN" && constraint?.ControlType != "DROPDOWN_HIDDEN")
+                        {
+                            if (!string.IsNullOrEmpty(Lang))
+                            {
+                                if (Lang == "ar")
+                                {
+                                    @control.ArValue
+
+                                }
+                                else
+                                {
+                                    @control.EnValue
+
+                                }
+                            }
+                            else
+                            {
+                                @control.EnValue
+
+                            }
+                        }
+
+                    }
+                    @if (constraint?.ControlType != "TEXT_BOX_HIDDEN" && constraint?.ControlType != "DROPDOWN_HIDDEN")
+                    {
+                        @if (constraint?.IsRequired == true)
+                        {
+                            <span class="text-danger">@Html.Raw("*")</span>
+                        }
+                        else
+                        {
+                            <span>@Html.Raw("")</span>
+                        }
+                    }
+                </label>
+
+
+
+                @{
+                    var output = string.Empty;
+
+                    if (constraint?.IsRequired != null && constraint.IsRequired)
+                    {
+                        output += $"required = '{constraint?.IsRequired.ToString().ToLower()}' ";
+                    }
+                    if (constraint?.MinLength != null)
+                    {
+                        output += $"minlength = '{constraint?.MinLength}' ";
+                    }
+                    if (constraint?.MaxLength != null)
+                    {
+                        output += $"maxlength = '{constraint?.MaxLength}' ";
+                    }
+
+                    if (!string.IsNullOrEmpty(constraint?.ControlAttribute))
+                    {
+
+                        var jsonConfig = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, string>>(constraint!.ControlAttribute!);
+                        if (jsonConfig!=null)
+                        {
+                            foreach (var kvp in jsonConfig)
+                            {
+                                output += $"{kvp.Key}=\"{kvp.Value}\" ";
+                            }
+                        }
+                       
+
+
+                    }
+                    switch (constraint?.ControlType)
+                    {
+                        case ("TEXT_BOX" or "TEXT_BOX_DISABLED"):
+
+                            <input type="text" class="form-control" id="@constraint.UibackendName" name="@constraint.UibackendName" @Html.Raw(string.IsNullOrEmpty(output) ? "" : output) />
+                            break;
+                        case "TEXT_BOX_DISABLED_COPY":
+                            <div class="position-relative">
+                                <input type="text" class="form-control pe-5" id="@constraint.UibackendName" name="@constraint.UibackendName" @Html.Raw(string.IsNullOrEmpty(output) ? "" : output) />
+
+                                <span onclick="copyTextfromtextbox('@constraint.UibackendName')" class="position-absolute top-50 end-0 translate-middle-y me-2 text-muted" style="cursor:pointer;"><i class="fas fa-copy"></i></span>
+                          
+                           </div>
+                            break;
+                        case "TEXT_BOX_BUTTON":
+                            var buttonname = @constraint.UibackendName + "_button";
+                            <div class="input-group">
+                                <input type="text"
+                                       class="form-control"
+                                       id="@constraint.UibackendName"
+                                       name="@constraint.UibackendName"
+                                @Html.Raw(string.IsNullOrEmpty(output) ? "" : output) />
+
+                                <button type="button" id="@buttonname"
+                                        onclick="textboxbuttonclick()"
+                                        class="btn btn-outline-secondary">
+                                    Show Client Id
+                                </button>
+                            </div>
+
+
+                            break;
+                        case "TEXT_BOX_KEY":
+
+                            <input type="text" class="form-control" id="@constraint.UibackendName" name="@constraint.UibackendName" @Html.Raw(string.IsNullOrEmpty(output) ? "" : output) />
+                            <span class="form-icon icon-picker top-50">
+                                <span onclick="copyTextToClipboard('@constraint.UibackendName')" class="bordered" style=""><i class="fas fa-copy"></i></span>
+                                <span onclick="openNewModel('@constraint.UibackendName')">
+                                    <i class="fas fa-eye"></i>
+                                </span>
+                            </span>
+                            break;
+                        case "TEXT_BOX_HIDDEN":
+
+                            <input type="text" hidden class="form-control" id="@constraint.UibackendName" name="@constraint.UibackendName" @Html.Raw(string.IsNullOrEmpty(output) ? "" : output) />
+                            break;
+                        case ("NUMBER" or "NUMBER_DISABLED"):
+
+                            <input type="number" class="form-control" id="@constraint.UibackendName" name="@constraint.UibackendName" @Html.Raw(string.IsNullOrEmpty(output) ? "" : output) />
+                            break;
+                        case "TEXT_AREA":
+                            <textarea id="@constraint.UibackendName" name="@constraint.UibackendName" class="form-control notinymceeditor" rows="5" @Html.Raw(string.IsNullOrEmpty(output) ? "" : output)></textarea>
+                            break;
+                        case "TEXT_TINY":
+                            <textarea id="@constraint.UibackendName" name="@constraint.UibackendName" class="form-control tinymceeditor" @Html.Raw(string.IsNullOrEmpty(output) ? "" : output)></textarea>
+
+                            break;
+                        case "ICON":
+                            <div class="position-relative ">
+                                <span class="icon-picker"><i id="IconPreview" class="fab fa-github"></i></span>
+                                <input name="@constraint.UibackendName" id="@constraint.UibackendName" data-iconpicker-input="input#@constraint.UibackendName"  class="form-control icon" @Html.Raw(string.IsNullOrEmpty(output) ? "" : output)>
+                            </div>
+
+                            break;
+                        case "COLOR":
+                            var colorpickername = @constraint.UibackendName + "picker";
+                            <div class="position-relative ">
+                                <input type="text" class="color form-control" id="@constraint.UibackendName" name="@constraint.UibackendName" @Html.Raw(string.IsNullOrEmpty(output) ? "" : output) />
+                                <input type="color" id="@colorpickername" class="clr-picker">
+                            </div>
+
+
+                            break;
+                        case "DATE" or "DATETIME":
+                            var divname = "dp" + @constraint.UibackendName;
+                            <div class="input-group" id='@divname' name="@divname">
+                                <input type="text" id="@constraint.UibackendName" name="@constraint.UibackendName" class="search-control form-control date" placeholder="Enter the Date" @Html.Raw(string.IsNullOrEmpty(output) ? "" : output)>
+                                <div class="input-group-addon">
+                                    <span class="glyphicon glyphicon-th"></span>
+                                </div>
+                            </div>
+
+                            break;
+                        case "DROPDOWN":
+                            <select class="form-control select2 form-select w-100 notinymceeditor" id="@constraint.UibackendName" name="@constraint.UibackendName" @Html.Raw(string.IsNullOrEmpty(output) ? "" : output)>
+                            </select>
+                            break;
+                        case "DROPDOWN_HIDDEN":
+                            <select disabled="disabled" id="@constraint.UibackendName" name="@constraint.UibackendName" @Html.Raw(string.IsNullOrEmpty(output) ? "" : output)>
+                            </select>
+                            break;
+                        case ("MULTIDROPDOWN" or "TAGS") :
+                            <select class="form-control select2 form-select w-100 " multiple="multiple" id="@constraint.UibackendName" name="@constraint.UibackendName" @Html.Raw(string.IsNullOrEmpty(output) ? "" : output)>
+                            </select>
+                            break;
+                        case "DROPZONE":
+                            <div class="row" id="thumbnail"> </div>
+                            <div id="dropzonejs" class="dropzone mt-3">
+
+                                <div class="dz-message needsclick">
+                                    <i class="bi bi-file-earmark-arrow-up text-primary fs-28"></i>
+                                    <div class="ms-4">
+                                        <button class="dropzone-button" type="button"></button>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            break;
+                        case "FILEUPLOAD":
+                            var imagename = @constraint.UibackendName + "_image";
+                            var labelname = @constraint.UibackendName + "_label";
+
+                            <input id="@constraint.UibackendName" type="file" class="form-control file" name="@constraint.UibackendName" @Html.Raw(string.IsNullOrEmpty(output) ? "" : output) />
+                            <div class="row mt-3">
+                                <div class="col-md-4">
+                                    <div class="card">
+                                        <div class="card-body p-0 text-center">
+                                            <img id="@imagename" class="img-fluid w-100" />
+
+                                            <p class="m-2" id="@labelname">
+                                                <i class="bi bi-cloud-upload bi-4x fs-24"></i>
+                                            </p>
+
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            break;
+                        case "TREEVIEW":
+                            var searchinput = @constraint.UibackendName + "searchInput";
+                            <div style="text-align: right;color: red;">
+                            <span id="treeviewtotalcount"></span>
+                            <span id="treeviewselectedcount"></span>
+                            </div>
+                            <input type="search" id="@searchinput" class="form-control mb-3" placeholder="Search for a node" />
+                            <div id="@constraint.UibackendName" class="form-control treeview"></div>
+                            break;
+                        case "LIST":
+                            var listsearchinput = @constraint.UibackendName + "searchInput";
+                            <input type="text" id="@listsearchinput" class="form-control mb-3" placeholder="Search here" />
+                            <div id="@constraint.UibackendName" class="form-control list-box"> 
+                                <ul></ul>
+                            </div>
+                            break;
+                        case "JSON_AREA":
+                            <textarea id="@constraint.UibackendName" name="@constraint.UibackendName" class="form-control notinymceeditor target" rows="5" @Html.Raw(string.IsNullOrEmpty(output) ? "" : output)></textarea>
+                            break;
+                        case "DUAL_LIST":
+
+                            var rightbutton = @constraint.UibackendName + "_rightbutton";
+                            var rightallbutton = @constraint.UibackendName + "_rightallbutton";
+                            var leftbutton = @constraint.UibackendName + "_leftbutton";
+                            var leftallbutton = @constraint.UibackendName + "_leftallbutton";
+                            var mainduallist = "main_"+@constraint.UibackendName;
+                            var mainduallistsearch = "main_" + @constraint.UibackendName + "searchList";
+                            var duallistsearch = @constraint.UibackendName + "searchList";
+                            <div class="dual-list-container">
+                                <div class="list-box card" id="@mainduallist">
+                                    <input type="text" id="@mainduallistsearch" placeholder="Search Here" onkeyup="DualsearchList('@mainduallist', '@mainduallistsearch')">
+                                    <ul></ul>
+                                </div>
+                                <div class="buttons">
+                                    <button class="listbutton btn btn-primary" id="@rightallbutton"><i class="fa fa-angle-double-right"></i></button>
+                                    <button class="listbutton btn btn-primary" id="@rightbutton"><i class="fa-solid fa-greater-than"></i></button>
+                                    
+                                    <button class="listbutton btn btn-primary" id="@leftbutton"><i class="fa-solid fa-less-than"></i></button>
+                                    <button class="listbutton btn btn-primary" id="@leftallbutton"><i class="fa fa-angle-double-left"></i></button>
+                                </div>
+                                <div class="list-box card" id="@constraint.UibackendName">
+                                    <input type="text" id="@duallistsearch" placeholder="Search Here" onkeyup="DualsearchList('@constraint.UibackendName', '@duallistsearch')">
+                                    <ul id="sortable-list"></ul>
+                                </div>
+                            </div>
+                            break;
+                        case "RADIO_BUTTON":
+                            <input type="radio" id="@constraint.UibackendName" name="radioselect" @Html.Raw(string.IsNullOrEmpty(output) ? "" : output) />
+
+
+                            break;
+                        case "CHECK_BOX_LIST":
+                            <div class="form-check d-flex align-items-center gap-2 ps-0 mb-3 checkboxlist-container" id="@constraint.UibackendName"></div>
+
+                            break;
+                        case "TABULATOR":
+                            var div =@constraint.UibackendName + "div";
+                            var tabulator =@constraint.UibackendName + "tabulator";
+                            var button =@constraint.UibackendName + "button";
+                            <div class="mb-3" id="@div" style="display:none">
+                                <div class="btns-group my-3" id="action-container">
+
+                                    <button type="button" id="@button" class="btn btn-primary"></button>
+                                </div>
+                                <div id="@tabulator"></div>
+                            </div>
+
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                <div class="messages "> </div>
+            </div>
+
+        }
+
+    }
+    else
+    {
+        <div class="form-group">
+            <div class="alert text-danger" role="alert">
+                <i class="fa-solid fa-triangle-exclamation"></i>  Missing Constraint for @*@ControlName*@
+            </div>
+        </div>
+    }
+}
+
+

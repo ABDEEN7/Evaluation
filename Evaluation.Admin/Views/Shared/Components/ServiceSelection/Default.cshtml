@@ -1,0 +1,64 @@
+﻿@using Evaluation.Admin.Extensions
+@using static Evaluation.SharedHelper.Enums.ConstantKeys
+
+@model ServiceSelectionVM
+@{
+
+
+    string Lang = Model.CurrentLanguage;
+    var textDir = Lang == "ar" ? "RTL" : "LTR";
+
+    string lang = Model.CurrentLanguage.Trim().ToLower();
+    var permissionsList = Model.PermissionsList;
+    var controlsList = Model.ControlsList;
+    var uiControlItems = Model.UiControlItems.ToList() ;
+    var ShowServiceDefault = Model.ShowServiceDefault;
+}
+@section Styles {
+    <link href="~/css/admin/serviceselection.css" rel="stylesheet" />
+   
+}
+
+
+<section id="divform">
+    <div class="card app-card">
+        <div class="card-body">
+            <form class="row">
+                <div class="col-auto">
+                    <div class="row">
+                        <label for="SystemModuleId" class="col col-form-label"> @controlsList.GetUiControlText(AdminBackendUI.lblSystemModule)</label>
+                        <div class="col">
+                            <select asp-for="SystemModuleId" class="select2 SystemModuleId form-control" required="required" id="SystemModuleId"></select>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-auto">
+                    <div class="row">
+                        <label for="ServiceId" class="col col-form-label">@controlsList.GetUiControlText(AdminBackendUI.lblService)</label>
+                        <div class="col">
+                            <select asp-for="ServiceId" class="select2 ServiceId form-control" required="required" id="ServiceId"></select>
+                            <input id="IsFreezeHidden" hidden />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-auto">
+                    <button type="button" id="submitBtn" class="btn btn-primary mb-3">@controlsList.GetUiControlText(AdminBackendUI.lblSearch)</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/jquery_ui/ui/jquery-ui.js"></script>
+<script src="~/lib/select2/dist/js/select2.js"></script>
+<script type="text/javascript">
+    var controlsList = JSON.parse(`@Html.Raw(Json.Serialize(controlsList))`);
+
+    const SystemModuleList = JSON.parse(`@Html.Raw(Json.Serialize(Model.SystemModules))`);
+    const ServiceList = JSON.parse(`@Html.Raw(Json.Serialize(Model.Services))`);
+    const lang = '@Html.Raw(Model.CurrentLanguage)';
+    var selectPlaceHolder=controlsList.find(x=>x.backEndName=='@AdminBackendUI.lblSelect').txtValue;
+</script>
+<script src="~/js/admin/serviceselection.js" asp-append-version="true"></script>
+
+

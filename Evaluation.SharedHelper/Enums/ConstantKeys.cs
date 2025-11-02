@@ -30,6 +30,19 @@ namespace Evaluation.SharedHelper.Enums
             public static readonly string ServiceExistsServiceAction = "ServiceExistsServiceAction";
             public static readonly string ServiceExistsEmailTemplate = "ServiceExistsEmailTemplate";
             public static readonly string SERVICE_FREEZED_CANNOT_ADD = "SERVICE_FREEZED_CANNOT_ADD";
+            public static readonly string ExistsActionStatusConfigNotification = "ExistsActionStatusConfigNotification";
+            public static readonly string ParentDoesNotExist = "ParentDoesNotExist";
+            public static readonly string CannotDeleteItsParent = "CannotDeleteItsParent";
+            public static readonly string InvalidRequest = "InvalidRequest";
+            public static readonly string NoDataFound = "NoDataFound";
+            public static readonly string ServiceActionUsed = "ServiceActionUsed";
+            public static readonly string ActionExistsActionAssignPartyType = "ActionExistsActionAssignPartyType";
+            public static readonly string ActionExistsActionCondition = "ActionExistsActionCondition";
+            public static readonly string ActionExistsActionPartyType = "ActionExistsActionPartyType";
+            public static readonly string ActionExistsActionShowLogPartyType = "ActionExistsActionShowLogPartyType";
+            public static readonly string ActionExistsActionTemplateDoc = "ActionExistsActionTemplateDoc";
+            public static readonly string ServiceStatusUsed = "ServiceStatusUsed";
+            public static readonly string StatusExistsServiceStatusPreventPartyType = "StatusExistsServiceStatusPreventPartyType";
         }
 
         public static class AdminSettings
@@ -63,7 +76,21 @@ namespace Evaluation.SharedHelper.Enums
             public static readonly string ADD_RECORD = "ADD_RECORD";
             public static readonly string BACK_BUTTON = "BACK_BUTTON";
             public static readonly string SAVE_BUTTON = "SAVE_BUTTON";
+            public static readonly string DELETE_BUTTON = "DELETE_BUTTON";
+            public static readonly string EDIT_BUTTON = "EDIT_BUTTON";
+            public static readonly string ADMIN_CANCEL = "ADMIN_CANCEL";
             public static readonly string ServiceAlreadyExists = "ServiceAlreadyExists";
+            public static readonly string lblSystemModule = "lblSystemModule";
+            public static readonly string lblService = "lblService";
+            public static readonly string lblSearch = "lblSearch";
+            public static readonly string lblSelect = "lblSelect";
+            public static readonly string lblStatusService = "lblStatusService";
+            public static readonly string lblStatusesRoster = "lblStatusesRoster";
+            public static readonly string lblStatusSearchForNames = "lblStatusSearchForNames";
+            public static readonly string lblStatusDetails = "lblStatusDetails";
+            public static readonly string StatusTab = "StatusTab";
+            public static readonly string ActionStatusConfigTab = "ActionStatusConfigTab";
+            public static readonly string lblStatusPartyTypeDisplayList = "lblStatusPartyTypeDisplayList";
         }
 
         public static class AdminPages
@@ -72,22 +99,65 @@ namespace Evaluation.SharedHelper.Enums
             public static readonly string AdminService = "AdminService";
             public static readonly string AdminPlaceHolder = "AdminPlaceHolder";
             public static readonly string AdminServiceFreeze = "AdminServiceFreeze";
+            public static readonly string AdminActionStatusConfiguration = "AdminActionStatusConfiguration";
+            public static readonly string AdminActionStatusConfigurationNotification = "AdminActionStatusConfigurationNotification";
+            public static readonly string AdminServiceStatus = "AdminServiceStatus";
         }
 
         public static class AdminPermission
         {
-            //Permission for Service
+            #region  Service
             public const string ADD_ADMIN_SERVICE = "ADD_ADMIN_SERVICE";
             public const string EDIT_ADMIN_SERVICE = "EDIT_ADMIN_SERVICE";
             public const string DELETE_ADMIN_SERVICE = "DELETE_ADMIN_SERVICE";
             public const string VIEW_ADMIN_SERVICE = "VIEW_ADMIN_SERVICE";
             public const string FREEZE_ADMIN_SERVICE = "FREEZE_ADMIN_SERVICE";
+            #endregion
 
-            //Permission for Placeholder
+            #region  Placeholder
             public const string ADD_ADMIN_SERVICE_PLACEHOLDER = "ADD_ADMIN_SERVICE_PLACEHOLDER";
             public const string EDIT_ADMIN_SERVICE_PLACEHOLDER = "EDIT_ADMIN_SERVICE_PLACEHOLDER";
             public const string DELETE_ADMIN_SERVICE_PLACEHOLDER = "DELETE_ADMIN_SERVICE_PLACEHOLDER";
             public const string VIEW_ADMIN_SERVICE_PLACEHOLDER = "VIEW_ADMIN_SERVICE_PLACEHOLDER";
+            #endregion
+
+            #region ACTIONSTATUSCONFIGURATION
+
+            public const string VIEW_ADMIN_ACTIONSTATUSCONFIGURATION = "VIEW_ADMIN_ACTIONSTATUSCONFIGURATION";
+            public const string ADD_ADMIN_ACTIONSTATUSCONFIGURATION = "ADD_ADMIN_ACTIONSTATUSCONFIGURATION";
+            public const string EDIT_ADMIN_ACTIONSTATUSCONFIGURATION = "EDIT_ADMIN_ACTIONSTATUSCONFIGURATION";
+            public const string DELETE_ADMIN_ACTIONSTATUSCONFIGURATION = "DELETE_ADMIN_ACTIONSTATUSCONFIGURATION";
+
+            #endregion
+
+            #region ACTIONSTATUSCONFIGURATION_NOTIFICATION_NOTIFICATION
+
+            public const string VIEW_ADMIN_ACTIONSTATUSCONFIGURATION_NOTIFICATION =
+                "VIEW_ADMIN_ACTIONSTATUSCONFIGURATION_NOTIFICATION";
+
+            public const string ADD_ADMIN_ACTIONSTATUSCONFIGURATION_NOTIFICATION =
+                "ADD_ADMIN_ACTIONSTATUSCONFIGURATION_NOTIFICATION";
+
+            public const string EDIT_ADMIN_ACTIONSTATUSCONFIGURATION_NOTIFICATION =
+                "EDIT_ADMIN_ACTIONSTATUSCONFIGURATION_NOTIFICATION";
+
+            public const string DELETE_ADMIN_ACTIONSTATUSCONFIGURATION_NOTIFICATION =
+                "DELETE_ADMIN_ACTIONSTATUSCONFIGURATION_NOTIFICATION";
+
+            #endregion
+
+            #region SERVICE_STATUS
+
+            public const string VIEW_ADMIN_SERVICE_STATUS = "VIEW_ADMIN_SERVICE_STATUS";
+            public const string ADD_ADMIN_SERVICE_STATUS = "ADD_ADMIN_SERVICE_STATUS";
+            public const string EDIT_ADMIN_SERVICE_STATUS = "EDIT_ADMIN_SERVICE_STATUS";
+            public const string DELETE_ADMIN_SERVICE_STATUS = "DELETE_ADMIN_SERVICE_STATUS";
+
+            public const string UPDATE_STATUS_PARTY_TYPE_DISPLAY_NAME_STATUS =
+                "UPDATE_STATUS_PARTY_TYPE_DISPLAY_NAME_STATUS";
+
+            #endregion
+
         }
         public static class WebAppSettings
         {
