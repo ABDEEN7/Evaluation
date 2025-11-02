@@ -26,13 +26,15 @@ public class PlanServiceRequestRepository(IServiceScopeFactory serviceScopeFacto
     ) : ApiBase(serviceScopeFactory, cacheDataProvider, unitOfWork, loggingServices, userInfo,
         serviceProvider, requestInfo)
 {
-    public async Task<PlanServiceRequest> CreateServicPlan(PlanServiceRequest model)
+    public async Task<string> CreateServicPlan(PlanServiceRequest model)
     {
         if (await IsThereExistingDraftPlanForSameAcadmicYear(model))
             throw new BusinessException(ConstantKeys.ExceptionMessage.DraftPlanWithSameAcademicYearAlreadyExists);
-        await unitOfWork.GetRepository<PlanServiceRequest>().InsertAsync(model);
-        await unitOfWork.CommitAsync();
-        return (await unitOfWork.GetRepository<PlanServiceRequest>().GetByIdAsync(model.Id));
+        var planValue = JsonConvert.SerializeObject(model.Value);
+        return planValue;
+        //await unitOfWork.GetRepository<PlanServiceRequest>().InsertAsync(model);
+        //await unitOfWork.CommitAsync();
+        //return (await unitOfWork.GetRepository<PlanServiceRequest>().GetByIdAsync(model.Id));
     }
     public async Task<bool> DeleteEvaluationPlan(Guid? id)
     {

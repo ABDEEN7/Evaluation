@@ -27,13 +27,13 @@ public class PlanServiceRequestServices(
     ) : ApiBase(serviceScopeFactory, cacheDataProvider, unitOfWork, loggingServices, userInfo,
         serviceProvider, requestInfo)
 {
-    public async Task<Result<CreateEvaluationPlanDto>> AddEvaulationPlan(CreateEvaluationPlanDto evaluationPlanDto)
+    public async Task<Result<string>> AddEvaulationPlan(CreateEvaluationPlanDto evaluationPlanDto)
     {
         await ValidateDraftPlan(evaluationPlanDto);
         return await ExecuteWithResult(async () =>
         {
             PlanServiceRequest planDraft = evaluationPlanDto.Adapt<PlanServiceRequest>();
-            var result = await unitOfWork.GetRepository<PlanServiceRequest>().InsertAsync(planDraft);
+            var result = await planRepository.CreateServicPlan(planDraft);
         });
     }
     public async Task<Result<bool>> UpdatePlanDraft(Guid id, string planDto)
