@@ -23,17 +23,17 @@ public class PlanServiceRequestServices(
     UserInfo userInfo,
     IServiceProvider serviceProvider,
     RequestInfo requestInfo,
-    PlanServiceRequestRepository planService
+    PlanServiceRequestRepository planRepository
     ) : ApiBase(serviceScopeFactory, cacheDataProvider, unitOfWork, loggingServices, userInfo,
         serviceProvider, requestInfo)
 {
-    public async Task<Result<CreateEvaluationPlanDto>> AddEvaulationPlan(CreateEvaluationPlanDto evaluationPlanDto)
+    public async Task<Result<string>> AddEvaulationPlan(CreateEvaluationPlanDto evaluationPlanDto)
     {
         await ValidateDraftPlan(evaluationPlanDto);
         return await ExecuteWithResult(async () =>
         {
             PlanServiceRequest planDraft = evaluationPlanDto.Adapt<PlanServiceRequest>();
-            var result = await unitOfWork.GetRepository<PlanServiceRequest>().InsertAsync(planDraft);
+            var result = await planRepository.CreateServicPlan(planDraft);
         });
     }
     public async Task<Result<bool>> UpdatePlanDraft(Guid id, string planDto)
@@ -62,7 +62,7 @@ public class PlanServiceRequestServices(
     {
         return await ExecuteWithResult(async () =>
         { 
-            bool result = await planService.DeleteEvaluationPlan(id);
+            bool result = await planRepository.DeleteEvaluationPlan(id);
             return result;
         });
     }
@@ -73,13 +73,14 @@ public class PlanServiceRequestServices(
         return await ExecuteWithResult(async () =>
         {
             Plan plan = modelDto.Adapt<Plan>();
-            var result = await planService.ApprovePlans(plan.Id);
+            var result = await planRepository.ApprovePlans(plan.Id);
         });
     }
-    //public async Task<Result<PlanTypeDto>> GetPlanType()
-    //{
-    //    var result = await ExecuteWithResult(async () => await )
-    //}
+    public async Task<Result<List<PlanTypeDto>>> GetPlanType()
+    {
+        var result = await ExecuteWithResult(async () => await planRepository.GetPlanTypeAsync());
+        return result;
+    }
 
     //public async Task<bool> ApproveDeleteSchool(Guid requestId)
     //{

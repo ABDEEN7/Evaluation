@@ -10,16 +10,16 @@ namespace Evaluation.API.Controllers;
 [Route("api/[controller]/[action]")]
 public class PlanController(MasterBL masterBL) : ControllerBase
 {
-    //[HttpPost]
-    //public async Task<IActionResult> CreateAsync([FromBody] string planRequest)
-    //{
+    [HttpPost]
+    public async Task<IActionResult> CreateAsync([FromBody] string planRequest)
+    {
 
-    //    CreateEvaluationPlanDto? planDto = JsonConvert.DeserializeObject<CreateEvaluationPlanDto>(planRequest.ToString());
-    //    if (planDto == null)
-    //        return BadRequest(new { error = "Invalid JSON structure." });
-    //    await masterBL.GetApiService<PlanServiceRequestServices>().AddEvaulationPlan(planDto);
-    //    return Ok();
-    //}
+        CreateEvaluationPlanDto? planDto = JsonConvert.DeserializeObject<CreateEvaluationPlanDto>(planRequest.ToString());
+        if (planDto == null)
+            return BadRequest(new { error = "Invalid JSON structure." });
+        var jsonPlan = await masterBL.GetApiService<PlanServiceRequestServices>().AddEvaulationPlan(planDto);
+        return Ok(jsonPlan);
+    }
     //[HttpDelete]
     //public async Task<IActionResult> DeletePlan(Guid id)
     //{
