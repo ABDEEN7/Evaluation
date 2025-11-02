@@ -27,22 +27,25 @@ public class PlanServiceRequestServices(
     ) : ApiBase(serviceScopeFactory, cacheDataProvider, unitOfWork, loggingServices, userInfo,
         serviceProvider, requestInfo)
 {
-    public async Task<Result<string>> AddEvaulationPlan(CreateEvaluationPlanDto evaluationPlanDto)
+    public async Task<Result<CreateEvaluationPlanDto>> AddEvaulationPlan(CreateEvaluationPlanDto evaluationPlanDto)
     {
-        await ValidateDraftPlan(evaluationPlanDto);
+        //await ValidateDraftPlan(evaluationPlanDto);
         return await ExecuteWithResult(async () =>
         {
-            PlanServiceRequest planDraft = evaluationPlanDto.Adapt<PlanServiceRequest>();
-            var result = await planRepository.CreateServicPlan(planDraft);
+            //PlanServiceRequest planDraft = evaluationPlanDto.Adapt<PlanServiceRequest>();
+            //var result = await planRepository.CreateServicPlan(evaluationPlanDto);
+            //var result = JsonConvert.SerializeObject(evaluationPlanDto);
+            var result = evaluationPlanDto;
         });
     }
-    public async Task<Result<bool>> UpdatePlanDraft(Guid id, string planDto)
+    public async Task<Result<PlanServiceRequest>> UpdatePlanDraft(Guid id, string planDto)
     {
         return await ExecuteWithResult(async () =>
         {
             PlanServiceRequest? oldPlan = await unitOfWork.GetRepository<PlanServiceRequest>().GetByIdAsync(id);
 
-            if (oldPlan is null) return true;
+            if (oldPlan is null)
+                throw new BusinessException(ConstantKeys.ExceptionMessage.PlanIsNotFound);
 
             string planJson = oldPlan.Value;
             var currentPlan = JsonConvert.DeserializeObject<CreateEvaluationPlanDto>(planJson);
@@ -55,13 +58,14 @@ public class PlanServiceRequestServices(
             var updatedPlanJson = JsonConvert.SerializeObject(currentPlan);
             oldPlan.Value = updatedPlanJson;
             //unitOfWork.GetRepository<PlanServiceRequest>().Update(oldPlan);
-            return true;
+            PlanServiceRequest model = new PlanServiceRequest { Id = id, Value = planDto };
+            return model;
         });
     }
     public async Task<Result<bool>> DeletePlanDraft(Guid id)
     {
         return await ExecuteWithResult(async () =>
-        { 
+        {
             bool result = await planRepository.DeleteEvaluationPlan(id);
             return result;
         });

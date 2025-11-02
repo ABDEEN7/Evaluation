@@ -21,8 +21,7 @@ public class PlanServiceRequestRepository(IServiceScopeFactory serviceScopeFacto
     LoggingServices loggingServices,
     UserInfo userInfo,
     IServiceProvider serviceProvider,
-    RequestInfo requestInfo,
-    PlanServiceRequestRepository planService
+    RequestInfo requestInfo
     ) : ApiBase(serviceScopeFactory, cacheDataProvider, unitOfWork, loggingServices, userInfo,
         serviceProvider, requestInfo)
 {

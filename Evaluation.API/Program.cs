@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Evaluation.API.Middlewares;
 using Evaluation.DAL.Context;
 using Evaluation.Services.Extensions;
@@ -43,7 +44,11 @@ else
     ClsAppSetting.AllowAdminCorsOnly = builder.Configuration.GetSection("AppSettings:baseAdminUrl").Value!.Replace("/{lang}", "") ?? "";
 
 }
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+      .AddJsonOptions(options =>
+      {
+          options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+      });
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

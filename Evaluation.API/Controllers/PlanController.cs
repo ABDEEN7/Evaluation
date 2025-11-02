@@ -1,4 +1,5 @@
-﻿using Evaluation.API.Extensions;
+﻿using System.Threading.Tasks;
+using Evaluation.API.Extensions;
 using Evaluation.Services.BusinessLayer;
 using Evaluation.Services.BusinessLayer.API.PlanLayer;
 using Evaluation.SharedHelper.Dtos.PlanDto;
@@ -11,14 +12,15 @@ namespace Evaluation.API.Controllers;
 public class PlanController(MasterBL masterBL) : ControllerBase
 {
     [HttpPost]
-    public async Task<IActionResult> CreateAsync([FromBody] string planRequest)
+    //public async Task<IActionResult> CreateAsync([FromBody] CreateEvaluationPlanDto planRequest)
+    public async Task<IActionResult> CreateAsync([FromBody] CreateEvaluationPlanDto planRequest)
     {
-
-        CreateEvaluationPlanDto? planDto = JsonConvert.DeserializeObject<CreateEvaluationPlanDto>(planRequest.ToString());
-        if (planDto == null)
-            return BadRequest(new { error = "Invalid JSON structure." });
-        var jsonPlan = await masterBL.GetApiService<PlanServiceRequestServices>().AddEvaulationPlan(planDto);
-        return Ok(jsonPlan);
+        var sfv = planRequest;
+        //CreateEvaluationPlanDto? planDto = JsonConvert.DeserializeObject<CreateEvaluationPlanDto>(planRequest);
+        //if (planDto == null)
+            //return BadRequest(new { error = "Invalid JSON structure." });
+        var jsonPlan = await masterBL.GetApiService<PlanServiceRequestServices>().AddEvaulationPlan(sfv);
+        return jsonPlan.ToActionResult();
     }
     //[HttpDelete]
     //public async Task<IActionResult> DeletePlan(Guid id)
@@ -47,10 +49,10 @@ public class PlanController(MasterBL masterBL) : ControllerBase
         return Ok();
     }
     [HttpPut]
-    public IActionResult UpdatePlan(Guid id, [FromBody] string planDto)
+    public async Task<IActionResult> UpdatePlan(Guid id, [FromBody] string planDto)
     {
-
-        return Ok();
+        var planJson =  await masterBL.GetApiService<PlanServiceRequestServices>().UpdatePlanDraft(id, planDto);
+        return Ok(planJson);
     }
     [HttpPost]
     public IActionResult ApproveDeleteSchool(Guid id, Guid schoolId)
