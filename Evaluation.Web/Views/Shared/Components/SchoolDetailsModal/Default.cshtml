@@ -1,14 +1,12 @@
 ﻿@{
     var modalId = ViewData["ModalId"] as string ?? "myModal";
-    var title = ViewData["Title"] as string ?? "Modal Title";
-    var body = ViewData["Body"] as string ?? "Modal body content here...";
 }
 <div class="modal fade" id="@modalId" tabindex="-1" aria-labelledby="@($"{modalId}Label")" aria-hidden="true">
     <div class="modal-dialog  modal-xl modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header align-items-start border-0">
                 <div>
-                    <h4 class="modal-title fw-semibold mb-2" id="exampleModalLabel">مدرسة الأمير سلطان الثانوية</h4>
+                    <h4 class="modal-title fw-semibold mb-2" id="exampleModalLabel"></h4>
                     <!-- Breadcrumbs -->
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb">
@@ -96,34 +94,14 @@
 
 
 
-@section Scripts {
-    <!-- Main JS File -->
-
-
-   
-}
 <script src="~/js/school/schooldetails.js" asp-append-version="true"></script>
 
 <script type="text/javascript">
 
-      //        function showModal() {
-
-      //                              initSchoolDetailsPage("ecd11007-2ff6-42cb-bca2-b168de94afbc");
-
-      // const modal = document.getElementById('@modalId');
-      // modal.classList.add('show');
-
-      // // Wait until next frame to ensure it's in the DOM and styles applied
-      // requestAnimationFrame(() => {
-      //   console.log('Modal is ready!');
-      //   // your code here
-      // });
-
-
-    //}
-
         $('#@modalId').on('shown.bs.modal', function () {
       console.log('Modal is ready!');
     initSchoolDetailsPage("ecd11007-2ff6-42cb-bca2-b168de94afbc");
+    $("#exampleModalLabel").text(schoolDetails.nameAr);
+    
         });
 </script>

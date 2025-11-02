@@ -4,6 +4,7 @@ using Evaluation.Services.Extensions;
 using Evaluation.SharedHelper;
 using Evaluation.SharedHelper.Helper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 var config = builder.Configuration;
@@ -52,7 +53,17 @@ builder.Services.AddSwaggerGen();
 builder.Services.ConfigureUserInfo(config);
 builder.Services.ConfigureRequestInfo(config);
 builder.Services.ConfigureMasterBL(config, builder.Environment.IsDevelopment());
-
+// Add CORS policy that allows everything
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy
+            .AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader();
+    });
+});
 
 
 builder.Services.AddDbContext<EvaluationDbContext>(options =>
@@ -67,6 +78,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+
+// Use the policy
+app.UseCors("AllowAll");
 
 app.UseHttpsRedirection();
 
