@@ -45,7 +45,7 @@ const Continue = () => {
         }
     };
 
-    jqClient(options).Post("/Account/CheckUserAuth", username);
+    jqClient(options).Get(`/Account/CheckUserAuth?username=${username}`);
 };
 
 

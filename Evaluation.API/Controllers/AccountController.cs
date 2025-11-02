@@ -17,11 +17,13 @@ namespace Evaluation.API.Controllers
     {
         private readonly MasterBL masterBL;
         private readonly RequestInfo requestInfo;
+        private readonly UserInfo userInfo;
 
         public AccountController(MasterBL masterBL, RequestInfo requestInfo, UserInfo userInfo)
         {
             this.masterBL = masterBL;
             this.requestInfo = requestInfo;
+            this.userInfo = userInfo;
         }
 
         [HttpPost("Login")]
@@ -45,7 +47,8 @@ namespace Evaluation.API.Controllers
         {
             try
             {
-                var redirectUrl = await masterBL.GetApiService<AuthenticationBL>().CheckUserAuth(username);
+				
+				var redirectUrl = await masterBL.GetApiService<AuthenticationBL>().CheckUserAuth(username);
                 return Ok(redirectUrl);
             }
             catch (BusinessException ex)
