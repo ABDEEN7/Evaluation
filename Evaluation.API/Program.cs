@@ -17,7 +17,6 @@ if (IsKeyVault)
 
     ClsAppSetting.BlobSasUrl = builder.Configuration["AzureBlobStorage"] ?? "";
 
-    ClsAppSetting.AllowWebCorsOnly = builder.Configuration["baseAppUrl"] ?? "";
 
 }
 else
