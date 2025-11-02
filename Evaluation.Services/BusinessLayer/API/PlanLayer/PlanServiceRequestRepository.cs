@@ -2,17 +2,29 @@
 using Evaluation.DAL.Entities.Org;
 using Evaluation.DAL.Entities.Planing;
 using Evaluation.DAL.UnitOfWork;
+using Evaluation.Services.Special;
 using Evaluation.SharedHelper;
 using Evaluation.SharedHelper.Dtos.PlanDto;
 using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Exceptions;
+using Evaluation.SharedHelper.Helper;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
+using static Evaluation.SharedHelper.Enums.ConstantKeys;
 namespace Evaluation.Services.BusinessLayer.API.PlanLayer;
 
-public class PlanServiceRequestRepository(UnitOfWork unitOfWork, IServiceScopeFactory serviceScopeFactory) : ApiServiceBase
+public class PlanServiceRequestRepository(IServiceScopeFactory serviceScopeFactory,
+    CacheDataProvider cacheDataProvider,
+    UnitOfWork unitOfWork,
+    LoggingServices loggingServices,
+    UserInfo userInfo,
+    IServiceProvider serviceProvider,
+    RequestInfo requestInfo,
+    PlanServiceRequestRepository planService
+    ) : ApiBase(serviceScopeFactory, cacheDataProvider, unitOfWork, loggingServices, userInfo,
+        serviceProvider, requestInfo)
 {
     public async Task<PlanServiceRequest> CreateServicPlan(PlanServiceRequest model)
     {
@@ -62,7 +74,7 @@ public class PlanServiceRequestRepository(UnitOfWork unitOfWork, IServiceScopeFa
         //List<Guid> schoolIds = plan.Schools.Select(s => s.Id).ToList();
         var selectedSchool = unitOfWork
             .GetRepository<School>();
-            //.GetAllActiveNonDeleted(x => schoolIds.Contains(x.Id));
+        //.GetAllActiveNonDeleted(x => schoolIds.Contains(x.Id));
 
         //added selected school to the plan 
         //plan.PlanSchedules = selectedSchool.Select(school => new PlanSchedule
@@ -84,10 +96,17 @@ public class PlanServiceRequestRepository(UnitOfWork unitOfWork, IServiceScopeFa
         await unitOfWork.CommitAsync();
         return true;
     }
-    //public async Task<PlanType> GetPlanType()
-    //{
-    //    return await 
-    //}
+    public async Task<List<PlanTypeDto>> GetPlanTypeAsync()
+    {
+        return await serviceScopeFactory.CreateScopedUow().GetRepository<PlanType>()
+            .GetAllActiveNonDeleted()
+            .Select(s => new PlanTypeDto
+            {
+                Id = s.Id,
+                Name = requestInfo.Lang == LanguageConst.Ar ? s.NameAr : s.NameEn,
+            }).
+            ToListAsync();
+    }
     private async Task<bool> IsThereExistingDraftPlanForSameAcadmicYear(PlanServiceRequest model)
     {
         return await
