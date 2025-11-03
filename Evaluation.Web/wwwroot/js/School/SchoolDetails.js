@@ -8,13 +8,12 @@ const options = {
     }
 };
 
-const GetSchoolDetails = (guid) => {
-    jqClient(options).Get(`/School/GetSchoolDetails?SchoolID=${guid}`);
+async function GetSchoolDetails(guid) {
+    await jqClient(options).Get(`/School/GetSchoolDetails?SchoolID=${guid}`);
 
     console.log(schoolDetails);
 };
 
-const initSchoolDetailsPage = (guid) => {
-    GetSchoolDetails(guid);
-
+async function initSchoolDetailsPage(guid) {
+    await GetSchoolDetails(guid);
 };

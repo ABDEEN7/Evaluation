@@ -94,14 +94,16 @@
 
 
 
+
 <script src="~/js/school/schooldetails.js" asp-append-version="true"></script>
+
 
 <script type="text/javascript">
 
-        $('#@modalId').on('shown.bs.modal', function () {
+        $('#@modalId').on('shown.bs.modal', async function () {
       console.log('Modal is ready!');
-    initSchoolDetailsPage("ecd11007-2ff6-42cb-bca2-b168de94afbc");
+    await initSchoolDetailsPage("ecd11007-2ff6-42cb-bca2-b168de94afbc");
     $("#exampleModalLabel").text(schoolDetails.nameAr);
-    
+
         });
 </script>

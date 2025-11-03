@@ -1,54 +1,83 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Evaluation.Web</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/Evaluation.Web.styles.css" asp-append-version="true" />
-</head>
-<body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Evaluation.Web</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2025 - Evaluation.Web - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div>
-    </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
+    <title>وزارة التربية والتعليم والتعليم العالي</title>
+    <meta content="" name="description">
+    <meta content="" name="keywords">
+
+    <!-- Favicons -->
+    <link href="~/assets/img/moe-logo2.png" rel="icon">
+    <link href="~/assets/img/moe-logo2.png" rel="apple-touch-icon">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400;500;600;700;800;900;1000&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxst.icons8.com/vue-static/landings/line-awesome/line-awesome/1.3.0/css/line-awesome.min.css">
+
+    <link rel="stylesheet" href="~/assets/vendor/bootstrap/css/bootstrap.min.css">
+
+    <!-- Template Main CSS File -->
+    <link href="~/assets/css/style.css" rel="stylesheet">
+
+    @await RenderSectionAsync("Styles", required: false)
+
+    <!-- Vendor JS Files -->
+    <script src='~/assets/js/jquery.min.js'></script>
+    <script src="~/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
+
     <script src="~/js/shared/ajax-setup.js" asp-append-version="true"></script>
     <script src="~/js/shared/shared-utility.js" asp-append-version="true"></script>
     <script src="~/js/shared/jq-client-util.js" asp-append-version="true"></script>
 
+    <!-- Template Main JS File -->
+    <script src="~/assets/js/main.js"></script>
+
     @await RenderSectionAsync("Scripts", required: false)
 
+</head>
+
+<body>
+    <!-- ======= Top Bar ======= -->
+    <div id="topbar"></div>
+    <!-- ======= Header ======= -->
+    <header id="header" class="fixed-top wow slideInDown animated" data-wow-duration="0.75s" data-wow-delay="0s">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-3 col-md-8 col-7"><div class="d-flex align-items-center"><i class="bi bi-list mobile-nav-toggle"></i><a href="/Home/Index" class="logo"><img src="~/assets/img/logo-en.png" alt="" class="img-fluid"></a></div></div>
+                <div class="col-lg-9 col-md-4 col-5">
+                    <div class="main-navbar d-flex align-items-center justify-content-between">
+                        <nav id="navbar" class="navbar">
+                            <ul class="px-3">
+                                <li class="nav-item">
+                                    <a class="nav-link" href="/Home/Index"><i class="fa fa-home"></i></a>
+                                </li>
+                                <li><a class="nav-link" href="#">دليل المستخدم</a></li>
+
+                            </ul>
+                        </nav><!-- .navbar -->
+                        <div class="social-media px-3">
+                            <a href="/Home/Index" class="btn"> <span class="d-none d-md-block"><i class="fas fa-globe"></i>&nbsp;&nbsp;Arabic</span><span class="d-block d-md-none">Ar</span></a>
+                            <a id="loginLink" href="/Authentication/Login" class="btn btn-getstarted btn-sm">تسجيل دخول</a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </header><!-- End Header -->
+
+    @RenderBody()
+
+    <footer id="footer" class="footer">
+        <div class="container copyright text-center"><p>جميع حقوق الملكية محفوظة © 2025 وزارة التربية والتعليم والتعليم العالي .</p></div>
+    </footer>
+
+    <!-- Scroll Top -->
+    <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i class="fa-solid fa-arrow-up"></i></a>
+
 </body>
+
 </html>
