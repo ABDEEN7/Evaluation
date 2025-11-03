@@ -85,14 +85,21 @@ public class PlanServiceRequestServices(
         var result = await ExecuteWithResult(async () => await planRepository.GetPlanTypeAsync());
         return result;
     }
+    public async Task<Result<bool>> RequestDeleteSchool()
+    {
+        return await ExecuteWithResult(async () =>
+        {
 
-    //public async Task<bool> ApproveDeleteSchool(Guid requestId)
-    //{
-    //    return await ExecuteWithResult(async () =>
-    //    {
-    //        var result = await planService.ApprovePlans(requestId);
-    //    });
-    //}
+        });
+    }
+    public async Task<Result<bool>> ApproveDeleteSchool(Guid requestId, Guid schoolId)
+    {
+        return await ExecuteWithResult(async () =>
+        {
+            var result = await planRepository.DeleteSchoolFromPlan(requestId, schoolId);
+            return result;
+        });
+    }
     private async Task ValidateApprovePlan(CreateEvaluationPlanDto model)
     {
         if (model is null || string.IsNullOrEmpty(model.NameEn) || string.IsNullOrEmpty(model.NameAr))

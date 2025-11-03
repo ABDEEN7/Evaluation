@@ -1,7 +1,7 @@
-﻿using System.Threading.Tasks;
-using Evaluation.API.Extensions;
+﻿using Evaluation.API.Extensions;
 using Evaluation.Services.BusinessLayer;
 using Evaluation.Services.BusinessLayer.API.PlanLayer;
+using Evaluation.Services.Models.Planing;
 using Evaluation.SharedHelper.Dtos.PlanDto;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -15,11 +15,10 @@ public class PlanController(MasterBL masterBL) : ControllerBase
     //public async Task<IActionResult> CreateAsync([FromBody] CreateEvaluationPlanDto planRequest)
     public async Task<IActionResult> CreateAsync([FromBody] CreateEvaluationPlanDto planRequest)
     {
-        var sfv = planRequest;
         //CreateEvaluationPlanDto? planDto = JsonConvert.DeserializeObject<CreateEvaluationPlanDto>(planRequest);
         //if (planDto == null)
             //return BadRequest(new { error = "Invalid JSON structure." });
-        var jsonPlan = await masterBL.GetApiService<PlanServiceRequestServices>().AddEvaulationPlan(sfv);
+        var jsonPlan = await masterBL.GetApiService<PlanServiceRequestServices>().AddEvaulationPlan(planRequest);
         return jsonPlan.ToActionResult();
     }
     //[HttpDelete]
@@ -29,7 +28,7 @@ public class PlanController(MasterBL masterBL) : ControllerBase
     //    return isDeleted.ToActionResult();
     //}
     [HttpPost]
-    public IActionResult RequestDeleteSchool(Guid planId, Guid schoolId)
+    public IActionResult RequestDeleteSchool(RequestDeleteSchoolDto requestDelete)
     {
         return Ok();
     }
@@ -55,9 +54,12 @@ public class PlanController(MasterBL masterBL) : ControllerBase
         return Ok(planJson);
     }
     [HttpPost]
-    public IActionResult ApproveDeleteSchool(Guid id, Guid schoolId)
+    public async Task<IActionResult> ApproveDeleteSchool(Guid id, Guid schoolId)
     {
-        return Ok();
+        var deletedSchool = await masterBL.
+            GetApiService<PlanServiceRequestServices>()
+            .ApproveDeleteSchool(id, schoolId);
+        return Ok(deletedSchool);
     }
     [HttpGet]
     public IActionResult GetPlanType()

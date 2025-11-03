@@ -91,9 +91,9 @@ public class PlanServiceRequestRepository(IServiceScopeFactory serviceScopeFacto
     {
         var changeRequest = await unitOfWork.GetRepository<ChangeRequest>().GetByIdAsync(requestId);
         var plan = await unitOfWork.GetRepository<Plan>().GetByIdAsync(changeRequest.PlanId);
-        var schoolPlan = await unitOfWork.GetRepository<PlanSchedule>()
+        var schoolPlan = await unitOfWork.GetRepository<EvaluationRequest>()
             .GetAllActiveNonDeleted().FirstOrDefaultAsync(x => x.PlanId == plan.Id && x.SchoolId == schoolId);
-        unitOfWork.GetRepository<PlanSchedule>().Delete(schoolPlan);
+        unitOfWork.GetRepository<EvaluationRequest>().Delete(schoolPlan);
         await unitOfWork.CommitAsync();
         return true;
     }
