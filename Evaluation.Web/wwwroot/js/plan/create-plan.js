@@ -2,7 +2,6 @@
     $ddlPlanType = $('#' + ddlPlanType);
 
 initTables = () => {
-    alert("fuck");
     getPlanTypes();
 }
 const getPlanTypes = () => {
