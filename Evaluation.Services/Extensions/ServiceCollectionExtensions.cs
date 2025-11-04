@@ -14,6 +14,7 @@ using Microsoft.Extensions.Options;
 using Evaluation.DAL.Context;
 using Evaluation.Services.BusinessLayer.CenterServices;
 using System.Net;
+using MapsterMapper;
 
 namespace Evaluation.SharedHelper
 {
@@ -127,7 +128,11 @@ namespace Evaluation.SharedHelper
 
         public static void ConfigureRequestInfo(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddScoped<Helper.RequestInfo>();
+            services.AddScoped<RequestInfo>();
+        }
+        public static void ConfigureMapper(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddScoped<IMapper>();
         }
         #endregion
 

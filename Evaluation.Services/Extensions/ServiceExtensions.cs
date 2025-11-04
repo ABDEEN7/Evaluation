@@ -1,13 +1,14 @@
-﻿using System.Reflection;
-using Evaluation.DAL.UnitOfWork;
+﻿using Evaluation.DAL.UnitOfWork;
 using Evaluation.Services.BusinessLayer;
 using Evaluation.Services.BusinessLayer.API;
 using Evaluation.Services.Models.JWT;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Models;
+using MapsterMapper;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using System.Reflection;
 
 namespace Evaluation.Services.Extensions;
 
@@ -42,7 +43,7 @@ public static class ServiceExtensions
             });
 
         services.AddScoped<LoggingServices>();
-
+        services.AddScoped<IMapper, Mapper>();
         services.AddScoped<ISmsServices, SmsServices>();
         services.AddScoped<ResponseInfo>();
 

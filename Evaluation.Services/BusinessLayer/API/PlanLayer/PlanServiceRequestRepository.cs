@@ -8,6 +8,7 @@ using Evaluation.SharedHelper.Dtos.PlanDto;
 using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Helper;
+using Evaluation.SharedHelper.Models;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,10 +20,11 @@ public class PlanServiceRequestRepository(IServiceScopeFactory serviceScopeFacto
     CacheDataProvider cacheDataProvider,
     UnitOfWork unitOfWork,
     LoggingServices loggingServices,
+    IMapper mapper,
     UserInfo userInfo,
     IServiceProvider serviceProvider,
     RequestInfo requestInfo
-    ) : ApiBase(serviceScopeFactory, cacheDataProvider, unitOfWork, loggingServices, userInfo,
+    ) : ApiBase(serviceScopeFactory, cacheDataProvider, unitOfWork, loggingServices, mapper, userInfo,
         serviceProvider, requestInfo)
 {
     public async Task<string> CreateServicPlan(PlanServiceRequest model)

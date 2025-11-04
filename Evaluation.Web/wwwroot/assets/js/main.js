@@ -143,11 +143,13 @@ on('click', '.mobile-nav-toggle', function(e) {
 // Add a click event listener to the document to close the menu when clicking outside
 document.addEventListener('click', function(e) {
   const navbar = select('#navbar');
-  const toggleButton = select('.mobile-nav-toggle');
+    const toggleButton = select('.mobile-nav-toggle');
+    if (navbar != null) {
+        if (navbar.classList.contains('navbar-mobile') && e.target !== toggleButton && !navbar.contains(e.target)) {
+            closeMobileMenu();
+        }
+    }
   
-  if (navbar.classList.contains('navbar-mobile') && e.target !== toggleButton && !navbar.contains(e.target)) {
-    closeMobileMenu();
-  }
 });
 
   /**
