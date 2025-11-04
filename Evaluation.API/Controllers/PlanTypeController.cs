@@ -10,7 +10,7 @@ public class PlanTypeController(MasterBL masterBl) : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetPlanTypes()
     {
-        var planTypes = await masterBl.GetApiService<PlanServiceRequestServices>().GetPlanType();
+        var planTypes = await masterBl.GetApiService<PlanServiceRequestServices>().GetPlansTypes();
         return planTypes.ToActionResult();
     }
 }

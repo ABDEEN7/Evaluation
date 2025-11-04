@@ -126,16 +126,16 @@ internal class Program
         //// -------------------------------------
         //// 5️⃣ CORS and Auth Policies
         //// -------------------------------------
-        //builder.Services.AddCors(options =>
-        //{
-        //    options.AddPolicy("AllowWebAndAdmin", policy =>
-        //    {
-        //        policy.WithOrigins(ClsAppSetting.AllowWebCorsOnly, ClsAppSetting.AllowAdminCorsOnly)
-        //              .AllowAnyHeader()
-        //              .AllowAnyMethod()
-        //              .WithExposedHeaders("Content-Disposition", "newToken", "expiryDateTime", "expirationTime");
-        //    });
-        //});
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy("AllowWebAndAdmin", policy =>
+            {
+                policy.WithOrigins(ClsAppSetting.AllowWebCorsOnly, ClsAppSetting.AllowAdminCorsOnly)
+                      .AllowAnyHeader()
+                      .AllowAnyMethod()
+                      .WithExposedHeaders("Content-Disposition", "newToken", "expiryDateTime", "expirationTime");
+            });
+        });
 
         builder.Services.AddAuthorization(options =>
         {
@@ -176,7 +176,7 @@ internal class Program
 
         app.UseSession(); // ✅ Must be after UseRouting
 
-        //app.UseCors("AllowWebAndAdmin");
+        app.UseCors("AllowWebAndAdmin");
         app.UseAuthentication();
         app.UseAuthorization();
 

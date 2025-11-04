@@ -1,3 +1,4 @@
+
 /**
 * Template Name: MOE Web Site
 * Bootstrap Version:v5.3.1
@@ -245,4 +246,4 @@ const swiper = new Swiper('.mySwiper', {
       autoplay:true
     });
 
-})()
+})

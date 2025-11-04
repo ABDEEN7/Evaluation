@@ -17,7 +17,7 @@ public class PlanController(MasterBL masterBL) : ControllerBase
     {
         //CreateEvaluationPlanDto? planDto = JsonConvert.DeserializeObject<CreateEvaluationPlanDto>(planRequest);
         //if (planDto == null)
-            //return BadRequest(new { error = "Invalid JSON structure." });
+        //return BadRequest(new { error = "Invalid JSON structure." });
         var jsonPlan = await masterBL.GetApiService<PlanServiceRequestServices>().AddEvaulationPlan(planRequest);
         return jsonPlan.ToActionResult();
     }
@@ -50,7 +50,7 @@ public class PlanController(MasterBL masterBL) : ControllerBase
     [HttpPut]
     public async Task<IActionResult> UpdatePlan(Guid id, [FromBody] string planDto)
     {
-        var planJson =  await masterBL.GetApiService<PlanServiceRequestServices>().UpdatePlanDraft(id, planDto);
+        var planJson = await masterBL.GetApiService<PlanServiceRequestServices>().UpdatePlanDraft(id, planDto);
         return Ok(planJson);
     }
     [HttpPost]
@@ -64,19 +64,19 @@ public class PlanController(MasterBL masterBL) : ControllerBase
     [HttpGet]
     public IActionResult GetPlanType()
     {
-        return Ok(GetPlanTypes());
+        return Ok(new { result = GetPlanTypes() });
     }
     private List<PlanTypeDto> GetPlanTypes()
     {
         return new List<PlanTypeDto>
         {
-            new PlanTypeDto{Id = new Guid(),Name= "Month"},
-            new PlanTypeDto{Id = new Guid(),Name = "Year"}
+            new PlanTypeDto{Id = 1,Name= "Month"},
+            new PlanTypeDto{Id = 2,Name = "Year"}
         };
     }
     public class PlanTypeDto
     {
-        public Guid Id { get; set; }
+        public int Id { get; set; }
         public string Name { get; set; } = null!;
     }
 

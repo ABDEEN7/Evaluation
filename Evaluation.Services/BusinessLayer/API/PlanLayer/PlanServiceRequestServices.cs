@@ -83,11 +83,11 @@ public class PlanServiceRequestServices(
             var result = await planRepository.ApprovePlans(plan.Id);
         });
     }
-    public async Task<Result<List<PlanTypeDto>>> GetPlanType()
-    {
-        var result = await ExecuteWithResult(async () => await planRepository.GetPlanTypeAsync());
-        return result;
-    }
+    //public async Task<Result<List<PlanTypeDto>>> GetPlanType()
+    //{
+    //    var result = await ExecuteWithResult(async () => await planRepository.GetPlanTypeAsync());
+    //    return result;
+    //}
     public async Task<Result<bool>> RequestDeleteSchool()
     {
         return await ExecuteWithResult(async () =>
@@ -103,6 +103,28 @@ public class PlanServiceRequestServices(
             return result;
         });
     }
+    public async Task<Result<List<PlanTypeDto>>> GetPlansTypes()
+    {
+        return await ExecuteWithResult(async () =>
+        {
+            var result = GetPlanTypes();
+            return result;
+        });
+    }
+    private List<PlanTypeDto> GetPlanTypes()
+    {
+        return new List<PlanTypeDto>
+        {
+            new PlanTypeDto{Id = new Guid(),Name= "Month"},
+            new PlanTypeDto{Id = new Guid(),Name = "Year"}
+        };
+    }
+    public class PlanTypeDto
+    {
+        public Guid Id { get; set; }
+        public string Name { get; set; } = null!;
+    }
+
     private async Task ValidateApprovePlan(CreateEvaluationPlanDto model)
     {
         if (model is null || string.IsNullOrEmpty(model.NameEn) || string.IsNullOrEmpty(model.NameAr))
