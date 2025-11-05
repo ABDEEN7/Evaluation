@@ -24,7 +24,7 @@
 <script src="~/js/shared/populate-system-setting.js" asp-append-version="true"></script>
 
 <script src="~/js/shared/populate-web-app-configs.js" asp-append-version="true"></script>
-    @await RenderSectionAsync("Scripts", required: false)
+
 <body>
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
@@ -58,6 +58,8 @@
             &copy; 2025 - Evaluation.Web - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
+    @await RenderSectionAsync("Scripts", required: false)
+
   
 </body>
 </html>
