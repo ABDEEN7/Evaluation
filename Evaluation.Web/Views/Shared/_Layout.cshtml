@@ -35,7 +35,6 @@
     <!-- Template Main JS File -->
     <script src="~/assets/js/main.js"></script>
 
-    @await RenderSectionAsync("Scripts", required: false)
 
 </head>
 
@@ -77,6 +76,9 @@
 
     <!-- Scroll Top -->
     <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i class="fa-solid fa-arrow-up"></i></a>
+
+    @await RenderSectionAsync("Scripts", required: false)
+
 
 </body>
 

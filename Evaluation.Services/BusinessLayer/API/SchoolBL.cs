@@ -23,7 +23,7 @@ public class SchoolBL : ApiBase
     {
     }
 
-    public async Task<School> GetUniversityDetails(Guid SchoolID)
+    public async Task<School> GetSchoolDetails(Guid SchoolID)
     {
         var schoollist = await uow.GetRepository<School>().GetAllActiveNonDeleted().ToListAsync();
 

@@ -21,7 +21,7 @@ public class SchoolController:ControllerBase
 
     public async Task<School> GetSchoolDetails(Guid SchoolID)
     {
-        var schooldetails = await _masterBl.GetApiService<SchoolBL>().GetUniversityDetails(SchoolID);
+        var schooldetails = await _masterBl.GetApiService<SchoolBL>().GetSchoolDetails(SchoolID);
         
         var dummyData = new List<School>() {
             new School() { Id = new Guid("921d891a-e0cb-4fd4-8e53-fb3443ef0199"), NameAr = "مدرسة احمد بن حنبل", NameEn = "Ahmad Bin Hanbal School"},
