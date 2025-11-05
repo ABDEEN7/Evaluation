@@ -7,7 +7,24 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Evaluation.Web.styles.css" asp-append-version="true" />
+    @await RenderSectionAsync("Styles", required: false)
+
 </head>
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="~/lib/toastr/toastr.min.js" asp-append-version="true"></script>
+<script src="~/js/site.js" asp-append-version="true"></script>
+<script src="~/js/shared/jq-message-util.js" asp-append-version="true"></script>
+<script src="~/js/shared/general-params.js" asp-append-version="true"></script>
+<script src="~/js/shared/shared-utility.js" asp-append-version="true"></script>
+<script src="~/js/shared/jq-client-util.js" asp-append-version="true"></script>
+<script src="~/js/shared/session-timer.js" asp-append-version="true"></script>
+<script src="~/js/shared/ajax-setup.js" asp-append-version="true"></script>
+<script src="~/js/shared/populate-ui-control.js" asp-append-version="true"></script>
+<script src="~/js/shared/populate-system-setting.js" asp-append-version="true"></script>
+
+<script src="~/js/shared/populate-web-app-configs.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
 <body>
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
@@ -41,9 +58,6 @@
             &copy; 2025 - Evaluation.Web - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    @await RenderSectionAsync("Scripts", required: false)
+  
 </body>
 </html>

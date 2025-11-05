@@ -61,7 +61,7 @@ public partial class EvaluationDbContext : DbContext
     public virtual DbSet<Department> Departments { get; set; }
     public virtual DbSet<OrganizationType> OrganizationTypes { get; set; }
     public virtual DbSet<Plan> Plans { get; set; }
-    public virtual DbSet<PlanSchedule> PlanSchedules { get; set; }
+    public virtual DbSet<EvaluationRequest> EvaluationRequests { get; set; }
     public virtual DbSet<PlanStatus> PlanStatuses { get; set; }
     public virtual DbSet<EmailTemplate> EmailTemplates { get; set; }
     public virtual DbSet<EmailTemplateDocument> EmailTemplateDocuments { get; set; }
@@ -78,6 +78,7 @@ public partial class EvaluationDbContext : DbContext
     public virtual DbSet<Service> Services { get; set; }
     public virtual DbSet<SystemModule> SystemModules { get; set; }
     public virtual DbSet<ModuleType> ModuleTypes { get; set; }
+    public virtual DbSet<UiControl> UiControls { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {

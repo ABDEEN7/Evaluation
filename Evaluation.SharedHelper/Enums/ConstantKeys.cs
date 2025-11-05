@@ -26,6 +26,11 @@ public static class ConstantKeys
 
             
         }
+    public static class AdminPages
+    {
+        public static readonly string AdminCommon = "AdminCommon";
+
+    }
     public static class WebAppSettings
         {
         }
@@ -40,6 +45,9 @@ public static class ConstantKeys
 			public static readonly string lblBackToEmail = "lblBackToEmail";
 			public static readonly string lblLoginBtn = "lblLoginBtn";
 			public static readonly string lblLoginTitle = "lblLoginTitle";
+			public static readonly string lblForgotPasswordQuestion = "lblForgotPasswordQuestion";
+			public static readonly string lblMobileResetPassword = "lblMobileResetPassword";
+			public static readonly string lblRegisterNewAccount = "lblRegisterNewAccount";
 		}
 
     public static class LanguageConst

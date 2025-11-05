@@ -1,18 +1,461 @@
-﻿<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Evaluation Dashboard</title>
-    <!-- Bootstrap Styles -->
-    <link href="~/plan-assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+﻿@{
+    Layout = "_Layout";
+}
+<main class="main-content">
+    <section>
+        <div class="card card-table mb-4">
+            <div class="card-body">
+                <h3>تحديد المدارس وإعداد الخطة الزمنية</h3>
+                <!-- Breadcrumbs -->
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="#">الرئيسية</a></li>
+                        <li class="breadcrumb-item"><a href="#">المدارس</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">تحديد المدارس</li>
+                    </ol>
+                </nav>
+                <div class="card-table  mb-4">
+                    <div class="card-body p-0">
+                        <div class="form-container pb-0">
+                            <h4 class="mb-4 text-primary"> انشاء الخطة</h4>
+                            <form class="row">
+                                <div class="col-md-4">
+                                    <!-- Text Input -->
+                                    <div class="mb-4">
+                                        <label for="username" class="form-label">عنوان <span class="text-danger">*</span></label>
+                                        <input type="text" id="username" class="form-control" placeholder="أدخل اسم المستخدم">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <!-- Select2 Dropdown -->
+                                    <div class="mb-4">
+                                        <label for="userRole" class="form-label">نوع الخطة <span class="text-danger">*</span></label>
+                                        <select class="form-control" id="ddlPlanType" name="ddlPlanType">
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <!-- Date Range Picker -->
+                                    <div class="mb-4">
+                                        <label for="dateRange" class="form-label">الفترة الزمنية</label>
+                                        <div class="input-group datetime">
+                                            <input type="text" class="form-control" id="dateRange" placeholder="اختر تاريخ بداية ونهاية الخطة">
+                                            <span class="input-group-text"><i class="la la-calendar"></i></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="card card-table">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-xl-7 col-lg-5"><h4 class="mb-3 mb-lg-0 ">تحديد المدارس</h4></div>
+                            <div class="col-xl-5 col-lg-7">
+                                <div class="row">
+                                    <div class="col-xl-8 col-lg-8 col-md-8 mb-3">
+                                        <div class="d-flex justify-content-end custom-search">
+                                            <div class="input-group">
+                                                <span class="input-group-text border-end-0 bg-transparent"><i class="las la-search"></i></span>
+                                                <input type="text" id="customSearch" class="form-control form-control-lg border-start-0 ps-0" placeholder="ابحث هنا...">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-4 col-lg-4 col-md-4 mb-3"><button class="btn filterbtn" data-bs-toggle="offcanvas" data-bs-target="#filterOffcanvas"><i class="la la-filter"></i> تصفية <span class="badge bg-primary rounded-pill mx-2">1</span></button></div>
+                                </div>
 
-    <!-- Custom Styles -->
+
+                            </div>
+                        </div>
+                        <div class="table-card rounded overflow-hidden">
+                            <div class="table-responsive">
+                                <table id="userTable" class="table table-bordered table-hover align-middle w-100">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>
+                                                <label class="custom-checkbox">
+                                                    <input type="checkbox" id="selectAll">
+                                                    <span class="checkmark"></span>
+                                                </label>
+                                            </th>
+                                            <th>اسم المدرسة</th>
+                                            <th>تاريخ الزيارة</th>
+                                            <th>تاريخ أخر تقييم</th>
+                                            <th>نوع الزيارة</th>
+                                            <th>تاريخ التقيم القادم</th>
+                                            <th>الإجراءت</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <label class="custom-checkbox">
+                                                    <input type="checkbox" class=" row-select">
+                                                    <span class="checkmark"></span>
+                                                </label>
+                                            <td>
+                                                <div class="d-flex align-items-center justify-content-between">
+                                                    <div class="">
+                                                        <h6>آمنة محمود الجيده للبنات</h6>
+                                                        <div class="square-bullet">
+                                                            <div>ابتدائية</div>
+                                                            <div><span>360</span> طالب</div>
+                                                        </div>
+                                                    </div>
+                                                    <span class="badge bg-danger">ضعيف</span>
+
+                                                </div>
+                                            </td>
+                                            <td><p class="m-0" id="dateRange"><i class="la la-calendar"></i> اختر تاريخ بداية ونهاية الزيارة </p></td>
+                                            <td><p class="m-0">10/10/2024</p></td>
+                                            <td>
+                                                <select id="userRole" class="form-select" style="width: 100%;">
+                                                    <option value="">دوري</option>
+                                                    <option value="">استثنائي</option>
+                                                    <option value="">زيارة</option>
+                                                </select>
+                                            </td>
+                                            <td><p class="m-0">10/10/2024</p></td>
+                                            <td><p class="m-0"><a href="#" class="text-dark" type="button" data-bs-toggle="modal" data-bs-target="#schoolDetailsModal"><i class="la la-eye"></i></a></p></td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <label class="custom-checkbox">
+                                                    <input type="checkbox" class=" row-select">
+                                                    <span class="checkmark"></span>
+                                                </label>
+                                            </td>
+                                            <td>
+                                                <div class="d-flex align-items-center justify-content-between">
+                                                    <div class="">
+                                                        <h6>آمنة محمود الجيده للبنات</h6>
+                                                        <div class="square-bullet">
+                                                            <div>ابتدائية</div>
+                                                            <div><span>360</span> طالب</div>
+                                                        </div>
+                                                    </div>
+                                                    <span class="badge bg-secondary">ممتاز</span>
+
+                                                </div>
+                                            </td>
+                                            <td><p class="m-0" id="dateRange"><i class="la la-calendar"></i> اختر تاريخ بداية ونهاية الزيارة </p></td>
+                                            <td><p class="m-0">10/10/2024</p></td>
+                                            <td>
+                                                <select id="userRole" class="form-select" style="width: 100%;">
+                                                    <option value="">دوري</option>
+                                                    <option value="">استثنائي</option>
+                                                    <option value="">زيارة</option>
+                                                </select>
+                                            </td>
+                                            <td><p class="m-0">10/10/2024</p></td>
+                                            <td><p class="m-0"><a href="#" class="text-dark" type="button" data-bs-toggle="modal" data-bs-target="#schoolDetailsModal"><i class="la la-eye"></i></a></p></td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <label class="custom-checkbox">
+                                                    <input type="checkbox" class=" row-select">
+                                                    <span class="checkmark"></span>
+                                                </label>
+                                            </td>
+                                            <td>
+                                                <div class="d-flex align-items-center justify-content-between">
+                                                    <div class="">
+                                                        <h6>آمنة محمود الجيده للبنات</h6>
+                                                        <div class="square-bullet">
+                                                            <div>ابتدائية</div>
+                                                            <div><span>360</span> طالب</div>
+                                                        </div>
+                                                    </div>
+                                                    <span class="badge bg-success">جيد جدًا</span>
+
+                                                </div>
+                                            </td>
+                                            <td><p class="m-0" id="dateRange"><i class="la la-calendar"></i> اختر تاريخ بداية ونهاية الزيارة </p></td>
+                                            <td><p class="m-0">10/10/2024</p></td>
+                                            <td>
+                                                <select class="form-select select2" id="planTypeId">
+                                                </select>
+                                            </td>
+                                            <td><p class="m-0">10/10/2024</p></td>
+                                            <td><p class="m-0"><a href="#" class="text-dark" type="button" data-bs-toggle="modal" data-bs-target="#schoolDetailsModal"><i class="la la-eye"></i></a></p></td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <label class="custom-checkbox">
+                                                    <input type="checkbox" class=" row-select">
+                                                    <span class="checkmark"></span>
+                                                </label>
+                                            </td>
+                                            <td>
+                                                <div class="d-flex align-items-center justify-content-between">
+                                                    <div class="">
+                                                        <h6>آمنة محمود الجيده للبنات</h6>
+                                                        <div class="square-bullet">
+                                                            <div>ابتدائية</div>
+                                                            <div><span>360</span> طالب</div>
+                                                        </div>
+                                                    </div>
+                                                    <span class="badge bg-warning">متوسط</span>
+
+                                                </div>
+                                            </td>
+                                            <td><p class="m-0" id="dateRange"><i class="la la-calendar"></i> اختر تاريخ بداية ونهاية الزيارة </p></td>
+                                            <td><p class="m-0">10/10/2024</p></td>
+                                            <td>
+                                                <select id="userRole" class="form-select" style="width: 100%;">
+                                                    <option value="">دوري</option>
+                                                    <option value="">استثنائي</option>
+                                                    <option value="">زيارة</option>
+                                                </select>
+                                            </td>
+                                            <td><p class="m-0">10/10/2024</p></td>
+                                            <td><p class="m-0"><a href="#" class="text-dark" type="button" data-bs-toggle="modal" data-bs-target="#schoolDetailsModal"><i class="la la-eye"></i></a></p></td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <label class="custom-checkbox">
+                                                    <input type="checkbox" class=" row-select">
+                                                    <span class="checkmark"></span>
+                                                </label>
+                                            </td>
+                                            <td>
+                                                <div class="d-flex align-items-center justify-content-between">
+                                                    <div class="">
+                                                        <h6>آمنة محمود الجيده للبنات</h6>
+                                                        <div class="square-bullet">
+                                                            <div>ابتدائية</div>
+                                                            <div><span>360</span> طالب</div>
+                                                        </div>
+                                                    </div>
+                                                    <span class="badge bg-warning">متوسط</span>
+
+                                                </div>
+                                            </td>
+                                            <td><p class="m-0" id="dateRange"><i class="la la-calendar"></i> اختر تاريخ بداية ونهاية الزيارة </p></td>
+                                            <td><p class="m-0">10/10/2024</p></td>
+                                            <td>
+                                                <select id="userRole" class="form-select" style="width: 100%;">
+                                                    <option value="">دوري</option>
+                                                    <option value="">استثنائي</option>
+                                                    <option value="">زيارة</option>
+                                                </select>
+                                            </td>
+                                            <td><p class="m-0">10/10/2024</p></td>
+                                            <td><p class="m-0"><a href="#" class="text-dark" type="button" data-bs-toggle="modal" data-bs-target="#schoolDetailsModal"><i class="la la-eye"></i></a></p></td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <label class="custom-checkbox">
+                                                    <input type="checkbox" class=" row-select">
+                                                    <span class="checkmark"></span>
+                                                </label>
+                                            </td>
+                                            <td>
+                                                <div class="d-flex align-items-center justify-content-between">
+                                                    <div class="">
+                                                        <h6>آمنة محمود الجيده للبنات</h6>
+                                                        <div class="square-bullet">
+                                                            <div>ابتدائية</div>
+                                                            <div><span>360</span> طالب</div>
+                                                        </div>
+                                                    </div>
+                                                    <span class="badge bg-info">جيد</span>
+
+                                                </div>
+                                            </td>
+                                            <td><p class="m-0" id="dateRange"><i class="la la-calendar"></i> اختر تاريخ بداية ونهاية الزيارة </p></td>
+                                            <td><p class="m-0">10/10/2024</p></td>
+                                            <td>
+                                                <select id="userRole" class="form-select" style="width: 100%;">
+                                                    <option value="">دوري</option>
+                                                    <option value="">استثنائي</option>
+                                                    <option value="">زيارة</option>
+                                                </select>
+                                            </td>
+                                            <td><p class="m-0">10/10/2024</p></td>
+                                            <td><p class="m-0"><a href="#" class="text-dark" type="button" data-bs-toggle="modal" data-bs-target="#schoolDetailsModal"><i class="la la-eye"></i></a></p></td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <label class="custom-checkbox">
+                                                    <input type="checkbox" class=" row-select">
+                                                    <span class="checkmark"></span>
+                                                </label>
+                                            </td>
+                                            <td>
+                                                <div class="d-flex align-items-center justify-content-between">
+                                                    <div class="">
+                                                        <h6>آمنة محمود الجيده للبنات</h6>
+                                                        <div class="square-bullet">
+                                                            <div>ابتدائية</div>
+                                                            <div><span>360</span> طالب</div>
+                                                        </div>
+                                                    </div>
+                                                    <span class="badge bg-info">جيد</span>
+
+                                                </div>
+                                            </td>
+                                            <td><p class="m-0" id="dateRange"><i class="la la-calendar"></i> اختر تاريخ بداية ونهاية الزيارة </p></td>
+                                            <td><p class="m-0">10/10/2024</p></td>
+                                            <td>
+                                                <select id="userRole" class="form-select" style="width: 100%;">
+                                                    <option value="">دوري</option>
+                                                    <option value="">استثنائي</option>
+                                                    <option value="">زيارة</option>
+                                                </select>
+                                            </td>
+                                            <td><p class="m-0">10/10/2024</p></td>
+                                            <td><p class="m-0"><a href="#" class="text-dark" type="button" data-bs-toggle="modal" data-bs-target="#schoolDetailsModal"><i class="la la-eye"></i></a></p></td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <label class="custom-checkbox">
+                                                    <input type="checkbox" class=" row-select">
+                                                    <span class="checkmark"></span>
+                                                </label>
+                                            </td>
+                                            <td>
+                                                <div class="d-flex align-items-center justify-content-between">
+                                                    <div class="">
+                                                        <h6>آمنة محمود الجيده للبنات</h6>
+                                                        <div class="square-bullet">
+                                                            <div>ابتدائية</div>
+                                                            <div><span>360</span> طالب</div>
+                                                        </div>
+                                                    </div>
+                                                    <span class="badge bg-success">جيد جدًا</span>
+
+                                                </div>
+                                            </td>
+                                            <td><p class="m-0" id="dateRange"><i class="la la-calendar"></i> اختر تاريخ بداية ونهاية الزيارة </p></td>
+                                            <td><p class="m-0">10/10/2024</p></td>
+                                            <td>
+                                                <select id="userRole" class="form-select" style="width: 100%;">
+                                                    <option value="">دوري</option>
+                                                    <option value="">استثنائي</option>
+                                                    <option value="">زيارة</option>
+                                                </select>
+                                            </td>
+                                            <td><p class="m-0">10/10/2024</p></td>
+                                            <td><p class="m-0"><a href="#" class="text-dark" type="button" data-bs-toggle="modal" data-bs-target="#schoolDetailsModal"><i class="la la-eye"></i></a></p></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6  mt-3">
+                                <div class="d-flex gap-2 align-items-center flex-wrap">
+                                    <a href="#" class="btn btn-primary mw-200" type="button" data-bs-toggle="modal" data-bs-target="#confirmation-modal"> <i class="la la-bookmark"></i> حفظ</a>
+                                    <a href="#" class=""> عرض الخطط</a>
+                                </div>
+
+                            </div>
+
+                            <div class="col-md-6 text-end  mt-3">
+                                <!-- Separate pagination / info container -->
+                                <div class="d-flex justify-content-end align-items-center">
+                                    <div id="dtPagination"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<!-- Offcanvas Filter -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="filterOffcanvas">
+    <div class="offcanvas-header justify-content-between p-4">
+        <h5 class="offcanvas-title border d-flex align-items-center w-75 justify-content-between px-3 py-2 rounded"><span>تصفية النتائج </span><i class="la la-filter"></i></h5>
+        <button type="button" class="btn btn-lg border d-flex align-items-center h-100" data-bs-dismiss="offcanvas"><i class="la la-angle-right"></i></button>
+    </div>
+    <div class="offcanvas-body p-4">
+        <form>
+            <div class="mb-3">
+                <label class="form-label">اسم المدرسة</label>
+                <input type="text" class="form-control" placeholder="أكتب هنا...">
+            </div>
+            <hr>
+            <div class="mb-3">
+                <label class="form-label">تاريخ اخر تقييم</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="la la-calendar"></i></span>
+                    <input type="text" class="form-control" id="singleDate" placeholder="12/7/2023">
+                </div>
+            </div>
+            <hr>
+            <div class="mb-3">
+                <label class="form-label">تاريخ الانشاء</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="la la-calendar"></i></span>
+                    <input type="text" class="form-control" id="singleDate" placeholder="10/1/2022">
+                </div>
+            </div>
+            <hr>
+            <div class="mb-3">
+                <label class="form-label">تاريخ التقييم القادم</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="la la-calendar"></i></span>
+                    <input type="text" class="form-control" id="singleDate" placeholder="16/7/2024">
+                </div>
+            </div>
+            <hr>
+            <div class="mb-3">
+                <label class="form-label">النتيجة السابقة</label>
+                <input type="text" class="form-control" placeholder="ضعيف">
+            </div>
+            <hr>
+            <div class="mb-3">
+                <label class="form-label">نوع الزيارة</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="la la-calendar"></i></span>
+                    <input type="text" class="form-control" id="singleDate" placeholder="دوري">
+                </div>
+            </div>
+            <div class="d-flex gap-2 mt-4">
+                <button type="submit" class="btn btn-primary w-100">حفظ</button>
+                <button type="submit" class="btn btn-outline-primary w-100">حذف</button>
+
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<div class="modal fade" id="confirmation-modal" tabindex="-1" aria-labelledby="confirmation-modalLabel" aria-hidden="true">
+    <div class="modal-dialog  modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-body py-0">
+                <div class="row">
+
+                    <div class="col-md-12 py-4 text-center">
+                        <div class="social-icon bg-primary text-white fw-normal m-auto  mb-3"><i class="la la-city"></i></div>
+                        <h5 class="fw-bold text-primary mb-3"> تم تحديد (03) مدرسة للإضافة للخطة</h5>
+                        <p>هل ترغب في إضافة مدارس أخري إلى خطة ؟</p>
+                        <div class="d-flex gap-2 justify-content-center">
+                            <button type="button" class="btn btn-primary mw-200"><i class="la la-bookmark"></i>  تأكيد الحفظ</button>
+                            <button type="button" class="btn btn-outline-primary mw-200" data-dismiss="modal"><i class="la la-window-close"></i> الغاء</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
     <link href="~/plan-assets/css/style.css" rel="stylesheet">
-</head>
-<body>
+}
+
+@section Scripts {
     <!-- JS -->
-    <script src="~/plan-assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <script src="~/plan-assets/js/jquery.min.js"></script>
     <script src="~/plan-assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
     <script src="~/plan-assets/vendor/datatables/js/dataTables.bootstrap5.min.js"></script>
 
@@ -22,588 +465,7 @@
     <!-- Flatpickr JS -->
     <script src="~/plan-assets/vendor/flatpickr/js/flatpickr.js"></script>
     <script src="~/plan-assets/js/main.js"></script>
-    <script src="~/js/shared/ajax-setup.js"></script>
-    <script src="~/js/shared/shared-utility.js"></script>
-    <script src="~/js/shared/jq-client-util.js"></script>
-    <script src="~/js/shared/jq-message-util.js"></script>
-    <!-- Header -->
-    <header class="topbar">
-        <div class="container-fluid">
-            <div class="row align-items-center">
-                <div class="col-lg-4 col-md-4 col-12 mb-2 mb-md-0">
-                    <div class="d-flex align-items-center gap-3">
-                        <!-- Collapse button placed next to logo -->
-                        <!-- <button id="collapseBtn" class="btn btn-outline-secondary">
-                          <i class="la la-angle-left"></i>
-                        </button> -->
-                        <div class="d-flex align-items-center">
-                            <a href="#"><img alt="" src="~/plan-assets/img/logo.png" class="img-fluid logo"></a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-4 col-6 mb-3 mb-md-0">
-                    <div class="d-flex justify-content-end custom-search">
-                        <div class="input-group">
-                            <span class="input-group-text border-end-0 bg-transparent"><i class="las la-search"></i></span>
-                            <input type="text" class="form-control form-control-lg border-start-0 ps-0" placeholder="البحث">
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-4 col-6 mb-3 mb-md-0">
-                    <div class="d-flex align-items-center gap-3 justify-content-end">
-                        <a href="/plan/create" class="language"> <i class="la la-globe"></i> <span>Arabic</span></a>
-                        <div class="dropdown notification">
-                            <button class="btn position-relative" data-bs-toggle="dropdown">
-                                <i class="la la-bell"></i>
-                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill">3</span>
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end p-2">
-                                <li class="d-flex justify-content-between mb-3">
-                                    <h5 class="dropdown-header">الإشعارات</h5>
-                                    <a href="#">مشاهدة الكل</a>
-                                </li>
-                                <li class="mb-4">
-                                    <p class="mb-1"><span class="circle mx-1"></span> تذكير: موعد الزيارة القادمة في 10/10/2024 </p>
-                                    <div class="d-flex gap-2 date-time">
-                                        <div class="date d-flex"><i class="la la-calendar-check"></i>3-سبتمبر 2024</div>
-                                        <div class="time d-flex"> <i class="la la-clock"></i>الساعة 05:31 م</div>
-                                    </div>
-                                </li>
-                                <li class="mb-4">
-                                    <p class="mb-1"><span class="circle mx-1"></span> تذكير: موعد الزيارة القادمة في 10/10/2024 </p>
-                                    <div class="d-flex gap-2 date-time">
-                                        <div class="date d-flex"><i class="la la-calendar-check"></i>3-سبتمبر 2024</div>
-                                        <div class="time d-flex"> <i class="la la-clock"></i>الساعة 05:31 م</div>
-                                    </div>
-                                </li>
-                                <li>
-                                    <p class="mb-1"><span class="circle mx-1"></span> تذكير: موعد الزيارة القادمة في 10/10/2024 </p>
-                                    <div class="d-flex gap-2 date-time">
-                                        <div class="date d-flex"><i class="la la-calendar-check"></i>3-سبتمبر 2024</div>
-                                        <div class="time d-flex"> <i class="la la-clock"></i>الساعة 05:31 م</div>
-                                    </div>
-                                </li>
-
-                            </ul>
-                        </div>
-
-                        <div class="dropdown profile">
-                            <a href="#" class="d-flex align-items-start text-decoration-none dropdown-toggle" data-bs-toggle="dropdown">
-                                <img src="~/plan-assets/img/profile-pic.png" alt="avatar" width="40" height="40" class="rounded-circle me-2">
-                                <div>
-                                    <h6>خالد المنصوري</h6>
-                                    <span>رئيس قسم المدارس الحكومية</span>
-                                </div>
-
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="#">الملف الشخصي</a></li>
-                                <li><a class="dropdown-item" href="#">الإعدادات</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="#">تسجيل الخروج</a></li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
-
-
-    </header>
-
-    <!-- Layout (Sidebar + Content) -->
-    <div class="layout">
-        <!-- Sidebar -->
-        <nav id="sidebar" class="sidebar p-2 d-flex flex-column">
-            <ul class="nav nav-pills flex-column mb-auto mt-3">
-                <li class="nav-item"><a href="#" class="nav-link  d-flex align-items-center p-2"><i class="la la-home me-2"></i><span class="nav-text">الرئيسية</span></a></li>
-                <!-- Reports Submenu -->
-                <li class="nav-item">
-                    <a class="nav-link d-flex align-items-center p-2 active" data-bs-toggle="collapse" href="#reportsSubmenu" role="button" aria-expanded="true" aria-controls="reportsSubmenu">
-                        <i class="la la-building me-2"></i>
-                        <span class="nav-text">المدارس</span>
-                        <i class="la la-angle-down ms-auto rotating"></i>
-                    </a>
-                    <div class="collapsed submenu" id="reportsSubmenu">
-                        <ul class="nav flex-column ms-2">
-                            <li><a href="/plan/create" class="nav-link p-1 active">تحديد المدارس</a></li>
-                            <li><a href="/plan/create" class="nav-link p-1">قائمة الخطط</a></li>
-                        </ul>
-                    </div>
-                </li>
-            </ul>
-            <ul class="nav nav-pills flex-column mb-auto mt-3">
-                <li class="nav-item"><a href="#" class="nav-link  d-flex align-items-center p-2"><i class="la la-cog me-2"></i><span class="nav-text">الإعدادات</span></a></li>
-                <li class="nav-item"><a href="#" class="nav-link  d-flex align-items-center p-2"><i class="la la-sign-out me-2"></i><span class="nav-text">الخروج</span></a></li>
-
-            </ul>
-        </nav>
-        <!-- Main Content -->
-        <main class="main-content">
-            <div class="card card-table mb-4">
-                <div class="card-body">
-                    <h3>تحديد المدارس وإعداد الخطة الزمنية</h3>
-                    <!-- Breadcrumbs -->
-                    <nav aria-label="breadcrumb">
-                        <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="#">الرئيسية</a></li>
-                            <li class="breadcrumb-item"><a href="#">المدارس</a></li>
-                            <li class="breadcrumb-item active" aria-current="page">تحديد المدارس</li>
-                        </ol>
-                    </nav>
-                    <div class="card-table  mb-4">
-                        <div class="card-body p-0">
-                            <div class="form-container pb-0">
-                                <h4 class="mb-4 text-primary"> انشاء الخطة</h4>
-                                <form class="row">
-                                    <div class="col-md-4">
-                                        <!-- Text Input -->
-                                        <div class="mb-4">
-                                            <label for="username" class="form-label">عنوان <span class="text-danger">*</span></label>
-                                            <input type="text" id="username" class="form-control" placeholder="أدخل اسم المستخدم">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <!-- Select2 Dropdown -->
-                                        <div class="mb-4">
-                                            <label for="planType" class="form-label">نوع الخطة <span class="text-danger">*</span></label>
-                                            <select class="form-control" id="ddlPlanType" name="ddlPlanType">
-                                            </select>
-                                            @*   <select id="planType" class="form-select" style="width: 100%;">
-                                                <option value="">اختر الدور</option>
-                                                <option value="admin">شهري</option>
-                                                <option value="editor">محرر</option>
-                                                <option value="viewer">عارض</option>
-                                            </select> *@
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <!-- Date Range Picker -->
-                                        <div class="mb-4">
-                                            <label for="dateRange" class="form-label">الفترة الزمنية</label>
-                                            <div class="input-group datetime">
-                                                <input type="text" class="form-control" id="dateRange" placeholder="اختر تاريخ بداية ونهاية الخطة">
-                                                <span class="input-group-text"><i class="la la-calendar"></i></span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card card-table">
-                        <div class="card-body">
-                            <div class="row align-items-center">
-                                <div class="col-xl-7 col-lg-5"><h4 class="mb-3 mb-lg-0 ">تحديد المدارس</h4></div>
-                                <div class="col-xl-5 col-lg-7">
-                                    <div class="row">
-                                        <div class="col-xl-8 col-lg-8 col-md-8 mb-3">
-                                            <div class="d-flex justify-content-end custom-search">
-                                                <div class="input-group">
-                                                    <span class="input-group-text border-end-0 bg-transparent"><i class="las la-search"></i></span>
-                                                    <input type="text" id="customSearch" class="form-control form-control-lg border-start-0 ps-0" placeholder="ابحث هنا...">
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-xl-4 col-lg-4 col-md-4 mb-3"><button class="btn filterbtn" data-bs-toggle="offcanvas" data-bs-target="#filterOffcanvas"><i class="la la-filter"></i> تصفية <span class="badge bg-primary rounded-pill mx-2">1</span></button></div>
-                                    </div>
-
-
-                                </div>
-                            </div>
-                            <div class="table-card rounded overflow-hidden">
-                                <div class="table-responsive">
-                                    <table id="userTable" class="table table-bordered table-hover align-middle w-100">
-                                        <thead class="table-light">
-                                            <tr>
-                                                <th>
-                                                    <label class="custom-checkbox">
-                                                        <input type="checkbox" id="selectAll">
-                                                        <span class="checkmark"></span>
-                                                    </label>
-                                                </th>
-                                                <th>اسم المدرسة</th>
-                                                <th>تاريخ الزيارة</th>
-                                                <th>تاريخ أخر تقييم</th>
-                                                <th>نوع الزيارة</th>
-                                                <th>تاريخ التقيم القادم</th>
-                                                <th>الإجراءت</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td>
-                                                    <label class="custom-checkbox">
-                                                        <input type="checkbox" class=" row-select">
-                                                        <span class="checkmark"></span>
-                                                    </label>
-                                                <td>
-                                                    <div class="d-flex align-items-center justify-content-between">
-                                                        <div class="">
-                                                            <h6>آمنة محمود الجيده للبنات</h6>
-                                                            <div class="square-bullet">
-                                                                <div>ابتدائية</div>
-                                                                <div><span>360</span> طالب</div>
-                                                            </div>
-                                                        </div>
-                                                        <span class="badge bg-danger">ضعيف</span>
-
-                                                    </div>
-                                                </td>
-                                                <td><p class="m-0" id="dateRange"><i class="la la-calendar"></i> اختر تاريخ بداية ونهاية الزيارة </p></td>
-                                                <td><p class="m-0">10/10/2024</p></td>
-                                                <td>
-                                                    <select id="planType" class="form-select" style="width: 100%;">
-                                                        <option value="">دوري</option>
-                                                        <option value="">استثنائي</option>
-                                                        <option value="">زيارة</option>
-                                                    </select>
-                                                </td>
-                                                <td><p class="m-0">10/10/2024</p></td>
-                                                <td><p class="m-0"><a href="#" class="text-dark" type="button" data-bs-toggle="modal" data-bs-target="#schoolDetailsModal"><i class="la la-eye"></i></a></p></td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <label class="custom-checkbox">
-                                                        <input type="checkbox" class=" row-select">
-                                                        <span class="checkmark"></span>
-                                                    </label>
-                                                </td>
-                                                <td>
-                                                    <div class="d-flex align-items-center justify-content-between">
-                                                        <div class="">
-                                                            <h6>آمنة محمود الجيده للبنات</h6>
-                                                            <div class="square-bullet">
-                                                                <div>ابتدائية</div>
-                                                                <div><span>360</span> طالب</div>
-                                                            </div>
-                                                        </div>
-                                                        <span class="badge bg-secondary">ممتاز</span>
-
-                                                    </div>
-                                                </td>
-                                                <td><p class="m-0" id="dateRange"><i class="la la-calendar"></i> اختر تاريخ بداية ونهاية الزيارة </p></td>
-                                                <td><p class="m-0">10/10/2024</p></td>
-                                                <td>
-                                                    <select id="planType" class="form-select" style="width: 100%;">
-                                                        <option value="">دوري</option>
-                                                        <option value="">استثنائي</option>
-                                                        <option value="">زيارة</option>
-                                                    </select>
-                                                </td>
-                                                <td><p class="m-0">10/10/2024</p></td>
-                                                <td><p class="m-0"><a href="#" class="text-dark" type="button" data-bs-toggle="modal" data-bs-target="#schoolDetailsModal"><i class="la la-eye"></i></a></p></td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <label class="custom-checkbox">
-                                                        <input type="checkbox" class=" row-select">
-                                                        <span class="checkmark"></span>
-                                                    </label>
-                                                </td>
-                                                <td>
-                                                    <div class="d-flex align-items-center justify-content-between">
-                                                        <div class="">
-                                                            <h6>آمنة محمود الجيده للبنات</h6>
-                                                            <div class="square-bullet">
-                                                                <div>ابتدائية</div>
-                                                                <div><span>360</span> طالب</div>
-                                                            </div>
-                                                        </div>
-                                                        <span class="badge bg-success">جيد جدًا</span>
-
-                                                    </div>
-                                                </td>
-                                                <td><p class="m-0" id="dateRange"><i class="la la-calendar"></i> اختر تاريخ بداية ونهاية الزيارة </p></td>
-                                                <td><p class="m-0">10/10/2024</p></td>
-                                                <td>
-                                                    <select id="planType" class="form-select" style="width: 100%;">
-                                                        <option value="">دوري</option>
-                                                        <option value="">استثنائي</option>
-                                                        <option value="">زيارة</option>
-                                                    </select>
-                                                </td>
-                                                <td><p class="m-0">10/10/2024</p></td>
-                                                <td><p class="m-0"><a href="#" class="text-dark" type="button" data-bs-toggle="modal" data-bs-target="#schoolDetailsModal"><i class="la la-eye"></i></a></p></td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <label class="custom-checkbox">
-                                                        <input type="checkbox" class=" row-select">
-                                                        <span class="checkmark"></span>
-                                                    </label>
-                                                </td>
-                                                <td>
-                                                    <div class="d-flex align-items-center justify-content-between">
-                                                        <div class="">
-                                                            <h6>آمنة محمود الجيده للبنات</h6>
-                                                            <div class="square-bullet">
-                                                                <div>ابتدائية</div>
-                                                                <div><span>360</span> طالب</div>
-                                                            </div>
-                                                        </div>
-                                                        <span class="badge bg-warning">متوسط</span>
-
-                                                    </div>
-                                                </td>
-                                                <td><p class="m-0" id="dateRange"><i class="la la-calendar"></i> اختر تاريخ بداية ونهاية الزيارة </p></td>
-                                                <td><p class="m-0">10/10/2024</p></td>
-                                                <td>
-                                                    <select id="planType" class="form-select" style="width: 100%;">
-                                                        <option value="">دوري</option>
-                                                        <option value="">استثنائي</option>
-                                                        <option value="">زيارة</option>
-                                                    </select>
-                                                </td>
-                                                <td><p class="m-0">10/10/2024</p></td>
-                                                <td><p class="m-0"><a href="#" class="text-dark" type="button" data-bs-toggle="modal" data-bs-target="#schoolDetailsModal"><i class="la la-eye"></i></a></p></td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <label class="custom-checkbox">
-                                                        <input type="checkbox" class=" row-select">
-                                                        <span class="checkmark"></span>
-                                                    </label>
-                                                </td>
-                                                <td>
-                                                    <div class="d-flex align-items-center justify-content-between">
-                                                        <div class="">
-                                                            <h6>آمنة محمود الجيده للبنات</h6>
-                                                            <div class="square-bullet">
-                                                                <div>ابتدائية</div>
-                                                                <div><span>360</span> طالب</div>
-                                                            </div>
-                                                        </div>
-                                                        <span class="badge bg-warning">متوسط</span>
-
-                                                    </div>
-                                                </td>
-                                                <td><p class="m-0" id="dateRange"><i class="la la-calendar"></i> اختر تاريخ بداية ونهاية الزيارة </p></td>
-                                                <td><p class="m-0">10/10/2024</p></td>
-                                                <td>
-                                                    <select id="planType" class="form-select" style="width: 100%;">
-                                                        <option value="">دوري</option>
-                                                        <option value="">استثنائي</option>
-                                                        <option value="">زيارة</option>
-                                                    </select>
-                                                </td>
-                                                <td><p class="m-0">10/10/2024</p></td>
-                                                <td><p class="m-0"><a href="#" class="text-dark" type="button" data-bs-toggle="modal" data-bs-target="#schoolDetailsModal"><i class="la la-eye"></i></a></p></td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <label class="custom-checkbox">
-                                                        <input type="checkbox" class=" row-select">
-                                                        <span class="checkmark"></span>
-                                                    </label>
-                                                </td>
-                                                <td>
-                                                    <div class="d-flex align-items-center justify-content-between">
-                                                        <div class="">
-                                                            <h6>آمنة محمود الجيده للبنات</h6>
-                                                            <div class="square-bullet">
-                                                                <div>ابتدائية</div>
-                                                                <div><span>360</span> طالب</div>
-                                                            </div>
-                                                        </div>
-                                                        <span class="badge bg-info">جيد</span>
-
-                                                    </div>
-                                                </td>
-                                                <td><p class="m-0" id="dateRange"><i class="la la-calendar"></i> اختر تاريخ بداية ونهاية الزيارة </p></td>
-                                                <td><p class="m-0">10/10/2024</p></td>
-                                                <td>
-                                                    <select id="planType" class="form-select" style="width: 100%;">
-                                                        <option value="">دوري</option>
-                                                        <option value="">استثنائي</option>
-                                                        <option value="">زيارة</option>
-                                                    </select>
-                                                </td>
-                                                <td><p class="m-0">10/10/2024</p></td>
-                                                <td><p class="m-0"><a href="#" class="text-dark" type="button" data-bs-toggle="modal" data-bs-target="#schoolDetailsModal"><i class="la la-eye"></i></a></p></td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <label class="custom-checkbox">
-                                                        <input type="checkbox" class=" row-select">
-                                                        <span class="checkmark"></span>
-                                                    </label>
-                                                </td>
-                                                <td>
-                                                    <div class="d-flex align-items-center justify-content-between">
-                                                        <div class="">
-                                                            <h6>آمنة محمود الجيده للبنات</h6>
-                                                            <div class="square-bullet">
-                                                                <div>ابتدائية</div>
-                                                                <div><span>360</span> طالب</div>
-                                                            </div>
-                                                        </div>
-                                                        <span class="badge bg-info">جيد</span>
-
-                                                    </div>
-                                                </td>
-                                                <td><p class="m-0" id="dateRange"><i class="la la-calendar"></i> اختر تاريخ بداية ونهاية الزيارة </p></td>
-                                                <td><p class="m-0">10/10/2024</p></td>
-                                                <td>
-                                                    <select id="planType" class="form-select" style="width: 100%;">
-                                                        <option value="">دوري</option>
-                                                        <option value="">استثنائي</option>
-                                                        <option value="">زيارة</option>
-                                                    </select>
-                                                </td>
-                                                <td><p class="m-0">10/10/2024</p></td>
-                                                <td><p class="m-0"><a href="#" class="text-dark" type="button" data-bs-toggle="modal" data-bs-target="#schoolDetailsModal"><i class="la la-eye"></i></a></p></td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <label class="custom-checkbox">
-                                                        <input type="checkbox" class=" row-select">
-                                                        <span class="checkmark"></span>
-                                                    </label>
-                                                </td>
-                                                <td>
-                                                    <div class="d-flex align-items-center justify-content-between">
-                                                        <div class="">
-                                                            <h6>آمنة محمود الجيده للبنات</h6>
-                                                            <div class="square-bullet">
-                                                                <div>ابتدائية</div>
-                                                                <div><span>360</span> طالب</div>
-                                                            </div>
-                                                        </div>
-                                                        <span class="badge bg-success">جيد جدًا</span>
-
-                                                    </div>
-                                                </td>
-                                                <td><p class="m-0" id="dateRange"><i class="la la-calendar"></i> اختر تاريخ بداية ونهاية الزيارة </p></td>
-                                                <td><p class="m-0">10/10/2024</p></td>
-                                                <td>
-                                                    <select id="" class="form-select" style="width: 100%;">
-                                                        <option value="">دوري</option>
-                                                        <option value="">استثنائي</option>
-                                                        <option value="">زيارة</option>
-                                                    </select>
-                                                </td>
-                                                <td><p class="m-0">10/10/2024</p></td>
-                                                <td><p class="m-0"><a href="#" class="text-dark" type="button" data-bs-toggle="modal" data-bs-target="#schoolDetailsModal"><i class="la la-eye"></i></a></p></td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-
-                            </div>
-                            <div class="row">
-                                <div class="col-md-6  mt-3">
-                                    <div class="d-flex gap-2 align-items-center flex-wrap">
-                                        <a href="#" class="btn btn-primary mw-200" type="button" data-bs-toggle="modal" data-bs-target="#confirmation-modal" id="confirmSaveBtn"> <i class="la la-bookmark"></i> حفظ</a>
-                                        <a href="#" class=""> عرض الخطط</a>
-                                    </div>
-
-                                </div>
-
-                                <div class="col-md-6 text-end  mt-3">
-                                    <!-- Separate pagination / info container -->
-                                    <div class="d-flex justify-content-end align-items-center">
-                                        <div id="dtPagination"></div>
-                                    </div>
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </main>
-    </div>
-
-    <!-- Offcanvas Filter -->
-    <div class="offcanvas offcanvas-end" tabindex="-1" id="filterOffcanvas">
-        <div class="offcanvas-header justify-content-between p-4">
-            <h5 class="offcanvas-title border d-flex align-items-center w-75 justify-content-between px-3 py-2 rounded"><span>تصفية النتائج </span><i class="la la-filter"></i></h5>
-            <button type="button" class="btn btn-lg border d-flex align-items-center h-100" data-bs-dismiss="offcanvas"><i class="la la-angle-right"></i></button>
-        </div>
-        <div class="offcanvas-body p-4">
-            <form>
-                <div class="mb-3">
-                    <label class="form-label">اسم المدرسة</label>
-                    <input type="text" class="form-control" placeholder="أكتب هنا...">
-                </div>
-                <hr>
-                <div class="mb-3">
-                    <label class="form-label">تاريخ اخر تقييم</label>
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="la la-calendar"></i></span>
-                        <input type="text" class="form-control" id="singleDate" placeholder="12/7/2023">
-                    </div>
-                </div>
-                <hr>
-                <div class="mb-3">
-                    <label class="form-label">تاريخ الانشاء</label>
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="la la-calendar"></i></span>
-                        <input type="text" class="form-control" id="singleDate" placeholder="10/1/2022">
-                    </div>
-                </div>
-                <hr>
-                <div class="mb-3">
-                    <label class="form-label">تاريخ التقييم القادم</label>
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="la la-calendar"></i></span>
-                        <input type="text" class="form-control" id="singleDate" placeholder="16/7/2024">
-                    </div>
-                </div>
-                <hr>
-                <div class="mb-3">
-                    <label class="form-label">النتيجة السابقة</label>
-                    <input type="text" class="form-control" placeholder="ضعيف">
-                </div>
-                <hr>
-                <div class="mb-3">
-                    <label class="form-label">نوع الزيارة</label>
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="la la-calendar"></i></span>
-                        <input type="text" class="form-control" id="singleDate" placeholder="دوري">
-                    </div>
-                </div>
-                <div class="d-flex gap-2 mt-4">
-                    <button type="submit" class="btn btn-primary w-100">حفظ</button>
-                    <button type="submit" class="btn btn-outline-primary w-100">حذف</button>
-
-                </div>
-
-            </form>
-        </div>
-    </div>
-
-    <div class="modal fade" id="confirmation-modal" tabindex="-1" aria-labelledby="confirmation-modalLabel" aria-hidden="true">
-        <div class="modal-dialog  modal-dialog-centered">
-            <div class="modal-content">
-
-                <div class="modal-body py-0">
-                    <div class="row">
-
-                        <div class="col-md-12 py-4 text-center">
-                            <div class="social-icon bg-primary text-white fw-normal m-auto  mb-3"><i class="la la-city"></i></div>
-                            <h5 class="fw-bold text-primary mb-3"> تم تحديد (03) مدرسة للإضافة للخطة</h5>
-                            <p>هل ترغب في إضافة مدارس أخري إلى خطة ؟</p>
-                            <div class="d-flex gap-2 justify-content-center">
-                                <button type="button" class="btn btn-primary mw-200"><i class="la la-bookmark"></i>  تأكيد الحفظ</button>
-                                <button type="button" class="btn btn-outline-primary mw-200" data-dismiss="modal"><i class="la la-window-close"></i> الغاء</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    @await Component.InvokeAsync("SchoolDetailsModal", new { modalId = "schoolDetailsModal", title = "School Details", body = "Hello from modal body!" })
-
-    <!-- Flatpickr JS -->
-    <script src="~/plan-assets/vendor/flatpickr/js/flatpickr.js"></script>
-    <script src="~/plan-assets/js/main.js"></script>
-    <script src="~/js/plan/create-plan.js"></script>
-</body>
-</html>
-
+    <script src="/js/plan/create-plan.js"></script>
+    <script src="/js/plan/getEvaluationPlanData.js"></script>
+}
+@* @await Component.InvokeAsync("SchoolDetailsModal", new { modalId = "schoolDetailsModal", title = "School Details", body = "Hello from modal body!" }) *@

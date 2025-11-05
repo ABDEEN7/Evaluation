@@ -1,9 +1,11 @@
-﻿using System.Collections.Concurrent;
-using Evaluation.DAL.UnitOfWork;
+﻿using Evaluation.DAL.UnitOfWork;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Helper;
+using Evaluation.SharedHelper.Models;
 using FluentResults;
+using MapsterMapper;
 using Microsoft.Extensions.DependencyInjection;
+using System.Collections.Concurrent;
 
 namespace Evaluation.Services.BusinessLayer.API
 {
@@ -13,6 +15,7 @@ namespace Evaluation.Services.BusinessLayer.API
         protected readonly CacheDataProvider cacheDataProvider;
         protected readonly UnitOfWork uow;
         protected readonly LoggingServices loggingServices;
+        protected readonly IMapper mapper;
         protected readonly UserInfo userInfo;
         protected readonly IServiceProvider serviceProvider;
         protected readonly RequestInfo requestInfo;
@@ -25,6 +28,7 @@ namespace Evaluation.Services.BusinessLayer.API
             CacheDataProvider cacheDataProvider,
             UnitOfWork uow,
             LoggingServices loggingServices,
+            IMapper mapper,
             UserInfo userInfo,
             IServiceProvider serviceProvider,
             RequestInfo requestInfo)
@@ -32,6 +36,7 @@ namespace Evaluation.Services.BusinessLayer.API
             this.serviceScopeFactory = serviceScopeFactory ?? throw new ArgumentNullException(nameof(serviceScopeFactory));
             this.cacheDataProvider = cacheDataProvider ?? throw new ArgumentNullException(nameof(cacheDataProvider));
             this.uow = uow ?? throw new ArgumentNullException(nameof(uow));
+            this.mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             this.loggingServices = loggingServices ?? throw new ArgumentNullException(nameof(loggingServices));
             this.userInfo = userInfo ?? throw new ArgumentNullException(nameof(userInfo));
             this.serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));

@@ -17,8 +17,6 @@ public class Plan : EntityBase
     public AcademicYear? AcademicYear { get; set; }
     public Guid PlanStatusId { get; set; }
     public PlanStatus? PlanStatus { get; set; }
-    public Guid PlanScheduleId { get; set; }
-    public PlanSchedule? PlanSchedule { get; set; }
     public ICollection<ChangeRequest>? ChangeRequests { get; set; }
     public Guid PlanTypeId { get; set; }
     public PlanType? PlanType { get; set; }

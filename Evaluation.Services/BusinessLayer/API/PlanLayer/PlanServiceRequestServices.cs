@@ -7,8 +7,10 @@ using Evaluation.SharedHelper.Dtos.PlanDto;
 using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Helper;
+using Evaluation.SharedHelper.Models;
 using FluentResults;
 using Mapster;
+using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
@@ -20,11 +22,12 @@ public class PlanServiceRequestServices(
     CacheDataProvider cacheDataProvider,
     UnitOfWork unitOfWork,
     LoggingServices loggingServices,
+    IMapper mapper,
     UserInfo userInfo,
     IServiceProvider serviceProvider,
     RequestInfo requestInfo,
     PlanServiceRequestRepository planRepository
-    ) : ApiBase(serviceScopeFactory, cacheDataProvider, unitOfWork, loggingServices, userInfo,
+    ) : ApiBase(serviceScopeFactory, cacheDataProvider, unitOfWork, loggingServices, mapper, userInfo,
         serviceProvider, requestInfo)
 {
     public async Task<Result<CreateEvaluationPlanDto>> AddEvaulationPlan(CreateEvaluationPlanDto evaluationPlanDto)
@@ -80,19 +83,48 @@ public class PlanServiceRequestServices(
             var result = await planRepository.ApprovePlans(plan.Id);
         });
     }
-    public async Task<Result<List<PlanTypeDto>>> GetPlanType()
+    //public async Task<Result<List<PlanTypeDto>>> GetPlanType()
+    //{
+    //    var result = await ExecuteWithResult(async () => await planRepository.GetPlanTypeAsync());
+    //    return result;
+    //}
+    public async Task<Result<bool>> RequestDeleteSchool()
     {
-        var result = await ExecuteWithResult(async () => await planRepository.GetPlanTypeAsync());
-        return result;
+        return await ExecuteWithResult(async () =>
+        {
+
+        });
+    }
+    public async Task<Result<bool>> ApproveDeleteSchool(Guid requestId, Guid schoolId)
+    {
+        return await ExecuteWithResult(async () =>
+        {
+            var result = await planRepository.DeleteSchoolFromPlan(requestId, schoolId);
+            return result;
+        });
+    }
+    public async Task<Result<List<PlanTypeDto>>> GetPlansTypes()
+    {
+        return await ExecuteWithResult(async () =>
+        {
+            var result = GetPlanTypes();
+            return result;
+        });
+    }
+    private List<PlanTypeDto> GetPlanTypes()
+    {
+        return new List<PlanTypeDto>
+        {
+            new PlanTypeDto{Id = new Guid(),Name= "Month"},
+            new PlanTypeDto{Id = new Guid(),Name = "Year"}
+        };
+    }
+    public class PlanTypeDto
+    {
+        public Guid Id { get; set; }
+        public string Name { get; set; } = null!;
     }
 
-    //public async Task<bool> ApproveDeleteSchool(Guid requestId)
-    //{
-    //    return await ExecuteWithResult(async () =>
-    //    {
-    //        var result = await planService.ApprovePlans(requestId);
-    //    });
-    //}
     private async Task ValidateApprovePlan(CreateEvaluationPlanDto model)
     {
         if (model is null || string.IsNullOrEmpty(model.NameEn) || string.IsNullOrEmpty(model.NameAr))

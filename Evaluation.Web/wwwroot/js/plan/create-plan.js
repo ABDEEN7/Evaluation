@@ -1,25 +1,30 @@
-﻿let ddlPlanType = 'ddlPlanType',
-    $ddlPlanType = $('#' + ddlPlanType);
+﻿$(function () { 
+    const ddlPlanType = 'ddlPlanType';
+    const $ddlPlanType = $('#' + ddlPlanType);
 
-initTables = () => {
-    alert("fuck");
+    const getPlanTypes = () => {
+        jqClient().Get('/Plan/GetPlanType').done((result) => {
+            console.log("Plan types:", result);
+            const data = (result && result.result) ? result.result : [];
+            $ddlPlanType.select2({
+                placeholder: "Select an option",
+                allowClear: true,
+                width: '100%',
+                dropdownCssClass: "manageselect2zindex",
+                data: data.map(item => ({ id: item.id, text: item.name }))
+            });
+            $ddlPlanType.val(null).trigger('change');
+        }).fail((jqXHR, textStatus, err) => {
+            console.error('GetPlanType failed', textStatus, err);
+        });
+    };
+
     getPlanTypes();
-}
-const getPlanTypes = () => {
-    jqClient().Get('/Plan/GetPlanType').done((result) => {
-        $ddlPlanType.select2({
-            placeholder: "Select an options",
-            allowClear: true,
-            width: '100%',
-            dropdownCssClass: "manageselect2zindex",
-            data: result.value?.map((item) => ({ id: item.Id, text: item.name })) || []
-        }).val('').trigger('change');
-    });
-}
+});
+
 const CreateEvaluationPlan = (data) => {
     //if(!data.NameEn || !)
 }
-getPlanTypes();
     //$(document).ready(function () {
     //    $('#confirmSaveBtn').on('click', function () {
     //        //const planData = 
