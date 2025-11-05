@@ -40,8 +40,6 @@ internal class Program
             ClsAppSetting.MOPHApiURL = config.GetSection("MOPHConfig:ApiURL").Value ?? "";
             ClsAppSetting.NSISApiURL = config.GetSection("NSISConfig:ApiURL").Value ?? "";
             ClsAppSetting.NSISAppID = config.GetSection("NSISConfig:AppID").Value ?? "";
-            ClsAppSetting.StudentCertificateUserName = config.GetSection("NSISConfig:StudentCertificateUserName").Value ?? "";
-            ClsAppSetting.StudentCertificatePassword = config.GetSection("NSISConfig:StudentCertificatePassword").Value ?? "";
             ClsAppSetting.ValidationURL = config.GetSection("NSISConfig:ValidationURL").Value ?? "";
             ClsAppSetting.StudentInfoURL = config.GetSection("NSISConfig:StudentInfoURL").Value ?? "";
             ClsAppSetting.FormJwtConfigKey = config.GetSection("FormJwtConfig:Key").Value ?? "";
