@@ -42,7 +42,7 @@ namespace Evaluation.API.Controllers
             return response;
         }
 
-		[HttpGet("CheckUserAuth")]
+		[HttpPost("CheckUserAuth")]
 		public async Task<IActionResult> CheckUserAuth([FromQuery] string username)
         {
             try
