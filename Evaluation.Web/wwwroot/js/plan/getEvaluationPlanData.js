@@ -8,8 +8,8 @@ function getEvaluationData() {
         const planName = document.getElementById('username')?.value?.trim() || '';
 
         // Get plan type from the select dropdown
-        const planTypeSelect = document.getElementById('userRole');
-        const planType = planTypeSelect?.value || '';
+        const planTypeSelect = document.getElementById('ddlPlanType');
+        const planTypeId = planTypeSelect?.value || '';
 
         // Get date range and parse start/end dates
         const dateRangeInput = document.getElementById('dateRange');
@@ -25,7 +25,7 @@ function getEvaluationData() {
         // Return structured data object
         return {
             planName,
-            planType,
+            planTypeId,
             startDate,
             endDate
         };
@@ -42,15 +42,39 @@ function getEvaluationData() {
  * @returns {Object} Object with startDate and endDate properties
  */
 function parseDateRange(dateRangeValue) {
-    const dates = dateRangeValue.split(/\s*(?:to|-)\s*/);
+    if (!dateRangeValue || typeof dateRangeValue !== 'string') {
+        return {
+            startDate: '',
+            endDate: ''
+        };
+    }
+
+    const trimmedValue = dateRangeValue.trim();
+
+    // Split by " to " (Flatpickr's default separator)
+    let dates = trimmedValue.split(' to ');
 
     if (dates.length === 2) {
-        return {
-            startDate: dates[0].trim(),
-            endDate: dates[1].trim()
-        };
+        const date1 = dates[0].trim();
+        const date2 = dates[1].trim();
+
+        // Convert to Date objects for comparison
+        const dateObj1 = new Date(date1);
+        const dateObj2 = new Date(date2);
+
+        // Ensure startDate is the earlier date and endDate is the later date
+        if (dateObj1 <= dateObj2) {
+            return {
+                startDate: date1,
+                endDate: date2
+            };
+        } else {
+            return {
+                startDate: date2,
+                endDate: date1
+            };
+        }
     } else if (dates.length === 1) {
-        // If only one date is provided, use it as both start and end
         const singleDate = dates[0].trim();
         return {
             startDate: singleDate,
@@ -63,6 +87,12 @@ function parseDateRange(dateRangeValue) {
         endDate: ''
     };
 }
+
+// Usage examples:
+console.log(parseDateRange("2024-01-01 to 2024-12-31"));
+console.log(parseDateRange("2024-01-01 - 2024-12-31"));
+console.log(parseDateRange("2024-01-01"));
+console.log(parseDateRange(""));
 
 /**
  * Validates evaluation data before submission
@@ -81,7 +111,7 @@ function validateEvaluationData(data) {
         errors.push('Plan name is required');
     }
 
-    if (!data.planType) {
+    if (!data.planTypeId) {
         errors.push('Plan type is required');
     }
 
@@ -123,21 +153,9 @@ async function submitEvaluationData(data) {
             submitBtn.disabled = true;
             submitBtn.textContent = 'Submitting...';
         }
-
-        // Make API call (replace with your actual API endpoint)
-        const response = await fetch('/api/evaluation', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data)
+        jqClient().Post(`/Plan/Create`, data).fail((jqXHR, textStatus, errorThrown) => {
+            console.error('Error: [Create Plan Condition]', textStatus, errorThrown);
         });
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const result = await response.json();
 
         // Handle success
         console.log('Submission successful:', result);
@@ -177,6 +195,7 @@ document.getElementById('btn-submit')?.addEventListener('click', async (event) =
     // Step 3: Submit data
     await submitEvaluationData(evaluationData);
 });
+
 
 // Alternative: jQuery version if you prefer
 $("#btn-submit").click(async function (event) {

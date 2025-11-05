@@ -13,7 +13,7 @@ public class PlanController(MasterBL masterBL) : ControllerBase
 {
     [HttpPost]
     //public async Task<IActionResult> CreateAsync([FromBody] CreateEvaluationPlanDto planRequest)
-    public async Task<IActionResult> CreateAsync([FromBody] CreateEvaluationPlanDto planRequest)
+    public async Task<IActionResult> Create([FromBody] CreateEvaluationPlanDto planRequest)
     {
         //CreateEvaluationPlanDto? planDto = JsonConvert.DeserializeObject<CreateEvaluationPlanDto>(planRequest);
         //if (planDto == null)
@@ -69,14 +69,14 @@ public class PlanController(MasterBL masterBL) : ControllerBase
     private List<PlanTypeDto> GetPlanTypes()
     {
         return new List<PlanTypeDto>
-        {
-            new PlanTypeDto{Id = 1,Name= "Month"},
-            new PlanTypeDto{Id = 2,Name = "Year"}
-        };
+    {
+        new PlanTypeDto { Id = Guid.Parse("11111111-1111-1111-1111-111111111111"), Name = "Month" },
+        new PlanTypeDto { Id = Guid.Parse("22222222-2222-2222-2222-222222222222"), Name = "Year" }
+    };
     }
     public class PlanTypeDto
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; }
         public string Name { get; set; } = null!;
     }
 

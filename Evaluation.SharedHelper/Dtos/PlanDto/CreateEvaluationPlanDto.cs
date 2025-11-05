@@ -8,7 +8,7 @@ public class CreateEvaluationPlanDto
     public string NameEn { get; set; } = null!;
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
-    public Guid PlayType { get; set; }
+    public Guid PlanTypeId { get; set; }
     public List<SelectedSchool>? Schools { get; set; }
     public Guid AcademicYearId { get; set; }
     public Guid PlanStatusId { get; set; }

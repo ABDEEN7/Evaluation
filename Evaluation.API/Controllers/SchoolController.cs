@@ -1,6 +1,7 @@
 ﻿using Evaluation.DAL.Entities.Org;
 using Evaluation.Services.BusinessLayer;
 using Evaluation.Services.BusinessLayer.API;
+using Evaluation.SharedHelper.Dtos.SchoolDto;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 
@@ -29,5 +30,47 @@ public class SchoolController:ControllerBase
         };
 
         return dummyData.FirstOrDefault(s => s.Id == SchoolID);
+    }
+    [HttpGet]
+    public async Task<List<ResponseSchools>> GetSchools()
+    {
+        return new List<ResponseSchools>
+        {
+            new ResponseSchools
+            {
+                Id = Guid.NewGuid(),
+                Name = "Greenwood High School",
+                LastEvaluationDate = new DateTime(2024, 5, 20),
+                GradLevel = 5
+            },
+            new ResponseSchools
+            {
+                Id = Guid.NewGuid(),
+                Name = "Sunrise Elementary",
+                LastEvaluationDate = new DateTime(2023, 11, 10),
+                GradLevel = 1
+            },
+            new ResponseSchools
+            {
+                Id = Guid.NewGuid(),
+                Name = "Riverside Middle School",
+                LastEvaluationDate = new DateTime(2024, 8, 15),
+                GradLevel = 3
+            },
+            new ResponseSchools
+            {
+                Id = Guid.NewGuid(),
+                Name = "Mountainview Academy",
+                LastEvaluationDate = new DateTime(2022, 12, 30),
+                GradLevel = 4
+            },
+            new ResponseSchools
+            {
+                Id = Guid.NewGuid(),
+                Name = "Lakeside Primary",
+                LastEvaluationDate = null,
+                GradLevel = 2
+            }
+        };
     }
 }
