@@ -48,9 +48,13 @@ const ConstantUrls = {
     RefreshTokenURL: '/Account/RefreshToken',
     GetMSAuthorizationURL: '/Account/GetMSAuthorizationURL',
     LoginMinistry: '/Account/LoginMinistry',
+    //LoginUser: '/Account/LoginUser/{email}/{password}/{json}',
+    //LoginStudent: '/Account/LoginStudent/{email}/{password}/{json}',
+    //LoginAD: '/Account/LoginAD/{json}',
     GetUserAuthType: '/Account/GetUserAuthType/{username}',
     Home: '/Home/Index',
     UserDetails: '/User/UserDetails',
+    MobileResetPasswordURL: '/Account/MobileResetPassword',
 
 };
 
@@ -69,6 +73,7 @@ let Enums = {
     },
     UserType: {
         Ministry: 'Ministry',
+        Student: 'Student',
     },
 
     AllocationFrequency: {
