@@ -32,7 +32,7 @@ const CreateEvaluationPlan = (data) => {
 
     //});
 const CreatePlan = (data) => {
-    return jqClient().Post(`/Plan/Create`, data).fail((jqXHR, textStatus, errorThrown) => {
+    return jqClient().Post(`/Plan/CreatePlan`, data).fail((jqXHR, textStatus, errorThrown) => {
         console.error('Error: [Create Plan Condition]', textStatus, errorThrown);
     });
 }
