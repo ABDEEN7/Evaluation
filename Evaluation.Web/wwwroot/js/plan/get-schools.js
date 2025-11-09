@@ -5,13 +5,79 @@ let allSchools = [];
 let filteredSchools = [];
 let currentPage = 1;
 let pageSize = 10;
+let visitTypes = [];
 
 // Initialize when DOM is ready
 $(document).ready(function () {
+    loadVisitTypes();
     loadSchoolsData();
     initializeSearch();
     initializeFilters();
+    initializeFlatpickr(); // Initialize Flatpickr on page load
 });
+
+// ============= INITIALIZE FLATPICKR =============
+function initializeFlatpickr() {
+    flatpickr(".dateRange", {
+        mode: "range",
+        locale: "ar",
+        dateFormat: "Y-m-d",
+        allowInput: true,
+        onChange: function (selectedDates, dateStr, instance) {
+            // Get the school ID from the input's closest row
+            const schoolId = $(instance.input).closest('tr').find('.selectRow').data('id');
+            console.log('Date selected for school:', schoolId, dateStr);
+            // You can save the date here via API if needed
+        },
+        onReady: function (selectedDates, dateStr, instance) {
+            const monthsContainer = instance.calendarContainer.querySelector('.flatpickr-months');
+
+            // Create arrow stack container
+            const prev = instance.calendarContainer.querySelector('.flatpickr-prev-month');
+            const next = instance.calendarContainer.querySelector('.flatpickr-next-month');
+            const arrowStack = document.createElement('div');
+            arrowStack.className = 'fp-arrow-stack';
+            arrowStack.appendChild(prev);
+            arrowStack.appendChild(next);
+
+            // Insert arrow stack at start (left side in RTL)
+            monthsContainer.insertBefore(arrowStack, monthsContainer.firstChild);
+
+            // Month/year container remains for dropdowns (right side in RTL)
+            const monthYear = monthsContainer.querySelector('.flatpickr-current-month');
+            monthsContainer.appendChild(monthYear);
+
+            // Add Apply/Cancel buttons if not already added
+            if (!instance.calendarContainer.querySelector('.fp-btns')) {
+                const btns = document.createElement('div');
+                btns.className = 'fp-btns';
+
+                const cancel = document.createElement('button');
+                cancel.type = 'button';
+                cancel.className = 'fp-cancel';
+                cancel.textContent = 'إلغاء';
+                cancel.onclick = (e) => {
+                    e.preventDefault();
+                    instance.clear();
+                    instance.close();
+                };
+
+                const apply = document.createElement('button');
+                apply.type = 'button';
+                apply.className = 'fp-apply';
+                apply.textContent = 'تأكيد';
+                apply.onclick = (e) => {
+                    e.preventDefault();
+                    instance.close();
+                };
+
+                btns.appendChild(cancel);
+                btns.appendChild(apply);
+                instance.calendarContainer.appendChild(btns);
+            }
+        }
+    });
+}
 
 // ============= LOAD SCHOOLS DATA (REAL API) =============
 function loadSchoolsData(page = 1) {
@@ -28,6 +94,9 @@ function loadSchoolsData(page = 1) {
             renderSchoolsTable(filteredSchools);
             const totalRecords = result.totalCount || filteredSchools.length;
             renderPagination(totalRecords);
+
+            // Re-initialize Flatpickr after table is rendered
+            initializeFlatpickr();
         })
         .fail((jqXHR, textStatus, err) => {
             console.error('GetAll schools failed', textStatus, err);
@@ -51,6 +120,9 @@ function renderSchoolsTable(schools) {
     let rows = '';
     paginated.forEach(function (school) {
         const ratingClass = getRatingClass(school.rating);
+        let visitOptions = visitTypes.map(v =>
+            `<option value="${v.id}" ${v.name === school.visitType ? 'selected' : ''}>${v.name}</option>`
+        ).join('');
         rows += `
         <tr>
             <td>
@@ -65,16 +137,26 @@ function renderSchoolsTable(schools) {
                         <h6>${school.name || '-'}</h6>
                         <div class="square-bullet">
                             <div>${school.level || 'ابتدائية'}</div>
-                            <div><span>${school.students || 0}</span> طالب</div>
                         </div>
                     </div>
                     <span class="badge ${ratingClass}">${school.rating || ''}</span>
                 </div>
             </td>
-            <td><p class="m-0 dateRange"><i class="la la-calendar"></i> اختر تاريخ بداية ونهاية الزيارة </p></td>
+            <td>
+                <input type="text" 
+                       class="form-control form-control-sm dateRange" 
+                       placeholder="اختر تاريخ بداية ونهاية الزيارة"
+                       data-school-id="${school.id}"
+                       readonly>
+            </td>
             <td>${school.lastEvaluationDate || '-'}</td>
-            <td>${school.visitType || '-'}</td>
-            <td>${school.nextEvalDate || '-'}</td>
+            <td>
+            <select class="form-select visitTypeSelect" data-school-id="${school.id}">
+                    <option value="">اختر نوع الزيارة</option>
+                    ${visitOptions}
+                </select>
+            </td>
+            <td>${school.academicYear || '-'}</td>
             <td>
                 <p class="m-0">
                     <a href="#" class="text-dark" type="button" data-bs-toggle="modal" data-bs-target="#exampleModal" data-id="${school.id}">
@@ -181,4 +263,12 @@ function getRatingClass(rating) {
         'Week': 'bg-danger'
     };
     return map[rating] || 'bg-light';
+}
+function loadVisitTypes() {
+    jqClient().Get('/School/GetVisits').done(result => {
+        const data = (result && result.result) ? result.result : [];
+        visitTypes = data;
+    }).fail((jqXHR, textStatus, err) => {
+        console.error('Get Visits failed', textStatus, err);
+    });
 }

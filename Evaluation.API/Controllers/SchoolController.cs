@@ -4,7 +4,6 @@ using Evaluation.Services.BusinessLayer;
 using Evaluation.Services.BusinessLayer.API;
 using Evaluation.SharedHelper.Dtos.SchoolDto;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
 
 namespace Evaluation.API.Controllers;
 
@@ -35,13 +34,29 @@ public class SchoolController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetVisits()
     {
-        var visit = await _masterBl.GetApiService<SchoolBL>().GetVisitsAsync();
-        return visit.ToActionResult();
+        //var visit = await _masterBl.GetApiService<SchoolBL>().GetVisitsAsync();
+        //return visit.ToActionResult();
+        var visits = GetSchoolVisits();
+        return Ok(new { result = visits });
     }
     [HttpGet]
     public IActionResult GetSchools([FromQuery] SchoolRequest request)
     {
         return Ok(new { result = GetListSchool() });
+    }
+    private List<SchoolVisits> GetSchoolVisits()
+    {
+        return new List<SchoolVisits>
+        {
+            new SchoolVisits {
+                Id = Guid.NewGuid(),
+                Name = "دوري"
+            },
+            new SchoolVisits {
+                Id = Guid.NewGuid(),
+                Name = "استثنائي"
+            },
+        };
     }
     private List<ResponseSchools> GetListSchool()
     {
@@ -52,35 +67,40 @@ public class SchoolController : ControllerBase
                 Id = Guid.NewGuid(),
                 Name = "Greenwood High School",
                 LastEvaluationDate = new DateTime(2024, 5, 20),
-                Rating = "Perfect"
+                Rating = "Perfect",
+                AcademicYear = 2025
             },
             new ResponseSchools
             {
                 Id = Guid.NewGuid(),
                 Name = "Sunrise Elementary",
                 LastEvaluationDate = new DateTime(2023, 11, 10),
-                Rating = "Week"
+                Rating = "Week",
+                AcademicYear = new DateTime(2025).Year
             },
             new ResponseSchools
             {
                 Id = Guid.NewGuid(),
                 Name = "Riverside Middle School",
                 LastEvaluationDate = new DateTime(2024, 8, 15),
-                Rating = "VeryGood"
+                Rating = "VeryGood",
+                AcademicYear = new DateTime(2025).Year
             },
             new ResponseSchools
             {
                 Id = Guid.NewGuid(),
                 Name = "Mountainview Academy",
                 LastEvaluationDate = new DateTime(2022, 12, 30),
-                Rating = "Perfect"
+                Rating = "Perfect",
+                AcademicYear = new DateTime(2025).Year
             },
             new ResponseSchools
             {
                 Id = Guid.NewGuid(),
                 Name = "Lakeside Primary",
                 LastEvaluationDate = null,
-                Rating = "Aecctable"
+                Rating = "Aecctable",
+                AcademicYear = new DateTime(2025).Year
             }
         };
     }

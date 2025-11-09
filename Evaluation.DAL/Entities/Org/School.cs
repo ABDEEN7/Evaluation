@@ -10,5 +10,6 @@ public class School : OrgTree
     public string? Region { get; set; }
     public Guid TypeId { get; set; }//بنين وبنات
     public SchoolType SchoolType { get; set; } = new();
+    //public int StudentNumber { get; set; }
     //public List<SchoolLevel> SchoolLevel { get; set; } disscucss with FT to add new relation ship between level and school 
 }

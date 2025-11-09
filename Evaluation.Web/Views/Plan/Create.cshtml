@@ -62,9 +62,9 @@
                                         </label>
                                         <div class="input-group datetime">
                                             <input type="text"
-                                                   class="form-control"
+                                                   class="form-control dateRange"
                                                    id="dateRange"
-                                                   name="DateRange"
+                                                   name="dateRange"
                                                    placeholder="اختر تاريخ بداية ونهاية الخطة"
                                                    required>
                                             <span class="input-group-text">
@@ -133,7 +133,7 @@
                                             <th style="width: 250px;">تاريخ الزيارة</th>
                                             <th style="width: 120px;">تاريخ أخر تقييم</th>
                                             <th style="width: 150px;">نوع الزيارة</th>
-                                            <th style="width: 120px;">تاريخ التقيم القادم</th>
+                                            <th style="width: 120px;">العام الاكاديمي</th>
                                             <th style="width: 80px;">الإجراءات</th>
                                         </tr>
                                     </thead>
@@ -154,19 +154,12 @@
 
                         <!-- Action Buttons and Pagination -->
                         <div class="row mt-3">
-                            <div class="col-md-6">
+                            <div class="col-md-6  mt-3">
                                 <div class="d-flex gap-2 align-items-center flex-wrap">
-                                    <button type="button"
-                                            class="btn btn-primary mw-200"
-                                            id="savePlanBtn">
-                                        <i class="la la-bookmark"></i> حفظ
-                                    </button>
-                                    <a href="@Url.Action("Index", "Plans")" class="text-decoration-none">
-                                        عرض الخطط
-                                    </a>
+                                    <a href="#" class="btn btn-primary mw-200" type="button" data-bs-toggle="modal" data-bs-target="#confirmation-modal"> <i class="la la-bookmark"></i> حفظ</a>
+                                    <a href="#" class=""> عرض الخطط</a>
                                 </div>
                             </div>
-
                             <div class="col-md-6 text-end">
                                 <!-- Pagination Container -->
                                 <div class="d-flex justify-content-end align-items-center">
@@ -356,9 +349,9 @@
 	<!-- Flatpickr JS -->
 	<script src="~/plan-assets/vendor/flatpickr/js/flatpickr.js"></script>
 	<script src="~/plan-assets/js/main.js"></script>
-	@* <script src="/js/plan/create-plan.js"></script>
-	<script src="/js/plan/getEvaluationPlanData.js" asp-append-version="true"></script> *@
     <script src="~/js/plan/get-schools.js" asp-append-version="true"></script>
+    <script src="/js/plan/create-plan.js"></script>
+    <script src="/js/plan/getEvaluationPlanData.js" asp-append-version="true"></script>
 
 }
 @* @await Component.InvokeAsync("SchoolDetailsModal", new { modalId = "schoolDetailsModal", title = "School Details", body = "Hello from modal body!" }) *@

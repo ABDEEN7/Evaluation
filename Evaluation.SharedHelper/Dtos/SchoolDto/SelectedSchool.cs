@@ -2,7 +2,8 @@
 
 public class SelectedSchool
 {
-    public int Id { get; set; }
+    public Guid Id { get; set; }
     public DateTime? StartEvaluationDate { get; set; }
     public DateTime? EndEvaluationDate { get; set; }
+    public Guid VisitTypeId { get; set; }
 }

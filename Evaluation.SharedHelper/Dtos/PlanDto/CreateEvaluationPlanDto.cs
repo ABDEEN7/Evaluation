@@ -4,8 +4,7 @@ namespace Evaluation.SharedHelper.Dtos.PlanDto;
 
 public class CreateEvaluationPlanDto
 {
-    public string NameAr { get; set; } = null!;
-    public string NameEn { get; set; } = null!;
+    public string Name { get; set; } = null!;
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
     public Guid PlanTypeId { get; set; }

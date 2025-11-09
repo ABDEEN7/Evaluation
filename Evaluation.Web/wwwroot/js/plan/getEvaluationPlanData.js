@@ -5,7 +5,7 @@
 function getEvaluationData() {
     try {
         // Get plan name from the title input
-        const planName = document.getElementById('username')?.value?.trim() || '';
+        const name = document.getElementById('planTitle')?.value?.trim() || '';
 
         // Get plan type from the select dropdown
         const planTypeSelect = document.getElementById('ddlPlanType');
@@ -21,13 +21,15 @@ function getEvaluationData() {
             startDate = parsedDates.startDate;
             endDate = parsedDates.endDate;
         }
+        const selectedSchools = getSelectedSchools();
 
         // Return structured data object
         return {
-            planName,
+            name,
             planTypeId,
             startDate,
-            endDate
+            endDate,
+            schools: selectedSchools
         };
 
     } catch (error) {
@@ -107,7 +109,7 @@ function validateEvaluationData(data) {
         return { isValid: false, errors };
     }
 
-    if (!data.planName) {
+    if (!data.name) {
         errors.push('Plan name is required');
     }
 
@@ -153,13 +155,13 @@ async function submitEvaluationData(data) {
             submitBtn.disabled = true;
             submitBtn.textContent = 'Submitting...';
         }
-        jqClient().Post(`/Plan/Create`, data).fail((jqXHR, textStatus, errorThrown) => {
-            console.error('Error: [Create Plan Condition]', textStatus, errorThrown);
-        });
+        //jqClient().Post(`/Plan/Create`, data).fail((jqXHR, textStatus, errorThrown) => {
+        //    console.error('Error: [Create Plan Condition]', textStatus, errorThrown);
+        //});
+        const result = await jqClient().Post(`/Plan/Create`, data);
 
         // Handle success
-        console.log('Submission successful:', result);
-        alert('Evaluation plan submitted successfully!');
+        console.log('Object Json:', result);
 
         // Optional: Reset form or redirect
         // document.getElementById('evaluationForm')?.reset();
@@ -211,3 +213,29 @@ $("#btn-submit").click(async function (event) {
 
     await submitEvaluationData(evaluationData);
 });
+function getSelectedSchools() {
+    const selectedSchools = [];
+    $('#planTable tbody .selectRow:checked').each(function () {
+        const checkbox = $(this);
+        const schoolId = checkbox.data('id');
+        const row = checkbox.closest('tr');
+
+        const dataRangeInput = row.find('.dateRange');
+        const dateRangeValue = dataRangeInput.val() || '';
+        const parsedDates = parseDateRange(dateRangeValue);
+        const visitTypeSelect = row.find('.visitTypeSelect');
+        const visitTypeId = visitTypeSelect.val() || '';
+        const visitTypeName = visitTypeSelect.find('option:selected').text() || '';
+
+        // Get school name from the table
+        const schoolData =
+        {
+            id: schoolId,
+            startEvaluationDate: parsedDates.startDate,
+            endEvaluationDate: parsedDates.endDate,
+            visitTypeId: visitTypeId
+        };
+        selectedSchools.push(schoolData);
+    });
+    return selectedSchools;
+}

@@ -64,8 +64,7 @@ public class PlanServiceRequestRepository(IServiceScopeFactory serviceScopeFacto
             .FirstOrDefault();
         Plan plan = new Plan
         {
-            NameAr = createplan.NameAr,
-            NameEn = createplan.NameEn,
+            NameEn = createplan.Name,
             AcademicYearId = createplan.AcademicYearId,
             PlanStatusId = createplan.PlanStatusId,
             DepartmentId = departmentId,

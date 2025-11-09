@@ -129,7 +129,7 @@ $('#userRole').select2({
 
   /******DateRange flatpickr********/
 
-  const fp = flatpickr("#dateRange", {
+  const fp = flatpickr(".dateRange", {
     mode: "range",
     locale: "ar",
     dateFormat: "Y-m-d",

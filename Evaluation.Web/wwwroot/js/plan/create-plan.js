@@ -4,7 +4,6 @@
 
     const getPlanTypes = () => {
         jqClient().Get('/Plan/GetPlanType').done((result) => {
-            console.log("Plan types:", result);
             const data = (result && result.result) ? result.result : [];
             $ddlPlanType.select2({
                 placeholder: "Select an option",

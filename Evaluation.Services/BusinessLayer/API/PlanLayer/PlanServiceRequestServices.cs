@@ -32,12 +32,13 @@ public class PlanServiceRequestServices(
 {
     public async Task<Result<CreateEvaluationPlanDto>> AddEvaulationPlan(CreateEvaluationPlanDto evaluationPlanDto)
     {
-        await ValidateDraftPlan(evaluationPlanDto);
+        //await ValidateDraftPlan(evaluationPlanDto);
         return await ExecuteWithResult(async () =>
         {
             //PlanServiceRequest planDraft = evaluationPlanDto.Adapt<PlanServiceRequest>();
             //var result = await f.CreateServicPlan(evaluationPlanDto);
             var result = evaluationPlanDto;
+            result.AcademicYearId = new Guid("00000000-0000-0000-0000-000000000001");
             return result;
         });
     }
@@ -127,7 +128,7 @@ public class PlanServiceRequestServices(
 
     private async Task ValidateApprovePlan(CreateEvaluationPlanDto model)
     {
-        if (model is null || string.IsNullOrEmpty(model.NameEn) || string.IsNullOrEmpty(model.NameAr))
+        if (model is null || string.IsNullOrEmpty(model.Name))
             throw new BusinessException(ConstantKeys.ExceptionMessage.InvalidApprovePlan);
 
         var selectedYear = await serviceScopeFactory.CreateScopedUow().GetRepository<AcademicYear>()
@@ -140,7 +141,7 @@ public class PlanServiceRequestServices(
     }
     private async Task ValidateDraftPlan(CreateEvaluationPlanDto model)
     {
-        if (model is null || string.IsNullOrEmpty(model.NameEn) || string.IsNullOrEmpty(model.NameAr))
+        if (model is null || string.IsNullOrEmpty(model.Name))
             throw new BusinessException(ConstantKeys.ExceptionMessage.InvalidDraftPlan);
 
         var selectedYear = await serviceScopeFactory.CreateScopedUow().GetRepository<AcademicYear>()
