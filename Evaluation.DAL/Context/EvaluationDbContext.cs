@@ -59,7 +59,7 @@ public partial class EvaluationDbContext : DbContext
     public virtual DbSet<School> Schools { get; set; }
     public virtual DbSet<SchoolType> SchoolTypes { get; set; }
     public virtual DbSet<Department> Departments { get; set; }
-    public virtual DbSet<OrganizationType> OrganizationTypes { get; set; }
+    public virtual DbSet<OrgType> OrgTypes { get; set; }
     public virtual DbSet<Plan> Plans { get; set; }
     public virtual DbSet<EvaluationRequest> EvaluationRequests { get; set; }
     public virtual DbSet<PlanStatus> PlanStatuses { get; set; }
@@ -79,6 +79,7 @@ public partial class EvaluationDbContext : DbContext
     public virtual DbSet<SystemModule> SystemModules { get; set; }
     public virtual DbSet<ModuleType> ModuleTypes { get; set; }
     public virtual DbSet<UiControl> UiControls { get; set; }
+    public virtual DbSet<OrgClass> OrgClass { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {

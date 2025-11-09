@@ -7,9 +7,9 @@ public class Employee : OrgTree
 {
     public string EmployeeNo { get; set; } = null!;
     public string Gender { get; set; } = null!;
-    public DateTime BirthDate { get; set; }
-    public string Nationality { get; set; }=null!;
-    public DateTime JoinDate { get; set; }
+    public DateOnly BirthDate { get; set; }
+    public string NationalityCode { get; set; }=null!;
+    public DateOnly JoinDate { get; set; }
     public string JobTitle { get; set; } = null!;
     //public Guid OrganizationId { get; set; }
     //public Organization? Organization { get; set; }
