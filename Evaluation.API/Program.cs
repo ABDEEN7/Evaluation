@@ -19,6 +19,8 @@ if (IsKeyVault)
 
     ClsAppSetting.AllowWebCorsOnly = builder.Configuration["baseAppUrl"] ?? "";
 
+    ClsAppSetting.OracleDBConnection = builder.Configuration["OracleDBConnection"] ?? "";
+
 }
 else
 {
@@ -42,7 +44,6 @@ else
     ClsAppSetting.AllowWebCorsOnly = builder.Configuration.GetSection("AppSettings:baseAppUrl").Value!.Replace("/{lang}", "") ?? "";
     ClsAppSetting.BaseApiUrl = builder.Configuration.GetSection("AppSettings:baseApiUrl").Value!.Replace("/{lang}", "") ?? "";
     ClsAppSetting.AllowAdminCorsOnly = builder.Configuration.GetSection("AppSettings:baseAdminUrl").Value!.Replace("/{lang}", "") ?? "";
-
 }
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
