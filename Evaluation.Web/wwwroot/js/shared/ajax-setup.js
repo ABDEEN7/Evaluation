@@ -68,7 +68,7 @@ const handleAjaxError = (jqXHR, textStatus, errorThrown, redirectUrl = false) =>
     if (uiControlsSetup().AnyUiBackendLabel(message)) {
         notificationUtil.error(uiControlsSetup().GetUiControlText(message));
     } else {
-        notificationUtil.error(message);
+        //notificationUtil.error(message);
     }
 };
 
@@ -76,11 +76,13 @@ const handleAjaxError = (jqXHR, textStatus, errorThrown, redirectUrl = false) =>
 // Default jQuery AJAX Setup
 // --------------------------------------------
 $.ajaxSetup({
+
     cache: false,
     contentType: 'application/json',
     dataType: 'json',
 
-    beforeSend: (xhr, options) => {
+        beforeSend: (xhr, options) => {
+            try {
         activeAjaxRequests++;
         showSpinner();
 
@@ -89,7 +91,11 @@ $.ajaxSetup({
             : decodeURIComponent(sharedUtility().BaseApiUrl());
 
         options.url = baseUrl + options.url;
-        options.headers = sharedUtility().SharedHeader();
+                options.headers = sharedUtility().SharedHeader();
+
+                console.log('>> AJAX', options.type || options.method, options.url, options.headers);
+            } catch (e) { console.error(e); return false; }
+        
     },
 
     success: handleAjaxSuccess,
@@ -99,5 +105,9 @@ $.ajaxSetup({
         hideSpinner();
     },
 
-    error: handleAjaxError
-});
+        error: handleAjaxError
+
+    });
+
+
+

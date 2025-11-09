@@ -3,6 +3,7 @@ using Evaluation.API.Models;
 using Evaluation.Services.BusinessLayer;
 using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Helper;
+using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Api.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,15 +14,17 @@ namespace Evaluation.API.Controllers
 
     [ApiController]
     [Route("api/[controller]")]
-    public class AccountController : Controller
+    public class AccountController : ControllerBase
     {
         private readonly MasterBL masterBL;
         private readonly RequestInfo requestInfo;
+        private readonly UserInfo userInfo;
 
         public AccountController(MasterBL masterBL, RequestInfo requestInfo, UserInfo userInfo)
         {
             this.masterBL = masterBL;
             this.requestInfo = requestInfo;
+            this.userInfo = userInfo;
         }
 
         [HttpPost("Login")]
@@ -39,19 +42,21 @@ namespace Evaluation.API.Controllers
             };
             return response;
         }
-        [HttpPost]
-        public async Task<IActionResult> CheckUserAuth([FromForm] string username)
+
+		[HttpPost("CheckUserAuth")]
+		public async Task<IActionResult> CheckUserAuth([FromQuery] string username)
         {
             try
             {
-                var redirectUrl = await masterBL.GetApiService<AuthenticationBL>().CheckUserAuth(username);
+				
+				var redirectUrl = await masterBL.GetApiService<AuthenticationBL>().CheckUserAuth(username);
                 return Ok(redirectUrl);
             }
             catch (BusinessException ex)
             {
                 return BadRequest(ex.Message);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 return StatusCode(500, "An unexpected error occurred.");
             }
