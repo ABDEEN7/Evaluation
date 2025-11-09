@@ -14,42 +14,42 @@ namespace Evaluation.API.Middlewares
             _logger = logger;
         }
 
-        public async Task InvokeAsync(HttpContext context, RequestInfo requestInfo)
+        public async Task InvokeAsync(HttpContext context/*, RequestInfo requestInfo*/)
         {
             var segments = context.Request.Path.Value.Split('/');
-            requestInfo.Lang = context.Request.Headers?.TryGetValue("lang", out var requestLang) == true
-                ? requestLang.ToString()
-                : "ar";
+            //requestInfo.Lang = context.Request.Headers?.TryGetValue("lang", out var requestLang) == true
+            //    ? requestLang.ToString()
+            //    : "ar";
 
-            // Set page number from body (if POST/PUT) or query string
-            if (context.Request.Method == HttpMethods.Post || HttpMethods.Put.Equals(context.Request.Method))
-            {
-                requestInfo.PageNumber = await GetPageNumberFromBody(context) ?? GetPageNumberFromQuery(context);
-            }
-            else
-            {
-                requestInfo.PageNumber = GetPageNumberFromQuery(context);
-            }
+            //// Set page number from body (if POST/PUT) or query string
+            //if (context.Request.Method == HttpMethods.Post || HttpMethods.Put.Equals(context.Request.Method))
+            //{
+            //    requestInfo.PageNumber = await GetPageNumberFromBody(context) ?? GetPageNumberFromQuery(context);
+            //}
+            //else
+            //{
+            //    requestInfo.PageNumber = GetPageNumberFromQuery(context);
+            //}
 
-            // Set User-Agent from request headers
-            requestInfo.UserAgent = context.Request.Headers?["User-Agent"].FirstOrDefault() ?? "Unknown";
+            //// Set User-Agent from request headers
+            //requestInfo.UserAgent = context.Request.Headers?["User-Agent"].FirstOrDefault() ?? "Unknown";
 
-            // Get the user IP address
-            requestInfo.UserIp = context.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
+            //// Get the user IP address
+            //requestInfo.UserIp = context.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
 
-            // Get controller and action from route values
-            requestInfo.Controller = context.GetRouteValue("controller")?.ToString() ?? "Unknown";
-            requestInfo.Action = context.GetRouteValue("action")?.ToString() ?? "Unknown";
+            //// Get controller and action from route values
+            //requestInfo.Controller = context.GetRouteValue("controller")?.ToString() ?? "Unknown";
+            //requestInfo.Action = context.GetRouteValue("action")?.ToString() ?? "Unknown";
 
-            // Retrieve the Authorization header and check if it exists
-            var authHeader = context.Request.Headers?["Authorization"].FirstOrDefault();
+            //// Retrieve the Authorization header and check if it exists
+            //var authHeader = context.Request.Headers?["Authorization"].FirstOrDefault();
 
-            // If the header is null or doesn't start with "Bearer ", handle it appropriately
-            if (!string.IsNullOrEmpty(authHeader) && authHeader.StartsWith("Bearer "))
-            {
-                var currentToken = authHeader.Replace("Bearer ", "");
-                requestInfo.Token = currentToken;
-            }
+            //// If the header is null or doesn't start with "Bearer ", handle it appropriately
+            //if (!string.IsNullOrEmpty(authHeader) && authHeader.StartsWith("Bearer "))
+            //{
+            //    var currentToken = authHeader.Replace("Bearer ", "");
+            //    requestInfo.Token = currentToken;
+            //}
 
             //_logger.LogInformation($"RequestContext: Lang={requestContext.Lang}, Page={requestContext.PageNumber}, UserAgent={requestContext.UserAgent}, UserIp={requestContext.UserIp}");
 

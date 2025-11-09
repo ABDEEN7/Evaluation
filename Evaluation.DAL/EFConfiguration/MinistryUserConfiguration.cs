@@ -8,12 +8,19 @@ namespace Evaluation.DAL.EFConfiguration
     {
         public void Configure(EntityTypeBuilder<MinistryUser> builder)
         {
+			builder.ToTable("MinistryUsers");
+			builder.HasKey(x => x.Id);
+
             builder.HasOne(c => c.CreateBy).WithMany().HasForeignKey(y => y.CreateById).IsRequired(false);
 
             builder.HasOne(c => c.UpdateBy).WithMany().HasForeignKey(c => c.UpdateById);
 
             builder.HasOne(c => c.DeleteBy).WithMany().HasForeignKey(c => c.DeleteById).IsRequired(false);
-        }
+
+			// Indexes
+			builder.HasIndex(x => x.Email).IsUnique();
+			builder.HasIndex(x => x.QID).IsUnique();
+		}
     }
 }
 

@@ -147,7 +147,23 @@ namespace Evaluation.Services.Special
 
             return results;
         }
+        public async Task<WebAppConfigsResponse> GetWebAppConfigs(WebAppConfigsRequest model)
+        {
+            var WebAppConfigs = new WebAppConfigsResponse();
 
+            WebAppConfigs.UiControls.Clear();
+            WebAppConfigs.SystemSettings.Clear();
+
+            var uiControlsTasks = GetUiControlsByPageNames(model.pageNames!, model.lang!);
+            var systemSettingsTasks = GetSystemSettings(model.keys!);
+            //var permissionsTasks = GetUserPagePermissions(model.pageNames);
+            //  await Task.WhenAll(uiControlsTasks, systemSettingsTasks);
+
+            WebAppConfigs.UiControls = await uiControlsTasks;
+            WebAppConfigs.SystemSettings = await systemSettingsTasks;
+            //WebAppConfigs.Permissions = await permissionsTasks;
+            return WebAppConfigs;
+        }
 
         //public async Task<IList<ActionStatusConfiguration>> GetActionStatusConfiguration()
         //{

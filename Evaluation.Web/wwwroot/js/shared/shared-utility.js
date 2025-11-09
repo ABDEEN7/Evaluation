@@ -7,15 +7,15 @@ const sharedUtility = () => {
 
         if (isMultipart)
             return {
-                "Authorization": "Bearer " + GetLocalStorageValue(LocalStorageKeys.Token),
-                "type": GetLocalStorageValue(LocalStorageKeys.Type),
+                "Authorization": "Bearer " + "",// GetLocalStorageValue(LocalStorageKeys.Token),
+                "type": "",// GetLocalStorageValue(LocalStorageKeys.Type),
                 'lang': getCookie('lang') ? getCookie('lang') : 'en'
             }
 
         else
             return {
-                "Authorization": "Bearer " + GetLocalStorageValue(LocalStorageKeys.Token),
-                "type": GetLocalStorageValue(LocalStorageKeys.Type),
+                "Authorization": "Bearer " + "",// GetLocalStorageValue(LocalStorageKeys.Token),
+                "type": "",//GetLocalStorageValue(LocalStorageKeys.Type),
                 'Content-Type': 'application/json',
                 'lang': getCookie('lang') ? getCookie('lang') : 'en'
             }

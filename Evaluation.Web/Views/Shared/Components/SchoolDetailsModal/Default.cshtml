@@ -100,10 +100,22 @@
 
 <script type="text/javascript">
 
-        $('#@modalId').on('shown.bs.modal', async function () {
-      console.log('Modal is ready!');
-    await initSchoolDetailsPage("ecd11007-2ff6-42cb-bca2-b168de94afbc");
+    //     $('#@modalId').on('shown.bs.modal', async function () {
+    //   console.log('Modal is ready!');
+    //      const button = event.relatedTarget; // The link that triggered the modal
+    // const schoolId = button.getAttribute('data-id');
+    // await initSchoolDetailsPage(schoolId);
+    // $("#exampleModalLabel").text(schoolDetails.nameAr);
+
+    //     });
+
+
+            $(document).on('click', 'a[data-bs-target="#schoolDetailsModal"]',async function() {
+        let schoolId = $(this).attr('data-id');
+        console.log(schoolId);
+            await initSchoolDetailsPage(schoolId);
     $("#exampleModalLabel").text(schoolDetails.nameAr);
 
-        });
+    });
+
 </script>

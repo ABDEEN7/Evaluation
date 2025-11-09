@@ -4,7 +4,7 @@ namespace Evaluation.DAL.Entities.Org;
 
 public class School : OrgTree
 {
-    public DateTime EstablishmentDate { get; set; }
+    public DateOnly EstablishmentDate { get; set; }
     public string? Address { get; set; }
     public string Code { get; set; } = null!;
     public string? Region { get; set; }

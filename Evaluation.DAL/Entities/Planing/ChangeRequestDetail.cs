@@ -5,9 +5,9 @@ namespace Evaluation.DAL.Entities.Planing;
 
 public class ChangeRequestDetail : EntityBase
 {
-    public int ChangeRequestId { get; set; }
+    public Guid ChangeRequestId { get; set; }
     public ChangeRequest ChangeRequest { get; set; } = new();
-    public int SchoolId { get; set; }
+    public Guid SchoolId { get; set; }
     public School? School { get; set; }
     //public DateTime ScheduledDate { get; set; }
     public  string Reason { get; set; } = null!;
