@@ -45,66 +45,64 @@ internal class Program
             ClsAppSetting.FormJwtConfigKey = config.GetSection("FormJwtConfig:Key").Value ?? "";
             ClsAppSetting.AllowWebCorsOnly = config.GetSection("AppSettings:baseAppUrl").Value!.Replace("/{lang}", "") ?? "";
             ClsAppSetting.BaseApiUrl = config.GetSection("AppSettings:baseApiUrl").Value!.Replace("/{lang}", "") ?? "";
-            ClsAppSetting.AllowAdminCorsOnly = config.GetSection("AppSettings:baseAdminUrl").Value!.Replace("/{lang}", "") ?? "";
-        }
 
-        // -------------------------------------
-        // 2️⃣ Add Core Services
-        // -------------------------------------
-        builder.Services.AddHttpContextAccessor();
-        builder.Services.AddControllers()
-            .AddJsonOptions(options =>
-            {
-                options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
-                options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-            });
-
-        builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddDistributedMemoryCache();
-        //builder.Services.AddDataProtection(); // ✅ Required for session encryption
-
-        builder.Services.AddSession(options =>
-        {
-            options.IdleTimeout = TimeSpan.FromMinutes(30);
-            options.Cookie.HttpOnly = true;
-            options.Cookie.IsEssential = true;
-        });
-
-        builder.Services.ConfigureSession(config, 30);
-        builder.Services.ConfigureUserInfo(config);
-        builder.Services.ConfigureRequestInfo(config);
-        builder.Services.PopulateAppSettings(config);
-        builder.Services.ConfigureMasterBL(config, builder.Environment.IsDevelopment());
-        builder.Services.AddScoped<TokenValidationFilter>();
-
-        // -------------------------------------
-        // 3️⃣ Register DbContext
-        // -------------------------------------
-        builder.Services.AddDbContext<EvaluationDbContext>(options =>
-            options.UseSqlServer(config.GetConnectionString("EvaluationDBConn")));
-
-        // -------------------------------------
-        // 4️⃣ Mapster Mapper Registration
-        // -------------------------------------
-        var mapsterConfig = TypeAdapterConfig.GlobalSettings;
-        builder.Services.AddSingleton(mapsterConfig);
-        builder.Services.AddScoped<IMapper, Mapper>();
-
-        builder.Services.AddSwaggerGen(c =>
-        {
-            c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
-
-            // Define the BearerAuth security scheme
-            c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-            {
-                Description = "JWT Authorization header using the Bearer scheme. Enter 'Bearer' [space] and then your token in the text input below.",
-                Name = "Authorization",
-                In = ParameterLocation.Header,
-                Type = SecuritySchemeType.ApiKey,
-                Scheme = "Bearer"
-            });
-            c.AddSecurityRequirement(new OpenApiSecurityRequirement
+            // -------------------------------------
+            // 2️⃣ Add Core Services
+            // -------------------------------------
+            builder.Services.AddHttpContextAccessor();
+            builder.Services.AddControllers()
+                .AddJsonOptions(options =>
                 {
+                    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+                    options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+                });
+
+            builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddDistributedMemoryCache();
+            //builder.Services.AddDataProtection(); // ✅ Required for session encryption
+
+            builder.Services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromMinutes(30);
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
+            });
+
+            builder.Services.ConfigureSession(config, 30);
+            builder.Services.ConfigureUserInfo(config);
+            builder.Services.ConfigureRequestInfo(config);
+            builder.Services.PopulateAppSettings(config);
+            builder.Services.ConfigureMasterBL(config, builder.Environment.IsDevelopment());
+            builder.Services.AddScoped<TokenValidationFilter>();
+
+            builder.Services.AddScoped<TokenValidationFilter>();
+
+            // -------------------------------------
+            // 3️⃣ Register DbContext
+            // -------------------------------------
+            builder.Services.AddDbContext<EvaluationDbContext>(options =>
+                options.UseSqlServer(config.GetConnectionString("EvaluationDBConn")));
+
+            // -------------------------------------
+            // 4️⃣ Mapster Mapper Registration
+            // -------------------------------------
+            var mapsterConfig = TypeAdapterConfig.GlobalSettings;
+
+            builder.Services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
+
+                // Define the BearerAuth security scheme
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Description = "JWT Authorization header using the Bearer scheme. Enter 'Bearer' [space] and then your token in the text input below.",
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = "Bearer"
+                });
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                    {
                     {
                         new OpenApiSecurityScheme
                         {
@@ -116,77 +114,75 @@ internal class Program
                         },
                         Array.Empty<string>()
                     }
+                    });
+            });
+
+            //// -------------------------------------
+            //// 5️⃣ CORS and Auth Policies
+            //// -------------------------------------
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowWebAndAdmin", policy =>
+                {
+                    policy.WithOrigins(ClsAppSetting.AllowWebCorsOnly, ClsAppSetting.AllowAdminCorsOnly)
+                          .AllowAnyHeader()
+                          .AllowAnyMethod()
+                          .WithExposedHeaders("Content-Disposition", "newToken", "expiryDateTime", "expirationTime");
                 });
-
-            c.CustomSchemaIds(x => x.FullName);
-        });
-
-        //// -------------------------------------
-        //// 5️⃣ CORS and Auth Policies
-        //// -------------------------------------
-        builder.Services.AddCors(options =>
-        {
-            options.AddPolicy("AllowWebAndAdmin", policy =>
-            {
-                policy.WithOrigins(ClsAppSetting.AllowWebCorsOnly, ClsAppSetting.AllowAdminCorsOnly)
-                      .AllowAnyHeader()
-                      .AllowAnyMethod()
-                      .WithExposedHeaders("Content-Disposition", "newToken", "expiryDateTime", "expirationTime");
             });
-        });
 
-        builder.Services.AddAuthorization(options =>
-        {
-            //options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
-        });
-
-        // -------------------------------------
-        // 6️⃣ Build the App
-        // -------------------------------------
-        var app = builder.Build();
-
-        // -------------------------------------
-        // 7️⃣ Middlewares (correct order)
-        // -------------------------------------
-        app.UseMiddleware<SecurityLayerMiddleware>();
-        app.UseMiddleware<ExceptionHandlingMiddleware>();
-
-        if (app.Environment.IsDevelopment())
-        {
-            app.UseSwagger();
-            app.UseSwaggerUI(c =>
+            builder.Services.AddAuthorization(options =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
-                c.OAuthUsePkce();
+                //options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
             });
-        }
 
-        app.UseHttpsRedirection();
-        app.UseStaticFiles(new StaticFileOptions
-        {
-            ContentTypeProvider = new FileExtensionContentTypeProvider
+            // -------------------------------------
+            // 6️⃣ Build the App
+            // -------------------------------------
+            var app = builder.Build();
+
+            // -------------------------------------
+            // 7️⃣ Middlewares (correct order)
+            // -------------------------------------
+            app.UseMiddleware<SecurityLayerMiddleware>();
+            app.UseMiddleware<ExceptionHandlingMiddleware>();
+
+            if (app.Environment.IsDevelopment())
             {
-                Mappings = { [".css"] = "text/css" }
+                app.UseSwagger();
+                app.UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+                    c.OAuthUsePkce();
+                });
             }
-        });
 
-        app.UseRouting();
+            app.UseHttpsRedirection();
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                ContentTypeProvider = new FileExtensionContentTypeProvider
+                {
+                    Mappings = { [".css"] = "text/css" }
+                }
+            });
 
-        app.UseSession(); // ✅ Must be after UseRouting
 
-        app.UseCors("AllowWebAndAdmin");
-        app.UseAuthentication();
-        app.UseAuthorization();
+            app.UseSession(); // ✅ Must be after UseRouting
 
-        app.UseMiddleware<PopulateUserInfoMiddleware>();
-        app.UseMiddleware<PopulateRequestInfoMiddleware>();
+            app.UseCors("AllowWebAndAdmin");
+            app.UseAuthentication();
+            app.UseAuthorization();
 
-        app.MapControllers();
+            app.UseMiddleware<PopulateUserInfoMiddleware>();
+            app.UseMiddleware<PopulateRequestInfoMiddleware>();
 
-        app.MapControllerRoute(
-            name: "default",
-            pattern: "api/{controller=Home}/{action=Index}/{id?}");
+            app.MapControllers();
 
-        app.Run();
+            app.MapControllerRoute(
+                name: "default",
+                pattern: "api/{controller=Home}/{action=Index}/{id?}");
+
+            app.Run();
+        }
     }
 }
