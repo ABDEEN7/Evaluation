@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace Evaluation.SharedHelper.Enums;
 
-namespace Evaluation.SharedHelper.Enums
-{
 #pragma warning disable S3218, S101
     public static class ConstantKeys
     {
@@ -162,6 +156,25 @@ namespace Evaluation.SharedHelper.Enums
         public static class WebAppSettings
         {
         }
+    public static class WebAppCommon
+        {
+        }
+	public static class WebAppLoginPage
+		{
+			public static readonly string lblEmail = "lblEmail";
+			public static readonly string lblPassword = "lblPassword";
+			public static readonly string lblContinue = "lblContinue";
+			public static readonly string lblBackToEmail = "lblBackToEmail";
+			public static readonly string lblLoginBtn = "lblLoginBtn";
+			public static readonly string lblLoginTitle = "lblLoginTitle";
+			public static readonly string lblForgotPasswordQuestion = "lblForgotPasswordQuestion";
+			public static readonly string lblMobileResetPassword = "lblMobileResetPassword";
+			public static readonly string lblRegisterNewAccount = "lblRegisterNewAccount";
+		}
 
+    public static class LanguageConst
+    {
+        public static readonly string En = "En";
+        public static readonly string Ar = "Ar";
     }
 }

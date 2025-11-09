@@ -1,12 +1,14 @@
 ﻿using Evaluation.DAL.Context;
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.UnitOfWork;
+using Evaluation.Services.BusinessLayer;
 using Evaluation.Services.BusinessLayer.API;
 using Evaluation.Services.Models.Admin;
 using Evaluation.Services.Models.JWT;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Models;
+using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,6 +17,7 @@ using System.Net;
 using System.Reflection;
 
 namespace Evaluation.Services.Extensions;
+
 
 public static class ServiceExtensions
 {
@@ -57,11 +60,13 @@ public static class ServiceExtensions
             });
 
         services.AddScoped<LoggingServices>();
-
+        services.AddScoped<IMapper, Mapper>();
+        services.AddScoped<ISmsServices, SmsServices>();
         services.AddScoped<ResponseInfo>();
 
         services.Configure<AzureADConfig>(config.GetSection("AzureADConfig"));
         services.Configure<FormJwtConfig>(config.GetSection("FormJwtConfig"));
+        //services.Configure<CenterServicesConfig>(config.GetSection("CenterServicesConfig"));
 
         services.AddScoped(sp =>
         {
@@ -92,15 +97,21 @@ public static class ServiceExtensions
             .AsSelf()
             .WithScopedLifetime());
 
-      
-
         services.Scan(scan => scan
             .FromAssemblies(typeof(ApiBase).GetTypeInfo().Assembly)
             .AddClasses(classes => classes.Where(x => x.IsSubclassOf(typeof(ApiBase))))
             .AsSelf()
             .WithScopedLifetime());
 
-       
+        services.Scan(scan => scan
+            .FromAssemblies(typeof(ApiServiceBase).GetTypeInfo().Assembly)
+            .AddClasses(classes => classes.Where(x => x.IsSubclassOf(typeof(ApiServiceBase))))
+            .AsSelf()
+            .WithScopedLifetime());
+
+        services.AddScoped<MSJsonWT>();
+
+        services.AddScoped<ISmsServices, SmsServices>();
 
 
     }
@@ -120,11 +131,10 @@ public static class ServiceExtensions
         return uow;
     }
 
+        services.AddScoped<CacheDataProvider>();
+        services.AddScoped<AzureBlobStorageService>();
 
-    public static void ConfigureUserInfo(this IServiceCollection services, IConfiguration configuration)
-    {
-        services.AddScoped<UserInfo>();
-    }
+        services.AddScoped<MasterBL>();
 
     public static void ConfigureRequestInfo(this IServiceCollection services, IConfiguration configuration)
     {

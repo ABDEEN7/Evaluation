@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Evaluation.DAL.EFConfiguration;
 
-internal class PlanScheduleConfiguration : IEntityTypeConfiguration<PlanSchedule>
+internal class PlanScheduleConfiguration : IEntityTypeConfiguration<EvaluationRequest>
 {
-    public void Configure(EntityTypeBuilder<PlanSchedule> builder)
+    public void Configure(EntityTypeBuilder<EvaluationRequest> builder)
     {
         builder.HasOne(x => x.Plan)
             .WithMany()
@@ -15,6 +15,5 @@ internal class PlanScheduleConfiguration : IEntityTypeConfiguration<PlanSchedule
         builder.HasOne(x => x.School)
             .WithMany()
             .HasForeignKey(x => x.SchoolId);
-
     }
 }

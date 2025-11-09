@@ -1,5 +1,6 @@
 ﻿using Evaluation.Web.Special;
 using System.Globalization;
+using System.Net;
 
 namespace Evaluation.Web.Middlewares
 {
@@ -16,6 +17,7 @@ namespace Evaluation.Web.Middlewares
 
         public async Task InvokeAsync(HttpContext context)
         {
+            SetWebApiBaseURL(context);
             SetWebAppBaseURL(context);
             SetLanguage(context);
             await _next(context);
@@ -41,14 +43,15 @@ namespace Evaluation.Web.Middlewares
 
         }
 
-        private void SetWebApiBaseURL(HttpContext context)
-        {
-            var cookieService = context.RequestServices.GetRequiredService<CookieServices>();
+		private void SetWebApiBaseURL(HttpContext context)
+		{
+			var cookieService = context.RequestServices.GetRequiredService<CookieServices>();
+			var url = config.GetValue<string>("baseApiUrl");
+			if (string.IsNullOrWhiteSpace(url)) return;
+			cookieService.SetCookie("webApiBaseURL", url);
+		}
 
-            cookieService.SetCookie("webApiBaseURL", config.GetValue<string>("baseApiUrl"));
-        }
-
-        private void SetLanguage(HttpContext context)
+		private void SetLanguage(HttpContext context)
         {
             var cookieService = context.RequestServices.GetRequiredService<CookieServices>();
 

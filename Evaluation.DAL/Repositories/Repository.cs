@@ -17,7 +17,7 @@ public class Repository<T>(DbContext context, UserInfo userInfo) : RepositoryBas
         Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null,
         int? pageNumber = 0, int? pageSize = 0, params Expression<Func<T, object>>?[]? includeProperties)
     {
-        IQueryable<T> query = _dbSet.IgnoreQueryFilters().Where(x => x.IsDeleted==false && x.IsActive==true);
+        IQueryable<T> query = _dbSet.IgnoreQueryFilters().Where(x => x.IsDeleted == false && x.IsActive == true);
         if (includeProperties != null)
             foreach (var item in includeProperties)
                 if (item != null)
