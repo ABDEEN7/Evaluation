@@ -1,4 +1,4 @@
-﻿using Evaluation.DAL.Entities.Planing;
+﻿using Evaluation.DAL.Entities.Planing.EvaluationRequestEntity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -12,8 +12,8 @@ internal class PlanScheduleConfiguration : IEntityTypeConfiguration<EvaluationRe
             .WithMany()
             .HasForeignKey(x => x.PlanId);
 
-        builder.HasOne(x => x.School)
+        builder.HasOne(x => x.OrgTree)
             .WithMany()
-            .HasForeignKey(x => x.SchoolId);
+            .HasForeignKey(x => x.OrgTreeId);
     }
 }

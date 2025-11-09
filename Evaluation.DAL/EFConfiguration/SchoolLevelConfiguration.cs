@@ -13,9 +13,9 @@ public class SchoolLevelConfiguration : IEntityTypeConfiguration<SchoolLevel>
             .WithMany()
             .HasForeignKey(x => x.SchoolId);
         builder
-            .HasOne(x => x.Level)
+            .HasOne(x => x.EducationLevel)
             .WithMany()
-            .HasForeignKey(x => x.LevelId);
+            .HasForeignKey(x => x.EducationLevelId);
 
     }
 }
