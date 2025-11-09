@@ -85,11 +85,17 @@ internal class Program
             options.Filters.Add<PopulateRequestInfoFilter>(); // Register globally
             options.Filters.Add<PopulateResponseInfoFilter>(); // Register globally
         });
+        builder.Services.AddSession(options =>
+        {
+            options.IdleTimeout = TimeSpan.FromMinutes(30);
+            options.Cookie.HttpOnly = true;
+            options.Cookie.IsEssential = true;
+        });
         builder.Services.ConfigureSession(config, 30);
         builder.Services.ConfigureAzureADServices(config);
         builder.Services.ConfigureUserInfo(config);
         builder.Services.ConfigureRequestInfo(config);
-        //builder.Services.PopulateAppSettings(config);
+        builder.Services.PopulateAppSettings(config);
         builder.Services.ConfigureMasterBL(config, builder.Environment.IsDevelopment());
         builder.Services.AddAutoMapper(typeof(Profile));
 
