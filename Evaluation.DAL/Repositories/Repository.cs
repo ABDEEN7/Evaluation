@@ -212,6 +212,13 @@ public class Repository<T>(DbContext context, UserInfo userInfo) : RepositoryBas
 
         return true;
     }
+    public async Task<T?> GetByIdAsync(Guid? id)
+    {
+        T? query = await _dbSet.Where(x => x.Id == id).FirstAsync();
+        //if (query is null)
+        //    throw new Exception();
+        return query;
+    }
     #endregion
 
     #region Audit
