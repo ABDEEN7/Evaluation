@@ -1,22 +1,21 @@
 using System.Net.Mail;
 using System.Text.RegularExpressions;
+using Evaluation.DAL.Entities.Website;
+using Evaluation.DAL.UnitOfWork;
+using Evaluation.Services.Special;
+using Evaluation.SharedHelper;
+using Evaluation.SharedHelper.Enums;
+using Evaluation.SharedHelper.Exceptions;
+using Evaluation.SharedHelper.Models;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
-using Scholarship.DAL.Framework;
-using Scholarship.DAL.Models.FormBuilder;
-using Scholarship.DAL.Models.Website;
-using Scholarship.Services.Extensions;
-using Scholarship.Services.Special;
-using Scholarship.Services.Special.Storage;
-using Scholarship.SharedHelper.Enums;
-using Scholarship.SharedHelper.Exceptions;
-using Scholarship.SharedHelper.Models;
-using Xceed.Document.NET;
-using Xceed.Words.NET;
+using Scholarship.Services.BusinessLayer.API.Template;
 
-namespace Scholarship.Services.BusinessLayer.API.Template.SubServices;
 
-    public class TemplateService(UnitOfWork uow, RequestInfo requestInfo,
+namespace Evaluation.Services.BusinessLayer.API.Template
+
+
+	public class TemplateService(UnitOfWork uow, RequestInfo requestInfo,
         AzureBlobStorageService blobService, IServiceProvider serviceProvider, PlaceholderService placeholderService,
         CacheDataProvider cacheDataProvider)
         : ApiServiceBase

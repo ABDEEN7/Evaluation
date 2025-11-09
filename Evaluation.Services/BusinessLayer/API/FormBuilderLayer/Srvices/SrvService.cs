@@ -1,25 +1,15 @@
-﻿using AutoMapper;
+﻿using Evaluation.DAL.Entities.ActionEntities;
+using Evaluation.DAL.Entities.Authentication;
+using Evaluation.DAL.Entities.ServicesEntities;
+using Evaluation.DAL.UnitOfWork;
+using Evaluation.Services.Special;
+using Evaluation.SharedHelper;
+using Evaluation.SharedHelper.Exceptions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
-using Scholarship.DAL.Framework;
-using Scholarship.DAL.Models.ActionEntities;
-using Scholarship.DAL.Models.Base;
-using Scholarship.DAL.Models.PartyTypeEntities;
-using Scholarship.DAL.Models.ScholarshipEntity;
-using Scholarship.DAL.Models.ServiceRequestEntities;
-using Scholarship.DAL.Models.ServicesEntities;
-using Scholarship.DAL.Models.SystemModulesEntities;
-using Scholarship.Services.Extensions;
-using Scholarship.Services.Models;
-using Scholarship.Services.Models.API;
-using Scholarship.Services.Special;
-using Scholarship.SharedHelper.Exceptions;
-using Scholarship.SharedHelper.Models;
-using Scholarship.SharedHelper.Models.Api;
-using Scholarship.SharedHelper.Models.Api.ScholarShipsDTO;
-using Scholarship.SharedHelper.Models.Api.ServiceDTOs;
-using static Scholarship.SharedHelper.Enums.ConstantKeys;
+using static Evaluation.SharedHelper.Enums.ConstantKeys;
+
 
 namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 {
@@ -282,7 +272,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
            using var scope = serviceScopeFactory.CreateScopedUow();
            using var scope1 = serviceScopeFactory.CreateScopedUow();
 
-                var userTask = scope.GetRepository<UserProfile>()
+                var userTask = scope.GetRepository<MinistryUser>()
                                     .GetAllQueryFiltered()?
                                     .Include(x=>x.UserPartTypes)
                                     .FirstAsync(c => c.Id == userInfo.UserId);

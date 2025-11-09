@@ -1,14 +1,11 @@
-﻿using AutoMapper;
+﻿using Evaluation.DAL.Entities.Authentication;
+using Evaluation.DAL.Entities.SystemModulesEntities;
+using Evaluation.DAL.UnitOfWork;
+using Evaluation.Services.Special;
+using Evaluation.SharedHelper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Scholarship.DAL.Framework;
-using Scholarship.DAL.Models.Base;
-using Scholarship.DAL.Models.SystemModulesEntities;
-using Scholarship.Services.Extensions;
-using Scholarship.Services.Models.API;
-using Scholarship.Services.Special;
-using Scholarship.SharedHelper.Models;
-using Scholarship.SharedHelper.Models.Api.SystemModulesDTOs;
+
 
 namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 {

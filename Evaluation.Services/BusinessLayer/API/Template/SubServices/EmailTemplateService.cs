@@ -1,14 +1,13 @@
+using Evaluation.DAL.Entities.Attachments;
+using Evaluation.DAL.Entities.ServicesEntities;
+using Evaluation.Services.Special;
+using Evaluation.SharedHelper;
+using Evaluation.SharedHelper.Enums;
+using Evaluation.SharedHelper.Exceptions;
 using Microsoft.EntityFrameworkCore;
-using Scholarship.DAL.Models.Attachments;
-using Scholarship.DAL.Models.ServiceRequestEntities;
-using Scholarship.DAL.Models.ServicesEntities;
-using Scholarship.DAL.Models.Templates;
-using Scholarship.Services.Extensions;
-using Scholarship.Services.Special.Storage;
-using Scholarship.SharedHelper.Enums;
-using Scholarship.SharedHelper.Exceptions;
 
-namespace Scholarship.Services.BusinessLayer.API.Template.SubServices
+
+namespace Evaluation.Services.BusinessLayer.API.Template
 {
     public class EmailTemplateService(
         TemplateService templateService,

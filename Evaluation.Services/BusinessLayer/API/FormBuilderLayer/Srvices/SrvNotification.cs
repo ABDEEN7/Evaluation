@@ -1,25 +1,12 @@
-﻿using AutoMapper;
+﻿using Evaluation.DAL.Entities.ActionEntities;
+using Evaluation.DAL.Entities.Attachments;
+using Evaluation.DAL.Entities.Authentication;
+using Evaluation.DAL.UnitOfWork;
+using Evaluation.Services.Special;
+using Evaluation.SharedHelper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Scholarship.DAL.Framework;
-using Scholarship.DAL.Models.ActionEntities;
-using Scholarship.DAL.Models.Attachments;
-using Scholarship.DAL.Models.Base;
-using Scholarship.DAL.Models.PartyTypeEntities;
-using Scholarship.DAL.Models.ScholarshipEntity;
-using Scholarship.DAL.Models.ServiceRequestEntities;
-using Scholarship.DAL.Models.Templates;
-using Scholarship.Services.BusinessLayer.API.Template;
-using Scholarship.Services.Extensions;
-using Scholarship.Services.Models;
-using Scholarship.Services.Models.API;
-using Scholarship.Services.Models.SMTP;
-using Scholarship.Services.Special;
-using Scholarship.SharedHelper.Enums;
-using Scholarship.SharedHelper.Exceptions;
-using Scholarship.SharedHelper.Models;
-using Spire.Doc;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+
 
 namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 {
@@ -33,7 +20,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             {
                 using var scopedUow = serviceScopeFactory.CreateScopedUow();
                 
-                var userProfileRepo = scopedUow.GetRepository<UserProfile>();
+                var userProfileRepo = scopedUow.GetRepository<MinistryUser>();
                 var partyTypeRepo = scopedUow.GetRepository<PartyType>();
                 var requestRepo = scopedUow.GetRepository<ServiceRequest>();
 
@@ -83,7 +70,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                 await scopedUow.CommitAsync();
             }
         }
-        private List<UserProfile> GetEmployeeRecipients( Guid serviceRequestId, Guid? requestCountryId, Guid? requestUniversityId, List<UserProfile> allUserProfiles, PartyType partyType)
+        private List<MinistryUser> GetEmployeeRecipients( Guid serviceRequestId, Guid? requestCountryId, Guid? requestUniversityId, List<MinistryUser> allUserProfiles, PartyType partyType)
         {
             var assignmentRepo = serviceScopeFactory.CreateScopedUow().GetRepository<RequestAssignment>();
 
@@ -122,14 +109,14 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                 .Select(g => g.First())
                 .ToList();
         }
-        private List<UserProfile> GetStudentRecipient(Guid? studentId, List<UserProfile> allUserProfiles)
+        private List<MinistryUser> GetStudentRecipient(Guid? studentId, List<MinistryUser> allUserProfiles)
         {
-            if (studentId == null) return new List<UserProfile>();
+            if (studentId == null) return new List<MinistryUser>();
 
             var student = allUserProfiles.FirstOrDefault(u => u.Id == studentId.Value);
-            return student != null ? new List<UserProfile> { student } : new List<UserProfile>();
+            return student != null ? new List<MinistryUser> { student } : new List<MinistryUser>();
         }
-        private async Task sendEmail( List<UserProfile> recipients,Guid emailTemplateId,ServiceRequest requestData,  Guid actionId, Guid? partyTypeId = null, string lang = "ar",string remarks = null!, List<Attachment> actionOtherAttachments = null!)
+        private async Task sendEmail( List<MinistryUser> recipients,Guid emailTemplateId,ServiceRequest requestData,  Guid actionId, Guid? partyTypeId = null, string lang = "ar",string remarks = null!, List<Attachment> actionOtherAttachments = null!)
         {
             using var scopedUow = serviceScopeFactory.CreateScopedUow();
 
@@ -208,7 +195,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                 }
             }
         }
-        private async Task SendSms(List<UserProfile> recipients, Guid smsTemplateId, ServiceRequest requestData, Guid actionId)
+        private async Task SendSms(List<MinistryUser> recipients, Guid smsTemplateId, ServiceRequest requestData, Guid actionId)
         {
             var lang = _requestInfo?.Lang ?? "ar";
 
@@ -252,7 +239,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
             await Task.WhenAll(tasks);
         }
-        private async Task SendNotification(List<UserProfile> recipients, Guid notificationTemplateId, ServiceRequest requestData, Guid actionId, string lang, Guid? partyTypeId = null)
+        private async Task SendNotification(List<MinistryUser> recipients, Guid notificationTemplateId, ServiceRequest requestData, Guid actionId, string lang, Guid? partyTypeId = null)
         {
             using var scopedUow = serviceScopeFactory.CreateScopedUow();
             var template = await scopedUow.GetRepository<NotificationTemplate>().GetByIDActiveNonDeleted(notificationTemplateId);

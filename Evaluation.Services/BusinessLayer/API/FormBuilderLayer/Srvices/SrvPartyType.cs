@@ -1,16 +1,11 @@
-﻿using AutoMapper;
+﻿using Evaluation.DAL.Entities.Authentication;
+using Evaluation.DAL.UnitOfWork;
+using Evaluation.Services.Special;
+using Evaluation.SharedHelper;
+using Evaluation.SharedHelper.Helper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Scholarship.DAL.Framework;
-using Scholarship.DAL.Models.Base;
-using Scholarship.DAL.Models.PartyTypeEntities;
-using Scholarship.Services.BusinessLayer.API.Scholarship;
-using Scholarship.Services.Extensions;
-using Scholarship.Services.Models.API;
-using Scholarship.Services.Special;
-using Scholarship.SharedHelper.Models;
-using Scholarship.SharedHelper.Models.Api;
-using Scholarship.SharedHelper.Models.Api.PartyTypeDTOs;
+
 
 
 namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
@@ -19,9 +14,9 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
            : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, _requestInfo)
         {
 
-        public async Task<List<PartyType>?> GetUserPartyTypeAsync()
+        public async Task<List<DAL.Entities.Authentication.PartyType>?> GetUserPartyTypeAsync()
         {
-            var UserPartyType= await serviceScopeFactory.CreateScopedUow().GetRepository<PartyType>()
+            var UserPartyType= await serviceScopeFactory.CreateScopedUow().GetRepository<DAL.Entities.Authentication.PartyType>()
                 .GetAllActiveNonDeleted()
                 .Include(pt => pt.PartyTypeCountyUniversity)
                 .Include(pt => pt.PartyTypeEntityContract)

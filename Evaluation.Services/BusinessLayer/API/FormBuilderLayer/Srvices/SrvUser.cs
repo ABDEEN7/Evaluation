@@ -1,29 +1,18 @@
-﻿using AutoMapper;
+﻿using Evaluation.DAL.Entities.Authentication;
+using Evaluation.DAL.Entities.UserEntiy;
+using Evaluation.DAL.UnitOfWork;
+using Evaluation.Services.Special;
+using Evaluation.SharedHelper;
+using Evaluation.SharedHelper.Enums;
+using Evaluation.SharedHelper.Exceptions;
 using FluentResults;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Scholarship.DAL.Framework;
-using Scholarship.DAL.Models.Base;
-using Scholarship.DAL.Models.Models;
-using Scholarship.DAL.Models.PartyTypeEntities;
-using Scholarship.DAL.Models.ScholarshipEntity;
-using Scholarship.DAL.Models.ServiceRequestEntities;
-using Scholarship.Services.BusinessLayer.API.Scholarship;
-using Scholarship.Services.Extensions;
-using Scholarship.Services.Models.API;
-using Scholarship.Services.Special;
-using Scholarship.SharedHelper.Enums;
-using Scholarship.SharedHelper.Exceptions;
-using Scholarship.SharedHelper.Models;
-using Scholarship.SharedHelper.Models.Api;
-using Scholarship.SharedHelper.Models.Api.MastersDTO;
-using Scholarship.SharedHelper.Models.Api.PartyTypeDTOs;
-using System.Diagnostics.Eventing.Reader;
-using static System.Formats.Asn1.AsnWriter;
+
 
 namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 {
-    public class  SrvUser(SrvDropdown SrvDropdown, SrvAccreditedUniversity SrvAccreditedUniversity, IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow, LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, IServiceProvider serviceProvider, RequestInfo requestInfo)
+    public class  SrvUser(SrvDropdown SrvDropdown,  IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow, LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, IServiceProvider serviceProvider, RequestInfo requestInfo)
            : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, requestInfo)
         {
           
@@ -68,20 +57,20 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
         }
 
-        public async Task<UserProfile> GetByIDActiveNonDeleted(Guid userId)
+        public async Task<MinistryUser> GetByIDActiveNonDeleted(Guid userId)
         {
 
             var UserProfile = await serviceScopeFactory.CreateScopedUow()
-                            .GetRepository<UserProfile>().GetByIDActiveNonDeleted(userId);
+                            .GetRepository<MinistryUser>().GetByIDActiveNonDeleted(userId);
 
             return UserProfile;
         }
 
-        public async Task<StudentUser> GetByStudentIDActiveNonDeleted(Guid userId)
+        public async Task<MinistryUser> GetByStudentIDActiveNonDeleted(Guid userId)
         {
 
             var UserProfile = await serviceScopeFactory.CreateScopedUow()
-                            .GetRepository<StudentUser>().GetByIDActiveNonDeleted(userId);
+                            .GetRepository<MinistryUser>().GetByIDActiveNonDeleted(userId);
 
             return UserProfile;
         }
@@ -89,7 +78,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
         public async Task<Guid> GetUserGenderByuserId(Guid userId)
         {
             var UserProfile = await serviceScopeFactory.CreateScopedUow()
-                            .GetRepository<StudentUser>().GetByIDActiveNonDeleted(userId);
+                            .GetRepository<MinistryUser>().GetByIDActiveNonDeleted(userId);
             if (UserProfile == null)
                 throw new BusinessException(ConstantKeys.ExceptionMessage.UserInfoNotFound);
             return UserProfile.UserGenderId;
@@ -107,9 +96,9 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                                             ur.Role.RolePermission.Any(rp => rp.Permission.BackendName == permissionName));
         }
 
-        public async Task<StudentUser?> GetStudentByIdAsync(Guid userId)
+        public async Task<MinistryUser?> GetStudentByIdAsync(Guid userId)
         {
-            return await serviceScopeFactory.CreateScopedUow().GetRepository<StudentUser>()
+            return await serviceScopeFactory.CreateScopedUow().GetRepository<MinistryUser>()
                 .GetByIDActiveNonDeleted(userId);
         }
 
@@ -120,7 +109,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
             user.ProfilePhoto = photo;
 
-            uow.GetRepository<UserProfile>().Update(user);
+            uow.GetRepository<MinistryUser>().Update(user);
             await uow.CommitAsync();
             return true;
         }
@@ -133,7 +122,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             user.IsVerifiedSecondMobile = false;
             user.SecondMobileVerificationDate = null;
 
-            uow.GetRepository<UserProfile>().Update(user);
+            uow.GetRepository<MinistryUser>().Update(user);
             await uow.CommitAsync();
             return true;
         }
@@ -142,8 +131,6 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
         {
             return await serviceScopeFactory.CreateScopedUow().GetRepository<PartyType>()
                 .GetAllActiveNonDeleted()
-                .Include(pt => pt.PartyTypeCountyUniversity)
-                .Include(pt => pt.PartyTypeEntityContract)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(pt => userInfo.PartyTypes.Contains(pt.Id));
         }

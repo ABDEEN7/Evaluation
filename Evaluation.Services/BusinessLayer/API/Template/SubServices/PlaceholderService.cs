@@ -1,27 +1,24 @@
 using System.Diagnostics;
+using Evaluation.DAL.Entities.Attachments;
+using Evaluation.DAL.Entities.Authentication;
+using Evaluation.Services.Special;
+using Evaluation.SharedHelper;
+using Evaluation.SharedHelper.Enums;
+using Evaluation.SharedHelper.Exceptions;
+using Evaluation.SharedHelper.Helper;
+using Evaluation.SharedHelper.Models;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
-using Scholarship.DAL.Framework;
-using Scholarship.DAL.Models.Attachments;
-using Scholarship.DAL.Models.Base;
-using Scholarship.DAL.Models.FormBuilder;
-using Scholarship.DAL.Models.Logs;
-using Scholarship.DAL.Models.ScholarshipEntity;
-using Scholarship.DAL.Models.ServiceRequestEntities;
-using Scholarship.DAL.Models.Templates;
-using Scholarship.Services.BusinessLayer.API.Services;
-using Scholarship.Services.Extensions;
-using Scholarship.Services.Special;
-using Scholarship.SharedHelper.Enums;
-using Scholarship.SharedHelper.Exceptions;
-using Scholarship.SharedHelper.Models;
+using Scholarship.Services.BusinessLayer.API.Template;
 
-namespace Scholarship.Services.BusinessLayer.API.Template.SubServices;
 
-    public class PlaceholderService(
+namespace Evaluation.Services.BusinessLayer.API.Template
+
+
+	public class PlaceholderService(
         IServiceProvider serviceProvider,
         SrvDropdown dropdownService,
-        CacheDataProvider cacheDataProvider, SrvFinShared srvFinShared,
+        CacheDataProvider cacheDataProvider, 
         RequestInfo requestInfo, UserInfo userInfo)
         : ApiServiceBase
     {

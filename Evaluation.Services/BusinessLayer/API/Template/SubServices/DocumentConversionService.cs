@@ -6,7 +6,7 @@ using SpireFileFormat = Spire.Doc.FileFormat;
 using AsposeDocument = Aspose.Words.Document;
 using AsposeSaveFormat = Aspose.Words.SaveFormat;
 
-namespace Scholarship.Services.BusinessLayer.API.Template.SubServices
+namespace Evaluation.Services.BusinessLayer.API.Template
 {
     public class DocumentConversionService : ApiServiceBase
     {

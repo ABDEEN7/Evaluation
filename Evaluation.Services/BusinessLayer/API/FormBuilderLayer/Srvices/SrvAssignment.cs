@@ -1,21 +1,11 @@
-﻿using AutoMapper;
+﻿
+using Evaluation.DAL.Entities.Authentication;
+using Evaluation.DAL.UnitOfWork;
+using Evaluation.Services.Special;
+using Evaluation.SharedHelper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Scholarship.DAL.Framework;
-using Scholarship.DAL.Models.ActionEntities;
-using Scholarship.DAL.Models.Base;
-using Scholarship.DAL.Models.ScholarshipEntity;
-using Scholarship.DAL.Models.ServiceRequestEntities;
-using Scholarship.Services.AdminBusinessLayer;
-using Scholarship.Services.Extensions;
-using Scholarship.Services.Models.API;
-using Scholarship.Services.Special;
-using Scholarship.SharedHelper.Enums;
-using Scholarship.SharedHelper.Exceptions;
-using Scholarship.SharedHelper.Models;
-using Scholarship.SharedHelper.Models.Api.ActionEntitiesDTOs;
-using System.Linq;
-using Xceed.Document.NET;
+
 
 namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 {
@@ -30,7 +20,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
             var userEmails = users.Select(c => c!.Email).Distinct().ToList();
 
-            var userDetails = _Uow.GetRepository<UserProfile>().GetAllQueryFiltered()
+            var userDetails = _Uow.GetRepository<MinistryUser>().GetAllQueryFiltered()
                          .Where(c => userEmails.Contains(c.Email))
                          .Select(c => new { c.Id, c.Email })
                          .ToList();
@@ -118,7 +108,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                     .Select(x => x.MinistryUserId!.Value)
                     .ToList();
 
-                var validAssignedUser = await uow.GetRepository<UserProfile>()
+                var validAssignedUser = await uow.GetRepository<MinistryUser>()
                     .GetAllQueryFiltered()
                     .Include(u => u.UserPartTypes)
                     .Where(u => validAssignedIds.Contains(u.Id) &&
@@ -160,7 +150,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             using var uow = serviceScopeFactory.CreateScopedUow();
 
             // Step 1: Get all users with allowed and active party types
-            var eligibleUsers = await uow.GetRepository<UserProfile>()
+            var eligibleUsers = await uow.GetRepository<MinistryUser>()
                 .GetAllQueryFiltered()
                 .Include(u => u.UserPartTypes)
                 .Where(u => u.UserPartTypes!.Any(pt => allowedPartyTypeIds.Contains(pt.PartyTypeId) && pt.IsActive==true))
@@ -259,7 +249,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             }
 
             var users = await serviceScopeFactory.CreateScopedUow()
-                            .GetRepository<UserProfile>()
+                            .GetRepository<MinistryUser>()
                             .GetAllQueryFiltered()
                             .Include(u => u.UserPartTypes!)
                                 .ThenInclude(pt => pt.PartyType)
@@ -295,18 +285,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             return result;
         }
 
-        public async Task<List<RequestAssignment>> GetAssignetPermanentEmployee(Guid requestId)
-        {
-
-            var assignmentUserIds = await serviceScopeFactory.CreateScopedUow()
-                                                 .GetRepository<RequestAssignment>()
-                                                 .GetAllQueryFiltered()
-                                                 .Where(c => c.ServiceRequestId == requestId && c.IsSchAssigner == true)
-                                                 .ToListAsync();
-
-
-            return assignmentUserIds;
-        }
+     
 
         public async Task<List<SchAssignment>> GetSchAssignetEmployee(Guid schId)
         {

@@ -1,20 +1,12 @@
-﻿using AutoMapper;
+﻿using Evaluation.DAL.Entities.Attachments;
+using Evaluation.DAL.Entities.Logs;
+using Evaluation.DAL.Entities.StatusEntities;
+using Evaluation.DAL.UnitOfWork;
+using Evaluation.Services.Special;
+using Evaluation.SharedHelper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Scholarship.DAL.Framework;
-using Scholarship.DAL.Models.Attachments;
-using Scholarship.DAL.Models.Base;
-using Scholarship.DAL.Models.Logs;
-using Scholarship.DAL.Models.ServiceRequestEntities;
-using Scholarship.DAL.Models.StatusEntities;
-using Scholarship.Services.Extensions;
-using Scholarship.Services.Models.API;
-using Scholarship.Services.Special;
-using Scholarship.SharedHelper.Enums;
-using Scholarship.SharedHelper.Models;
-using Scholarship.SharedHelper.Models.Api.AttachmentsDTOs;
-using Scholarship.SharedHelper.Models.Api.LogsDTO;
-using System;
+
 
 namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 {
@@ -128,12 +120,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                 log.NextStatus = SrvStatus.GetStatusDisplayName(log.NextStatusId, DepartmentId);
                 log.ActionTransactionAttachments = await GetActionTransactionAttachments(log.Id);
             }
-            //await actionTransactionLogs.ParallelForEachAsync(async (item) =>
-            //{
-            //    //item.PreviousStatus = SrvStatus.GetStatusDisplayName(item.PreviousStatusId, DepartmentId);
-            //    //item.NextStatus = SrvStatus.GetStatusDisplayName(item.NextStatusId, DepartmentId);
-            //    item.ActionTransactionAttachments = await GetActionTransactionAttachments(item.Id);
-            //});
+         
             return actionTransactionLogs!;
         }
 

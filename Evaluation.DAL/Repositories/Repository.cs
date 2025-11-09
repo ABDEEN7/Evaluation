@@ -135,8 +135,26 @@ public class Repository<T>(DbContext context, UserInfo userInfo) : RepositoryBas
         await _dbSet.AddAsync(entity);
         return entity;
     }
-
-    public T Update(T entity)
+	public async Task<IEnumerable<T>> InsertRange(IEnumerable<T> entities)
+	{
+		var today = DateTime.Now;
+		var addedentities = entities.ToList();
+		foreach (var entity in addedentities)
+		{
+			entity.Id = Guid.NewGuid();
+			entity.CreateDate = today;
+			entity.IsDeleted = false;
+			if (userInfo.UserId.HasValue)
+				entity.CreateById = userInfo.UserId.Value;
+			else
+			{
+				entity.CreateById = ConstantKeys.ConstantKeys.DefaultCreateBy;
+			}
+		}
+		await _dbSet.AddRangeAsync(addedentities);
+		return entities;
+	}
+	public T Update(T entity)
     {
         entity.UpdateDate = DateTime.Now;
         if (userInfo.UserId != Guid.Empty)
@@ -145,7 +163,31 @@ public class Repository<T>(DbContext context, UserInfo userInfo) : RepositoryBas
         return entity;
     }
 
-    public bool Delete(T entity)
+	public IEnumerable<T> UpdateRange(IEnumerable<T> entities)
+	{
+		var today = DateTime.Now;
+
+		foreach (var entity in entities)
+		{
+			if (entity is IAuditLogEntity)
+			{
+				var entry = context.Entry(entity);
+
+				var auditLogs = GenerateAuditLogs(entry);
+
+				if (auditLogs.Any()) context.Set<AuditLog>().AddRange(auditLogs);
+			}
+
+			entity.UpdateDate = today;
+			entity.IsDeleted = false;
+			if (userInfo.UserId != Guid.Empty) entity.UpdateById = userInfo.UserId;
+		}
+
+		_dbSet.UpdateRange(entities);
+		return entities;
+	}
+
+	public bool Delete(T entity)
     {
         entity.IsDeleted = true;
         entity.DeleteDate = DateTime.Now;

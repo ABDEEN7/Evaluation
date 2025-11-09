@@ -1,34 +1,14 @@
-﻿using AutoMapper;
-using Azure.Core;
+﻿using Azure.Core;
+using Evaluation.DAL.Entities.ActionEntities;
+using Evaluation.DAL.Entities.Authentication;
+using Evaluation.DAL.UnitOfWork;
+using Evaluation.Services.Special;
+using Evaluation.SharedHelper;
+using Evaluation.SharedHelper.Exceptions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json;
-using Scholarship.DAL.Framework;
-using Scholarship.DAL.Models.ActionEntities;
-using Scholarship.DAL.Models.Base;
-using Scholarship.DAL.Models.FormBuilder;
-using Scholarship.DAL.Models.ScholarshipEntity;
-using Scholarship.DAL.Models.ServiceRequestEntities;
-using Scholarship.DAL.Models.ServicesEntities;
-using Scholarship.DAL.Models.Templates;
-using Scholarship.Services.AdminBusinessLayer;
-using Scholarship.Services.Extensions;
-using Scholarship.Services.Models.Admin;
-using Scholarship.Services.Models.API;
-using Scholarship.Services.Special;
-using Scholarship.SharedHelper.Enums;
-using Scholarship.SharedHelper.Exceptions;
-using Scholarship.SharedHelper.Extensions;
-using Scholarship.SharedHelper.Models;
-using Scholarship.SharedHelper.Models.Api.ActionEntitiesDTOs;
-using Scholarship.SharedHelper.Models.Api.ServiceDTOs;
-using Scholarship.SharedHelper.Models.Api.TemplatesDTO;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static Scholarship.SharedHelper.Enums.ConstantKeys;
+using static Evaluation.SharedHelper.Enums.ConstantKeys;
+
 
 namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 {

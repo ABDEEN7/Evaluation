@@ -1,23 +1,17 @@
-﻿using AutoMapper;
+﻿using Evaluation.DAL.Entities.Attachments;
+using Evaluation.DAL.Entities.FormBuilder;
+using Evaluation.DAL.UnitOfWork;
+using Evaluation.Services.Special;
+using Evaluation.SharedHelper;
+using Evaluation.SharedHelper.Enums;
+using Evaluation.SharedHelper.Exceptions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Scholarship.DAL.Framework;
-using Scholarship.DAL.Models.Attachments;
-using Scholarship.DAL.Models.FormBuilder;
-using Scholarship.DAL.Models.ServiceRequestEntities;
-using Scholarship.Services.Extensions;
-using Scholarship.Services.Models.API;
-using Scholarship.Services.Special;
-using Scholarship.Services.Special.Storage;
-using Scholarship.SharedHelper.Enums;
-using Scholarship.SharedHelper.Exceptions;
-using Scholarship.SharedHelper.Models;
-using Scholarship.SharedHelper.Models.Api.AttachmentsDTOs;
-using Scholarship.SharedHelper.Models.Api.FormBuilderDTO;
+
 using System.Text.RegularExpressions;
 
 namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
@@ -61,7 +55,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                         throw new BusinessException(ConstantKeys.ExceptionMessage.IncompleteRequest);
                     }
 
-                    var attachmentsToBeInserted = new List<DAL.Models.Attachments.Attachment>();
+                    var attachmentsToBeInserted = new List<DAL.Entities.Attachments.Attachment>();
                     uploadedFiles.ForEach(fileDTO =>
                     {
 
@@ -136,10 +130,10 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                     {
                         throw new BusinessException(ConstantKeys.ExceptionMessage.IncompleteRequest);
                     }
-                    var attachmentsToBeInserted = new List<DAL.Models.Attachments.Attachment>();
+                    var attachmentsToBeInserted = new List<DAL.Entities.Attachments.Attachment>();
                     uploadedFiles.ForEach(fileDTO =>
                     {
-                        var attachment = new DAL.Models.Attachments.Attachment()
+                        var attachment = new DAL.Entities.Attachments.Attachment()
                         {
                             ActionTransactionsLogId = actionlog,
                             FileName = fileDTO.CustomFileName,
@@ -208,7 +202,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
         public async Task<Field?> GetFieldsByIdsAsync(Guid fieldId)
         {
             var fields = await serviceScopeFactory.CreateScopedUow()
-                .GetRepository<DAL.Models.FormBuilder.Field>()
+                .GetRepository<DAL.Entities.FormBuilder.Field>()
                 .GetAllActiveNonDeleted(x => x.Id == fieldId)
                 .Include(x => x.FieldType)
                 .AsNoTracking()
@@ -255,7 +249,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             if (uploadedFile == null)
                 return null;
 
-            var attachment = new DAL.Models.Attachments.Attachment
+            var attachment = new DAL.Entities.Attachments.Attachment
             {
                 FieldId = parentFieldId,
                 ChildFieldId = childFieldId,
@@ -267,7 +261,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                 ServiceRequestId = ServiceRequestId
             };
 
-            var inserted = await InsertAttachments(new List<DAL.Models.Attachments.Attachment> { attachment });
+            var inserted = await InsertAttachments(new List<DAL.Entities.Attachments.Attachment> { attachment });
             var savedAttachment = inserted.FirstOrDefault();
 
             return savedAttachment?.Id.ToString();
