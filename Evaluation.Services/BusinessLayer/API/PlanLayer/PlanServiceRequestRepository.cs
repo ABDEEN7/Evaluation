@@ -1,6 +1,7 @@
 ﻿using Evaluation.DAL.Entities.Calendars;
 using Evaluation.DAL.Entities.Org;
 using Evaluation.DAL.Entities.Planing;
+using Evaluation.DAL.Helper;
 using Evaluation.DAL.UnitOfWork;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper;
@@ -91,8 +92,8 @@ public class PlanServiceRequestRepository(IServiceScopeFactory serviceScopeFacto
     }
     public async Task<bool> DeleteSchoolFromPlan(Guid requestId, Guid schoolId)
     {
-        var changeRequest = await unitOfWork.GetRepository<ChangeRequest>().GetByIdAsync(requestId);
-        var plan = await unitOfWork.GetRepository<Plan>().GetByIdAsync(changeRequest.PlanId);
+        var changeRequest = await unitOfWork.GetRepository<ChangeRequest>().GetByIDNonDeleted(requestId);
+        var plan = await unitOfWork.GetRepository<Plan>().GetByIDNonDeleted(changeRequest.PlanId);
         var schoolPlan = await unitOfWork.GetRepository<EvaluationRequest>()
             .GetAllActiveNonDeleted().FirstOrDefaultAsync(x => x.PlanId == plan.Id && x.SchoolId == schoolId);
         unitOfWork.GetRepository<EvaluationRequest>().Delete(schoolPlan);

@@ -2,7 +2,7 @@
 
 using Evaluation.SharedHelper.Models.Api.Authentication;
 
-namespace Evaluation.SharedHelper.Models
+namespace Evaluation.SharedHelper.Models.Api
 {
     public class ControlValidationDTO : EntityBaseDTO
     {

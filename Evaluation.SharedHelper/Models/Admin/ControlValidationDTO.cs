@@ -1,6 +1,6 @@
 ﻿
 
-namespace Evaluation.SharedHelper.Models
+namespace Evaluation.SharedHelper.Models.Admin
 {
     public class ControlValidationDTO : EntityBaseDTO
     {

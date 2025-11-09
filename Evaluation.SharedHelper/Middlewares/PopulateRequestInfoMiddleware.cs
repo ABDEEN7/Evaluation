@@ -3,6 +3,7 @@ using Evaluation.SharedHelper.Enums;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Routing;
+using Evaluation.SharedHelper.Models;
 
 namespace Evaluation.SharedHelper.Middlewares
 {

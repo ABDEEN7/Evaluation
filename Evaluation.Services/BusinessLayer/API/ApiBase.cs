@@ -7,11 +7,12 @@ using Evaluation.SharedHelper.Models;
 using FluentResults;
 using MapsterMapper;
 using Microsoft.Extensions.DependencyInjection;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using RequestInfo = Evaluation.SharedHelper.Helper.RequestInfo;
+using RequestInfo = Evaluation.SharedHelper.Models.RequestInfo;
 
 namespace Evaluation.Services.BusinessLayer.API
 {

@@ -1,5 +1,4 @@
 ﻿using Evaluation.Services.Shared;
-using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Admin;
 
 namespace Evaluation.Admin.Models

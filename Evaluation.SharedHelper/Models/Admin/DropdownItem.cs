@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Evaluation.SharedHelper.Models
+namespace Evaluation.SharedHelper.Models.Admin
 {
     public class DropdownItem
     {

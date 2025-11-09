@@ -1,12 +1,9 @@
 ﻿using Evaluation.DAL.Context;
-using Evaluation.DAL.Helper;
 using Evaluation.DAL.UnitOfWork;
-using Evaluation.Services.BusinessLayer;
 using Evaluation.Services.BusinessLayer.API;
 using Evaluation.Services.Models.Admin;
 using Evaluation.Services.Models.JWT;
 using Evaluation.Services.Special;
-using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Models;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
@@ -22,12 +19,7 @@ namespace Evaluation.Services.Extensions;
 public static class ServiceExtensions
 {
 #pragma warning disable  S4830
-    public static void PopulateAppSettings(this IServiceCollection services, IConfiguration config)
-    {
-        AppSettings.CreateById = config.GetValue<Guid>("AppSettings:CreateById");
-        AppSettings.DefaultLanguage = config.GetValue<string>("AppSettings:DefaultLanguage") ?? "en";
-        AppSettings.DateFormat = config.GetValue<string>("AppSettings:DateFormat") ?? "yyyy-MM-dd";
-    }
+   
     public static void ConfigureMasterBL(this IServiceCollection services, IConfiguration config, bool isDevEnvironment)
     {
 
@@ -131,25 +123,4 @@ public static class ServiceExtensions
         return uow;
     }
 
-        services.AddScoped<CacheDataProvider>();
-        services.AddScoped<AzureBlobStorageService>();
-
-        services.AddScoped<MasterBL>();
-
-    public static void ConfigureRequestInfo(this IServiceCollection services, IConfiguration configuration)
-    {
-        services.AddScoped<RequestInfo>();
-    }
-
-
-
-    public static void ConfigureSession(this IServiceCollection services, IConfiguration configuration, int sessionTimeout)
-    {
-        services.AddSession(options =>
-        {
-            options.IdleTimeout = TimeSpan.FromMinutes(sessionTimeout); // Adjust the timeout as needed
-            options.Cookie.HttpOnly = true;
-            options.Cookie.IsEssential = true;
-        });
-    }
 }

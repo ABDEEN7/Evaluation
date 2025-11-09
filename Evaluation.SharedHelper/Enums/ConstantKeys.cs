@@ -37,6 +37,11 @@
             public static readonly string ActionExistsActionTemplateDoc = "ActionExistsActionTemplateDoc";
             public static readonly string ServiceStatusUsed = "ServiceStatusUsed";
             public static readonly string StatusExistsServiceStatusPreventPartyType = "StatusExistsServiceStatusPreventPartyType";
+            public static readonly string DraftPlanWithSameAcademicYearAlreadyExists = "DraftPlanWithSameAcademicYearAlreadyExists";
+            public static readonly string PlanIsNotFound = "PlanIsNotFound";
+            public static readonly string InvalidApprovePlan = "InvalidApprovePlan";
+            public static readonly string PlanInThePastIsNotAllowed = "PlanInThePastIsNotAllowed";
+            public static readonly string InvalidDraftPlan = "InvalidDraftPlan";
         }
 
         public static class AdminSettings
