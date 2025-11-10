@@ -3,6 +3,7 @@ using Evaluation.DAL.Entities.FormBuilder;
 using  Evaluation.DAL.Entities.BaseModule;
 using Evaluation.DAL.Entities.StatusEntities;
 using Evaluation.DAL.Entities.Audit;
+using Evaluation.DAL.Entities.FormsModules;
 
 namespace Evaluation.DAL.Entities.ServicesEntities
 {
@@ -32,7 +33,9 @@ namespace Evaluation.DAL.Entities.ServicesEntities
         public string? UrlEn { get; set; }
         public bool ShowInWebSite { get; set; }
 
-        public virtual ICollection<FormGroup>? FormGroups { get; set; }
+		public Guid? EvaluationPartyId { get; set; }
+		public EvaluationParty? EvaluationParty { get; set; }
+		public virtual ICollection<FormGroup>? FormGroups { get; set; }
         public virtual ICollection<ServiceStatus>? Statuses { get; set; }
         public virtual ICollection<ServiceRequestShowPartyType>? RequestShowPartyType { get; set; }
 

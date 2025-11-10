@@ -1,4 +1,5 @@
 ﻿using  Evaluation.DAL.Entities.BaseModule;
+using Evaluation.DAL.Entities.Planing;
 
 namespace Evaluation.DAL.Entities.Org;
 
@@ -6,10 +7,12 @@ public class OrgTree : EntityBase
 {
     public string NameAr { get; set; } = null!;
     public string NameEn { get; set; } = null!;
-    public Guid OrgTreeId { get; set; }
-    public OrgTree? Parent { get; set; }
+    public Guid? OrgParentId { get; set; }
+    public OrgTree? OrgParent { get; set; }
     public string? HrCode { get; set; } 
     public string? NSISCode { get; set; }
-    public Guid OrgTreeTypeId { get; set; }
-    public OrgTreeClass OrgTreeClass { get; set; } = null!;
+    public Guid OrgTypeId { get; set; }
+    public OrgType? OrgType { get; set; }
+    public Guid OrgClassId { get; set; } 
+    public OrgClass? OrgClass { get; set; }
 }

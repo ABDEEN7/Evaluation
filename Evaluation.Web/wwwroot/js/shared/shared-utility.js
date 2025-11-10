@@ -131,7 +131,8 @@ const sharedUtility = () => {
         }
 
 
-        if (existingToken()) {
+        //if (existingToken()) {
+            if (false) {
             let data = { token: '' };
             const options = {
                 success: function (result) {

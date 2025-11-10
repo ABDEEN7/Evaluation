@@ -1,5 +1,5 @@
 ﻿@{
-	Layout = "_Layout";
+    Layout = "_Layout";
 }
 <main class="main-content">
     <section>
@@ -325,7 +325,7 @@
 </div>
 
 <!-- School Details Modal (Optional) -->
-<div class="modal fade" id="schoolDetailsModal" tabindex="-1" aria-labelledby="schoolDetailsModalLabel" aria-hidden="true">
+@* <div class="modal fade" id="schoolDetailsModal" tabindex="-1" aria-labelledby="schoolDetailsModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
@@ -340,25 +340,26 @@
             </div>
         </div>
     </div>
-</div>
+</div> *@
 @section Styles {
-	<link href="~/plan-assets/css/style.css" rel="stylesheet">
+    <link href="~/plan-assets/css/style.css" rel="stylesheet">
 }
 
 @section Scripts {
-	<!-- JS -->
-	<script src="~/plan-assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
-	<script src="~/plan-assets/vendor/datatables/js/dataTables.bootstrap5.min.js"></script>
+    <!-- JS -->
+    <script src="~/plan-assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
+    <script src="~/plan-assets/vendor/datatables/js/dataTables.bootstrap5.min.js"></script>
 
-	<!-- Select2 JS -->
-	<script src="~/plan-assets/vendor/select2/js/select2.min.js"></script>
+    <!-- Select2 JS -->
+    <script src="~/plan-assets/vendor/select2/js/select2.min.js"></script>
 
-	<!-- Flatpickr JS -->
-	<script src="~/plan-assets/vendor/flatpickr/js/flatpickr.js"></script>
-	<script src="~/plan-assets/js/main.js"></script>
-	@* <script src="/js/plan/create-plan.js"></script>
+    <!-- Flatpickr JS -->
+    <script src="~/plan-assets/vendor/flatpickr/js/flatpickr.js"></script>
+    <script src="~/plan-assets/js/main.js"></script>
+    @* <script src="/js/plan/create-plan.js"></script>
 	<script src="/js/plan/getEvaluationPlanData.js" asp-append-version="true"></script> *@
     <script src="~/js/plan/get-schools.js" asp-append-version="true"></script>
 
 }
-@* @await Component.InvokeAsync("SchoolDetailsModal", new { modalId = "schoolDetailsModal", title = "School Details", body = "Hello from modal body!" }) *@
+@await Component.InvokeAsync("SchoolDetailsModal", new { modalId = "schoolDetailsModal", title = "School Details", body = "Hello from modal body!" })
+ 

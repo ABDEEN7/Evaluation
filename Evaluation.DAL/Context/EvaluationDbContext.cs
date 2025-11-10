@@ -4,9 +4,12 @@ using  Evaluation.DAL.Entities.BaseModule;
 using Evaluation.DAL.Entities.Calendars;
 using Evaluation.DAL.Entities.DepartementEntites;
 using Evaluation.DAL.Entities.FormsModules;
+using Evaluation.DAL.Entities.Masters;
 using Evaluation.DAL.Entities.Org;
 using Evaluation.DAL.Entities.PermissionEntity;
 using Evaluation.DAL.Entities.Planing;
+using Evaluation.DAL.Entities.Planing.EvaluationRequestEntity;
+using Evaluation.DAL.Entities.ServiceRequestEntities;
 using Evaluation.DAL.Entities.ServicesEntities;
 using Evaluation.DAL.Entities.SystemModulesEntities;
 using Evaluation.DAL.Entities.Template;
@@ -59,8 +62,9 @@ public partial class EvaluationDbContext : DbContext
     public virtual DbSet<School> Schools { get; set; }
     public virtual DbSet<SchoolType> SchoolTypes { get; set; }
     public virtual DbSet<Department> Departments { get; set; }
-    public virtual DbSet<OrganizationType> OrganizationTypes { get; set; }
+    public virtual DbSet<OrgType> OrgTypes { get; set; }
     public virtual DbSet<Plan> Plans { get; set; }
+    public virtual DbSet<PlanHistory> PlanHistory { get; set; }
     public virtual DbSet<EvaluationRequest> EvaluationRequests { get; set; }
     public virtual DbSet<PlanStatus> PlanStatuses { get; set; }
     public virtual DbSet<EmailTemplate> EmailTemplates { get; set; }
@@ -79,6 +83,16 @@ public partial class EvaluationDbContext : DbContext
     public virtual DbSet<SystemModule> SystemModules { get; set; }
     public virtual DbSet<ModuleType> ModuleTypes { get; set; }
     public virtual DbSet<UiControl> UiControls { get; set; }
+    public virtual DbSet<OrgClass> OrgClass { get; set; }
+    public virtual DbSet<ServiceRequestFieldsValue> ServiceRequestFieldsValue { get; set; }
+    public virtual DbSet<RequestAssignment> RequestAssignment { get; set; }
+    public virtual DbSet<EvaluationRequest> EvaluationRequest { get; set; }
+    public virtual DbSet<EvaluationRequestFieldsValue> EvaluationRequestFieldsValue { get; set; }
+    public virtual DbSet<EvaluationRequestHistory> EvaluationRequestHistory { get; set; }
+    public virtual DbSet<EvaluationRequestHistoryFieldsValue> EvaluationRequestHistoryFieldsValue { get; set; }
+    public virtual DbSet<JobTitle> JobTitle { get; set; }
+    public virtual DbSet<UserGender> UserGender { get; set; }
+    public virtual DbSet<EvaluationType> EvaluationType { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
