@@ -1,9 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Evaluation.DAL.Entities.BaseModule;
+using Microsoft.EntityFrameworkCore;
 
 namespace Evaluation.DAL.SystemSetting;
 
 [Index(nameof(BackendName), IsUnique = true)]
-public class EmailProfile
+public class EmailProfile : EntityBase
 {
     public string SenderAddress { get; set; } = null!;
     public string SenderDisplayName { get; set; } = string.Empty;

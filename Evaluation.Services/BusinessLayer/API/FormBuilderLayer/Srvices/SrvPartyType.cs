@@ -1,8 +1,11 @@
 ﻿using Evaluation.DAL.Entities.Authentication;
+using Evaluation.DAL.Helper;
 using Evaluation.DAL.UnitOfWork;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper;
 using Evaluation.SharedHelper.Helper;
+using Evaluation.SharedHelper.Models;
+using Evaluation.SharedHelper.Models.Api.PartyTypeDTOs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -10,16 +13,14 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 {
-    public class SrvPartyType( IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow, LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, IServiceProvider serviceProvider, RequestInfo _requestInfo)
-           : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, _requestInfo)
+    public class SrvPartyType( IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow, LoggingServices loggingServices,  UserInfo userInfo, IServiceProvider serviceProvider, RequestInfo _requestInfo)
+           : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, userInfo, serviceProvider, _requestInfo)
         {
 
         public async Task<List<DAL.Entities.Authentication.PartyType>?> GetUserPartyTypeAsync()
         {
             var UserPartyType= await serviceScopeFactory.CreateScopedUow().GetRepository<DAL.Entities.Authentication.PartyType>()
                 .GetAllActiveNonDeleted()
-                .Include(pt => pt.PartyTypeCountyUniversity)
-                .Include(pt => pt.PartyTypeEntityContract)
                 .AsNoTracking()
                 .Where(pt => userInfo.PartyTypes.Contains(pt.Id)).ToListAsync();
 
@@ -37,13 +38,12 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
           
             var partyTypes = await partyTypeRepo
                 .GetAllQueryFiltered(x => x.IsEmployeePartyType && !x.CanViewAllRequests && x.SystemModuleId == moduleId)
-                .Include(x => x.PartyTypeCountyUniversity)
                 .AsNoTracking()
                 .ToListAsync();
 
             var result = new List<SelectListItemDTO>();
             var userPartyTypes = await userPartyTypesTask;
-            var canViewAll = userPartyTypes!.Any(x => x.CanViewAllRequests && (x.PartyTypeCountyUniversity == null || !x.PartyTypeCountyUniversity.Any()));
+            var canViewAll = userPartyTypes!.Any(x => x.CanViewAllRequests );
             if (canViewAll)
             {
                 result = partyTypes
@@ -58,27 +58,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                 return result;
             }
 
-            var userCountries = userPartyTypes!
-                .Where(x => x.CanViewAllRequests && x.PartyTypeCountyUniversity != null && x.PartyTypeCountyUniversity.Any())
-                .SelectMany(x => x.PartyTypeCountyUniversity!)
-                .Where(c => c.CountryId != Guid.Empty)
-                .Select(c => c.CountryId)
-                .Distinct()
-                .ToList();
-
-            if (userCountries.Any())
-            {
-                result = partyTypes
-                    .Where(pt => pt.PartyTypeCountyUniversity != null &&
-                                 pt.PartyTypeCountyUniversity.Any(c => userCountries.Contains(c.CountryId)))
-                    .Select(x => new SelectListItemDTO
-                    {
-                        Value = x.Id.ToString(),
-                        Text = lang == "ar" ? x.NameAr : x.NameEn
-                    })
-                    .Distinct()
-                    .ToList();
-            }
+          
 
             return result;
         }
@@ -97,7 +77,6 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                                         .Include(x => x.PartyType)
                                         .Where(x => x.UserId == userId)
                                         .Where(x => x.PartyType!.SystemModuleId == ModuleId)
-                                        .Where(x => !x.PartyType!.PartyTypeCountyUniversity!.Any())
                                         .AnyAsync(x => x.PartyType!.CanViewAllRequests);
 
             return result;
@@ -115,8 +94,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                                         .Include(x => x.PartyType)
                                         .Where(x => x.UserId == userId)
                                         .Where(x => x.PartyType!.SystemModuleId == ModuleId)
-                                        .Where(x => !x.PartyType!.PartyTypeCountyUniversity!.Any())
-                                        .AnyAsync(x => x.PartyType!.CanViewAllScholarships);
+                                        .AnyAsync(x => x.PartyType!.CanViewAllEvaluations);
 
             return result;
         }
@@ -129,18 +107,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                 {
                     PartyTypeId = x.PartyTypeId,
                     CanViewAllRequests = x.PartyType!.CanViewAllRequests,
-                    CanViewAllScholarships = x.PartyType.CanViewAllScholarships,
-                    PartyTypeCountyUniversity = x.PartyType.PartyTypeCountyUniversity!
-                        .Select(ptcu => new PartyTypeCountyUniversityDTO
-                        {
-                            CountryId = ptcu.CountryId,
-                            UniversityId = ptcu.UniversityId
-                        }).ToList(),
-                    PartyTypeEntityContract = x.PartyType.PartyTypeEntityContract!
-                        .Select(ptcu => new EntityContractPartyTypeDTO
-                        {
-                            EntityContractId = ptcu.EntityContractId,
-                        }).ToList(),
+					CanViewAllEvaluations = x.PartyType.CanViewAllEvaluations,
                 })
                 .ToListAsync();
         }

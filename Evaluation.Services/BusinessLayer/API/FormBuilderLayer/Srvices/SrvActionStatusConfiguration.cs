@@ -1,10 +1,16 @@
 ﻿using Azure.Core;
 using Evaluation.DAL.Entities.ActionEntities;
 using Evaluation.DAL.Entities.Authentication;
+using Evaluation.DAL.Entities.ServiceRequestEntities;
+using Evaluation.DAL.Helper;
 using Evaluation.DAL.UnitOfWork;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper;
+using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Exceptions;
+using Evaluation.SharedHelper.Models;
+using Evaluation.SharedHelper.Models.Api.ActionEntitiesDTOs;
+using Evaluation.SharedHelper.Models.Api.TemplatesDTO;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using static Evaluation.SharedHelper.Enums.ConstantKeys;
@@ -12,8 +18,8 @@ using static Evaluation.SharedHelper.Enums.ConstantKeys;
 
 namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 {
-    public class SrvActionStatusConfiguration (SrvUser srvUser,SrvAction SrvAction,IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow, LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, IServiceProvider serviceProvider, RequestInfo _requestInfo)
-            : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, _requestInfo)
+    public class SrvActionStatusConfiguration (SrvUser srvUser,SrvAction SrvAction,IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow, LoggingServices loggingServices,  UserInfo userInfo, IServiceProvider serviceProvider, RequestInfo _requestInfo)
+            : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, userInfo, serviceProvider, _requestInfo)
     { 
      
         public async Task<List<ActionDTO>> GetActionsByStatus(Guid serviceId,Guid? statusId, Guid? requestId, Guid? scholarshipId, string lang, bool CheckActionCondition=true)
@@ -100,7 +106,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 			var request = await serviceScopeFactory.CreateScopedUow()
                                        .GetRepository<ServiceRequest>().GetByIDActiveNonDeleted(requestId);
 
-            if (request == null) { throw new BusinessException(ConstantKeys.ExceptionMessage.InActiveData); }
+            if (request == null) { throw new BusinessException(ConstantKeys.ExceptionMessage.ServiceRequestNotFound); }
             var statusId = request.StatusId;
             var user = await userTask;
 
@@ -164,54 +170,54 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
                     fieldValue = fieldValueEntity.Value;
                 }
-                else if (condition.Type.Equals("scholarship", StringComparison.OrdinalIgnoreCase))
-                {
-                    var sysField = await uow.GetRepository<SystemField>()
-                        .GetAllQueryFiltered()
-                        .FirstOrDefaultAsync(f => f.Id == condition.RefID);
+                //else if (condition.Type.Equals("scholarship", StringComparison.OrdinalIgnoreCase))
+                //{
+                //    var sysField = await uow.GetRepository<SystemField>()
+                //        .GetAllQueryFiltered()
+                //        .FirstOrDefaultAsync(f => f.Id == condition.RefID);
 
-                    if (sysField == null)
-                    {
-                        return false;
-                    }
+                //    if (sysField == null)
+                //    {
+                //        return false;
+                //    }
 
-                    if (sysField.IsCoreColumn)
-                    {
-                        var schData = await uow.GetRepository<ScholarshipData>()
-                            .GetAllQueryFiltered()
-                            .FirstOrDefaultAsync(c => c.Id == scholarshipId);
+                //    if (sysField.IsCoreColumn)
+                //    {
+                //        var schData = await uow.GetRepository<ScholarshipData>()
+                //            .GetAllQueryFiltered()
+                //            .FirstOrDefaultAsync(c => c.Id == scholarshipId);
 
-                        if (schData == null)
-                        {
-                            return false;
-                        }
+                //        if (schData == null)
+                //        {
+                //            return false;
+                //        }
 
-                        fieldValue = sysField.BackendName switch
-                        {
-                            "MajorId" => schData.MajorId,
-                            "CountryId" => schData.CountryId,
-                            "UniversityId" => schData.UniversityId,
-                            "AcademicDegreeId" => schData.AcademicDegreeId,
-                            "ParentAcademicDegreeId" => schData.ParentAcademicDegreeId,
-                            "SchPlanId" => schData.SchPlanId,
-                            "SchStatusId" => schData.SchStatusId,
-                            _ => throw new ArgumentException($"Unsupported BackendName: {sysField.BackendName}")
-                        };
-                    }
-                    else
-                    {
-                        var schFieldValueEntity = await uow.GetRepository<SchFieldValue>()
-                            .GetAllQueryFiltered()
-                            .FirstOrDefaultAsync(c => c.ScholarshipId == scholarshipId && c.SystemFieldId == condition.RefID);
+                //        fieldValue = sysField.BackendName switch
+                //        {
+                //            "MajorId" => schData.MajorId,
+                //            "CountryId" => schData.CountryId,
+                //            "UniversityId" => schData.UniversityId,
+                //            "AcademicDegreeId" => schData.AcademicDegreeId,
+                //            "ParentAcademicDegreeId" => schData.ParentAcademicDegreeId,
+                //            "SchPlanId" => schData.SchPlanId,
+                //            "SchStatusId" => schData.SchStatusId,
+                //            _ => throw new ArgumentException($"Unsupported BackendName: {sysField.BackendName}")
+                //        };
+                //    }
+                //    else
+                //    {
+                //        var schFieldValueEntity = await uow.GetRepository<SchFieldValue>()
+                //            .GetAllQueryFiltered()
+                //            .FirstOrDefaultAsync(c => c.ScholarshipId == scholarshipId && c.SystemFieldId == condition.RefID);
 
-                        if (schFieldValueEntity == null)
-                        {
-                            return false;
-                        }
+                //        if (schFieldValueEntity == null)
+                //        {
+                //            return false;
+                //        }
 
-                        fieldValue = schFieldValueEntity.Value;
-                    }
-                }
+                //        fieldValue = schFieldValueEntity.Value;
+                //    }
+                //}
                 else
                 {
                     throw new ArgumentException($"Unsupported condition type: {condition.Type}");

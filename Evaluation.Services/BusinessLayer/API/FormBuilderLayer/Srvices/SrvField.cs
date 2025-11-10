@@ -14,7 +14,7 @@ using Scholarship.Services.Models.API;
 using Scholarship.Services.Special;
 using Scholarship.SharedHelper.Exceptions;
 using Scholarship.SharedHelper.Models;
-using Scholarship.SharedHelper.Models.Api.FormBuilderDTO;
+using Evaluation.SharedHelper.Models.Api.FormBuilderDTO;
 using System.Globalization;
 using static Scholarship.SharedHelper.Enums.ConstantKeys;
 using Field = Scholarship.DAL.Models.FormBuilder.Field;

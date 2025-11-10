@@ -1,20 +1,27 @@
 ﻿
+using Evaluation.DAL.Entities.ActionEntities;
 using Evaluation.DAL.Entities.Authentication;
+using Evaluation.DAL.Entities.ServiceRequestEntities;
+using Evaluation.DAL.Helper;
 using Evaluation.DAL.UnitOfWork;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper;
+using Evaluation.SharedHelper.Enums;
+using Evaluation.SharedHelper.Exceptions;
+using Evaluation.SharedHelper.Models;
+using Evaluation.SharedHelper.Models.Api.ActionEntitiesDTOs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 
 namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 {
-    public class SrvAssignment (SrvServiceRequest SrvServiceRequest, IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow, SrvUser SrvUser, LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, IServiceProvider serviceProvider, RequestInfo _requestInfo)
-            : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, _requestInfo)
+    public class SrvAssignment (SrvServiceRequest SrvServiceRequest, IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow, SrvUser SrvUser, LoggingServices loggingServices, UserInfo userInfo, IServiceProvider serviceProvider, RequestInfo _requestInfo)
+            : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, userInfo, serviceProvider, _requestInfo)
 
     {
 
-        public async Task PerformAssignAction(Guid requestId, List<AssignUserDTO?> users)
+        public async Task PerformAssignAction(Guid requestId, List<SharedHelper.Models.Api.ActionEntitiesDTOs.AssignUserDTO?> users)
         {
             var _Uow = serviceScopeFactory.CreateScopedUow();
 
@@ -30,7 +37,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                 u.Id,
                 u.Email,
                 PartyTypeId = users.FirstOrDefault(userDto => userDto?.Email == u.Email)?.PartyTypeId,
-                IsDefault = users.FirstOrDefault(userDto => userDto?.Email == u.Email)?.IsDefault ?? false,
+                IsDefault = users.FirstOrDefault(userDto => userDto?.Email == u.Email)?.IsLeader ?? false,
             }).ToList();
 
             var userPartyTypes = users.Select(x => x!.PartyTypeId).Distinct().ToList();
@@ -55,7 +62,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
                 if (matchedUser != null)
                 {
-                    assignment.IsSchAssigner = matchedUser.IsDefault;
+                    assignment.IsLeader = matchedUser.IsDefault;
                     uow.GetRepository<RequestAssignment>().Update(assignment);
                 }
             }
@@ -67,7 +74,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                     MinistryUserId = u.Id,
                     ServiceRequestId = requestId,
                     PartyTypeId = u.PartyTypeId!.Value,
-                    IsSchAssigner = u.IsDefault
+					IsLeader = u.IsDefault
                 })
                 .ToList();
 
@@ -75,75 +82,75 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
         }
 
-        public async Task<bool> PerformAutoAssign(ServiceRequest request, Guid actionId, Guid? country, Guid? university)
-        {
-            var allowedPartyTypeIdsTask = GetAllowedPartyTypeIds(actionId, request.Id, request.Scholarship!, country, university);
-            var creatorUserTask = SrvUser.GetByIDActiveNonDeleted(userInfo.UserId!.Value);
-            Task<List<SchAssignment>> assignedUsersTask = request.ScholarshipId != null
-                ? GetSchAssignetEmployee(request.ScholarshipId.Value)
-                : Task.FromResult<List<SchAssignment>>(null!);
+        //public async Task<bool> PerformAutoAssign(ServiceRequest request, Guid actionId, Guid? country, Guid? university)
+        //{
+        //    var allowedPartyTypeIdsTask = GetAllowedPartyTypeIds(actionId, request.Id, request.Scholarship!, country, university);
+        //    var creatorUserTask = SrvUser.GetByIDActiveNonDeleted(userInfo.UserId!.Value);
+        //    Task<List<SchAssignment>> assignedUsersTask = request.ScholarshipId != null
+        //        ? GetSchAssignetEmployee(request.ScholarshipId.Value)
+        //        : Task.FromResult<List<SchAssignment>>(null!);
 
          
-            var allowedPartyTypeIds = await allowedPartyTypeIdsTask;
-            var creatorUser = await creatorUserTask;
-            var assignedUsers = await assignedUsersTask;
+        //    var allowedPartyTypeIds = await allowedPartyTypeIdsTask;
+        //    var creatorUser = await creatorUserTask;
+        //    var assignedUsers = await assignedUsersTask;
 
-            if (creatorUser == null || !allowedPartyTypeIds.Any())
-                return false;
+        //    if (creatorUser == null || !allowedPartyTypeIds.Any())
+        //        return false;
 
-            var isMinistry = creatorUser is MinistryUser;
-            Guid? finalUserId = null;
+        //    var isMinistry = creatorUser is MinistryUser;
+        //    Guid? finalUserId = null;
 
-            // Step 1: If creator has allowed party type
-            if (creatorUser.UserPartTypes!.Any(pt => allowedPartyTypeIds.Contains(pt.PartyTypeId)))
-            {
-                finalUserId = creatorUser.Id;
-            }
+        //    // Step 1: If creator has allowed party type
+        //    if (creatorUser.UserPartTypes!.Any(pt => allowedPartyTypeIds.Contains(pt.PartyTypeId)))
+        //    {
+        //        finalUserId = creatorUser.Id;
+        //    }
 
-            // Step 2: If previous assigned user exists and still valid
-            else if (assignedUsers?.Any() == true)
-            {
-                var validAssignedIds = assignedUsers
-                    .Where(x => x.MinistryUserId.HasValue)
-                    .Select(x => x.MinistryUserId!.Value)
-                    .ToList();
+        //    // Step 2: If previous assigned user exists and still valid
+        //    else if (assignedUsers?.Any() == true)
+        //    {
+        //        var validAssignedIds = assignedUsers
+        //            .Where(x => x.MinistryUserId.HasValue)
+        //            .Select(x => x.MinistryUserId!.Value)
+        //            .ToList();
 
-                var validAssignedUser = await uow.GetRepository<MinistryUser>()
-                    .GetAllQueryFiltered()
-                    .Include(u => u.UserPartTypes)
-                    .Where(u => validAssignedIds.Contains(u.Id) &&
-                                u.UserPartTypes!.Any(pt => allowedPartyTypeIds.Contains(pt.PartyTypeId)))
-                    .FirstOrDefaultAsync();
+        //        var validAssignedUser = await uow.GetRepository<MinistryUser>()
+        //            .GetAllQueryFiltered()
+        //            .Include(u => u.UserPartTypes)
+        //            .Where(u => validAssignedIds.Contains(u.Id) &&
+        //                        u.UserPartTypes!.Any(pt => allowedPartyTypeIds.Contains(pt.PartyTypeId)))
+        //            .FirstOrDefaultAsync();
 
-                finalUserId = validAssignedUser?.Id;
-                if(finalUserId == null)
-                {
-                    finalUserId = await FindUserIdWithMinimumAssignmentsAndAllowedPartyType(allowedPartyTypeIds);
-                }
-            }
-            // Step 3: If user is not ministry, assign to user with least workload
-            else 
-            {
-                finalUserId = await FindUserIdWithMinimumAssignmentsAndAllowedPartyType(allowedPartyTypeIds);
-            }
+        //        finalUserId = validAssignedUser?.Id;
+        //        if(finalUserId == null)
+        //        {
+        //            finalUserId = await FindUserIdWithMinimumAssignmentsAndAllowedPartyType(allowedPartyTypeIds);
+        //        }
+        //    }
+        //    // Step 3: If user is not ministry, assign to user with least workload
+        //    else 
+        //    {
+        //        finalUserId = await FindUserIdWithMinimumAssignmentsAndAllowedPartyType(allowedPartyTypeIds);
+        //    }
 
-            if (finalUserId.HasValue)
-            {
-                var assign = new RequestAssignment
-                {
-                    Id = Guid.NewGuid(),
-                    ServiceRequestId = request.Id,
-                    MinistryUserId = finalUserId.Value,
-                    IsSchAssigner = false,
-                    PartyTypeId = allowedPartyTypeIds.FirstOrDefault()
+        //    if (finalUserId.HasValue)
+        //    {
+        //        var assign = new RequestAssignment
+        //        {
+        //            Id = Guid.NewGuid(),
+        //            ServiceRequestId = request.Id,
+        //            MinistryUserId = finalUserId.Value,
+        //            IsSchAssigner = false,
+        //            PartyTypeId = allowedPartyTypeIds.FirstOrDefault()
 
-                };
+        //        };
 
-                await uow.GetRepository<RequestAssignment>().InsertAsync(assign);
-                return true;
-            }
-            return false;
-        }
+        //        await uow.GetRepository<RequestAssignment>().InsertAsync(assign);
+        //        return true;
+        //    }
+        //    return false;
+        //}
 
         private async Task<Guid?> FindUserIdWithMinimumAssignmentsAndAllowedPartyType(List<Guid> allowedPartyTypeIds)
         {
@@ -166,7 +173,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                 .Include(x => x.ServiceRequest)
                 .ThenInclude(sr => sr.Status)
                 .Where(a => a.IsActive == true &&
-                            eligibleUsers.Contains(a.MinistryUserId!.Value) &&
+                            eligibleUsers.Contains(a.MinistryUserId) &&
                             a.ServiceRequest.Status!.IsOpen == false)
                 .GroupBy(a => a.MinistryUserId)
                 .Select(g => new { UserId = g.Key, Count = g.Count() })
@@ -186,48 +193,19 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
         }
 
 
-        private async Task<List<Guid>> GetAllowedPartyTypeIds(Guid actionId, Guid requestId, ScholarshipData scholarship, Guid? requestCountry, Guid? university)
+        private async Task<List<Guid>> GetAllowedPartyTypeIds(Guid actionId)
         {
             using var uow = serviceScopeFactory.CreateScopedUow();
 
-            // Fetch assignable party types based on actionId
             var assignablePartyTypes = await uow.GetRepository<ActionAssignPartyType>()
-                .GetAllQueryFiltered(c => c.ScholarshipActionId == actionId)
+                .GetAllQueryFiltered(c => c.EvaluationActionId == actionId)
                 .Include(x => x.PartyType)
-                .ThenInclude(x => x!.PartyTypeCountyUniversity)
                 .AsNoTracking()
                 .ToListAsync();
 
-            // If no assignable party types found, return an empty list
             if (!assignablePartyTypes.Any()) return new List<Guid>();
 
-            // If requestCountry and university are not provided, get them from the request or scholarship
-            if (!requestCountry.HasValue || !university.HasValue)
-            {
-                if (scholarship != null)
-                {
-                    // If scholarship is not null, use its CountryId and UniversityId
-                    requestCountry = scholarship.CountryId;
-                    university = scholarship.UniversityId;
-                }
-                else
-                {
-                    // If scholarship is null, fetch from the request
-                    var countryUniversity = await SrvServiceRequest.GetRequestCountryAndUniversityAsync(requestId);
-                    requestCountry = countryUniversity.Item1;
-                    university = countryUniversity.Item2;
-                }
-            }
-
-            // Filter assignable party types based on the country and university conditions
-            return assignablePartyTypes
-                .Where(pt => pt.PartyType?.PartyTypeCountyUniversity == null ||
-                             !pt.PartyType.PartyTypeCountyUniversity.Any() ||
-                             pt.PartyType.PartyTypeCountyUniversity.Any(cu =>
-                                 cu.CountryId == requestCountry &&
-                                 (cu.UniversityId == null || cu.UniversityId == university)))
-                .Select(pt => pt.PartyTypeId)
-                .ToList();
+            return assignablePartyTypes.Select(x=>x.PartyTypeId).ToList();
         }
 
         public async Task<List<AssignUserDTO>> GetAssignedUsers(ServiceRequest request, Guid? actionId, bool showIsDefault)
@@ -239,7 +217,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                 throw new BusinessException(ConstantKeys.ExceptionMessage.lblActionNotFound);
             }
 
-            var allowedPartyTypeIdsTask =  GetAllowedPartyTypeIds( actionId.Value,request.Id, request.Scholarship!, null, null);
+            var allowedPartyTypeIdsTask =  GetAllowedPartyTypeIds( actionId.Value);
             var assignedUsersTask =  GetRequestAssignet(request.Id);
 
             var allowedPartyTypeIds = await allowedPartyTypeIdsTask;
@@ -270,13 +248,13 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                         return new AssignUserDTO
                         {
                             Email = user.Email,
-                            NameAr = user.FullNameAr,
-                            NameEn = user.FullNameEn,
+                            NameAr = user.NameAr,
+                            NameEn = user.NameEn,
                             PartyTypeId = pt.PartyTypeId,
                             PartyTypeTitle = lang == "ar" ? pt.PartyType?.NameAr : pt.PartyType?.NameEn,
                             IsSelected = assignedUser != null,
                             ShowIsDefaultAssigner = showIsDefault,
-                            IsDefault = assignedUser?.IsSchAssigner ?? false
+							IsLeader = assignedUser?.IsLeader ?? false
                         };
                     }))
                 .Distinct()
@@ -287,18 +265,18 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
      
 
-        public async Task<List<SchAssignment>> GetSchAssignetEmployee(Guid schId)
-        {
+        //public async Task<List<SchAssignment>> GetSchAssignetEmployee(Guid schId)
+        //{
 
-            var assignmentUsers = await serviceScopeFactory.CreateScopedUow()
-                                                 .GetRepository<SchAssignment>()
-                                                 .GetAllQueryFiltered()
-                                                 .Where(c => c.ScholarshipId == schId )
-                                                 .ToListAsync();
+        //    var assignmentUsers = await serviceScopeFactory.CreateScopedUow()
+        //                                         .GetRepository<SchAssignment>()
+        //                                         .GetAllQueryFiltered()
+        //                                         .Where(c => c.ScholarshipId == schId )
+        //                                         .ToListAsync();
 
 
-            return assignmentUsers;
-        }
+        //    return assignmentUsers;
+        //}
         public async Task<List<RequestAssignment>> GetRequestAssignet(Guid requestId)
         {
 

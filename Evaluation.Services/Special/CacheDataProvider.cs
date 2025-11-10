@@ -1,8 +1,16 @@
-﻿using Evaluation.DAL.SystemSetting;
+﻿using Evaluation.DAL.Entities.ActionEntities;
+using Evaluation.DAL.Entities.ServicesEntities;
+using Evaluation.DAL.Entities.StatusEntities;
+using Evaluation.DAL.Entities.Template;
+using Evaluation.DAL.SystemSetting;
 using Evaluation.DAL.UnitOfWork;
 using Evaluation.SharedHelper;
 using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Models.Api;
+using Evaluation.SharedHelper.Models.Api.ActionEntitiesDTOs;
+using Evaluation.SharedHelper.Models.Api.ProfileDTO;
+using Evaluation.SharedHelper.Models.Api.TemplatesDTO;
+using Mapster;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -165,152 +173,159 @@ namespace Evaluation.Services.Special
             return WebAppConfigs;
         }
 
-        //public async Task<IList<ActionStatusConfiguration>> GetActionStatusConfiguration()
-        //{
-        //    var key = ConstantKeys.WebAppCacheTableName.CACHE_ACTIONSTATUSCONFIG;
+        public async Task<IList<ActionStatusConfiguration>> GetActionStatusConfiguration()
+        {
+            var key = ConstantKeys.WebAppCacheTableName.CACHE_ACTIONSTATUSCONFIG;
 
-        //    var list = await GetOrSetCacheAsync(key, async () =>
-        //    {
-        //        using var scopedUow = serviceScopeFactory.CreateScopedUow();
-        //        var repo = scopedUow.GetRepository<ActionStatusConfiguration>();
-        //        var data = await repo.GetAllQueryFiltered()
-        //                             .Include(c => c.Notifications)
-        //                             .Include(c => c.CurrentStatus)
-        //                             .Include(c => c.ServiceAction)
-        //                             .ToListAsync();
-        //        return data;
-        //    });
+            var list = await GetOrSetCacheAsync(key, async () =>
+            {
+                using var scopedUow = serviceScopeFactory.CreateScopedUow();
+                var repo = scopedUow.GetRepository<ActionStatusConfiguration>();
+                var data = await repo.GetAllQueryFiltered()
+                                     .Include(c => c.Notifications)
+                                     .Include(c => c.CurrentStatus)
+                                     .Include(c => c.ServiceAction)
+                                     .ToListAsync();
+                return data;
+            });
 
-        //    return list.Where(c => c.IsActive && !c.IsDeleted).ToList();
-        //}
+            return list.Where(c => c.IsActive==true && c.IsDeleted==false).ToList();
+        }
 
 
 
-        // -------------------------------------------------------------------
-        // 📨 EMAIL PROFILES
-        // -------------------------------------------------------------------
-        //public async Task<List<EmailProfileDTO>> GetEmailProfiles()
-        //{
-        //    var key = ConstantKeys.WebAppCacheTableName.EmailProfiles;
-        //    return await GetOrSetCacheAsync(key, async () =>
-        //    {
-        //        using var scopedUow = serviceScopeFactory.CreateScopedUow();
-        //        var repo = scopedUow.GetRepository<EmailProfile>();
-        //        var list = await repo.GetAllActiveNonDeleted().ToListAsync();
-        //        return mapper.Map<List<EmailProfileDTO>>(list);
-        //    });
-        //}
+		// -------------------------------------------------------------------
+		//// 📨 EMAIL PROFILES
+		// -------------------------------------------------------------------
+		public async Task<List<EmailProfileDTO>> GetEmailProfiles()
+		{
+			var key = ConstantKeys.WebAppCacheTableName.EmailProfiles;
+			return await GetOrSetCacheAsync(key, async () =>
+			{
+				using var scopedUow = serviceScopeFactory.CreateScopedUow();
+				var repo = scopedUow.GetRepository<EmailProfile>();
+				var list = await repo.GetAllActiveNonDeleted().ToListAsync();
+				return list.Adapt<List<EmailProfileDTO>>();
+			});
+		}
 
-        // -------------------------------------------------------------------
-        // 📱 SMS PROFILES
-        // -------------------------------------------------------------------
-        //public async Task<List<SMSProfileDTO>> GetSMSProfiles()
-        //{
-        //    var key = ConstantKeys.WebAppCacheTableName.SMSProfiles;
-        //    return await GetOrSetCacheAsync(key, async () =>
-        //    {
-        //        using var scopedUow = serviceScopeFactory.CreateScopedUow();
-        //        var repo = scopedUow.GetRepository<SMSProfile>();
-        //        var list = await repo.GetAllActiveNonDeleted().ToListAsync();
-        //        return mapper.Map<List<SMSProfileDTO>>(list);
-        //    });
-        //}
 
-        // -------------------------------------------------------------------
-        // 📧 EMAIL TEMPLATES
-        // -------------------------------------------------------------------
-        //public async Task<List<EmailTemplateDTO>> GetEmailTemplates()
-        //{
-        //    var key = ConstantKeys.WebAppCacheTableName.EmailTemplates;
-        //    return await GetOrSetCacheAsync(key, async () =>
-        //    {
-        //        using var scopedUow = serviceScopeFactory.CreateScopedUow();
-        //        var repo = scopedUow.GetRepository<EmailTemplate>();
-        //        var list = await repo.GetAllActiveNonDeleted().ToListAsync();
-        //        return mapper.Map<List<EmailTemplateDTO>>(list);
-        //    });
-        //}
+		//-------------------------------------------------------------------
+		//📱 SMS PROFILES
+		//-------------------------------------------------------------------
+		public async Task<List<SMSProfileDTO>> GetSMSProfiles()
+		{
+			var key = ConstantKeys.WebAppCacheTableName.SMSProfiles;
+			return await GetOrSetCacheAsync(key, async () =>
+			{
+				using var scopedUow = serviceScopeFactory.CreateScopedUow();
+				var repo = scopedUow.GetRepository<SMSProfile>();
+				var list = await repo.GetAllActiveNonDeleted().ToListAsync();
+				return list.Adapt<List<SMSProfileDTO>>();
+			});
+		}
 
-        // -------------------------------------------------------------------
-        // 💬 SMS TEMPLATES
-        // -------------------------------------------------------------------
-        //public async Task<List<SMSTemplateDTO>> GetSMSTemplates()
-        //{
-        //    var key = ConstantKeys.WebAppCacheTableName.SMSTemplates;
-        //    return await GetOrSetCacheAsync(key, async () =>
-        //    {
-        //        using var scopedUow = serviceScopeFactory.CreateScopedUow();
-        //        var repo = scopedUow.GetRepository<SMSTemplate>();
-        //        var list = await repo.GetAllActiveNonDeleted().ToListAsync();
-        //        return mapper.Map<List<SMSTemplateDTO>>(list);
-        //    });
-        //}
 
-        // -------------------------------------------------------------------
-        // ⚙️ SERVICE STATUS CONFIGURATION
-        // -------------------------------------------------------------------
-        //public async Task<List<SchServiceStatusConfiguration>> GetServiceStatusConfiguration()
-        //{
-        //    var key = ConstantKeys.WebAppCacheTableName.SchServiceStatusConfiguration;
-        //    return await GetOrSetCacheAsync(key, async () =>
-        //    {
-        //        using var scopedUow = serviceScopeFactory.CreateScopedUow();
-        //        var repo = scopedUow.GetRepository<SchServiceStatusConfiguration>();
-        //        var list = await repo.GetAllQueryFiltered()
-        //                             .Include(c => c.Service)
-        //                             .ToListAsync();
-        //        return list;
-        //    });
-        //}
+		//-------------------------------------------------------------------
+		//📧 EMAIL TEMPLATES
+		//-------------------------------------------------------------------
+		public async Task<List<EmailTemplateDTO>> GetEmailTemplates()
+		{
+			var key = ConstantKeys.WebAppCacheTableName.EmailTemplates;
+			return await GetOrSetCacheAsync(key, async () =>
+			{
+				using var scopedUow = serviceScopeFactory.CreateScopedUow();
+				var repo = scopedUow.GetRepository<EmailTemplate>();
+				var list = await repo.GetAllActiveNonDeleted().ToListAsync();
+				return list.Adapt<List<EmailTemplateDTO>>();
+			});
+		}
 
-        // -------------------------------------------------------------------
-        // 🚀 SERVICE INITIATOR PARTY TYPES
-        // -------------------------------------------------------------------
-        //public async Task<List<ServiceInitiatorPartyType>> GetServiceIntiator()
-        //{
-        //    var key = ConstantKeys.WebAppCacheTableName.ServiceInitiatorPartyType;
-        //    return await GetOrSetCacheAsync(key, async () =>
-        //    {
-        //        using var scopedUow = serviceScopeFactory.CreateScopedUow();
-        //        var repo = scopedUow.GetRepository<ServiceInitiatorPartyType>();
-        //        var list = await repo.GetAllActiveNonDeleted().ToListAsync();
-        //        return list;
-        //    });
-        //}
 
-        // -------------------------------------------------------------------
-        // 🧩 ACTION PARTY TYPES
-        // -------------------------------------------------------------------
-        //public async Task<List<ActionPartyTypeDTO>> GetActionPartyTypes()
-        //{
-        //    var key = ConstantKeys.WebAppCacheTableName.ActionPartyTypes;
-        //    return await GetOrSetCacheAsync(key, async () =>
-        //    {
-        //        using var scopedUow = serviceScopeFactory.CreateScopedUow();
-        //        var repo = scopedUow.GetRepository<ActionPartyType>();
-        //        var list = await repo.GetAllActiveNonDeleted().ToListAsync();
-        //        return mapper.Map<List<ActionPartyTypeDTO>>(list);
-        //    });
-        //}
+		//-------------------------------------------------------------------
+		//💬 SMS TEMPLATES
+		//-------------------------------------------------------------------
+		public async Task<List<SMSTemplateDTO>> GetSMSTemplates()
+		{
+			var key = ConstantKeys.WebAppCacheTableName.SMSTemplates;
+			return await GetOrSetCacheAsync(key, async () =>
+			{
+				using var scopedUow = serviceScopeFactory.CreateScopedUow();
+				var repo = scopedUow.GetRepository<SMSTemplate>();
+				var list = await repo.GetAllActiveNonDeleted().ToListAsync();
+				return list.Adapt<List<SMSTemplateDTO>>();
+			});
+		}
 
-        // -------------------------------------------------------------------
-        // 🧮 SERVICE STATUS (with deleted)
-        // -------------------------------------------------------------------
-        //public async Task<IList<ServiceStatus>> GetStatusAllWithDeleted()
-        //{
-        //    var key = ConstantKeys.WebAppCacheTableName.ServiceStatus;
-        //    var data = await GetOrSetCacheAsync(key, async () =>
-        //    {
-        //        using var scopedUow = serviceScopeFactory.CreateScopedUow();
-        //        var repo = scopedUow.GetRepository<ServiceStatus>();
-        //        var list = await repo.GetAll()
-        //                             .Include(c => c.StatusPartyTypeDisplayNames)
-        //                             .ToListAsync();
-        //        return mapper.Map<List<ServiceStatus>>(list);
-        //    });
 
-        //    return data;
-        //}
-    }
+		//-------------------------------------------------------------------
+		//⚙️ SERVICE STATUS CONFIGURATION
+		//-------------------------------------------------------------------
+		//public async Task<List<SchServiceStatusConfiguration>> GetServiceStatusConfiguration()
+		//{
+		//    var key = ConstantKeys.WebAppCacheTableName.SchServiceStatusConfiguration;
+		//    return await GetOrSetCacheAsync(key, async () =>
+		//    {
+		//        using var scopedUow = serviceScopeFactory.CreateScopedUow();
+		//        var repo = scopedUow.GetRepository<SchServiceStatusConfiguration>();
+		//        var list = await repo.GetAllQueryFiltered()
+		//                             .Include(c => c.Service)
+		//                             .ToListAsync();
+		//        return list;
+		//    });
+		//}
+
+		//-------------------------------------------------------------------
+		//🚀 SERVICE INITIATOR PARTY TYPES
+		//-------------------------------------------------------------------
+		public async Task<List<ServiceInitiatorPartyType>> GetServiceIntiator()
+		{
+			var key = ConstantKeys.WebAppCacheTableName.ServiceInitiatorPartyType;
+			return await GetOrSetCacheAsync(key, async () =>
+			{
+				using var scopedUow = serviceScopeFactory.CreateScopedUow();
+				var repo = scopedUow.GetRepository<ServiceInitiatorPartyType>();
+				var list = await repo.GetAllActiveNonDeleted().ToListAsync();
+				return list.Adapt<List<ServiceInitiatorPartyType>>();
+			});
+		}
+
+
+		//-------------------------------------------------------------------
+		//🧩 ACTION PARTY TYPES
+		//-------------------------------------------------------------------
+		public async Task<List<ActionPartyTypeDTO>> GetActionPartyTypes()
+		{
+			var key = ConstantKeys.WebAppCacheTableName.ActionPartyTypes;
+			return await GetOrSetCacheAsync(key, async () =>
+			{
+				using var scopedUow = serviceScopeFactory.CreateScopedUow();
+				var repo = scopedUow.GetRepository<ActionPartyType>();
+				var list = await repo.GetAllActiveNonDeleted().ToListAsync();
+				return list.Adapt<List<ActionPartyTypeDTO>>();
+			});
+		}
+
+
+		//-------------------------------------------------------------------
+		//🧮 SERVICE STATUS(with deleted)
+		//-------------------------------------------------------------------
+		public async Task<IList<ServiceStatus>> GetStatusAllWithDeleted()
+		{
+			var key = ConstantKeys.WebAppCacheTableName.ServiceStatus;
+			var data = await GetOrSetCacheAsync(key, async () =>
+			{
+				using var scopedUow = serviceScopeFactory.CreateScopedUow();
+				var repo = scopedUow.GetRepository<ServiceStatus>();
+				var list = await repo.GetAll()
+									 .Include(c => c.StatusPartyTypeDisplayNames)
+									 .ToListAsync();
+				return list.Adapt<List<ServiceStatus>>();
+			});
+
+			return data;
+		}
+
+	}
 
 }

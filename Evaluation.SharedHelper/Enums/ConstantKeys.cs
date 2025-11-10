@@ -42,9 +42,49 @@
             public static readonly string InvalidApprovePlan = "InvalidApprovePlan";
             public static readonly string PlanInThePastIsNotAllowed = "PlanInThePastIsNotAllowed";
             public static readonly string InvalidDraftPlan = "InvalidDraftPlan";
-        }
 
-        public static class AdminSettings
+		public static readonly string ServiceRequestNotFound = "ServiceRequestNotFound";
+		public static readonly string lblMajorOrDegreeIdMissing = "lblMajorOrDegreeIdMissing";
+		public static readonly string lblInvalidGuidForMajorOrDegree = "lblInvalidGuidForMajorOrDegree";
+		public static readonly string lbl_Request_is_not_Valid = "lbl_Request_is_not_Valid";
+		public static readonly string lblRequestFieldsMissing = "lblRequestFieldsMissing";
+		public static readonly string lblNoAvailableVacancySeat = "lblNoAvailableVacancySeat";
+		public static readonly string lblUserGenderIDMissing = "lblUserGenderIDMissing";
+		public static readonly string lblRequestNotValid = "lblRequestNotValid";
+		public static readonly string lblNoPermissionForRequestStatus = "lblNoPermissionForRequestStatus";
+		public static readonly string lblOnlyAuthorizedCanSeeHistory = "lblOnlyAuthorizedCanSeeHistory";
+		public static readonly string lblNoDefaultStepFound = "lblNoDefaultStepFound";
+		public static readonly string lblActionNotFound = "lblActionNotFound";
+		public static readonly string lblQIDRequiredForNSIS = "lblQIDRequiredForNSIS";
+		public static readonly string lblNoServiceStatusFound = "lblNoServiceStatusFound";
+		public static readonly string lblActionConditionsNotMet = "lblActionConditionsNotMet";
+		public static readonly string lblNoActionStatusConfiguration = "lblNoActionStatusConfiguration";
+		public static readonly string lblMajorDegreeOrEntityIdMissing = "lblMajorDegreeOrEntityIdMissing";
+		public static readonly string lblNoAccessToEvaluationRequest = "lblNoAccessToEvaluationRequest";
+		public static readonly string lblRemarksRequired = "lblRemarksRequired";
+		public static readonly string lblOtherAttachmentsRequired = "lblOtherAttachmentsRequired";
+		public static readonly string lbl_you_are_not_authorized_to_perform_this_action_in_the_current_status = "lbl_you_are_not_authorized_to_perform_this_action_in_the_current_status";
+		public static readonly string lblSomeFieldsCannotBePartOfAction = "lblSomeFieldsCannotBePartOfAction";
+		public static readonly string lblRegistrationFailedOTPInterval = "lblRegistrationFailedOTPInterval";
+		public static readonly string lblMaximumNewRowsExceeded = "lblMaximumNewRowsExceeded";
+		public static readonly string lblMinimumNewRowsRequired = "lblMinimumNewRowsRequired";
+		public static readonly string lblMinimumRowsRequired = "lblMinimumRowsRequired";
+		public static readonly string lblMaximumRowsExceeded = "lblMaximumRowsExceeded";
+
+		public static readonly string Attachment_NoFiles = "Attachment_NoFiles";
+		public static readonly string Attachment_TooManyFiles = "Attachment_TooManyFiles";
+		public static readonly string Attachment_InvalidExtension = "Attachment_InvalidExtension";
+		public static readonly string Attachment_TooLarge = "Attachment_TooLarge";
+		public static readonly string Attachment_InsertFailed = "Attachment_InsertFailed";
+		public static readonly string IncompleteRequest = "IncompleteRequest";
+
+		public static readonly string EmailtemplateNotFound = "EmailtemplateNotFound";
+		public static readonly string SMSTemplateNotFound = "SMSTemplateNotFound";
+		public static readonly string SMSProfileNotFound = "SMSProfileNotFound";
+
+	}
+
+	public static class AdminSettings
         {
             public static readonly string EnableCaching = "EnableCaching";
             public static readonly string ClearCacheDuration = "ClearCacheDuration";
@@ -177,9 +217,77 @@
 			public static readonly string lblRegisterNewAccount = "lblRegisterNewAccount";
 		}
 
-    public static class LanguageConst
+	public static class WebAppCacheTableName
+	{
+
+		public static readonly string ServiceStatus = "ServiceStatus";
+		public static readonly string ServiceInitiatorPartyType = "ServiceInitiatorPartyType";
+		public static readonly string SchServiceStatusConfiguration = "SchServiceStatusConfiguration";
+		public static readonly string DropDown = "DropDown";
+		public static readonly string ActionPartyType = "ActionPartyType";
+		public static readonly string CACHE_DROPDOWNTYPE = "CACHE_DROPDOWNTYPE";
+		public static readonly string CACHE_FIELDS = "CACHE_FIELDS";
+		public static readonly string CACHE_ACTIONSTATUSCONFIG = "CACHE_ACTIONSTATUSCONFIG";
+		public static readonly string CACHE_ALL_CLEAR = "CACHE_ALL_CLEAR";
+		public static readonly string ActionPartyTypes = "ActionPartyTypes";
+		public static readonly string SMSTemplates = "SMSTemplates";
+		public static readonly string EmailTemplates = "EmailTemplates";
+		public static readonly string SMSProfiles = "SMSProfiles";
+		public static readonly string EmailProfiles = "EmailProfiles";
+	}
+	public static class LanguageConst
     {
         public static readonly string En = "En";
         public static readonly string Ar = "Ar";
     }
+
+	public static class SystemSettings
+	{
+		public static readonly string ServiceSettings = "ServiceSettings";
+		public static readonly string TimeFormat = "TimeFormat";
+		public static readonly string ShortTimeFormat = "ShortTimeFormat";
+		public static readonly string DateFormat = "DateFormat";
+		public static readonly string DateTimeFormat = "DateTimeFormat";
+		public static readonly string PageSize = "PageSize";
+		public static readonly string ServiceRequestPageSize = "ServiceRequestPageSize";
+		public static readonly string SchRestrictedStatuses = "SchRestrictedStatuses";
+		public static readonly string ExceptionsPageSize = "ExceptionsPageSize";
+		public static readonly string DropDownDataSourceAllowedTables = "DropDownDataSourceAllowedTables";
+		public static readonly string DefaultMissingImage = "DefaultNullImage";
+		public static readonly string AddAttachment_FILE_EXTENSION = "AddAttachment_FILE_EXTENSION";
+		public static readonly string AddAttachment_FILE_SIZE = "AddAttachment_FILE_SIZE"; // in MB
+		public static readonly string AddAttachment_FILE_COUNT = "AddAttachment_FILE_COUNT";
+	}
+
+
+	public static class FieldTypeConstant
+	{
+		public const string label = "label";
+		public const string text = "text";
+		public const string textarea = "textarea";
+		public const string jqte = "jqte";
+		public const string Tiny = "Tiny";
+		public const string number = "number";
+		public const string date = "date";
+		public const string datetime = "datetime";
+		public const string checkbox = "checkbox";
+		public const string radioButton = "radioButton";
+		public const string dropdown = "dropdown";
+		public const string select2 = "select2";
+		public const string dual_select = "dual_select";
+		public const string file = "file";
+		public const string fileV2 = "fileV2";
+		public const string dropzone = "dropzone";
+		public const string table = "table";
+		public const string list = "list";
+	}
+	public static class Module
+	{
+		public static readonly string AuthenticationModule = "AuthenticationModule";
+		public static readonly string ConfigurationModule = "ConfigurationModule";
+		public static readonly string Notification = "NotificationModule";
+		public static readonly string Alert = "AlertModule";
+		public static readonly string EvaluationModule = "EvaluationModule";
+	}
+
 }

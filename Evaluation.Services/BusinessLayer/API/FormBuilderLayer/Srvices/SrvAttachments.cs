@@ -1,10 +1,15 @@
 ﻿using Evaluation.DAL.Entities.Attachments;
 using Evaluation.DAL.Entities.FormBuilder;
+using Evaluation.DAL.Entities.Planing.EvaluationRequestEntity;
+using Evaluation.DAL.Helper;
 using Evaluation.DAL.UnitOfWork;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper;
 using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Exceptions;
+using Evaluation.SharedHelper.Models;
+using Evaluation.SharedHelper.Models.Api.AttachmentsDTOs;
+using Evaluation.SharedHelper.Models.Api.FormBuilderDTO;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.EntityFrameworkCore;
@@ -16,8 +21,8 @@ using System.Text.RegularExpressions;
 
 namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 {
-    public class  SrvAttachments( AzureBlobStorageService StorageService, IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow, LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, IServiceProvider serviceProvider, RequestInfo requestInfo)
-            : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, requestInfo)
+    public class  SrvAttachments( AzureBlobStorageService StorageService, IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow, LoggingServices loggingServices,  UserInfo userInfo, IServiceProvider serviceProvider, RequestInfo requestInfo)
+            : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, userInfo, serviceProvider, requestInfo)
         {
            
         public async Task<string?> GetAttachmentById(Guid attachmentId, Guid requestId)
@@ -42,7 +47,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                 return attachment;
 
         }
-        public async Task<List<FieldValueDTO>> UploadAndInsertAttachments(List<FieldValueDTO> FieldValueDTOs, Guid? RequestId, Guid? SchtId ,List<FileFieldDTO> fileFields, List<IFormFile> files)
+        public async Task<List<FieldValueDTO>> UploadAndInsertAttachments(List<FieldValueDTO> FieldValueDTOs, Guid? RequestId, Guid? EvaluationRequestId, List<FileFieldDTO> fileFields, List<IFormFile> files)
         {
             if (files.Any())
             {
@@ -64,7 +69,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
                         if (field != null)
                         {
-                            var attachment = new DAL.Models.Attachments.Attachment
+                            var attachment = new Attachment
                             {
                                 FieldId = field.FieldId,
                                 FileName = fileDTO.CustomFileName,
@@ -74,7 +79,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                                 ServiceRequestId = RequestId,
                                 ChildFieldId = parts.Length > 2 ? Guid.Parse(parts[0]) : null,
                                 Index = parts.Length > 2 ? parts[1] : null,
-                                ScholarshipDataId=SchtId,
+                                EvaluationRequestId= EvaluationRequestId,
                             };
 
                             attachmentsToBeInserted.Add(attachment);
@@ -117,7 +122,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             }
             return FieldValueDTOs;
         }
-        public async Task<List<Attachment>> UploadAndInsertOtherAttachments(List<IFormFile> files, Guid? actionlog,Guid? SchId)
+        public async Task<List<Attachment>> UploadAndInsertOtherAttachments(List<IFormFile> files, Guid? actionlog,Guid? EvaluationRequestId)
         {
             if (files.Any())
             {
@@ -141,7 +146,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                             FileExtension = Path.GetExtension(fileDTO.FileName),
                             FileSize = fileDTO.FileLength!.Value,
                             IsOthers = true,
-                            ScholarshipDataId=SchId,
+                            EvaluationRequestId= EvaluationRequestId,
 
                         };
 
@@ -304,7 +309,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
             return bytes;
         }
-        public async Task<IReadOnlyList<Attachment>> UpdateRequestAttachmentsAsync(Guid requestId,Guid scholarshipDataId)
+        public async Task<IReadOnlyList<Attachment>> UpdateRequestAttachmentsAsync(Guid requestId,Guid EvaluationRequestId)
         {
             using var scopedUow = serviceScopeFactory.CreateScopedUow();
             var repo = scopedUow.GetRepository<Attachment>();
@@ -318,7 +323,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
             foreach (var a in attachments)
             {
-                a.ScholarshipDataId = scholarshipDataId;
+                a.EvaluationRequestId = EvaluationRequestId;
             }
             repo.UpdateRange(attachments);
             return attachments;
@@ -328,16 +333,16 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             if (files == null || files.Count == 0)
                 throw new BusinessException(ConstantKeys.ExceptionMessage.Attachment_NoFiles);
 
-            var allowedExtensionsSetting = await cacheDataProvider.GetSystemSettingValue(ConstantKeys.SystemSettings.AddScholarshipAttachment_FILE_EXTENSION);
+            var allowedExtensionsSetting = await cacheDataProvider.GetSystemSettingValue(ConstantKeys.SystemSettings.AddAttachment_FILE_EXTENSION);
             var allowedExtensions = allowedExtensionsSetting?
                 .Split(',', StringSplitOptions.RemoveEmptyEntries)
                 .Select(x => x.Trim().ToLower())
                 .ToList() ?? new List<string> { ".pdf", ".jpg", ".jpeg", ".png" };
 
-            var maxSizeStr = await cacheDataProvider.GetSystemSettingValue(ConstantKeys.SystemSettings.AddScholarshipAttachment_FILE_SIZE);
+            var maxSizeStr = await cacheDataProvider.GetSystemSettingValue(ConstantKeys.SystemSettings.AddAttachment_FILE_SIZE);
             var maxFileSizeMB = int.TryParse(maxSizeStr, out var sizeVal) ? sizeVal : 10;
 
-            var maxCountStr = await cacheDataProvider.GetSystemSettingValue(ConstantKeys.SystemSettings.AddScholarshipAttachment_FILE_COUNT);
+            var maxCountStr = await cacheDataProvider.GetSystemSettingValue(ConstantKeys.SystemSettings.AddAttachment_FILE_COUNT);
             var maxFileCount = int.TryParse(maxCountStr, out var countVal) ? countVal : 10;
 
             if (files.Count > maxFileCount)

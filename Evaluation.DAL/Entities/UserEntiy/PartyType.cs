@@ -14,7 +14,6 @@ public class PartyType : EntityBase, IAuditLogEntity
     public bool IsEmployeePartyType { get; set; }
     public bool CanViewAllRequests { get; set; }
     public bool CanViewAllEvaluations { get; set; }
-    public bool CanViewEntityEvaluation { get; set; }
     public Guid SystemModuleId { get; set; }
  
     //public Departement? Departement { get; set; }

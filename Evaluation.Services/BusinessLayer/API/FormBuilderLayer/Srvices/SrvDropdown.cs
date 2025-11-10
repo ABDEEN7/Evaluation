@@ -18,7 +18,7 @@ using Scholarship.SharedHelper.Enums;
 using Scholarship.SharedHelper.Exceptions;
 using Scholarship.SharedHelper.Models;
 using Scholarship.SharedHelper.Models.Api;
-using Scholarship.SharedHelper.Models.Api.FormBuilderDTO;
+using Evaluation.SharedHelper.Models.Api.FormBuilderDTO;
 using Scholarship.SharedHelper.Models.Api.MastersDTO;
 using Scholarship.SharedHelper.Models.Api.ScholarshipDTOs;
 using System.Text.Json;

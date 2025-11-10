@@ -1,17 +1,25 @@
 ﻿using Evaluation.DAL.Entities.ActionEntities;
 using Evaluation.DAL.Entities.Attachments;
 using Evaluation.DAL.Entities.Authentication;
+using Evaluation.DAL.Entities.ServiceRequestEntities;
+using Evaluation.DAL.Entities.Template;
+using Evaluation.DAL.Helper;
 using Evaluation.DAL.UnitOfWork;
+using Evaluation.Services.Models.SMTP;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper;
+using Evaluation.SharedHelper.Enums;
+using Evaluation.SharedHelper.Exceptions;
+using Evaluation.SharedHelper.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Scholarship.Services.BusinessLayer.API.Template;
 
 
 namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 {
-    public class SrvNotification(IServiceScopeFactory serviceScopeFactory, IEmailServices emailServices, CacheDataProvider cacheDataProvider, MasterBL masterBL, UnitOfWork uow, LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, IServiceProvider serviceProvider, RequestInfo _requestInfo, EmailTemplateProvider emailTemplateProvider)
-            : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, _requestInfo)
+    public class SrvNotification(IServiceScopeFactory serviceScopeFactory, IEmailServices emailServices, CacheDataProvider cacheDataProvider, MasterBL masterBL, UnitOfWork uow, LoggingServices loggingServices,  UserInfo userInfo, IServiceProvider serviceProvider, RequestInfo _requestInfo, EmailTemplateProvider emailTemplateProvider)
+            : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, userInfo, serviceProvider, _requestInfo)
         {
         public async Task HandleNotification(IList<ActionStatusConfigNotification> notifications, ServiceRequest request, Guid actionId, string lang, string remarks, List<Attachment>? actionOtherAttachments = null)
         {
@@ -44,7 +52,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
                   
                      var recipients = partyType.IsEmployeePartyType
-                        ? GetEmployeeRecipients( request.Id, request.CountryId,request.UniversityId, allUserProfiles, partyType)
+                        ? GetEmployeeRecipients( request.Id,  allUserProfiles, partyType)
                         : GetStudentRecipient(request.StudentId, allUserProfiles);
 
                     if (!recipients.Any()) continue;
@@ -225,7 +233,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             var message = await engine.GetRequestEmailTemplate(requestData, template.Messages, null, lang);
 
             var smsService = masterBL.SmsServices;
-            var tasks = recipients.OfType<StudentUser>()
+            var tasks = recipients.OfType<MinistryUser>()
                 .Where(u => !string.IsNullOrEmpty(u.Mobile))
                 .Select(u => smsService.SendMessage(new SMSMessageModel
                 {
@@ -250,10 +258,10 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             }
 
             var engine = serviceProvider.GetRequiredService<TemplateBl>();
-            var bodyAr = await engine.GetRequestEmailTemplate(requestData, template.TemplateBodyAr, partyTypeId, lang);
-            var bodyEn = await engine.GetRequestEmailTemplate(requestData, template.TemplateBodyEn, partyTypeId, lang);
-            var titleAr = await engine.GetRequestEmailTemplate(requestData, template.TemplateSubjectAr!, partyTypeId, lang);
-            var titleEn = await engine.GetRequestEmailTemplate(requestData, template.TemplateSubjectEn!, partyTypeId, lang);
+            var bodyAr = await engine.GetRequestEmailTemplate(requestData, template.BodyAr, partyTypeId, lang);
+            var bodyEn = await engine.GetRequestEmailTemplate(requestData, template.BodyEn, partyTypeId, lang);
+            var titleAr = await engine.GetRequestEmailTemplate(requestData, template.SubjectAr!, partyTypeId, lang);
+            var titleEn = await engine.GetRequestEmailTemplate(requestData, template.SubjectEn!, partyTypeId, lang);
 
             var notifications = recipients.Select(user => new Notification
             {
@@ -263,7 +271,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                 DescriptionEn = bodyEn,
                 NotificationTemplateId = notificationTemplateId,
                 ReadCount = 0,
-                UserProfileId = user.Id
+				UserId = user.Id
             }).ToList();
 
             await scopedUow.GetRepository<Notification>().InsertRange(notifications);

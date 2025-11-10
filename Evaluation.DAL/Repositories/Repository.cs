@@ -150,25 +150,7 @@ public class Repository<T>(DbContext context, UserInfo userInfo) : RepositoryBas
         await _dbSet.AddAsync(entity);
         return entity;
     }
-	public async Task<IEnumerable<T>> InsertRange(IEnumerable<T> entities)
-	{
-		var today = DateTime.Now;
-		var addedentities = entities.ToList();
-		foreach (var entity in addedentities)
-		{
-			entity.Id = Guid.NewGuid();
-			entity.CreateDate = today;
-			entity.IsDeleted = false;
-			if (userInfo.UserId.HasValue)
-				entity.CreateById = userInfo.UserId.Value;
-			else
-			{
-				entity.CreateById = ConstantKeys.ConstantKeys.DefaultCreateBy;
-			}
-		}
-		await _dbSet.AddRangeAsync(addedentities);
-		return entities;
-	}
+	
 	public T Update(T entity)
     {
         entity.UpdateDate = DateTime.Now;

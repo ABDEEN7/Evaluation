@@ -19,7 +19,7 @@ using Scholarship.SharedHelper.Exceptions;
 using Scholarship.SharedHelper.Extensions;
 using Scholarship.SharedHelper.Models;
 using Scholarship.SharedHelper.Models.Api.AttachmentsDTOs;
-using Scholarship.SharedHelper.Models.Api.FormBuilderDTO;
+using Evaluation.SharedHelper.Models.Api.FormBuilderDTO;
 using Scholarship.SharedHelper.Models.Api.PartyTypeDTOs;
 using Scholarship.SharedHelper.Models.Api.ServiceRequestEntitiesDTO;
 using static iText.StyledXmlParser.Jsoup.Select.NodeFilter;

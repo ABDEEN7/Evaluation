@@ -1,17 +1,24 @@
 ﻿using Evaluation.DAL.Entities.Attachments;
+using Evaluation.DAL.Entities.Authentication;
 using Evaluation.DAL.Entities.Logs;
+using Evaluation.DAL.Entities.ServiceRequestEntities;
 using Evaluation.DAL.Entities.StatusEntities;
+using Evaluation.DAL.Helper;
 using Evaluation.DAL.UnitOfWork;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper;
+using Evaluation.SharedHelper.Enums;
+using Evaluation.SharedHelper.Models;
+using Evaluation.SharedHelper.Models.Api.AttachmentsDTOs;
+using Evaluation.SharedHelper.Models.Api.LogsDTO;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 
 namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 {
-    public class SrvActionTransactionsLog (SrvStatus SrvStatus,IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow, LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, IServiceProvider serviceProvider, RequestInfo requestInfo)
-            : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, requestInfo)
+    public class SrvActionTransactionsLog (SrvStatus SrvStatus,IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow, LoggingServices loggingServices, UserInfo userInfo, IServiceProvider serviceProvider, RequestInfo requestInfo)
+            : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, userInfo, serviceProvider, requestInfo)
     {
 
         public async Task<Guid> UpdateStatusAndLogAction(ServiceRequest application, Guid actionId, Guid nextStatusId, string Remarks, bool saveAsDraft = false)
@@ -73,7 +80,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             return actionLogs.Id;
         }
 
-        public async Task<IList<ActionTransactionLogDTO?>?> GetActionLog(Guid id, Guid ServiceId,Guid? DepartmentId,UserProfile user)
+        public async Task<IList<ActionTransactionLogDTO?>?> GetActionLog(Guid id, Guid ServiceId,Guid? DepartmentId,MinistryUser user)
         {
             string lang = requestInfo.Lang;
             var dateTime_Format = await cacheDataProvider.GetSystemSettingValue(ConstantKeys.SystemSettings.DateTimeFormat);
@@ -92,22 +99,22 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                         .Where(c => c.ServiceRequestId == id).ToListAsync();
 
 
-            if (user is StudentUser)
-            {
-                query = query.Where(c => c.ServiceAction!.ActionShowLogPartyTypes!.Count == 0 ||
-                                         c.ServiceAction.ActionShowLogPartyTypes.Any(t => t.Partytype != null &&  t.Partytype?.IsEmployeePartyType==false )).ToList();
-            }
-            else
-            {
+            //if (user is StudentUser)
+            //{
+            //    query = query.Where(c => c.ServiceAction!.ActionShowLogPartyTypes!.Count == 0 ||
+            //                             c.ServiceAction.ActionShowLogPartyTypes.Any(t => t.Partytype != null &&  t.Partytype?.IsEmployeePartyType==false )).ToList();
+            //}
+            //else
+            //{
                 query = query.Where(c => c.ServiceAction!.ActionShowLogPartyTypes!.Count == 0 ||
                                          c.ServiceAction.ActionShowLogPartyTypes.Any(t => userInfo.PartyTypes.Contains(t.PartytypeId))).ToList();
-            }
+            //}
             actionTransactionLogs = query.OrderBy(c => c.CreateDate).Select(c => new ActionTransactionLogDTO()
             {
                 Action = lang == "ar" ? c.ServiceAction!.NameAr : c.ServiceAction!.NameEn,
                 PreviousStatusId = c.PreviousStatusId,
                 NextStatusId = c.NextStatusId,
-                Actor = lang == "ar" ? c.CreateBy!.FullNameAr : c.CreateBy!.FullNameEn,
+                Actor = lang == "ar" ? c.CreateBy!.NameAr : c.CreateBy!.NameEn,
                 CreatedDate = c.CreateDate,
                 FormattedCreatedDate = c.CreateDate.ToString(dateTime_Format),
                 Remarks = c.Remarks,
