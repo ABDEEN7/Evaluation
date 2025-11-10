@@ -30,6 +30,7 @@ internal class Program
             ClsAppSetting.AzureBlobConnectionString = config["AzureBlobStorageConnectionString"] ?? "";
             ClsAppSetting.BlobSasUrl = config["AzureBlobStorage"] ?? "";
             ClsAppSetting.AllowWebCorsOnly = config["baseAppUrl"] ?? "";
+            ClsAppSetting.OracleDBConnection = config["OracleDBConnection"] ?? "";
         }
         else
         {
@@ -45,6 +46,8 @@ internal class Program
             ClsAppSetting.FormJwtConfigKey = config.GetSection("FormJwtConfig:Key").Value ?? "";
             ClsAppSetting.AllowWebCorsOnly = config.GetSection("AppSettings:baseAppUrl").Value!.Replace("/{lang}", "") ?? "";
             ClsAppSetting.BaseApiUrl = config.GetSection("AppSettings:baseApiUrl").Value!.Replace("/{lang}", "") ?? "";
+            ClsAppSetting.OracleDBConnection = config["OracleDBConnection"] ?? "";
+
 
             // -------------------------------------
             // 2️⃣ Add Core Services

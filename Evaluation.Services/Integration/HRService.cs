@@ -7,8 +7,6 @@ using Evaluation.SharedHelper.Models;
 using MapsterMapper;
 using Microsoft.Extensions.DependencyInjection;
 using Oracle.ManagedDataAccess.Client;
-using System.Data;
-using System.Text;
 
 namespace Evaluation.Services.Integration;
 
@@ -18,58 +16,60 @@ public class HRService: ApiBase
     : base(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, requestInfo)
     {
     }
-
-    public List<Employee> GetAllHRUsers()
+    public async Task<List<Employee>> GetAllHRUsersAsync(int skip = 0, int top = 50)
     {
-        List<Employee> _Allobj = new List<Employee>();
+        var employees = new List<Employee>();
 
-        OracleConnection con = new OracleConnection(ClsAppSetting.OracleDBConnection);
-        try
+        using (var con = new OracleConnection(ClsAppSetting.OracleDBConnection))
         {
-            using (OracleCommand cmd = con.CreateCommand())
+            try
             {
-                con.Open();
-
-                cmd.BindByName = true;
-
-                cmd.CommandText = "select * from TEMP_HR.MOE_EMPLOYEES_EVALAPP_V where Email is not null";
-                //Execute the command and use DataReader to display the data
-                OracleDataReader reader = cmd.ExecuteReader();
-                var count = 0;
-                while (reader.Read())
+                using (var cmd = con.CreateCommand())
                 {
-                    Employee _obj = new Employee();
-                    _obj.NameEn = reader.IsDBNull("EMPLOYEE_E") ? "" : reader.GetString("EMPLOYEE_E");
-                    _obj.NameAr = reader.IsDBNull("EMPLOYEE_A") ? "" : reader.GetString("EMPLOYEE_A");
-                    _obj.EmployeeNo = reader.IsDBNull("EMPLOYEE_NUMBER") ? "" : reader.GetString("EMPLOYEE_NUMBER");
-                    //_obj.Gender = 
-                    //_obj.BirthDate =
-                    _obj.Nationality = reader.IsDBNull("NATIONALITY_E") ? "" : reader.GetString("NATIONALITY_E");
-                    //_obj.JoinDate = reader.IsDBNull("DATE_OF_JOINING") ? "" : reader.GetString("DATE_OF_JOINING");
-                    _obj.JobTitle = reader.IsDBNull("JOB_TITLE_E") ? reader.GetString("JOB_TITLE_A") : reader.GetString("JOB_TITLE_E");
-                    //_obj.HrCode =
+                    await con.OpenAsync();
 
-                    _Allobj.Add(_obj);
-                    count++;
-                    if(count > 10)
-                        break;
+                    cmd.BindByName = true;
+
+                    cmd.CommandText = @"
+                    SELECT *
+                    FROM TEMP_HR.MOE_EMPLOYEES_EVALAPP_V
+                    WHERE Email IS NOT NULL
+                    OFFSET :Skip ROWS FETCH NEXT :Top ROWS ONLY";
+
+                    cmd.Parameters.Add(new OracleParameter("Skip", skip));
+                    cmd.Parameters.Add(new OracleParameter("Top", top));
+
+                    using (var reader = await cmd.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            var emp = new Employee
+                            {
+                                NameEn = reader.IsDBNull(reader.GetOrdinal("EMPLOYEE_E")) ? "" : reader.GetString(reader.GetOrdinal("EMPLOYEE_E")),
+                                NameAr = reader.IsDBNull(reader.GetOrdinal("EMPLOYEE_A")) ? "" : reader.GetString(reader.GetOrdinal("EMPLOYEE_A")),
+                                EmployeeNo = reader.IsDBNull(reader.GetOrdinal("EMPLOYEE_NUMBER")) ? "" : reader.GetString(reader.GetOrdinal("EMPLOYEE_NUMBER")),
+
+                                // Need check here !!
+
+                                // Nationality = reader.IsDBNull(reader.GetOrdinal("NATIONALITY_E")) ? "" : reader.GetString(reader.GetOrdinal("NATIONALITY_E")),
+                                // JoinDate = reader.IsDBNull(reader.GetOrdinal("DATE_OF_JOINING")) ? "" : reader.GetDateTime(reader.GetOrdinal("DATE_OF_JOINING")),
+                                // JobTitle = reader.IsDBNull(reader.GetOrdinal("JOB_TITLE_E")) ? reader.GetString(reader.GetOrdinal("JOB_TITLE_A")) : reader.GetString(reader.GetOrdinal("JOB_TITLE_E")),
+                                //_obj.Gender = 
+                                //_obj.BirthDate =
+                                //_obj.HrCode =
+                            };
+
+                            employees.Add(emp);
+                        }
+                    }
                 }
-
-
-                reader.Dispose();
-                con.Dispose();
-                con.Close();
-                return _Allobj;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading employees: {ex.Message}");
             }
         }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.Message);
-        }
-        finally
-        {
-            con.Close();
-        }
-        return _Allobj;
+
+        return employees;
     }
 }
