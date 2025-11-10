@@ -35,14 +35,7 @@ internal class Program
         {
             ClsAppSetting.AzureBlobConnectionString = config.GetSection("AzureBlobStorageConnectionString").Value ?? "";
             ClsAppSetting.BlobSasUrl = config.GetSection("ConnectionStrings:AzureBlobStorage").Value ?? "";
-            ClsAppSetting.MOPHUserName = config.GetSection("MOPHConfig:UserName").Value ?? "";
-            ClsAppSetting.MOPHPassword = config.GetSection("MOPHConfig:Password").Value ?? "";
-            ClsAppSetting.MOPHApiURL = config.GetSection("MOPHConfig:ApiURL").Value ?? "";
-            ClsAppSetting.NSISApiURL = config.GetSection("NSISConfig:ApiURL").Value ?? "";
-            ClsAppSetting.NSISAppID = config.GetSection("NSISConfig:AppID").Value ?? "";
-            ClsAppSetting.ValidationURL = config.GetSection("NSISConfig:ValidationURL").Value ?? "";
-            ClsAppSetting.StudentInfoURL = config.GetSection("NSISConfig:StudentInfoURL").Value ?? "";
-            ClsAppSetting.FormJwtConfigKey = config.GetSection("FormJwtConfig:Key").Value ?? "";
+           
             ClsAppSetting.AllowWebCorsOnly = config.GetSection("AppSettings:baseAppUrl").Value!.Replace("/{lang}", "") ?? "";
             ClsAppSetting.BaseApiUrl = config.GetSection("AppSettings:baseApiUrl").Value!.Replace("/{lang}", "") ?? "";
 
