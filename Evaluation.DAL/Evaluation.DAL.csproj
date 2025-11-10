@@ -15,8 +15,6 @@
     <Compile Remove="EFConfiguration\FormBuilderConfiguration\FieldTypeShowConfiguration.cs" />
     <Compile Remove="EFConfiguration\FormBuilderConfiguration\FormGroupConfiguration.cs" />
     <Compile Remove="EFConfiguration\FormBuilderConfiguration\FormGroupTypeConfiguration.cs" />
-    <Compile Remove="EFConfiguration\SchoolLevelConfiguration.cs" />
-    <Compile Remove="Entities\Org\SchoolLevel.cs" />
   </ItemGroup>
 
   <ItemGroup>

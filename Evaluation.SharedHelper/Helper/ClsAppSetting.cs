@@ -19,8 +19,6 @@ namespace Evaluation.SharedHelper.Helper
         public static string AllowAdminCorsOnly { get; set; } = "";
         public static string AllowWebCorsOnly { get; set; } = "";
         public static string BaseApiUrl { get; set; } = "";
-        public static string AllowWebCorsOnly { get; set; } = "";
-        public static string AllowAdminCorsOnly { get; set; } = "";
         public static string StudentCertificateUserName { get; set; } = "";
         public static string StudentCertificatePassword { get; set; } = "";
         public static string ValidationURL { get; set; } = "";
