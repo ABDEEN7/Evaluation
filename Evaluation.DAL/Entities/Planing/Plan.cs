@@ -6,8 +6,7 @@ namespace Evaluation.DAL.Entities.Planing;
 
 public class Plan : EntityBase
 {
-    public string NameAr { get; set; } = null!;
-    public string NameEn { get; set; } = null!;
+    public string PlanName { get; set; } = null!;
     public DateOnly StartDate { get; set; }
     public DateOnly EndDate { get; set; }
     public string? ExpectedListJson { get; set; }
@@ -17,7 +16,6 @@ public class Plan : EntityBase
     public AcademicYear? AcademicYear { get; set; }
     public Guid PlanStatusId { get; set; }
     public PlanStatus? PlanStatus { get; set; }
-    public ICollection<ChangeRequest>? ChangeRequests { get; set; }
     public Guid PlanTypeId { get; set; }
     public PlanType? PlanType { get; set; }
 

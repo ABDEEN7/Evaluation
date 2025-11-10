@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Evaluation.DAL.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class InitialDB : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -17,8 +17,7 @@ namespace Evaluation.DAL.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     QID = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     NationalityCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     NameAr = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     NameEn = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -478,6 +477,44 @@ namespace Evaluation.DAL.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "EducationLevel",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    NameAr = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    NameEn = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    BackendName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    OrderNo = table.Column<int>(type: "int", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
+                    UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeleteById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    DeleteDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "0")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EducationLevel", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_EducationLevel_MinistryUsers_CreateById",
+                        column: x => x.CreateById,
+                        principalTable: "MinistryUsers",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_EducationLevel_MinistryUsers_DeleteById",
+                        column: x => x.DeleteById,
+                        principalTable: "MinistryUsers",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_EducationLevel_MinistryUsers_UpdateById",
+                        column: x => x.UpdateById,
+                        principalTable: "MinistryUsers",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "EmailLog",
                 columns: table => new
                 {
@@ -558,6 +595,47 @@ namespace Evaluation.DAL.Migrations
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_EmailTemplates_MinistryUsers_UpdateById",
+                        column: x => x.UpdateById,
+                        principalTable: "MinistryUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "EvaluationType",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    BackendName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    NameAr = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    NameEn = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    OrderNo = table.Column<int>(type: "int", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
+                    UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeleteById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    DeleteDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "0")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EvaluationType", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_EvaluationType_MinistryUsers_CreateById",
+                        column: x => x.CreateById,
+                        principalTable: "MinistryUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_EvaluationType_MinistryUsers_DeleteById",
+                        column: x => x.DeleteById,
+                        principalTable: "MinistryUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_EvaluationType_MinistryUsers_UpdateById",
                         column: x => x.UpdateById,
                         principalTable: "MinistryUsers",
                         principalColumn: "Id",
@@ -767,12 +845,14 @@ namespace Evaluation.DAL.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Level",
+                name: "JobTitle",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    BackendName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     NameAr = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     NameEn = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    OrderNo = table.Column<int>(type: "int", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
                     CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
@@ -784,22 +864,25 @@ namespace Evaluation.DAL.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Level", x => x.Id);
+                    table.PrimaryKey("PK_JobTitle", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Level_MinistryUsers_CreateById",
+                        name: "FK_JobTitle_MinistryUsers_CreateById",
                         column: x => x.CreateById,
                         principalTable: "MinistryUsers",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Level_MinistryUsers_DeleteById",
+                        name: "FK_JobTitle_MinistryUsers_DeleteById",
                         column: x => x.DeleteById,
                         principalTable: "MinistryUsers",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Level_MinistryUsers_UpdateById",
+                        name: "FK_JobTitle_MinistryUsers_UpdateById",
                         column: x => x.UpdateById,
                         principalTable: "MinistryUsers",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -849,46 +932,7 @@ namespace Evaluation.DAL.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "OrganizationTypes",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    NameAr = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    NameEn = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
-                    UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeleteById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    DeleteDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "0")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_OrganizationTypes", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_OrganizationTypes_MinistryUsers_CreateById",
-                        column: x => x.CreateById,
-                        principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_OrganizationTypes_MinistryUsers_DeleteById",
-                        column: x => x.DeleteById,
-                        principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_OrganizationTypes_MinistryUsers_UpdateById",
-                        column: x => x.UpdateById,
-                        principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "OrgTreeClass",
+                name: "OrgClass",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -907,29 +951,68 @@ namespace Evaluation.DAL.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_OrgTreeClass", x => x.Id);
+                    table.PrimaryKey("PK_OrgClass", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_OrgTreeClass_MinistryUsers_CreateById",
+                        name: "FK_OrgClass_MinistryUsers_CreateById",
                         column: x => x.CreateById,
                         principalTable: "MinistryUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_OrgTreeClass_MinistryUsers_DeleteById",
+                        name: "FK_OrgClass_MinistryUsers_DeleteById",
                         column: x => x.DeleteById,
                         principalTable: "MinistryUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_OrgTreeClass_MinistryUsers_UpdateById",
+                        name: "FK_OrgClass_MinistryUsers_UpdateById",
                         column: x => x.UpdateById,
                         principalTable: "MinistryUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_OrgTreeClass_OrgTreeClass_ParentId",
+                        name: "FK_OrgClass_OrgClass_ParentId",
                         column: x => x.ParentId,
-                        principalTable: "OrgTreeClass",
+                        principalTable: "OrgClass",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "OrgTypes",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    NameAr = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    NameEn = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
+                    UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeleteById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    DeleteDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "0")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OrgTypes", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_OrgTypes_MinistryUsers_CreateById",
+                        column: x => x.CreateById,
+                        principalTable: "MinistryUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_OrgTypes_MinistryUsers_DeleteById",
+                        column: x => x.DeleteById,
+                        principalTable: "MinistryUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_OrgTypes_MinistryUsers_UpdateById",
+                        column: x => x.UpdateById,
+                        principalTable: "MinistryUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -1294,42 +1377,6 @@ namespace Evaluation.DAL.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "SectionDepartment",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    SectionId = table.Column<int>(type: "int", nullable: false),
-                    DepartmentId = table.Column<int>(type: "int", nullable: false),
-                    IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
-                    UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeleteById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    DeleteDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "0")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_SectionDepartment", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_SectionDepartment_MinistryUsers_CreateById",
-                        column: x => x.CreateById,
-                        principalTable: "MinistryUsers",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_SectionDepartment_MinistryUsers_DeleteById",
-                        column: x => x.DeleteById,
-                        principalTable: "MinistryUsers",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_SectionDepartment_MinistryUsers_UpdateById",
-                        column: x => x.UpdateById,
-                        principalTable: "MinistryUsers",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
                 name: "SiteDocument",
                 columns: table => new
                 {
@@ -1690,7 +1737,7 @@ namespace Evaluation.DAL.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "UiControl",
+                name: "UiControls",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -1712,22 +1759,65 @@ namespace Evaluation.DAL.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UiControl", x => x.Id);
+                    table.PrimaryKey("PK_UiControls", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_UiControl_MinistryUsers_CreateById",
+                        name: "FK_UiControls_MinistryUsers_CreateById",
                         column: x => x.CreateById,
                         principalTable: "MinistryUsers",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_UiControl_MinistryUsers_DeleteById",
+                        name: "FK_UiControls_MinistryUsers_DeleteById",
                         column: x => x.DeleteById,
                         principalTable: "MinistryUsers",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_UiControl_MinistryUsers_UpdateById",
+                        name: "FK_UiControls_MinistryUsers_UpdateById",
                         column: x => x.UpdateById,
                         principalTable: "MinistryUsers",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserGender",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    BackendName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    NameAr = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    NameEn = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
+                    UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeleteById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    DeleteDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "0")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserGender", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UserGender_MinistryUsers_CreateById",
+                        column: x => x.CreateById,
+                        principalTable: "MinistryUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_UserGender_MinistryUsers_DeleteById",
+                        column: x => x.DeleteById,
+                        principalTable: "MinistryUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_UserGender_MinistryUsers_UpdateById",
+                        column: x => x.UpdateById,
+                        principalTable: "MinistryUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -1818,6 +1908,79 @@ namespace Evaluation.DAL.Migrations
                     table.ForeignKey(
                         name: "FK_UserToken_MinistryUsers_UserId",
                         column: x => x.UserId,
+                        principalTable: "MinistryUsers",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserType",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    NameAr = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    NameEn = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    BackendName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
+                    UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeleteById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    DeleteDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "0")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserType", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UserType_MinistryUsers_CreateById",
+                        column: x => x.CreateById,
+                        principalTable: "MinistryUsers",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_UserType_MinistryUsers_DeleteById",
+                        column: x => x.DeleteById,
+                        principalTable: "MinistryUsers",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_UserType_MinistryUsers_UpdateById",
+                        column: x => x.UpdateById,
+                        principalTable: "MinistryUsers",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "VisitType",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    NameAr = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    NameEn = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
+                    UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeleteById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    DeleteDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "0")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_VisitType", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_VisitType_MinistryUsers_CreateById",
+                        column: x => x.CreateById,
+                        principalTable: "MinistryUsers",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_VisitType_MinistryUsers_DeleteById",
+                        column: x => x.DeleteById,
+                        principalTable: "MinistryUsers",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_VisitType_MinistryUsers_UpdateById",
+                        column: x => x.UpdateById,
                         principalTable: "MinistryUsers",
                         principalColumn: "Id");
                 });
@@ -2001,59 +2164,6 @@ namespace Evaluation.DAL.Migrations
                         name: "FK_FieldType_MinistryUsers_UpdateById",
                         column: x => x.UpdateById,
                         principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Departments",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    NameAr = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    NameEn = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    OrganizationTypeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CategoryId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
-                    UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeleteById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    DeleteDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "0")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Departments", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Departments_Category_CategoryId",
-                        column: x => x.CategoryId,
-                        principalTable: "Category",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Departments_MinistryUsers_CreateById",
-                        column: x => x.CreateById,
-                        principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Departments_MinistryUsers_DeleteById",
-                        column: x => x.DeleteById,
-                        principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Departments_MinistryUsers_UpdateById",
-                        column: x => x.UpdateById,
-                        principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Departments_OrganizationTypes_OrganizationTypeId",
-                        column: x => x.OrganizationTypeId,
-                        principalTable: "OrganizationTypes",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -2426,89 +2536,6 @@ namespace Evaluation.DAL.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "OrgTree",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    NameAr = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    NameEn = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    OrgTreeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ParentId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    HrCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    NSISCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    OrgTreeTypeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    OrgTreeClassId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Discriminator = table.Column<string>(type: "nvarchar(13)", maxLength: 13, nullable: false),
-                    EmployeeNo = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Gender = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    BirthDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Nationality = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    JoinDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    JobTitle = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    OrganizationTypeId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    EstablishmentDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Region = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    TypeId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    SchoolTypeId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
-                    UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeleteById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    DeleteDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "0")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_OrgTree", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_OrgTree_MinistryUsers_CreateById",
-                        column: x => x.CreateById,
-                        principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_OrgTree_MinistryUsers_DeleteById",
-                        column: x => x.DeleteById,
-                        principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_OrgTree_MinistryUsers_UpdateById",
-                        column: x => x.UpdateById,
-                        principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_OrgTree_OrgTreeClass_OrgTreeClassId",
-                        column: x => x.OrgTreeClassId,
-                        principalTable: "OrgTreeClass",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_OrgTree_OrgTree_ParentId",
-                        column: x => x.ParentId,
-                        principalTable: "OrgTree",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_OrgTree_OrganizationTypes_OrganizationTypeId",
-                        column: x => x.OrganizationTypeId,
-                        principalTable: "OrganizationTypes",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_OrgTree_SchoolTypes_SchoolTypeId",
-                        column: x => x.SchoolTypeId,
-                        principalTable: "SchoolTypes",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "SMSTemplates",
                 columns: table => new
                 {
@@ -2609,6 +2636,341 @@ namespace Evaluation.DAL.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "OrgTree",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    NameAr = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    NameEn = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    OrgParentId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    HrCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    NSISCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    OrgTypeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    OrgClassId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Discriminator = table.Column<string>(type: "nvarchar(13)", maxLength: 13, nullable: false),
+                    EmployeeNo = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UserGenderId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    BirthDate = table.Column<DateOnly>(type: "date", nullable: true),
+                    NationalityCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    JoinDate = table.Column<DateOnly>(type: "date", nullable: true),
+                    JobTitleId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TypeId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    SchoolTypeId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    EstablishmentDate = table.Column<DateOnly>(type: "date", nullable: true),
+                    ManagerQID = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ManageEmail = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    OrgEmail = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Phone = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Mobile = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    School_TypeId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    SchoolTypeId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    School_EstablishmentDate = table.Column<DateOnly>(type: "date", nullable: true),
+                    School_ManagerQID = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    School_ManageEmail = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    School_OrgEmail = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    School_Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    School_Phone = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    School_Mobile = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Region = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
+                    UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeleteById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    DeleteDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "0")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OrgTree", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_OrgTree_JobTitle_JobTitleId",
+                        column: x => x.JobTitleId,
+                        principalTable: "JobTitle",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_OrgTree_MinistryUsers_CreateById",
+                        column: x => x.CreateById,
+                        principalTable: "MinistryUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_OrgTree_MinistryUsers_DeleteById",
+                        column: x => x.DeleteById,
+                        principalTable: "MinistryUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_OrgTree_MinistryUsers_UpdateById",
+                        column: x => x.UpdateById,
+                        principalTable: "MinistryUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_OrgTree_OrgClass_OrgClassId",
+                        column: x => x.OrgClassId,
+                        principalTable: "OrgClass",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_OrgTree_OrgTree_OrgParentId",
+                        column: x => x.OrgParentId,
+                        principalTable: "OrgTree",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_OrgTree_OrgTypes_OrgTypeId",
+                        column: x => x.OrgTypeId,
+                        principalTable: "OrgTypes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_OrgTree_SchoolTypes_SchoolTypeId",
+                        column: x => x.SchoolTypeId,
+                        principalTable: "SchoolTypes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_OrgTree_SchoolTypes_SchoolTypeId1",
+                        column: x => x.SchoolTypeId1,
+                        principalTable: "SchoolTypes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_OrgTree_UserGender_UserGenderId",
+                        column: x => x.UserGenderId,
+                        principalTable: "UserGender",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserPartyTypeSignatures",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserPartyTypeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Signature = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
+                    UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeleteById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    DeleteDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "0")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserPartyTypeSignatures", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UserPartyTypeSignatures_MinistryUsers_CreateById",
+                        column: x => x.CreateById,
+                        principalTable: "MinistryUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_UserPartyTypeSignatures_MinistryUsers_DeleteById",
+                        column: x => x.DeleteById,
+                        principalTable: "MinistryUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_UserPartyTypeSignatures_MinistryUsers_UpdateById",
+                        column: x => x.UpdateById,
+                        principalTable: "MinistryUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_UserPartyTypeSignatures_UserPartyTypes_UserPartyTypeId",
+                        column: x => x.UserPartyTypeId,
+                        principalTable: "UserPartyTypes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SiteContent",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    TitleAr = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    TitleEn = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    DescriptionAr = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    DescriptionEn = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Routing = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ParentId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    NavbarId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    FileNameAr = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FileNameAr_UiFileName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FileNameAr_BlobURL = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FileNameAr_FileExt = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FileNameAr_Size = table.Column<long>(type: "bigint", nullable: true),
+                    FileNameEn = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FileNameEn_UiFileName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FileNameEn_BlobURL = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FileNameEn_FileExt = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FileNameEn_Size = table.Column<long>(type: "bigint", nullable: true),
+                    OrderNo = table.Column<int>(type: "int", nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
+                    UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeleteById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    DeleteDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "0")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SiteContent", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_SiteContent_MinistryUsers_CreateById",
+                        column: x => x.CreateById,
+                        principalTable: "MinistryUsers",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_SiteContent_MinistryUsers_DeleteById",
+                        column: x => x.DeleteById,
+                        principalTable: "MinistryUsers",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_SiteContent_MinistryUsers_UpdateById",
+                        column: x => x.UpdateById,
+                        principalTable: "MinistryUsers",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_SiteContent_Navbar_NavbarId",
+                        column: x => x.NavbarId,
+                        principalTable: "Navbar",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_SiteContent_SiteContent_ParentId",
+                        column: x => x.ParentId,
+                        principalTable: "SiteContent",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Departments",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    NameAr = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    NameEn = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    RoutingPath = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    BackendName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    DepIcon = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    TargetOrgTreeId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CategoryId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    IsNDA = table.Column<bool>(type: "bit", nullable: false),
+                    DescAr = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DescEn = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    OrderNo = table.Column<int>(type: "int", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
+                    UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeleteById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    DeleteDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "0")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Departments", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Departments_Category_CategoryId",
+                        column: x => x.CategoryId,
+                        principalTable: "Category",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Departments_MinistryUsers_CreateById",
+                        column: x => x.CreateById,
+                        principalTable: "MinistryUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Departments_MinistryUsers_DeleteById",
+                        column: x => x.DeleteById,
+                        principalTable: "MinistryUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Departments_MinistryUsers_UpdateById",
+                        column: x => x.UpdateById,
+                        principalTable: "MinistryUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Departments_OrgTree_TargetOrgTreeId",
+                        column: x => x.TargetOrgTreeId,
+                        principalTable: "OrgTree",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "OrgAcademicYears",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    OrgTreeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ParentOrgTreeId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    JobTitleAr = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    JobTitleEn = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Year = table.Column<int>(type: "int", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
+                    UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeleteById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    DeleteDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "0")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OrgAcademicYears", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_OrgAcademicYears_MinistryUsers_CreateById",
+                        column: x => x.CreateById,
+                        principalTable: "MinistryUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_OrgAcademicYears_MinistryUsers_DeleteById",
+                        column: x => x.DeleteById,
+                        principalTable: "MinistryUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_OrgAcademicYears_MinistryUsers_UpdateById",
+                        column: x => x.UpdateById,
+                        principalTable: "MinistryUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_OrgAcademicYears_OrgTree_OrgTreeId",
+                        column: x => x.OrgTreeId,
+                        principalTable: "OrgTree",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_OrgAcademicYears_OrgTree_ParentOrgTreeId",
+                        column: x => x.ParentOrgTreeId,
+                        principalTable: "OrgTree",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AcademicYears",
                 columns: table => new
                 {
@@ -2703,6 +3065,58 @@ namespace Evaluation.DAL.Migrations
                         name: "FK_CalcMethods_MinistryUsers_UpdateById",
                         column: x => x.UpdateById,
                         principalTable: "MinistryUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "DepartmentOrgTrees",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    DepartmentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    OrganizationTreeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    OrgTreeId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
+                    UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeleteById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    DeleteDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "0")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DepartmentOrgTrees", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_DepartmentOrgTrees_Departments_DepartmentId",
+                        column: x => x.DepartmentId,
+                        principalTable: "Departments",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_DepartmentOrgTrees_MinistryUsers_CreateById",
+                        column: x => x.CreateById,
+                        principalTable: "MinistryUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_DepartmentOrgTrees_MinistryUsers_DeleteById",
+                        column: x => x.DeleteById,
+                        principalTable: "MinistryUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_DepartmentOrgTrees_MinistryUsers_UpdateById",
+                        column: x => x.UpdateById,
+                        principalTable: "MinistryUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_DepartmentOrgTrees_OrgTree_OrgTreeId",
+                        column: x => x.OrgTreeId,
+                        principalTable: "OrgTree",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -2956,54 +3370,6 @@ namespace Evaluation.DAL.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "UserDeparment",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DepartmentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
-                    UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeleteById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    DeleteDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "0")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_UserDeparment", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_UserDeparment_Departments_DepartmentId",
-                        column: x => x.DepartmentId,
-                        principalTable: "Departments",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_UserDeparment_MinistryUsers_CreateById",
-                        column: x => x.CreateById,
-                        principalTable: "MinistryUsers",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_UserDeparment_MinistryUsers_DeleteById",
-                        column: x => x.DeleteById,
-                        principalTable: "MinistryUsers",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_UserDeparment_MinistryUsers_UpdateById",
-                        column: x => x.UpdateById,
-                        principalTable: "MinistryUsers",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_UserDeparment_MinistryUsers_UserId",
-                        column: x => x.UserId,
-                        principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "UserDepartment",
                 columns: table => new
                 {
@@ -3049,270 +3415,6 @@ namespace Evaluation.DAL.Migrations
                         principalTable: "MinistryUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "UserPartyTypeSignatures",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    UserPartyTypeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Signature = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
-                    IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
-                    UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeleteById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    DeleteDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "0")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_UserPartyTypeSignatures", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_UserPartyTypeSignatures_MinistryUsers_CreateById",
-                        column: x => x.CreateById,
-                        principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_UserPartyTypeSignatures_MinistryUsers_DeleteById",
-                        column: x => x.DeleteById,
-                        principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_UserPartyTypeSignatures_MinistryUsers_UpdateById",
-                        column: x => x.UpdateById,
-                        principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_UserPartyTypeSignatures_UserPartyTypes_UserPartyTypeId",
-                        column: x => x.UserPartyTypeId,
-                        principalTable: "UserPartyTypes",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "SiteContent",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    TitleAr = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    TitleEn = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    DescriptionAr = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    DescriptionEn = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Routing = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ParentId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    NavbarId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    FileNameAr = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    FileNameAr_UiFileName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    FileNameAr_BlobURL = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    FileNameAr_FileExt = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    FileNameAr_Size = table.Column<long>(type: "bigint", nullable: true),
-                    FileNameEn = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    FileNameEn_UiFileName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    FileNameEn_BlobURL = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    FileNameEn_FileExt = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    FileNameEn_Size = table.Column<long>(type: "bigint", nullable: true),
-                    OrderNo = table.Column<int>(type: "int", nullable: true),
-                    IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
-                    UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeleteById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    DeleteDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "0")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_SiteContent", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_SiteContent_MinistryUsers_CreateById",
-                        column: x => x.CreateById,
-                        principalTable: "MinistryUsers",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_SiteContent_MinistryUsers_DeleteById",
-                        column: x => x.DeleteById,
-                        principalTable: "MinistryUsers",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_SiteContent_MinistryUsers_UpdateById",
-                        column: x => x.UpdateById,
-                        principalTable: "MinistryUsers",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_SiteContent_Navbar_NavbarId",
-                        column: x => x.NavbarId,
-                        principalTable: "Navbar",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_SiteContent_SiteContent_ParentId",
-                        column: x => x.ParentId,
-                        principalTable: "SiteContent",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "DepartmentOrgTrees",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DepartmentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    OrganizationTreeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    OrgTreeId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
-                    UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeleteById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    DeleteDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "0")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_DepartmentOrgTrees", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_DepartmentOrgTrees_Departments_DepartmentId",
-                        column: x => x.DepartmentId,
-                        principalTable: "Departments",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_DepartmentOrgTrees_MinistryUsers_CreateById",
-                        column: x => x.CreateById,
-                        principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_DepartmentOrgTrees_MinistryUsers_DeleteById",
-                        column: x => x.DeleteById,
-                        principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_DepartmentOrgTrees_MinistryUsers_UpdateById",
-                        column: x => x.UpdateById,
-                        principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_DepartmentOrgTrees_OrgTree_OrgTreeId",
-                        column: x => x.OrgTreeId,
-                        principalTable: "OrgTree",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "SchoolLevel",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    SchoolId = table.Column<int>(type: "int", nullable: false),
-                    SchoolId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    LevelId = table.Column<int>(type: "int", nullable: false),
-                    LevelId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
-                    UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeleteById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    DeleteDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "0")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_SchoolLevel", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_SchoolLevel_Level_LevelId1",
-                        column: x => x.LevelId1,
-                        principalTable: "Level",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_SchoolLevel_MinistryUsers_CreateById",
-                        column: x => x.CreateById,
-                        principalTable: "MinistryUsers",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_SchoolLevel_MinistryUsers_DeleteById",
-                        column: x => x.DeleteById,
-                        principalTable: "MinistryUsers",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_SchoolLevel_MinistryUsers_UpdateById",
-                        column: x => x.UpdateById,
-                        principalTable: "MinistryUsers",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_SchoolLevel_OrgTree_SchoolId1",
-                        column: x => x.SchoolId1,
-                        principalTable: "OrgTree",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ChangeRequestType",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    NameAr = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    NameEn = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    DepartmentId = table.Column<int>(type: "int", nullable: false),
-                    DepartmentId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    AcademicYearId = table.Column<int>(type: "int", nullable: false),
-                    AcademicYearId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
-                    UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeleteById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    DeleteDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "0")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ChangeRequestType", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_ChangeRequestType_AcademicYears_AcademicYearId1",
-                        column: x => x.AcademicYearId1,
-                        principalTable: "AcademicYears",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_ChangeRequestType_Departments_DepartmentId1",
-                        column: x => x.DepartmentId1,
-                        principalTable: "Departments",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_ChangeRequestType_MinistryUsers_CreateById",
-                        column: x => x.CreateById,
-                        principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_ChangeRequestType_MinistryUsers_DeleteById",
-                        column: x => x.DeleteById,
-                        principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_ChangeRequestType_MinistryUsers_UpdateById",
-                        column: x => x.UpdateById,
-                        principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -3370,83 +3472,18 @@ namespace Evaluation.DAL.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "OrgAcademicYears",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    OrganizationId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ParentOrgId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    ParentId = table.Column<int>(type: "int", nullable: false),
-                    AcademicYearId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
-                    UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeleteById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    DeleteDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "0")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_OrgAcademicYears", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_OrgAcademicYears_AcademicYears_AcademicYearId",
-                        column: x => x.AcademicYearId,
-                        principalTable: "AcademicYears",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_OrgAcademicYears_MinistryUsers_CreateById",
-                        column: x => x.CreateById,
-                        principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_OrgAcademicYears_MinistryUsers_DeleteById",
-                        column: x => x.DeleteById,
-                        principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_OrgAcademicYears_MinistryUsers_UpdateById",
-                        column: x => x.UpdateById,
-                        principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_OrgAcademicYears_OrgTree_OrganizationId",
-                        column: x => x.OrganizationId,
-                        principalTable: "OrgTree",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_OrgAcademicYears_OrgTree_ParentOrgId",
-                        column: x => x.ParentOrgId,
-                        principalTable: "OrgTree",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Plans",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    NameAr = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    NameEn = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PlanName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     StartDate = table.Column<DateOnly>(type: "date", nullable: false),
                     EndDate = table.Column<DateOnly>(type: "date", nullable: false),
                     ExpectedListJson = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    DepartmentId = table.Column<int>(type: "int", nullable: false),
-                    DepartmentId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    AcademicYearId = table.Column<int>(type: "int", nullable: false),
-                    AcademicYearId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    PlanStatusId = table.Column<int>(type: "int", nullable: false),
-                    PlanStatusId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    PlanScheduleId = table.Column<int>(type: "int", nullable: false),
-                    PlanTypeId = table.Column<int>(type: "int", nullable: false),
-                    PlanTypeId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    DepartmentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    AcademicYearId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    PlanStatusId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    PlanTypeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
                     CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
@@ -3460,14 +3497,14 @@ namespace Evaluation.DAL.Migrations
                 {
                     table.PrimaryKey("PK_Plans", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Plans_AcademicYears_AcademicYearId1",
-                        column: x => x.AcademicYearId1,
+                        name: "FK_Plans_AcademicYears_AcademicYearId",
+                        column: x => x.AcademicYearId,
                         principalTable: "AcademicYears",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Plans_Departments_DepartmentId1",
-                        column: x => x.DepartmentId1,
+                        name: "FK_Plans_Departments_DepartmentId",
+                        column: x => x.DepartmentId,
                         principalTable: "Departments",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -3490,17 +3527,62 @@ namespace Evaluation.DAL.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Plans_PlanStatuses_PlanStatusId1",
-                        column: x => x.PlanStatusId1,
+                        name: "FK_Plans_PlanStatuses_PlanStatusId",
+                        column: x => x.PlanStatusId,
                         principalTable: "PlanStatuses",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Plans_PlanType_PlanTypeId1",
-                        column: x => x.PlanTypeId1,
+                        name: "FK_Plans_PlanType_PlanTypeId",
+                        column: x => x.PlanTypeId,
                         principalTable: "PlanType",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PlanServiceRequest",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Key = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Value = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsEnableDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    AcadmicYearId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    AcademicYearId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    HasOnePlan = table.Column<bool>(type: "bit", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
+                    UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeleteById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    DeleteDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "0")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PlanServiceRequest", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_PlanServiceRequest_AcademicYears_AcademicYearId",
+                        column: x => x.AcademicYearId,
+                        principalTable: "AcademicYears",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_PlanServiceRequest_MinistryUsers_CreateById",
+                        column: x => x.CreateById,
+                        principalTable: "MinistryUsers",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_PlanServiceRequest_MinistryUsers_DeleteById",
+                        column: x => x.DeleteById,
+                        principalTable: "MinistryUsers",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_PlanServiceRequest_MinistryUsers_UpdateById",
+                        column: x => x.UpdateById,
+                        principalTable: "MinistryUsers",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -3749,6 +3831,7 @@ namespace Evaluation.DAL.Migrations
                     UrlAr = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UrlEn = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ShowInWebSite = table.Column<bool>(type: "bit", nullable: false),
+                    EvaluationPartyId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
                     CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
@@ -3761,6 +3844,12 @@ namespace Evaluation.DAL.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Services", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Services_EvaluationParties_EvaluationPartyId",
+                        column: x => x.EvaluationPartyId,
+                        principalTable: "EvaluationParties",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Services_MinistryUsers_CreateById",
                         column: x => x.CreateById,
@@ -3788,77 +3877,20 @@ namespace Evaluation.DAL.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ChangeRequest",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    NameAr = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    NameEn = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    RequestTypeId = table.Column<int>(type: "int", nullable: false),
-                    ChangeRequestTypeId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    PlanId = table.Column<int>(type: "int", nullable: false),
-                    PlanId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    RequestedById = table.Column<int>(type: "int", nullable: false),
-                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    Notes = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
-                    UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeleteById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    DeleteDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "0")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ChangeRequest", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_ChangeRequest_ChangeRequestType_ChangeRequestTypeId",
-                        column: x => x.ChangeRequestTypeId,
-                        principalTable: "ChangeRequestType",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_ChangeRequest_MinistryUsers_CreateById",
-                        column: x => x.CreateById,
-                        principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_ChangeRequest_MinistryUsers_DeleteById",
-                        column: x => x.DeleteById,
-                        principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_ChangeRequest_MinistryUsers_UpdateById",
-                        column: x => x.UpdateById,
-                        principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_ChangeRequest_MinistryUsers_UserId",
-                        column: x => x.UserId,
-                        principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_ChangeRequest_Plans_PlanId1",
-                        column: x => x.PlanId1,
-                        principalTable: "Plans",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "PlanSchedules",
+                name: "PlanHistory",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     PlanId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    SchoolId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    PlanId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    NameAr = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    NameEn = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    StartDate = table.Column<DateOnly>(type: "date", nullable: false),
+                    EndDate = table.Column<DateOnly>(type: "date", nullable: false),
+                    ExpectedListJson = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DepartmentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    AcademicYearId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    PlanStatusId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    PlanTypeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
                     CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
@@ -3870,40 +3902,52 @@ namespace Evaluation.DAL.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_PlanSchedules", x => x.Id);
+                    table.PrimaryKey("PK_PlanHistory", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_PlanSchedules_MinistryUsers_CreateById",
+                        name: "FK_PlanHistory_AcademicYears_AcademicYearId",
+                        column: x => x.AcademicYearId,
+                        principalTable: "AcademicYears",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_PlanHistory_Departments_DepartmentId",
+                        column: x => x.DepartmentId,
+                        principalTable: "Departments",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_PlanHistory_MinistryUsers_CreateById",
                         column: x => x.CreateById,
                         principalTable: "MinistryUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_PlanSchedules_MinistryUsers_DeleteById",
+                        name: "FK_PlanHistory_MinistryUsers_DeleteById",
                         column: x => x.DeleteById,
                         principalTable: "MinistryUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_PlanSchedules_MinistryUsers_UpdateById",
+                        name: "FK_PlanHistory_MinistryUsers_UpdateById",
                         column: x => x.UpdateById,
                         principalTable: "MinistryUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_PlanSchedules_OrgTree_SchoolId",
-                        column: x => x.SchoolId,
-                        principalTable: "OrgTree",
+                        name: "FK_PlanHistory_PlanStatuses_PlanStatusId",
+                        column: x => x.PlanStatusId,
+                        principalTable: "PlanStatuses",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_PlanSchedules_Plans_PlanId",
+                        name: "FK_PlanHistory_PlanType_PlanTypeId",
+                        column: x => x.PlanTypeId,
+                        principalTable: "PlanType",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_PlanHistory_Plans_PlanId",
                         column: x => x.PlanId,
-                        principalTable: "Plans",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_PlanSchedules_Plans_PlanId1",
-                        column: x => x.PlanId1,
                         principalTable: "Plans",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -4292,6 +4336,80 @@ namespace Evaluation.DAL.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "EvaluationRequest",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    PlanId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    OrgTreeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    EvaluationTypeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    FromDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ToDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ServiceId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    StatusServiceId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
+                    UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeleteById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    DeleteDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "0")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EvaluationRequest", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_EvaluationRequest_EvaluationType_EvaluationTypeId",
+                        column: x => x.EvaluationTypeId,
+                        principalTable: "EvaluationType",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_EvaluationRequest_MinistryUsers_CreateById",
+                        column: x => x.CreateById,
+                        principalTable: "MinistryUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_EvaluationRequest_MinistryUsers_DeleteById",
+                        column: x => x.DeleteById,
+                        principalTable: "MinistryUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_EvaluationRequest_MinistryUsers_UpdateById",
+                        column: x => x.UpdateById,
+                        principalTable: "MinistryUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_EvaluationRequest_OrgTree_OrgTreeId",
+                        column: x => x.OrgTreeId,
+                        principalTable: "OrgTree",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_EvaluationRequest_Plans_PlanId",
+                        column: x => x.PlanId,
+                        principalTable: "Plans",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_EvaluationRequest_Services_ServiceId",
+                        column: x => x.ServiceId,
+                        principalTable: "Services",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_EvaluationRequest_StatusService_StatusServiceId",
+                        column: x => x.StatusServiceId,
+                        principalTable: "StatusService",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "FormGroup",
                 columns: table => new
                 {
@@ -4512,74 +4630,6 @@ namespace Evaluation.DAL.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ServiceRequests",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    RequestNo = table.Column<int>(type: "int", nullable: false),
-                    PlanId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    StatusId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ServiceId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    OrganizationId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
-                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
-                    UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeleteById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    DeleteDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "0")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ServiceRequests", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_ServiceRequests_MinistryUsers_CreateById",
-                        column: x => x.CreateById,
-                        principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_ServiceRequests_MinistryUsers_DeleteById",
-                        column: x => x.DeleteById,
-                        principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_ServiceRequests_MinistryUsers_UpdateById",
-                        column: x => x.UpdateById,
-                        principalTable: "MinistryUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_ServiceRequests_OrgTree_OrganizationId",
-                        column: x => x.OrganizationId,
-                        principalTable: "OrgTree",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_ServiceRequests_Plans_PlanId",
-                        column: x => x.PlanId,
-                        principalTable: "Plans",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_ServiceRequests_Services_ServiceId",
-                        column: x => x.ServiceId,
-                        principalTable: "Services",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_ServiceRequests_StatusService_StatusId",
-                        column: x => x.StatusId,
-                        principalTable: "StatusService",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "ServiceRequestShowPartyType",
                 columns: table => new
                 {
@@ -4683,16 +4733,18 @@ namespace Evaluation.DAL.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ChangeRequestDetail",
+                name: "EvaluationRequestHistory",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ChangeRequestId = table.Column<int>(type: "int", nullable: false),
-                    ChangeRequestId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    SchoolId = table.Column<int>(type: "int", nullable: false),
-                    SchoolId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    Reason = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    EvidenceDocument = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    EvaluationRequestId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    PlanId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    OrgTreeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    EvaluationTypeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    FromDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ToDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ServiceId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    StatusServiceId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
                     CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
@@ -4704,33 +4756,61 @@ namespace Evaluation.DAL.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ChangeRequestDetail", x => x.Id);
+                    table.PrimaryKey("PK_EvaluationRequestHistory", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ChangeRequestDetail_ChangeRequest_ChangeRequestId1",
-                        column: x => x.ChangeRequestId1,
-                        principalTable: "ChangeRequest",
+                        name: "FK_EvaluationRequestHistory_EvaluationRequest_EvaluationRequestId",
+                        column: x => x.EvaluationRequestId,
+                        principalTable: "EvaluationRequest",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_ChangeRequestDetail_MinistryUsers_CreateById",
+                        name: "FK_EvaluationRequestHistory_EvaluationType_EvaluationTypeId",
+                        column: x => x.EvaluationTypeId,
+                        principalTable: "EvaluationType",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_EvaluationRequestHistory_MinistryUsers_CreateById",
                         column: x => x.CreateById,
                         principalTable: "MinistryUsers",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_ChangeRequestDetail_MinistryUsers_DeleteById",
+                        name: "FK_EvaluationRequestHistory_MinistryUsers_DeleteById",
                         column: x => x.DeleteById,
                         principalTable: "MinistryUsers",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_ChangeRequestDetail_MinistryUsers_UpdateById",
+                        name: "FK_EvaluationRequestHistory_MinistryUsers_UpdateById",
                         column: x => x.UpdateById,
                         principalTable: "MinistryUsers",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_ChangeRequestDetail_OrgTree_SchoolId1",
-                        column: x => x.SchoolId1,
+                        name: "FK_EvaluationRequestHistory_OrgTree_OrgTreeId",
+                        column: x => x.OrgTreeId,
                         principalTable: "OrgTree",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_EvaluationRequestHistory_Plans_PlanId",
+                        column: x => x.PlanId,
+                        principalTable: "Plans",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_EvaluationRequestHistory_Services_ServiceId",
+                        column: x => x.ServiceId,
+                        principalTable: "Services",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_EvaluationRequestHistory_StatusService_StatusServiceId",
+                        column: x => x.StatusServiceId,
+                        principalTable: "StatusService",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -4943,7 +5023,7 @@ namespace Evaluation.DAL.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ServiceActionId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     PartyTypeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Priority = table.Column<int>(type: "int", nullable: false),
+                    Priority = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ActionPartyTypeSettings = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
                     CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
@@ -5363,6 +5443,101 @@ namespace Evaluation.DAL.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ServiceRequests",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    RequestNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    StatusId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ServiceId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    OrgTreeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Sequence = table.Column<int>(type: "int", nullable: false),
+                    PlanId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    EvaluationRequestId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    EvaluationPartyId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    EvaluationRequestHistoryId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    PlanHistoryId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
+                    UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeleteById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    DeleteDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "0")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ServiceRequests", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ServiceRequests_EvaluationParties_EvaluationPartyId",
+                        column: x => x.EvaluationPartyId,
+                        principalTable: "EvaluationParties",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_ServiceRequests_EvaluationRequestHistory_EvaluationRequestHistoryId",
+                        column: x => x.EvaluationRequestHistoryId,
+                        principalTable: "EvaluationRequestHistory",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_ServiceRequests_EvaluationRequest_EvaluationRequestId",
+                        column: x => x.EvaluationRequestId,
+                        principalTable: "EvaluationRequest",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_ServiceRequests_MinistryUsers_CreateById",
+                        column: x => x.CreateById,
+                        principalTable: "MinistryUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_ServiceRequests_MinistryUsers_DeleteById",
+                        column: x => x.DeleteById,
+                        principalTable: "MinistryUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_ServiceRequests_MinistryUsers_UpdateById",
+                        column: x => x.UpdateById,
+                        principalTable: "MinistryUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_ServiceRequests_OrgTree_OrgTreeId",
+                        column: x => x.OrgTreeId,
+                        principalTable: "OrgTree",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_ServiceRequests_PlanHistory_PlanHistoryId",
+                        column: x => x.PlanHistoryId,
+                        principalTable: "PlanHistory",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_ServiceRequests_Plans_PlanId",
+                        column: x => x.PlanId,
+                        principalTable: "Plans",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_ServiceRequests_ServiceStatus_StatusId",
+                        column: x => x.StatusId,
+                        principalTable: "ServiceStatus",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_ServiceRequests_Services_ServiceId",
+                        column: x => x.ServiceId,
+                        principalTable: "Services",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ActionField",
                 columns: table => new
                 {
@@ -5412,6 +5587,68 @@ namespace Evaluation.DAL.Migrations
                         name: "FK_ActionField_ServiceAction_ServiceActionId",
                         column: x => x.ServiceActionId,
                         principalTable: "ServiceAction",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "EvaluationRequestHistoryFieldsValue",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    EvaluationRequesttId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    EvaluationRequestId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    EvaluationRequestHistoryId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    FieldId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Value = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsMissing = table.Column<bool>(type: "bit", nullable: true),
+                    IsApproved = table.Column<bool>(type: "bit", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
+                    UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeleteById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    DeleteDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "0")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EvaluationRequestHistoryFieldsValue", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_EvaluationRequestHistoryFieldsValue_EvaluationRequestHistory_EvaluationRequestHistoryId",
+                        column: x => x.EvaluationRequestHistoryId,
+                        principalTable: "EvaluationRequestHistory",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_EvaluationRequestHistoryFieldsValue_EvaluationRequest_EvaluationRequestId",
+                        column: x => x.EvaluationRequestId,
+                        principalTable: "EvaluationRequest",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_EvaluationRequestHistoryFieldsValue_Field_FieldId",
+                        column: x => x.FieldId,
+                        principalTable: "Field",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_EvaluationRequestHistoryFieldsValue_MinistryUsers_CreateById",
+                        column: x => x.CreateById,
+                        principalTable: "MinistryUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_EvaluationRequestHistoryFieldsValue_MinistryUsers_DeleteById",
+                        column: x => x.DeleteById,
+                        principalTable: "MinistryUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_EvaluationRequestHistoryFieldsValue_MinistryUsers_UpdateById",
+                        column: x => x.UpdateById,
+                        principalTable: "MinistryUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -5757,6 +5994,183 @@ namespace Evaluation.DAL.Migrations
                         name: "FK_ActionStatusConfigNotification_SMSTemplates_SMSTemplateId",
                         column: x => x.SMSTemplateId,
                         principalTable: "SMSTemplates",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "EvaluationRequestFieldsValue",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    EvaluationRequestId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    FieldId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Value = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsMissing = table.Column<bool>(type: "bit", nullable: true),
+                    IsApproved = table.Column<bool>(type: "bit", nullable: false),
+                    ServiceRequestId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
+                    UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeleteById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    DeleteDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "0")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EvaluationRequestFieldsValue", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_EvaluationRequestFieldsValue_EvaluationRequest_EvaluationRequestId",
+                        column: x => x.EvaluationRequestId,
+                        principalTable: "EvaluationRequest",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_EvaluationRequestFieldsValue_Field_FieldId",
+                        column: x => x.FieldId,
+                        principalTable: "Field",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_EvaluationRequestFieldsValue_MinistryUsers_CreateById",
+                        column: x => x.CreateById,
+                        principalTable: "MinistryUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_EvaluationRequestFieldsValue_MinistryUsers_DeleteById",
+                        column: x => x.DeleteById,
+                        principalTable: "MinistryUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_EvaluationRequestFieldsValue_MinistryUsers_UpdateById",
+                        column: x => x.UpdateById,
+                        principalTable: "MinistryUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_EvaluationRequestFieldsValue_ServiceRequests_ServiceRequestId",
+                        column: x => x.ServiceRequestId,
+                        principalTable: "ServiceRequests",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "RequestAssignment",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    MinistryUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ServiceRequestId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    PartyTypeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    IsLeader = table.Column<bool>(type: "bit", nullable: false),
+                    IsNDA = table.Column<bool>(type: "bit", nullable: false),
+                    NDAStatusId = table.Column<bool>(type: "bit", nullable: false),
+                    NDAApproveDate = table.Column<bool>(type: "bit", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
+                    UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeleteById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    DeleteDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "0")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RequestAssignment", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_RequestAssignment_MinistryUsers_CreateById",
+                        column: x => x.CreateById,
+                        principalTable: "MinistryUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_RequestAssignment_MinistryUsers_DeleteById",
+                        column: x => x.DeleteById,
+                        principalTable: "MinistryUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_RequestAssignment_MinistryUsers_MinistryUserId",
+                        column: x => x.MinistryUserId,
+                        principalTable: "MinistryUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_RequestAssignment_MinistryUsers_UpdateById",
+                        column: x => x.UpdateById,
+                        principalTable: "MinistryUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_RequestAssignment_PartyTypes_PartyTypeId",
+                        column: x => x.PartyTypeId,
+                        principalTable: "PartyTypes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_RequestAssignment_ServiceRequests_ServiceRequestId",
+                        column: x => x.ServiceRequestId,
+                        principalTable: "ServiceRequests",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ServiceRequestFieldsValue",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ServiceRequestId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    FieldId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Value = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsMissing = table.Column<bool>(type: "bit", nullable: true),
+                    IsApproved = table.Column<bool>(type: "bit", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "1"),
+                    CreateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
+                    UpdateById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeleteById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    DeleteDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: true, defaultValueSql: "0")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ServiceRequestFieldsValue", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ServiceRequestFieldsValue_Field_FieldId",
+                        column: x => x.FieldId,
+                        principalTable: "Field",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_ServiceRequestFieldsValue_MinistryUsers_CreateById",
+                        column: x => x.CreateById,
+                        principalTable: "MinistryUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_ServiceRequestFieldsValue_MinistryUsers_DeleteById",
+                        column: x => x.DeleteById,
+                        principalTable: "MinistryUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_ServiceRequestFieldsValue_MinistryUsers_UpdateById",
+                        column: x => x.UpdateById,
+                        principalTable: "MinistryUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_ServiceRequestFieldsValue_ServiceRequests_ServiceRequestId",
+                        column: x => x.ServiceRequestId,
+                        principalTable: "ServiceRequests",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -6278,61 +6692,6 @@ namespace Evaluation.DAL.Migrations
                 column: "UpdateById");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ChangeRequest_ChangeRequestTypeId",
-                table: "ChangeRequest",
-                column: "ChangeRequestTypeId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ChangeRequest_CreateById",
-                table: "ChangeRequest",
-                column: "CreateById");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ChangeRequest_DeleteById",
-                table: "ChangeRequest",
-                column: "DeleteById");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ChangeRequest_PlanId1",
-                table: "ChangeRequest",
-                column: "PlanId1");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ChangeRequest_UpdateById",
-                table: "ChangeRequest",
-                column: "UpdateById");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ChangeRequest_UserId",
-                table: "ChangeRequest",
-                column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ChangeRequestDetail_ChangeRequestId1",
-                table: "ChangeRequestDetail",
-                column: "ChangeRequestId1");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ChangeRequestDetail_CreateById",
-                table: "ChangeRequestDetail",
-                column: "CreateById");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ChangeRequestDetail_DeleteById",
-                table: "ChangeRequestDetail",
-                column: "DeleteById");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ChangeRequestDetail_SchoolId1",
-                table: "ChangeRequestDetail",
-                column: "SchoolId1");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ChangeRequestDetail_UpdateById",
-                table: "ChangeRequestDetail",
-                column: "UpdateById");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_ChangeRequestStatus_CreateById",
                 table: "ChangeRequestStatus",
                 column: "CreateById");
@@ -6345,31 +6704,6 @@ namespace Evaluation.DAL.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_ChangeRequestStatus_UpdateById",
                 table: "ChangeRequestStatus",
-                column: "UpdateById");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ChangeRequestType_AcademicYearId1",
-                table: "ChangeRequestType",
-                column: "AcademicYearId1");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ChangeRequestType_CreateById",
-                table: "ChangeRequestType",
-                column: "CreateById");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ChangeRequestType_DeleteById",
-                table: "ChangeRequestType",
-                column: "DeleteById");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ChangeRequestType_DepartmentId1",
-                table: "ChangeRequestType",
-                column: "DepartmentId1");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ChangeRequestType_UpdateById",
-                table: "ChangeRequestType",
                 column: "UpdateById");
 
             migrationBuilder.CreateIndex(
@@ -6529,9 +6863,9 @@ namespace Evaluation.DAL.Migrations
                 column: "DeleteById");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Departments_OrganizationTypeId",
+                name: "IX_Departments_TargetOrgTreeId",
                 table: "Departments",
-                column: "OrganizationTypeId");
+                column: "TargetOrgTreeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Departments_UpdateById",
@@ -6562,6 +6896,21 @@ namespace Evaluation.DAL.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_DropDownType_UpdateById",
                 table: "DropDownType",
+                column: "UpdateById");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EducationLevel_CreateById",
+                table: "EducationLevel",
+                column: "CreateById");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EducationLevel_DeleteById",
+                table: "EducationLevel",
+                column: "DeleteById");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EducationLevel_UpdateById",
+                table: "EducationLevel",
                 column: "UpdateById");
 
             migrationBuilder.CreateIndex(
@@ -6643,6 +6992,166 @@ namespace Evaluation.DAL.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_EvaluationParties_UpdateById",
                 table: "EvaluationParties",
+                column: "UpdateById");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EvaluationRequest_CreateById",
+                table: "EvaluationRequest",
+                column: "CreateById");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EvaluationRequest_DeleteById",
+                table: "EvaluationRequest",
+                column: "DeleteById");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EvaluationRequest_EvaluationTypeId",
+                table: "EvaluationRequest",
+                column: "EvaluationTypeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EvaluationRequest_OrgTreeId",
+                table: "EvaluationRequest",
+                column: "OrgTreeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EvaluationRequest_PlanId",
+                table: "EvaluationRequest",
+                column: "PlanId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EvaluationRequest_ServiceId",
+                table: "EvaluationRequest",
+                column: "ServiceId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EvaluationRequest_StatusServiceId",
+                table: "EvaluationRequest",
+                column: "StatusServiceId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EvaluationRequest_UpdateById",
+                table: "EvaluationRequest",
+                column: "UpdateById");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EvaluationRequestFieldsValue_CreateById",
+                table: "EvaluationRequestFieldsValue",
+                column: "CreateById");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EvaluationRequestFieldsValue_DeleteById",
+                table: "EvaluationRequestFieldsValue",
+                column: "DeleteById");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EvaluationRequestFieldsValue_EvaluationRequestId",
+                table: "EvaluationRequestFieldsValue",
+                column: "EvaluationRequestId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EvaluationRequestFieldsValue_FieldId",
+                table: "EvaluationRequestFieldsValue",
+                column: "FieldId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EvaluationRequestFieldsValue_ServiceRequestId",
+                table: "EvaluationRequestFieldsValue",
+                column: "ServiceRequestId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EvaluationRequestFieldsValue_UpdateById",
+                table: "EvaluationRequestFieldsValue",
+                column: "UpdateById");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EvaluationRequestHistory_CreateById",
+                table: "EvaluationRequestHistory",
+                column: "CreateById");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EvaluationRequestHistory_DeleteById",
+                table: "EvaluationRequestHistory",
+                column: "DeleteById");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EvaluationRequestHistory_EvaluationRequestId",
+                table: "EvaluationRequestHistory",
+                column: "EvaluationRequestId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EvaluationRequestHistory_EvaluationTypeId",
+                table: "EvaluationRequestHistory",
+                column: "EvaluationTypeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EvaluationRequestHistory_OrgTreeId",
+                table: "EvaluationRequestHistory",
+                column: "OrgTreeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EvaluationRequestHistory_PlanId",
+                table: "EvaluationRequestHistory",
+                column: "PlanId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EvaluationRequestHistory_ServiceId",
+                table: "EvaluationRequestHistory",
+                column: "ServiceId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EvaluationRequestHistory_StatusServiceId",
+                table: "EvaluationRequestHistory",
+                column: "StatusServiceId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EvaluationRequestHistory_UpdateById",
+                table: "EvaluationRequestHistory",
+                column: "UpdateById");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EvaluationRequestHistoryFieldsValue_CreateById",
+                table: "EvaluationRequestHistoryFieldsValue",
+                column: "CreateById");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EvaluationRequestHistoryFieldsValue_DeleteById",
+                table: "EvaluationRequestHistoryFieldsValue",
+                column: "DeleteById");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EvaluationRequestHistoryFieldsValue_EvaluationRequestHistoryId",
+                table: "EvaluationRequestHistoryFieldsValue",
+                column: "EvaluationRequestHistoryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EvaluationRequestHistoryFieldsValue_EvaluationRequestId",
+                table: "EvaluationRequestHistoryFieldsValue",
+                column: "EvaluationRequestId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EvaluationRequestHistoryFieldsValue_FieldId",
+                table: "EvaluationRequestHistoryFieldsValue",
+                column: "FieldId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EvaluationRequestHistoryFieldsValue_UpdateById",
+                table: "EvaluationRequestHistoryFieldsValue",
+                column: "UpdateById");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EvaluationType_CreateById",
+                table: "EvaluationType",
+                column: "CreateById");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EvaluationType_DeleteById",
+                table: "EvaluationType",
+                column: "DeleteById");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EvaluationType_UpdateById",
+                table: "EvaluationType",
                 column: "UpdateById");
 
             migrationBuilder.CreateIndex(
@@ -7081,18 +7590,18 @@ namespace Evaluation.DAL.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Level_CreateById",
-                table: "Level",
+                name: "IX_JobTitle_CreateById",
+                table: "JobTitle",
                 column: "CreateById");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Level_DeleteById",
-                table: "Level",
+                name: "IX_JobTitle_DeleteById",
+                table: "JobTitle",
                 column: "DeleteById");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Level_UpdateById",
-                table: "Level",
+                name: "IX_JobTitle_UpdateById",
+                table: "JobTitle",
                 column: "UpdateById");
 
             migrationBuilder.CreateIndex(
@@ -7104,6 +7613,12 @@ namespace Evaluation.DAL.Migrations
                 name: "IX_MinistryUsers_DeleteById",
                 table: "MinistryUsers",
                 column: "DeleteById");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MinistryUsers_Email",
+                table: "MinistryUsers",
+                column: "Email",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_MinistryUsers_QID",
@@ -7213,11 +7728,6 @@ namespace Evaluation.DAL.Migrations
                 column: "UpdateById");
 
             migrationBuilder.CreateIndex(
-                name: "IX_OrgAcademicYears_AcademicYearId",
-                table: "OrgAcademicYears",
-                column: "AcademicYearId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_OrgAcademicYears_CreateById",
                 table: "OrgAcademicYears",
                 column: "CreateById");
@@ -7228,14 +7738,14 @@ namespace Evaluation.DAL.Migrations
                 column: "DeleteById");
 
             migrationBuilder.CreateIndex(
-                name: "IX_OrgAcademicYears_OrganizationId",
+                name: "IX_OrgAcademicYears_OrgTreeId",
                 table: "OrgAcademicYears",
-                column: "OrganizationId");
+                column: "OrgTreeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_OrgAcademicYears_ParentOrgId",
+                name: "IX_OrgAcademicYears_ParentOrgTreeId",
                 table: "OrgAcademicYears",
-                column: "ParentOrgId");
+                column: "ParentOrgTreeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_OrgAcademicYears_UpdateById",
@@ -7243,18 +7753,29 @@ namespace Evaluation.DAL.Migrations
                 column: "UpdateById");
 
             migrationBuilder.CreateIndex(
-                name: "IX_OrganizationTypes_CreateById",
-                table: "OrganizationTypes",
+                name: "IX_OrgClass_BackendName",
+                table: "OrgClass",
+                column: "BackendName",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_OrgClass_CreateById",
+                table: "OrgClass",
                 column: "CreateById");
 
             migrationBuilder.CreateIndex(
-                name: "IX_OrganizationTypes_DeleteById",
-                table: "OrganizationTypes",
+                name: "IX_OrgClass_DeleteById",
+                table: "OrgClass",
                 column: "DeleteById");
 
             migrationBuilder.CreateIndex(
-                name: "IX_OrganizationTypes_UpdateById",
-                table: "OrganizationTypes",
+                name: "IX_OrgClass_ParentId",
+                table: "OrgClass",
+                column: "ParentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_OrgClass_UpdateById",
+                table: "OrgClass",
                 column: "UpdateById");
 
             migrationBuilder.CreateIndex(
@@ -7268,19 +7789,24 @@ namespace Evaluation.DAL.Migrations
                 column: "DeleteById");
 
             migrationBuilder.CreateIndex(
-                name: "IX_OrgTree_OrganizationTypeId",
+                name: "IX_OrgTree_JobTitleId",
                 table: "OrgTree",
-                column: "OrganizationTypeId");
+                column: "JobTitleId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_OrgTree_OrgTreeClassId",
+                name: "IX_OrgTree_OrgClassId",
                 table: "OrgTree",
-                column: "OrgTreeClassId");
+                column: "OrgClassId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_OrgTree_ParentId",
+                name: "IX_OrgTree_OrgParentId",
                 table: "OrgTree",
-                column: "ParentId");
+                column: "OrgParentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_OrgTree_OrgTypeId",
+                table: "OrgTree",
+                column: "OrgTypeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_OrgTree_SchoolTypeId",
@@ -7288,34 +7814,33 @@ namespace Evaluation.DAL.Migrations
                 column: "SchoolTypeId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_OrgTree_SchoolTypeId1",
+                table: "OrgTree",
+                column: "SchoolTypeId1");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_OrgTree_UpdateById",
                 table: "OrgTree",
                 column: "UpdateById");
 
             migrationBuilder.CreateIndex(
-                name: "IX_OrgTreeClass_BackendName",
-                table: "OrgTreeClass",
-                column: "BackendName",
-                unique: true);
+                name: "IX_OrgTree_UserGenderId",
+                table: "OrgTree",
+                column: "UserGenderId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_OrgTreeClass_CreateById",
-                table: "OrgTreeClass",
+                name: "IX_OrgTypes_CreateById",
+                table: "OrgTypes",
                 column: "CreateById");
 
             migrationBuilder.CreateIndex(
-                name: "IX_OrgTreeClass_DeleteById",
-                table: "OrgTreeClass",
+                name: "IX_OrgTypes_DeleteById",
+                table: "OrgTypes",
                 column: "DeleteById");
 
             migrationBuilder.CreateIndex(
-                name: "IX_OrgTreeClass_ParentId",
-                table: "OrgTreeClass",
-                column: "ParentId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_OrgTreeClass_UpdateById",
-                table: "OrgTreeClass",
+                name: "IX_OrgTypes_UpdateById",
+                table: "OrgTypes",
                 column: "UpdateById");
 
             migrationBuilder.CreateIndex(
@@ -7427,9 +7952,49 @@ namespace Evaluation.DAL.Migrations
                 column: "UpdateById");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Plans_AcademicYearId1",
+                name: "IX_PlanHistory_AcademicYearId",
+                table: "PlanHistory",
+                column: "AcademicYearId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PlanHistory_CreateById",
+                table: "PlanHistory",
+                column: "CreateById");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PlanHistory_DeleteById",
+                table: "PlanHistory",
+                column: "DeleteById");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PlanHistory_DepartmentId",
+                table: "PlanHistory",
+                column: "DepartmentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PlanHistory_PlanId",
+                table: "PlanHistory",
+                column: "PlanId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PlanHistory_PlanStatusId",
+                table: "PlanHistory",
+                column: "PlanStatusId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PlanHistory_PlanTypeId",
+                table: "PlanHistory",
+                column: "PlanTypeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PlanHistory_UpdateById",
+                table: "PlanHistory",
+                column: "UpdateById");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Plans_AcademicYearId",
                 table: "Plans",
-                column: "AcademicYearId1");
+                column: "AcademicYearId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Plans_CreateById",
@@ -7442,19 +8007,19 @@ namespace Evaluation.DAL.Migrations
                 column: "DeleteById");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Plans_DepartmentId1",
+                name: "IX_Plans_DepartmentId",
                 table: "Plans",
-                column: "DepartmentId1");
+                column: "DepartmentId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Plans_PlanStatusId1",
+                name: "IX_Plans_PlanStatusId",
                 table: "Plans",
-                column: "PlanStatusId1");
+                column: "PlanStatusId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Plans_PlanTypeId1",
+                name: "IX_Plans_PlanTypeId",
                 table: "Plans",
-                column: "PlanTypeId1");
+                column: "PlanTypeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Plans_UpdateById",
@@ -7462,35 +8027,23 @@ namespace Evaluation.DAL.Migrations
                 column: "UpdateById");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PlanSchedules_CreateById",
-                table: "PlanSchedules",
+                name: "IX_PlanServiceRequest_AcademicYearId",
+                table: "PlanServiceRequest",
+                column: "AcademicYearId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PlanServiceRequest_CreateById",
+                table: "PlanServiceRequest",
                 column: "CreateById");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PlanSchedules_DeleteById",
-                table: "PlanSchedules",
+                name: "IX_PlanServiceRequest_DeleteById",
+                table: "PlanServiceRequest",
                 column: "DeleteById");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PlanSchedules_PlanId",
-                table: "PlanSchedules",
-                column: "PlanId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_PlanSchedules_PlanId1",
-                table: "PlanSchedules",
-                column: "PlanId1",
-                unique: true,
-                filter: "[PlanId1] IS NOT NULL");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_PlanSchedules_SchoolId",
-                table: "PlanSchedules",
-                column: "SchoolId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_PlanSchedules_UpdateById",
-                table: "PlanSchedules",
+                name: "IX_PlanServiceRequest_UpdateById",
+                table: "PlanServiceRequest",
                 column: "UpdateById");
 
             migrationBuilder.CreateIndex(
@@ -7585,6 +8138,36 @@ namespace Evaluation.DAL.Migrations
                 column: "UpdateById");
 
             migrationBuilder.CreateIndex(
+                name: "IX_RequestAssignment_CreateById",
+                table: "RequestAssignment",
+                column: "CreateById");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RequestAssignment_DeleteById",
+                table: "RequestAssignment",
+                column: "DeleteById");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RequestAssignment_MinistryUserId",
+                table: "RequestAssignment",
+                column: "MinistryUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RequestAssignment_PartyTypeId",
+                table: "RequestAssignment",
+                column: "PartyTypeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RequestAssignment_ServiceRequestId",
+                table: "RequestAssignment",
+                column: "ServiceRequestId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RequestAssignment_UpdateById",
+                table: "RequestAssignment",
+                column: "UpdateById");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_RolePermissions_CreateById",
                 table: "RolePermissions",
                 column: "CreateById");
@@ -7622,31 +8205,6 @@ namespace Evaluation.DAL.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Roles_UpdateById",
                 table: "Roles",
-                column: "UpdateById");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_SchoolLevel_CreateById",
-                table: "SchoolLevel",
-                column: "CreateById");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_SchoolLevel_DeleteById",
-                table: "SchoolLevel",
-                column: "DeleteById");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_SchoolLevel_LevelId1",
-                table: "SchoolLevel",
-                column: "LevelId1");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_SchoolLevel_SchoolId1",
-                table: "SchoolLevel",
-                column: "SchoolId1");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_SchoolLevel_UpdateById",
-                table: "SchoolLevel",
                 column: "UpdateById");
 
             migrationBuilder.CreateIndex(
@@ -7775,21 +8333,6 @@ namespace Evaluation.DAL.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_SectionDepartment_CreateById",
-                table: "SectionDepartment",
-                column: "CreateById");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_SectionDepartment_DeleteById",
-                table: "SectionDepartment",
-                column: "DeleteById");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_SectionDepartment_UpdateById",
-                table: "SectionDepartment",
-                column: "UpdateById");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_ServiceAction_ActionTypeId",
                 table: "ServiceAction",
                 column: "ActionTypeId");
@@ -7846,6 +8389,31 @@ namespace Evaluation.DAL.Migrations
                 column: "UpdateById");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ServiceRequestFieldsValue_CreateById",
+                table: "ServiceRequestFieldsValue",
+                column: "CreateById");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ServiceRequestFieldsValue_DeleteById",
+                table: "ServiceRequestFieldsValue",
+                column: "DeleteById");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ServiceRequestFieldsValue_FieldId",
+                table: "ServiceRequestFieldsValue",
+                column: "FieldId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ServiceRequestFieldsValue_ServiceRequestId",
+                table: "ServiceRequestFieldsValue",
+                column: "ServiceRequestId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ServiceRequestFieldsValue_UpdateById",
+                table: "ServiceRequestFieldsValue",
+                column: "UpdateById");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ServiceRequests_CreateById",
                 table: "ServiceRequests",
                 column: "CreateById");
@@ -7856,9 +8424,29 @@ namespace Evaluation.DAL.Migrations
                 column: "DeleteById");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ServiceRequests_OrganizationId",
+                name: "IX_ServiceRequests_EvaluationPartyId",
                 table: "ServiceRequests",
-                column: "OrganizationId");
+                column: "EvaluationPartyId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ServiceRequests_EvaluationRequestHistoryId",
+                table: "ServiceRequests",
+                column: "EvaluationRequestHistoryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ServiceRequests_EvaluationRequestId",
+                table: "ServiceRequests",
+                column: "EvaluationRequestId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ServiceRequests_OrgTreeId",
+                table: "ServiceRequests",
+                column: "OrgTreeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ServiceRequests_PlanHistoryId",
+                table: "ServiceRequests",
+                column: "PlanHistoryId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ServiceRequests_PlanId",
@@ -7914,6 +8502,11 @@ namespace Evaluation.DAL.Migrations
                 name: "IX_Services_DeleteById",
                 table: "Services",
                 column: "DeleteById");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Services_EvaluationPartyId",
+                table: "Services",
+                column: "EvaluationPartyId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Services_SystemModuleId",
@@ -8264,50 +8857,25 @@ namespace Evaluation.DAL.Migrations
                 column: "UpdateById");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UiControl_BackendName",
-                table: "UiControl",
+                name: "IX_UiControls_BackendName",
+                table: "UiControls",
                 column: "BackendName",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_UiControl_CreateById",
-                table: "UiControl",
+                name: "IX_UiControls_CreateById",
+                table: "UiControls",
                 column: "CreateById");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UiControl_DeleteById",
-                table: "UiControl",
+                name: "IX_UiControls_DeleteById",
+                table: "UiControls",
                 column: "DeleteById");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UiControl_UpdateById",
-                table: "UiControl",
+                name: "IX_UiControls_UpdateById",
+                table: "UiControls",
                 column: "UpdateById");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_UserDeparment_CreateById",
-                table: "UserDeparment",
-                column: "CreateById");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_UserDeparment_DeleteById",
-                table: "UserDeparment",
-                column: "DeleteById");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_UserDeparment_DepartmentId",
-                table: "UserDeparment",
-                column: "DepartmentId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_UserDeparment_UpdateById",
-                table: "UserDeparment",
-                column: "UpdateById");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_UserDeparment_UserId",
-                table: "UserDeparment",
-                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserDepartment_CreateById",
@@ -8333,6 +8901,21 @@ namespace Evaluation.DAL.Migrations
                 name: "IX_UserDepartment_UserId",
                 table: "UserDepartment",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserGender_CreateById",
+                table: "UserGender",
+                column: "CreateById");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserGender_DeleteById",
+                table: "UserGender",
+                column: "DeleteById");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserGender_UpdateById",
+                table: "UserGender",
+                column: "UpdateById");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserLoginLogs_CreateById",
@@ -8475,6 +9058,36 @@ namespace Evaluation.DAL.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_UserType_CreateById",
+                table: "UserType",
+                column: "CreateById");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserType_DeleteById",
+                table: "UserType",
+                column: "DeleteById");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserType_UpdateById",
+                table: "UserType",
+                column: "UpdateById");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_VisitType_CreateById",
+                table: "VisitType",
+                column: "CreateById");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_VisitType_DeleteById",
+                table: "VisitType",
+                column: "DeleteById");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_VisitType_UpdateById",
+                table: "VisitType",
+                column: "UpdateById");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_WebsiteAttachment_CreateById",
                 table: "WebsiteAttachment",
                 column: "CreateById");
@@ -8530,9 +9143,6 @@ namespace Evaluation.DAL.Migrations
                 name: "Banner");
 
             migrationBuilder.DropTable(
-                name: "ChangeRequestDetail");
-
-            migrationBuilder.DropTable(
                 name: "ChangeRequestStatus");
 
             migrationBuilder.DropTable(
@@ -8554,10 +9164,19 @@ namespace Evaluation.DAL.Migrations
                 name: "DepartmentRoleAttributeValue");
 
             migrationBuilder.DropTable(
+                name: "EducationLevel");
+
+            migrationBuilder.DropTable(
                 name: "EmailLog");
 
             migrationBuilder.DropTable(
                 name: "EmailTemplateDocuments");
+
+            migrationBuilder.DropTable(
+                name: "EvaluationRequestFieldsValue");
+
+            migrationBuilder.DropTable(
+                name: "EvaluationRequestHistoryFieldsValue");
 
             migrationBuilder.DropTable(
                 name: "ExceptionLog");
@@ -8602,7 +9221,7 @@ namespace Evaluation.DAL.Migrations
                 name: "PlaceHolder");
 
             migrationBuilder.DropTable(
-                name: "PlanSchedules");
+                name: "PlanServiceRequest");
 
             migrationBuilder.DropTable(
                 name: "PlanTypeDepartment");
@@ -8614,10 +9233,10 @@ namespace Evaluation.DAL.Migrations
                 name: "RequestAssign");
 
             migrationBuilder.DropTable(
-                name: "RolePermissions");
+                name: "RequestAssignment");
 
             migrationBuilder.DropTable(
-                name: "SchoolLevel");
+                name: "RolePermissions");
 
             migrationBuilder.DropTable(
                 name: "ScopeAcademicYears");
@@ -8626,13 +9245,10 @@ namespace Evaluation.DAL.Migrations
                 name: "ScopeUserTeam");
 
             migrationBuilder.DropTable(
-                name: "SectionDepartment");
-
-            migrationBuilder.DropTable(
                 name: "ServiceInitiatorPartyType");
 
             migrationBuilder.DropTable(
-                name: "ServiceRequests");
+                name: "ServiceRequestFieldsValue");
 
             migrationBuilder.DropTable(
                 name: "ServiceRequestShowPartyType");
@@ -8665,10 +9281,7 @@ namespace Evaluation.DAL.Migrations
                 name: "TemplateGenrationTypies");
 
             migrationBuilder.DropTable(
-                name: "UiControl");
-
-            migrationBuilder.DropTable(
-                name: "UserDeparment");
+                name: "UiControls");
 
             migrationBuilder.DropTable(
                 name: "UserDepartment");
@@ -8689,6 +9302,12 @@ namespace Evaluation.DAL.Migrations
                 name: "UserToken");
 
             migrationBuilder.DropTable(
+                name: "UserType");
+
+            migrationBuilder.DropTable(
+                name: "VisitType");
+
+            migrationBuilder.DropTable(
                 name: "WebsiteAttachment");
 
             migrationBuilder.DropTable(
@@ -8702,9 +9321,6 @@ namespace Evaluation.DAL.Migrations
 
             migrationBuilder.DropTable(
                 name: "ActionTransactionsLog");
-
-            migrationBuilder.DropTable(
-                name: "ChangeRequest");
 
             migrationBuilder.DropTable(
                 name: "CssApplyType");
@@ -8731,13 +9347,7 @@ namespace Evaluation.DAL.Migrations
                 name: "Pages");
 
             migrationBuilder.DropTable(
-                name: "Level");
-
-            migrationBuilder.DropTable(
-                name: "OrgTree");
-
-            migrationBuilder.DropTable(
-                name: "StatusService");
+                name: "ServiceRequests");
 
             migrationBuilder.DropTable(
                 name: "Navbar");
@@ -8758,22 +9368,10 @@ namespace Evaluation.DAL.Migrations
                 name: "Field");
 
             migrationBuilder.DropTable(
-                name: "ServiceStatus");
-
-            migrationBuilder.DropTable(
                 name: "SMSProfiles");
 
             migrationBuilder.DropTable(
                 name: "ServiceAction");
-
-            migrationBuilder.DropTable(
-                name: "ChangeRequestType");
-
-            migrationBuilder.DropTable(
-                name: "Plans");
-
-            migrationBuilder.DropTable(
-                name: "EvaluationParties");
 
             migrationBuilder.DropTable(
                 name: "FormStatus");
@@ -8782,10 +9380,13 @@ namespace Evaluation.DAL.Migrations
                 name: "CalcMethods");
 
             migrationBuilder.DropTable(
-                name: "OrgTreeClass");
+                name: "EvaluationRequestHistory");
 
             migrationBuilder.DropTable(
-                name: "SchoolTypes");
+                name: "PlanHistory");
+
+            migrationBuilder.DropTable(
+                name: "ServiceStatus");
 
             migrationBuilder.DropTable(
                 name: "Permissions");
@@ -8809,13 +9410,7 @@ namespace Evaluation.DAL.Migrations
                 name: "ActionType");
 
             migrationBuilder.DropTable(
-                name: "AcademicYears");
-
-            migrationBuilder.DropTable(
-                name: "PlanStatuses");
-
-            migrationBuilder.DropTable(
-                name: "PlanType");
+                name: "EvaluationRequest");
 
             migrationBuilder.DropTable(
                 name: "FieldTypeShow");
@@ -8827,7 +9422,28 @@ namespace Evaluation.DAL.Migrations
                 name: "FormGroupType");
 
             migrationBuilder.DropTable(
+                name: "EvaluationType");
+
+            migrationBuilder.DropTable(
+                name: "Plans");
+
+            migrationBuilder.DropTable(
                 name: "Services");
+
+            migrationBuilder.DropTable(
+                name: "StatusService");
+
+            migrationBuilder.DropTable(
+                name: "AcademicYears");
+
+            migrationBuilder.DropTable(
+                name: "PlanStatuses");
+
+            migrationBuilder.DropTable(
+                name: "PlanType");
+
+            migrationBuilder.DropTable(
+                name: "EvaluationParties");
 
             migrationBuilder.DropTable(
                 name: "SystemModules");
@@ -8839,7 +9455,22 @@ namespace Evaluation.DAL.Migrations
                 name: "Category");
 
             migrationBuilder.DropTable(
-                name: "OrganizationTypes");
+                name: "OrgTree");
+
+            migrationBuilder.DropTable(
+                name: "JobTitle");
+
+            migrationBuilder.DropTable(
+                name: "OrgClass");
+
+            migrationBuilder.DropTable(
+                name: "OrgTypes");
+
+            migrationBuilder.DropTable(
+                name: "SchoolTypes");
+
+            migrationBuilder.DropTable(
+                name: "UserGender");
 
             migrationBuilder.DropTable(
                 name: "MinistryUsers");

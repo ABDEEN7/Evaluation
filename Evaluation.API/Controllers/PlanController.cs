@@ -38,15 +38,15 @@ public class PlanController(MasterBL masterBL) : ControllerBase
         //var
         return Ok();
     }
-    [HttpPost]
-    public async Task<IActionResult> Approve(string approveDto)
-    {
-        ApproveEvaluationPlanDto? planDto = JsonConvert.DeserializeObject<ApproveEvaluationPlanDto>(approveDto.ToString());
-        if (planDto == null)
-            return BadRequest(new { error = "Invalid JSON structure." });
-        await masterBL.GetApiService<PlanServiceRequestServices>().ApprovePlan(planDto);
-        return Ok();
-    }
+    //[HttpPost]
+    //public async Task<IActionResult> Approve(string approveDto)
+    //{
+    //    ApproveEvaluationPlanDto? planDto = JsonConvert.DeserializeObject<ApproveEvaluationPlanDto>(approveDto.ToString());
+    //    if (planDto == null)
+    //        return BadRequest(new { error = "Invalid JSON structure." });
+    //    await masterBL.GetApiService<PlanServiceRequestServices>().ApprovePlan(planDto);
+    //    return Ok();
+    //}
     [HttpPut]
     public async Task<IActionResult> UpdatePlan(Guid id, [FromBody] string planDto)
     {
@@ -54,13 +54,13 @@ public class PlanController(MasterBL masterBL) : ControllerBase
         return Ok(planJson);
     }
     [HttpPost]
-    public async Task<IActionResult> ApproveDeleteSchool(Guid id, Guid schoolId)
-    {
-        var deletedSchool = await masterBL.
-            GetApiService<PlanServiceRequestServices>()
-            .ApproveDeleteSchool(id, schoolId);
-        return Ok(deletedSchool);
-    }
+    //public async Task<IActionResult> ApproveDeleteSchool(Guid id, Guid schoolId)
+    //{
+    //    var deletedSchool = await masterBL.
+    //        GetApiService<PlanServiceRequestServices>()
+    //        .ApproveDeleteSchool(id, schoolId);
+    //    return Ok(deletedSchool);
+    //}
     [HttpGet]
     public IActionResult GetPlanType()
     {

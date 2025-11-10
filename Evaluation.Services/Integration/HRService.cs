@@ -44,9 +44,9 @@ public class HRService: ApiBase
                     _obj.EmployeeNo = reader.IsDBNull("EMPLOYEE_NUMBER") ? "" : reader.GetString("EMPLOYEE_NUMBER");
                     //_obj.Gender = 
                     //_obj.BirthDate =
-                    _obj.Nationality = reader.IsDBNull("NATIONALITY_E") ? "" : reader.GetString("NATIONALITY_E");
+                    _obj.NationalityCode = reader.IsDBNull("NATIONALITY_E") ? "" : reader.GetString("NATIONALITY_E");
                     //_obj.JoinDate = reader.IsDBNull("DATE_OF_JOINING") ? "" : reader.GetString("DATE_OF_JOINING");
-                    _obj.JobTitle = reader.IsDBNull("JOB_TITLE_E") ? reader.GetString("JOB_TITLE_A") : reader.GetString("JOB_TITLE_E");
+                    //_obj.JobTitle = reader.IsDBNull("JOB_TITLE_E") ? reader.GetString("JOB_TITLE_A") : reader.GetString("JOB_TITLE_E");
                     //_obj.HrCode =
 
                     _Allobj.Add(_obj);

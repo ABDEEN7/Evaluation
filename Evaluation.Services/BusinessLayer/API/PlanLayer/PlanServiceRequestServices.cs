@@ -73,16 +73,16 @@ public class PlanServiceRequestServices(
             return result;
         });
     }
-    public async Task<Result<CreateEvaluationPlanDto>> ApprovePlan(ApproveEvaluationPlanDto? modelDto)
-    {
-        await ValidateApprovePlan(modelDto);
+    //public async Task<Result<CreateEvaluationPlanDto>> ApprovePlan(ApproveEvaluationPlanDto? modelDto)
+    //{
+    //    await ValidateApprovePlan(modelDto);
 
-        return await ExecuteWithResult(async () =>
-        {
-            Plan plan = modelDto.Adapt<Plan>();
-            var result = await planRepository.ApprovePlans(plan.Id);
-        });
-    }
+    //    return await ExecuteWithResult(async () =>
+    //    {
+    //        Plan plan = modelDto.Adapt<Plan>();
+    //        var result = await planRepository.ApprovePlans(plan.Id);
+    //    });
+    //}
     //public async Task<Result<List<PlanTypeDto>>> GetPlanType()
     //{
     //    var result = await ExecuteWithResult(async () => await planRepository.GetPlanTypeAsync());
@@ -95,14 +95,7 @@ public class PlanServiceRequestServices(
 
         });
     }
-    public async Task<Result<bool>> ApproveDeleteSchool(Guid requestId, Guid schoolId)
-    {
-        return await ExecuteWithResult(async () =>
-        {
-            var result = await planRepository.DeleteSchoolFromPlan(requestId, schoolId);
-            return result;
-        });
-    }
+   
     public async Task<Result<List<PlanTypeDto>>> GetPlansTypes()
     {
         return await ExecuteWithResult(async () =>
