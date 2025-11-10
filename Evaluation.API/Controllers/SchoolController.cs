@@ -43,6 +43,12 @@ public class SchoolController : ControllerBase
     }
 
     [HttpGet]
+    public async Task<List<OrgTree>> GetHROrgDetailsAsync(int skip, int top)
+    {
+        return await _hrService.GetAllHROrgAsync(skip, top);
+    }
+
+    [HttpGet]
     public async Task<IActionResult> GetVisits()
     {
         var visit = await _masterBl.GetApiService<SchoolBL>().GetVisitsAsync();

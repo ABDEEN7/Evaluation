@@ -49,7 +49,7 @@ public class HRService: ApiBase
                                 NameAr = reader.IsDBNull(reader.GetOrdinal("EMPLOYEE_A")) ? "" : reader.GetString(reader.GetOrdinal("EMPLOYEE_A")),
                                 EmployeeNo = reader.IsDBNull(reader.GetOrdinal("EMPLOYEE_NUMBER")) ? "" : reader.GetString(reader.GetOrdinal("EMPLOYEE_NUMBER")),
 
-                                // Need check here !!
+                                //TODO: Need check here !!
 
                                 // Nationality = reader.IsDBNull(reader.GetOrdinal("NATIONALITY_E")) ? "" : reader.GetString(reader.GetOrdinal("NATIONALITY_E")),
                                 // JoinDate = reader.IsDBNull(reader.GetOrdinal("DATE_OF_JOINING")) ? "" : reader.GetDateTime(reader.GetOrdinal("DATE_OF_JOINING")),
@@ -67,6 +67,57 @@ public class HRService: ApiBase
             catch (Exception ex)
             {
                 Console.WriteLine($"Error loading employees: {ex.Message}");
+            }
+        }
+
+        return employees;
+    }
+
+    public async Task<List<OrgTree>> GetAllHROrgAsync(int skip = 0, int top = 50)
+    {
+        var employees = new List<OrgTree>();
+
+        using (var con = new OracleConnection(ClsAppSetting.OracleDBConnection))
+        {
+            try
+            {
+                using (var cmd = con.CreateCommand())
+                {
+                    await con.OpenAsync();
+
+                    cmd.BindByName = true;
+
+                    cmd.CommandText = @"
+                    SELECT *
+                    FROM TEMP_HR.ORGANIZATION_EVALAPP_V
+                    WHERE Email IS NOT NULL
+                    OFFSET :Skip ROWS FETCH NEXT :Top ROWS ONLY";
+
+                    cmd.Parameters.Add(new OracleParameter("Skip", skip));
+                    cmd.Parameters.Add(new OracleParameter("Top", top));
+
+                    using (var reader = await cmd.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            var emp = new OrgTree
+                            {
+                                NameEn = reader.IsDBNull(reader.GetOrdinal("ORG_DESC_E")) ? "" : reader.GetString(reader.GetOrdinal("ORG_DESC_E")),
+                                NameAr = reader.IsDBNull(reader.GetOrdinal("ORG_DESC_A")) ? "" : reader.GetString(reader.GetOrdinal("ORG_DESC_A")),
+                                
+
+                                //TODO: Need check here to add more!!
+
+                            };
+
+                            employees.Add(emp);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading orgs: {ex.Message}");
             }
         }
 
