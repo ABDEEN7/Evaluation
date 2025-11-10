@@ -1,5 +1,4 @@
-﻿using Evaluation.API.Extensions;
-using Evaluation.DAL.Entities.Org;
+﻿using Evaluation.DAL.Entities.Org;
 using Evaluation.Services.BusinessLayer;
 using Evaluation.Services.BusinessLayer.API;
 using Evaluation.SharedHelper.Dtos.SchoolDto;

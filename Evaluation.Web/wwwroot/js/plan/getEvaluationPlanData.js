@@ -151,10 +151,10 @@ async function submitEvaluationData(data) {
         // Show loading state
         const submitBtn = document.getElementById('btn-submit');
         const originalText = submitBtn?.textContent;
-        if (submitBtn) {
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Submitting...';
-        }
+        //if (submitBtn) {
+        //    submitBtn.disabled = true;
+        //    submitBtn.textContent = 'Submitting...';
+        //}
         //jqClient().Post(`/Plan/Create`, data).fail((jqXHR, textStatus, errorThrown) => {
         //    console.error('Error: [Create Plan Condition]', textStatus, errorThrown);
         //});

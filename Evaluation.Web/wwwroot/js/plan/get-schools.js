@@ -13,12 +13,12 @@ $(document).ready(function () {
     loadSchoolsData();
     initializeSearch();
     initializeFilters();
-    initializeFlatpickr(); // Initialize Flatpickr on page load
+    //initializeFlatpickr(); // Initialize Flatpickr on page load
 });
 
 // ============= INITIALIZE FLATPICKR =============
 function initializeFlatpickr() {
-    flatpickr(".dateRange", {
+    flatpickr(".childDate", {
         mode: "range",
         locale: "ar",
         dateFormat: "Y-m-d",
@@ -144,7 +144,7 @@ function renderSchoolsTable(schools) {
             </td>
             <td>
                 <input type="text" 
-                       class="form-control form-control-sm dateRange" 
+                       class="form-control form-control-sm childDate" 
                        placeholder="اختر تاريخ بداية ونهاية الزيارة"
                        data-school-id="${school.id}"
                        readonly>

@@ -38,7 +38,7 @@ public class PlanServiceRequestServices(
             //PlanServiceRequest planDraft = evaluationPlanDto.Adapt<PlanServiceRequest>();
             //var result = await f.CreateServicPlan(evaluationPlanDto);
             var result = evaluationPlanDto;
-            result.AcademicYearId = new Guid("00000000-0000-0000-0000-000000000001");
+            result.AcademicYearId = new Guid("00066600-9999-0000-7777-000000000001");
             return result;
         });
     }
