@@ -1,4 +1,5 @@
-﻿using Evaluation.SharedHelper.Helper;
+﻿using Evaluation.DAL.Helper;
+using Evaluation.SharedHelper.Helper;
 
 namespace Evaluation.API.Middlewares
 {

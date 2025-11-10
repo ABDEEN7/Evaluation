@@ -2,9 +2,10 @@
 using Evaluation.DAL.Entities.PermissionEntity;
 using Evaluation.DAL.Entities.UserEntiy;
 using Evaluation.SharedHelper.Enums;
-using Evaluation.SharedHelper.Helper;
 using Evaluation.SharedHelper;
 using Microsoft.EntityFrameworkCore;
+using Evaluation.DAL.Helper;
+
 
 namespace Evaluation.API.Middlewares
 {

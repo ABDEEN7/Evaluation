@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Evaluation.SharedHelper.Helper
+namespace Evaluation.DAL.Helper
 {
     public class UserInfo
     {
