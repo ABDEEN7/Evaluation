@@ -19,6 +19,7 @@ namespace Evaluation.Web.Middlewares
         {
             SetWebApiBaseURL(context);
             SetWebAppBaseURL(context);
+            SetWebApiBaseURL(context);
             SetLanguage(context);
             await _next(context);
         }

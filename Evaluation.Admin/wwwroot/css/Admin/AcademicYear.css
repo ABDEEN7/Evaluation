@@ -1,0 +1,34 @@
+
+.disabled-div {
+    pointer-events: none; /* Prevent clicking, hovering, etc. */
+    opacity: 0.5; /* Optional: visually indicate it's disabled */
+}
+
+.list-box {
+    border: 1px solid #ddd;
+    width: 300px;
+    height: 200px;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+    .list-box ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .list-box li {
+        padding: 5px;
+        margin: 5px 0;
+        background-color: #f4f4f9;
+        border: 1px solid #ddd;
+        cursor: pointer;
+    }
+
+.treeview {
+    height: 497px;
+    overflow: scroll;
+}
+
+

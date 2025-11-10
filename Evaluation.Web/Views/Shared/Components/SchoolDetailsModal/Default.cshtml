@@ -1,14 +1,12 @@
 ﻿@{
     var modalId = ViewData["ModalId"] as string ?? "myModal";
-    var title = ViewData["Title"] as string ?? "Modal Title";
-    var body = ViewData["Body"] as string ?? "Modal body content here...";
 }
 <div class="modal fade" id="@modalId" tabindex="-1" aria-labelledby="@($"{modalId}Label")" aria-hidden="true">
     <div class="modal-dialog  modal-xl modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header align-items-start border-0">
                 <div>
-                    <h4 class="modal-title fw-semibold mb-2" id="exampleModalLabel">مدرسة الأمير سلطان الثانوية</h4>
+                    <h4 class="modal-title fw-semibold mb-2" id="exampleModalLabel"></h4>
                     <!-- Breadcrumbs -->
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb">
@@ -96,16 +94,28 @@
 
 
 
-@section Scripts {
-    <!-- Main JS File -->
 
-
-   
-}
 <script src="~/js/school/schooldetails.js" asp-append-version="true"></script>
 
+
 <script type="text/javascript">
-     $(document).ready(async function () {
-            initSchoolDetailsPage();
-         });
+
+    //     $('#@modalId').on('shown.bs.modal', async function () {
+    //   console.log('Modal is ready!');
+    //      const button = event.relatedTarget; // The link that triggered the modal
+    // const schoolId = button.getAttribute('data-id');
+    // await initSchoolDetailsPage(schoolId);
+    // $("#exampleModalLabel").text(schoolDetails.nameAr);
+
+    //     });
+
+
+            $(document).on('click', 'a[data-bs-target="#schoolDetailsModal"]',async function() {
+        let schoolId = $(this).attr('data-id');
+        console.log(schoolId);
+            await initSchoolDetailsPage(schoolId);
+    $("#exampleModalLabel").text(schoolDetails.nameAr);
+
+    });
+
 </script>
