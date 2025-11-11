@@ -1,4 +1,5 @@
 ﻿using Evaluation.API.Extensions;
+using Evaluation.DAL.DTOs;
 using Evaluation.DAL.Entities.Org;
 using Evaluation.Services.BusinessLayer;
 using Evaluation.Services.BusinessLayer.API;
@@ -37,15 +38,15 @@ public class SchoolController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<List<Employee>> GetHREmployeesDetails(int skip, int top)
+    public async Task<List<HREmployeeInfoDto>> GetHREmployeesDetails(int page)
     {
-        return await _hrService.GetAllHRUsersAsync(skip, top);
+        return await _hrService.GetAllHRUsersAsync(page);
     }
 
     [HttpGet]
-    public async Task<List<OrgTree>> GetHROrgDetailsAsync(int skip, int top)
+    public async Task<List<HROrganizationInfoDto>> GetHROrgDetailsAsync(int page)
     {
-        return await _hrService.GetAllHROrgAsync(skip, top);
+        return await _hrService.GetAllHROrgAsync(page);
     }
 
     [HttpGet]
