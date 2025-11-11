@@ -61,6 +61,11 @@ public class HRService: ApiBase
             {
                 Console.WriteLine($"Error loading employees: {ex.Message}");
             }
+            finally
+            {
+                con.Dispose();
+                con.Close();
+            }
         }
 
         return employees;
@@ -105,6 +110,11 @@ public class HRService: ApiBase
             catch (Exception ex)
             {
                 Console.WriteLine($"Error loading orgs: {ex.Message}");
+            }
+            finally
+            {
+                con.Dispose();
+                con.Close();
             }
         }
 
