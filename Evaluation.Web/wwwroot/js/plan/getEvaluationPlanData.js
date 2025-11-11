@@ -12,7 +12,7 @@ function getEvaluationData() {
         const planTypeId = planTypeSelect?.value || '';
 
         // Get date range and parse start/end dates
-        const dateRangeInput = document.getElementById('dateRange');
+        const dateRangeInput = document.getElementById('parentDate');
         let startDate = '';
         let endDate = '';
 
@@ -90,11 +90,7 @@ function parseDateRange(dateRangeValue) {
     };
 }
 
-// Usage examples:
-console.log(parseDateRange("2024-01-01 to 2024-12-31"));
-console.log(parseDateRange("2024-01-01 - 2024-12-31"));
-console.log(parseDateRange("2024-01-01"));
-console.log(parseDateRange(""));
+// Usage examples
 
 /**
  * Validates evaluation data before submission
@@ -220,7 +216,7 @@ function getSelectedSchools() {
         const schoolId = checkbox.data('id');
         const row = checkbox.closest('tr');
 
-        const dataRangeInput = row.find('.dateRange');
+        const dataRangeInput = row.find('.childDate');
         const dateRangeValue = dataRangeInput.val() || '';
         const parsedDates = parseDateRange(dateRangeValue);
         const visitTypeSelect = row.find('.visitTypeSelect');

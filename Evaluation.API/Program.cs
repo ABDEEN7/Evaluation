@@ -65,7 +65,7 @@ internal class Program
             builder.Services.ConfigureUserInfo(config);
             builder.Services.ConfigureRequestInfo(config);
             builder.Services.PopulateAppSettings(config);
-            builder.Services.ConfigureMasterBL(config, builder.Environment.IsDevelopment());
+            builder.Services.ConfigureMasterBL(config);
             builder.Services.AddScoped<TokenValidationFilter>();
 
             builder.Services.AddScoped<TokenValidationFilter>();

@@ -43,7 +43,7 @@ namespace Evaluation.Services.BusinessLayer.API
             this.serviceScopeFactory = serviceScopeFactory ?? throw new ArgumentNullException(nameof(serviceScopeFactory));
             this.cacheDataProvider = cacheDataProvider ?? throw new ArgumentNullException(nameof(cacheDataProvider));
             this.uow = uow ?? throw new ArgumentNullException(nameof(uow));
-            this.mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+            //this.mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             this.loggingServices = loggingServices ?? throw new ArgumentNullException(nameof(loggingServices));
             this.userInfo = userInfo ?? throw new ArgumentNullException(nameof(userInfo));
             this.serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
