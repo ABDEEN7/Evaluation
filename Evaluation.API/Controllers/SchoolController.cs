@@ -1,7 +1,9 @@
 ﻿using Evaluation.API.Extensions;
+using Evaluation.DAL.DTOs;
 using Evaluation.DAL.Entities.Org;
 using Evaluation.Services.BusinessLayer;
 using Evaluation.Services.BusinessLayer.API;
+using Evaluation.Services.Integration;
 using Evaluation.SharedHelper.Dtos.SchoolDto;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
@@ -14,9 +16,11 @@ public class SchoolController : ControllerBase
 {
 
     private readonly MasterBL _masterBl;
-    public SchoolController(MasterBL masterBl)
+    private readonly HRService _hrService;
+    public SchoolController(MasterBL masterBl, HRService hrService)
     {
         this._masterBl = masterBl;
+        this._hrService = hrService;
     }
 
     [HttpGet]
@@ -32,6 +36,19 @@ public class SchoolController : ControllerBase
 
         return dummyData.FirstOrDefault(s => s.Id == SchoolID);
     }
+
+    [HttpGet]
+    public async Task<List<HREmployeeInfoDto>> GetHREmployeesDetails(int page)
+    {
+        return await _hrService.GetAllHRUsersAsync(page);
+    }
+
+    [HttpGet]
+    public async Task<List<HROrganizationInfoDto>> GetHROrgDetailsAsync(int page)
+    {
+        return await _hrService.GetAllHROrgAsync(page);
+    }
+
     [HttpGet]
     public async Task<IActionResult> GetVisits()
     {
