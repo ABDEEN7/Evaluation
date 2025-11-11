@@ -1,52 +1,437 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+﻿@{
+    var lang = string.IsNullOrEmpty(requestInfo.Lang) ? "ar" : requestInfo.Lang;
+    var dir = lang == "ar" ? "rtl" : "ltr";
+
+}
+<!DOCTYPE html>
+<html lang="@lang" dir="@dir">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Evaluation.Admin</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/Evaluation.Admin.styles.css" asp-append-version="true" />
+    <title>@ViewData["Title"] - Scholarship.Admin</title>
+    <link rel="shortcut icon" href="" id="logoFaviconImageId" type="image/x-icon">
+    @RenderSection("Styles", required: false)
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.12/themes/default/style.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tabulator/4.9.3/css/tabulator.min.css" rel="stylesheet">
+    <link href="~/css/cover-spin.css" rel="stylesheet" />
+    <link href="~/lib/gijgo/css/gijgo.css" rel="stylesheet" />
+    <link href="~/lib/IconPicker/dist/Iconpicker-1.5.0.css" rel="stylesheet" />
+    <link href="~/lib/" rel="stylesheet" asp-append-version="true" />
+    <link href="~/lib/bootstrap-datepicker/dist/css/bootstrap-datepicker.css" rel="stylesheet" asp-append-version="true" />
+    <link href="~/lib/bootstrap-datetimepicker/css/jquery.datetimepicker.min.css" rel="stylesheet" asp-append-version="true" />
+
+
+    <!-- Customized Bootstrap Stylesheet -->
+    @if (@lang == "ar")
+    {
+        <link href="/css/bootstrap.rtl.min.css" rel="stylesheet" />
+    }
+    else
+    {
+        <link href="/css/bootstrap.min.css" rel="stylesheet">
+    }
+    <!-- Template Stylesheet -->
+    <link href="/css/style.css" rel="stylesheet">
+    @if (@lang == "ar")
+    {
+        <link href="/css/style-ar.css" rel="stylesheet" />
+    }
+    <link href="~/css/jsonviewwer.css" rel="stylesheet" />
 </head>
-<body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Evaluation.Admin</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
-                    <partial name="_LoginPartial" />
+<body dir="@dir">
+
+   @*  <partial name="_CoverSpin" /> *@
+
+    <div class="container-fluid position-relative d-flex p-0 flex-column">
+
+        <!-- Content Start -->
+        <div class="content">
+
+            <div class="main-panel">
+                <!-- Sidebar Start -->
+                @await Html.PartialAsync("_MainSidebar")
+                <!-- Sidebar End -->
+                <!-- Navbar Start -->
+                @await Html.PartialAsync("_NavBar")
+                <!-- Navbar End -->
+                <!-- Content Wrapper. Contains page content -->
+                <div class="container-fluid pt-4 px-4" id="contentarea">
+                    <div class="row g-4 mb-3">
+                        <div class="col-12 "><h3 class="heading lg" id="PageTitle"></h3></div>
+                    </div>
+                    <div class="row g-4">
+                        <div class="col-md-12">
+                            <div class="alert alert-info" role="alert" id="AlertMsg" style="display:none;"></div>
+
+                            @RenderBody()
+                        </div>
+                    </div>
                 </div>
+
+
+
+
+
+                <!-- Footer Start -->
+                <div class="container-fluid px-4 adminfooter">
+                    <div class="row">
+                        <div class="col-12 text-center text-sm-start">
+                            <p id="Property_Rights"></p>
+                        </div>
+                        <footer class="border-top footer text-muted">
+                            <div class="row">
+
+                                <div class="col-12">
+                                    &copy; 2025 - Scholarship.Admin - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                                </div>
+                            </div>
+                        </footer>
+                    </div>
+                </div>
+
+                <!-- Footer End -->
             </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
+        </div>
+        <!-- Content End -->
+        <!-- Back to Top -->
+        <a href="#" class="btn btn-primary btn-sm-square back-to-top"><i class="fa-solid fa-arrow-up-long"></i></a>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2025 - Evaluation.Admin - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    <div id="content-dailog"></div>
+    <div class="modal fade" id="FileModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" style="z-index:99999999">
+        <div class="modal-dialog" id="FileModalDialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="FileModal-Title"></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+
+
+                </div>
+                <div class="modal-body">
+                    <div class="ratio ratio-1x1">
+                        <div class="d-flex justify-content-center" id="FileModalContent">
+                        </div>
+                        @* <iframe id="file_frame"></iframe>*@
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="CloseButton" type="button" class="btn btn-secondary" data-bs-dismiss="modal"></button>
+                </div>
+            </div>
         </div>
-    </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    </div>
+    <!-- Modal for adding new rows -->
+    <div class="modal" id="ModalPopup">
+        <div class="modal-dialog modal-xl  modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"></h5>
+                    <button type="button" id="btn-close_popup" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" style="max-height:75vh">
+
+                    <div class="row">
+                        <form id="PopupForm">
+                            <input id="Id" hidden />
+
+
+
+                        </form>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="btn-clear_popup" class="btn btn-secondary"></button>
+                    <button type="button" id="btn-back_popup" class="btn btn-secondary"></button>
+                    <button type="button" id="btn-submit_popup" class="btn btn-primary"></button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script src="~/lib/moment/moment.min.js" asp-append-version="true"></script>
+    <script src="~/lib/moment/moment-timezone.min.js" asp-append-version="true"></script>
+    <script src="~/lib/moment/moment-timezone-with-data.min.js" asp-append-version="true"></script>
+    <script src="~/lib/jquery/dist/jquery.min.js" asp-append-version="true"></script>
+    <script src="~/lib/jquery_ui/ui/jquery-ui.js" asp-append-version="true"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/shared/jq-message-util.js" asp-append-version="true"></script>
+    <script src="~/lib/toastr/toastr.js" asp-append-version="true"></script>
+    <script src="~/lib/tinymce/tinymce.min.js" asp-append-version="true"></script>
+
+    <script src="~/lib/sweetalert2/dist/sweetalert2.js" asp-append-version="true"></script>
+    <script src="~/lib/select2/dist/js/select2.js" asp-append-version="true"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.12/jstree.min.js"></script>
+
+    <script src="~/lib/tabular/js/tabulator.min.js" asp-append-version="true"></script>
+    <script src="~/js/utility/jq-search-panel-util.js" asp-append-version="true"></script>
+    <script src="~/lib/sortablejs/sortable.min.js" asp-append-version="true"></script>
+    <script src="~/js/shared/shared-fn.js" asp-append-version="true"></script>
+    <script src="~/js/utility/jq-helper-util.js" asp-append-version="true"></script>
+    <script src="~/js/utility/jq-table-util.js" asp-append-version="true"></script>
+    <script src="~/js/utility/jq-message-util.js" asp-append-version="true"></script>
+    <script src="~/js/utility/jq-client-util.js" asp-append-version="true"></script>
     <script src="~/js/shared/jq-client-util.js" asp-append-version="true"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    @await RenderSectionAsync("Scripts", required: false)
+    <script src="~/lib/gijgo/js/gijgo.js" asp-append-version="true"></script>
+    <script src="~/lib/dropzone/dist/dropzone.js"></script>
+    <script src="~/lib/IconPicker/dist/iconpicker-1.5.0.js" asp-append-version="true"></script>
+    <script src="~/lib/bootstrap-datepicker/dist/js/bootstrap-datepicker.js" asp-append-version="true"></script>
+    <script src="~/lib/bootstrap-datetimepicker/js/jquery.datetimepicker.full.js" asp-append-version="true"></script>
+    <script src="~/lib/bootstrap-datetimepicker/js/jquery.datetimepicker.full.min.js" asp-append-version="true"></script>
+    <script src="~/lib/bootstrap-datetimepicker/js/jquery.datetimepicker.min.js" asp-append-version="true"></script>
+
+    <script src="~/js/shared/jq-dropdown-util.js" asp-append-version="true"></script>
+    <script type="text/javascript">
+              let idleTimeout;
+         let idleTimeLimit = 20 * 60 * 1000;
+          const SetActivesidebar = (pathname) => {
+
+             var ul, li, a, a1, div;
+             ul = document.getElementById("menu");
+             li = ul.getElementsByTagName('li');
+
+             // Loop through all list items, and hide those who don't match the search query
+             for (i = 0; i < li.length; i++) {
+                 a = li[i].getElementsByTagName("a")[0];
+                 a1 = li[i].parentNode.parentNode.parentNode.getElementsByTagName("a")[0];
+                 div = li[i].parentNode.parentNode;
+                 if (a.href == pathname) {
+                     $(a).addClass("sidebaractive");
+                     $(a1).addClass("sidebaractivemain");
+                     $(div).addClass("show");
+
+                 }
+
+
+
+             }
+         }
+          const activesidebar = window.location.href;
+             SetActivesidebar(activesidebar);
+             ajaxSetup().Init();
+             $("#PageTitle").html(sharedFn().GetPageNameText());
+
+             if (document.getElementsByClassName('sidebaractivemain')[0]) {
+                 document.getElementsByClassName('sidebaractivemain')[0].focus();
+             }
+             else
+             {
+         //                    var $firstParent = $('#menu > li').first();
+
+         // // Set parent <a> active
+         //  $firstParent.find('a[data-bs-toggle="collapse"]').addClass('sidebaractivemain');
+
+         // // Expand submenu
+         // $firstParent.find('.collapse').addClass('show');
+
+         // // Set first child <a> active
+         //       var $firstChildLink = $firstParent.find('.sub-menu li a').first()
+         // .addClass('sidebaractive')
+         // .focus();
+         //         var href = $firstChildLink.attr('href');
+         // if (href) {
+         //  // window.location.href = href;
+         // }
+
+                 }
+             if (document.getElementsByClassName('sidebaractive')[0]) {
+                 document.getElementsByClassName('sidebaractive')[0].focus();
+             }
+
+
+           // Function to search for text in nested list
+         function FilterSidebar(list) {
+             var input, searchText, ul, li, txtValue, div;
+             input = document.getElementById('sidebarsearch');
+             searchText = input.value.toLowerCase();
+             ul = document.getElementById("menu");
+             li = ul.getElementsByTagName('li');
+             $(list).find('li').each(function () {
+                 var listItemText = $(this).text().toLowerCase();
+                 if (listItemText.includes(searchText)) {
+                     // Perform actions when text is found (for example, add a class)
+                     this.style.display = "";
+                     if ($(this).parent().parent()[0].getElementsByClassName("collapse")) {
+                         div = $(this).parent().parent()[0].getElementsByClassName("collapse");
+                         $(div).addClass("show");
+
+                     }
+                 }
+                 else {
+                     this.style.display = "none";
+                 }
+
+                 // Recursively search in nested lists
+                 var nestedList = $(this).find('ul');
+                 if (nestedList.length) {
+                     FilterSidebar(nestedList);
+                 }
+             });
+         }
+         var columnWidths = {};
+         // Function to set the width of all columns
+         function setAllColumnWidths(table, columnWidths) {
+             for (var field in columnWidths) {
+                 if (field != "undefined")
+                     table.updateColumnDefinition(field, { width: columnWidths[field] }); // Set the stored width back to the column
+             }
+         }
+         function Showloader(IsShow) {
+             if (IsShow == true) {
+                 $('#preloader').css('display', 'block');
+                 $('#preloader').css('background', '#0000001f');
+                 $('#status').css('display', 'block');
+
+                 $('#preloader').addClass('internalloader');
+
+             }
+             else {
+                 $('#preloader').css('display', 'none');
+                 $('#status').css('display', 'none');
+             }
+         }
+         function  DualsearchList (listId, searchId){
+             if (listId && searchId) {
+                 let input = document.getElementById(searchId).value.toLowerCase();
+                 let list = document.getElementById(listId);
+                 let items = list.getElementsByTagName("li");
+
+                 for (let i = 0; i < items.length; i++) {
+                     let text = items[i].textContent.toLowerCase();
+                     if (text.includes(input)) {
+                         items[i].style.display = ""; // Show matching items
+                     } else {
+                         items[i].style.display = "none"; // Hide non-matching items
+                     }
+                 }
+             }
+
+         }
+
+         tinymce.init({
+             // selector: 'textarea:not(.notinymceeditor)',
+             selector: 'textarea.tinymceeditor',
+             branding: false,
+             promotion: false,
+             statusbar: false,
+             valid_elements: '*[*]',
+              relative_urls: true,
+               remove_script_host: false,
+                 link_assume_external_targets: false,
+              convert_urls: false,
+              cleanup: false,
+             verify_html: false,
+             forced_root_block: false,
+             allow_html_in_named_anchor: true,
+             entity_encoding: 'raw',
+             extended_valid_elements: 'i[class|style],span[dir|class|style],svg[*],path[*]',
+             plugins: 'preview searchreplace autolink directionality code fullscreen image link media table anchor advlist lists quickbars',
+             menubar: 'file edit view insert format table',
+             toolbar: "undo redo | blocks fontsize | bold italic underline strikethrough fontfamily | align numlist bullist | link image | table | lineheight outdent indent| forecolor backcolor removeformat | code fullscreen preview | print newdocument | tinycomments | anchor | ltr rtl",
+             tinycomments_mode: 'embedded',
+             tinycomments_author: 'Author name',
+             mergetags_list: [
+                 { value: 'First.Name', title: 'First Name' },
+                 { value: 'Email', title: 'Email' },
+             ],
+             table_default_attributes: {
+                 border: '1'
+             },
+             image_advtab: true,
+             height: 400,
+             image_caption: true,
+             quickbars_selection_toolbar: 'bold italic | quicklink h2 h3 blockquote quickimage quicktable',
+             quickbars_insert_toolbar: false,
+             toolbar_mode: 'sliding',
+             contextmenu: 'link image table',
+             skin: 'oxide',
+             font_family_formats:
+                 "Cairo=Cairo, sans-serif;Andale Mono=andale mono,times; Arial=arial,helvetica,sans-serif; Arial Black=arial black,avant garde; Book Antiqua=book antiqua,palatino; Comic Sans MS=comic sans ms,sans-serif; Courier New=courier new,courier; Georgia=georgia,palatino; Helvetica=helvetica; Impact=impact,chicago; Symbol=symbol; Tahoma=tahoma,arial,helvetica,sans-serif; Terminal=terminal,monaco; Times New Roman=times new roman,times; Trebuchet MS=trebuchet ms,geneva; Verdana=verdana,geneva; Webdings=webdings; Wingdings=wingdings,zapf dingbats",
+                        content_css: [
+           '/css/fontawesome-free/css/all.min.css'
+        ]
+         });
+
+
+
+
+
+             // Fetch idle timeout from the server
+         function fetchIdleTimeout() {
+             var url=window.location.origin+"/@lang/Home/GetIdleTimeout";
+              const options = {
+             success: function (data) {
+                 if (data) {
+
+
+                     idleTimeLimit = data * 60 * 1000; // Convert minutes to milliseconds
+                 startIdleTimer();
+                 }
+             }
+         };
+         jqClientAdvanced(options).Get(url);
+
+         }
+
+         function startIdleTimer() {
+                updateActivity(); // Set initial activity
+             resetIdleTimer(); // Initialize timer
+
+             $(document).on("mousemove keypress click scroll", function () {
+                   updateActivity(); // Reset on any interaction
+             });
+             // Listen for activity from other tabs
+         window.addEventListener("storage", function (event) {
+             if (event.key === "lastActivityKey") {
+                 resetIdleTimer(); // Reset timer in this tab if activity is detected in another
+             }
+         });
+         }
+             function updateActivity() {
+             localStorage.setItem("lastActivityKey", new Date().getTime());
+         }
+         function resetIdleTimer() {
+
+             clearTimeout(idleTimeout);
+             //idleTimeout = setTimeout(logoutUser, idleTimeLimit);
+              idleTimeout = requestAnimationFrame(logoutUser, idleTimeLimit);
+         }
+
+         function logoutUser() {
+             $("#signOut-btn").click();
+
+         }
+         const getSysLogoUrl = () => {
+             jqClient.Get({
+                 url: "@Url.Action("GetSystemLogo", "Home")",
+                 dataType: 'text',
+                 onSuccess: (result) => {
+
+
+                     if (result) {
+                         const { FaviconSetting } = result;
+                         if (FaviconSetting) {
+                             $("#logoFaviconImageId").attr('href', FaviconSetting);
+
+                         }
+                         else {
+                             $("#logoFaviconImageId").attr('href', "/new-styles/img/logo-icon.png");
+
+
+                         }
+                     }
+
+                 }
+             });
+         }
+         // Start it all
+         $(document).ready(function () {
+             fetchIdleTimeout();
+              getSysLogoUrl();
+         });
+
+
+    </script>
+    @RenderSection("Scripts", required: false)
 </body>
 </html>
