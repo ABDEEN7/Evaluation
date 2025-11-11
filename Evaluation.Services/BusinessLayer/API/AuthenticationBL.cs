@@ -1,3 +1,5 @@
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using Evaluation.DAL.Entities.Authentication;
 using Evaluation.DAL.Entities.PermissionEntity;
 using Evaluation.DAL.Entities.UserEntiy;
@@ -8,14 +10,11 @@ using Evaluation.Services.Special;
 using Evaluation.SharedHelper;
 using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Exceptions;
-using Evaluation.SharedHelper.Helper;
 using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Api.Authentication;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 using UserType = Evaluation.SharedHelper.Enums.UserType;
 
 public class AuthenticationBL : ApiBase

@@ -89,7 +89,10 @@ public static class ServiceExtensions
             .WithScopedLifetime());
 
         services.AddScoped<MSJsonWT>();
-
+        services.AddScoped<CacheDataProvider>();
+        services.AddScoped<CacheManager>();
+        services.AddScoped<UnitOfWork>();
+        services.AddScoped<AzureBlobStorageService>();
         services.AddScoped<ISmsServices, SmsServices>();
         services.AddScoped<MasterBL>();
 
