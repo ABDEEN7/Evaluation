@@ -1,8 +1,7 @@
 ﻿using System.Linq.Expressions;
 using Evaluation.DAL.Entities.Audit;
-using Evaluation.DAL.Entities.BaseModule;
 using Evaluation.DAL.Entities.Generic;
-using Evaluation.SharedHelper.Helper;
+using Evaluation.DAL.Helper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
@@ -122,6 +121,22 @@ public class Repository<T>(DbContext context, UserInfo userInfo) : RepositoryBas
         _dbSet.Add(entity);
         return entity;
     }
+    public async Task<IEnumerable<T>> InsertRange(IEnumerable<T> entities)
+    {
+        var today = DateTime.Now;
+        var addedentities = entities.ToList();
+        foreach (var entity in addedentities)
+        {
+            entity.Id = Guid.NewGuid();
+            entity.CreateDate = today;
+            entity.IsDeleted = false;
+            if (userInfo.UserId.HasValue)
+                entity.CreateById = userInfo.UserId.Value;
+
+        }
+        await _dbSet.AddRangeAsync(addedentities);
+        return entities;
+    }
 
     public async Task<T> InsertAsync(T entity, bool generateGUID = true)
     {
@@ -144,7 +159,30 @@ public class Repository<T>(DbContext context, UserInfo userInfo) : RepositoryBas
         _dbSet.Update(entity);
         return entity;
     }
+    public IEnumerable<T> UpdateRange(IEnumerable<T> entities)
+    {
+        var today = DateTime.Now;
 
+        foreach (var entity in entities)
+        {
+            if (entity is IAuditLogEntity)
+            {
+                var entry = context.Entry(entity);
+
+                var auditLogs = GenerateAuditLogs(entry);
+
+                // Add audit logs to the context
+                if (auditLogs.Any()) context.Set<AuditLog>().AddRange(auditLogs);
+            }
+
+            entity.UpdateDate = today;
+            entity.IsDeleted = false;
+            if (userInfo.UserId != Guid.Empty) entity.UpdateById = userInfo.UserId;
+        }
+
+        _dbSet.UpdateRange(entities);
+        return entities;
+    }
     public bool Delete(T entity)
     {
         entity.IsDeleted = true;
@@ -152,6 +190,26 @@ public class Repository<T>(DbContext context, UserInfo userInfo) : RepositoryBas
         if (userInfo.UserId != Guid.Empty)
             entity.DeleteById = userInfo.UserId;
         context.Entry(entity).State = EntityState.Modified;
+        return true;
+    }
+
+    public bool DeleteRange(IEnumerable<T> entities)
+    {
+        if (entities == null || !entities.Any()) return false;
+
+        var today = DateTime.Now;
+        var userId = userInfo?.UserId;
+
+        foreach (var entity in entities)
+        {
+            entity.IsDeleted = true;
+            entity.DeleteDate = today;
+            if (userId != Guid.Empty)
+            {
+                entity.DeleteById = userId;
+            }
+        }
+
         return true;
     }
     public async Task<T?> GetByIdAsync(Guid? id)

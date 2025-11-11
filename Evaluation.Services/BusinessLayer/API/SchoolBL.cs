@@ -1,5 +1,6 @@
 ﻿using Evaluation.DAL.Entities.Org;
 using Evaluation.DAL.Entities.Planing;
+using Evaluation.DAL.Helper;
 using Evaluation.DAL.UnitOfWork;
 using Evaluation.Services.BusinessLayer.API.SchooLayer;
 using Evaluation.Services.Special;
@@ -22,7 +23,7 @@ public class SchoolBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvide
         : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, requestInfo)
 {
 
-    public async Task<School> GetUniversityDetails(Guid SchoolID)
+    public async Task<School> GetSchoolDetails(Guid SchoolID)
     {
         var schoollist = await uow.GetRepository<School>().GetAllActiveNonDeleted().ToListAsync();
 

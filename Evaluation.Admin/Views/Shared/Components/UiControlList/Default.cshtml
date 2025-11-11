@@ -1,0 +1,18 @@
+﻿@model UiControlListVM
+@foreach (var item in Model.UiControlItemList)
+{
+    var row = item.Constraint.RowOrder;
+    var column = item.Constraint.ColumnOrder;
+    
+    var getcolcount = Model.UiControlItemList.Where(x => x.RowOrder == row).Count();
+    var colcount = getcolcount==1?12:12 / getcolcount;
+    <div class="col-@colcount">
+        @{
+    @await Component.InvokeAsync("UiControl", item)
+        }
+    </div>
+
+}
+
+
+

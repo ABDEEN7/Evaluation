@@ -21,8 +21,8 @@ public class SchoolController : ControllerBase
 
     public async Task<School> GetSchoolDetails(Guid SchoolID)
     {
-        var schooldetails = await _masterBl.GetApiService<SchoolBL>().GetUniversityDetails(SchoolID);
-
+        //var schooldetails = await _masterBl.GetApiService<SchoolBL>().GetSchoolDetails(SchoolID);
+        
         var dummyData = new List<School>() {
             new School() { Id = new Guid("921d891a-e0cb-4fd4-8e53-fb3443ef0199"), NameAr = "مدرسة احمد بن حنبل", NameEn = "Ahmad Bin Hanbal School"},
             new School() { Id = new Guid("ecd11007-2ff6-42cb-bca2-b168de94afbc"), NameAr = "مدرسة عائشة", NameEn = "Aesha School" }
@@ -63,7 +63,7 @@ public class SchoolController : ControllerBase
         {
             new ResponseSchools
             {
-                Id = Guid.NewGuid(),
+                Id = new Guid("921d891a-e0cb-4fd4-8e53-fb3443ef0199"),
                 Name = "Greenwood High School",
                 LastEvaluationDate = new DateTime(2024, 5, 20),
                 Rating = "Perfect",
@@ -71,7 +71,7 @@ public class SchoolController : ControllerBase
             },
             new ResponseSchools
             {
-                Id = Guid.NewGuid(),
+                Id = new Guid("ecd11007-2ff6-42cb-bca2-b168de94afbc"),
                 Name = "Sunrise Elementary",
                 LastEvaluationDate = new DateTime(2023, 11, 10),
                 Rating = "Week",

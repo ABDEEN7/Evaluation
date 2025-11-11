@@ -159,13 +159,14 @@ function renderSchoolsTable(schools) {
             <td>${school.academicYear || '-'}</td>
             <td>
                 <p class="m-0">
-                    <a href="#" class="text-dark" type="button" data-bs-toggle="modal" data-bs-target="#exampleModal" data-id="${school.id}">
+                    <a href="#" class="text-dark" type="button" data-bs-toggle="modal" data-bs-target="#schoolDetailsModal" data-id="${school.id}">
                         <i class="la la-eye"></i>
                     </a>
                 </p>
             </td>
         </tr>`;
     });
+    // <td><p class="m-0"><a href="#" class="text-dark" type="button" data-bs-toggle="modal" data-bs-target="#schoolDetailsModal"><i class="la la-eye"></i></a></p></td>
 
     tbody.html(rows);
 }

@@ -1,8 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System.Linq;
-using System;
+﻿using Evaluation.DAL.Helper;
+using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
-using Evaluation.SharedHelper.Helper;
 
 namespace Evaluation.DAL.Repositories
 {
