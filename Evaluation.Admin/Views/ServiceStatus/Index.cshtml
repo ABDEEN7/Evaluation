@@ -1,0 +1,255 @@
+﻿@using Evaluation.Admin.Extensions
+@using static Evaluation.SharedHelper.Enums.ConstantKeys
+
+
+@model ServiceStatusVM
+@{
+
+    string Lang = Model.CurrentLanguage;
+    var SearchuiControlItems = Model.UiControlItems.Where(x => x.RowOrder == 0);
+
+    var uiControlItems = Model.UiControlItems.Where(x => x.RowOrder > 0 && x.Constraint.Permission.BackEndName == AdminPermission.ADD_ADMIN_SERVICE_STATUS).ToList();
+    var ActionStatusConfigControlItems = Model.UiControlItems.Where(x => x.RowOrder > 0 && x.Constraint.Permission.BackEndName == AdminPermission.ADD_ADMIN_ACTIONSTATUSCONFIGURATION).ToList();
+    var ActionStatusConfigNotificationControlItems = Model.UiControlItems.Where(x => x.RowOrder > 0 && x.Constraint.Permission.BackEndName == AdminPermission.ADD_ADMIN_ACTIONSTATUSCONFIGURATION_NOTIFICATION).ToList();
+    var textDir = Lang == "ar" ? "RTL" : "LTR";
+    var permissionsList = Model.PermissionsList;
+    var controlsList = Model.ControlsList;
+    var settingList = Model.SettingList;
+    var containsOrderNo = Model.containsOrderNo;
+    var columnList = Model.UiControlItems.Where(x => x.Constraint.ShowInGrid == true && x.Constraint.Permission.BackEndName == AdminPermission.ADD_ADMIN_SERVICE_STATUS);
+    var ActionStatusConfigcolumnList = Model.UiControlItems.Where(x => x.Constraint.ShowInGrid == true && x.Constraint.Permission.BackEndName == AdminPermission.ADD_ADMIN_ACTIONSTATUSCONFIGURATION).Select(X => X.Constraint).ToList();
+    var ActionStatusConfigNotificationcolumnList = Model.UiControlItems.Where(x => x.Constraint.ShowInGrid == true && x.Constraint.Permission.BackEndName == AdminPermission.ADD_ADMIN_ACTIONSTATUSCONFIGURATION_NOTIFICATION).Select(X => X.Constraint).ToList();
+    var AllActions = ViewBag.AllActions;
+}
+
+@section Styles {
+
+    <link href="~/css/admin/servicestatus.css" rel="stylesheet" />
+   
+}
+
+
+<div class="row">
+
+
+    <div class="col-4 position-relative mb-3">
+        <div class="sub-page-container">
+            <section class="section-container">
+                <div class="card app-card">
+
+                    <div class="card-header justify-content-end d-flex align-items-center bg-light">
+                    </div>
+
+                    <div class="card-body">
+
+
+                        <div class=" row">
+                            <div class="col-auto">
+                                <label class="form-label m-0">@controlsList.GetUiControlText(AdminBackendUI.lblStatusService)</label>
+                            </div>
+
+                            <div class="col-auto">
+                                <select class="select2 form-control" required="required" id="ServiceId"></select>
+                            </div>
+                        </div>
+
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <h3 class="heading lg">@controlsList.GetUiControlText(AdminBackendUI.lblStatusesRoster)</h3>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <form class="d-flex" role="search">
+
+                                    <input type="text" id="searchTxt" class="form-control me-2" placeholder="@controlsList.GetUiControlText(AdminBackendUI.lblStatusSearchForNames)" />
+
+                                    @if (permissionsList.IsPermissionAvailabe(AdminPermission.ADD_ADMIN_SERVICE_STATUS))
+                                    {
+                                        <button type="button" id="AddStatus" class="btn btn-primary btn-lg btn-block">+</button>
+                                    }
+                                </form>
+                            </div>
+                        </div>
+
+                        <div class=" row">
+                            <div class="col-auto listclass">
+                                <ul id="filteredList" class="list-group" >
+                                </ul>
+
+                                <div class="offcanvas offcanvas-start  border-0" tabindex="-1" id="offcanvas" aria-labelledby="offcanvasLabel">
+                                    <div class="offcanvas-body p-0" id="offcanvas-body">
+                                        <div id="statusesTable">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+        </div>
+    </div>
+
+
+    <div class="col-8">
+        <div class="sub-page-container StatusDetails" style="display:none;">
+            <section class="section-container">
+                <div class="card app-card">
+                    <div class="card-header bg-light">
+
+                        <div class=" row align-items-center">
+                            <div class="col-md-4">
+                                <h4 class="heading m-0">
+                                    @controlsList.GetUiControlText(AdminBackendUI.lblStatusDetails)
+                                </h4>
+                            </div>
+
+
+                            <div class="col-md-8 d-flex justify-content-end">
+                                <div id="DeleteOrEdit" class="btns-group m-0">
+                                    @if (permissionsList.IsPermissionAvailabe(AdminPermission.DELETE_ADMIN_SERVICE_STATUS))
+                                    {
+                                        <button id="DeleteStatus" type="button" class="btn btn-secondary btn-sm">@controlsList.GetUiControlText(AdminBackendUI.DELETE_BUTTON)</button>
+                                    }
+                                    @if (permissionsList.IsPermissionAvailabe(AdminPermission.EDIT_ADMIN_SERVICE_STATUS))
+                                    {
+                                        <button id="openEditModeForm" type="button" class="btn btn-primary btn-sm">@controlsList.GetUiControlText(AdminBackendUI.EDIT_BUTTON)</button>
+                                    }
+
+                                </div>
+                                <div id="CancelOrSave" class="btns-group m-0" style="display:none;">
+                                    @if (permissionsList.IsPermissionAvailabe(AdminPermission.EDIT_ADMIN_SERVICE_STATUS))
+                                    {
+                                        <button id="cancelStatus" type="button" class="btn btn-secondary btn-sm">@controlsList.GetUiControlText(AdminBackendUI.ADMIN_CANCEL)</button>
+                                        <button id="saveStatus" type="button" class="btn btn-primary btn-sm">@controlsList.GetUiControlText(AdminBackendUI.SAVE_BUTTON)</button>
+                                    }
+                                </div>
+                            </div>
+
+                           
+                        </div>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <form id="UpdateStatusForm" method="post">
+
+                                    <input type="hidden" id="ServiceStatusId" class="form-control" />
+
+                                    @foreach (var rowGroup in uiControlItems.GroupBy(item => item.Constraint.RowOrder))
+                                    {
+                                        <div class="row">
+                                            @foreach (var model in rowGroup.OrderBy(item => item.Constraint.ColumnOrder))
+                                            {
+                                                <div class="col-12">
+                                                    <div class="mb-3">
+                                                        @{
+                                                            @await Component.InvokeAsync("UiControl", model)
+                                                        }
+                                                    </div>
+                                                </div>
+                                            }
+                                        </div>
+                                    }
+                                </form>
+                            </div>
+                        </div>
+                        <hr />
+                       
+                    </div>
+
+                </div>
+            </section>
+        </div>
+
+    </div>
+
+</div>
+<div class="row">
+    <div class="col-12">
+        <div class="card app-card">
+            <div class="card-body StatusDetails">
+                <div class="nav nav-tabs tab">
+                    <button type="button" id="defaultOpen" class="nav-link tablinks " onclick="opentab(event, 'EvaluationStatusDiv')">@controlsList.GetUiControlText(AdminBackendUI.StatusTab) </button>
+                    @if (permissionsList.IsPermissionAvailabe(AdminPermission.VIEW_ADMIN_ACTIONSTATUSCONFIGURATION))
+                    {
+                        <button type="button" class="nav-link tablinks" onclick="opentab(event, 'EvaluationActionStatusConfigDiv')">@controlsList.GetUiControlText(AdminBackendUI.ActionStatusConfigTab) </button>
+                    }
+                </div>
+                <div id="EvaluationStatusDiv" class="col-md-12 tabcontent mt-3">
+                    <h5 class="heading">
+
+                        @controlsList.GetUiControlText(AdminBackendUI.lblStatusPartyTypeDisplayList)
+
+                    </h5>
+                    <div id="StatusPartyTypeDisplayListTableErrorDiv" class="alert alert-danger" role="alert" style="display:none"></div>
+                    <div id="StatusPartyTypeDisplayListTable"></div>
+                </div>
+                @if (permissionsList.IsPermissionAvailabe(AdminPermission.VIEW_ADMIN_ACTIONSTATUSCONFIGURATION))
+                {
+                    <div id="EvaluationActionStatusConfigDiv" class="card-body  tabcontent">
+                        <div class="card-header justify-content-end d-flex align-items-center bg-light">
+                            @if (permissionsList.IsPermissionAvailabe(AdminPermission.ADD_ADMIN_ACTIONSTATUSCONFIGURATION))
+                            {
+                                <button id="btnActionStatusConfigAdd" type="button" class="btn btn-primary">
+                                    <i class="fa fa-plus-circle"></i> &nbsp;@controlsList.GetUiControlText(AdminBackendUI.ADD_RECORD)
+                                </button>
+                            }
+
+                        </div>
+                        <div id="ActionStatusConfigtable"></div>
+
+
+                    </div>
+                }
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div>
+    <input id="Id" hidden />
+    <input id="actionstatusconfigid" hidden />
+</div>
+
+
+
+@section Scripts {
+    
+    <script>
+
+        var lang = `@Html.Raw(Lang)`;
+        let txtDir = '@textDir';
+         const AllActions = @Json.Serialize(AllActions);
+        var controlsList = JSON.parse(`@Html.Raw(Json.Serialize(controlsList))`);
+        var columnList = JSON.parse(`@Html.Raw(Json.Serialize(columnList))`);
+        const settingList = JSON.parse(`@Html.Raw(Json.Serialize(settingList))`);
+         let containsOrderNo='@containsOrderNo';
+        const services = JSON.parse(`@Html.Raw(Json.Serialize(Model.Services))`);
+        var ActionStatusConfigcolumnList = @Html.Raw(Json.Serialize(ActionStatusConfigcolumnList));
+        const ActionStatusConfigcontrolvalidationlist = @Html.Raw(Json.Serialize(ActionStatusConfigControlItems));
+         const IsView_ActionStatusConfig='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.VIEW_ADMIN_ACTIONSTATUSCONFIGURATION))';
+        const IsEdit_ActionStatusConfig='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.EDIT_ADMIN_ACTIONSTATUSCONFIGURATION))';
+        const IsDelete_ActionStatusConfig='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.DELETE_ADMIN_ACTIONSTATUSCONFIGURATION))';
+
+        var ActionStatusConfigNotificationcolumnList = @Html.Raw(Json.Serialize(ActionStatusConfigNotificationcolumnList));
+        const ActionStatusConfigNotificationcontrolvalidationlist = @Html.Raw(Json.Serialize(ActionStatusConfigNotificationControlItems));
+         const IsView_ActionStatusConfigNotification='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.VIEW_ADMIN_ACTIONSTATUSCONFIGURATION_NOTIFICATION))';
+        const IsEdit_ActionStatusConfigNotification='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.EDIT_ADMIN_ACTIONSTATUSCONFIGURATION_NOTIFICATION))';
+        const IsDelete_ActionStatusConfigNotification='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.DELETE_ADMIN_ACTIONSTATUSCONFIGURATION_NOTIFICATION))';
+
+        const partyTypesList = JSON.parse(`@Html.Raw(Json.Serialize(Model.PartyTypesList))`);
+        sharedFn().PopulateUiControl(controlsList);
+
+
+    </script>
+    <script src="~/js/admin/ServiceStatus.js" asp-append-version="true"></script>
+
+}
+
+

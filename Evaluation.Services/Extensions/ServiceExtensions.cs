@@ -1,13 +1,17 @@
-﻿using Evaluation.DAL.UnitOfWork;
+﻿using Evaluation.DAL.Context;
+using Evaluation.DAL.UnitOfWork;
 using Evaluation.Services.BusinessLayer;
 using Evaluation.Services.BusinessLayer.API;
+using Evaluation.Services.Models.Admin;
 using Evaluation.Services.Models.JWT;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Models;
 using MapsterMapper;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using System.Net;
 using System.Reflection;
 
 namespace Evaluation.Services.Extensions;
@@ -16,18 +20,24 @@ namespace Evaluation.Services.Extensions;
 public static class ServiceExtensions
 {
 #pragma warning disable  S4830
-
+   
     public static void ConfigureMasterBL(this IServiceCollection services, IConfiguration config, bool isDevEnvironment)
     {
 
+        services.AddDbContext<EvaluationDbContext>(options =>
+        {
+            options.UseSqlServer(config.GetConnectionString("EvaluationDBConn"));
+        });
+
         services.AddMemoryCache();
+
         services.AddHttpClient<HttpClientServices>()
             .SetHandlerLifetime(TimeSpan.FromMinutes(5))    // Default is 2 mins
             .ConfigurePrimaryHttpMessageHandler(() =>
             {
                 var handler = new HttpClientHandler
                 {
-                    //AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
+                    AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
                     UseCookies = false,
                     AllowAutoRedirect = false,
                     UseDefaultCredentials = true
@@ -63,11 +73,22 @@ public static class ServiceExtensions
             return options.Value;
         });
 
-        //services.AddScoped(sp =>
-        //{
-        //    var options = sp.GetRequiredService<IOptions<CenterServicesConfig>>();
-        //    return options.Value;
-        //});
+
+        services.AddScoped<MSJsonWT>();
+
+        services.AddScoped<UnitOfWork>();
+        services.AddScoped<CacheManager>();
+        services.AddScoped<CacheDataProvider>();
+        services.AddScoped<AzureBlobStorageService>();
+
+        services.AddScoped<MapperConfigServices>();
+        services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies()); // Automatically scans the assembly for profiles
+
+        services.Scan(scan => scan
+            .FromAssemblies(typeof(AdminBase).GetTypeInfo().Assembly)
+            .AddClasses(classes => classes.Where(x => x.IsSubclassOf(typeof(AdminBase))))
+            .AsSelf()
+            .WithScopedLifetime());
 
         services.Scan(scan => scan
             .FromAssemblies(typeof(ApiBase).GetTypeInfo().Assembly)
@@ -84,15 +105,23 @@ public static class ServiceExtensions
         services.AddScoped<MSJsonWT>();
 
         services.AddScoped<ISmsServices, SmsServices>();
-
-        services.AddScoped<UnitOfWork>();
-        services.AddScoped<CacheManager>();
-
-        services.AddScoped<CacheDataProvider>();
-        services.AddScoped<AzureBlobStorageService>();
-
         services.AddScoped<MasterBL>();
 
+    }
+    public static UnitOfWork CreateScopedUow(this IServiceProvider serviceProvider)
+    {
+        var scope = serviceProvider.CreateScope();
+        return scope.CreateScopedUow();
+    }
+    public static UnitOfWork CreateScopedUow(this IServiceScopeFactory serviceProvider)
+    {
+        var scope = serviceProvider.CreateScope();
+        return scope.CreateScopedUow();
+    }
+    public static UnitOfWork CreateScopedUow(this IServiceScope scope)
+    {
+        var uow = scope.ServiceProvider.GetRequiredService<UnitOfWork>();
+        return uow;
     }
 
 }

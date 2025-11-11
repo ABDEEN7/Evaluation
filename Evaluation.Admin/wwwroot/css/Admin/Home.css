@@ -1,0 +1,140 @@
+﻿.modal-scrollable-list {
+    max-height: 70vh; /* Adjust based on modal height */
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+.sticky-header-modal h6 {
+    position: sticky;
+    top: 0;
+    background-color: white;
+    z-index: 10;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    margin-bottom: 0;
+    border-bottom: 1px solid #ccc;
+}
+
+/* Modal enhancements */
+.modal-content {
+    border-radius: 12px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.2);
+    background-color: #fff;
+}
+
+.modal-header {
+    border-bottom: 1px solid #dee2e6;
+    background-color: #f8f9fa;
+    padding: 1rem 1.5rem;
+}
+
+.modal-title {
+    font-weight: 600;
+    font-size: 1.25rem;
+}
+
+.modal-body {
+    padding: 1rem 1.5rem;
+    max-height: 88vh;
+    overflow-y: auto;
+}
+
+.modal-footer {
+    padding: 0.75rem 1.5rem;
+    border-top: 1px solid #dee2e6;
+    background-color: #f8f9fa;
+}
+
+/* Table-like ul style */
+.field-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    background-color: #fefefe;
+}
+
+    .field-list li {
+        padding: 10px 14px;
+        border-bottom: 1px solid #eee;
+        font-size: 0.95rem;
+    }
+
+        .field-list li:last-child {
+            border-bottom: none;
+        }
+
+        .field-list li::before {
+            margin-right: 8px;
+            color: #007bff;
+        }
+
+
+.text-success,
+.text-danger {
+    font-weight: 600;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 6px;
+    margin-bottom: 10px;
+}
+
+.field-type {
+    color: #2f19d9
+}
+
+.formgrouplist {
+    background-color: lightblue;
+}
+.notsametype {
+    background-color: #e74646;
+    color: antiquewhite;
+}
+.treeview ul {
+    list-style-type: none;
+    padding-left: 20px;
+    margin-bottom: 5px;
+}
+
+.treeview li {
+    margin: 5px 0;
+    position: relative;
+    padding-left: 15px;
+}
+
+    .treeview li::before {
+        content: "▸";
+        position: absolute;
+        left: 0;
+        color: #dc3545;
+    }
+.tree-toggle {
+    cursor: pointer;
+    margin-right: 6px;
+    color: #0d6efd;
+    font-weight: bold;
+    display: inline-block;
+    width: 1em;
+}
+.node-circle {
+    fill: #e6f0ff;
+    stroke: #007bff;
+    stroke-width: 2px;
+}
+
+.node-text {
+    fill: #333;
+    font-family: Arial, sans-serif;
+    font-size: 13px;
+}
+
+.fielddiagram {
+    margin-bottom: 30px;
+    border: 1px solid;
+}
+
+
+
+
+
+
