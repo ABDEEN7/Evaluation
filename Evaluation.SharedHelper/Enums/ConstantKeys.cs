@@ -59,6 +59,7 @@
             public static readonly string Favicon = "Favicon";
             public static readonly string RequestColumn = "RequestColumn";
             public static readonly string ScholarshipColumn = "ScholarshipColumn";
+            public static readonly string SessionExpireTime = "SessionExpireTime";
 
             
         }

@@ -1,0 +1,24 @@
+﻿@model dynamic
+
+
+
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@{
+    var Lang = "ar";// string.IsNullOrEmpty(HttpContextAccessor.HttpContext?.Request.Cookies["AdminLang"]) ? "ar" : HttpContextAccessor.HttpContext.Request.Cookies["AdminLang"] ?? "ar";
+    var RequestCulture = "ar";// string.IsNullOrEmpty(HttpContextAccessor.HttpContext.Request.Cookies["AdminLang"]) ? "en" : HttpContextAccessor.HttpContext.Request.Cookies["AdminLang"] ?? "en";
+    var langClazz = "culture-" + RequestCulture;
+    var textDir = Lang == "ar" ? "rtl" : "ltr";
+   //  string appTitle = "Scholarship"; //Model.GetType().GetProperty("AppTitle").GetValue(Model, null);
+   //  string userName = "";// Model.GetType().GetProperty("UserName").GetValue(Model, null);
+   //  string LogoURL = ""; //Model.GetType().GetProperty("LogoURL").GetValue(Model, null);
+   // // LogoURL = "/Images/notfound/9235156f-a0dc-4616-b652-ec01365ddb50.png";// string.IsNullOrEmpty(LogoURL) ? (Lang == "ar") ? "/Images/moe-logo-rgb-ar.png" : "/Images/moe-logo-rgb-en.png" : LogoURL;
+
+}
+<!-- Sidebar Start -->
+<div class="sidebar sidebar-offcanvas pb-3 bg-light">
+    @await Component.InvokeAsync("SideBar")
+    
+</div>
+<!-- Sidebar End -->
+
+

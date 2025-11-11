@@ -91,13 +91,6 @@ public static class ServiceExtensions
         services.AddScoped<MSJsonWT>();
 
         services.AddScoped<ISmsServices, SmsServices>();
-
-        services.AddScoped<UnitOfWork>();
-        services.AddScoped<CacheManager>();
-
-        services.AddScoped<CacheDataProvider>();
-        services.AddScoped<AzureBlobStorageService>();
-
         services.AddScoped<MasterBL>();
 
     }

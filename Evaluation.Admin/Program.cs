@@ -3,6 +3,7 @@ using Evaluation.Admin.ActionFilter;
 using Evaluation.Admin.Extensions;
 using Evaluation.Admin.Middlewares;
 using Evaluation.DAL.Context;
+using Evaluation.Services.BusinessLayer;
 using Evaluation.Services.Extensions;
 using Evaluation.SharedHelper;
 using Evaluation.SharedHelper.Helper;
@@ -76,7 +77,7 @@ internal class Program
         builder.Services.AddScoped<RequestInfo>();
         builder.Services.AddScoped<PopulateRequestInfoFilter>();
 
-
+        builder.Services.AddScoped<MasterBL>();
         builder.Services.AddScoped<ResponseInfo>();
         builder.Services.AddScoped<PopulateResponseInfoFilter>();
 

@@ -1,0 +1,127 @@
+@import url("cairo.css");
+:root {
+    --primary: #8f1537;
+    --light: #F3F6F9;
+    --dark: #263544;
+    --white: #ffffff;
+    --grey: #c9c8c8;
+    --shadow: 0 2px 4px 0 rgba(43,43,43,.1);
+    --font-primary: "Inter-regular", sans-serif;
+    --font-arabic: "Cairo", sans-serif;
+}
+
+
+body {
+    font: 400 14px/28px "Cairo", sans-serif;
+}
+.btns-group > .btn:not(:first-child) {
+    margin-left: 0;
+    margin-right: 10px;
+}
+#signOut-btn i.fas{
+    transform: rotate(-180deg);
+}
+.select2-container--default .select2-selection--single .select2-selection__clear {
+    margin-right: 0;
+    margin-left: 20px;
+}
+
+
+
+.sidebar .nav .nav-item .nav-link {
+    border-right: 3px solid transparent;
+    border-left: 0;
+}
+
+.header-logo h6{
+    text-align:right
+}
+.sidebar .nav .nav-item .nav-link .menu-title {
+    font-family: var(--font-arabic);
+}
+.sidebar .nav.sub-menu .nav-item::before {
+    right: 0;
+}
+
+.sidebar .nav.sub-menu {
+    padding: 0.25rem 3.07rem 0 0rem;
+}
+.sidebar .nav .nav-item .nav-link i.fa-chevron-down {
+    margin-left: 0;
+    margin-right: auto;
+}
+.sidebar .nav .nav-item .nav-link .badge {
+    margin-left: 0;
+    margin-right: auto;
+}
+
+.sidebar .nav .nav-item .nav-link i.menu-icon {
+    margin-right: 0;
+}
+@media (min-width: 992px) {
+    .main-panel {
+            margin-right: 250px;
+            margin-left: auto
+     }
+    .main-panel.open {
+        width: 94%;
+        margin-right: 80px;
+        margin-left: auto
+    }
+    .sidebar {
+        right: 0;
+        left: auto
+    }
+    .sidebar {
+        margin-right: 0;
+    }
+
+    .sidebar.open {
+        margin-right: 0;
+        width: 90px;
+    }
+        
+    .sidebar-icon-only .sidebar .nav .nav-item.hover-open .nav-link .menu-title{
+        left:auto;
+        right:90px
+    }
+    .sidebar-icon-only .sidebar .nav .nav-item .nav-link .menu-title {
+        border-radius: 5px 0 0 5px;
+    }
+    .sidebar-icon-only .sidebar .nav .nav-item .nav-link i.menu-icon {
+        margin-right: 0;
+        margin-left: 10px;
+    }
+}
+
+
+.clr-picker, .icon-picker {
+    right: auto;
+    left: 1%
+}
+
+.back-to-top {
+    left: 10px;
+    right:auto
+}
+
+
+@media screen and (max-width: 991.98px) {
+    .sidebar-offcanvas {
+        right: -250px;
+        left: auto;
+    }
+        .sidebar-offcanvas.open {
+            right: 0;
+        }
+}
+
+.timeline-step:after {
+    left: -22px;
+    right: auto
+}
+
+.timeline-step:not(:first-child):before {
+    right: -22px;
+    left: auto
+}
