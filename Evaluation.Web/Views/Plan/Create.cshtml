@@ -1,6 +1,20 @@
 ﻿@{
     Layout = "_Layout";
 }
+<style>
+    .date-list li.blocked{
+        background: #ffe6e6;
+        border-left-color: #ff4444;
+        text-decoration: line-through;
+        opacity: 0.6;
+    }
+
+    .flatpickr-day.blocked {
+        background: #fff8e1 !important;
+        border-color: #ff4444 !important;
+        font-weight: bold;
+    }
+</style>
 <main class="main-content">
     <section>
         <div class="card card-table mb-4">
@@ -317,23 +331,7 @@
     </div>
 </div>
 
-<!-- School Details Modal (Optional) -->
- <div class="modal fade" id="schoolDetailsModal" tabindex="-1" aria-labelledby="schoolDetailsModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="schoolDetailsModalLabel">تفاصيل المدرسة</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body" id="schoolDetailsContent">
-                <!-- School details will be loaded here -->
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
-            </div>
-        </div>
-    </div>
-</div>
+
 @section Styles {
     <link href="~/plan-assets/css/style.css" rel="stylesheet">
 }

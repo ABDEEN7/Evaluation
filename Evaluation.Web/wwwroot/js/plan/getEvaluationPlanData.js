@@ -6,7 +6,7 @@ function getEvaluationData() {
     try {
         // Get plan name from the title input
         const name = document.getElementById('planTitle')?.value?.trim() || '';
-
+        const id = '';
         // Get plan type from the select dropdown
         const planTypeSelect = document.getElementById('ddlPlanType');
         const planTypeId = planTypeSelect?.value || '';
@@ -25,6 +25,7 @@ function getEvaluationData() {
 
         // Return structured data object
         return {
+            id,
             name,
             planTypeId,
             startDate,

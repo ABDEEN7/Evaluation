@@ -18,7 +18,6 @@ public class SchoolController : ControllerBase
     }
 
     [HttpGet]
-
     public async Task<School> GetSchoolDetails(Guid SchoolID)
     {
         //var schooldetails = await _masterBl.GetApiService<SchoolBL>().GetSchoolDetails(SchoolID);
@@ -28,7 +27,7 @@ public class SchoolController : ControllerBase
             new School() { Id = new Guid("ecd11007-2ff6-42cb-bca2-b168de94afbc"), NameAr = "مدرسة عائشة", NameEn = "Aesha School" }
         };
 
-        return dummyData.FirstOrDefault(s => s.Id == SchoolID);
+        return  dummyData.FirstOrDefault(s => s.Id == SchoolID);
     }
     [HttpGet]
     public async Task<IActionResult> GetVisits()

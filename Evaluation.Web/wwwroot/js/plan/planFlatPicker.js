@@ -1,10 +1,35 @@
 ﻿let childPicker = null;
+let holidays = [
+    { date: '2025-01-01', name: 'New Year\'s Day' },
+    { date: '2025-12-25', name: 'Christmas Day' }
+];
+function getVcationDays() {
+    jqClient.Get('/AcademicYears/GetVcationDate').done((result) => {
+        const data = (result && result.result) ? result.result : [];
+        holidays = data.map(item => ({ date: item.date }));
+    });
+}
+function formatDateISO(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+function isHoliday(date) {
+    const dateStr = formatDateISO(date);
+    return holidays.some(h => h.date === dateStr);
+}
 
 // Initialize parent picker first
 const parentPicker = flatpickr("#parentDate", {
     mode: "range",
     locale: "ar",
     dateFormat: "Y-m-d",
+    onDayCreate: function (dObj, dStr, fp, dayElem) {
+        if (isHoliday(dayElem.dateObj)) {
+            dayElem.classList.add('blocked');
+        }
+    },
     allowInput: true,
     onClose: function (selectedDates, dateStr, instance) {
         if (selectedDates.length === 2) {
