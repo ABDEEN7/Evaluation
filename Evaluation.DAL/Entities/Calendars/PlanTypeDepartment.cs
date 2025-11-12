@@ -6,9 +6,12 @@ namespace Evaluation.DAL.Entities.Calendars;
 
 public class PlanTypeDepartment : EntityBase
 {
-    public Guid PlanTypeId { get; set; }
-    public PlanType? PlanType { get; set; }
-    public Guid OrderNo { get; set; }
+    public string NameAr { get; set; } = null!;
+    public string NameEn { get; set; } = null!;
     public Guid DepartmentId { get; set; }
     public Department? Department { get; set; }
+    public Guid PlanTypeId { get; set; }
+    public PlanType? PlanType { get; set; }
+    //public int OrderNo { get; set; } = 0;
+
 }

@@ -94,10 +94,11 @@ public partial class EvaluationDbContext : DbContext
     public virtual DbSet<UserGender> UserGender { get; set; }
     public virtual DbSet<EvaluationType> EvaluationType { get; set; }
     public virtual DbSet<DepartmentHoliday> DepartmentHolidays { get; set; }
+    public virtual DbSet<Semester> Semesters { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        //optionsBuilder.UseSqlServer("Server=DCDCSQL2DNET01;Database=Evaluation;Trust Server Certificate=true;User id=t-m.fatouh-dev;Integrated Security=SSPI;");
+        optionsBuilder.UseSqlServer("Server=DCDCSQL2DNET01;Database=Evaluation;Trust Server Certificate=true;User id=t-m.fatouh-dev;Integrated Security=SSPI;");
         //optionsBuilder.UseSqlServer("Server=DCDCSQL2DNET01;Database=Evaluation;Trust Server Certificate=true;User id=Eval_User; Password=Abc@1234;");
     }
 
