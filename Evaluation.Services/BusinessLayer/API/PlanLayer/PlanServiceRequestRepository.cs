@@ -26,7 +26,7 @@ public class PlanServiceRequestRepository(IServiceScopeFactory serviceScopeFacto
     UserInfo userInfo,
     IServiceProvider serviceProvider,
     RequestInfo requestInfo
-    ) : ApiBase(serviceScopeFactory, cacheDataProvider, unitOfWork, loggingServices, mapper, userInfo,
+    ) : ApiBase(serviceScopeFactory, cacheDataProvider, unitOfWork, loggingServices, userInfo,
         serviceProvider, requestInfo)
 {
     public async Task<string> CreateServicPlan(PlanServiceRequest model)

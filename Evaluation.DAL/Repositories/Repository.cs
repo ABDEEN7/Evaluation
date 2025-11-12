@@ -150,8 +150,8 @@ public class Repository<T>(DbContext context, UserInfo userInfo) : RepositoryBas
         await _dbSet.AddAsync(entity);
         return entity;
     }
-
-    public T Update(T entity)
+	
+	public T Update(T entity)
     {
         entity.UpdateDate = DateTime.Now;
         if (userInfo.UserId != Guid.Empty)

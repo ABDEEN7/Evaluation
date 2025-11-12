@@ -2,6 +2,7 @@
 using  Evaluation.DAL.Entities.BaseModule;
 using Evaluation.DAL.Entities.FormBuilder;
 using Evaluation.DAL.Entities.Logs;
+using Evaluation.DAL.Entities.Planing.EvaluationRequestEntity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,5 +27,7 @@ namespace Evaluation.DAL.Entities.Attachments
         public Guid? ChildFieldId { get; set; }
         public Field? ChildField { get; set; }
         public string? Index { get; set; }
-    }
+		public Guid? EvaluationRequestId { get; set; }
+		public EvaluationRequest? EvaluationRequest { get; set; }
+	}
 }

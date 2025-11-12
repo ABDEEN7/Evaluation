@@ -18,11 +18,9 @@ namespace Evaluation.DAL.Entities.FormBuilder
         public Field? Field { get; set; }
         public Guid ServiceActionId { get; set; }
         public ActionEntities.ServiceAction? ServiceAction { get; set; }
-    
         public bool IsEditable { get; set; }
-        public bool IsUpdateOnModule { get; set; }//Flag for reflect field value on system module value(Evaluation, vacancy ...etc)
         public int? OrderNo { get; set; }
-        public ICollection<ActionFieldAttribute> ActionStepFieldAttribute { get; } = new List<ActionFieldAttribute>();
+        public ICollection<ActionFieldAttribute>? ActionFieldAttribute { get; } = new List<ActionFieldAttribute>();
 
     }
 }
