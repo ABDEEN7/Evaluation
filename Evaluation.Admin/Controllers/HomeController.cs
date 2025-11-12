@@ -1,5 +1,7 @@
+using Evaluation.Admin.ActionFilter;
 using Evaluation.Admin.Extensions;
 using Evaluation.Admin.Models;
+using Evaluation.DAL.Helper;
 using Evaluation.Services.BusinessLayer;
 using Evaluation.Services.Models.Admin;
 using Evaluation.SharedHelper.Enums;
@@ -17,15 +19,24 @@ namespace Evaluation.Admin.Controllers
         private readonly ILogger<HomeController> _logger;
         private readonly MasterBL _masterBL;
         private readonly RequestInfo _requestInfo;
-        public HomeController(ILogger<HomeController> logger, MasterBL masterBL, RequestInfo requestInfo)
+        private readonly UserInfo userInfoSession;
+        public HomeController(ILogger<HomeController> logger, MasterBL masterBL, RequestInfo requestInfo, UserInfo userInfoSession)
         {
+            this.userInfoSession = userInfoSession;
             _logger = logger;
             _masterBL = masterBL;
             _requestInfo = requestInfo;
         }
-
+        [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.AdminPermission.VIEW_ADMIN_HOME })]
         public IActionResult Index()
         {
+            var data = userInfoSession;
+           
+            _requestInfo.Lang = string.IsNullOrEmpty(_requestInfo.Lang) ? "ar" : _requestInfo.Lang;
+
+            ViewBag.Lang = _requestInfo.Lang;
+
+
             return View();
         }
         public IActionResult SetLanguage()

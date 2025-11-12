@@ -89,6 +89,8 @@ public static class ConstantKeys
         public static readonly string UserPartyTypeNotFound = "UserPartyTypeNotFound";
         public static readonly string UserNotFound = "UserNotFound";
         public static readonly string lblNoPermissionForViewRequest = "lblNoPermissionForViewRequest";
+        public static readonly string DepartmentExistsSystemModule = "DepartmentExistsSystemModule";
+        public static readonly string DropDownTypeHasDataSource = "DropDownTypeHasDataSource";
     }
 
         public static class AdminSettings
@@ -158,6 +160,8 @@ public static class ConstantKeys
 
     public static class AdminPermission
     {
+        public const string VIEW_ADMIN_HOME = "VIEW_ADMIN_HOME";
+        
         #region  Service
         public const string ADD_ADMIN_SERVICE = "ADD_ADMIN_SERVICE";
         public const string EDIT_ADMIN_SERVICE = "EDIT_ADMIN_SERVICE";
@@ -233,6 +237,9 @@ public static class ConstantKeys
         public const string CanViewEvalFieldHistory = "CanViewEvalFieldHistory";
         #endregion
 
+    }
+    public static class CustomDataSource
+    {
     }
     public static class WebAppSettings
     {

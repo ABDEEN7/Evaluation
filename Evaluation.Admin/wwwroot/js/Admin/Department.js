@@ -144,7 +144,27 @@ $(document).ready(function () {
     });
     
     dialogElem = commonUtil.createDailog({ dailogId: dailogId });
+    if (controlvalidationlist) {
 
+        //initializing ICON
+        var iconlist = controlvalidationlist.filter(c => c.constraint.controlType == 'ICON');
+        if (iconlist.length > 0) {
+
+            iconlist.forEach(item => {
+                var constrain = item.constraint;
+                var id = '#' + constrain.uibackendName;
+                IconPicker.Run(id, function (e) {
+                    document.getElementById('IconPreview').className = document.getElementById(constrain.uibackendName).value;
+                    var selectedIcon = document.getElementById(constrain.uibackendName).value;
+                    if (selectedIcon) {
+                        sharedFn().NewvalidateInput($('#' + constrain.uibackendName).attr('id'), sharedFn().GetUiControlText('ADMIN_CNTRL_REQUIRED'), sharedFn().GetUiControlText('ADMIN_MSG_MAX_CHAR_LENGTH'), sharedFn().GetUiControlText('ADMIN_MSG_MIN_CHAR_LENGTH'));
+
+
+                    }
+                });
+            });
+        }
+    }
    
 
     document.getElementById(btnAddContentId).addEventListener('click', event => {
