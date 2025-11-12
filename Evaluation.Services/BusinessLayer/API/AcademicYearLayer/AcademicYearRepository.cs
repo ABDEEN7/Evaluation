@@ -2,7 +2,6 @@
 using Evaluation.DAL.Entities.Calendars;
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.UnitOfWork;
-using Evaluation.Services.Extensions;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Models;
 using Mapster;
@@ -31,10 +30,10 @@ public class AcademicYearRepository(IServiceScopeFactory serviceScopeFactory,
             .Select(s => s.Id)
             .FirstOrDefaultAsync();
     }
-    public async Task<VacationDateDto?> GetBlockedDays(Guid academicYearId, Guid departmentId)
+    public async Task<VacationDateDto?> GetBlockedDays(Guid academicYearId)
     {
         var query = unitOfWork.GetRepository<DepartmentHoliday>()
-            .GetAllActiveNonDeleted(x => x.DepartmentId == departmentId && x.AcademicYearId == academicYearId)
+            .GetAllActiveNonDeleted(x => x.AcademicYearId == academicYearId)
             .AsNoTracking()
             .OrderByDescending(x => x.CreateDate)
             .ThenBy(x => x.UpdateDate);
