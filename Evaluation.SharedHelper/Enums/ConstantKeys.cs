@@ -43,6 +43,7 @@
             public static readonly string PlanInThePastIsNotAllowed = "PlanInThePastIsNotAllowed";
             public static readonly string InvalidDraftPlan = "InvalidDraftPlan";
             public static readonly string DropDownTypeHasDataSource = "DropDownTypeHasDataSource";
+            public static readonly string DepartmentExistsSystemModule = "DepartmentExistsSystemModule";
         }
 
         public static class AdminSettings
@@ -105,6 +106,7 @@
             public static readonly string AdminActionStatusConfigurationNotification = "AdminActionStatusConfigurationNotification";
             public static readonly string AdminServiceStatus = "AdminServiceStatus";
             public static readonly string AdminDropDown = "AdminDropDown";
+            public static readonly string AdminDepartment = "AdminDepartment";
         }
 
         public static class AdminPermission
@@ -166,6 +168,15 @@
         public const string ADD_ADMIN_DROPDOWN = "ADD_ADMIN_DROPDOWN";
         public const string EDIT_ADMIN_DROPDOWN = "EDIT_ADMIN_DROPDOWN";
         public const string DELETE_ADMIN_DROPDOWN = "DELETE_ADMIN_DROPDOWN";
+
+        #endregion
+
+        #region DEPARTMENT
+
+        public const string VIEW_ADMIN_DEPARTMENT = "VIEW_ADMIN_DEPARTMENT";
+        public const string ADD_ADMIN_DEPARTMENT = "ADD_ADMIN_DEPARTMENT";
+        public const string EDIT_ADMIN_DEPARTMENT = "EDIT_ADMIN_DEPARTMENT";
+        public const string DELETE_ADMIN_DEPARTMENT = "DELETE_ADMIN_DEPARTMENT";
 
         #endregion
 
