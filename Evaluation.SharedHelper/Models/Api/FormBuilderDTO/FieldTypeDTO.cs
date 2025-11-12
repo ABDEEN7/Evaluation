@@ -1,7 +1,4 @@
 ﻿
-using Scholarship.SharedHelper.Models.Admin;
-using Evaluation.SharedHelper.Models.Api.FormBuilderDTO;
-
 namespace Evaluation.SharedHelper.Models.Api.FormBuilderDTO
 {
     public class FieldTypeDTO : EntityBaseDTO

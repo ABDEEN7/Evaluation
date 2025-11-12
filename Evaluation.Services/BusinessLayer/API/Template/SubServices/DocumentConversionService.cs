@@ -1,10 +1,10 @@
 using System.Text;
-using Scholarship.DAL.Models.Templates;
 using Spire.Doc.Documents;
 using SpireDocument = Spire.Doc.Document;
 using SpireFileFormat = Spire.Doc.FileFormat;
 using AsposeDocument = Aspose.Words.Document;
 using AsposeSaveFormat = Aspose.Words.SaveFormat;
+using Evaluation.DAL.Entities.Template;
 
 namespace Evaluation.Services.BusinessLayer.API.Template
 {
@@ -36,7 +36,7 @@ namespace Evaluation.Services.BusinessLayer.API.Template
             return outputStream.ToArray();
         }
         
-        public Task<byte[]> HandleNonAttachmentSpire(List<PlaceholderDto> placeholders, TemplateDoc template, string lang)
+        public Task<byte[]> HandleNonAttachmentSpire(List<PlaceholderDto> placeholders, TemplateDocument template, string lang)
         {
             var html = BuildHtmlWithPlaceholders(placeholders, template, lang);
 
@@ -50,7 +50,7 @@ namespace Evaluation.Services.BusinessLayer.API.Template
             return Task.FromResult(pdfStream.ToArray());
         }
         
-        public Task<byte[]> HandleNonAttachmentAspose(List<PlaceholderDto> placeholders, TemplateDoc template, string lang)
+        public Task<byte[]> HandleNonAttachmentAspose(List<PlaceholderDto> placeholders, TemplateDocument template, string lang)
         {
             var html = BuildHtmlWithPlaceholders(placeholders, template, lang);
 
@@ -63,7 +63,7 @@ namespace Evaluation.Services.BusinessLayer.API.Template
             return Task.FromResult(pdfStream.ToArray());
         }
         
-        private static string BuildHtmlWithPlaceholders(List<PlaceholderDto> placeholders, TemplateDoc template, string lang)
+        private static string BuildHtmlWithPlaceholders(List<PlaceholderDto> placeholders, TemplateDocument template, string lang)
         {
             var html = (lang == "ar" ? template.TemplateAr : template.TemplateEn) ?? string.Empty;
 

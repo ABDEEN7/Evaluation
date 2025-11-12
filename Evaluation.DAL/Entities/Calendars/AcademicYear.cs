@@ -15,4 +15,5 @@ public class AcademicYear : EntityBase
     public int Year { get; set; }
     public Guid DepartmentId { get; set; }
     public Department? Department { get; set; }
+	public bool IsCurrent { get; set; }
 }

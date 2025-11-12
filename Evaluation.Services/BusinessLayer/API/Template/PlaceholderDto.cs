@@ -1,6 +1,7 @@
-using Scholarship.DAL.Models.FormBuilder;
 
-namespace Scholarship.Services.BusinessLayer.API.Template;
+using Evaluation.DAL.Entities.FormBuilder;
+
+namespace Evaluation.Services.BusinessLayer.API.Template;
 
 public class PlaceholderDto
 {

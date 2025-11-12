@@ -1,4 +1,4 @@
-﻿using Scholarship.SharedHelper.Models.Admin;
+﻿
 
 
 namespace Evaluation.SharedHelper.Models.Api.ActionEntitiesDTOs

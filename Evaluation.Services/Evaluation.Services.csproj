@@ -7,8 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Aspose.Words" Version="25.11.0" />
     <PackageReference Include="AutoMapper" Version="13.0.1" />
     <PackageReference Include="Azure.Storage.Blobs" Version="12.26.0" />
+    <PackageReference Include="DocX" Version="5.0.0" />
     <PackageReference Include="FluentResults" Version="4.0.0" />
     <PackageReference Include="Mapster" Version="7.4.0" />
     <PackageReference Include="Microsoft.AspNetCore.Session" Version="2.3.0" />
@@ -20,6 +22,7 @@
     <PackageReference Include="Scrutor" Version="6.1.0" />
     <PackageReference Include="Oracle.ManagedDataAccess" Version="23.26.0" />
     <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="23.26.0" />
+    <PackageReference Include="Spire.Doc" Version="13.10.3" />
   </ItemGroup>
 
   <ItemGroup>

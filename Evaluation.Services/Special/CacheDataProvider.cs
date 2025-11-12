@@ -326,6 +326,45 @@ namespace Evaluation.Services.Special
 			return data;
 		}
 
+		public T? GetFromCache<T>(string key) where T : class
+		{
+			var settingItem = GetSystemSettingValue(ConstantKeys.AdminSettings.EnableCaching)
+						 .GetAwaiter().GetResult();
+
+			var EnableCaching = true;
+
+			if (!string.IsNullOrEmpty(settingItem))
+			{
+				EnableCaching = bool.Parse(settingItem.ToLower());
+			}
+
+			if (EnableCaching)
+			{
+				return cacheManager.GetValue<T>(key);
+			}
+			else
+			{
+				return null;
+			}
+
+		}
+		public async Task SetToCache(string key, object value)
+		{
+			if (string.IsNullOrWhiteSpace(key))
+				throw new ArgumentException("Cache key cannot be null or whitespace.", nameof(key));
+			if (value is null)
+				throw new ArgumentNullException(nameof(value));
+
+			string clearCacheDurationStr = await GetSystemSettingValue(ConstantKeys.WebAppAccountConfigurations.ClearCacheDuration);
+
+			int hours = 1; // Default fallback
+			if (!string.IsNullOrEmpty(clearCacheDurationStr) && int.TryParse(clearCacheDurationStr, out int parsedHours))
+				hours = parsedHours;
+
+			TimeSpan cacheDuration = TimeSpan.FromHours(hours);
+			cacheManager.SetValue(key, value, cacheDuration);
+		}
+
 	}
 
 }

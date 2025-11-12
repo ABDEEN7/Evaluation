@@ -1,6 +1,4 @@
 ﻿
-using Scholarship.SharedHelper.Models;
-using Scholarship.SharedHelper.Models.Admin;
 
 namespace Evaluation.SharedHelper.Models.Api.FormBuilderDTO
 {

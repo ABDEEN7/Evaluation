@@ -13,7 +13,7 @@ using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Scholarship.Services.BusinessLayer.API.Template;
+using Evaluation.Services.BusinessLayer.API.Template;
 
 
 namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
@@ -53,7 +53,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                   
                      var recipients = partyType.IsEmployeePartyType
                         ? GetEmployeeRecipients( request.Id,  allUserProfiles, partyType)
-                        : GetStudentRecipient(request.StudentId, allUserProfiles);
+                        : GetStudentRecipient(request.OrgTreeId, allUserProfiles);
 
                     if (!recipients.Any()) continue;
 
@@ -78,7 +78,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                 await scopedUow.CommitAsync();
             }
         }
-        private List<MinistryUser> GetEmployeeRecipients( Guid serviceRequestId, Guid? requestCountryId, Guid? requestUniversityId, List<MinistryUser> allUserProfiles, PartyType partyType)
+        private List<MinistryUser> GetEmployeeRecipients( Guid serviceRequestId,  List<MinistryUser> allUserProfiles, PartyType partyType)
         {
             var assignmentRepo = serviceScopeFactory.CreateScopedUow().GetRepository<RequestAssignment>();
 
@@ -96,16 +96,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             var usersWithViewAllOrCountryAccess = allUserProfiles
                      .Where(u => u.UserPartTypes?.Any(pt =>
                          pt.PartyTypeId == partyType.Id && (
-                             // Case 1: Can view all requests, no country/university restriction
-                             (pt.PartyType!.CanViewAllRequests &&
-                              (pt.PartyType.PartyTypeCountyUniversity == null ||
-                               pt.PartyType.PartyTypeCountyUniversity.Count == 0))
-                             ||
-                             // Case 2: Restricted, but matches country/university
-                             pt.PartyType!.PartyTypeCountyUniversity!.Any(ctu =>
-                                 ctu.CountryId == requestCountryId &&
-                                 (ctu.UniversityId == null || ctu.UniversityId == requestUniversityId))
-                         )) == true)
+                             (pt.PartyType!.CanViewAllRequests  ))) == true)
                      .ToList();
 
             // Merge: assigned + viewAll + country/univ access
@@ -162,46 +153,46 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
         {
             var templateEngine = serviceProvider.GetRequiredService<TemplateBl>();
 
-            if (!string.IsNullOrWhiteSpace(template.fielsFromRequest))
-            {
-                foreach (var field in template.fielsFromRequest.Split(',', StringSplitOptions.RemoveEmptyEntries))
-                {
-                    if (field.Trim() == "ActionOtherAttachement" && actionOtherAttachments != null)
-                    {
-                        foreach (var att in actionOtherAttachments)
-                        {
-                            if (att?.Id != null)
-                                emailModel.Attachments.Add(await templateEngine.HandleAttachment(att.Id));
-                        }
-                    }
-                    else if (Guid.TryParse(field.Trim(), out var fieldGuid))
-                    {
-                        var fieldValue = await uow.GetRepository<ServiceRequestFieldsValue>()
-                            .GetAllQueryFiltered(f => f.ServiceRequestId == requestData.Id && f.FieldId == fieldGuid)
-                            .FirstOrDefaultAsync();
+            //if (!string.IsNullOrWhiteSpace(template.fielsFromRequest))
+            //{
+            //    foreach (var field in template.fielsFromRequest.Split(',', StringSplitOptions.RemoveEmptyEntries))
+            //    {
+            //        if (field.Trim() == "ActionOtherAttachement" && actionOtherAttachments != null)
+            //        {
+            //            foreach (var att in actionOtherAttachments)
+            //            {
+            //                if (att?.Id != null)
+            //                    emailModel.Attachments.Add(await templateEngine.HandleAttachment(att.Id));
+            //            }
+            //        }
+            //        else if (Guid.TryParse(field.Trim(), out var fieldGuid))
+            //        {
+            //            var fieldValue = await uow.GetRepository<ServiceRequestFieldsValue>()
+            //                .GetAllQueryFiltered(f => f.ServiceRequestId == requestData.Id && f.FieldId == fieldGuid)
+            //                .FirstOrDefaultAsync();
 
-                        if (!string.IsNullOrWhiteSpace(fieldValue?.Value) && Guid.TryParse(fieldValue.Value, out var fileId))
-                            emailModel.Attachments.Add(await templateEngine.HandleAttachment(fileId));
-                    }
-                }
-            }
+            //            if (!string.IsNullOrWhiteSpace(fieldValue?.Value) && Guid.TryParse(fieldValue.Value, out var fileId))
+            //                emailModel.Attachments.Add(await templateEngine.HandleAttachment(fileId));
+            //        }
+            //    }
+            //}
 
-            if (!string.IsNullOrWhiteSpace(template.fielsFromScholarship) && requestData.ScholarshipId.HasValue)
-            {
-                foreach (var schField in template.fielsFromScholarship.Split(',', StringSplitOptions.RemoveEmptyEntries))
-                {
-                    if (Guid.TryParse(schField.Trim(), out var fieldId))
-                    {
-                        var value = await uow.GetRepository<SchFieldValue>()
-                            .GetAllQueryFiltered()
-                            .Where(f => f.ScholarshipId == requestData.ScholarshipId && f.SystemFieldId == fieldId)
-                            .FirstOrDefaultAsync();
+            //if (!string.IsNullOrWhiteSpace(template.fielsFromScholarship) && requestData.ScholarshipId.HasValue)
+            //{
+            //    foreach (var schField in template.fielsFromScholarship.Split(',', StringSplitOptions.RemoveEmptyEntries))
+            //    {
+            //        if (Guid.TryParse(schField.Trim(), out var fieldId))
+            //        {
+            //            var value = await uow.GetRepository<SchFieldValue>()
+            //                .GetAllQueryFiltered()
+            //                .Where(f => f.ScholarshipId == requestData.ScholarshipId && f.SystemFieldId == fieldId)
+            //                .FirstOrDefaultAsync();
 
-                        if (!string.IsNullOrWhiteSpace(value?.Value) && Guid.TryParse(value.Value, out var fileId))
-                            emailModel.Attachments.Add(await templateEngine.HandleAttachment(fileId));
-                    }
-                }
-            }
+            //            if (!string.IsNullOrWhiteSpace(value?.Value) && Guid.TryParse(value.Value, out var fileId))
+            //                emailModel.Attachments.Add(await templateEngine.HandleAttachment(fileId));
+            //        }
+            //    }
+            //}
         }
         private async Task SendSms(List<MinistryUser> recipients, Guid smsTemplateId, ServiceRequest requestData, Guid actionId)
         {

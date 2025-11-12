@@ -1,4 +1,4 @@
-namespace Scholarship.SharedHelper.Models.Api.ServiceRequestEntitiesDTO;
+namespace Evaluation.SharedHelper.Models.Api.ServiceRequestEntitiesDTO;
 
 public class ServiceRequestSummaryDTO
 {

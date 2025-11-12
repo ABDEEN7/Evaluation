@@ -1,6 +1,4 @@
-﻿using Scholarship.DAL.Models.Audit;
-using Scholarship.DAL.Models.Base;
-using Scholarship.SharedHelper.Models.Admin;
+﻿
 using System;
 using System.Collections.Generic;
 using System.Linq;

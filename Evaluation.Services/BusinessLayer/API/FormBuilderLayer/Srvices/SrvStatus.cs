@@ -1,8 +1,14 @@
-﻿using Evaluation.DAL.Entities.StatusEntities;
+﻿using Evaluation.DAL.Entities.Authentication;
+using Evaluation.DAL.Entities.StatusEntities;
+using Evaluation.DAL.Helper;
 using Evaluation.DAL.UnitOfWork;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper;
 using Evaluation.SharedHelper.Helper;
+using Evaluation.SharedHelper.Models;
+using Evaluation.SharedHelper.Models.Api.PartyTypeDTOs;
+using Evaluation.SharedHelper.Models.Api.StatusDTOs;
+using Mapster;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -10,7 +16,8 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 {
             
-    public class SrvStatus(IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow, LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, IServiceProvider serviceProvider, RequestInfo requestInfo) : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, requestInfo)
+    public class SrvStatus(IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow, LoggingServices loggingServices,  UserInfo userInfo, IServiceProvider serviceProvider, RequestInfo requestInfo) :
+        ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices,  userInfo, serviceProvider, requestInfo)
     {
         
 
@@ -174,7 +181,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
         #region MapDTO
         private StatusDTO MapToStatusDTO(ServiceStatus status, string lang)
         {
-            var resultStatus = mapper.Map<StatusDTO>(status);
+            var resultStatus = status.Adapt<StatusDTO>();
             resultStatus.Name = lang.ToLower() == "ar" ? status.NameAr : status.NameEn;
             return resultStatus;
         }

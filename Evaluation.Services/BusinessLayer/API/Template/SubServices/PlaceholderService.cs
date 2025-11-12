@@ -1,6 +1,12 @@
 using System.Diagnostics;
 using Evaluation.DAL.Entities.Attachments;
 using Evaluation.DAL.Entities.Authentication;
+using Evaluation.DAL.Entities.FormBuilder;
+using Evaluation.DAL.Entities.ServiceRequestEntities;
+using Evaluation.DAL.Entities.Template;
+using Evaluation.DAL.Helper;
+using Evaluation.DAL.UnitOfWork;
+using Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper;
 using Evaluation.SharedHelper.Enums;
@@ -9,10 +15,9 @@ using Evaluation.SharedHelper.Helper;
 using Evaluation.SharedHelper.Models;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
-using Scholarship.Services.BusinessLayer.API.Template;
 
 
-namespace Evaluation.Services.BusinessLayer.API.Template
+namespace Evaluation.Services.BusinessLayer.API.Template;
 
 
 	public class PlaceholderService(
@@ -40,7 +45,7 @@ namespace Evaluation.Services.BusinessLayer.API.Template
 
        
         result.AddRange(await GetScholarshipFieldPlaceHolders(scopedUow, 
-                placeholders.Where(p => p.TypeDisplay == ConstantKeys.PlaceHolderTypes.ScholarshipField).ToList(), 
+                placeholders.Where(p => p.TypeDisplay == ConstantKeys.PlaceHolderTypes.EvaluationField).ToList(), 
                 request, lang));
 
             return result;
@@ -51,7 +56,7 @@ namespace Evaluation.Services.BusinessLayer.API.Template
             var result = new List<PlaceholderDto>();
             var scopedUow = serviceProvider.CreateScopedUow();
 
-            var template = await scopedUow.GetRepository<TemplateDoc>()
+            var template = await scopedUow.GetRepository<TemplateDocument>()
                 .GetAllQueryFiltered(x => x.Id == templateId)
                 .FirstOrDefaultAsync();
 
@@ -146,33 +151,33 @@ namespace Evaluation.Services.BusinessLayer.API.Template
         public async Task<List<PlaceholderDto>> GetScholarshipFieldPlaceHolders(UnitOfWork scopedUow, List<PlaceHolder>? placeHolders, 
             ServiceRequest request, string lang)
         {
-            if (request.ScholarshipId == null || placeHolders == null || !placeHolders.Any())
-                return new List<PlaceholderDto>();
+            //if (request.ScholarshipId == null || placeHolders == null || !placeHolders.Any())
+            //    return new List<PlaceholderDto>();
 
-            var scholarshipFields = scopedUow.GetRepository<SchFieldValue>().GetAll()
-                .Include(x => x.SystemField)
-                .ThenInclude(f => f!.FieldType)
-                .Where(f => f.ScholarshipId == request.ScholarshipId && placeHolders.Select(ph => ph.FieldId).Contains(f.SystemFieldId))
-                .ToList();
+            //var scholarshipFields = scopedUow.GetRepository<SchFieldValue>().GetAll()
+            //    .Include(x => x.SystemField)
+            //    .ThenInclude(f => f!.FieldType)
+            //    .Where(f => f.ScholarshipId == request.ScholarshipId && placeHolders.Select(ph => ph.FieldId).Contains(f.SystemFieldId))
+            //    .ToList();
 
             var result = new List<PlaceholderDto>();
 
-            foreach (var holder in placeHolders)
-            {
-                var fieldValue = scholarshipFields.FirstOrDefault(f => f.SystemFieldId == holder.FieldId);
-                if (fieldValue == null) continue;
+            //foreach (var holder in placeHolders)
+            //{
+            //    var fieldValue = scholarshipFields.FirstOrDefault(f => f.SystemFieldId == holder.FieldId);
+            //    if (fieldValue == null) continue;
 
-                var langToUse = GetLangFromPlaceHolderName(holder.PlaceHolderName);
-                if (string.IsNullOrEmpty(langToUse)) langToUse = lang;
+            //    var langToUse = GetLangFromPlaceHolderName(holder.PlaceHolderName);
+            //    if (string.IsNullOrEmpty(langToUse)) langToUse = lang;
 
-                result.Add(new PlaceholderDto
-                {
-                    Key = holder.PlaceHolderName,
-                    Value = await RetrieveValueAsync(fieldValue.SystemField!.FieldType.BackendName, 
-                        fieldValue.SystemField.DropDownTypeId, 
-                        fieldValue.Value,  langToUse, holder.PlaceHolderName)
-                });
-            }
+            //    result.Add(new PlaceholderDto
+            //    {
+            //        Key = holder.PlaceHolderName,
+            //        Value = await RetrieveValueAsync(fieldValue.SystemField!.FieldType.BackendName, 
+            //            fieldValue.SystemField.DropDownTypeId, 
+            //            fieldValue.Value,  langToUse, holder.PlaceHolderName)
+            //    });
+            //}
 
             return result;
         }
@@ -298,84 +303,84 @@ namespace Evaluation.Services.BusinessLayer.API.Template
         result.Add(new PlaceholderDto() { Key = "{{ServiceNameAr}}", Value = dbreq.Service!.NameAr });
         result.Add(new PlaceholderDto() { Key = "{{ServiceNameEn}}", Value = dbreq.Service!.NameEn });
 
-        // ======================= Student Details =======================
-        if (dbreq.Scholarship?.StudentUser != null)
-        {
-            var student = dbreq.Scholarship.StudentUser;
-            result.Add(new PlaceholderDto() { Key = "{{DbStudentQID}}", Value = student.QID });
-            result.Add(new PlaceholderDto() { Key = "{{DbStudentNameEN}}", Value = student.FullNameEn });
-            result.Add(new PlaceholderDto() { Key = "{{DbStudentNameAr}}", Value = student.FullNameAr });
+        //// ======================= Student Details =======================
+        //if (dbreq.Scholarship?.StudentUser != null)
+        //{
+        //    var student = dbreq.Scholarship.StudentUser;
+        //    result.Add(new PlaceholderDto() { Key = "{{DbStudentQID}}", Value = student.QID });
+        //    result.Add(new PlaceholderDto() { Key = "{{DbStudentNameEN}}", Value = student.FullNameEn });
+        //    result.Add(new PlaceholderDto() { Key = "{{DbStudentNameAr}}", Value = student.FullNameAr });
 
-            var nationalityCode = student.NationalityCode;
-            var nationality = await dropdownService.GetCountryBycode(nationalityCode);
-            var nationalityName = requestInfo.Lang == "ar" ? nationality?.NameAr : nationality?.NameEn;
-            result.Add(new PlaceholderDto() { Key = "{{DbStudentNationality}}", Value = nationalityName });
-        }
-        else if (dbreq.Student != null)
-        {
-            var student = dbreq.Student;
-            result.Add(new PlaceholderDto() { Key = "{{DbStudentQID}}", Value = student.QID });
-            result.Add(new PlaceholderDto() { Key = "{{DbStudentNameEN}}", Value = student.FullNameEn });
-            result.Add(new PlaceholderDto() { Key = "{{DbStudentNameAr}}", Value = student.FullNameAr });
+        //    var nationalityCode = student.NationalityCode;
+        //    var nationality = await dropdownService.GetCountryBycode(nationalityCode);
+        //    var nationalityName = requestInfo.Lang == "ar" ? nationality?.NameAr : nationality?.NameEn;
+        //    result.Add(new PlaceholderDto() { Key = "{{DbStudentNationality}}", Value = nationalityName });
+        //}
+        //else if (dbreq.Student != null)
+        //{
+        //    var student = dbreq.Student;
+        //    result.Add(new PlaceholderDto() { Key = "{{DbStudentQID}}", Value = student.QID });
+        //    result.Add(new PlaceholderDto() { Key = "{{DbStudentNameEN}}", Value = student.FullNameEn });
+        //    result.Add(new PlaceholderDto() { Key = "{{DbStudentNameAr}}", Value = student.FullNameAr });
 
-            var nationalityCode = student.NationalityCode;
-            var nationality = await dropdownService.GetCountryBycode(nationalityCode);
-            var nationalityName = requestInfo.Lang == "ar" ? nationality?.NameAr : nationality?.NameEn;
-            result.Add(new PlaceholderDto() { Key = "{{DbStudentNationality}}", Value = nationalityName });
-        }
+        //    var nationalityCode = student.NationalityCode;
+        //    var nationality = await dropdownService.GetCountryBycode(nationalityCode);
+        //    var nationalityName = requestInfo.Lang == "ar" ? nationality?.NameAr : nationality?.NameEn;
+        //    result.Add(new PlaceholderDto() { Key = "{{DbStudentNationality}}", Value = nationalityName });
+        //}
 
-        // ======================= Scholarship Financial Data =======================
-        if (dbreq.ScholarshipId.HasValue)
-        {
-            var schId = dbreq.ScholarshipId.Value;
+        //// ======================= Scholarship Financial Data =======================
+        //if (dbreq.ScholarshipId.HasValue)
+        //{
+        //    var schId = dbreq.ScholarshipId.Value;
 
-            var salary = await srvFinShared.GetStudentSalaryAsync(schId);
-            var netPay = await srvFinShared.GetStudentNetPayAsync(schId);
-            var totalInstalment = await srvFinShared.GetTotalInstalmentAsync(schId);
-            var totalPaidInstalment = await srvFinShared.GetTotalPaidInstalmentAsync(schId);
-            var remainingInstalment = await srvFinShared.GetRemainingInstalmentAsync(schId);
-            var totalDeduction = await srvFinShared.GetTotalScheduleDeductionAsync(schId);
-            var totalPaidDeduction = await srvFinShared.GetTotalPaidScheduleDeductionAsync(schId);
-            var remainingDeduction = await srvFinShared.GetRemainingScheduleDeductionAsync(schId);
+        //    var salary = await srvFinShared.GetStudentSalaryAsync(schId);
+        //    var netPay = await srvFinShared.GetStudentNetPayAsync(schId);
+        //    var totalInstalment = await srvFinShared.GetTotalInstalmentAsync(schId);
+        //    var totalPaidInstalment = await srvFinShared.GetTotalPaidInstalmentAsync(schId);
+        //    var remainingInstalment = await srvFinShared.GetRemainingInstalmentAsync(schId);
+        //    var totalDeduction = await srvFinShared.GetTotalScheduleDeductionAsync(schId);
+        //    var totalPaidDeduction = await srvFinShared.GetTotalPaidScheduleDeductionAsync(schId);
+        //    var remainingDeduction = await srvFinShared.GetRemainingScheduleDeductionAsync(schId);
 
-            result.AddRange(new List<PlaceholderDto>
-        {
-            new() { Key = "{{StudentSalary}}", Value = salary },
-            new() { Key = "{{StudentNetPay}}", Value = netPay.ToString("N2") },
-            new() { Key = "{{TotalInstalment}}", Value = totalInstalment.ToString("N2") },
-            new() { Key = "{{TotalPaidInstalment}}", Value = totalPaidInstalment.ToString("N2") },
-            new() { Key = "{{RemainingInstalment}}", Value = remainingInstalment.ToString("N2") },
-            new() { Key = "{{totalSchaduleDeduction}}", Value = totalDeduction.ToString("N2") },
-            new() { Key = "{{totalPaidSchaduleDeduction}}", Value = totalPaidDeduction.ToString("N2") },
-            new() { Key = "{{remainingSchaduleDeduction}}", Value = remainingDeduction.ToString("N2") }
-        });
+        //    result.AddRange(new List<PlaceholderDto>
+        //{
+        //    new() { Key = "{{StudentSalary}}", Value = salary },
+        //    new() { Key = "{{StudentNetPay}}", Value = netPay.ToString("N2") },
+        //    new() { Key = "{{TotalInstalment}}", Value = totalInstalment.ToString("N2") },
+        //    new() { Key = "{{TotalPaidInstalment}}", Value = totalPaidInstalment.ToString("N2") },
+        //    new() { Key = "{{RemainingInstalment}}", Value = remainingInstalment.ToString("N2") },
+        //    new() { Key = "{{totalSchaduleDeduction}}", Value = totalDeduction.ToString("N2") },
+        //    new() { Key = "{{totalPaidSchaduleDeduction}}", Value = totalPaidDeduction.ToString("N2") },
+        //    new() { Key = "{{remainingSchaduleDeduction}}", Value = remainingDeduction.ToString("N2") }
+        //});
 
 
 
-            // ======================= Request Status =======================
-            var actionStatus = serviceProvider.CreateScopedUow()
-                .GetRepository<ActionTransactionsLog>().GetAllQueryFiltered()
-                .Where(c => c.ServiceRequestId == dbreq.Id && c.NextStatusId == dbreq.StatusId)
-                .OrderByDescending(c => c.CreateDate)
-                .FirstOrDefault();
+        //    // ======================= Request Status =======================
+        //    var actionStatus = serviceProvider.CreateScopedUow()
+        //        .GetRepository<ActionTransactionsLog>().GetAllQueryFiltered()
+        //        .Where(c => c.ServiceRequestId == dbreq.Id && c.NextStatusId == dbreq.StatusId)
+        //        .OrderByDescending(c => c.CreateDate)
+        //        .FirstOrDefault();
 
-            if (actionStatus != null && partyTypeId != null)
-            {
-                result.Add(new PlaceholderDto() { Key = "{{CurrenStatusEn}}", Value = GetStatusDisplayName(actionStatus.NextStatusId, partyTypeId, "en") });
-                result.Add(new PlaceholderDto() { Key = "{{CurrenStatusAr}}", Value = GetStatusDisplayName(actionStatus.NextStatusId, partyTypeId) });
-                result.Add(new PlaceholderDto() { Key = "{{PreviousStatusEn}}", Value = GetStatusDisplayName(actionStatus.PreviousStatusId, partyTypeId, "en") });
-                result.Add(new PlaceholderDto() { Key = "{{PreviousStatusAr}}", Value = GetStatusDisplayName(actionStatus.PreviousStatusId, partyTypeId) });
-            }
+        //    if (actionStatus != null && partyTypeId != null)
+        //    {
+        //        result.Add(new PlaceholderDto() { Key = "{{CurrenStatusEn}}", Value = GetStatusDisplayName(actionStatus.NextStatusId, partyTypeId, "en") });
+        //        result.Add(new PlaceholderDto() { Key = "{{CurrenStatusAr}}", Value = GetStatusDisplayName(actionStatus.NextStatusId, partyTypeId) });
+        //        result.Add(new PlaceholderDto() { Key = "{{PreviousStatusEn}}", Value = GetStatusDisplayName(actionStatus.PreviousStatusId, partyTypeId, "en") });
+        //        result.Add(new PlaceholderDto() { Key = "{{PreviousStatusAr}}", Value = GetStatusDisplayName(actionStatus.PreviousStatusId, partyTypeId) });
+        //    }
 
-            // ======================= Service Info =======================
-            if (dbreq.Service != null)
-            {
-                result.Add(new PlaceholderDto() { Key = "{{ServiceNameAr}}", Value = dbreq.Service.NameAr });
-                result.Add(new PlaceholderDto() { Key = "{{ServiceNameEn}}", Value = dbreq.Service.NameEn });
-            }
+        //    // ======================= Service Info =======================
+        //    if (dbreq.Service != null)
+        //    {
+        //        result.Add(new PlaceholderDto() { Key = "{{ServiceNameAr}}", Value = dbreq.Service.NameAr });
+        //        result.Add(new PlaceholderDto() { Key = "{{ServiceNameEn}}", Value = dbreq.Service.NameEn });
+        //    }
 
            
-        }
+        //}
         return result;
     }
 
@@ -383,7 +388,7 @@ namespace Evaluation.Services.BusinessLayer.API.Template
     {
 
         var result = new List<PlaceholderDto>();
-        var template = await serviceProvider.CreateScopedUow().GetRepository<TemplateDoc>().GetAllQueryFiltered(x => x.Id == templateId).FirstOrDefaultAsync();
+        var template = await serviceProvider.CreateScopedUow().GetRepository<TemplateDocument>().GetAllQueryFiltered(x => x.Id == templateId).FirstOrDefaultAsync();
         if (template != null)
         {
             var userPartyTypesIdsList = await serviceProvider.CreateScopedUow().GetRepository<UserPartyType>()

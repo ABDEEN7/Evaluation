@@ -9,6 +9,7 @@ using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Helper;
 using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Api;
+using Mapster;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,7 +20,7 @@ namespace Evaluation.Services.Models.API
     public class UiControlBL : ApiBase
     {
         public UiControlBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow, LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, IServiceProvider serviceProvider, RequestInfo requestInfo)
-            : base(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, requestInfo)
+            : base(serviceScopeFactory, cacheDataProvider, uow, loggingServices, userInfo, serviceProvider, requestInfo)
         {
         }
 
@@ -60,7 +61,7 @@ namespace Evaluation.Services.Models.API
                    .Where(x => backendKeys.Contains(x.BackendName))
                 .ToListAsync();
 
-                result = mapper.Map<List<UiControlDTO>>(list);
+                result = list.Adapt<List<UiControlDTO>>();
             }
 
             return result;
@@ -77,7 +78,7 @@ namespace Evaluation.Services.Models.API
                                         OrderBy(x=>x.RowOrder)
                                         .ThenBy(x=>x.ColumnOrder)
                                         .ToListAsync();
-            var result = mapper.Map<List<ControlValidationDTO>>(query);
+            var result = query.Adapt<List<ControlValidationDTO>>();
             return result;
 
 

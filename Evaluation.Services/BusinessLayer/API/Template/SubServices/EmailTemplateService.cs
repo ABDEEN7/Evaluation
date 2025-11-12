@@ -1,5 +1,7 @@
 using Evaluation.DAL.Entities.Attachments;
+using Evaluation.DAL.Entities.ServiceRequestEntities;
 using Evaluation.DAL.Entities.ServicesEntities;
+using Evaluation.DAL.Entities.Template;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper;
 using Evaluation.SharedHelper.Enums;
@@ -29,7 +31,7 @@ namespace Evaluation.Services.BusinessLayer.API.Template
                 placeholders.Where(p => p.TypeDisplay == ConstantKeys.PlaceHolderTypes.RequestField).ToList(), 
                 request, lang));
             result.AddRange(await placeholderService.GetScholarshipFieldPlaceHolders(scopedUow, 
-                placeholders.Where(p => p.TypeDisplay == ConstantKeys.PlaceHolderTypes.ScholarshipField).ToList(), 
+                placeholders.Where(p => p.TypeDisplay == ConstantKeys.PlaceHolderTypes.EvaluationField).ToList(), 
                 request, lang));
 
             return templateService.GetTextFromHtml(template, result);
@@ -46,13 +48,13 @@ namespace Evaluation.Services.BusinessLayer.API.Template
 
             var emailTemplateDocuments = scopedUow.GetRepository<EmailTemplateDocument>()
                 .GetAllQueryFiltered()
-                .Include(d => d.TemplateDoc.TemplateGenrationType)
+                .Include(d => d.TemplateDocument.TemplateGenrationType)
                 .Where(d => d.EmailTemplateId == emailTemplateId).ToList();
 
             foreach (var doc in emailTemplateDocuments)
             {
                 requestPlaceholders.AddRange(await placeholderService.GetSystemModulePlaceHoldersByTemplateId(doc.TemplateDocId, lang));
-                var generationType = doc.TemplateDoc.TemplateGenrationType!.BackendName;
+                var generationType = doc.TemplateDocument.TemplateGenrationType!.BackendName;
                 var templateId = doc.TemplateDocId;
                 using var client = new HttpClient();
                 

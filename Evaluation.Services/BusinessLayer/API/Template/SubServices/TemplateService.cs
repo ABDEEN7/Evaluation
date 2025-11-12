@@ -9,10 +9,12 @@ using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Models;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
-using Scholarship.Services.BusinessLayer.API.Template;
+using Evaluation.Services.BusinessLayer.API.Template;
+using Evaluation.DAL.Entities.FormBuilder;
+using Xceed.Document.NET;
+using Xceed.Words.NET;
 
-
-namespace Evaluation.Services.BusinessLayer.API.Template
+namespace Evaluation.Services.BusinessLayer.API.Template;
 
 
 	public class TemplateService(UnitOfWork uow, RequestInfo requestInfo,
@@ -79,7 +81,7 @@ namespace Evaluation.Services.BusinessLayer.API.Template
             var fileBytes = await httpClient.GetByteArrayAsync(url);
 
             using var stream = new MemoryStream(fileBytes);
-            using var docx = DocX.Load(stream);
+            using var docx = Xceed.Words.NET.DocX.Load(stream);
             await ReplacePlaceholders(docx, placeholders, width, height);
 
             using var output = new MemoryStream();

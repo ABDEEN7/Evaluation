@@ -1,4 +1,5 @@
 ﻿using Evaluation.DAL.Entities.Org;
+using Evaluation.DAL.Helper;
 using Evaluation.DAL.UnitOfWork;
 using Evaluation.Services.BusinessLayer.API;
 using Evaluation.Services.Special;
@@ -14,8 +15,8 @@ namespace Evaluation.Services.Integration;
 
 public class HRService: ApiBase
 {
-    public HRService(IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow, LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, IServiceProvider serviceProvider, RequestInfo requestInfo)
-    : base(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, requestInfo)
+    public HRService(IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow, LoggingServices loggingServices, UserInfo userInfo, IServiceProvider serviceProvider, RequestInfo requestInfo)
+    : base(serviceScopeFactory, cacheDataProvider, uow, loggingServices,  userInfo, serviceProvider, requestInfo)
     {
     }
 
@@ -44,9 +45,9 @@ public class HRService: ApiBase
                     _obj.EmployeeNo = reader.IsDBNull("EMPLOYEE_NUMBER") ? "" : reader.GetString("EMPLOYEE_NUMBER");
                     //_obj.Gender = 
                     //_obj.BirthDate =
-                    _obj.Nationality = reader.IsDBNull("NATIONALITY_E") ? "" : reader.GetString("NATIONALITY_E");
+                    _obj.NationalityCode = reader.IsDBNull("NATIONALITY_E") ? "" : reader.GetString("NATIONALITY_E");
                     //_obj.JoinDate = reader.IsDBNull("DATE_OF_JOINING") ? "" : reader.GetString("DATE_OF_JOINING");
-                    _obj.JobTitle = reader.IsDBNull("JOB_TITLE_E") ? reader.GetString("JOB_TITLE_A") : reader.GetString("JOB_TITLE_E");
+                    //_obj.JobTitle = reader.IsDBNull("JOB_TITLE_E") ? reader.GetString("JOB_TITLE_A") : reader.GetString("JOB_TITLE_E");
                     //_obj.HrCode =
 
                     _Allobj.Add(_obj);

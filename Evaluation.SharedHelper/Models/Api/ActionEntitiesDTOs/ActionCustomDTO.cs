@@ -1,5 +1,9 @@
 ﻿
 
+using Evaluation.SharedHelper.Models.Api.AttachmentsDTOs;
+using Evaluation.SharedHelper.Models.Api.FormBuilderDTO;
+using Evaluation.SharedHelper.Models.Api.TemplatesDTO;
+
 namespace Evaluation.SharedHelper.Models.Api.ActionEntitiesDTOs
 {
     public class ActionCustomDTO : EntityBaseDTO
@@ -22,11 +26,10 @@ namespace Evaluation.SharedHelper.Models.Api.ActionEntitiesDTOs
         public string ActionTypeType { get; set; } = null!;
         public List<TempLateDocDTO> TempLateDoc { get; set; } = new();
         public ActionTypeDTO? ActionType { get; set; }
-        public List<StepDTO> Steps { get; set; } = new();
+		public List<FormGroupDTO> FormGroups { get; set; } = new();
 
-        public IList<AssignUserDTO?>? AssignUsers { get; set; }
+		public IList<AssignUserDTO?>? AssignUsers { get; set; }
         //public string? ActionType { get; set; } 
-        public bool ShowInOneStep { get; set; } 
         public bool IsOtherAttachment { get; set; } 
         public bool IsOtherAttachmentRequired { get; set; } 
         public string? AttachmentLabel { get; set; } 

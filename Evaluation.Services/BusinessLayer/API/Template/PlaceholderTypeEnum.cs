@@ -1,4 +1,4 @@
-namespace Scholarship.Services.BusinessLayer.API.Template;
+namespace Evaluation.Services.BusinessLayer.API.Template;
 
 public enum PlaceholderType
 {

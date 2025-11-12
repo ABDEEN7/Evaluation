@@ -1,5 +1,7 @@
 ﻿using Evaluation.DAL.Entities.Audit;
 using  Evaluation.DAL.Entities.BaseModule;
+using Evaluation.DAL.Entities.DepartementEntites;
+using Evaluation.DAL.Entities.SystemModulesEntities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Evaluation.DAL.Entities.Authentication;
@@ -15,7 +17,7 @@ public class PartyType : EntityBase, IAuditLogEntity
     public bool CanViewAllRequests { get; set; }
     public bool CanViewAllEvaluations { get; set; }
     public Guid SystemModuleId { get; set; }
- 
-    //public Departement? Departement { get; set; }
-    //public Guid? DepartementId? { get; set; }
+    public SystemModule? SystemModule { get; set; }
+	//public Guid? DepartmentId { get; set; }
+ //   public Department? Department { get; set; }
 }

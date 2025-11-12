@@ -1,8 +1,8 @@
 ﻿
 
 
-using Evaluation.SharedHelper.Models.Admin;
-using Scholarship.SharedHelper.Models.Api.ServiceRequestEntitiesDTO;
+using Evaluation.SharedHelper.Models.Api.ActionEntitiesDTOs;
+using Evaluation.SharedHelper.Models.Api.ServiceRequestEntitiesDTO;
 
 namespace Evaluation.SharedHelper.Models.Api.ServiceDTOs
 {
