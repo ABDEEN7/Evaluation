@@ -105,7 +105,7 @@ public static class ConstantKeys
         public static readonly string WebLogoEn = "WebLogoEn";
         public static readonly string Favicon = "Favicon";
         public static readonly string RequestColumn = "RequestColumn";
-        public static readonly string ScholarshipColumn = "ScholarshipColumn";
+        public static readonly string EvaluationRequestColumn = "EvaluationRequestColumn";
 		public static readonly string SignatureUploadWidth = "SignatureUploadWidth";
 		public static readonly string SignatureUploadHeight = "SignatureUploadHeight";
 		public static readonly string SessionExpireTime = "SessionExpireTime";

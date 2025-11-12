@@ -139,7 +139,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
             var dto = service.Adapt<ServiceDTO>();
 
-            Guid? scholarshipId = null;
+            Guid? planId = null;
 
             var CheckActionCondition=true;
             if (!service.Initialservice)
@@ -152,17 +152,17 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                 //if (dto.EligableScholarShips.Count == 1)
                 //{
                 //    CheckActionCondition = true;
-                //    scholarshipId = dto.EligableScholarShips.FirstOrDefault()?.Id;
+                //    planId = dto.EligableScholarShips.FirstOrDefault()?.Id;
                 //}
                 //else if (dto.EligableScholarShips.Count > 1)
                 //{
-                //    scholarshipId = null;
+                //    planId = null;
                 //    CheckActionCondition = false;
                 //}
 
             }
 
-            var actions = await SrvActionStatusConfiguration.GetActionsByStatus(service.Id, statusId: null,requestId: null, scholarshipId: scholarshipId,lang: lang, CheckActionCondition);
+            var actions = await SrvActionStatusConfiguration.GetActionsByStatus(service.Id, statusId: null,requestId: null, planId: planId,lang: lang, CheckActionCondition);
 
             dto.Actions = actions;
             dto.Routing = service.SystemModule?.Routing;

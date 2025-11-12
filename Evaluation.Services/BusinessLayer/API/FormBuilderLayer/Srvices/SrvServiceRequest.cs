@@ -102,7 +102,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 		public async Task<WebAppRequestsDTO> GetRequestsAsync(Guid userId, FilterRequestsDTO model)
 		{
 			string lang = _requestInfo!.Lang;
-			model.ModuleName = "/scholarship";
+			model.ModuleName = "/EvaluationPlan";
 
 			using var uow = serviceScopeFactory.CreateScopedUow();
 			using var uow2 = serviceScopeFactory.CreateScopedUow();
@@ -142,11 +142,11 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
 
 		}
-		//public async Task<List<ServiceRequestSummaryDTO>> SearchServiceRequestSummary(Guid scholarshipId, string requestNumber)
+		//public async Task<List<ServiceRequestSummaryDTO>> SearchServiceRequestSummary(Guid planId, string requestNumber)
 		//{
 		//	var requestsList = await serviceScopeFactory.CreateScopedUow()
 		//		.GetRepository<ServiceRequest>()
-		//		.GetAllActiveNonDeleted(x => x.RequestNumber.Contains(requestNumber) && x.ScholarshipId == scholarshipId)
+		//		.GetAllActiveNonDeleted(x => x.RequestNumber.Contains(requestNumber) && x.planId == planId)
 		//		.Include(c => c.Plan)
 		//		.Include(c => c.InitialHistory)
 		//		.Include(x => x.Status)
@@ -172,7 +172,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 		//	var requestObj = await serviceScopeFactory.CreateScopedUow()
 		//		.GetRepository<ServiceRequest>()
 		//		.GetAllActiveNonDeleted(x => x.Id == requestId)
-		//		.Include(c => c.Scholarship)
+		//		.Include(c => c.plan)
 		//		.Include(c => c.InitialHistory)
 		//		.Include(x => x.Status)
 		//		.ThenInclude(x => x!.StatusPreventPartyTypes)
@@ -249,8 +249,8 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 				ActionTransactions = actionTransactionsTask.Result,
 				Applicant = applicantTask.Result,
 				Actions = actionsTask.Result,
-				//ScholarshipNo = request.EvaluationRequest?.,
-				//ScholarshipId = request.Plan?.Id,
+				//planNo = request.EvaluationRequest?.,
+				//planId = request.Plan?.Id,
 				RequestNumber = request.RequestNumber,
 				Status = SrvStatus.GetStatusDisplayName(request.StatusId, Module?.Id),
 				Service = lang == "ar" ? request.Service.NameAr : request.Service.NameEn,
@@ -321,7 +321,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 		//					  .Include(c => c.Service)
 		//					  .Include(c => c.Service!.RequestShowPartyType)
 		//					 .Include(c => c.Status!.StatusPreventPartyTypes)
-		//					 .Include(c => c.Scholarship)
+		//					 .Include(c => c.plan)
 		//					 .ThenInclude(c => c!.SchStatus)
 		//					 .Include(c => c.InitialHistory)
 		//					 .Include(c => c.Status)
@@ -330,7 +330,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 		//					 .AsSplitQuery()
 		//					 .Where(c => c.Service!.SystemModuleId == module.Id)
 		//					 .Where(c => c.CreateById == userId || c.StudentId == userId
-		//					   || c.Scholarship!.StudentUserId == userId
+		//					   || c.plan!.StudentUserId == userId
 		//					   && c.Service!.RequestShowPartyType!.Any(x => userInfo.PartyTypes.Contains(x.PartyTypeId)))
 		//					 .Where(c =>
 		//					 !c.Status!.StatusPreventPartyTypes.Any(sp => userInfo.PartyTypes.Contains(sp.PartyTypeId) && sp.IsActive == true && sp.IsDeleted == false))
@@ -351,9 +351,9 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 		//						 OwnerName = lang == "ar" ? c.Student!.FullNameAr : c.Student!.FullNameEn,
 		//						 StudentNationalityId = c.Student.NationalityCode,
 		//						 StudentIsSpecial = c.Student.IsSpecial,
-		//						 ScholarshipNo = c.Scholarship!.ScholarshipNumber,
-		//						 ScholarshipId = c.Scholarship.Id,
-		//						 SchStatus = lang == "ar" ? c.Scholarship.SchStatus!.NameAr : c.Scholarship.SchStatus!.NameEn,
+		//						 planNo = c.plan!.planNumber,
+		//						 planId = c.plan.Id,
+		//						 SchStatus = lang == "ar" ? c.plan.SchStatus!.NameAr : c.plan.SchStatus!.NameEn,
 		//						 CountryId = c.CountryId,
 		//						 UniversityId = c.UniversityId,
 		//						 CountryName = lang == "ar"
@@ -426,10 +426,10 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 				//Mobile = c.Student != null ? c.Student.Mobile : "",
 				//OwnerName = c.Student != null ? (lang == "ar" ? c.Student.FullNameAr : c.Student.FullNameEn) : "",
 				//StudentIsSpecial = c.Student != null && c.Student.IsSpecial,
-				//ScholarshipNo = c.Scholarship != null ? c.Scholarship.ScholarshipNumber : "",
-				//ScholarshipId = c.Scholarship != null ? c.Scholarship.Id : null,
-				//SchStatus = c.Scholarship != null && c.Scholarship.SchStatus != null
-				//	? (lang == "ar" ? c.Scholarship.SchStatus.NameAr : c.Scholarship.SchStatus.NameEn)
+				//planNo = c.plan != null ? c.plan.planNumber : "",
+				//planId = c.plan != null ? c.plan.Id : null,
+				//SchStatus = c.plan != null && c.plan.SchStatus != null
+				//	? (lang == "ar" ? c.plan.SchStatus.NameAr : c.plan.SchStatus.NameEn)
 				//	: "",
 				
 			});
@@ -847,9 +847,9 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 					}
 				}
 
-				if (!string.IsNullOrEmpty(model.ScholarshipNo))
+				if (!string.IsNullOrEmpty(model.planNo))
 				{
-					requests = requests.Where(x => !string.IsNullOrEmpty(x.ScholarshipNo) && x.ScholarshipNo.ToLower().Contains(model.ScholarshipNo.ToLower()));
+					requests = requests.Where(x => !string.IsNullOrEmpty(x.planNo) && x.planNo.ToLower().Contains(model.planNo.ToLower()));
 				}
 
 				if (!string.IsNullOrEmpty(model.RequestNo))

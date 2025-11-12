@@ -22,7 +22,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, userInfo, serviceProvider, _requestInfo)
     { 
      
-        public async Task<List<ActionDTO>> GetActionsByStatus(Guid serviceId,Guid? statusId, Guid? requestId, Guid? scholarshipId, string lang, bool CheckActionCondition=true)
+        public async Task<List<ActionDTO>> GetActionsByStatus(Guid serviceId,Guid? statusId, Guid? requestId, Guid? planId, string lang, bool CheckActionCondition=true)
         {
             var ActionStatusConfiguration = (await cacheDataProvider.GetActionStatusConfiguration())
                                             .Where(c =>c.ServiceAction!.ServiceId== serviceId && (c.CurrentStatusId == statusId || (statusId==null && requestId==null && c.CurrentStatus!.IsInitial==true)))
@@ -78,7 +78,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                 {
                     foreach (var action in actions)
                     {
-                        bool isValid = await ValidateActionConditions(action.Id!.Value, requestId, scholarshipId);
+                        bool isValid = await ValidateActionConditions(action.Id!.Value, requestId, planId);
                         if (isValid)
                         {
                             validActions.Add(action);
@@ -140,7 +140,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                 return null!;
         }
 
-        public async Task<bool> ValidateActionConditions(Guid ActionId, Guid? RequestId, Guid? scholarshipId)
+        public async Task<bool> ValidateActionConditions(Guid ActionId, Guid? RequestId, Guid? planId)
         {
             var uow = serviceScopeFactory.CreateScopedUow();
             var conditions = await uow.GetRepository<ActionCondition>()
@@ -185,7 +185,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                 //    {
                 //        var schData = await uow.GetRepository<ScholarshipData>()
                 //            .GetAllQueryFiltered()
-                //            .FirstOrDefaultAsync(c => c.Id == scholarshipId);
+                //            .FirstOrDefaultAsync(c => c.Id == planId);
 
                 //        if (schData == null)
                 //        {
@@ -208,7 +208,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                 //    {
                 //        var schFieldValueEntity = await uow.GetRepository<SchFieldValue>()
                 //            .GetAllQueryFiltered()
-                //            .FirstOrDefaultAsync(c => c.ScholarshipId == scholarshipId && c.SystemFieldId == condition.RefID);
+                //            .FirstOrDefaultAsync(c => c.planId == planId && c.SystemFieldId == condition.RefID);
 
                 //        if (schFieldValueEntity == null)
                 //        {

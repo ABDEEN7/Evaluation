@@ -13,7 +13,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace Scholarship.Services.BusinessLayer.API
+namespace Evaluation.Services.BusinessLayer.API
 {
 #pragma warning disable S2325
     public class FieldValidatorBL(CacheDataProvider cacheDataProvider)

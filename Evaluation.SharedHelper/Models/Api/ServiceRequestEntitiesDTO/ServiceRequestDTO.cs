@@ -48,8 +48,8 @@ namespace Evaluation.SharedHelper.Models.Api.ServiceRequestEntitiesDTO
 		public Guid? StudentUserId { get; set; }
 		public string? OwnerName { get; set; }
 		public bool? StudentIsSpecial { get; set; }
-		public string? ScholarshipNo { get; set; }
-		public Guid? ScholarshipId { get; set; }
+		public string? planNo { get; set; }
+		public Guid? planId { get; set; }
 		public string? SchStatus { get; set; }
 		public string? CountryName { get; set; }
 		public string? CountryCode { get; set; }

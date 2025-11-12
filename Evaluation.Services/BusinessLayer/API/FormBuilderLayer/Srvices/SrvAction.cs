@@ -21,7 +21,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Scholarship.Services.BusinessLayer.API;
 using System.Collections;
 using System.Globalization;
 using System.Linq;
@@ -333,9 +332,9 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 			return actionMappedFieldIdsList;
 
 		}
-		public async Task<(List<SharedHelper.Models.Api.FormBuilderDTO.FieldErrorDTO> errors, IList<FieldValueDTO> updatedFields)> ValidateFieldsAttributesAsync(IList<FieldValueDTO> fields, IList<FieldValueDTO> allFields, IList<FileFieldDTO> files, List<FieldAttributeValue> fullAttributes, Guid? OrgTreeId, string lang, Guid? ScholarshipId)
+		public async Task<(List<SharedHelper.Models.Api.FormBuilderDTO.FieldErrorDTO> errors, IList<FieldValueDTO> updatedFields)> ValidateFieldsAttributesAsync(IList<FieldValueDTO> fields, IList<FieldValueDTO> allFields, IList<FileFieldDTO> files, List<FieldAttributeValue> fullAttributes, Guid? OrgTreeId, string lang, Guid? PlanId)
 		{
-			var listFieldsTask = ValidateListFieldsAsync(fields, allFields, files, OrgTreeId, lang, ScholarshipId);
+			var listFieldsTask = ValidateListFieldsAsync(fields, allFields, files, OrgTreeId, lang, PlanId);
 			var simpleFieldsTask = ValidateSimpleFieldsAsync(fields, allFields, files, fullAttributes, lang);
 
 			await Task.WhenAll(listFieldsTask, simpleFieldsTask);
@@ -352,7 +351,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
 			return (allErrors, updatedFields);
 		}
-		private async Task<(List<SharedHelper.Models.Api.FormBuilderDTO.FieldErrorDTO> errors, IList<FieldValueDTO> updatedFields)> ValidateListFieldsAsync(IList<FieldValueDTO> fields, IList<FieldValueDTO> allFields, IList<FileFieldDTO> files, Guid? OrgTreeId, string lang, Guid? ScholarshipId)
+		private async Task<(List<SharedHelper.Models.Api.FormBuilderDTO.FieldErrorDTO> errors, IList<FieldValueDTO> updatedFields)> ValidateListFieldsAsync(IList<FieldValueDTO> fields, IList<FieldValueDTO> allFields, IList<FileFieldDTO> files, Guid? OrgTreeId, string lang, Guid? PlanId)
 		{
 			var validator = new FieldValidatorBL(cacheDataProvider);
 			var errors = new List<SharedHelper.Models.Api.FormBuilderDTO.FieldErrorDTO>();

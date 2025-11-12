@@ -27,7 +27,7 @@ using System.Reflection.PortableExecutable;
 
 
 
-namespace Scholarship.Services.BusinessLayer.API
+namespace Evaluation.Services.BusinessLayer.API
 {
     public class  FormRenderBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, SrvUser SrvUser, UnitOfWork uow, LoggingServices loggingServices, 
              UserInfo userInfo,   RequestInfo _requestInfo, SrvServiceRequest SrvServiceRequest
@@ -36,7 +36,7 @@ namespace Scholarship.Services.BusinessLayer.API
             : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, userInfo, serviceProvider, _requestInfo)
         {
 
-		public async Task<ActionCustomDTO> GetActionSteps(ServiceAction action, Guid serviceId, Guid? requestId = null, Guid? scholarshipId = null)
+		public async Task<ActionCustomDTO> GetActionSteps(ServiceAction action, Guid serviceId, Guid? requestId = null, Guid? PlanId = null)
 		{
 			string lang = _requestInfo.Lang;
 			var result = action.Adapt<ActionCustomDTO>();
@@ -140,7 +140,7 @@ namespace Scholarship.Services.BusinessLayer.API
 						await HandleFieldsWithReadFromFieldIdAsync(
 							fieldDtos.Where(x => x.ReadFromFieldId != null).ToList(),
 							requestId,
-							scholarshipId);
+							PlanId);
 
 					foreach (var att in attachmentsFromReadFields)
 						schAttachmentIds.Add(att);
@@ -187,7 +187,7 @@ namespace Scholarship.Services.BusinessLayer.API
 		}
 
 
-		private async Task<List<string>> HandleFieldsWithReadFromFieldIdAsync(List<FieldValueDTO> fields, Guid? requestId, Guid? ScholarshipId)
+		private async Task<List<string>> HandleFieldsWithReadFromFieldIdAsync(List<FieldValueDTO> fields, Guid? requestId, Guid? PlanId)
 		{
 			List<string> attachmentList = new List<string>();
 			//if (fields == null || !fields.Any())

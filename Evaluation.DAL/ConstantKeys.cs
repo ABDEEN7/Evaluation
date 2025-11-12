@@ -42,9 +42,7 @@ public static class ConstantKeys
 		public static readonly Guid RETURNBACK = Guid.Parse("d71bba64-9e7f-4e19-948f-03f08d0243f7");
 		public static readonly Guid SubmitMissingData = Guid.Parse("6d697ec3-cc8c-485a-bdf3-ef2e9c24c512");
 		public static readonly Guid RequestDataChange = Guid.Parse("cfeb4c71-d1a7-4d35-9a77-5f90e1f8768b");
-		public static readonly Guid CreateScholarship = Guid.Parse("3e6d8fd3-76f9-479f-94f9-14b8b4a7d589");
-		//public static readonly Guid ActivateScholarship = Guid.Parse("1a6b6b3a-1e0b-40f7-a83f-bbdb57d3c7d4");
-		public static readonly Guid FreezeScholarship = Guid.Parse("8fd7e467-df72-4533-83b1-cd6cc59d1e84");
+		public static readonly Guid CreatePlan = Guid.Parse("3e6d8fd3-76f9-479f-94f9-14b8b4a7d589");
 		public static readonly Guid ReserveVacancy = Guid.Parse("423dbe7b-3e9d-4f10-bcf4-6d232de5ec39");
 		public static readonly Guid INFO_WITH_DRAFT = Guid.Parse("d71bba64-9e7f-4e19-948f-03f08d024311");
 

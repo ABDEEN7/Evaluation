@@ -719,7 +719,7 @@ namespace Evaluation.Services.Models.Admin
             obj.PlaceHolderName = message.PlaceHolderName;
             obj.TypeDisplay = message.TypeDisplay;
             obj.Type = message.Type;
-            if (message.Type == ConstantKeys.AdminSettings.RequestColumn || message.Type == ConstantKeys.AdminSettings.ScholarshipColumn)
+            if (message.Type == ConstantKeys.AdminSettings.RequestColumn || message.Type == ConstantKeys.AdminSettings.EvaluationRequestColumn)
             {
                 obj.ColumnName = message.FieldId;
             }
@@ -780,7 +780,7 @@ namespace Evaluation.Services.Models.Admin
                 obj.PlaceHolderName = message.PlaceHolderName;
                 obj.TypeDisplay = message.TypeDisplay;
                 obj.Type = message.Type;
-                if (message.Type == ConstantKeys.AdminSettings.RequestColumn || message.Type == ConstantKeys.AdminSettings.ScholarshipColumn)
+                if (message.Type == ConstantKeys.AdminSettings.RequestColumn || message.Type == ConstantKeys.AdminSettings.EvaluationRequestColumn)
                 {
                     obj.ColumnName = message.FieldId!.ToString();
                 }

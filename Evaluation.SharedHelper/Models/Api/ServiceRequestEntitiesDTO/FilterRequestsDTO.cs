@@ -22,7 +22,7 @@ namespace Evaluation.SharedHelper.Models.Api.ServiceRequestEntitiesDTO
         public string? RequestDateFrom { get; set; }
         public string? RequestDateTo { get; set; }
         public string? RequestNo { get; set; }
-        public string? ScholarshipNo { get; set; }
+        public string? planNo { get; set; }
 
         public List<Guid>? ServiceId { get; set; }
         public List<Guid?>? StatusesList { get; set; }

@@ -27,7 +27,7 @@ using System.Text.RegularExpressions;
 using static Evaluation.DAL.ConstantKeys;
 using static Evaluation.SharedHelper.Enums.ConstantKeys;
 
-namespace Scholarship.Services.Models.API
+namespace Evaluation.Services.Models.API
 {
 
     public class RequestsBL(
@@ -38,7 +38,7 @@ namespace Scholarship.Services.Models.API
             : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices,  userInfo, serviceProvider, _requestInfo)
     {
 
-		public async Task<ServiceRequestDTO> HandleServiceRequestAsync(ActionFormDTO? actionFormDTO, Guid? scholarshipId,
+		public async Task<ServiceRequestDTO> HandleServiceRequestAsync(ActionFormDTO? actionFormDTO, Guid? planId,
 			Guid serviceId, string actionName, string fieldValuesJson, List<AssignUserDTO?> assignUsers,
 			IFormFileCollection files, string remarks, bool saveAsDraft = false)
 		{
@@ -103,7 +103,7 @@ namespace Scholarship.Services.Models.API
 
 				};
 
-				var validateRequestTask = ValidateCanCreateRequest(scholarshipId, serviceObj);
+				var validateRequestTask = ValidateCanCreateRequest(planId, serviceObj);
 				if (actionFormDTO?.FieldValues != null)
 				{
 					var validateActionTask = SrvAction.ValidateActionAndActionFieldAsync(null,  actionFormDTO?.FieldValues!, remarks, othersAttachement, serviceObj, status.Id, action, fileFields, saveAsDraft);
@@ -121,7 +121,7 @@ namespace Scholarship.Services.Models.API
 
 				var actionResult = await PerformAction(request, serviceObj, actionFormDTO!.FieldValues!, action.BackendName, assignUsers.Where(c => c!.IsSelected).ToList()!, remarks, saveAsDraft);
 
-				var otherAttachmentsTask = SrvAttachments.UploadAndInsertOtherAttachments(othersAttachement, actionResult.actionlog, scholarshipId);
+				var otherAttachmentsTask = SrvAttachments.UploadAndInsertOtherAttachments(othersAttachement, actionResult.actionlog, planId);
 				var sequence = request.Sequence;
 				var requestNumber = DateTime.Now.ToString(serviceObj.ReqNumberDef ?? "", new CultureInfo("en-US")) + sequence;
 
@@ -224,7 +224,7 @@ namespace Scholarship.Services.Models.API
 			return (null, null, null);
 		}
 	
-		public async Task<bool> ValidateCanCreateRequest(Guid? scholarshipId, Service serviceObj)
+		public async Task<bool> ValidateCanCreateRequest(Guid? planId, Service serviceObj)
 		{
 			if (serviceObj == null)
 			{
@@ -252,7 +252,7 @@ namespace Scholarship.Services.Models.API
 				}
 			}
 
-			await ValidateIfThereIsOpenedRequestForServiceAsync(scholarshipId, serviceObj, maxCountOpen);
+			await ValidateIfThereIsOpenedRequestForServiceAsync(planId, serviceObj, maxCountOpen);
 
 			#endregion
 

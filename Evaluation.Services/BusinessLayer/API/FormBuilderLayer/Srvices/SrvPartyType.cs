@@ -81,7 +81,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
             return result;
         }
-        public async Task<bool> IsAllowedToViewAllScholarshipWitoutFilterationAsync(Guid? userId, Guid? ModuleId)
+        public async Task<bool> IsAllowedToViewAllPlansWitoutFilterationAsync(Guid? userId, Guid? ModuleId)
         {
             if (ModuleId is null)
             {
