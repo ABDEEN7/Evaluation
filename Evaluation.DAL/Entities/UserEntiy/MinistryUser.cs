@@ -13,8 +13,8 @@ public class MinistryUser : EntityBase
     public string? NationalityCode { get; set; }
     public string NameAr { get; set; } = null!;
     public string NameEn { get; set; } = null!;
-	public Guid UserGenderId { get; set; }
-	public UserGender? UserGender { get; set; }
+	//public Guid? UserGenderId { get; set; }
+	//public UserGender? UserGender { get; set; }
 	public DateTime? LastLoginDate { get; set; }
     public string PreferredLanguage { get; set; } = null!;
     public string? Mobile { get; set; }

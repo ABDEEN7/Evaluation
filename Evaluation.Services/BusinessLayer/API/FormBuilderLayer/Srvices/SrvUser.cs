@@ -79,14 +79,14 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 			return UserProfile;
 		}
 
-		public async Task<Guid> GetUserGenderByuserId(Guid userId)
-		{
-			var UserProfile = await serviceScopeFactory.CreateScopedUow()
-							.GetRepository<MinistryUser>().GetByIDActiveNonDeleted(userId);
-			if (UserProfile == null)
-				throw new BusinessException(ConstantKeys.ExceptionMessage.UserInfoNotFound);
-			return UserProfile.UserGenderId;
-		}
+		//public async Task<Guid> GetUserGenderByuserId(Guid userId)
+		//{
+		//	var UserProfile = await serviceScopeFactory.CreateScopedUow()
+		//					.GetRepository<MinistryUser>().GetByIDActiveNonDeleted(userId);
+		//	if (UserProfile == null)
+		//		throw new BusinessException(ConstantKeys.ExceptionMessage.UserInfoNotFound);
+		//	return UserProfile.UserGenderId;
+		//}
 
 		public async Task<bool> HasPermission(Guid userId, string permissionName)
 		{
