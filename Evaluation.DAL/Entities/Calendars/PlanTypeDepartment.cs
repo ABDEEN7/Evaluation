@@ -12,6 +12,6 @@ public class PlanTypeDepartment : EntityBase
     public Department? Department { get; set; }
     public Guid PlanTypeId { get; set; }
     public PlanType? PlanType { get; set; }
-    //public int OrderNo { get; set; } = 0;
+    public int OrderNo { get; set; } = 0;
 
 }
