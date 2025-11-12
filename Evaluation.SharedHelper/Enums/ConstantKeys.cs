@@ -108,7 +108,7 @@ public static class ConstantKeys
         public static readonly string ScholarshipColumn = "ScholarshipColumn";
 		public static readonly string SignatureUploadWidth = "SignatureUploadWidth";
 		public static readonly string SignatureUploadHeight = "SignatureUploadHeight";
-
+		public static readonly string SessionExpireTime = "SessionExpireTime";
 
 	}
 

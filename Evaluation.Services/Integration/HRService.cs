@@ -1,7 +1,9 @@
-﻿using Evaluation.DAL.Entities.Org;
+﻿using Evaluation.DAL.DTOs;
+using Evaluation.DAL.Entities.Org;
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.UnitOfWork;
 using Evaluation.Services.BusinessLayer.API;
+using Evaluation.Services.Mapping;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Helper;
 using Evaluation.SharedHelper.Models;
@@ -9,7 +11,6 @@ using MapsterMapper;
 using Microsoft.Extensions.DependencyInjection;
 using Oracle.ManagedDataAccess.Client;
 using System.Data;
-using System.Text;
 
 namespace Evaluation.Services.Integration;
 
@@ -20,57 +21,103 @@ public class HRService: ApiBase
     {
     }
 
-    public List<Employee> GetAllHRUsers()
+    int recordsPerPage = 50;//TODO: This value should be retrive from system settings table
+
+    public async Task<List<HREmployeeInfoDto>> GetAllHRUsersAsync(int page)
     {
-        List<Employee> _Allobj = new List<Employee>();
+        var top = recordsPerPage;
+        var skip = (page - 1) * recordsPerPage;
+        var employees = new List<HREmployeeInfoDto>();
 
-        OracleConnection con = new OracleConnection(ClsAppSetting.OracleDBConnection);
-        try
+        using (var con = new OracleConnection(ClsAppSetting.OracleDBConnection))
         {
-            using (OracleCommand cmd = con.CreateCommand())
+            try
             {
-                con.Open();
-
-                cmd.BindByName = true;
-
-                cmd.CommandText = "select * from TEMP_HR.MOE_EMPLOYEES_EVALAPP_V where Email is not null";
-                //Execute the command and use DataReader to display the data
-                OracleDataReader reader = cmd.ExecuteReader();
-                var count = 0;
-                while (reader.Read())
+                using (var cmd = con.CreateCommand())
                 {
-                    Employee _obj = new Employee();
-                    _obj.NameEn = reader.IsDBNull("EMPLOYEE_E") ? "" : reader.GetString("EMPLOYEE_E");
-                    _obj.NameAr = reader.IsDBNull("EMPLOYEE_A") ? "" : reader.GetString("EMPLOYEE_A");
-                    _obj.EmployeeNo = reader.IsDBNull("EMPLOYEE_NUMBER") ? "" : reader.GetString("EMPLOYEE_NUMBER");
-                    //_obj.Gender = 
-                    //_obj.BirthDate =
-                    _obj.NationalityCode = reader.IsDBNull("NATIONALITY_E") ? "" : reader.GetString("NATIONALITY_E");
-                    //_obj.JoinDate = reader.IsDBNull("DATE_OF_JOINING") ? "" : reader.GetString("DATE_OF_JOINING");
-                    //_obj.JobTitle = reader.IsDBNull("JOB_TITLE_E") ? reader.GetString("JOB_TITLE_A") : reader.GetString("JOB_TITLE_E");
-                    //_obj.HrCode =
+                    await con.OpenAsync();
 
-                    _Allobj.Add(_obj);
-                    count++;
-                    if(count > 10)
-                        break;
+                    cmd.BindByName = true;
+
+                    cmd.CommandText = @"
+                    SELECT *
+                    FROM TEMP_HR.MOE_EMPLOYEES_EVALAPP_V
+                    WHERE Email IS NOT NULL
+                    OFFSET :Skip ROWS FETCH NEXT :Top ROWS ONLY";
+
+                    cmd.Parameters.Add(new OracleParameter("Skip", skip));
+                    cmd.Parameters.Add(new OracleParameter("Top", top));
+
+                    using (var reader = await cmd.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            employees.Add(IntegrationMapping.MapToHREmployeeInfoDto(reader));
+                        }
+                    }
                 }
-
-
-                reader.Dispose();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading employees: {ex.Message}");
+            }
+            finally
+            {
                 con.Dispose();
                 con.Close();
-                return _Allobj;
             }
         }
-        catch (Exception ex)
+
+        return employees;
+    }
+
+    public async Task<List<HROrganizationInfoDto>> GetAllHROrgAsync(int page)
+    {
+        var top = recordsPerPage;
+        var skip = (page - 1) * recordsPerPage;
+        var orgs = new List<HROrganizationInfoDto>();
+
+        using (var con = new OracleConnection(ClsAppSetting.OracleDBConnection))
         {
-            Console.WriteLine(ex.Message);
+            try
+            {
+                using (var cmd = con.CreateCommand())
+                {
+                    await con.OpenAsync();
+
+
+                    cmd.BindByName = true;
+
+                    cmd.CommandText = @"
+                    SELECT *
+                    FROM TEMP_HR.ORGANIZATION_EVALAPP_V
+                    WHERE Email IS NOT NULL
+                    OFFSET :Skip ROWS FETCH NEXT :Top ROWS ONLY";
+
+                    cmd.Parameters.Add(new OracleParameter("Skip", skip));
+                    cmd.Parameters.Add(new OracleParameter("Top", top));
+
+
+                    using (var reader = await cmd.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            orgs.Add(IntegrationMapping.MapToOrganizationInfoDto(reader));
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading orgs: {ex.Message}");
+            }
+            finally
+            {
+                con.Dispose();
+                con.Close();
+            }
         }
-        finally
-        {
-            con.Close();
-        }
-        return _Allobj;
+
+        return orgs;
     }
 }

@@ -14,5 +14,7 @@ public class Employee : OrgTree
     public DateOnly JoinDate { get; set; }
     public Guid JobTitleId { get; set; } 
     public JobTitle JobTitle { get; set; } = null!;
+    public string? Email { get; set; }
+
 
 }

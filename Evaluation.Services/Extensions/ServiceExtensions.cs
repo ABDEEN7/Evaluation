@@ -1,5 +1,6 @@
 ﻿using Evaluation.DAL.Context;
 using Evaluation.DAL.UnitOfWork;
+using Evaluation.Services.BusinessLayer;
 using Evaluation.Services.BusinessLayer.API;
 using Evaluation.Services.Models.Admin;
 using Evaluation.Services.Models.JWT;
@@ -104,7 +105,7 @@ public static class ServiceExtensions
         services.AddScoped<MSJsonWT>();
 
         services.AddScoped<ISmsServices, SmsServices>();
-
+        services.AddScoped<MasterBL>();
 
     }
     public static UnitOfWork CreateScopedUow(this IServiceProvider serviceProvider)

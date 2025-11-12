@@ -51,56 +51,16 @@ public class PlanServiceRequestRepository(IServiceScopeFactory serviceScopeFacto
         await unitOfWork.CommitAsync();
         return true;
     }
-    public async Task<bool> ApprovePlans(Guid planId)
-    {
-        //Get the the approver request from مدير النظام
-        PlanServiceRequest? planRequest = await unitOfWork
-            .GetRepository<PlanServiceRequest>()
-            .GetByIdAsync(planId);
-        //Deseialize the value of the approver request 
-        CreateEvaluationPlanDto? createplan = JsonConvert.DeserializeObject<CreateEvaluationPlanDto>(planRequest.Value);
-        Guid departmentId = unitOfWork
-            .GetRepository<AcademicYear>()
-            .GetAllActiveNonDeleted(x => x.Id == planRequest.AcadmicYearId)
-            .Select(x => x.DepartmentId)
-            .FirstOrDefault();
-        Plan plan = new Plan
-        {
-            NameAr = createplan.NameAr,
-            NameEn = createplan.NameEn,
-            AcademicYearId = createplan.AcademicYearId,
-            PlanStatusId = createplan.PlanStatusId,
-            DepartmentId = departmentId,
-            //PlanSchedules = PlanSchedules
-
-
-        };
-        //Get id of school that we will evaluate
-        //List<Guid> schoolIds = plan.Schools.Select(s => s.Id).ToList();
-        var selectedSchool = unitOfWork
-            .GetRepository<School>();
-        //.GetAllActiveNonDeleted(x => schoolIds.Contains(x.Id));
-
-        //added selected school to the plan 
-        //plan.PlanSchedules = selectedSchool.Select(school => new PlanSchedule
-        //{
-        //    SchoolId = school.Id,
-        //    School = school
-        //}).ToList();
-        //await unitOfWork.GetRepository<Plan>().InsertAsync(plan);
-        await unitOfWork.CommitAsync();
-        return true;
-    }
-    public async Task<bool> DeleteSchoolFromPlan(Guid requestId, Guid schoolId)
-    {
-        var changeRequest = await unitOfWork.GetRepository<ChangeRequest>().GetByIdAsync(requestId);
-        var plan = await unitOfWork.GetRepository<Plan>().GetByIdAsync(changeRequest.PlanId);
-        var schoolPlan = await unitOfWork.GetRepository<EvaluationRequest>()
-            .GetAllActiveNonDeleted().FirstOrDefaultAsync(x => x.PlanId == plan.Id && x.OrgTreeId == schoolId);
-        unitOfWork.GetRepository<EvaluationRequest>().Delete(schoolPlan);
-        await unitOfWork.CommitAsync();
-        return true;
-    }
+    
+    //public async Task<bool> DeleteSchoolFromPlan(Guid requestId, Guid schoolId)
+    //{
+    //    var plan = await unitOfWork.GetRepository<Plan>().GetByIdAsync(changeRequest.PlanId);
+    //    var schoolPlan = await unitOfWork.GetRepository<EvaluationRequest>()
+    //        .GetAllActiveNonDeleted().FirstOrDefaultAsync(x => x.PlanId == plan.Id && x.OrgTreeId == schoolId);
+    //    unitOfWork.GetRepository<EvaluationRequest>().Delete(schoolPlan);
+    //    await unitOfWork.CommitAsync();
+    //    return true;
+    //}
     public async Task<List<PlanTypeDto>> GetPlanTypeAsync()
     {
         return await serviceScopeFactory.CreateScopedUow().GetRepository<PlanType>()

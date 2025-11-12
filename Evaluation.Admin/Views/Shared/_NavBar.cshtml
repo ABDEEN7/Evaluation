@@ -1,0 +1,67 @@
+﻿@using Microsoft.AspNetCore.Builder
+@using Microsoft.AspNetCore.Http.Features
+@using Microsoft.AspNetCore.Localization
+@using Microsoft.AspNetCore.Mvc.Localization
+@using Microsoft.Extensions.Options
+@using Evaluation.SharedHelper.Models
+
+@inject IOptions<RequestLocalizationOptions> LocOptions
+@inject RequestInfo _requestInfo;
+
+@{
+    var RequestCulture = Context.Features.Get<IRequestCultureFeature>();
+    
+    var Lang = string.IsNullOrEmpty(_requestInfo.Lang) ? "ar" : _requestInfo.Lang ?? "ar";
+
+    var Arabic = new SelectListItem() { Text = "Arabic", Value = "ar",Selected= Lang=="ar" ? true : false};
+    var English = new SelectListItem() { Text = "English", Value = "en", Selected = Lang == "en" ? true : false };
+    var CultureList = new List<SelectListItem>();
+    CultureList.Add(Arabic);
+    CultureList.Add(English);
+    var ReturnUrl = string.IsNullOrEmpty(Context.Request.Path) ? "~/" : $"~{Context.Request.Path.Value}{Context.Request.QueryString}";
+
+}
+<!-- Navbar Start -->
+
+<nav class="navbar navbar-expand bg-white p-0 py-2 shadow1" >
+    @*<div class="navbar-logo bg-dark">
+         <a href="index.html" class="header-logo">
+            <img class="rounded-circle bg-light" src="/new-styles/img/logo-icon.png" alt="" style="width: 40px; height: 40px;">
+            <h6>The Ministry of Education and Higher Education</h6>
+        </a>
+        <!-- sidebar collapse-->
+        <a href="#" class="sidebar-toggler flex-shrink-0 flex-grow-1 text-white" data-toggle="minimize"><i class="fa fa-bars"></i></a>
+    </div>*@
+    
+    <ul class="navbar-nav align-items-center ms-auto">
+
+        <li class="nav-item dropdown">
+            <a class="nav-link app-lanuage d-flex align-items-center" href="javascript:void(0);">
+                <i class="fas fa-globe"></i>&nbsp;&nbsp;
+                <form id="selectLanguage" asp-controller="Home"
+                      asp-action="SetLanguage" asp-route-returnUrl="@ReturnUrl"
+                      method="post" class="form-horizontal mb-0" role="form">
+                    <select name="culture" class="ddl-culture form-select form-select-sm"
+                            onchange="this.form.submit();"
+                            asp-items="@CultureList">
+                    </select>
+                </form>
+            </a>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link" data-widget="fullscreen" href="javascript:void(0);" role="button">
+                <i class="fas fa-expand-arrows-alt"></i>
+            </a>
+        </li>
+
+        <li class="nav-item">
+            <a id="signOut-btn" class="nav-link" href="@Url.Action("LogOut","Home")"><i class="fas fa-sign-out-alt"></i> <span id="signOut-text"></span></a>
+        </li>
+
+    </ul>
+   
+
+    
+</nav>
+<!-- Navbar End -->
