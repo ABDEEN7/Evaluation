@@ -1,6 +1,7 @@
 ﻿using Evaluation.DAL.Entities.ActionEntities;
 using  Evaluation.DAL.Entities.BaseModule;
 using Evaluation.DAL.Entities.Masters;
+using Evaluation.DAL.Entities.ServiceRequestEntities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,6 +19,8 @@ namespace Evaluation.DAL.Entities.Logs
         public TransactionType? TransactionsType { get; set; }
         public Guid ServiceActionId { get; set; }
         public ServiceAction? ServiceAction { get; set; }
+		public Guid ServiceRequestFieldsValueId { get; set; }
+		public ServiceRequestFieldsValue? ServiceRequestFieldsValue { get; set; }
 
-    }
+	}
 }

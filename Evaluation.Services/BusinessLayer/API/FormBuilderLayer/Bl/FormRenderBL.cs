@@ -1,0 +1,555 @@
+﻿using Azure.Core;
+using Evaluation.DAL.Entities.ActionEntities;
+using Evaluation.DAL.Entities.Authentication;
+using Evaluation.DAL.Entities.FormBuilder;
+using Evaluation.DAL.Entities.ServiceRequestEntities;
+using Evaluation.DAL.Helper;
+using Evaluation.DAL.UnitOfWork;
+using Evaluation.Services.BusinessLayer.API;
+using Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices;
+using Evaluation.Services.Extensions;
+using Evaluation.Services.Special;
+using Evaluation.SharedHelper.Enums;
+using Evaluation.SharedHelper.Exceptions;
+using Evaluation.SharedHelper.Models;
+using Evaluation.SharedHelper.Models.Api.ActionEntitiesDTOs;
+using Evaluation.SharedHelper.Models.Api.FormBuilderDTO;
+using Mapster;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
+using System;
+using System.Collections.Concurrent;
+using System.Data.Common;
+using System.Drawing;
+using System.Globalization;
+using System.Reflection.PortableExecutable;
+
+
+
+namespace Evaluation.Services.BusinessLayer.API
+{
+    public class  FormRenderBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, SrvUser SrvUser, UnitOfWork uow, LoggingServices loggingServices, 
+             UserInfo userInfo,   RequestInfo _requestInfo, SrvServiceRequest SrvServiceRequest
+            , SrvAttachments SrvAttachments, SrvDropdown SrvDropdown,
+                SrvField srvField, IServiceProvider serviceProvider)
+            : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, userInfo, serviceProvider, _requestInfo)
+        {
+
+		public async Task<ActionCustomDTO> GetActionSteps(ServiceAction action, Guid serviceId, Guid? requestId = null, Guid? PlanId = null)
+		{
+			string lang = _requestInfo.Lang;
+			var result = action.Adapt<ActionCustomDTO>();
+
+			var integrationFieldsToProcess = new ConcurrentBag<FieldValueDTO>();
+			var schAttachmentIds = new ConcurrentBag<string>();
+
+			var hiddenFieldsTask = srvField.GetHiddenFields(action.ServiceId);
+			var ActionFieldsTask = srvField.GetFieldsByActionId(action.Id, action.ServiceId);
+			var ActionFieldListsTask = srvField.GetFieldsListByActionIdAsync(action.ServiceId);
+			var requestFieldValuesTask = SrvServiceRequest.GetRequestFieldsValueAsync(requestId);
+
+			await Task.WhenAll(hiddenFieldsTask, ActionFieldsTask, ActionFieldListsTask, requestFieldValuesTask);
+
+			var hiddenFieldIds = await hiddenFieldsTask;
+			var stepFields = await ActionFieldsTask;
+			var stepFieldsList = await ActionFieldListsTask;
+			var requestFieldValues = await requestFieldValuesTask ?? new List<ServiceRequestFieldsValue>();
+
+			var visibleFieldsForAction = stepFields
+				.Where(f => action.ActionFields!.Any(x => x.FieldId == f.Id) && !hiddenFieldIds.Contains(f.Id))
+				.ToList();
+
+			// Group by form group
+			var grouped = visibleFieldsForAction
+				.GroupBy(f => new
+				{
+					f.FormGroupId,
+					Title = lang == "ar" ? f.FormGroup!.TitleAr : f.FormGroup!.TitleEn,
+					f.FormGroup.Order
+				})
+				.OrderBy(g => g.Key.Order);
+
+			var formGroups = new List<FormGroupDTO>();
+
+			foreach (var group in grouped)
+			{
+				var fieldDtos = new List<FieldValueDTO>();
+
+				foreach (var field in group)
+				{
+					var fieldAttributesTask = GetFieldAttributes(field, action, lang);
+					Task<string?>? jsonSchemaTask = null;
+
+					if (field.FormGroupListId.HasValue)
+					{
+						jsonSchemaTask = srvField.GenerateJsonSchemaForFormGroupList(field.FormGroupListId.Value, stepFieldsList);
+					}
+
+					var isEditable = action.ActionFields!
+						.FirstOrDefault(x => x.FieldId == field.Id)?.IsEditable ?? true;
+
+					var fieldValue = requestFieldValues.FirstOrDefault(x => x.FieldId == field.Id);
+					var value = fieldValue?.Value;
+
+					string fieldType = field.FieldType!.NameEn;
+
+					var fieldDto = new FieldValueDTO
+					{
+						FieldId = field.Id,
+						Value = value,
+						IsApproved = fieldValue?.IsApproved,
+						Type = fieldType,
+						FormGroupId = field.FormGroupId,
+						FormGroupListId = field.FormGroupListId,
+						FormGroupName = group.Key.Title,
+						Row = field.Row,
+						Column = field.Column,
+						FieldName = lang == "ar" ? field.TitleAr : field.TitleEn,
+						FieldTooltip = lang == "ar" ? field.InfoAr : field.InfoEn,
+						ReadFromFieldId = field.ReadFieldId,
+						DropDownTypeId = field.DropDownTypeId,
+						DropDownParentFieldId = field.DropDownParentFieldId,
+						ClassName = field.ClassName,
+						IsEditable = isEditable,
+						Attributes = (await fieldAttributesTask ?? [])!,
+						Conditions = (field.FieldViewConditions?.Select(c => new FieldViewConditionDTO
+						{
+							operators = c.operators,
+							FieldValue = c.FieldValue,
+							IsSufficient = c.IsSufficient,
+							ParentFieldId = c.ParentFieldId
+						}).ToList() ?? [])!,
+						JsonSchema = jsonSchemaTask != null ? await jsonSchemaTask : null
+					};
+
+					// Queue integration fields with empty value
+					if (string.IsNullOrWhiteSpace(value) &&
+						field.FieldAttributeValues?.Any(attr => attr.AttributeKey.StartsWith("Integration_")) == true)
+					{
+						integrationFieldsToProcess.Add(fieldDto);
+					}
+
+					fieldDtos.Add(fieldDto);
+				}
+
+				// Handle read-from fields (collect attachments)
+				if (fieldDtos.Any(x => x.ReadFromFieldId != null))
+				{
+					var attachmentsFromReadFields =
+						await HandleFieldsWithReadFromFieldIdAsync(
+							fieldDtos.Where(x => x.ReadFromFieldId != null).ToList(),
+							requestId,
+							PlanId);
+
+					foreach (var att in attachmentsFromReadFields)
+						schAttachmentIds.Add(att);
+				}
+
+				formGroups.Add(new FormGroupDTO
+				{
+					FormGroupName = group.Key.Title,
+					Order = group.Key.Order,
+					Fields = fieldDtos.Where(f => f.Visible != false).ToList()
+				});
+			}
+
+
+			if (requestId != null && requestId != Guid.Empty)
+			{
+				// If you need: await ApplyContractSignatureIfNeededAsync(action, allStepDtos, requestFieldValues, requestId.Value);
+			}
+
+			// Optional integration post-processing (left as in your code)
+			// if (integrationFieldsToProcess.Any() && !string.IsNullOrEmpty(studentQID))
+			// {
+			//     var updatedFields = await srvField.ProcessIntegrationFieldsAsync(integrationFieldsToProcess.ToList(), studentQID, requestId);
+			//     foreach (var updated in updatedFields)
+			//     {
+			//         var target = allStepDtos
+			//             .SelectMany(s => s.FormGroups)
+			//             .SelectMany(g => g.Fields)
+			//             .FirstOrDefault(f => f.FieldId == updated.FieldId);
+			//         if (target != null)
+			//         {
+			//             target.Value = updated.Value;
+			//             target.IsApproved = updated.IsApproved;
+			//             if (target.Type == "file")
+			//                 target.Visible = false;
+			//         }
+			//     }
+			// }
+
+			result.FormGroups = formGroups.OrderBy(fg => fg.Order).ToList(); 
+			result.SchAttachmentIds = schAttachmentIds.ToList();
+
+			return result;
+		}
+
+
+		private async Task<List<string>> HandleFieldsWithReadFromFieldIdAsync(List<FieldValueDTO> fields, Guid? requestId, Guid? PlanId)
+		{
+			List<string> attachmentList = new List<string>();
+			//if (fields == null || !fields.Any())
+			//	return attachmentList;
+
+
+			//var fieldsWithReadFrom = fields.Where(f => f.ReadFromFieldId.HasValue && string.IsNullOrWhiteSpace(f.Value)).ToList();
+
+			//if (!fieldsWithReadFrom.Any())
+			//	return attachmentList;
+
+			//var readFromFieldIds = fieldsWithReadFrom
+			//						.Select(f => f.ReadFromFieldId!.Value)
+			//						.Distinct()
+			//						.ToList();
+
+			//// 2. Get SystemFields
+			//var systemFields = await SrvSystemField.GetSystemFieldsByIds(readFromFieldIds);
+
+			//if (systemFields == null || !systemFields.Any())
+			//	return attachmentList;
+			//Guid? userId = requestId != null
+			//				? await SrvServiceRequest.GetUserIdByRequestIdAsync(requestId.Value)
+			//				: userInfo.UserId;
+
+			//if (userId == null)
+			//	return attachmentList;
+
+			//var userProfile = await SrvUser.GetStudentByIdAsync(userId.Value);
+
+			//var schFieldValues = (ScholarshipId != Guid.Empty && ScholarshipId != null)
+			//	? await SrvScholarship.GetSchFieldValues(ScholarshipId.Value)
+			//	: new List<SchFieldValue>();
+
+			//// 3. Process each field
+			//foreach (var field in fieldsWithReadFrom)
+			//{
+			//	var sysField = systemFields.FirstOrDefault(sf => sf.Id == field.ReadFromFieldId);
+			//	if (sysField == null)
+			//		continue;
+
+			//	if (sysField.SystemTable?.BackendName?.ToLower() == "scholarship")
+			//	{
+			//		var FieldValue = schFieldValues?.FirstOrDefault(x => x.SystemFieldId == sysField.Id);
+			//		if (FieldValue != null)
+			//		{
+			//			if (sysField.FieldType.BackendName == "file" || sysField.FieldType.BackendName == "fileV2")
+			//			{
+			//				attachmentList.Add(FieldValue.Value!);
+			//			}
+			//			if (sysField.FieldType.BackendName == "list")
+			//			{
+			//				var fieldList = await srvField.GetFieldListByFieldId(field.FieldId!.Value);
+			//				var (extractedJson, attachments) = ExtractFieldValues(fieldList, FieldValue.Value!);
+			//				field.Value = extractedJson;
+			//				attachmentList.AddRange(attachments);
+
+			//			}
+
+			//			else
+			//			{
+			//				field.Value = FieldValue.Value;
+			//			}
+
+			//		}
+			//	}
+			//	else if (sysField.SystemTable?.BackendName?.ToLower() == "studentprofile" && userProfile != null)
+			//	{
+			//		var userProfileValue = await GetStudentProfileFieldValue(userProfile, sysField.BackendName);
+			//		if (!string.IsNullOrWhiteSpace(userProfileValue))
+			//		{
+			//			field.Value = userProfileValue;
+			//			field.IsApproved = true;
+			//		}
+			//	}
+			//}
+			return attachmentList;
+		}
+		public (string extractedJson, List<string> attachmentList) ExtractFieldValues(List<Field> fieldList, string jsonData)
+		{
+			if (string.IsNullOrEmpty(jsonData) || fieldList == null || !fieldList.Any())
+				return ("[]", new List<string>());
+
+			var jsonDataList = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(jsonData)
+								?? new List<Dictionary<string, object>>();
+
+			var mergedList = new List<Dictionary<string, object>>();
+			var attachmentList = new List<string>();
+
+			foreach (var entry in jsonDataList)
+			{
+				var entryDict = new Dictionary<string, object>();
+
+				foreach (var item in entry)
+				{
+					if (item.Key.Trim() == "Index")
+					{
+						entryDict["Index"] = item.Value?.ToString() ?? "[]";
+						continue;
+					}
+
+					if (item.Key.Trim() == "IsOld")
+					{
+						entryDict["IsOld"] = true;
+						continue;
+					}
+					if (!Guid.TryParse(item.Key.ToString(), out var fieldId))
+						continue;
+
+					var matchingField = fieldList.FirstOrDefault(f => f.ReadFieldId == fieldId);
+					if (matchingField == null || matchingField.ReadField?.Id == null || matchingField.ReadField?.Id == Guid.Empty)
+						continue;
+
+					var key = matchingField.Id.ToString();
+					var valueString = item.Value?.ToString();
+					var value = string.IsNullOrEmpty(valueString) ? "[]" : valueString;
+
+					if (matchingField.FieldType?.BackendName == "file" || matchingField.FieldType?.BackendName == "fileV2")
+					{
+						try
+						{
+							var fileList = JsonConvert.DeserializeObject<List<string>>(valueString!);
+							if (fileList != null && fileList.Any())
+							{
+								attachmentList.AddRange(fileList);
+							}
+							else
+							{
+								attachmentList.Add(valueString!);
+							}
+						}
+						catch
+						{
+							attachmentList.Add(valueString!);
+						}
+					}
+
+					entryDict[key] = value;
+				}
+				if (!entryDict.ContainsKey("IsOld"))
+				{
+					entryDict["IsOld"] = true;
+				}
+
+				mergedList.Add(entryDict);
+			}
+
+
+			return (JsonConvert.SerializeObject(mergedList), attachmentList);
+		}
+		//private async Task<string> GetStudentProfileFieldValue(StudentUser student, string backendName)
+		//{
+		//	return backendName switch
+		//	{
+		//		"QID" => student.QID!,
+		//		"FullName" => student.FullNameAr!,
+		//		"GenderId" => student.UserGenderId.ToString()!,
+		//		"AccountMobile" => student.Mobile!,
+		//		"NationalityId" => (await SrvAccreditedUniversity.GetCountryBycode(student!.NationalityCode!))?.Id.ToString()!,
+		//		"AccountEmail" => student.Email!,
+		//		"DOB" => student.DOB?.ToString("dd-MM-yyyy")!,
+		//		"Age" => student.DOB.HasValue ? CalculateAge(student.DOB.Value).ToString()! : null!,
+		//		_ => null!,
+		//	};
+		//}
+	
+		public async Task<ActionCustomDTO> GetApprovedAndMissingFields(ServiceRequest request, ServiceAction action)
+		{
+			string lang = _requestInfo.Lang;
+
+			var result = action.Adapt<ActionCustomDTO>();
+
+			// Fetch necessary data in parallel to improve performance
+			var hiddenFieldsTask = srvField.GetHiddenFields(request.ServiceId);
+			var ActionFieldsListTask = srvField.GetFieldsListByActionIdAsync(action.ServiceId);
+
+			await Task.WhenAll(hiddenFieldsTask, ActionFieldsListTask);
+
+			var hiddenFields = hiddenFieldsTask.Result ?? new List<Guid>();
+			var stepFieldsList = ActionFieldsListTask.Result;
+
+			// Fetch approved and non-missing fields in a single query
+			var fieldValuesRaw = await serviceScopeFactory.CreateScopedUow()
+								.GetRepository<ServiceRequestFieldsValue>()
+								.GetAllQueryFiltered()
+								.Include(f => f.Field)
+									.ThenInclude(f => f!.FieldType)
+								.Include(f => f.Field!.FieldAttributeValues)
+								.Include(f => f.Field!.FieldViewConditions)
+								.Include(f => f.Field!.FormGroup)
+								.AsSplitQuery()
+								.Where(f => f.ServiceRequestId == request.Id &&
+											(f.IsApproved || f.IsMissing == false) &&
+											!hiddenFields.Contains(f.FieldId))
+								.ToListAsync();
+
+			var fieldValueTasks = fieldValuesRaw.Select(async f => new FieldValueDTO
+			{
+				FieldId = f.FieldId,
+				Value = f.Value,
+				Type = f.Field!.FieldType?.BackendName ?? "Unknown",
+				FormGroupId = f.Field.FormGroupId,
+				FormGroupName = lang == "ar" ? f.Field.FormGroup?.TitleAr : f.Field.FormGroup?.TitleEn,
+				FormGroupOrderNo = f.Field.FormGroup?.Order ?? 0,
+				Row = f.Field.Row,
+				Column = f.Field.Column,
+				FieldName = lang == "ar" ? f.Field.TitleAr : f.Field.TitleEn,
+				FieldTooltip = lang == "ar" ? f.Field.InfoAr : f.Field.InfoEn,
+				ClassName = f.Field.ClassName,
+				DropDownTypeId = f.Field.DropDownTypeId,
+				DropDownParentFieldId = f.Field.DropDownParentFieldId,
+				Attributes = (f.Field!.FieldAttributeValues!.Select(attr => new AttributeDTO
+				{
+					Name = attr.AttributeKey,
+					Value = attr.AttributeValue,
+					Message = lang == "ar" ? attr.MessageAr : attr.MessageEn
+				}).ToList() ?? [])!,
+				Conditions = (f.Field.FieldViewConditions!.Select(cond => new FieldViewConditionDTO
+				{
+					operators = cond.operators,
+					FieldValue = cond.FieldValue,
+					IsSufficient = cond.IsSufficient,
+					ParentFieldId = cond.ParentFieldId
+				}).ToList() ?? [])!,
+				IsApproved = f.IsApproved,
+				JsonSchema = f.Field.FormGroupListId is not null
+					 ? await srvField.GenerateJsonSchemaForFormGroupList(f.Field.FormGroupListId, stepFieldsList)
+					 : null
+			}).ToList();
+
+			// Wait for all tasks to complete
+			var fieldValues = await Task.WhenAll(fieldValueTasks);
+
+
+			var groupedFields = fieldValues
+				.GroupBy(f => new { f.FormGroupId, f.FormGroupName, f.FormGroupOrderNo })
+				.Select(g => new FormGroupDTO
+				{
+					FormGroupName = g.Key.FormGroupName ?? "Uncategorized",
+					Order = g.Key.FormGroupOrderNo,
+					Fields = g.ToList()
+				})
+				.OrderBy(g => g.Order)
+				.ToList();
+
+			result.FormGroups = groupedFields;
+				
+
+			return result;
+		}
+		public async Task<ActionCustomDTO> GetMissingFields(ServiceRequest request, ServiceAction action)
+		{
+			string lang = _requestInfo.Lang;
+			var result = action.Adapt<ActionCustomDTO>();
+
+			var hiddenFieldsTask = srvField.GetHiddenFields(request.ServiceId);
+			var ActionFieldsListTask = srvField.GetFieldsListByActionIdAsync(request.ServiceId);
+
+			await Task.WhenAll( hiddenFieldsTask, ActionFieldsListTask);
+
+			var hiddenFieldsIds = hiddenFieldsTask.Result ?? new List<Guid>();
+			var ActionFieldsList = ActionFieldsListTask.Result;
+
+			var fieldValuesRaw = await serviceScopeFactory.CreateScopedUow()
+				.GetRepository<ServiceRequestFieldsValue>()
+				.GetAllQueryFiltered()
+				.Include(f => f.Field)
+					.ThenInclude(f => f!.FieldType)
+				.Include(f => f.Field!.FieldAttributeValues)
+				.Include(f => f.Field!.FieldViewConditions)
+				.Include(f => f.Field!.FormGroup)
+				.AsSplitQuery()
+				.Where(f => f.ServiceRequestId == request.Id && f.IsMissing == true && !hiddenFieldsIds.Contains(f.FieldId))
+				.ToListAsync();
+
+			var fieldValueTasks = fieldValuesRaw.Select(async f => new FieldValueDTO
+			{
+				FieldId = f.FieldId,
+				Value = f.Value,
+				Type = f.Field!.FieldType?.BackendName ?? "Unknown",
+				FormGroupId = f.Field.FormGroupId,
+				FormGroupName = lang == "ar" ? f.Field.FormGroup?.TitleAr : f.Field.FormGroup?.TitleEn,
+				FormGroupOrderNo = f.Field.FormGroup?.Order ?? 0,
+				Row = f.Field.Row,
+				Column = f.Field.Column,
+				FieldName = lang == "ar" ? f.Field.TitleAr : f.Field.TitleEn,
+				FieldTooltip = lang == "ar" ? f.Field.InfoAr : f.Field.InfoEn,
+				ClassName = f.Field.ClassName,
+				DropDownTypeId = f.Field.DropDownTypeId,
+				DropDownParentFieldId = f.Field.DropDownParentFieldId,
+				Attributes = (f.Field.FieldAttributeValues!.Select(attr => new AttributeDTO
+				{
+					Name = attr.AttributeKey,
+					Value = attr.AttributeValue,
+					Message = lang == "ar" ? attr.MessageAr : attr.MessageEn
+				}).ToList() ?? [])!,
+				Conditions = (f.Field.FieldViewConditions!.Select(cond => new FieldViewConditionDTO
+				{
+					operators = cond.operators,
+					FieldValue = cond.FieldValue,
+					IsSufficient = cond.IsSufficient,
+					ParentFieldId = cond.ParentFieldId
+				}).ToList() ?? [])!,
+				IsApproved = f.IsApproved,
+				JsonSchema = f.Field.FormGroupListId is not null
+							 ? await srvField.GenerateJsonSchemaForFormGroupList(f.Field.FormGroupListId, ActionFieldsList)
+							 : null
+			}).ToList();
+
+			var fieldValues = await Task.WhenAll(fieldValueTasks);
+
+			var groupedFields = fieldValues
+				.GroupBy(f => new { f.FormGroupId, f.FormGroupName, f.FormGroupOrderNo })
+				.Select(g => new FormGroupDTO
+				{
+					FormGroupName = g.Key.FormGroupName ?? "Uncategorized",
+					Order = g.Key.FormGroupOrderNo,
+					Fields = g.ToList()
+				})
+				.OrderBy(g => g.Order)
+				.ToList();
+
+			result.FormGroups = groupedFields;
+
+			return result;
+		}
+		private async Task<List<AttributeDTO>> GetFieldAttributes(Field field, ServiceAction action, string lang)
+		{
+			var actionStepAttributes = (action?.ActionFields ?? new List<ActionField>())
+				.Where(x => x.FieldId == field.Id)
+				.SelectMany(x => x.ActionFieldAttribute ?? new List<ActionFieldAttribute>())
+				.Select(a => new AttributeDTO
+				{
+					Name = a.AttributeKey,
+					Value = a.AttributeValue,
+					Message = lang == "ar" ? a.MessageAr : a.MessageEn
+				});
+
+			var fieldAttributes = (field.FieldAttributeValues ?? new List<FieldAttributeValue>())
+				.Select(f => new AttributeDTO
+				{
+					Name = f.AttributeKey,
+					Value = f.AttributeValue,
+					Message = lang == "ar" ? f.MessageAr : f.MessageEn
+				});
+
+			return actionStepAttributes!
+				.Union(fieldAttributes)
+				.GroupBy(attr => attr.Name ?? string.Empty, StringComparer.OrdinalIgnoreCase)
+				.Select(g =>
+				{
+					var hasActionStepAttribute = (action?.ActionFields ?? new List<ActionField>())
+						.SelectMany(x => x.ActionFieldAttribute! ?? new List<ActionFieldAttribute>())
+						.Any(a => a.AttributeKey == g.Key)!;
+
+					return hasActionStepAttribute
+						? g.FirstOrDefault()
+						: g.First();
+				})
+				.ToList();
+		}
+
+
+	}
+}

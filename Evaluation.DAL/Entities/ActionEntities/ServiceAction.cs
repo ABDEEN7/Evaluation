@@ -28,7 +28,7 @@ namespace Evaluation.DAL.Entities.ActionEntities
 
         public Guid? NewStatusId { get; set; } // need To Add Relation Later
         
-        public virtual ICollection<ActionField>? ActionStepsFields { get; } = new List<ActionField>();
+        public virtual ICollection<ActionField>? ActionFields { get; } = new List<ActionField>();
         public virtual ICollection<ActionStatusConfiguration>? NextStatusConfiguration { get; } = new List<ActionStatusConfiguration>();
         public virtual ICollection<ActionTemplateDoc>? ActionTemplateDocs { get; } = new List<ActionTemplateDoc>();      
         public virtual ICollection<ActionShowLogPartyType>? ActionShowLogPartyTypes { get; } = new List<ActionShowLogPartyType>();

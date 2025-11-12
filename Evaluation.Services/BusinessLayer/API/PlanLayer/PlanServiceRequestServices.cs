@@ -28,7 +28,7 @@ public class PlanServiceRequestServices(
     IServiceProvider serviceProvider,
     RequestInfo requestInfo,
     PlanServiceRequestRepository planRepository
-    ) : ApiBase(serviceScopeFactory, cacheDataProvider, unitOfWork, loggingServices, mapper, userInfo,
+    ) : ApiBase(serviceScopeFactory, cacheDataProvider, unitOfWork, loggingServices, userInfo,
         serviceProvider, requestInfo)
 {
     public async Task<Result<CreateEvaluationPlanDto>> AddEvaulationPlan(CreateEvaluationPlanDto evaluationPlanDto)

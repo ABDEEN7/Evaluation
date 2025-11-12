@@ -20,7 +20,7 @@ namespace Evaluation.Services.BusinessLayer.API;
 public class SchoolBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider,
         UnitOfWork uow, LoggingServices loggingServices, IMapper mapper, UserInfo userInfo,
         IServiceProvider serviceProvider, RequestInfo requestInfo, SchoolRepository schoolRepository)
-        : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, requestInfo)
+        : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, userInfo, serviceProvider, requestInfo)
 {
 
     public async Task<School> GetSchoolDetails(Guid SchoolID)

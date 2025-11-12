@@ -33,7 +33,7 @@ public class AuthenticationBL : ApiBase
          IMapper mapper,
         RequestInfo requestInfo,
         IServiceProvider serviceProvider)
-        : base(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, requestInfo)
+        : base(serviceScopeFactory, cacheDataProvider, uow, loggingServices,  userInfo, serviceProvider, requestInfo)
     {
         _msJsonWT = msJsonWT;
         _requestInfo = requestInfo;
