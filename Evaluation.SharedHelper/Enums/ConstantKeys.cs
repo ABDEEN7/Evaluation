@@ -325,7 +325,6 @@ public static class ConstantKeys
         public const string Close = "Close";
         public const string INFO_Override_Approve = "INFO_Override_Approve";
         public const string CreateEvaluationPlan = "CREATE_EVALUATION_PLAN";
-        public const string VACANCY_RESERVATION = "VACANCY_RESERVATION";
         public const string UPDATE_ITEGRATION_FIELDS = "UPDATE_ITEGRATION_FIELDS";
         public const string INFO_WITH_DRAFT = "INFO_WITH_DRAFT";
     }
