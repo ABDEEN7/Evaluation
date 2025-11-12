@@ -672,7 +672,54 @@ namespace Evaluation.Services.Models.Admin
             return result;
 
         }
-     
+
+        public async Task<List<DropdownItem>> GetEvaluationField(Guid serviceid)
+        {
+            var services = uow.GetRepository<Service>().GetAllActiveNonDeleted();
+            var systemModuleId = services.FirstOrDefault(x => x.Id == serviceid)?.SystemModuleId;
+            var initialServiceId = services.FirstOrDefault(x => x.SystemModuleId == systemModuleId && x.Initialservice)?.Id;
+
+            var result = await uow.GetRepository<Field>()
+                .GetAllActiveNonDeleted()
+                .Include(x => x.Service)
+                .Include(x => x.FieldType)
+                .Include(x => x.CreateBy)
+                .Include(x => x.FormGroup)
+                .Include(x => x.FormGroup!.FormGroupType)
+               .Where(x=>x.ServiceId==initialServiceId && x.FormGroup!.FormGroupType!.BackendName=="FormGroup")
+                .OrderByDescending(x => x.CreateDate)
+                .Select(x=>new DropdownItem
+                {
+                    Id=x.Id,
+                    Title=_requestInfo.Lang=="ar"?x.FormGroup!.TitleAr+"_"+x.TitleAr:x.FormGroup!.TitleEn+"_"+x.TitleEn,
+                    Type="EvaluationField",
+                    FieldType=x.FieldType!.BackendName
+                })
+                .ToListAsync();
+            var rslt1 =  await uow.GetRepository<SystemSetting>()
+                        .GetAllActiveNonDeleted(x => x.SettingKey == ConstantKeys.AdminSettings.EvaluationColumn)
+                        .Select(x => x.SettingValue)
+                        .FirstOrDefaultAsync();
+            if (rslt1 != null)
+            {
+                var jsonArray = JArray.Parse(rslt1);
+                foreach (var data in jsonArray)
+                {
+                    DropdownItem rslt2 = new DropdownItem();
+                    rslt2.Id = (data["Id"]?.ToString() ?? "");
+                    rslt2.Title = _requestInfo.Lang == "ar"
+    ? (data["TitleAr"]?.ToString() ?? "")
+    : (data["TitleEn"]?.ToString() ?? "");
+                    rslt2.Type = "EvaluationColumn";
+                    rslt2.FieldType = "";
+                    result.Add(rslt2);
+                }
+            }
+
+            return result;
+
+        }
+
         public async Task<List<PlaceHolderDTO>> GetPlaceHolderList(Guid serviceid)
         {
 
@@ -719,7 +766,7 @@ namespace Evaluation.Services.Models.Admin
             obj.PlaceHolderName = message.PlaceHolderName;
             obj.TypeDisplay = message.TypeDisplay;
             obj.Type = message.Type;
-            if (message.Type== ConstantKeys.AdminSettings.RequestColumn || message.Type == ConstantKeys.AdminSettings.ScholarshipColumn)
+            if (message.Type== ConstantKeys.AdminSettings.RequestColumn || message.Type == ConstantKeys.AdminSettings.EvaluationColumn)
             {
                 obj.ColumnName = message.FieldId;
             }
@@ -780,7 +827,7 @@ namespace Evaluation.Services.Models.Admin
                 obj.PlaceHolderName = message.PlaceHolderName;
                 obj.TypeDisplay = message.TypeDisplay;
                 obj.Type = message.Type;
-                if (message.Type == ConstantKeys.AdminSettings.RequestColumn || message.Type == ConstantKeys.AdminSettings.ScholarshipColumn)
+                if (message.Type == ConstantKeys.AdminSettings.RequestColumn || message.Type == ConstantKeys.AdminSettings.EvaluationColumn)
                 {
                     obj.ColumnName = message.FieldId!.ToString();
                 }

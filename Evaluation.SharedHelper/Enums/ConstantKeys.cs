@@ -42,6 +42,7 @@
             public static readonly string InvalidApprovePlan = "InvalidApprovePlan";
             public static readonly string PlanInThePastIsNotAllowed = "PlanInThePastIsNotAllowed";
             public static readonly string InvalidDraftPlan = "InvalidDraftPlan";
+            public static readonly string DropDownTypeHasDataSource = "DropDownTypeHasDataSource";
         }
 
         public static class AdminSettings
@@ -58,8 +59,9 @@
             public static readonly string WebLogoEn = "WebLogoEn";
             public static readonly string Favicon = "Favicon";
             public static readonly string RequestColumn = "RequestColumn";
-            public static readonly string ScholarshipColumn = "ScholarshipColumn";
+            public static readonly string EvaluationColumn = "EvaluationColumn";
             public static readonly string SessionExpireTime = "SessionExpireTime";
+            public static readonly string PlaceHolderType = "PlaceHolderType";
 
             
         }
@@ -102,6 +104,7 @@
             public static readonly string AdminActionStatusConfiguration = "AdminActionStatusConfiguration";
             public static readonly string AdminActionStatusConfigurationNotification = "AdminActionStatusConfigurationNotification";
             public static readonly string AdminServiceStatus = "AdminServiceStatus";
+            public static readonly string AdminDropDown = "AdminDropDown";
         }
 
         public static class AdminPermission
@@ -156,11 +159,23 @@
             public const string UPDATE_STATUS_PARTY_TYPE_DISPLAY_NAME_STATUS =
                 "UPDATE_STATUS_PARTY_TYPE_DISPLAY_NAME_STATUS";
 
-            #endregion
+        #endregion
+        #region DROPDOWN
 
-        }
-        public static class WebAppSettings
+        public const string VIEW_ADMIN_DROPDOWN = "VIEW_ADMIN_DROPDOWN";
+        public const string ADD_ADMIN_DROPDOWN = "ADD_ADMIN_DROPDOWN";
+        public const string EDIT_ADMIN_DROPDOWN = "EDIT_ADMIN_DROPDOWN";
+        public const string DELETE_ADMIN_DROPDOWN = "DELETE_ADMIN_DROPDOWN";
+
+        #endregion
+
+
+    }
+    public static class WebAppSettings
         {
+        }
+        public static class CustomDataSource
+    {
         }
     public static class WebAppCommon
         {

@@ -1,8 +1,10 @@
+using Evaluation.Admin.Extensions;
 using Evaluation.Admin.Models;
 using Evaluation.Services.BusinessLayer;
 using Evaluation.Services.Models.Admin;
 using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Models;
+using Evaluation.SharedHelper.Models.Admin;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
@@ -98,6 +100,13 @@ namespace Evaluation.Admin.Controllers
             // Let's say you fetch this from DB
             int idleMinutes =20; //Convert.ToInt32(_masterBL.GetAdminService<SrvSystemSettingBL>().GetSetting(ConstantKeys.AdminSettings.SessionExpireTime)??"20");
             return Ok(idleMinutes);
+        }
+        [HttpPost]
+        public IActionResult UiControlList()
+        {
+            var model = Request.Form["request"][0]?.StringToObject<List<UiControlItemDTO>>();
+
+            return ViewComponent("UiControlList", model);
         }
     }
 }

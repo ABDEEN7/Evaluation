@@ -129,7 +129,9 @@ namespace Evaluation.Admin.Controllers
         {
             Dictionary<string, object> response = new Dictionary<string, object>();
             var RequestField = await masterBL.GetAdminService<SrvServiceBL>().GetRequestField(serviceid);
+            var EvaluationField = await masterBL.GetAdminService<SrvServiceBL>().GetEvaluationField(systemmoduleid);
             response.Add("RequestField", RequestField);
+            response.Add("EvaluationField", EvaluationField);
             return Ok(response);
         }
         [HttpGet]
