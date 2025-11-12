@@ -1,17 +1,10 @@
-﻿using Evaluation.DAL.Helper;
+﻿using System.Collections.Concurrent;
+using Evaluation.DAL.Helper;
 using Evaluation.DAL.UnitOfWork;
 using Evaluation.Services.Special;
-using Evaluation.SharedHelper.Helper;
-using Evaluation.SharedHelper.Models;
-using Evaluation.SharedHelper.Models;
 using FluentResults;
 using MapsterMapper;
 using Microsoft.Extensions.DependencyInjection;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using RequestInfo = Evaluation.SharedHelper.Models.RequestInfo;
 
 namespace Evaluation.Services.BusinessLayer.API
@@ -20,7 +13,7 @@ namespace Evaluation.Services.BusinessLayer.API
     {
         protected readonly IServiceScopeFactory serviceScopeFactory;
         protected readonly CacheDataProvider cacheDataProvider;
-        protected readonly UnitOfWork uow;
+        protected readonly UnitOfWork unitOfWork;
         protected readonly LoggingServices loggingServices;
         protected readonly IMapper mapper;
         protected readonly UserInfo userInfo;
@@ -33,7 +26,7 @@ namespace Evaluation.Services.BusinessLayer.API
         protected ApiBase(
             IServiceScopeFactory serviceScopeFactory,
             CacheDataProvider cacheDataProvider,
-            UnitOfWork uow,
+            UnitOfWork unitOfWork,
             LoggingServices loggingServices,
             IMapper mapper,
             UserInfo userInfo,
@@ -42,8 +35,8 @@ namespace Evaluation.Services.BusinessLayer.API
         {
             this.serviceScopeFactory = serviceScopeFactory ?? throw new ArgumentNullException(nameof(serviceScopeFactory));
             this.cacheDataProvider = cacheDataProvider ?? throw new ArgumentNullException(nameof(cacheDataProvider));
-            this.uow = uow ?? throw new ArgumentNullException(nameof(uow));
-            //this.mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+            this.unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
+            this.mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             this.loggingServices = loggingServices ?? throw new ArgumentNullException(nameof(loggingServices));
             this.userInfo = userInfo ?? throw new ArgumentNullException(nameof(userInfo));
             this.serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));

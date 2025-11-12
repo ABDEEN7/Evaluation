@@ -1,8 +1,10 @@
-﻿using Evaluation.DAL.Helper;
+﻿using Evaluation.DAL.Dtos;
+using Evaluation.DAL.Helper;
 using Evaluation.DAL.UnitOfWork;
 using Evaluation.Services.BusinessLayer.API.PlanLayer;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Models;
+using FluentResults;
 using MapsterMapper;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -16,9 +18,13 @@ public class AcademicYearServices(IServiceScopeFactory serviceScopeFactory,
     UserInfo userInfo,
     IServiceProvider serviceProvider,
     RequestInfo requestInfo,
-    PlanServiceRequestRepository planRepository
+    AcademicYearRepository academicYearRepository
     ) : ApiBase(serviceScopeFactory, cacheDataProvider, unitOfWork, loggingServices, mapper, userInfo,
         serviceProvider, requestInfo)
 {
+    public async Task<Result<VacationDateDto>> GetVcationDateAsync()
+    {
 
+        AcademicYearRepository? academicYear = await academicYearRepository.GetBlockedDays();
+    }
 }

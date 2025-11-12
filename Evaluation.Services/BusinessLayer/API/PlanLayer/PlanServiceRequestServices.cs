@@ -90,13 +90,13 @@ public class PlanServiceRequestServices(
     //    var result = await ExecuteWithResult(async () => await planRepository.GetPlanTypeAsync());
     //    return result;
     //}
-    public async Task<Result<bool>> RequestDeleteSchool()
-    {
-        return await ExecuteWithResult(async () =>
-        {
+    //public async Task<Result<bool>> RequestDeleteSchool()
+    //{
+    //    return await ExecuteWithResult(async () =>
+    //    {
 
-        });
-    }
+    //    });
+    //}
    
     public async Task<Result<List<PlanTypeDto>>> GetPlansTypes()
     {
