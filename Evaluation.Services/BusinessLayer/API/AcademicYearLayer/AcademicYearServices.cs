@@ -22,9 +22,9 @@ public class AcademicYearServices(IServiceScopeFactory serviceScopeFactory,
     ) : ApiBase(serviceScopeFactory, cacheDataProvider, unitOfWork, loggingServices, mapper, userInfo,
         serviceProvider, requestInfo)
 {
-    public async Task<Result<VacationDateDto>> GetVcationDateAsync()
-    {
+    //public async Task<Result<VacationDateDto>> GetVcationDateAsync()
+    //{
 
-        AcademicYearRepository? academicYear = await academicYearRepository.GetBlockedDays();
-    }
+    //    AcademicYearRepository? academicYear = await academicYearRepository.GetBlockedDays();
+    //}
 }

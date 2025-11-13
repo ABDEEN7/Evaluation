@@ -210,7 +210,7 @@ public class AuthenticationBL : ApiBase
 
     public async Task<UserToken?> GetUserToken(string token)
     {
-        var entity = await uow.GetRepository<UserToken>()
+        var entity = await unitOfWork.GetRepository<UserToken>()
                  .GetAll()
                  .Where(x => x.Token == token)
                  .FirstOrDefaultAsync();
