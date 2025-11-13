@@ -9,7 +9,7 @@ using Evaluation.SharedHelper.Dtos.SchoolDto;
 using Evaluation.SharedHelper.Helper;
 using Evaluation.SharedHelper.Models;
 using Mapster;
-using MapsterMapper;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -23,7 +23,7 @@ public class SchoolRepository(IServiceScopeFactory serviceScopeFactory,
     UserInfo userInfo,
     IServiceProvider serviceProvider,
     RequestInfo requestInfo
-    ) : ApiBase(serviceScopeFactory, cacheDataProvider, unitOfWork, loggingServices, userInfo,
+    ) : ApiBase(serviceScopeFactory, cacheDataProvider, unitOfWork, loggingServices, mapper, userInfo,
         serviceProvider, requestInfo)
 {
     public async Task<List<School>> GetSchoolsAsync()

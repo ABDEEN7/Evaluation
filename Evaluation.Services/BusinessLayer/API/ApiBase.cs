@@ -1,11 +1,11 @@
-﻿using Evaluation.DAL.Helper;
+﻿using AutoMapper;
+using Evaluation.DAL.Helper;
 using Evaluation.DAL.UnitOfWork;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Helper;
 using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models;
 using FluentResults;
-using MapsterMapper;
 using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -22,6 +22,7 @@ namespace Evaluation.Services.BusinessLayer.API
         protected readonly CacheDataProvider cacheDataProvider;
         protected readonly UnitOfWork uow;
         protected readonly LoggingServices loggingServices;
+        protected readonly IMapper mapper;
         protected readonly UserInfo userInfo;
         protected readonly IServiceProvider serviceProvider;
         protected readonly RequestInfo requestInfo;
@@ -34,6 +35,7 @@ namespace Evaluation.Services.BusinessLayer.API
             CacheDataProvider cacheDataProvider,
             UnitOfWork uow,
             LoggingServices loggingServices,
+            IMapper mapper,
             UserInfo userInfo,
             IServiceProvider serviceProvider,
             RequestInfo requestInfo)

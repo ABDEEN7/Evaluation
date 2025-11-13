@@ -2,7 +2,9 @@
 using Evaluation.DAL.UnitOfWork;
 using Evaluation.Services.BusinessLayer;
 using Evaluation.Services.BusinessLayer.API;
+using Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices;
 using Evaluation.Services.Models.Admin;
+using Evaluation.Services.Models.API;
 using Evaluation.Services.Models.JWT;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Models;
@@ -55,7 +57,11 @@ public static class ServiceExtensions
         services.AddScoped<LoggingServices>();
         services.AddScoped<IMapper, Mapper>();
         services.AddScoped<ISmsServices, SmsServices>();
+        services.AddScoped<IEmailServices, EmailServices>();
         services.AddScoped<ResponseInfo>();
+        services.AddScoped<RequestsBL>();
+        services.AddScoped<SrvNotification>();
+        services.AddScoped<EmailTemplateProvider>();
 
         services.Configure<AzureADConfig>(config.GetSection("AzureADConfig"));
         services.Configure<FormJwtConfig>(config.GetSection("FormJwtConfig"));
