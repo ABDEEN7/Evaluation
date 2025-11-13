@@ -1,4 +1,5 @@
 ﻿using Evaluation.DAL.Entities.BaseModule;
+using Evaluation.DAL.SystemSetting;
 using Microsoft.EntityFrameworkCore;
 
 namespace Evaluation.DAL.Entities.Template;
@@ -12,7 +13,7 @@ public class EmailTemplate: EntityBase
     public string BackendName { get; set; } = null!;
 
     public Guid EmailProfileId { get; set; }
-    //public EmailProfile? EmailProfile { get; set; }
+    public EmailProfile? EmailProfile { get; set; }
 
     public Guid? ServiceId { get; set; }
     //public Service? Service { get; set; }

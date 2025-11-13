@@ -7,7 +7,7 @@ using Evaluation.Services.Mapping;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Helper;
 using Evaluation.SharedHelper.Models;
-using MapsterMapper;
+using AutoMapper;
 using Microsoft.Extensions.DependencyInjection;
 using Oracle.ManagedDataAccess.Client;
 using System.Data;

@@ -1,15 +1,14 @@
-﻿using Evaluation.DAL.Entities.BaseModule;
+﻿using AutoMapper;
+using Evaluation.DAL.Entities.BaseModule;
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.SystemSetting;
 using Evaluation.DAL.UnitOfWork;
 using Evaluation.Services.BusinessLayer.API;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper;
-using Evaluation.SharedHelper.Enums;
-using Evaluation.SharedHelper.Helper;
 using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Api;
-using MapsterMapper;
+using Mapster;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using static Evaluation.SharedHelper.Enums.ConstantKeys;
@@ -60,7 +59,7 @@ namespace Evaluation.Services.Models.API
                    .Where(x => backendKeys.Contains(x.BackendName))
                 .ToListAsync();
 
-                result = mapper.Map<List<UiControlDTO>>(list);
+                result = list.Adapt<List<UiControlDTO>>();
             }
 
             return result;
@@ -77,7 +76,7 @@ namespace Evaluation.Services.Models.API
                                         OrderBy(x=>x.RowOrder)
                                         .ThenBy(x=>x.ColumnOrder)
                                         .ToListAsync();
-            var result = mapper.Map<List<ControlValidationDTO>>(query);
+            var result = query.Adapt<List<ControlValidationDTO>>();
             return result;
 
 

@@ -1,6 +1,7 @@
 ﻿using Evaluation.DAL.Entities.ActionEntities;
 using Evaluation.DAL.Entities.Attachments;
 using  Evaluation.DAL.Entities.BaseModule;
+using Evaluation.DAL.Entities.ServiceRequestEntities;
 using Evaluation.DAL.Entities.ServicesEntities;
 using Evaluation.DAL.Entities.SystemModulesEntities;
 using System;
@@ -15,6 +16,8 @@ namespace Evaluation.DAL.Entities.Logs
     {
         public Guid ServiceActionId { get; set; }
         public ServiceAction? ServiceAction { get; set; }
+        public Guid ServiceRequestId { get; set; }
+        public ServiceRequest? ServiceRequest { get; set; }
         public Guid RefId { get; set; }
         public SystemModule? SystemModule { get; set; }
         public Guid? SystemModuleId { get; set; }

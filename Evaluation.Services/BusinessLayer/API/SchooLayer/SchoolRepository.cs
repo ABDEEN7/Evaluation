@@ -9,7 +9,7 @@ using Evaluation.SharedHelper.Dtos.SchoolDto;
 using Evaluation.SharedHelper.Helper;
 using Evaluation.SharedHelper.Models;
 using Mapster;
-using MapsterMapper;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 

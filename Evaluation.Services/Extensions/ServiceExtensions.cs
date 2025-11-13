@@ -1,15 +1,20 @@
-﻿using System.Reflection;
-using Mapster;
+﻿using Evaluation.DAL.Context;
 using Evaluation.DAL.UnitOfWork;
 using Evaluation.Services.BusinessLayer;
 using Evaluation.Services.BusinessLayer.API;
+using Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices;
+using Evaluation.Services.Models.Admin;
+using Evaluation.Services.Models.API;
 using Evaluation.Services.Models.JWT;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Models;
+using MapsterMapper;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using MapsterMapper;
+using System.Net;
+using System.Reflection;
 
 namespace Evaluation.Services.Extensions;
 
@@ -17,9 +22,14 @@ namespace Evaluation.Services.Extensions;
 public static class ServiceExtensions
 {
 #pragma warning disable  S4830
-
-    public static void ConfigureMasterBL(this IServiceCollection services, IConfiguration config)
+   
+    public static void ConfigureMasterBL(this IServiceCollection services, IConfiguration config, bool isDevEnvironment)
     {
+
+        services.AddDbContext<EvaluationDbContext>(options =>
+        {
+            options.UseSqlServer(config.GetConnectionString("EvaluationDBConn"));
+        });
 
         services.AddMemoryCache();
 
@@ -29,35 +39,34 @@ public static class ServiceExtensions
             {
                 var handler = new HttpClientHandler
                 {
-                    //AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
+                    AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
                     UseCookies = false,
                     AllowAutoRedirect = false,
                     UseDefaultCredentials = true
                 };
 
                 // Only bypass SSL certificate validation in development
-                //if (isDevEnvironment)
-                //{
-#if DEBUG
-                handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true;
-#endif
-                //}
+                if (isDevEnvironment)
+                {
+                    handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true;
+                }
 
                 return handler;
             });
 
         services.AddScoped<LoggingServices>();
-
+        services.AddScoped<IMapper, Mapper>();
         services.AddScoped<ISmsServices, SmsServices>();
+        services.AddScoped<IEmailServices, EmailServices>();
         services.AddScoped<ResponseInfo>();
+        services.AddScoped<RequestsBL>();
+        services.AddScoped<SrvNotification>();
+        services.AddScoped<EmailTemplateProvider>();
 
         services.Configure<AzureADConfig>(config.GetSection("AzureADConfig"));
         services.Configure<FormJwtConfig>(config.GetSection("FormJwtConfig"));
         //services.Configure<CenterServicesConfig>(config.GetSection("CenterServicesConfig"));
-        var typeAdapterConfig = TypeAdapterConfig.GlobalSettings;
-        typeAdapterConfig.Scan(AppDomain.CurrentDomain.GetAssemblies());
-        services.AddSingleton(typeAdapterConfig);
-        services.AddScoped<IMapper, ServiceMapper>();
+
         services.AddScoped(sp =>
         {
             var options = sp.GetRequiredService<IOptions<AzureADConfig>>();
@@ -70,12 +79,23 @@ public static class ServiceExtensions
             return options.Value;
         });
 
-        //services.AddScoped(sp =>
-        //{
-        //    var options = sp.GetRequiredService<IOptions<CenterServicesConfig>>();
-        //    return options.Value;
-        //});
-        
+
+        services.AddScoped<MSJsonWT>();
+
+        services.AddScoped<UnitOfWork>();
+        services.AddScoped<CacheManager>();
+        services.AddScoped<CacheDataProvider>();
+        services.AddScoped<AzureBlobStorageService>();
+
+        services.AddScoped<MapperConfigServices>();
+        services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies()); // Automatically scans the assembly for profiles
+
+        services.Scan(scan => scan
+            .FromAssemblies(typeof(AdminBase).GetTypeInfo().Assembly)
+            .AddClasses(classes => classes.Where(x => x.IsSubclassOf(typeof(AdminBase))))
+            .AsSelf()
+            .WithScopedLifetime());
+
         services.Scan(scan => scan
             .FromAssemblies(typeof(ApiBase).GetTypeInfo().Assembly)
             .AddClasses(classes => classes.Where(x => x.IsSubclassOf(typeof(ApiBase))))
@@ -89,13 +109,25 @@ public static class ServiceExtensions
             .WithScopedLifetime());
 
         services.AddScoped<MSJsonWT>();
-        services.AddScoped<CacheDataProvider>();
-        services.AddScoped<CacheManager>();
-        services.AddScoped<UnitOfWork>();
-        services.AddScoped<AzureBlobStorageService>();
+
         services.AddScoped<ISmsServices, SmsServices>();
         services.AddScoped<MasterBL>();
 
+    }
+    public static UnitOfWork CreateScopedUow(this IServiceProvider serviceProvider)
+    {
+        var scope = serviceProvider.CreateScope();
+        return scope.CreateScopedUow();
+    }
+    public static UnitOfWork CreateScopedUow(this IServiceScopeFactory serviceProvider)
+    {
+        var scope = serviceProvider.CreateScope();
+        return scope.CreateScopedUow();
+    }
+    public static UnitOfWork CreateScopedUow(this IServiceScope scope)
+    {
+        var uow = scope.ServiceProvider.GetRequiredService<UnitOfWork>();
+        return uow;
     }
 
 }

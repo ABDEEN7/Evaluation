@@ -1,4 +1,5 @@
-﻿using Evaluation.DAL.Entities.Calendars;
+﻿using AutoMapper;
+using Evaluation.DAL.Entities.Calendars;
 using Evaluation.DAL.Entities.Planing;
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.UnitOfWork;
@@ -10,7 +11,6 @@ using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Models;
 using FluentResults;
 using Mapster;
-using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;

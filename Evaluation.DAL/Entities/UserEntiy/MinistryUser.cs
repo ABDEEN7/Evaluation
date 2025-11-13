@@ -1,4 +1,5 @@
 ﻿using  Evaluation.DAL.Entities.BaseModule;
+using Evaluation.DAL.Entities.Masters;
 using Evaluation.DAL.Entities.UserEntiy;
 using Microsoft.EntityFrameworkCore;
 

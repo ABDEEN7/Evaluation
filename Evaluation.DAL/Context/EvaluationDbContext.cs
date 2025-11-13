@@ -93,6 +93,8 @@ public partial class EvaluationDbContext : DbContext
     public virtual DbSet<JobTitle> JobTitle { get; set; }
     public virtual DbSet<UserGender> UserGender { get; set; }
     public virtual DbSet<EvaluationType> EvaluationType { get; set; }
+    public virtual DbSet<DepartmentHoliday> DepartmentHolidays { get; set; }
+    public virtual DbSet<Semester> Semesters { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
