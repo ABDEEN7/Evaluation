@@ -16,14 +16,14 @@ using Attachment = System.Net.Mail.Attachment;
 namespace Evaluation.Services.BusinessLayer.API.Template;
 
 public class TemplateBl(IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider,
-    UnitOfWork uow, LoggingServices loggingServices, UserInfo userInfo, RequestInfo requestInfo,
+    UnitOfWork uow, LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, RequestInfo requestInfo,
     IServiceProvider serviceProvider,
     TemplateService templateService,
     PlaceholderService placeholderService,
     DocumentConversionService documentConversionService,
     EmailTemplateService emailTemplateService
 ) : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices,
-    userInfo, serviceProvider, requestInfo)
+    mapper, userInfo, serviceProvider, requestInfo)
 {
 	public async Task<Attachment> HandleAttachment(Guid attachmentId)
 		=> await templateService.HandleAttachment(attachmentId);

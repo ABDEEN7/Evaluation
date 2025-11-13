@@ -17,7 +17,7 @@ using Evaluation.DAL.Entities.Calendars;
 namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 {
     public class SrvDropdown(IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow,SrvPartyType SrvPartyType,  LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, IServiceProvider serviceProvider, RequestInfo _requestInfo)
-            : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, userInfo, serviceProvider, _requestInfo)
+            : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, _requestInfo)
     {
 
         public async Task<List<Guid>> GetDropdownFieldsGroup(List<Guid> list)

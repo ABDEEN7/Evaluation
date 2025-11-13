@@ -1,4 +1,5 @@
-﻿using Evaluation.DAL.Entities.ActionEntities;
+﻿using AutoMapper;
+using Evaluation.DAL.Entities.ActionEntities;
 using Evaluation.DAL.Entities.Authentication;
 using Evaluation.DAL.Entities.ServiceRequestEntities;
 using Evaluation.DAL.Entities.ServicesEntities;
@@ -20,8 +21,8 @@ using static Evaluation.SharedHelper.Enums.ConstantKeys;
 
 namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 {
-    public class  SrvService(IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow,SrvUser SrvUser, SrvActionStatusConfiguration SrvActionStatusConfiguration, LoggingServices loggingServices,  UserInfo userInfo, IServiceProvider serviceProvider, RequestInfo requestInfo)
-            : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, userInfo, serviceProvider, requestInfo)
+    public class  SrvService(IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow,SrvUser SrvUser, SrvActionStatusConfiguration SrvActionStatusConfiguration, LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, IServiceProvider serviceProvider, RequestInfo requestInfo)
+            : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, requestInfo)
         {
         
 

@@ -1,4 +1,5 @@
-﻿using Evaluation.DAL.Entities.ActionEntities;
+﻿using AutoMapper;
+using Evaluation.DAL.Entities.ActionEntities;
 using Evaluation.DAL.Entities.Authentication;
 using Evaluation.DAL.Entities.FormBuilder;
 using Evaluation.DAL.Entities.Logs;
@@ -21,7 +22,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
-using Evaluation.SharedHelper.Models.Api.ServiceRequestEntitiesDTO;
 using System.Globalization;
 using System.Text.RegularExpressions;
 using static Evaluation.DAL.ConstantKeys;
@@ -32,10 +32,10 @@ namespace Evaluation.Services.Models.API
 
     public class RequestsBL(
         IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow, SrvNotification SrvNotification, SrvUser SrvUser, 
-        LoggingServices loggingServices,  UserInfo userInfo, SrvField SrvField, SrvAction SrvAction, 
+        LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, SrvField SrvField, SrvAction SrvAction, 
         SrvStatus SrvStatus, SrvAssignment SrvAssignment, SrvDropdown SrvDropdown, SrvActionTransactionsLog SrvActionTransactionsLog, 
         SrvService SrvService, SrvServiceRequest SrvServiceRequest, SrvAttachments SrvAttachments, IServiceProvider serviceProvider,RequestInfo _requestInfo)
-            : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices,  userInfo, serviceProvider, _requestInfo)
+            : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, _requestInfo)
     {
 
 		public async Task<ServiceRequestDTO> HandleServiceRequestAsync(ActionFormDTO? actionFormDTO, Guid? planId,

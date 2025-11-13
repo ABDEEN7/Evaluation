@@ -1,4 +1,5 @@
-﻿using Evaluation.DAL.Entities.Attachments;
+﻿using AutoMapper;
+using Evaluation.DAL.Entities.Attachments;
 using Evaluation.DAL.Entities.FormBuilder;
 using Evaluation.DAL.Entities.Planing.EvaluationRequestEntity;
 using Evaluation.DAL.Helper;
@@ -21,8 +22,8 @@ using System.Text.RegularExpressions;
 
 namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 {
-    public class  SrvAttachments( AzureBlobStorageService StorageService, IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow, LoggingServices loggingServices,  UserInfo userInfo, IServiceProvider serviceProvider, RequestInfo requestInfo)
-            : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, userInfo, serviceProvider, requestInfo)
+    public class  SrvAttachments( AzureBlobStorageService StorageService, IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow, LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, IServiceProvider serviceProvider, RequestInfo requestInfo)
+            : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, requestInfo)
         {
            
         public async Task<string?> GetAttachmentById(Guid attachmentId, Guid requestId)
