@@ -7,7 +7,6 @@ using Evaluation.SharedHelper;
 using Evaluation.SharedHelper.Dtos.PlanDto;
 using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Exceptions;
-using Evaluation.SharedHelper.Helper;
 using Evaluation.SharedHelper.Models;
 using FluentResults;
 using Mapster;
@@ -31,7 +30,7 @@ public class PlanServiceRequestServices(
     ) : ApiBase(serviceScopeFactory, cacheDataProvider, unitOfWork, loggingServices, mapper, userInfo,
         serviceProvider, requestInfo)
 {
-    public async Task<Result<CreateEvaluationPlanDto>> AddEvaulationPlan(CreateEvaluationPlanDto evaluationPlanDto)
+    public async Task<Result<CreatePlanResponse>> AddEvaulationPlan(CreateEvaluationPlanDto evaluationPlanDto)
     {
         //await ValidateDraftPlan(evaluationPlanDto);
         return await ExecuteWithResult(async () =>
@@ -40,6 +39,10 @@ public class PlanServiceRequestServices(
             //var result = await f.CreateServicPlan(evaluationPlanDto);
             var result = evaluationPlanDto;
             result.AcademicYearId = new Guid("00066600-9999-0000-7777-000000000001");
+            var result = evaluationPlanDto.ConvertFromRequestToResponse(evaluationPlanDto);
+            result.CreateDate = DateTime.Now;
+            result.IsActive = true;
+            result.CreateById = new Guid("11111111-1111-1111-1111-000000000069");
             return result;
         });
     }

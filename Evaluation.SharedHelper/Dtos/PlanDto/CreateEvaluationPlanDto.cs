@@ -11,4 +11,19 @@ public class CreateEvaluationPlanDto
     public List<SelectedSchool>? Schools { get; set; }
     public Guid AcademicYearId { get; set; }
     public Guid PlanStatusId { get; set; }
+
+    public CreatePlanResponse ConvertFromRequestToResponse(CreateEvaluationPlanDto request)
+    {
+        return new CreatePlanResponse
+        {
+            Id = request.Id,
+            Title = request.Title,
+            StartDate = request.StartDate,
+            EndDate = request.EndDate,
+            PlanTypeId = request.PlanTypeId,
+            Schools = request.Schools,
+            AcademicYearId = request.AcademicYearId,
+            PlanStatusId = request.PlanStatusId,
+        };
+    }
 }
