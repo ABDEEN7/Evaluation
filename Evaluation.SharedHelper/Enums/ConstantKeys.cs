@@ -91,6 +91,12 @@ public static class ConstantKeys
         public static readonly string lblNoPermissionForViewRequest = "lblNoPermissionForViewRequest";
         public static readonly string DepartmentExistsSystemModule = "DepartmentExistsSystemModule";
         public static readonly string DropDownTypeHasDataSource = "DropDownTypeHasDataSource";
+        public static readonly string FieldExistsFieldVisabilityConfig = "FieldExistsFieldVisabilityConfig";
+        public static readonly string FieldExistsFieldAttributeValue = "FieldExistsFieldAttributeValue";
+        public static readonly string FieldExistsDropDownParentField = "FieldExistsDropDownParentField";
+        public static readonly string FieldExistsFieldPartyType = "FieldExistsFieldPartyType";
+        public static readonly string FieldExistsFieldViewCondition = "FieldExistsFieldViewCondition";
+        public static readonly string FieldExistsPlaceHolder = "FieldExistsPlaceHolder";
     }
 
         public static class AdminSettings
@@ -112,6 +118,7 @@ public static class ConstantKeys
             public static readonly string PlaceHolderType = "PlaceHolderType";
         public static readonly string SignatureUploadWidth = "SignatureUploadWidth";
         public static readonly string SignatureUploadHeight = "SignatureUploadHeight";
+        public static readonly string OPERATORS_LIST = "OPERATORS_LIST";
         
 
     }
@@ -143,6 +150,10 @@ public static class ConstantKeys
         public static readonly string StatusTab = "StatusTab";
         public static readonly string ActionStatusConfigTab = "ActionStatusConfigTab";
         public static readonly string lblStatusPartyTypeDisplayList = "lblStatusPartyTypeDisplayList";
+        public static readonly string ADD_NEW_FORM_GROUP = "ADD_NEW_FORM_GROUP";
+        public static readonly string FormGroupTabTitle = "FormGroupTabTitle";
+        public static readonly string ListTabTitle = "ListTabTitle";
+        public static readonly string SearchFormGroup = "SearchFormGroup";
     }
 
         public static class AdminPages
@@ -156,6 +167,10 @@ public static class ConstantKeys
             public static readonly string AdminServiceStatus = "AdminServiceStatus";
             public static readonly string AdminDropDown = "AdminDropDown";
             public static readonly string AdminDepartment = "AdminDepartment";
+            public static readonly string AdminFormGroup = "AdminFormGroup";
+            public static readonly string AdminField = "AdminField";
+            public static readonly string AdminFieldAttribute = "AdminFieldAttribute";
+            public static readonly string AdminFieldCondition = "AdminFieldCondition";
         }
 
     public static class AdminPermission
@@ -235,6 +250,38 @@ public static class ConstantKeys
         public const string CanViewFieldHistory = "CanViewFieldHistory";
         public const string CanViewAllFieldHistory = "CanViewAllFieldHistory";
         public const string CanViewEvalFieldHistory = "CanViewEvalFieldHistory";
+        #endregion
+
+        #region FormGroup
+        public const string VIEW_ADMIN_FORMGROUP = "VIEW_ADMIN_FORMGROUP";
+        public const string ADD_ADMIN_FORMGROUP = "ADD_ADMIN_FORMGROUP";
+        public const string EDIT_ADMIN_FORMGROUP = "EDIT_ADMIN_FORMGROUP";
+        public const string DELETE_ADMIN_FORMGROUP = "DELETE_ADMIN_FORMGROUP";
+        #endregion
+        #region FIELD
+
+        public const string VIEW_ADMIN_FIELD = "VIEW_ADMIN_FIELD";
+        public const string ADD_ADMIN_FIELD = "ADD_ADMIN_FIELD";
+        public const string EDIT_ADMIN_FIELD = "EDIT_ADMIN_FIELD";
+        public const string DELETE_ADMIN_FIELD = "DELETE_ADMIN_FIELD";
+
+        #endregion
+        #region FIELD_ATTRIBUTE
+
+        public const string VIEW_ADMIN_FIELD_ATTRIBUTE = "VIEW_ADMIN_FIELD_ATTRIBUTE";
+        public const string ADD_ADMIN_FIELD_ATTRIBUTE = "ADD_ADMIN_FIELD_ATTRIBUTE";
+        public const string EDIT_ADMIN_FIELD_ATTRIBUTE = "EDIT_ADMIN_FIELD_ATTRIBUTE";
+        public const string DELETE_ADMIN_FIELD_ATTRIBUTE = "DELETE_ADMIN_FIELD_ATTRIBUTE";
+
+        #endregion
+
+        #region FIELD_CONDITION
+
+        public const string VIEW_ADMIN_FIELD_CONDITION = "VIEW_ADMIN_FIELD_CONDITION";
+        public const string ADD_ADMIN_FIELD_CONDITION = "ADD_ADMIN_FIELD_CONDITION";
+        public const string EDIT_ADMIN_FIELD_CONDITION = "EDIT_ADMIN_FIELD_CONDITION";
+        public const string DELETE_ADMIN_FIELD_CONDITION = "DELETE_ADMIN_FIELD_CONDITION";
+
         #endregion
 
     }
