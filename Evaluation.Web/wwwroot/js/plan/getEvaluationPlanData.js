@@ -6,7 +6,6 @@ function getEvaluationData() {
     try {
         // Get plan name from the title input
         const name = document.getElementById('planTitle')?.value?.trim() || '';
-        const id = '';
         // Get plan type from the select dropdown
         const planTypeSelect = document.getElementById('ddlPlanType');
         const planTypeId = planTypeSelect?.value || '';
@@ -25,7 +24,6 @@ function getEvaluationData() {
 
         // Return structured data object
         return {
-            id,
             name,
             planTypeId,
             startDate,
@@ -146,8 +144,8 @@ function displayErrors(errors) {
 async function submitEvaluationData(data) {
     try {
         // Show loading state
-        const submitBtn = document.getElementById('btn-submit');
-        const originalText = submitBtn?.textContent;
+        //const submitBtn = document.getElementById('btn-submit');
+        //const originalText = submitBtn?.textContent;
         //if (submitBtn) {
         //    submitBtn.disabled = true;
         //    submitBtn.textContent = 'Submitting...';
@@ -196,20 +194,6 @@ document.getElementById('btn-submit')?.addEventListener('click', async (event) =
 });
 
 
-// Alternative: jQuery version if you prefer
-$("#btn-submit").click(async function (event) {
-    event.preventDefault();
-
-    const evaluationData = getEvaluationData();
-    const validation = validateEvaluationData(evaluationData);
-
-    if (!validation.isValid) {
-        displayErrors(validation.errors);
-        return;
-    }
-
-    await submitEvaluationData(evaluationData);
-});
 function getSelectedSchools() {
     const selectedSchools = [];
     $('#planTable tbody .selectRow:checked').each(function () {

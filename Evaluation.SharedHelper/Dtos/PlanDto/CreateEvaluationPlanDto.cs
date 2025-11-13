@@ -4,6 +4,7 @@ namespace Evaluation.SharedHelper.Dtos.PlanDto;
 
 public class CreateEvaluationPlanDto
 {
+    public Guid Id { get; set; }
     public string Name { get; set; } = null!;
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
@@ -17,7 +18,7 @@ public class CreateEvaluationPlanDto
         return new CreatePlanResponse
         {
             Id = request.Id,
-            Title = request.Title,
+            Name = request.Name,
             StartDate = request.StartDate,
             EndDate = request.EndDate,
             PlanTypeId = request.PlanTypeId,

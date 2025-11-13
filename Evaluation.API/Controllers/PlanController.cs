@@ -15,9 +15,6 @@ public class PlanController(MasterBL masterBL) : ControllerBase
     //public async Task<IActionResult> CreateAsync([FromBody] CreateEvaluationPlanDto planRequest)
     public async Task<IActionResult> Create([FromBody] CreateEvaluationPlanDto planRequest)
     {
-        //CreateEvaluationPlanDto? planDto = JsonConvert.DeserializeObject<CreateEvaluationPlanDto>(planRequest);
-        //if (planDto == null)
-        //return BadRequest(new { error = "Invalid JSON structure." });
         var jsonPlan = await masterBL.GetApiService<PlanServiceRequestServices>().AddEvaulationPlan(planRequest);
         return jsonPlan.ToActionResult();
     }

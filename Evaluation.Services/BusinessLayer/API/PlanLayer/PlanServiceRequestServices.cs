@@ -37,10 +37,10 @@ public class PlanServiceRequestServices(
         {
             //PlanServiceRequest planDraft = evaluationPlanDto.Adapt<PlanServiceRequest>();
             //var result = await f.CreateServicPlan(evaluationPlanDto);
-            var result = evaluationPlanDto;
-            result.AcademicYearId = new Guid("00066600-9999-0000-7777-000000000001");
+            
             var result = evaluationPlanDto.ConvertFromRequestToResponse(evaluationPlanDto);
             result.CreateDate = DateTime.Now;
+            result.AcademicYearId = new Guid("00066600-9999-0000-7777-000000000001");
             result.IsActive = true;
             result.CreateById = new Guid("11111111-1111-1111-1111-000000000069");
             return result;
