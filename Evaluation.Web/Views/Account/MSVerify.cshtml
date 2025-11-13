@@ -1,0 +1,15 @@
+﻿@{
+}
+
+<input type="hidden" value="@ViewData["code"]" id="code" />
+
+@section Scripts {
+    <script src="~/js/account/ms-verify.js" asp-append-version="true"></script>
+    
+    <script>
+        $(document).ready(function () {
+             $('body').hide();
+             VerifyMSToken();
+        });
+    </script>
+}

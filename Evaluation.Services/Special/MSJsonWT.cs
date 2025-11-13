@@ -45,35 +45,44 @@ namespace Evaluation.Services.Special
 
         public async Task<ClaimsPrincipal> ValidateMSIdToken(string idToken)
         {
-            if (string.IsNullOrEmpty(idToken))
-                throw new ArgumentException("Empty ID token");
-
-            var clientId = _azureADConfig.ClientId;
-
-            var jwks = await GetCachedJWKSAsync();
-            if (jwks?.Keys == null || jwks.Keys.Count == 0)
-                throw new SecurityTokenException("Unable to retrieve JWKS keys from Azure AD.");
-
-            var validationParams = new TokenValidationParameters
+            try
             {
-                ValidateIssuer = true,
-                ValidIssuer = _azureADConfig.Instance,
-                ValidateAudience = true,
-                ValidAudience = clientId,
-                ValidateLifetime = true,
-                RequireExpirationTime = true,
-                ClockSkew = TimeSpan.FromMinutes(2), // small tolerance
-                IssuerSigningKeys = jwks.Keys,
-                RequireSignedTokens = true
-            };
+                if (string.IsNullOrEmpty(idToken))
+                    throw new ArgumentException("Empty ID token");
 
-            var handler = new JwtSecurityTokenHandler();
-            var claimsPrincipal = handler.ValidateToken(idToken, validationParams, out var validatedToken);
+                var clientId = _azureADConfig.ClientId;
 
-            if (validatedToken is not JwtSecurityToken jwtToken || !jwtToken.Header.Alg.Equals(SecurityAlgorithms.RsaSha256, StringComparison.Ordinal))
-                throw new SecurityTokenException("Invalid token algorithm.");
+                var jwks = await GetCachedJWKSAsync();
+                if (jwks?.Keys == null || jwks.Keys.Count == 0)
+                    throw new SecurityTokenException("Unable to retrieve JWKS keys from Azure AD.");
 
-            return claimsPrincipal;
+                var validationParams = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidIssuer = _azureADConfig.Instance,
+                    ValidateAudience = true,
+                    ValidAudience = clientId,
+                    ValidateLifetime = true,
+                    RequireExpirationTime = true,
+                    ClockSkew = TimeSpan.FromMinutes(2), // small tolerance
+                    IssuerSigningKeys = jwks.Keys,
+                    RequireSignedTokens = true
+                };
+
+                var handler = new JwtSecurityTokenHandler();
+                var claimsPrincipal = handler.ValidateToken(idToken, validationParams, out var validatedToken);
+
+                if (validatedToken is not JwtSecurityToken jwtToken || !jwtToken.Header.Alg.Equals(SecurityAlgorithms.RsaSha256, StringComparison.Ordinal))
+                    throw new SecurityTokenException("Invalid token algorithm.");
+
+                return claimsPrincipal;
+            }
+            catch (Exception ex)
+            {
+                return null;
+
+            }
+
         }
 
         private async Task<JwKeysResponse> GetCachedJWKSAsync()

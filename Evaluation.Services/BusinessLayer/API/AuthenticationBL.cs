@@ -41,7 +41,7 @@ public class AuthenticationBL : ApiBase
 
     #region ?? Microsoft SSO Login
 
-    public async Task<string> CheckUserAuth(string username)
+    public async Task<string> checkUserAndRedirect(string username)
     {
 
         if (string.IsNullOrEmpty(username))
@@ -294,7 +294,7 @@ public class AuthenticationBL : ApiBase
         var log = new UserLoginLog
         {
             UserId = userId,
-            IP = _requestInfo.UserIp,
+            IP = _requestInfo.UserIp ,
             UserAgent = _requestInfo.UserAgent,
             CreateById = userId
         };
