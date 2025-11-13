@@ -15,7 +15,6 @@ using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Admin;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json;
 namespace Evaluation.Services.Models.Admin
 {
     public class SrvServiceActionBL : AdminBase

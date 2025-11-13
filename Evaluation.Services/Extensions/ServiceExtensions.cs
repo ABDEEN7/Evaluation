@@ -1,4 +1,6 @@
-﻿using Evaluation.DAL.Context;
+﻿using System.Net;
+using System.Reflection;
+using Evaluation.DAL.Context;
 using Evaluation.DAL.UnitOfWork;
 using Evaluation.Services.BusinessLayer;
 using Evaluation.Services.BusinessLayer.API;
@@ -13,8 +15,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using System.Net;
-using System.Reflection;
 
 namespace Evaluation.Services.Extensions;
 

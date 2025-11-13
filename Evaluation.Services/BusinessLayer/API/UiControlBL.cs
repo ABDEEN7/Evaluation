@@ -17,18 +17,18 @@ namespace Evaluation.Services.Models.API
 {
     public class UiControlBL : ApiBase
     {
-        public UiControlBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork unitOfWork, LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, IServiceProvider serviceProvider, RequestInfo requestInfo)
-            : base(serviceScopeFactory, cacheDataProvider, unitOfWork, loggingServices, mapper, userInfo, serviceProvider, requestInfo)
+        public UiControlBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow, LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, IServiceProvider serviceProvider, RequestInfo requestInfo)
+            : base(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, requestInfo)
         {
         }
 
 
         public string GetSetting(string Key)
         {
-            using (var newunitOfWork = serviceProvider.CreateScopedUow())
+            using (var newuow = serviceProvider.CreateScopedUow())
             {
 
-                var result = newunitOfWork.GetRepository<SystemSetting>()
+                var result = newuow.GetRepository<SystemSetting>()
                                        .GetAllNonDeleted()
                                        .Where(c => c.SettingKey == Key)
                                        .Select(c => c.SettingValue).FirstOrDefault();
@@ -37,10 +37,10 @@ namespace Evaluation.Services.Models.API
         }
         //public string GetWebLogo()
         //{
-        //    using (var newunitOfWork = serviceProvider.CreateScopedunitOfWork())
+        //    using (var newuow = serviceProvider.CreateScopeduow())
         //    {
 
-        //        var result = newunitOfWork.GetRepository<SystemSetting>()
+        //        var result = newuow.GetRepository<SystemSetting>()
         //                               .GetAllNonDeleted()
         //                               .Where(c => c.SettingKey == (requestInfo.Lang=="ar"?ConstantKeys.AdminSettings.WebLogoAr:ConstantKeys.AdminSettings.WebLogoEn))
         //                               .Select(c => c.SettingValue).FirstOrDefault();
@@ -54,7 +54,7 @@ namespace Evaluation.Services.Models.API
 
             if (backendKeys != null)
             {
-                var list = await unitOfWork.GetRepository<UiControl>()
+                var list = await uow.GetRepository<UiControl>()
                    .GetAllActiveNonDeleted()
                    .Where(x => backendKeys.Contains(x.BackendName))
                 .ToListAsync();
@@ -69,7 +69,7 @@ namespace Evaluation.Services.Models.API
 
 
 
-            var query = await unitOfWork.GetRepository<ControlValidation>()
+            var query = await uow.GetRepository<ControlValidation>()
                                         .GetAllActiveNonDeleted()
                                         .Include(x=>x.Permission)
                                         .Where(x => x.Permission.BackendName == PermissionbackendName).
@@ -87,7 +87,7 @@ namespace Evaluation.Services.Models.API
         {
             //this.cacheService.RemoveCahe(PageName);
            
-            var _UiControles = await unitOfWork.GetRepository<UiControl>().GetAllNonDeleted()
+            var _UiControles = await uow.GetRepository<UiControl>().GetAllNonDeleted()
                                            .Where(x => x.PageName == Pagename)
                    .Select(c => new UiControlDTO
                    {

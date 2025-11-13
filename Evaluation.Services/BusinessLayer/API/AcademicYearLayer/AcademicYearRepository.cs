@@ -4,7 +4,7 @@ using Evaluation.DAL.Helper;
 using Evaluation.DAL.UnitOfWork;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Models;
-using Mapster;
+using AutoMapper;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -41,6 +41,7 @@ public class AcademicYearRepository(IServiceScopeFactory serviceScopeFactory,
         if (await query.AnyAsync())
             throw new Exception("Blocked days already exist.");
         
-        return await query.ProjectToType<VacationDateDto>().FirstOrDefaultAsync();
+        return new VacationDateDto { };
+        //return await query.ProjectToType<VacationDateDto>().FirstOrDefaultAsync();
     }
 }
