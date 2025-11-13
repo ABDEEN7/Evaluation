@@ -1,4 +1,5 @@
-﻿using Evaluation.DAL.Entities.Authentication;
+﻿using AutoMapper;
+using Evaluation.DAL.Entities.Authentication;
 using Evaluation.DAL.Entities.StatusEntities;
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.UnitOfWork;
@@ -16,8 +17,8 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 {
             
-    public class SrvStatus(IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow, LoggingServices loggingServices,  UserInfo userInfo, IServiceProvider serviceProvider, RequestInfo requestInfo) :
-        ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices,  userInfo, serviceProvider, requestInfo)
+    public class SrvStatus(IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow, LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, IServiceProvider serviceProvider, RequestInfo requestInfo) :
+        ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, requestInfo)
     {
         
 

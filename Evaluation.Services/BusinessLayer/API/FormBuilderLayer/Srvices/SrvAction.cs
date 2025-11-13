@@ -1,4 +1,5 @@
-﻿using AutoMapper.Internal;
+﻿using AutoMapper;
+using AutoMapper.Internal;
 using Azure.Core;
 using Evaluation.DAL.Entities.ActionEntities;
 using Evaluation.DAL.Entities.Authentication;
@@ -33,8 +34,8 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 {
 #pragma warning disable CS8620
 
-    public class SrvAction (SrvDropdown SrvDropdown, SrvUser SrvUser, SrvField SrvField, IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow, LoggingServices loggingServices,  UserInfo userInfo, IServiceProvider serviceProvider, RequestInfo requestInfo)
-            : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, userInfo, serviceProvider, requestInfo)
+    public class SrvAction (SrvDropdown SrvDropdown, SrvUser SrvUser, SrvField SrvField, IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow, LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, IServiceProvider serviceProvider, RequestInfo requestInfo)
+            : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, requestInfo)
     {
 
 		public async Task<ServiceAction?> GetActionByBackendNameAsync(Guid serviceId, string backendName, bool includeActionFields = false)

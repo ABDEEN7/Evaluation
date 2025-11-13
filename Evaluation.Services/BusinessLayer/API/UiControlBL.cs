@@ -1,16 +1,14 @@
-﻿using Evaluation.DAL.Entities.BaseModule;
+﻿using AutoMapper;
+using Evaluation.DAL.Entities.BaseModule;
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.SystemSetting;
 using Evaluation.DAL.UnitOfWork;
 using Evaluation.Services.BusinessLayer.API;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper;
-using Evaluation.SharedHelper.Enums;
-using Evaluation.SharedHelper.Helper;
 using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Api;
 using Mapster;
-using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using static Evaluation.SharedHelper.Enums.ConstantKeys;
@@ -20,7 +18,7 @@ namespace Evaluation.Services.Models.API
     public class UiControlBL : ApiBase
     {
         public UiControlBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow, LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, IServiceProvider serviceProvider, RequestInfo requestInfo)
-            : base(serviceScopeFactory, cacheDataProvider, uow, loggingServices, userInfo, serviceProvider, requestInfo)
+            : base(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, requestInfo)
         {
         }
 

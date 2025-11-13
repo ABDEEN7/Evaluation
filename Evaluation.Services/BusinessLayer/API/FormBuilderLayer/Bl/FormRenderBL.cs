@@ -1,4 +1,5 @@
-﻿using Azure.Core;
+﻿using AutoMapper;
+using Azure.Core;
 using Evaluation.DAL.Entities.ActionEntities;
 using Evaluation.DAL.Entities.Authentication;
 using Evaluation.DAL.Entities.FormBuilder;
@@ -29,11 +30,11 @@ using System.Reflection.PortableExecutable;
 
 namespace Evaluation.Services.BusinessLayer.API
 {
-    public class  FormRenderBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, SrvUser SrvUser, UnitOfWork uow, LoggingServices loggingServices, 
-             UserInfo userInfo,   RequestInfo _requestInfo, SrvServiceRequest SrvServiceRequest
+    public class  FormRenderBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, SrvUser SrvUser, UnitOfWork uow, LoggingServices loggingServices,
+                  IMapper mapper,UserInfo userInfo,   RequestInfo _requestInfo, SrvServiceRequest SrvServiceRequest
             , SrvAttachments SrvAttachments, SrvDropdown SrvDropdown,
                 SrvField srvField, IServiceProvider serviceProvider)
-            : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, userInfo, serviceProvider, _requestInfo)
+            : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, _requestInfo)
         {
 
 		public async Task<ActionCustomDTO> GetActionSteps(ServiceAction action, Guid serviceId, Guid? requestId = null, Guid? PlanId = null)
