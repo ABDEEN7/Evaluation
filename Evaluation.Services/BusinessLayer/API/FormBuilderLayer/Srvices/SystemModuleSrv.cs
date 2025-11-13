@@ -1,4 +1,5 @@
-﻿using Evaluation.DAL.Entities.Authentication;
+﻿using AutoMapper;
+using Evaluation.DAL.Entities.Authentication;
 using Evaluation.DAL.Entities.SystemModulesEntities;
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.UnitOfWork;
@@ -12,8 +13,8 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 {
-    public class  SystemModuleSrv(IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow, LoggingServices loggingServices,  UserInfo userInfo, IServiceProvider serviceProvider, RequestInfo _requestInfo)
-            : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, userInfo, serviceProvider, _requestInfo)
+    public class  SystemModuleSrv(IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow, LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, IServiceProvider serviceProvider, RequestInfo _requestInfo)
+            : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, _requestInfo)
         {
         
 

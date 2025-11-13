@@ -1,4 +1,5 @@
-﻿using Evaluation.DAL.Entities.Authentication;
+﻿using AutoMapper;
+using Evaluation.DAL.Entities.Authentication;
 using Evaluation.DAL.Entities.ServiceRequestEntities;
 using Evaluation.DAL.Entities.UserEntiy;
 using Evaluation.DAL.Helper;
@@ -16,8 +17,8 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 {
-	public class SrvUser(SrvDropdown SrvDropdown, IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow, LoggingServices loggingServices, UserInfo userInfo, IServiceProvider serviceProvider, RequestInfo requestInfo)
-		   : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, userInfo, serviceProvider, requestInfo)
+	public class SrvUser(SrvDropdown SrvDropdown, IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow, LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, IServiceProvider serviceProvider, RequestInfo requestInfo)
+		   : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, requestInfo)
 	{
 
 		public async Task<UserProfileCustomDTO?> GetApplicantStudent(ServiceRequest request)
@@ -79,14 +80,14 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 			return UserProfile;
 		}
 
-		public async Task<Guid> GetUserGenderByuserId(Guid userId)
-		{
-			var UserProfile = await serviceScopeFactory.CreateScopedUow()
-							.GetRepository<MinistryUser>().GetByIDActiveNonDeleted(userId);
-			if (UserProfile == null)
-				throw new BusinessException(ConstantKeys.ExceptionMessage.UserInfoNotFound);
-			return UserProfile.UserGenderId;
-		}
+		//public async Task<Guid> GetUserGenderByuserId(Guid userId)
+		//{
+		//	var UserProfile = await serviceScopeFactory.CreateScopedUow()
+		//					.GetRepository<MinistryUser>().GetByIDActiveNonDeleted(userId);
+		//	if (UserProfile == null)
+		//		throw new BusinessException(ConstantKeys.ExceptionMessage.UserInfoNotFound);
+		//	return UserProfile.UserGenderId;
+		//}
 
 		public async Task<bool> HasPermission(Guid userId, string permissionName)
 		{

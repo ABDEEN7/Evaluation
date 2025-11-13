@@ -14,12 +14,13 @@ using Evaluation.SharedHelper.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Evaluation.Services.BusinessLayer.API.Template;
+using AutoMapper;
 
 
 namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 {
-    public class SrvNotification(IServiceScopeFactory serviceScopeFactory, IEmailServices emailServices, CacheDataProvider cacheDataProvider, MasterBL masterBL, UnitOfWork uow, LoggingServices loggingServices,  UserInfo userInfo, IServiceProvider serviceProvider, RequestInfo _requestInfo, EmailTemplateProvider emailTemplateProvider)
-            : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, userInfo, serviceProvider, _requestInfo)
+    public class SrvNotification(IServiceScopeFactory serviceScopeFactory, IEmailServices emailServices, CacheDataProvider cacheDataProvider, MasterBL masterBL, UnitOfWork uow, LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, IServiceProvider serviceProvider, RequestInfo _requestInfo, EmailTemplateProvider emailTemplateProvider)
+            : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, _requestInfo)
         {
         public async Task HandleNotification(IList<ActionStatusConfigNotification> notifications, ServiceRequest request, Guid actionId, string lang, string remarks, List<Attachment>? actionOtherAttachments = null)
         {

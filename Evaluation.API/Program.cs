@@ -132,6 +132,10 @@ internal class Program
                 //options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
             });
 
+            // Register AutoMapper and scan all assemblies
+            builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+
             // -------------------------------------
             // 6️⃣ Build the App
             // -------------------------------------
