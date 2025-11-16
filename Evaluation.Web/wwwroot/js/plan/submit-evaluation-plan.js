@@ -7,8 +7,10 @@ function getEvaluationData() {
         // Get plan name from the title input
         const name = document.getElementById('planTitle')?.value?.trim() || '';
         // Get plan type from the select dropdown
-        const planTypeSelect = document.getElementById('ddlPlanType');
-        const planTypeId = planTypeSelect?.value || '';
+        const planTypeSelect = $('#ddlPlanType');
+        const selectedPlanType = planTypeSelect.select2('data')[0];
+        const planTypeId = selectedPlanType?.id || '';
+        const planTypeBackendName = selectedPlanType?.backendName || '';
 
         // Get date range and parse start/end dates
         const dateRangeInput = document.getElementById('parentDate');
@@ -20,16 +22,28 @@ function getEvaluationData() {
             startDate = parsedDates.startDate;
             endDate = parsedDates.endDate;
         }
+
+        //Get semester Id if paln type is semtster
+        let semesterId = null;
+        if (planTypeBackendName === 'Semester') {
+            const semesterSelect = $('#ddlSemester');
+            semesterId = semesterSelect.val() || null;
+        }
+
         const selectedSchools = getSelectedSchools();
 
         // Return structured data object
-        return {
+        const evaluationData = {
             name,
             planTypeId,
             startDate,
             endDate,
             schools: selectedSchools
         };
+        if (planTypeBackendName === 'Semester' && semesterId) {
+            evaluationData.semesterId = semesterId;
+        }
+        return evaluationData;
 
     } catch (error) {
         console.error('Error collecting evaluation data:', error);
