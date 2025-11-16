@@ -1,12 +1,13 @@
-﻿using System.Reflection.PortableExecutable;
+﻿using Evaluation.DAL.Entities.Audit;
 using  Evaluation.DAL.Entities.BaseModule;
 using Evaluation.DAL.Entities.Calendars;
 using Evaluation.DAL.Entities.DepartementEntites;
 using Evaluation.DAL.Entities.Planing;
+using System.Reflection.PortableExecutable;
 
 namespace Evaluation.DAL.Entities.FormsModules;
 
-public class ScopeAcademicYear : EntityBase
+public class ScopeAcademicYear : EntityBase, IAuditLogEntity
 {
     public Guid DepartmentId { get; set; }
     public Department? Department { get; set; }

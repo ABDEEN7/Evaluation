@@ -49,10 +49,10 @@ public partial class EvaluationDbContext : DbContext
     public virtual DbSet<AcademicYear> AcademicYears { get; set; }
     public virtual DbSet<CalcMethod> CalcMethods { get; set; }
     public virtual DbSet<EvaluationParty> EvaluationParties { get; set; }
-    public virtual DbSet<Form> Forms { get; set; }
+    public virtual DbSet<EvalForm> EvalForms { get; set; }
     public virtual DbSet<FormScope> FormScopes { get; set; }
-    public virtual DbSet<Item> Items { get; set; }
-    public virtual DbSet<ItemValue> ItemValues { get; set; }
+    public virtual DbSet<FormItem> FormItems { get; set; }
+    public virtual DbSet<FormItemValue> FormItemValues { get; set; }
     public virtual DbSet<Scope> Scopes { get; set; }
     public virtual DbSet<ScopeType> ScopeTypes { get; set; }
     public virtual DbSet<DepartmentOrgTree> DepartmentOrgTrees { get; set; }
@@ -95,10 +95,14 @@ public partial class EvaluationDbContext : DbContext
     public virtual DbSet<EvaluationType> EvaluationType { get; set; }
     public virtual DbSet<DepartmentHoliday> DepartmentHolidays { get; set; }
     public virtual DbSet<Semester> Semesters { get; set; }
+    public virtual DbSet<FormItem> FormItem { get; set; }
+    public virtual DbSet<EvalFormType> EvalFormType { get; set; }
+    public virtual DbSet<SubFormItem> SubFormItems { get; set; }
+    public virtual DbSet<SubFormItemValue> SubFormItemValues { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        //optionsBuilder.UseSqlServer("Server=DCDCSQL2DNET01;Database=Evaluation;Trust Server Certificate=true;User id=t-m.fatouh-dev;Integrated Security=SSPI;");
+        optionsBuilder.UseSqlServer("Server=DCDCSQL2DNET01;Database=Evaluation;Trust Server Certificate=true;User id=t-m.fatouh-dev;Integrated Security=SSPI;");
         //optionsBuilder.UseSqlServer("Server=DCDCSQL2DNET01;Database=Evaluation;Trust Server Certificate=true;User id=Eval_User; Password=Abc@1234;");
     }
 
