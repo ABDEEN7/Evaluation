@@ -1,8 +1,9 @@
-﻿using  Evaluation.DAL.Entities.BaseModule;
+﻿using Evaluation.DAL.Entities.Audit;
+using  Evaluation.DAL.Entities.BaseModule;
 
 namespace Evaluation.DAL.Entities.Org;
 
-public class School : OrgTree
+public class School : OrgTree , IAuditLogEntity
 {
     public Guid TypeId { get; set; }//بنين وبنات
     public SchoolType SchoolType { get; set; } = new();

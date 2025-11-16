@@ -1,10 +1,13 @@
 ﻿using  Evaluation.DAL.Entities.BaseModule;
+using Evaluation.DAL.Entities.DepartementEntites;
 using Microsoft.EntityFrameworkCore;
 
 namespace Evaluation.DAL.SystemSetting;
 [Index(nameof(BackendName), IsUnique = true)]
 public class UiControl : EntityBase
 {
+    public Guid? DepartmentId { get; set; }
+    public Department? Department { get; set; }
     public string PageName { get; set; } = null!;
     public string UserUiname { get; set; } = null!;
 

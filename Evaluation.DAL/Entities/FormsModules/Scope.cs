@@ -1,10 +1,11 @@
-﻿using  Evaluation.DAL.Entities.BaseModule;
+﻿using Evaluation.DAL.Entities.Audit;
+using  Evaluation.DAL.Entities.BaseModule;
 using Evaluation.DAL.Entities.DepartementEntites;
 using Evaluation.DAL.Entities.Planing;
 
 namespace Evaluation.DAL.Entities.FormsModules;
 
-public class Scope : EntityBase
+public class Scope : EntityBase, IAuditLogEntity
 {
     public string NameAr { get; set; } = null!;
     public string NameEn { get; set; } = null!;

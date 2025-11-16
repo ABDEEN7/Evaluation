@@ -1,9 +1,10 @@
-﻿using  Evaluation.DAL.Entities.BaseModule;
+﻿using Evaluation.DAL.Entities.Audit;
+using  Evaluation.DAL.Entities.BaseModule;
 using Evaluation.DAL.Entities.Planing;
 
 namespace Evaluation.DAL.Entities.Org;
 
-public class OrgTree : EntityBase
+public class OrgTree : EntityBase , IAuditLogEntity
 {
     public string NameAr { get; set; } = null!;
     public string NameEn { get; set; } = null!;
