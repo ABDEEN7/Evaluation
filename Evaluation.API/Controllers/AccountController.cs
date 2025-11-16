@@ -50,9 +50,9 @@ namespace Evaluation.API.Controllers
             try
             {
 				
-				var redirectUrl = await masterBL.GetApiService<AuthenticationBL>().CheckUserAuth(username);
-                return Ok(redirectUrl);
-            }
+				var redirectUrl = await masterBL.GetApiService<AuthenticationBL>().checkUserAndRedirect(username);
+				return Ok(new { ssoRedirectUrl = redirectUrl });
+			}
             catch (BusinessException ex)
             {
                 return BadRequest(ex.Message);

@@ -2,6 +2,7 @@
 using Evaluation.DAL.Entities.Masters;
 using Evaluation.DAL.Entities.UserEntiy;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Evaluation.DAL.Entities.Authentication;
 [Index(nameof(QID), IsUnique = true)]
@@ -13,7 +14,12 @@ public class MinistryUser : EntityBase
     public string? NationalityCode { get; set; }
     public string NameAr { get; set; } = null!;
     public string NameEn { get; set; } = null!;
-    public DateTime? LastLoginDate { get; set; }
+    [NotMapped]
+	public Guid UserGenderId { get; set; }
+	[NotMapped]
+
+	public UserGender? UserGender { get; set; }
+	public DateTime? LastLoginDate { get; set; }
     public string PreferredLanguage { get; set; } = null!;
     public string? Mobile { get; set; }
     public string JobTitleEn { get; set; } = null!;
