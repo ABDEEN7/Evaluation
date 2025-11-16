@@ -72,11 +72,9 @@ public class PlanController(MasterBL masterBL) : ControllerBase
         new PlanTypeDto { Id = Guid.Parse("22222222-2222-2222-2222-222222222222"), Name = "Year", BackendName = "Year" },
         new PlanTypeDto { Id = Guid.Parse("33333333-2222-2222-2222-222222222222"), Name = "Semester" , BackendName = "Semester"},
         new PlanTypeDto { Id = Guid.Parse("44444444-2222-2222-2222-222222222222"), Name = "Custom" , BackendName = "Custom"}
-
     };
     }
     [HttpGet]
-
     public IActionResult GetSemesters()
     {
         return Ok(new { result = GetSemestersAsync() });
@@ -86,8 +84,7 @@ public class PlanController(MasterBL masterBL) : ControllerBase
         return new List<SemesterDto>
     {
         new SemesterDto { Id = Guid.Parse("11111111-2111-1111-1111-111111111111"), Name = "Firstly",StartDate = new DateTime(2026,04,01), EndDate= new DateTime(2026,08,01) },
-        new SemesterDto { Id = Guid.Parse("22222222-1222-2222-2222-222222222222"), Name = "Scandle", StartDate = new DateTime(2025,04,01), EndDate= new DateTime(2025,08,01)  }
-
+        new SemesterDto { Id = Guid.Parse("22222222-1222-2222-2222-222222222222"), Name = "Scandle", StartDate = new DateTime(2025,04,01), EndDate= new DateTime(2025,08,01) }
     };
     }
 

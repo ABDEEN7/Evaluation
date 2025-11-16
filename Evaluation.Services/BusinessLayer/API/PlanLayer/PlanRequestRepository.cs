@@ -1,16 +1,10 @@
-﻿using AutoMapper;
-using Evaluation.DAL.Entities.Calendars;
-using Evaluation.DAL.Entities.Org;
+﻿using Evaluation.DAL.Entities.Calendars;
 using Evaluation.DAL.Entities.Planing;
-using Evaluation.DAL.Entities.Planing.EvaluationRequestEntity;
-using Evaluation.DAL.Helper;
 using Evaluation.DAL.UnitOfWork;
-using Evaluation.Services.Special;
 using Evaluation.SharedHelper;
 using Evaluation.SharedHelper.Dtos.PlanDto;
 using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Exceptions;
-using Evaluation.SharedHelper.Helper;
 using Evaluation.SharedHelper.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,16 +12,10 @@ using Newtonsoft.Json;
 using static Evaluation.SharedHelper.Enums.ConstantKeys;
 namespace Evaluation.Services.BusinessLayer.API.PlanLayer;
 
-public class PlanServiceRequestRepository(IServiceScopeFactory serviceScopeFactory,
-    CacheDataProvider cacheDataProvider,
+public class PlanRequestRepository(IServiceScopeFactory serviceScopeFactory,
     UnitOfWork unitOfWork,
-    LoggingServices loggingServices,
-    IMapper mapper,
-    UserInfo userInfo,
-    IServiceProvider serviceProvider,
     RequestInfo requestInfo
-    ) : ApiBase(serviceScopeFactory, cacheDataProvider, unitOfWork, loggingServices, mapper, userInfo,
-        serviceProvider, requestInfo)
+    ) : ApiServiceBase
 {
     public async Task<string> CreateServicPlan(PlanServiceRequest model)
     {

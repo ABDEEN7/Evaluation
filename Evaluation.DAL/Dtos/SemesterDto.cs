@@ -1,4 +1,7 @@
-﻿namespace Evaluation.DAL.Dtos;
+﻿using Evaluation.DAL.Entities.Calendars;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+
+namespace Evaluation.DAL.Dtos;
 
 public class SemesterDto
 {
@@ -6,4 +9,14 @@ public class SemesterDto
     public string Name { get; set; }
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
+    public List<SemesterDto> ConvertSemesterToDto(List<Semester> model)
+    {
+        return model.Select(e => new SemesterDto
+        {
+            Id = e.Id,
+            Name = e.NameEn,
+            StartDate = e.StartDate,
+            EndDate = e.EndDate
+        }).ToList();
+    }
 }
