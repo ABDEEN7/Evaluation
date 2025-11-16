@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
-using Evaluation.DAL.Entities.Authentication;
 using Evaluation.DAL.Helper;
-using Evaluation.DAL.UnitOfWork;
+using Evaluation.DAL.Models.UserEntiy;
+using Evaluation.DAL.Repositories;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper;
 using Evaluation.SharedHelper.Helper;
@@ -18,9 +18,9 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
            : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, _requestInfo)
         {
 
-        public async Task<List<DAL.Entities.Authentication.PartyType>?> GetUserPartyTypeAsync()
+        public async Task<List<PartyType>?> GetUserPartyTypeAsync()
         {
-            var UserPartyType= await serviceScopeFactory.CreateScopedUow().GetRepository<DAL.Entities.Authentication.PartyType>()
+            var UserPartyType= await serviceScopeFactory.CreateScopedUow().GetRepository<PartyType>()
                 .GetAllActiveNonDeleted()
                 .AsNoTracking()
                 .Where(pt => userInfo.PartyTypes.Contains(pt.Id)).ToListAsync();

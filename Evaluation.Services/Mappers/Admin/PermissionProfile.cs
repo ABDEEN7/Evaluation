@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Evaluation.DAL.Entities.PermissionEntity;
+using Evaluation.DAL.Models.PermissionEntity;
 using Evaluation.SharedHelper.Models.Admin;
 
 

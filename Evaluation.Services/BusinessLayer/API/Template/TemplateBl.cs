@@ -1,9 +1,9 @@
 using AutoMapper;
-using Evaluation.DAL.Entities.Attachments;
-using Evaluation.DAL.Entities.ServiceRequestEntities;
-using Evaluation.DAL.Entities.Template;
 using Evaluation.DAL.Helper;
-using Evaluation.DAL.UnitOfWork;
+using Evaluation.DAL.Models.Attachments;
+using Evaluation.DAL.Models.ServiceRequestEntities;
+using Evaluation.DAL.Models.Template;
+using Evaluation.DAL.Repositories;
 using Evaluation.Services.Extensions;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Enums;

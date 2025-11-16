@@ -1,8 +1,5 @@
 ﻿using System.Threading.Tasks;
-using Evaluation.DAL.Entities.Org;
-using Evaluation.DAL.Entities.Planing;
 using Evaluation.DAL.Helper;
-using Evaluation.DAL.UnitOfWork;
 using Evaluation.Services.Extensions;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Dtos.SchoolDto;
@@ -12,6 +9,9 @@ using Mapster;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Evaluation.DAL.Models.Org;
+using Evaluation.DAL.Models.Planing;
+using Evaluation.DAL.Repositories;
 
 namespace Evaluation.Services.BusinessLayer.API.SchooLayer;
 

@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Evaluation.DAL.Dtos;
-using Evaluation.DAL.Entities.DepartementEntites;
+using Evaluation.DAL.Models.DepartementEntites;
 
 namespace Evaluation.Services.MappingProfiles;
 

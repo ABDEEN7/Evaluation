@@ -8,7 +8,7 @@ using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Models.Admin;
 using Evaluation.DAL.Helper;
 using Evaluation.Services.BusinessLayer;
-using Evaluation.DAL.Entities.ActionEntities;
+using Evaluation.DAL.Models.ActionEntities;
 
 namespace Evaluation.Admin.Controllers
 {

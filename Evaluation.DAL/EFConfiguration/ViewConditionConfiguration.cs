@@ -1,4 +1,4 @@
-﻿using Evaluation.DAL.Entities.FormBuilder;
+﻿using Evaluation.DAL.Models.FormBuilder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

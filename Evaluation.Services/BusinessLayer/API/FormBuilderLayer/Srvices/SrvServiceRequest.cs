@@ -1,11 +1,5 @@
 ﻿using AutoMapper;
-using Evaluation.DAL.Entities.Attachments;
-using Evaluation.DAL.Entities.Authentication;
-using Evaluation.DAL.Entities.Logs;
-using Evaluation.DAL.Entities.ServiceRequestEntities;
-using Evaluation.DAL.Entities.SystemModulesEntities;
 using Evaluation.DAL.Helper;
-using Evaluation.DAL.UnitOfWork;
 using Evaluation.Services.Extensions;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Exceptions;
@@ -21,6 +15,12 @@ using Evaluation.SharedHelper.Models.Api.ServiceRequestEntitiesDTO;
 using System.Diagnostics.Metrics;
 using System.Globalization;
 using static Evaluation.SharedHelper.Enums.ConstantKeys;
+using Evaluation.DAL.Models.Attachments;
+using Evaluation.DAL.Models.DepartementEntites;
+using Evaluation.DAL.Models.Logs;
+using Evaluation.DAL.Models.ServiceRequestEntities;
+using Evaluation.DAL.Models.UserEntiy;
+using Evaluation.DAL.Repositories;
 
 
 namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices

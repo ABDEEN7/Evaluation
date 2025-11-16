@@ -1,11 +1,11 @@
 ﻿using AutoMapper;
-using Evaluation.DAL.Entities.ActionEntities;
-using Evaluation.DAL.Entities.Authentication;
-using Evaluation.DAL.Entities.FormBuilder;
-using Evaluation.DAL.Entities.ServicesEntities;
-using Evaluation.DAL.Entities.Template;
 using Evaluation.DAL.Helper;
-using Evaluation.DAL.UnitOfWork;
+using Evaluation.DAL.Models.ActionEntities;
+using Evaluation.DAL.Models.FormBuilder;
+using Evaluation.DAL.Models.ServiceEnities;
+using Evaluation.DAL.Models.Template;
+using Evaluation.DAL.Models.UserEntiy;
+using Evaluation.DAL.Repositories;
 using Evaluation.Services.Extensions;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Enums;

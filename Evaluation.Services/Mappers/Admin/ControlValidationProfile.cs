@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Evaluation.DAL.Entities.BaseModule;
+using Evaluation.DAL.Models.BaseModule;
 using Evaluation.SharedHelper.Models.Admin;
 
 

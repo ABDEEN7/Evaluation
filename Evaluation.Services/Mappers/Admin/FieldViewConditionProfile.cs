@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Evaluation.DAL.Entities.FormBuilder;
+using Evaluation.DAL.Models.FormBuilder;
 using Evaluation.SharedHelper.Models.Admin;
 
 
