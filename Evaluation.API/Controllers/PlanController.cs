@@ -21,16 +21,21 @@ public class PlanController(MasterBL masterBL) : ControllerBase
         var jsonPlan = await masterBL.GetApiService<PlanServiceRequestServices>().AddEvaulationPlan(planRequest);
         return jsonPlan.ToActionResult();
     }
-    [HttpPost]
-    public async Task<IActionResult> CreatePlan([FromBody] CreateEvaluationPlanDto planApproved)
-    {
-        var plan = await masterBL.GetAdminService<PlanServiceRequestServices>().AddEvaulationPlan
-    }
+    //[HttpPost]
+    //public async Task<IActionResult> CreatePlan([FromBody] CreateEvaluationPlanDto planApproved)
+    //{
+    //    var plan = await masterBL.GetAdminService<PlanServiceRequestServices>().AddEvaulationPlan
+    //}
     //[HttpDelete]
     //public async Task<IActionResult> DeletePlan(Guid id)
     //{
     //    var isDeleted = await masterBL.GetApiService<PlanServiceRequestServices>().DeletePlanDraft(id);
     //    return isDeleted.ToActionResult();
+    //}
+    //[HttpPut]
+    //public IActionResult UpdatePlan()
+    //{
+    //    return new { result = new CreateEvaluationPlanDto { } }
     //}
     [HttpPost]
     public IActionResult RequestDeleteSchool(RequestDeleteSchoolDto requestDelete)
@@ -95,5 +100,6 @@ public class PlanController(MasterBL masterBL) : ControllerBase
         public string Name { get; set; } = null!;
         public string BackendName { get; set; }
     }
+
 
 }

@@ -34,7 +34,7 @@ public class PlanRequestRepository(IServiceScopeFactory serviceScopeFactory,
         model.PlanJsonValue = JsonConvert.SerializeObject(model);
         Guid departmentId = unitOfWork
             .GetRepository<AcademicYear>()
-            .GetAllActiveNonDeleted(x => x.Id == planRequest.AcadmicYearId)
+            .GetAllActiveNonDeleted(x => x.Id == model.AcademicYearId)
             .Select(x => x.DepartmentId)
             .FirstOrDefault();
         //Get id of school that we will evaluate

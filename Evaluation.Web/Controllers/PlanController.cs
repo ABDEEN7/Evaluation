@@ -8,5 +8,9 @@ namespace Evaluation.Web.Controllers
         {
             return View();
         }
+        public IActionResult Update(Guid planId)
+        {
+            return View(planId);
+        }
     }
 }
