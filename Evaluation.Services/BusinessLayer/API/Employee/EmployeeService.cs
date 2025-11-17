@@ -1,11 +1,11 @@
 ﻿using AutoMapper;
 using Evaluation.DAL.Helper;
-using Evaluation.DAL.UnitOfWork;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Models;
 using Microsoft.Extensions.DependencyInjection;
-using Evaluation.DAL.Entities.Org;
 using Microsoft.EntityFrameworkCore;
+using Evaluation.DAL.Repositories;
+using Evaluation.DAL.Models.Org;
 
 namespace Evaluation.Services.BusinessLayer.API;
 

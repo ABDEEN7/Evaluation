@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Evaluation.DAL.Dtos;
-using Evaluation.DAL.Entities.Org;
+using Evaluation.DAL.Models.Org;
 
 namespace Evaluation.Services.MappingProfiles;
 public class EmployeeProfile : Profile

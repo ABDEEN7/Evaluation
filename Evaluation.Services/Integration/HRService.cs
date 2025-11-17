@@ -1,7 +1,4 @@
 ﻿using Evaluation.DAL.DTOs;
-using Evaluation.DAL.Entities.ActionEntities;
-using Evaluation.DAL.Entities.Authentication;
-using Evaluation.DAL.Entities.Org;
 using Evaluation.DAL.Helper;
 using Evaluation.Services.BusinessLayer.API;
 using Evaluation.Services.Extensions;
@@ -16,6 +13,7 @@ using Oracle.ManagedDataAccess.Client;
 using System.Data;
 using System.Text;
 using Evaluation.DAL.Repositories;
+using Evaluation.DAL.Models.Org;
 
 namespace Evaluation.Services.Integration;
 
