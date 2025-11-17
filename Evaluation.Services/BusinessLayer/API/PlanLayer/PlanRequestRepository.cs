@@ -28,29 +28,20 @@ public class PlanRequestRepository(IServiceScopeFactory serviceScopeFactory,
         //await unitOfWork.CommitAsync();
         //return (await unitOfWork.GetRepository<PlanServiceRequest>().GetByIdAsync(model.Id));
     }
-    public async Task<bool> ApprovePlans(Plan plan)
+    public async Task<bool> ApprovePlans(Plan model)
     {
-      
-        CreateEvaluationPlanDto? createplan = JsonConvert.DeserializeObject<CreateEvaluationPlanDto>(planRequest.Value);
+
+        model.PlanJsonValue = JsonConvert.SerializeObject(model);
         Guid departmentId = unitOfWork
             .GetRepository<AcademicYear>()
             .GetAllActiveNonDeleted(x => x.Id == planRequest.AcadmicYearId)
             .Select(x => x.DepartmentId)
             .FirstOrDefault();
-        Plan plan = new Plan
-        {
-            NameEn = createplan.Name,
-            AcademicYearId = createplan.AcademicYearId,
-            PlanStatusId = createplan.PlanStatusId,
-            DepartmentId = departmentId,
-            //PlanSchedules = PlanSchedules
-
-
-        };
         //Get id of school that we will evaluate
         //List<Guid> schoolIds = plan.Schools.Select(s => s.Id).ToList();
         var selectedSchool = unitOfWork
             .GetRepository<School>();
+        
         //.GetAllActiveNonDeleted(x => schoolIds.Contains(x.Id));
 
         //added selected school to the plan 
