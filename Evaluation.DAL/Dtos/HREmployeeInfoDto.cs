@@ -51,4 +51,5 @@ public class HREmployeeInfoDto
     public string ContractType { get; set; }
     public string ContractTypeDesc { get; set; }
     public string ContractTypeDescE { get; set; }
+    public string JoiningDate { get; set; }
 }
