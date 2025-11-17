@@ -1,8 +1,8 @@
 ﻿using Evaluation.DAL.Models.Audit;
 using Evaluation.DAL.Models.BaseModule;
 using Evaluation.DAL.Models.FormBuilder;
-using Evaluation.DAL.Models.Logs;
 using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
+using Evaluation.DAL.Models.SystemLog;
 using System;
 using System.Collections.Generic;
 using System.Linq;

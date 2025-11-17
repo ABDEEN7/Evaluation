@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.Attachments;
-using Evaluation.DAL.Models.Logs;
 using Evaluation.DAL.Models.ServiceRequestEntities;
 using Evaluation.DAL.Models.StatusEntities;
+using Evaluation.DAL.Models.SystemLog;
 using Evaluation.DAL.Models.UserEntiy;
 using Evaluation.DAL.Repositories;
 using Evaluation.Services.Special;
