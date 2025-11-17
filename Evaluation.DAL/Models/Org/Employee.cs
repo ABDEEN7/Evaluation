@@ -15,6 +15,7 @@ public class Employee : OrgTree
     public Guid JobTitleId { get; set; } 
     public JobTitle JobTitle { get; set; } = null!;
     public string? Email { get; set; }
+    public string QID { get; set; } = null!;
 
 
 }
