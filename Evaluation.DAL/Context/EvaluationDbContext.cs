@@ -128,6 +128,45 @@ public partial class EvaluationDbContext : DbContext
 
     private void ApplyGeneralConfigurations(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<OrgTree>()
+           .HasOne(x => x.OrgType)
+                   .WithMany()
+                   .HasForeignKey(x => x.OrgTypeId)
+                   .IsRequired()
+                   .OnDelete(DeleteBehavior.Restrict);
+
+        // Employee relations
+        modelBuilder.Entity<Employee>()
+            .HasOne(e => e.UserGender)
+            .WithMany()
+            .HasForeignKey(e => e.UserGenderId);
+
+        modelBuilder.Entity<Employee>()
+            .HasOne(e => e.JobTitle)
+            .WithMany()
+            .HasForeignKey(e => e.JobTitleId);
+
+        // Organization relations
+        modelBuilder.Entity<Organization>()
+            .HasOne(o => o.SchoolType)
+            .WithMany()
+            .HasForeignKey(o => o.TypeId);
+
+        // School relations
+        modelBuilder.Entity<School>()
+            .HasOne(s => s.SchoolType)
+            .WithMany()
+            .HasForeignKey(s => s.TypeId);
+
+        var baseType = typeof(OrgTree);
+        var derivedTypes =
+            Assembly.GetExecutingAssembly()
+            .GetTypes()
+            .Where(t => t.IsClass && !t.IsAbstract && t.IsSubclassOf(baseType));
+        foreach (var type in derivedTypes)
+        {
+            modelBuilder.Entity(type).ToTable(type.Name + "s");
+        }
 
         foreach (var relationship in modelBuilder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys()))
         {
@@ -144,7 +183,7 @@ public partial class EvaluationDbContext : DbContext
             typeof(Organization),
             typeof(Employee),
             typeof(School),
-            
+
         };
 
         foreach (var entityType in entityTypes)
