@@ -17,10 +17,10 @@ using System.Globalization;
 using static Evaluation.SharedHelper.Enums.ConstantKeys;
 using Evaluation.DAL.Models.Attachments;
 using Evaluation.DAL.Models.DepartementEntites;
-using Evaluation.DAL.Models.Logs;
 using Evaluation.DAL.Models.ServiceRequestEntities;
 using Evaluation.DAL.Models.UserEntiy;
 using Evaluation.DAL.Repositories;
+using Evaluation.DAL.Models.SystemLog;
 
 
 namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
