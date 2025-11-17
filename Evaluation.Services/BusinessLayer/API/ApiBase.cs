@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Evaluation.DAL.Helper;
-using Evaluation.DAL.UnitOfWork;
+using Evaluation.DAL.Repositories;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Helper;
 using Evaluation.SharedHelper.Models;

@@ -1,8 +1,8 @@
 using Evaluation.Admin.ActionFilter;
 using Evaluation.Admin.Extensions;
 using Evaluation.Admin.Models;
-using Evaluation.DAL.Entities.ServicesEntities;
 using Evaluation.DAL.Helper;
+using Evaluation.DAL.Models.ServiceEnities;
 using Evaluation.Services.BusinessLayer;
 using Evaluation.Services.Models.Admin;
 using Evaluation.SharedHelper.Enums;
@@ -129,7 +129,9 @@ namespace Evaluation.Admin.Controllers
         {
             Dictionary<string, object> response = new Dictionary<string, object>();
             var RequestField = await masterBL.GetAdminService<SrvServiceBL>().GetRequestField(serviceid);
+            var EvaluationField = await masterBL.GetAdminService<SrvServiceBL>().GetEvaluationField(systemmoduleid);
             response.Add("RequestField", RequestField);
+            response.Add("EvaluationField", EvaluationField);
             return Ok(response);
         }
         [HttpGet]

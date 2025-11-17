@@ -3,7 +3,6 @@ using Evaluation.DAL.Entities.ActionEntities;
 using Evaluation.DAL.Entities.Authentication;
 using Evaluation.DAL.Entities.Org;
 using Evaluation.DAL.Helper;
-using Evaluation.DAL.UnitOfWork;
 using Evaluation.Services.BusinessLayer.API;
 using Evaluation.Services.Extensions;
 using Evaluation.Services.Mapping;
@@ -16,6 +15,7 @@ using Newtonsoft.Json.Linq;
 using Oracle.ManagedDataAccess.Client;
 using System.Data;
 using System.Text;
+using Evaluation.DAL.Repositories;
 
 namespace Evaluation.Services.Integration;
 

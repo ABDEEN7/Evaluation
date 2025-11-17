@@ -1,4 +1,4 @@
-﻿using Evaluation.DAL.Entities.BaseModule;
+﻿using Evaluation.DAL.Models.BaseModule;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;

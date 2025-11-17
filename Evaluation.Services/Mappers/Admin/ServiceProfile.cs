@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
-using Evaluation.DAL.Entities.Authentication;
-using Evaluation.DAL.Entities.ServicesEntities;
-using Evaluation.DAL.Entities.SystemModulesEntities;
-using Evaluation.DAL.UnitOfWork;
+using Evaluation.DAL.Models.DepartementEntites;
+using Evaluation.DAL.Models.ServiceEnities;
+using Evaluation.DAL.Models.UserEntiy;
+using Evaluation.DAL.Repositories;
 using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Admin;
 using Microsoft.Extensions.DependencyInjection;

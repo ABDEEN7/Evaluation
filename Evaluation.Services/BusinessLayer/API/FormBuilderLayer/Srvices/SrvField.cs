@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
-using Evaluation.DAL.Entities.BaseModule;
-using Evaluation.DAL.Entities.FormBuilder;
-using Evaluation.DAL.Entities.IntegrationEntity;
 using Evaluation.DAL.Helper;
-using Evaluation.DAL.UnitOfWork;
+using Evaluation.DAL.Models.BaseModule;
+using Evaluation.DAL.Models.FormBuilder;
+using Evaluation.DAL.Models.IntegrationEntity;
+using Evaluation.DAL.Repositories;
 using Evaluation.Services.Extensions;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Enums;

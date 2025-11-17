@@ -1,7 +1,4 @@
-﻿using Evaluation.DAL.Entities.Org;
-using Evaluation.DAL.Entities.Planing;
-using Evaluation.DAL.Helper;
-using Evaluation.DAL.UnitOfWork;
+﻿using Evaluation.DAL.Helper;
 using Evaluation.Services.BusinessLayer.API.SchooLayer;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper;
@@ -13,6 +10,8 @@ using Mapster;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Evaluation.DAL.Models.Org;
+using Evaluation.DAL.Repositories;
 
 namespace Evaluation.Services.BusinessLayer.API;
 

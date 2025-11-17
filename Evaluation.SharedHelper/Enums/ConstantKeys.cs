@@ -89,28 +89,39 @@ public static class ConstantKeys
         public static readonly string UserPartyTypeNotFound = "UserPartyTypeNotFound";
         public static readonly string UserNotFound = "UserNotFound";
         public static readonly string lblNoPermissionForViewRequest = "lblNoPermissionForViewRequest";
+        public static readonly string DepartmentExistsSystemModule = "DepartmentExistsSystemModule";
+        public static readonly string DropDownTypeHasDataSource = "DropDownTypeHasDataSource";
+        public static readonly string FieldExistsFieldVisabilityConfig = "FieldExistsFieldVisabilityConfig";
+        public static readonly string FieldExistsFieldAttributeValue = "FieldExistsFieldAttributeValue";
+        public static readonly string FieldExistsDropDownParentField = "FieldExistsDropDownParentField";
+        public static readonly string FieldExistsFieldPartyType = "FieldExistsFieldPartyType";
+        public static readonly string FieldExistsFieldViewCondition = "FieldExistsFieldViewCondition";
+        public static readonly string FieldExistsPlaceHolder = "FieldExistsPlaceHolder";
     }
 
-    public static class AdminSettings
-    {
-        public static readonly string EnableCaching = "EnableCaching";
-        public static readonly string ClearCacheDuration = "ClearCacheDuration";
-        public static readonly string ADMIN_FILE_SIZE = "ADMIN_FILE_SIZE";
-        public static readonly string ADMIN_FILE_EXTENSION = "ADMIN_FILE_EXTENSION";
-        public static readonly string ADMIN_FILE_COUNT = "ADMIN_FILE_COUNT";
-        public static readonly string ADMIN_PAGE_SIZE = "ADMIN_PAGE_SIZE";
-        public static readonly string AdminLogoAr = "AdminLogoAr";
-        public static readonly string AdminLogoEn = "AdminLogoEn";
-        public static readonly string WebLogoAr = "WebLogoAr";
-        public static readonly string WebLogoEn = "WebLogoEn";
-        public static readonly string Favicon = "Favicon";
-        public static readonly string RequestColumn = "RequestColumn";
-        public static readonly string EvaluationRequestColumn = "EvaluationRequestColumn";
-		public static readonly string SignatureUploadWidth = "SignatureUploadWidth";
-		public static readonly string SignatureUploadHeight = "SignatureUploadHeight";
-		public static readonly string SessionExpireTime = "SessionExpireTime";
+        public static class AdminSettings
+        {
+            public static readonly string EnableCaching = "EnableCaching";
+            public static readonly string ClearCacheDuration = "ClearCacheDuration";
+            public static readonly string ADMIN_FILE_SIZE = "ADMIN_FILE_SIZE";
+            public static readonly string ADMIN_FILE_EXTENSION = "ADMIN_FILE_EXTENSION";
+            public static readonly string ADMIN_FILE_COUNT = "ADMIN_FILE_COUNT";
+            public static readonly string ADMIN_PAGE_SIZE = "ADMIN_PAGE_SIZE";
+            public static readonly string AdminLogoAr = "AdminLogoAr";
+            public static readonly string AdminLogoEn = "AdminLogoEn";
+            public static readonly string WebLogoAr = "WebLogoAr";
+            public static readonly string WebLogoEn = "WebLogoEn";
+            public static readonly string Favicon = "Favicon";
+            public static readonly string RequestColumn = "RequestColumn";
+            public static readonly string EvaluationColumn = "EvaluationColumn";
+            public static readonly string SessionExpireTime = "SessionExpireTime";
+            public static readonly string PlaceHolderType = "PlaceHolderType";
+        public static readonly string SignatureUploadWidth = "SignatureUploadWidth";
+        public static readonly string SignatureUploadHeight = "SignatureUploadHeight";
+        public static readonly string OPERATORS_LIST = "OPERATORS_LIST";
+        
 
-	}
+    }
 
     public static class AdminBackendUI
     {
@@ -139,21 +150,33 @@ public static class ConstantKeys
         public static readonly string StatusTab = "StatusTab";
         public static readonly string ActionStatusConfigTab = "ActionStatusConfigTab";
         public static readonly string lblStatusPartyTypeDisplayList = "lblStatusPartyTypeDisplayList";
+        public static readonly string ADD_NEW_FORM_GROUP = "ADD_NEW_FORM_GROUP";
+        public static readonly string FormGroupTabTitle = "FormGroupTabTitle";
+        public static readonly string ListTabTitle = "ListTabTitle";
+        public static readonly string SearchFormGroup = "SearchFormGroup";
     }
 
-    public static class AdminPages
-    {
-        public static readonly string AdminCommon = "AdminCommon";
-        public static readonly string AdminService = "AdminService";
-        public static readonly string AdminPlaceHolder = "AdminPlaceHolder";
-        public static readonly string AdminServiceFreeze = "AdminServiceFreeze";
-        public static readonly string AdminActionStatusConfiguration = "AdminActionStatusConfiguration";
-        public static readonly string AdminActionStatusConfigurationNotification = "AdminActionStatusConfigurationNotification";
-        public static readonly string AdminServiceStatus = "AdminServiceStatus";
-    }
+        public static class AdminPages
+        {
+            public static readonly string AdminCommon = "AdminCommon";
+            public static readonly string AdminService = "AdminService";
+            public static readonly string AdminPlaceHolder = "AdminPlaceHolder";
+            public static readonly string AdminServiceFreeze = "AdminServiceFreeze";
+            public static readonly string AdminActionStatusConfiguration = "AdminActionStatusConfiguration";
+            public static readonly string AdminActionStatusConfigurationNotification = "AdminActionStatusConfigurationNotification";
+            public static readonly string AdminServiceStatus = "AdminServiceStatus";
+            public static readonly string AdminDropDown = "AdminDropDown";
+            public static readonly string AdminDepartment = "AdminDepartment";
+            public static readonly string AdminFormGroup = "AdminFormGroup";
+            public static readonly string AdminField = "AdminField";
+            public static readonly string AdminFieldAttribute = "AdminFieldAttribute";
+            public static readonly string AdminFieldCondition = "AdminFieldCondition";
+        }
 
     public static class AdminPermission
     {
+        public const string VIEW_ADMIN_HOME = "VIEW_ADMIN_HOME";
+        
         #region  Service
         public const string ADD_ADMIN_SERVICE = "ADD_ADMIN_SERVICE";
         public const string EDIT_ADMIN_SERVICE = "EDIT_ADMIN_SERVICE";
@@ -205,6 +228,23 @@ public static class ConstantKeys
             "UPDATE_STATUS_PARTY_TYPE_DISPLAY_NAME_STATUS";
 
         #endregion
+        #region DROPDOWN
+
+        public const string VIEW_ADMIN_DROPDOWN = "VIEW_ADMIN_DROPDOWN";
+        public const string ADD_ADMIN_DROPDOWN = "ADD_ADMIN_DROPDOWN";
+        public const string EDIT_ADMIN_DROPDOWN = "EDIT_ADMIN_DROPDOWN";
+        public const string DELETE_ADMIN_DROPDOWN = "DELETE_ADMIN_DROPDOWN";
+
+        #endregion
+
+        #region DEPARTMENT
+
+        public const string VIEW_ADMIN_DEPARTMENT = "VIEW_ADMIN_DEPARTMENT";
+        public const string ADD_ADMIN_DEPARTMENT = "ADD_ADMIN_DEPARTMENT";
+        public const string EDIT_ADMIN_DEPARTMENT = "EDIT_ADMIN_DEPARTMENT";
+        public const string DELETE_ADMIN_DEPARTMENT = "DELETE_ADMIN_DEPARTMENT";
+
+        #endregion
 
         #region EvaluationRequest
         public const string CanViewFieldHistory = "CanViewFieldHistory";
@@ -212,6 +252,41 @@ public static class ConstantKeys
         public const string CanViewEvalFieldHistory = "CanViewEvalFieldHistory";
         #endregion
 
+        #region FormGroup
+        public const string VIEW_ADMIN_FORMGROUP = "VIEW_ADMIN_FORMGROUP";
+        public const string ADD_ADMIN_FORMGROUP = "ADD_ADMIN_FORMGROUP";
+        public const string EDIT_ADMIN_FORMGROUP = "EDIT_ADMIN_FORMGROUP";
+        public const string DELETE_ADMIN_FORMGROUP = "DELETE_ADMIN_FORMGROUP";
+        #endregion
+        #region FIELD
+
+        public const string VIEW_ADMIN_FIELD = "VIEW_ADMIN_FIELD";
+        public const string ADD_ADMIN_FIELD = "ADD_ADMIN_FIELD";
+        public const string EDIT_ADMIN_FIELD = "EDIT_ADMIN_FIELD";
+        public const string DELETE_ADMIN_FIELD = "DELETE_ADMIN_FIELD";
+
+        #endregion
+        #region FIELD_ATTRIBUTE
+
+        public const string VIEW_ADMIN_FIELD_ATTRIBUTE = "VIEW_ADMIN_FIELD_ATTRIBUTE";
+        public const string ADD_ADMIN_FIELD_ATTRIBUTE = "ADD_ADMIN_FIELD_ATTRIBUTE";
+        public const string EDIT_ADMIN_FIELD_ATTRIBUTE = "EDIT_ADMIN_FIELD_ATTRIBUTE";
+        public const string DELETE_ADMIN_FIELD_ATTRIBUTE = "DELETE_ADMIN_FIELD_ATTRIBUTE";
+
+        #endregion
+
+        #region FIELD_CONDITION
+
+        public const string VIEW_ADMIN_FIELD_CONDITION = "VIEW_ADMIN_FIELD_CONDITION";
+        public const string ADD_ADMIN_FIELD_CONDITION = "ADD_ADMIN_FIELD_CONDITION";
+        public const string EDIT_ADMIN_FIELD_CONDITION = "EDIT_ADMIN_FIELD_CONDITION";
+        public const string DELETE_ADMIN_FIELD_CONDITION = "DELETE_ADMIN_FIELD_CONDITION";
+
+        #endregion
+
+    }
+    public static class CustomDataSource
+    {
     }
     public static class WebAppSettings
     {
