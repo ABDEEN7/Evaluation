@@ -43,13 +43,15 @@ public class SchoolBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvide
             return schoolResponse;
         });
     }
-    public async Task<Result<List<SchoolVisits>>> GetVisitsAsync()
+    public async Task<List<SchoolVisits>> GetVisitsAsync()
     {
-        return await ExecuteWithResult(async () =>
+        var responses = await schoolRepository.GetVisitTypes();
+        List<SchoolVisits> schoolVisits = responses.Select(x => new SchoolVisits
         {
-            var responses = await schoolRepository.GetVisitTypes();
-            return responses;
-        });
+            Id = x.Id,
+            Name = requestInfo.Lang == "ar" ? x.NameAr : x.NameEn
+        }).ToList();
+        return schoolVisits;
     }
 
 }

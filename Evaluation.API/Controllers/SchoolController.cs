@@ -26,13 +26,13 @@ public class SchoolController : ControllerBase
     public async Task<School> GetSchoolDetails(Guid SchoolID)
     {
         //var schooldetails = await _masterBl.GetApiService<SchoolBL>().GetSchoolDetails(SchoolID);
-        
+
         var dummyData = new List<School>() {
             new School() { Id = new Guid("921d891a-e0cb-4fd4-8e53-fb3443ef0199"), NameAr = "مدرسة احمد بن حنبل", NameEn = "Ahmad Bin Hanbal School"},
             new School() { Id = new Guid("ecd11007-2ff6-42cb-bca2-b168de94afbc"), NameAr = "مدرسة عائشة", NameEn = "Aesha School" }
         };
 
-        return  dummyData.FirstOrDefault(s => s.Id == SchoolID);
+        return dummyData.FirstOrDefault(s => s.Id == SchoolID);
     }
 
     [HttpGet]
@@ -50,29 +50,14 @@ public class SchoolController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetVisits()
     {
-        //var visit = await _masterBl.GetApiService<SchoolBL>().GetVisitsAsync();
+        var visits = await _masterBl.GetApiService<SchoolBL>().GetVisitsAsync();
         //return visit.ToActionResult();
-        var visits = GetSchoolVisits();
         return Ok(new { result = visits });
     }
     [HttpGet]
     public IActionResult GetSchools([FromQuery] SchoolRequest request)
     {
         return Ok(new { result = GetListSchool() });
-    }
-    private List<SchoolVisits> GetSchoolVisits()
-    {
-        return new List<SchoolVisits>
-        {
-            new SchoolVisits {
-                Id = Guid.NewGuid(),
-                Name = "دوري"
-            },
-            new SchoolVisits {
-                Id = Guid.NewGuid(),
-                Name = "استثنائي"
-            },
-        };
     }
     private List<ResponseSchools> GetListSchool()
     {

@@ -35,12 +35,11 @@ public class SchoolRepository(IServiceScopeFactory serviceScopeFactory,
             .ToListAsync();
         return schools;
     }
-    public async Task<List<SchoolVisits>> GetVisitTypes()
+    public async Task<List<VisitType>> GetVisitTypes()
     {
         return await unitOfWork
             .GetRepository<VisitType>()
             .GetAllActiveNonDeleted()
-            .ProjectToType<SchoolVisits>()
             .ToListAsync();
     }
 }

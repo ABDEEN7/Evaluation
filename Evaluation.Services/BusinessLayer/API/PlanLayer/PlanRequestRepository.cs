@@ -1,4 +1,5 @@
 ﻿using Evaluation.DAL.Entities.Calendars;
+using Evaluation.DAL.Entities.Org;
 using Evaluation.DAL.Entities.Planing;
 using Evaluation.DAL.UnitOfWork;
 using Evaluation.SharedHelper;
@@ -26,6 +27,41 @@ public class PlanRequestRepository(IServiceScopeFactory serviceScopeFactory,
         //await unitOfWork.GetRepository<PlanServiceRequest>().InsertAsync(model);
         //await unitOfWork.CommitAsync();
         //return (await unitOfWork.GetRepository<PlanServiceRequest>().GetByIdAsync(model.Id));
+    }
+    public async Task<bool> ApprovePlans(Plan plan)
+    {
+      
+        CreateEvaluationPlanDto? createplan = JsonConvert.DeserializeObject<CreateEvaluationPlanDto>(planRequest.Value);
+        Guid departmentId = unitOfWork
+            .GetRepository<AcademicYear>()
+            .GetAllActiveNonDeleted(x => x.Id == planRequest.AcadmicYearId)
+            .Select(x => x.DepartmentId)
+            .FirstOrDefault();
+        Plan plan = new Plan
+        {
+            NameEn = createplan.Name,
+            AcademicYearId = createplan.AcademicYearId,
+            PlanStatusId = createplan.PlanStatusId,
+            DepartmentId = departmentId,
+            //PlanSchedules = PlanSchedules
+
+
+        };
+        //Get id of school that we will evaluate
+        //List<Guid> schoolIds = plan.Schools.Select(s => s.Id).ToList();
+        var selectedSchool = unitOfWork
+            .GetRepository<School>();
+        //.GetAllActiveNonDeleted(x => schoolIds.Contains(x.Id));
+
+        //added selected school to the plan 
+        //plan.PlanSchedules = selectedSchool.Select(school => new PlanSchedule
+        //{
+        //    SchoolId = school.Id,
+        //    School = school
+        //}).ToList();
+        //await unitOfWork.GetRepository<Plan>().InsertAsync(plan);
+        await unitOfWork.CommitAsync();
+        return true;
     }
     public async Task<bool> DeleteEvaluationPlan(Guid? id)
     {
@@ -57,6 +93,7 @@ public class PlanRequestRepository(IServiceScopeFactory serviceScopeFactory,
             {
                 Id = s.Id,
                 Name = requestInfo.Lang == LanguageConst.Ar ? s.NameAr : s.NameEn,
+                BackendName = s.BackendName,
             }).
             ToListAsync();
     }

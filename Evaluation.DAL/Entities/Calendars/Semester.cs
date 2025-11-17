@@ -1,9 +1,4 @@
 ﻿using Evaluation.DAL.Entities.BaseModule;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Evaluation.DAL.Entities.Calendars
 {

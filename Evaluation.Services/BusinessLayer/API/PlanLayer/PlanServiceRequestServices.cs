@@ -37,7 +37,7 @@ public class PlanServiceRequestServices(
         {
             //PlanServiceRequest planDraft = evaluationPlanDto.Adapt<PlanServiceRequest>();
             //var result = await f.CreateServicPlan(evaluationPlanDto);
-            
+
             var result = evaluationPlanDto.ConvertFromRequestToResponse(evaluationPlanDto);
             result.CreateDate = DateTime.Now;
             result.AcademicYearId = new Guid("00066600-9999-0000-7777-000000000001");
@@ -78,21 +78,21 @@ public class PlanServiceRequestServices(
             return result;
         });
     }
-    //public async Task<Result<CreateEvaluationPlanDto>> ApprovePlan(ApproveEvaluationPlanDto? modelDto)
-    //{
-    //    await ValidateApprovePlan(modelDto);
+    public async Task<Result<CreateEvaluationPlanDto>> ApprovePlan(ApproveEvaluationPlanDto? modelDto)
+    {
+        //await ValidateApprovePlan(modelDto);
 
-    //    return await ExecuteWithResult(async () =>
-    //    {
-    //        Plan plan = modelDto.Adapt<Plan>();
-    //        var result = await planRepository.ApprovePlans(plan.Id);
-    //    });
-    //}
-    //public async Task<Result<List<PlanTypeDto>>> GetPlanType()
-    //{
-    //    var result = await ExecuteWithResult(async () => await planRepository.GetPlanTypeAsync());
-    //    return result;
-    //}
+        return await ExecuteWithResult(async () =>
+        {
+            Plan plan = modelDto.Adapt<Plan>();
+            var result = await planRepository.ApprovePlans(plan);
+        });
+    }
+    public async Task<List<PlanTypeDto>> GetPlanTypes()
+    {
+        var result = await planRepository.GetPlanTypeAsync();
+        return result;
+    }
     //public async Task<Result<bool>> RequestDeleteSchool()
     //{
     //    return await ExecuteWithResult(async () =>
@@ -100,28 +100,15 @@ public class PlanServiceRequestServices(
 
     //    });
     //}
-   
-    public async Task<Result<List<PlanTypeDto>>> GetPlansTypes()
-    {
-        return await ExecuteWithResult(async () =>
-        {
-            var result = GetPlanTypes();
-            return result;
-        });
-    }
-    private List<PlanTypeDto> GetPlanTypes()
-    {
-        return new List<PlanTypeDto>
-        {
-            new PlanTypeDto{Id = new Guid(),Name= "Month"},
-            new PlanTypeDto{Id = new Guid(),Name = "Year"}
-        };
-    }
-    public class PlanTypeDto
-    {
-        public Guid Id { get; set; }
-        public string Name { get; set; } = null!;
-    }
+
+    //public async Task<Result<List<PlanTypeDto>>> GetPlansTypes()
+    //{
+    //    return await ExecuteWithResult(async () =>
+    //    {
+    //        var result = GetPlanTypes();
+    //        return result;
+    //    });
+    //}
 
     private async Task ValidateApprovePlan(CreateEvaluationPlanDto model)
     {

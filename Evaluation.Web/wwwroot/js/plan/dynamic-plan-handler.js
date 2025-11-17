@@ -34,7 +34,7 @@ function isHoliday(date) {
 
 // Get plan types
 const getPlanTypes = () => {
-    jqClient().Get('/Plan/GetPlanType').done((result) => {
+    jqClient().Get('/PlanType/GetPlanTypes').done((result) => {
         const data = (result && result.result) ? result.result : [];
         $ddlPlanType.select2({
             placeholder: "اختر نوع الخطة",

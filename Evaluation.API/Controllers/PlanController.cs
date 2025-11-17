@@ -1,7 +1,9 @@
-﻿using Evaluation.API.Extensions;
+﻿using System.Threading.Tasks;
+using Evaluation.API.Extensions;
 using Evaluation.DAL.Dtos;
 using Evaluation.Services.BusinessLayer;
 using Evaluation.Services.BusinessLayer.API.PlanLayer;
+using Evaluation.Services.BusinessLayer.API.SteamerLayer;
 using Evaluation.Services.Models.Planing;
 using Evaluation.SharedHelper.Dtos.PlanDto;
 using Microsoft.AspNetCore.Mvc;
@@ -18,6 +20,11 @@ public class PlanController(MasterBL masterBL) : ControllerBase
     {
         var jsonPlan = await masterBL.GetApiService<PlanServiceRequestServices>().AddEvaulationPlan(planRequest);
         return jsonPlan.ToActionResult();
+    }
+    [HttpPost]
+    public async Task<IActionResult> CreatePlan([FromBody] CreateEvaluationPlanDto planApproved)
+    {
+        var plan = await masterBL.GetAdminService<PlanServiceRequestServices>().AddEvaulationPlan
     }
     //[HttpDelete]
     //public async Task<IActionResult> DeletePlan(Guid id)
@@ -75,17 +82,11 @@ public class PlanController(MasterBL masterBL) : ControllerBase
     };
     }
     [HttpGet]
-    public IActionResult GetSemesters()
+    public async Task<IActionResult> GetSemesters()
     {
-        return Ok(new { result = GetSemestersAsync() });
-    }
-    private List<SemesterDto> GetSemestersAsync()
-    {
-        return new List<SemesterDto>
-    {
-        new SemesterDto { Id = Guid.Parse("11111111-2111-1111-1111-111111111111"), Name = "Firstly",StartDate = new DateTime(2026,04,01), EndDate= new DateTime(2026,08,01) },
-        new SemesterDto { Id = Guid.Parse("22222222-1222-2222-2222-222222222222"), Name = "Scandle", StartDate = new DateTime(2025,04,01), EndDate= new DateTime(2025,08,01) }
-    };
+        var semester = await masterBL.GetApiService<SemesterRequestServices>().GetSemestersAsync(new Guid("37689d34-4928-4bb9-92b4-8a11abc0dbaf"));
+        return Ok(new { result = semester });
+        //return semester.ToActionResult();
     }
 
     public class PlanTypeDto
