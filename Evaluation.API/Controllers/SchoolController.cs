@@ -24,7 +24,6 @@ public class SchoolController : ControllerBase
     }
 
     [HttpGet]
-
     public async Task<School> GetSchoolDetails(Guid SchoolID)
     {
         //var schooldetails = await _masterBl.GetApiService<SchoolBL>().GetSchoolDetails(SchoolID);
@@ -41,6 +40,18 @@ public class SchoolController : ControllerBase
     public async Task<List<HREmployeeInfoDto>> GetHREmployeesDetails(int page)
     {
         return await _hrService.GetAllHRUsersAsync(page);
+    }
+
+    [HttpGet]
+    public async Task<List<HREmployeeInfoDto>> GetHREmployees(long? qID = null, string email = null, string orgno = null)
+    {
+        return await _hrService.GetHRUsersAsync(qID, email, orgno);
+    }
+
+    [HttpGet]
+    public async Task<bool> AddUpdateOrgTree(string? hrCode = null ,long? qID = null)
+    {
+        return await _hrService.AddUpdateOrgTree(hrCode, qID);
     }
 
     [HttpGet]
