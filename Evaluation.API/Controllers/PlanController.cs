@@ -36,7 +36,7 @@ public class PlanController(MasterBL masterBL) : ControllerBase
     //    var isDeleted = await masterBL.GetApiService<PlanServiceRequestServices>().DeletePlanDraft(id);
     //    return isDeleted.ToActionResult();
     //}
-  
+
     [HttpPost]
     public IActionResult RequestDeleteSchool(RequestDeleteSchoolDto requestDelete)
     {
@@ -91,7 +91,8 @@ public class PlanController(MasterBL masterBL) : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetSemesters()
     {
-        var semester = await masterBL.GetApiService<SemesterRequestServices>().GetSemestersAsync(new Guid("37689d34-4928-4bb9-92b4-8a11abc0dbaf"));
+        //var semester = await masterBL.GetApiService<SemesterRequestServices>().GetSemestersAsync(new Guid("37689d34-4928-4bb9-92b4-8a11abc0dbaf"));
+        var semester = await masterBL.GetApiService<SemesterRequestServices>().GetSemestersAsync();
         return Ok(new { result = semester });
         //return semester.ToActionResult();
     }

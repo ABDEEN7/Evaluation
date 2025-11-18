@@ -1,4 +1,5 @@
 ﻿using  Evaluation.DAL.Entities.BaseModule;
+using Evaluation.DAL.Entities.Calendars;
 using Evaluation.DAL.Entities.Org;
 using Evaluation.DAL.Entities.Planing;
 
@@ -19,4 +20,5 @@ public class Department : EntityBase
     public string? DescAr { get; set; }
     public string? DescEn { get; set; }
     public int OrderNo { get; set; } = 0;
+    public ICollection<AcademicYear> AcademicYears { get; set; }
 }

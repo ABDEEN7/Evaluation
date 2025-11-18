@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Evaluation.DAL.Dtos;
 using Evaluation.DAL.Entities.Calendars;
+using Evaluation.DAL.Entities.DepartementEntites;
 using Evaluation.DAL.Entities.Planing;
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.UnitOfWork;
@@ -38,6 +39,13 @@ public class PlanServiceRequestServices(
         {
             //PlanServiceRequest planDraft = evaluationPlanDto.Adapt<PlanServiceRequest>();
             //var result = await f.CreateServicPlan(evaluationPlanDto);
+            var academicYearIdForCurrentUser = unitOfWork
+                 .GetRepository<Department>()
+                 .GetAllActiveNonDeleted(d => d.TargetOrgTreeId == userInfo.UserId)
+                 .SelectMany(d => d.AcademicYears) 
+                 .OrderByDescending(a => a.CreateDate)
+                 .Select(a => a.Id)
+                 .FirstOrDefault();
 
             var result = evaluationPlanDto.ConvertFromRequestToResponse(evaluationPlanDto);
             result.CreateDate = DateTime.Now;

@@ -23,18 +23,18 @@ public class SemesterRequestServices(IServiceScopeFactory serviceScopeFactory,
     ) : ApiBase(serviceScopeFactory, cacheDataProvider, unitOfWork, loggingServices, mapper, userInfo,
         serviceProvider, requestInfo)
 {
-    public async Task<Result<List<SemesterDto>>> GetSemestersTemplateAsync(Guid academicYearId)
+    //public async Task<Result<List<SemesterDto>>> GetSemestersTemplateAsync(Guid academicYearId)
+    //{
+    //    return await ExecuteWithResult(async () =>
+    //    {
+    //        List<Semester> semesters = await semesterRepostiory.GetSemesters(academicYearId);
+    //        List<SemesterDto> semesterDtos = new SemesterDto().ConvertSemesterToDto(semesters);
+    //        return semesterDtos;
+    //    });
+    //}
+    public async Task<List<SemesterDto>> GetSemestersAsync()
     {
-        return await ExecuteWithResult(async () =>
-        {
-            List<Semester> semesters = await semesterRepostiory.GetSemesters(academicYearId);
-            List<SemesterDto> semesterDtos = new SemesterDto().ConvertSemesterToDto(semesters);
-            return semesterDtos;
-        });
-    }
-    public async Task<List<SemesterDto>> GetSemestersAsync(Guid academicYearId)
-    {
-            List<Semester> semesters = await semesterRepostiory.GetSemesters(academicYearId);
+            List<Semester> semesters = await semesterRepostiory.GetSemesters();
             List<SemesterDto> semesterDtos = new SemesterDto().ConvertSemesterToDto(semesters);
             return semesterDtos;
     }
