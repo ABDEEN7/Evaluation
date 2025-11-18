@@ -32,7 +32,7 @@ public class SemesterRepostiory(IServiceScopeFactory serviceScopeFactory,
                 .Select(x => new SemesterDto
                 {
                     Id = x.Id,
-                    Name = requestInfo.Lang == "Ar" ? x.NameAr : x.NameEn,
+                    Name = requestInfo.Lang == "Ar".ToLower() ? x.NameAr.ToLower() : x.NameEn.ToLower(),
                     EndDate = x.EndDate,
                     StartDate = x.StartDate
                 }).ToListAsync();

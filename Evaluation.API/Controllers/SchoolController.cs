@@ -25,14 +25,8 @@ public class SchoolController : ControllerBase
     [HttpGet]
     public async Task<School> GetSchoolDetails(Guid SchoolID)
     {
-        //var schooldetails = await _masterBl.GetApiService<SchoolBL>().GetSchoolDetails(SchoolID);
-
-        var dummyData = new List<School>() {
-            new School() { Id = new Guid("921d891a-e0cb-4fd4-8e53-fb3443ef0199"), NameAr = "مدرسة احمد بن حنبل", NameEn = "Ahmad Bin Hanbal School"},
-            new School() { Id = new Guid("ecd11007-2ff6-42cb-bca2-b168de94afbc"), NameAr = "مدرسة عائشة", NameEn = "Aesha School" }
-        };
-
-        return dummyData.FirstOrDefault(s => s.Id == SchoolID);
+        var schooldetails = await _masterBl.GetApiService<SchoolBL>().GetSchoolDetails(SchoolID);
+        return schooldetails;
     }
 
     [HttpGet]
@@ -55,54 +49,14 @@ public class SchoolController : ControllerBase
         return Ok(new { result = visits });
     }
     [HttpGet]
-    public IActionResult GetSchools([FromQuery] SchoolRequest request)
+    public async Task<IActionResult> GetSchools([FromQuery] SchoolRequest request)
     {
-        return Ok(new { result = GetListSchool() });
+        var schooldetails = await _masterBl.GetApiService<SchoolBL>().GetSchools();
+
+        return Ok(new { result = schooldetails });
     }
-    private List<ResponseSchools> GetListSchool()
-    {
-        return new List<ResponseSchools>
-        {
-            new ResponseSchools
-            {
-                Id = new Guid("921d891a-e0cb-4fd4-8e53-fb3443ef0199"),
-                Name = "Greenwood High School",
-                LastEvaluationDate = new DateTime(2024, 5, 20),
-                Rating = "Perfect",
-                AcademicYear = 2025
-            },
-            new ResponseSchools
-            {
-                Id = new Guid("ecd11007-2ff6-42cb-bca2-b168de94afbc"),
-                Name = "Sunrise Elementary",
-                LastEvaluationDate = new DateTime(2023, 11, 10),
-                Rating = "Week",
-                AcademicYear = new DateTime(2025).Year
-            },
-            new ResponseSchools
-            {
-                Id = Guid.NewGuid(),
-                Name = "Riverside Middle School",
-                LastEvaluationDate = new DateTime(2024, 8, 15),
-                Rating = "VeryGood",
-                AcademicYear = new DateTime(2025).Year
-            },
-            new ResponseSchools
-            {
-                Id = Guid.NewGuid(),
-                Name = "Mountainview Academy",
-                LastEvaluationDate = new DateTime(2022, 12, 30),
-                Rating = "Perfect",
-                AcademicYear = new DateTime(2025).Year
-            },
-            new ResponseSchools
-            {
-                Id = Guid.NewGuid(),
-                Name = "Lakeside Primary",
-                LastEvaluationDate = null,
-                Rating = "Aecctable",
-                AcademicYear = new DateTime(2025).Year
-            }
-        };
-    }
+    //private List<ResponseSchools> GetListSchool()
+    //{
+    //    var schooldetails = await _masterBl.GetApiService<SchoolBL>().GetSchools());
+    //}
 }
