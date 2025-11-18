@@ -218,10 +218,10 @@ public class PlanMocksController : ControllerBase
     {
         return new List<PlanTypeDto>
     {
-        new PlanTypeDto { Id = new Guid("10000000-0000-0000-0000-000000000001"), Name = "سنوي", BackendName = "Year" },
-        new PlanTypeDto { Id = new Guid("20000000-0000-0000-0000-000000000002"), Name = "شهري", BackendName = "Month" },
-        new PlanTypeDto { Id = new Guid("30000000-0000-0000-0000-000000000003"), Name = "فصلي", BackendName = "Semester" },
-        new PlanTypeDto { Id = new Guid("40000000-0000-0000-0000-000000000004"), Name = "مخصص", BackendName = "Custom" }
+        new PlanTypeDto { Id = new Guid("30EC25FB-9BA2-432F-974F-C044B70910B1"), Name = "سنوي", BackendName = "Year" },
+        new PlanTypeDto { Id = new Guid("9974D7BE-EF1B-45DE-B277-3E2AC10A3CCB"), Name = "شهري", BackendName = "Month" },
+        new PlanTypeDto { Id = new Guid("ED98573C-EE74-4368-92E7-309799A9D582"), Name = "فصلي", BackendName = "Semester" },
+        new PlanTypeDto { Id = new Guid("70BBE659-BB1E-40CF-95A8-3332E7091BD9"), Name = "مخصص", BackendName = "Custom" }
     };
     }
 
@@ -250,8 +250,8 @@ public class PlanMocksController : ControllerBase
     {
         return new List<VisitTypeDto>
     {
-        new VisitTypeDto { Id = new Guid("60000000-0000-0000-0000-000000000001"), Name = "دوري" },
-        new VisitTypeDto { Id = new Guid("60000000-0000-0000-0000-000000000002"), Name = "استثنائي" },
+        new VisitTypeDto { Id = new Guid("E56666BF-B6EA-4063-A169-282AADB9FBE3"), Name = "دوري" },
+        new VisitTypeDto { Id = new Guid("B19D3A0E-2424-4174-8B9A-1236FAA8C241"), Name = "استثنائي" },
         new VisitTypeDto { Id = new Guid("60000000-0000-0000-0000-000000000003"), Name = "زيارة" }
     };
     }

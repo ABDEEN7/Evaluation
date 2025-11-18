@@ -1,4 +1,5 @@
 ﻿using Evaluation.DAL.Entities.Calendars;
+using Evaluation.DAL.Entities.FormsModules;
 using Evaluation.DAL.Entities.Org;
 using Evaluation.DAL.Entities.Planing;
 using Evaluation.DAL.UnitOfWork;
@@ -18,6 +19,9 @@ public class PlanRequestRepository(IServiceScopeFactory serviceScopeFactory,
     RequestInfo requestInfo
     ) : ApiServiceBase
 {
+    public async Task<Plan?> GetPlanAsync(Guid id)
+        => await unitOfWork.GetRepository<Plan>().GetByIDActiveNonDeleted(id);
+
     public async Task<string> CreateServicPlan(PlanServiceRequest model)
     {
         if (await IsThereExistingDraftPlanForSameAcadmicYear(model))
@@ -28,6 +32,13 @@ public class PlanRequestRepository(IServiceScopeFactory serviceScopeFactory,
         //await unitOfWork.CommitAsync();
         //return (await unitOfWork.GetRepository<PlanServiceRequest>().GetByIdAsync(model.Id));
     }
+    public async Task<bool> UpdatePlanAsync(Plan plan)
+{
+    var repo = unitOfWork.GetRepository<Plan>();
+    repo.Update(plan);
+        await unitOfWork.CommitAsync();
+    return  true;
+}
     public async Task<bool> ApprovePlans(Plan model)
     {
 
@@ -41,7 +52,7 @@ public class PlanRequestRepository(IServiceScopeFactory serviceScopeFactory,
         //List<Guid> schoolIds = plan.Schools.Select(s => s.Id).ToList();
         var selectedSchool = unitOfWork
             .GetRepository<School>();
-        
+
         //.GetAllActiveNonDeleted(x => schoolIds.Contains(x.Id));
 
         //added selected school to the plan 
@@ -66,7 +77,7 @@ public class PlanRequestRepository(IServiceScopeFactory serviceScopeFactory,
         await unitOfWork.CommitAsync();
         return true;
     }
-    
+
     //public async Task<bool> DeleteSchoolFromPlan(Guid requestId, Guid schoolId)
     //{
     //    var plan = await unitOfWork.GetRepository<Plan>().GetByIdAsync(changeRequest.PlanId);

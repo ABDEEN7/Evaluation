@@ -1,21 +1,25 @@
 ﻿using System.Threading.Tasks;
 using Evaluation.API.Extensions;
-using Evaluation.DAL.Dtos;
 using Evaluation.Services.BusinessLayer;
 using Evaluation.Services.BusinessLayer.API.PlanLayer;
 using Evaluation.Services.BusinessLayer.API.SteamerLayer;
 using Evaluation.Services.Models.Planing;
 using Evaluation.SharedHelper.Dtos.PlanDto;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 
 namespace Evaluation.API.Controllers;
 
 [Route("api/[controller]/[action]")]
 public class PlanController(MasterBL masterBL) : ControllerBase
 {
+    [HttpGet]
+    public async Task<IActionResult> GetPlanById(Guid planId)
+    {
+        var plan = await masterBL.GetApiService<PlanServiceRequestServices>().GetPlanByIdAsync(planId);
+        return Ok(new { result = plan });
+    }
+
     [HttpPost]
-    //public async Task<IActionResult> CreateAsync([FromBody] CreateEvaluationPlanDto planRequest)
     public async Task<IActionResult> Create([FromBody] CreateEvaluationPlanDto planRequest)
     {
         var jsonPlan = await masterBL.GetApiService<PlanServiceRequestServices>().AddEvaulationPlan(planRequest);
@@ -32,11 +36,7 @@ public class PlanController(MasterBL masterBL) : ControllerBase
     //    var isDeleted = await masterBL.GetApiService<PlanServiceRequestServices>().DeletePlanDraft(id);
     //    return isDeleted.ToActionResult();
     //}
-    //[HttpPut]
-    //public IActionResult UpdatePlan()
-    //{
-    //    return new { result = new CreateEvaluationPlanDto { } }
-    //}
+  
     [HttpPost]
     public IActionResult RequestDeleteSchool(RequestDeleteSchoolDto requestDelete)
     {
@@ -57,11 +57,13 @@ public class PlanController(MasterBL masterBL) : ControllerBase
     //    await masterBL.GetApiService<PlanServiceRequestServices>().ApprovePlan(planDto);
     //    return Ok();
     //}
-    [HttpPut]
-    public async Task<IActionResult> UpdatePlan(Guid id, [FromBody] string planDto)
+    [HttpPut("{id:guid}")]
+    public async Task<IActionResult> UpdatePlan(Guid id, [FromBody] UpdatePlanDto planDto)
     {
-        var planJson = await masterBL.GetApiService<PlanServiceRequestServices>().UpdatePlanDraft(id, planDto);
-        return Ok(planJson);
+        var result = await masterBL
+              .GetApiService<PlanServiceRequestServices>()
+              .UpdatePlanAsync(id, planDto);
+        return Ok(result);
     }
     [HttpPost]
     //public async Task<IActionResult> ApproveDeleteSchool(Guid id, Guid schoolId)

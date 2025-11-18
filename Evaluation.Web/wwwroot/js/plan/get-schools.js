@@ -273,3 +273,4 @@ function loadVisitTypes() {
         console.error('Get Visits failed', textStatus, err);
     });
 }
+

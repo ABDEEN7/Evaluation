@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Evaluation.DAL.Dtos;
 using Evaluation.DAL.Entities.Calendars;
 using Evaluation.DAL.Entities.Planing;
 using Evaluation.DAL.Helper;
@@ -46,30 +47,32 @@ public class PlanServiceRequestServices(
             return result;
         });
     }
-    public async Task<Result<PlanServiceRequest>> UpdatePlanDraft(Guid id, string planDto)
+    public async Task<bool> UpdatePlanAsync(Guid id, UpdatePlanDto planDto)
     {
-        return await ExecuteWithResult(async () =>
-        {
-            PlanServiceRequest? oldPlan = await unitOfWork.GetRepository<PlanServiceRequest>().GetByIdAsync(id);
+        // 1. Fetch existing plan
+        var plan = await planRepository.GetPlanAsync(id);
 
-            if (oldPlan is null)
-                throw new BusinessException(ConstantKeys.ExceptionMessage.PlanIsNotFound);
+        if (plan is null)
+            throw new BusinessException(ConstantKeys.ExceptionMessage.PlanIsNotFound);
 
-            string planJson = oldPlan.Value;
-            var currentPlan = JsonConvert.DeserializeObject<CreateEvaluationPlanDto>(planJson);
+        // 2. Save old version as JSON (audit or history)
+        planDto.PlanJsonValue = JsonConvert.SerializeObject(plan);
 
-            //if (currentPlan == null)
-            //    return Result<bool>.Failure("Failed to deserialize the existing plan.");
-            var dto = JsonConvert.DeserializeObject<CreateEvaluationPlanDto>(planDto);
-            await ValidateDraftPlan(dto);
-            currentPlan = dto.Adapt<CreateEvaluationPlanDto>();
-            var updatedPlanJson = JsonConvert.SerializeObject(currentPlan);
-            oldPlan.Value = updatedPlanJson;
-            //unitOfWork.GetRepository<PlanServiceRequest>().Update(oldPlan);
-            PlanServiceRequest model = new PlanServiceRequest { Id = id, Value = planDto };
-            return model;
-        });
+        // 3. Validate input
+        await ValidateUpdatePlan(planDto);
+
+        // 4. Update the existing entity instead of replacing it
+        UpdatePlanEntity(plan, planDto);
+        // 5. Save to DB
+        return await planRepository.UpdatePlanAsync(plan);
     }
+    public async Task<PlanDto> GetPlanByIdAsync(Guid id)
+    {
+        var result = await planRepository.GetPlanAsync(id);
+        var planDto = PlanDto.FromEntity(result);
+        return planDto;
+    }
+
     public async Task<Result<bool>> DeletePlanDraft(Guid id)
     {
         return await ExecuteWithResult(async () =>
@@ -88,42 +91,15 @@ public class PlanServiceRequestServices(
             var result = await planRepository.ApprovePlans(plan);
         });
     }
+
+    //Plan Type Module
     public async Task<List<PlanTypeDto>> GetPlanTypes()
     {
         var result = await planRepository.GetPlanTypeAsync();
         return result;
     }
-    //public async Task<Result<bool>> RequestDeleteSchool()
-    //{
-    //    return await ExecuteWithResult(async () =>
-    //    {
-
-    //    });
-    //}
-
-    //public async Task<Result<List<PlanTypeDto>>> GetPlansTypes()
-    //{
-    //    return await ExecuteWithResult(async () =>
-    //    {
-    //        var result = GetPlanTypes();
-    //        return result;
-    //    });
-    //}
-
-    private async Task ValidateApprovePlan(CreateEvaluationPlanDto model)
-    {
-        if (model is null || string.IsNullOrEmpty(model.Name))
-            throw new BusinessException(ConstantKeys.ExceptionMessage.InvalidApprovePlan);
-
-        var selectedYear = await serviceScopeFactory.CreateScopedUow().GetRepository<AcademicYear>()
-           .GetAllActiveNonDeleted()
-           .FirstOrDefaultAsync(x => x.Id == model.AcademicYearId);
-
-        if (selectedYear?.Year < DateTime.Now.Year)
-            throw new BusinessException(ConstantKeys.ExceptionMessage.PlanInThePastIsNotAllowed);
-        //if(model.PlanStatusId)
-    }
-    private async Task ValidateDraftPlan(CreateEvaluationPlanDto model)
+    //Validation Plans
+    private async Task ValidateUpdatePlan(UpdatePlanDto model)
     {
         if (model is null || string.IsNullOrEmpty(model.Name))
             throw new BusinessException(ConstantKeys.ExceptionMessage.InvalidDraftPlan);
@@ -134,6 +110,18 @@ public class PlanServiceRequestServices(
 
         if (selectedYear?.Year < DateTime.Now.Year)
             throw new BusinessException(ConstantKeys.ExceptionMessage.PlanInThePastIsNotAllowed);
+    }
+    private void UpdatePlanEntity(Plan plan, UpdatePlanDto dto)
+    {
+        plan.PlanName = dto.Name;
+        plan.StartDate = dto.StartDate;
+        plan.EndDate = dto.EndDate;
+        plan.DepartmentId = dto.DepartmentId;
+        plan.AcademicYearId = dto.AcademicYearId;
+        plan.PlanStatusId = dto.PlanStatusId;
+        plan.PlanTypeDepartmentId = dto.PlanTypeDepartmentId;
+        plan.SemesterId = dto.SemesterId;
+        plan.PlanJsonValue = dto.PlanJsonValue;
     }
 
 }
