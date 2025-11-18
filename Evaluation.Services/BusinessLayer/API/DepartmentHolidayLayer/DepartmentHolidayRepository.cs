@@ -1,6 +1,5 @@
-﻿using System.Threading.Tasks;
-using Evaluation.DAL.Entities.Calendars;
-using Evaluation.DAL.UnitOfWork;
+﻿using Evaluation.DAL.Models.Calendars;
+using Evaluation.DAL.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 namespace Evaluation.Services.BusinessLayer.API.DepartmentHolidayLayer;

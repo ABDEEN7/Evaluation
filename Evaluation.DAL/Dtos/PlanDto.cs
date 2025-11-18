@@ -1,4 +1,4 @@
-﻿using Evaluation.DAL.Entities.Planing;
+﻿using Evaluation.DAL.Models.Planing;
 
 namespace Evaluation.DAL.Dtos;
 

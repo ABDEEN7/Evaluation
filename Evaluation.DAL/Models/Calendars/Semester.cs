@@ -1,4 +1,4 @@
-﻿using Evaluation.DAL.Entities.BaseModule;
+﻿using Evaluation.DAL.Models.BaseModule;
 
 namespace Evaluation.DAL.Models.Calendars
 {

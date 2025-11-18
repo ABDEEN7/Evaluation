@@ -1,6 +1,4 @@
-﻿using Evaluation.DAL.Entities.Authentication;
-
-namespace Evaluation.SharedHelper.Dtos.PlanDto;
+﻿namespace Evaluation.SharedHelper.Dtos.PlanDto;
 
 public class BaseDto
 {

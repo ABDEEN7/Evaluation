@@ -1,15 +1,12 @@
-﻿using Aspose.Words.Drawing;
-using AutoMapper;
+﻿using AutoMapper;
 using Evaluation.DAL.Dtos;
-using Evaluation.DAL.Entities.Calendars;
 using Evaluation.DAL.Helper;
-using Evaluation.DAL.UnitOfWork;
-using Evaluation.Services.BusinessLayer.API.AcademicYearLayer;
+using Evaluation.DAL.Models.Calendars;
+using Evaluation.DAL.Repositories;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Models;
 using FluentResults;
 using Microsoft.Extensions.DependencyInjection;
-using Spire.Doc.AI.Client;
 
 namespace Evaluation.Services.BusinessLayer.API.DepartmentHolidayLayer;
 

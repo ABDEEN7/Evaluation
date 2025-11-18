@@ -1,7 +1,7 @@
-﻿using  Evaluation.DAL.Entities.BaseModule;
-using Evaluation.DAL.Entities.Calendars;
-using Evaluation.DAL.Entities.Org;
-using Evaluation.DAL.Entities.Planing;
+﻿using Evaluation.DAL.Models.BaseModule;
+using Evaluation.DAL.Models.Calendars;
+using Evaluation.DAL.Models.Org;
+using Evaluation.DAL.Models.Planing;
 
 namespace Evaluation.DAL.Models.DepartementEntites;
 
@@ -20,5 +20,6 @@ public class Department : EntityBase
     public string? DescAr { get; set; }
     public string? DescEn { get; set; }
     public int OrderNo { get; set; } = 0;
+    public ICollection<UserDepartment> UserDepartments { get; set; }
     public ICollection<AcademicYear> AcademicYears { get; set; }
 }

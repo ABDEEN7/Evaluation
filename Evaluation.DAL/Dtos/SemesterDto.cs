@@ -1,5 +1,4 @@
-﻿using Evaluation.DAL.Entities.Calendars;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
+﻿using Evaluation.DAL.Models.Calendars;
 
 namespace Evaluation.DAL.Dtos;
 

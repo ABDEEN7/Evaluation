@@ -1,12 +1,11 @@
 ﻿using AutoMapper;
 using Evaluation.DAL.Dtos;
-using Evaluation.DAL.Entities.Calendars;
 using Evaluation.DAL.Helper;
-using Evaluation.DAL.UnitOfWork;
+using Evaluation.DAL.Models.Calendars;
+using Evaluation.DAL.Repositories;
 using Evaluation.Services.BusinessLayer.API.SemesterLayer;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Models;
-using FluentResults;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Evaluation.Services.BusinessLayer.API.SteamerLayer;
@@ -34,8 +33,8 @@ public class SemesterRequestServices(IServiceScopeFactory serviceScopeFactory,
     //}
     public async Task<List<SemesterDto>> GetSemestersAsync()
     {
-            List<Semester> semesters = await semesterRepostiory.GetSemesters();
-            List<SemesterDto> semesterDtos = new SemesterDto().ConvertSemesterToDto(semesters);
-            return semesterDtos;
+        List<SemesterDto> semesters = await semesterRepostiory.GetSemesters();
+        //List<SemesterDto> semesterDtos = new SemesterDto().ConvertSemesterToDto(semesters);
+        return semesters;
     }
 }

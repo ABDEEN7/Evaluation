@@ -1,8 +1,4 @@
-﻿using Evaluation.DAL.Entities.Calendars;
-using Evaluation.DAL.Entities.DepartementEntites;
-using Evaluation.DAL.Entities.Planing;
-
-namespace Evaluation.SharedHelper.Dtos.PlanDto;
+﻿namespace Evaluation.SharedHelper.Dtos.PlanDto;
 
 public class UpdatePlanDto
 {
