@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Evaluation.DAL.Entities.BaseModule;
+using Evaluation.DAL.Models.BaseModule;
 using Evaluation.SharedHelper.Models.Admin;
 
 
@@ -9,7 +9,9 @@ namespace Evaluation.Services.Mappers
     {
         public ControlValidationProfile()
         {
-            CreateMap<ControlValidation, ControlValidationDTO>();
+            CreateMap<ControlValidation, ControlValidationDTO>()
+                 .ForMember(dest => dest.ControlName, opt => opt.MapFrom(src => src.Name))
+                   .ForMember(dest => dest.TabulatorConfig, opt => opt.MapFrom(src => src.TabulatorConfigJson));
         }
     }
 }

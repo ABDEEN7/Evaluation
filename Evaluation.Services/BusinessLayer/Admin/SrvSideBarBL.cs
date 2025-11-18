@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
-using Evaluation.DAL.Entities.PermissionEntity;
-using Evaluation.DAL.Entities.Website;
 using Evaluation.DAL.Helper;
-using Evaluation.DAL.UnitOfWork;
+using Evaluation.DAL.Models.PermissionEntity;
+using Evaluation.DAL.Models.Website;
+using Evaluation.DAL.Repositories;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Exceptions;

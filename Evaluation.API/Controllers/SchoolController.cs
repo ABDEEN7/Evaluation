@@ -1,6 +1,6 @@
 ﻿using Evaluation.API.Extensions;
 using Evaluation.DAL.DTOs;
-using Evaluation.DAL.Entities.Org;
+using Evaluation.DAL.Models.Org;
 using Evaluation.Services.BusinessLayer;
 using Evaluation.Services.BusinessLayer.API;
 using Evaluation.Services.Integration;

@@ -1,7 +1,5 @@
 using System.Net.Mail;
 using System.Text.RegularExpressions;
-using Evaluation.DAL.Entities.Website;
-using Evaluation.DAL.UnitOfWork;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper;
 using Evaluation.SharedHelper.Enums;
@@ -10,9 +8,11 @@ using Evaluation.SharedHelper.Models;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Evaluation.Services.BusinessLayer.API.Template;
-using Evaluation.DAL.Entities.FormBuilder;
 using Xceed.Document.NET;
 using Xceed.Words.NET;
+using Evaluation.DAL.Models.FormBuilder;
+using Evaluation.DAL.Models.Website;
+using Evaluation.DAL.Repositories;
 
 namespace Evaluation.Services.BusinessLayer.API.Template;
 

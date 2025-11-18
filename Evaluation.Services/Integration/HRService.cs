@@ -1,7 +1,5 @@
 ﻿using Evaluation.DAL.DTOs;
-using Evaluation.DAL.Entities.Org;
 using Evaluation.DAL.Helper;
-using Evaluation.DAL.UnitOfWork;
 using Evaluation.Services.BusinessLayer.API;
 using Evaluation.Services.Mapping;
 using Evaluation.Services.Special;
@@ -11,6 +9,7 @@ using AutoMapper;
 using Microsoft.Extensions.DependencyInjection;
 using Oracle.ManagedDataAccess.Client;
 using System.Data;
+using Evaluation.DAL.Repositories;
 
 namespace Evaluation.Services.Integration;
 

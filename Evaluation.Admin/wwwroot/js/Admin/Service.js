@@ -6,7 +6,7 @@ let isSearch = false;
 let isLoading = true;
 let AllStatusList = [];
 let RequestFieldList = [];
-let ScholarShipFieldList = [];
+let EvaluationFieldList = [];
 let fieldvalueselectedlist = '';
 const btnAddContentId = 'btn-add-content',
     btnSubmitId = "btn-submit",
@@ -266,9 +266,9 @@ function SetDropDown (){
                         success: function (result) {
                             if (result) {
                               
-                                    const { RequestField, ScholarShipField } = result;
+                                const { RequestField, EvaluationField } = result;
                                     RequestFieldList = RequestField;
-                                    ScholarShipFieldList = ScholarShipField;
+                                EvaluationFieldList = EvaluationField;
                                 var $dropdownTarget = $('#' + constrain.uibackendName); 
                                 $dropdownTarget.select2({
                                     width: 'resolve',
@@ -351,7 +351,7 @@ function SetDropDown (){
             else {
                 $("#PlaceHolderChildFieldIds").empty();
                 $("#PlaceHolderChildFieldIds").parent().hide();
-                const ddlData = ScholarShipFieldList.map(item => (
+                const ddlData = EvaluationFieldList.map(item => (
                     {
                         id: item.id,
                         text: item.title
@@ -367,7 +367,7 @@ function SetDropDown (){
                 }).on("change", event => {
                     var data = event.target.value;
                     if (data) {
-                        var type = ScholarShipFieldList.find(x => x.id == data);
+                        var type = EvaluationFieldList.find(x => x.id == data);
                         if (type) {
                             $('#PlaceHolderType').val(type.type);
                             
@@ -455,6 +455,10 @@ $('#btn-submit_popup').click(function () {
         var requestdata = sharedFn().GetSaveObject(Placeholdercontrolvalidationlist, $('#Id').val());
 
         if (popupname == "ServiceFreeze") {
+            var serviceid = $("#serviceid").val();
+            if ($('#Id').val() == '') {
+                $('#Id').val(serviceid);
+            }
             var data = {
                 Id: $('#Id').val(),
                 IsFreez: $('#ServiceIsFreez').prop("checked")

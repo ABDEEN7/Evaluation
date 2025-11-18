@@ -1,9 +1,8 @@
 ﻿using AutoMapper;
-using Evaluation.DAL.Entities.Attachments;
-using Evaluation.DAL.Entities.FormBuilder;
-using Evaluation.DAL.Entities.Planing.EvaluationRequestEntity;
 using Evaluation.DAL.Helper;
-using Evaluation.DAL.UnitOfWork;
+using Evaluation.DAL.Models.Attachments;
+using Evaluation.DAL.Models.FormBuilder;
+using Evaluation.DAL.Repositories;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper;
 using Evaluation.SharedHelper.Enums;
@@ -61,7 +60,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                         throw new BusinessException(ConstantKeys.ExceptionMessage.IncompleteRequest);
                     }
 
-                    var attachmentsToBeInserted = new List<DAL.Entities.Attachments.Attachment>();
+                    var attachmentsToBeInserted = new List<Attachment>();
                     uploadedFiles.ForEach(fileDTO =>
                     {
 
@@ -136,10 +135,10 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                     {
                         throw new BusinessException(ConstantKeys.ExceptionMessage.IncompleteRequest);
                     }
-                    var attachmentsToBeInserted = new List<DAL.Entities.Attachments.Attachment>();
+                    var attachmentsToBeInserted = new List<Attachment>();
                     uploadedFiles.ForEach(fileDTO =>
                     {
-                        var attachment = new DAL.Entities.Attachments.Attachment()
+                        var attachment = new Attachment()
                         {
                             ActionTransactionsLogId = actionlog,
                             FileName = fileDTO.CustomFileName,
@@ -208,7 +207,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
         public async Task<Field?> GetFieldsByIdsAsync(Guid fieldId)
         {
             var fields = await serviceScopeFactory.CreateScopedUow()
-                .GetRepository<DAL.Entities.FormBuilder.Field>()
+                .GetRepository<Field>()
                 .GetAllActiveNonDeleted(x => x.Id == fieldId)
                 .Include(x => x.FieldType)
                 .AsNoTracking()
@@ -255,7 +254,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             if (uploadedFile == null)
                 return null;
 
-            var attachment = new DAL.Entities.Attachments.Attachment
+            var attachment = new Attachment
             {
                 FieldId = parentFieldId,
                 ChildFieldId = childFieldId,
@@ -267,7 +266,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                 ServiceRequestId = ServiceRequestId
             };
 
-            var inserted = await InsertAttachments(new List<DAL.Entities.Attachments.Attachment> { attachment });
+            var inserted = await InsertAttachments(new List<Attachment> { attachment });
             var savedAttachment = inserted.FirstOrDefault();
 
             return savedAttachment?.Id.ToString();

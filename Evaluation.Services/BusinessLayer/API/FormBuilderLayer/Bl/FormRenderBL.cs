@@ -1,11 +1,10 @@
 ﻿using AutoMapper;
 using Azure.Core;
-using Evaluation.DAL.Entities.ActionEntities;
-using Evaluation.DAL.Entities.Authentication;
-using Evaluation.DAL.Entities.FormBuilder;
-using Evaluation.DAL.Entities.ServiceRequestEntities;
 using Evaluation.DAL.Helper;
-using Evaluation.DAL.UnitOfWork;
+using Evaluation.DAL.Models.ActionEntities;
+using Evaluation.DAL.Models.FormBuilder;
+using Evaluation.DAL.Models.ServiceRequestEntities;
+using Evaluation.DAL.Repositories;
 using Evaluation.Services.BusinessLayer.API;
 using Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices;
 using Evaluation.Services.Extensions;

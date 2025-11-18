@@ -1,4 +1,4 @@
-﻿using Evaluation.DAL.Entities.Planing.EvaluationRequestEntity;
+﻿using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

@@ -1,7 +1,7 @@
 ﻿using System.Linq.Expressions;
-using Evaluation.DAL.Entities.Audit;
-using Evaluation.DAL.Entities.Generic;
 using Evaluation.DAL.Helper;
+using Evaluation.DAL.Models.Audit;
+using Evaluation.DAL.Models.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 

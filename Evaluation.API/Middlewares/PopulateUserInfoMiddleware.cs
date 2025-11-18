@@ -1,10 +1,8 @@
-﻿using Evaluation.DAL.Entities.Authentication;
-using Evaluation.DAL.Entities.PermissionEntity;
-using Evaluation.DAL.Entities.UserEntiy;
-using Evaluation.SharedHelper.Enums;
+﻿using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper;
 using Microsoft.EntityFrameworkCore;
 using Evaluation.DAL.Helper;
+using Evaluation.DAL.Models.PermissionEntity;
 
 
 namespace Evaluation.API.Middlewares

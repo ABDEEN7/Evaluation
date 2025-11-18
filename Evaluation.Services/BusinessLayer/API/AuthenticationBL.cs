@@ -1,21 +1,22 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using Evaluation.DAL.Entities.Authentication;
-using Evaluation.DAL.Entities.PermissionEntity;
-using Evaluation.DAL.Entities.UserEntiy;
 using Evaluation.DAL.Helper;
-using Evaluation.DAL.UnitOfWork;
 using Evaluation.Services.BusinessLayer.API;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper;
 using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Exceptions;
+using Evaluation.SharedHelper.Helper;
 using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Api.Authentication;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using UserType = Evaluation.SharedHelper.Enums.UserType;
+using Evaluation.DAL.Models.Authentication;
+using Evaluation.DAL.Models.PermissionEntity;
+using Evaluation.DAL.Models.UserEntiy;
+using Evaluation.DAL.Repositories;
 
 public class AuthenticationBL : ApiBase
 {
@@ -40,7 +41,7 @@ public class AuthenticationBL : ApiBase
 
     #region ?? Microsoft SSO Login
 
-    public async Task<string> CheckUserAuth(string username)
+    public async Task<string> checkUserAndRedirect(string username)
     {
 
         if (string.IsNullOrEmpty(username))
@@ -293,7 +294,7 @@ public class AuthenticationBL : ApiBase
         var log = new UserLoginLog
         {
             UserId = userId,
-            IP = _requestInfo.UserIp,
+            IP = _requestInfo.UserIp ,
             UserAgent = _requestInfo.UserAgent,
             CreateById = userId
         };

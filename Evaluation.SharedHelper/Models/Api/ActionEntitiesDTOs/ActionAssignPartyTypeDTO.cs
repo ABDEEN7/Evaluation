@@ -1,4 +1,4 @@
-﻿using Evaluation.DAL.Entities.ActionEntities;
+﻿using Evaluation.DAL.Models.ActionEntities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
