@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
-using Evaluation.DAL.Entities.ActionEntities;
-using Evaluation.DAL.Entities.StatusEntities;
-using Evaluation.DAL.UnitOfWork;
+using Evaluation.DAL.Models.ActionEntities;
+using Evaluation.DAL.Models.StatusEntities;
+using Evaluation.DAL.Repositories;
 using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Admin;
 

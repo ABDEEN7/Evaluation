@@ -1,6 +1,6 @@
-﻿using Evaluation.DAL.Entities.PermissionEntity;
-using Evaluation.DAL.Entities.UserEntiy;
-using Evaluation.DAL.Helper;
+﻿using Evaluation.DAL.Helper;
+using Evaluation.DAL.Models.PermissionEntity;
+using Evaluation.DAL.Models.UserEntiy;
 using Evaluation.SharedHelper;
 using Evaluation.SharedHelper.Models;
 using Microsoft.EntityFrameworkCore;

@@ -4,7 +4,7 @@ using SpireDocument = Spire.Doc.Document;
 using SpireFileFormat = Spire.Doc.FileFormat;
 using AsposeDocument = Aspose.Words.Document;
 using AsposeSaveFormat = Aspose.Words.SaveFormat;
-using Evaluation.DAL.Entities.Template;
+using Evaluation.DAL.Models.Template;
 
 namespace Evaluation.Services.BusinessLayer.API.Template
 {

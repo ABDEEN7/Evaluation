@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
-using Evaluation.DAL.Entities.Attachments;
-using Evaluation.DAL.Entities.FormBuilder;
-using Evaluation.DAL.SystemSetting;
-using Evaluation.DAL.UnitOfWork;
+using Evaluation.DAL.Models.Attachments;
+using Evaluation.DAL.Models.FormBuilder;
+using Evaluation.DAL.Models.SystemSetting;
+using Evaluation.DAL.Repositories;
 using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Admin;

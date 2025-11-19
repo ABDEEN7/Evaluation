@@ -1,5 +1,4 @@
-﻿using Evaluation.DAL.Entities.BaseModule;
-using Evaluation.DAL.Entities.FormBuilder;
+﻿using Evaluation.DAL.Models.FormBuilder;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Models.Api.FormBuilderDTO;

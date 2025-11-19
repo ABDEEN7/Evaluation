@@ -1,9 +1,9 @@
-﻿using Evaluation.DAL.Entities.ActionEntities;
-using Evaluation.DAL.Entities.ServicesEntities;
-using Evaluation.DAL.Entities.StatusEntities;
-using Evaluation.DAL.Entities.Template;
-using Evaluation.DAL.SystemSetting;
-using Evaluation.DAL.UnitOfWork;
+﻿using Evaluation.DAL.Models.ActionEntities;
+using Evaluation.DAL.Models.ServiceEnities;
+using Evaluation.DAL.Models.StatusEntities;
+using Evaluation.DAL.Models.SystemSetting;
+using Evaluation.DAL.Models.Template;
+using Evaluation.DAL.Repositories;
 using Evaluation.SharedHelper;
 using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Models.Api;

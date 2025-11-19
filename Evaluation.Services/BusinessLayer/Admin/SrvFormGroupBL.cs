@@ -1,12 +1,12 @@
 ﻿using AutoMapper;
-using Evaluation.DAL.Entities.Attachments;
-using Evaluation.DAL.Entities.Authentication;
-using Evaluation.DAL.Entities.Calendars;
-using Evaluation.DAL.Entities.FormBuilder;
-using Evaluation.DAL.Entities.Masters;
-using Evaluation.DAL.Entities.ServicesEntities;
 using Evaluation.DAL.Helper;
-using Evaluation.DAL.UnitOfWork;
+using Evaluation.DAL.Models.Attachments;
+using Evaluation.DAL.Models.Calendars;
+using Evaluation.DAL.Models.FormBuilder;
+using Evaluation.DAL.Models.Master;
+using Evaluation.DAL.Models.ServiceEnities;
+using Evaluation.DAL.Models.UserEntiy;
+using Evaluation.DAL.Repositories;
 using Evaluation.Services.Extensions;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Enums;
@@ -172,7 +172,7 @@ namespace Evaluation.Services.Models.Admin
         public async Task<List<DropdownItem>> GetAttributeList()
         {
 
-            var list = await uow.GetRepository<DAL.Entities.FormBuilder.Attribute>()
+            var list = await uow.GetRepository<DAL.Models.FormBuilder.Attribute>()
                                 .GetAllNonDeleted()
                                 .OrderByDescending(x=>x.CreateDate)
                                 .Select(x=>new DropdownItem

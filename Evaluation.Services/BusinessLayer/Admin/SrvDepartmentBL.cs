@@ -1,8 +1,7 @@
 ﻿using AutoMapper;
-using Evaluation.DAL.Entities.DepartementEntites;
-using Evaluation.DAL.Entities.SystemModulesEntities;
 using Evaluation.DAL.Helper;
-using Evaluation.DAL.UnitOfWork;
+using Evaluation.DAL.Models.DepartementEntites;
+using Evaluation.DAL.Repositories;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Exceptions;

@@ -1,7 +1,7 @@
 ﻿using Evaluation.Admin.ActionFilter;
 using Evaluation.Admin.Extensions;
 using Evaluation.Admin.Models;
-using Evaluation.DAL.Entities.ActionEntities;
+using Evaluation.DAL.Models.ActionEntities;
 using Evaluation.Services.BusinessLayer;
 using Evaluation.Services.Models.Admin;
 using Evaluation.Services.Special;

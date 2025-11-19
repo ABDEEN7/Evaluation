@@ -1,5 +1,4 @@
-﻿using Evaluation.DAL.Entities.Org;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 
 namespace Evaluation.Web.ViewComponents;
 
