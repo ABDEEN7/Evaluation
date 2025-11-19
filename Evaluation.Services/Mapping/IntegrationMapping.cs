@@ -5,7 +5,7 @@ namespace Evaluation.Services.Mapping;
 
 public static class IntegrationMapping
 {
-    public static HROrganizationInfoDto MapToOrganizationInfoDto(OracleDataReader reader)
+    public static HROrganizationInfoDto ToOrganizationInfoDto(this OracleDataReader reader)
     {
         return new HROrganizationInfoDto
         {
@@ -28,7 +28,7 @@ public static class IntegrationMapping
         };
     }
 
-    public static HREmployeeInfoDto MapToHREmployeeInfoDto(OracleDataReader reader)
+    public static HREmployeeInfoDto ToHREmployeeInfoDto(this OracleDataReader reader)
     {
         return new HREmployeeInfoDto
         {

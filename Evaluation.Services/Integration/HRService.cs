@@ -67,7 +67,7 @@ public class HRService : ApiBase
                     {
                         while (await reader.ReadAsync())
                         {
-                            employees.Add(IntegrationMapping.MapToHREmployeeInfoDto(reader));
+                            employees.Add(reader.ToHREmployeeInfoDto());
                         }
                     }
                 }
@@ -119,7 +119,7 @@ public class HRService : ApiBase
                     {
                         while (await reader.ReadAsync())
                         {
-                            orgs.Add(IntegrationMapping.MapToOrganizationInfoDto(reader));
+                            orgs.Add(reader.ToOrganizationInfoDto());
                         }
                     }
                 }
@@ -179,7 +179,7 @@ public class HRService : ApiBase
                     {
                         while (await reader.ReadAsync())
                         {
-                            employees.Add(IntegrationMapping.MapToHREmployeeInfoDto(reader));
+                            employees.Add(reader.ToHREmployeeInfoDto());
                         }
                     }
                 }
@@ -232,7 +232,7 @@ public class HRService : ApiBase
                     {
                         while (await reader.ReadAsync())
                         {
-                            employees.Add(IntegrationMapping.MapToOrganizationInfoDto(reader));
+                            employees.Add(reader.ToOrganizationInfoDto());
                         }
                     }
                 }
