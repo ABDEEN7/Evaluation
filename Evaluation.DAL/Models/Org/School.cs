@@ -16,5 +16,6 @@ public class School : OrgTree , IAuditLogEntity
     public string Code { get; set; } = null!;
     public string? Region { get; set; }
 
-    //public List<SchoolLevel> SchoolLevel { get; set; } disscucss with FT to add new relation ship between level and school 
+    public ICollection<SchoolLevel>? SchoolLevel { get; set; }
+    
 }

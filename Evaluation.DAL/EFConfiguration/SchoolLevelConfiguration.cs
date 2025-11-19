@@ -10,8 +10,9 @@ public class SchoolLevelConfiguration : IEntityTypeConfiguration<SchoolLevel>
     {
         builder
             .HasOne(x => x.School)
-            .WithMany()
+            .WithMany(x=>x.SchoolLevel)
             .HasForeignKey(x => x.SchoolId);
+
         builder
             .HasOne(x => x.EducationLevel)
             .WithMany()

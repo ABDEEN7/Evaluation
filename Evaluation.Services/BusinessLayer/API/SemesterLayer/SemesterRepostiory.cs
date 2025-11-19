@@ -3,6 +3,7 @@ using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.Calendars;
 using Evaluation.DAL.Repositories;
 using Evaluation.Services.Special;
+using Evaluation.SharedHelper.Consts;
 using Evaluation.SharedHelper.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -32,7 +33,7 @@ public class SemesterRepostiory(IServiceScopeFactory serviceScopeFactory,
                 .Select(x => new SemesterDto
                 {
                     Id = x.Id,
-                    Name = requestInfo.Lang == "Ar".ToLower() ? x.NameAr.ToLower() : x.NameEn.ToLower(),
+                    Name = LanguageStatic.SelectLang(requestInfo.Lang, x.NameAr, x.NameEn),
                     EndDate = x.EndDate,
                     StartDate = x.StartDate
                 }).ToListAsync();

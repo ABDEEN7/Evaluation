@@ -12,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Evaluation.DAL.Models.Org;
 using Evaluation.DAL.Models.Planing;
 using Evaluation.DAL.Repositories;
+using Evaluation.SharedHelper.Consts;
 
 namespace Evaluation.Services.BusinessLayer.API.SchooLayer;
 
@@ -26,12 +27,22 @@ public class SchoolRepository(IServiceScopeFactory serviceScopeFactory,
     ) : ApiBase(serviceScopeFactory, cacheDataProvider, unitOfWork, loggingServices, mapper, userInfo,
         serviceProvider, requestInfo)
 {
-    public async Task<List<School>> GetSchoolsAsync()
+    public async Task<List<ResponseSchools>> GetSchoolsAsync()
     {
         var schools = await unitOfWork
             .GetRepository<School>()
             .GetAllActiveNonDeleted()
             .OrderByDescending(x => x.EstablishmentDate)
+            .Select(s => new ResponseSchools
+            {
+                Id = s.Id,
+                Name = LanguageStatic.SelectLang(requestInfo.Lang, s.NameAr, s.NameEn),
+                Rating = (s.SchoolLevel ?? Enumerable.Empty<SchoolLevel>())
+                .OrderByDescending(c => c.CreateDate)
+                .Select(c => c.EducationLevel.BackendName)
+                .FirstOrDefault(),
+
+            })
             .ToListAsync();
         return schools;
     }

@@ -38,15 +38,15 @@ public class SchoolBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvide
 
         var schoolsRequest = await schoolRepository.GetSchoolsAsync();
         //var schoolResponse = schoolsRequest.Adapt<List<ResponseSchools>>();
-        var schoolResponse = schoolsRequest.Select(x => new ResponseSchools
-        {
-            Id = x.Id,
-            Name = x.NameEn,
-            Rating = "Aecctable",
-            AcademicYear = new DateTime(2025).Year,
-            LastEvaluationDate = DateTime.Now
-        }).ToList();
-        return schoolResponse;
+        //var schoolResponse = schoolsRequest.Select(x => new ResponseSchools
+        //{
+        //    Id = x.Id,
+        //    Name = x.NameEn,
+        //    Rating = "Aecctable",
+        //    AcademicYear = new DateTime(2025).Year,
+        //    LastEvaluationDate = DateTime.Now
+        //}).ToList();
+        return schoolsRequest;
 
     }
     public async Task<List<SchoolVisits>> GetVisitsAsync()
