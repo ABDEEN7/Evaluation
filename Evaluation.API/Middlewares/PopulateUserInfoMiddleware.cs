@@ -22,8 +22,8 @@ namespace Evaluation.API.Middlewares
 		public async Task InvokeAsync(HttpContext context, UserInfo userInfo)
 		{
 
-			userInfo.UserId = Guid.Parse("98786faf-b41c-489a-af3f-3b61fb5b079b");
-			userInfo.Email = "test.user@moehe.gov.qa";
+            userInfo.UserId = Guid.Parse("11111111-1111-1111-1111-111111111111");
+            userInfo.Email = "test.user@moehe.gov.qa";
 			userInfo.Name = "Test User";
 			userInfo.UserType = "MinistryUser";
 			userInfo.DBName = "EvaluationDB";
