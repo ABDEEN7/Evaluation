@@ -10,12 +10,11 @@
     public class ActionFieldFormGroupDTO
     {
         public Guid id { get; set; }
-        public Guid? ActionStepFieldId { get; set; }
+        public Guid? ActionFieldId { get; set; }
 
         public string text { get; set; } = null!;
         public string value { get; set; } = null!;
         public bool IsEditable { get; set; }
-        public bool IsUpdateOnModule { get; set; }
         public Guid parentId { get; set; }
         public string ParentName { get; set; } = null!;
         public ActionStateDTO state { get; set; } = new ActionStateDTO();

@@ -119,6 +119,7 @@ public static class ConstantKeys
         public static readonly string SignatureUploadWidth = "SignatureUploadWidth";
         public static readonly string SignatureUploadHeight = "SignatureUploadHeight";
         public static readonly string OPERATORS_LIST = "OPERATORS_LIST";
+        public static readonly string ActionConditionType = "ActionConditionType";
         
 
     }
@@ -154,6 +155,17 @@ public static class ConstantKeys
         public static readonly string FormGroupTabTitle = "FormGroupTabTitle";
         public static readonly string ListTabTitle = "ListTabTitle";
         public static readonly string SearchFormGroup = "SearchFormGroup";
+        public static readonly string EvaluationActionDetails = "EvaluationActionDetails";
+        public static readonly string EvaluationActionFieldDetails = "EvaluationActionFieldDetails";
+        public static readonly string ActionConditionTab = "ActionConditionTab";
+        public static readonly string EvaluationActionsField = "EvaluationActionsField";
+        public static readonly string ActionTab = "ActionTab";
+        public static readonly string EvaluationActionsService = "EvaluationActionsService";
+        public static readonly string EvaluationActionsRoster = "EvaluationActionsRoster";
+        public static readonly string EvaluationActionsFieldsRoster = "EvaluationActionsFieldsRoster";
+        public static readonly string lblSearchTable = "lblSearchTable";
+        public static readonly string lblSearchForNames = "lblSearchForNames";
+        public static readonly string lblSearchTree = "lblSearchTree";
     }
 
         public static class AdminPages
@@ -171,6 +183,9 @@ public static class ConstantKeys
             public static readonly string AdminField = "AdminField";
             public static readonly string AdminFieldAttribute = "AdminFieldAttribute";
             public static readonly string AdminFieldCondition = "AdminFieldCondition";
+            public static readonly string AdminEvaluationAction = "AdminEvaluationAction";
+            public static readonly string AdminActionFieldAttribute = "AdminActionFieldAttribute";
+            public static readonly string AdminActionCondition = "AdminActionCondition";
         }
 
     public static class AdminPermission
@@ -281,6 +296,35 @@ public static class ConstantKeys
         public const string ADD_ADMIN_FIELD_CONDITION = "ADD_ADMIN_FIELD_CONDITION";
         public const string EDIT_ADMIN_FIELD_CONDITION = "EDIT_ADMIN_FIELD_CONDITION";
         public const string DELETE_ADMIN_FIELD_CONDITION = "DELETE_ADMIN_FIELD_CONDITION";
+
+        #endregion
+
+        #region ACTION
+
+        public const string VIEW_ADMIN_ACTION = "VIEW_ADMIN_ACTION";
+        public const string ADD_ADMIN_ACTION = "ADD_ADMIN_ACTION";
+        public const string EDIT_ADMIN_ACTION = "EDIT_ADMIN_ACTION";
+        public const string DELETE_ADMIN_ACTION = "DELETE_ADMIN_ACTION";
+        public const string VIEW_ADMIN_ACTION_FIELD = "VIEW_ADMIN_ACTION_FIELD";
+        public const string UPDATE_ADMIN_ACTION_FIELD = "UPDATE_ADMIN_ACTION_FIELD";
+
+        #endregion
+
+        #region ACTION_FIELD_ATTRIBUTE
+
+        public const string VIEW_ADMIN_ACTION_FIELD_ATTRIBUTE = "VIEW_ADMIN_ACTION_FIELD_ATTRIBUTE";
+        public const string ADD_ADMIN_ACTION_FIELD_ATTRIBUTE = "ADD_ADMIN_ACTION_FIELD_ATTRIBUTE";
+        public const string EDIT_ADMIN_ACTION_FIELD_ATTRIBUTE = "EDIT_ADMIN_ACTION_FIELD_ATTRIBUTE";
+        public const string DELETE_ADMIN_ACTION_FIELD_ATTRIBUTE = "DELETE_ADMIN_ACTION_FIELD_ATTRIBUTE";
+
+        #endregion
+
+        #region ACTIONCONDITION
+
+        public const string VIEW_ADMIN_ACTIONCONDITION = "VIEW_ADMIN_ACTIONCONDITION";
+        public const string ADD_ADMIN_ACTIONCONDITION = "ADD_ADMIN_ACTIONCONDITION";
+        public const string EDIT_ADMIN_ACTIONCONDITION = "EDIT_ADMIN_ACTIONCONDITION";
+        public const string DELETE_ADMIN_ACTIONCONDITION = "DELETE_ADMIN_ACTIONCONDITION";
 
         #endregion
 

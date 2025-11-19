@@ -1,0 +1,586 @@
+﻿@using Evaluation.Admin.Extensions
+@using static Evaluation.SharedHelper.Enums.ConstantKeys
+
+
+
+@model ServiceActionVM
+@{
+
+    string Lang = Model.CurrentLanguage;
+    var SearchuiControlItems = Model.UiControlItems.Where(x => x.RowOrder == 0);
+    var uiControlItems = Model.UiControlItems.Where(x => x.RowOrder > 0 && x.Constraint.Permission.BackEndName == AdminPermission.ADD_ADMIN_ACTION).ToList();
+    var ActionFieldAttributeControlItems = Model.UiControlItems.Where(x => x.RowOrder > 0 && x.Constraint.Permission.BackEndName == AdminPermission.ADD_ADMIN_ACTION_FIELD_ATTRIBUTE).ToList();
+    var ActionStatusConfigControlItems = Model.UiControlItems.Where(x => x.RowOrder > 0 && x.Constraint.Permission.BackEndName == AdminPermission.ADD_ADMIN_ACTIONSTATUSCONFIGURATION).ToList();
+    var ActionStatusConfigNotificationControlItems = Model.UiControlItems.Where(x => x.RowOrder > 0 && x.Constraint.Permission.BackEndName == AdminPermission.ADD_ADMIN_ACTIONSTATUSCONFIGURATION_NOTIFICATION).ToList();
+    var ActionConditionControlItems = Model.UiControlItems.Where(x => x.RowOrder > 0 && x.Constraint.Permission.BackEndName == AdminPermission.ADD_ADMIN_ACTIONCONDITION).ToList();
+    var textDir = Lang == "ar" ? "RTL" : "LTR";
+    var permissionsList = Model.PermissionsList;
+    var controlsList = Model.ControlsList;
+    var settingList = Model.SettingList;
+    var containsOrderNo = Model.containsOrderNo;
+    var columnList = Model.UiControlItems.Where(x => x.Constraint.ShowInGrid == true && x.Constraint.Permission.BackEndName == AdminPermission.ADD_ADMIN_ACTION);
+    var ActionFieldAttributecolumnList = Model.UiControlItems.Where(x => x.Constraint.ShowInGrid == true && x.Constraint.Permission.BackEndName == AdminPermission.ADD_ADMIN_ACTION_FIELD_ATTRIBUTE).Select(X => X.Constraint).ToList();
+    var ActionStatusConfigcolumnList = Model.UiControlItems.Where(x => x.Constraint.ShowInGrid == true && x.Constraint.Permission.BackEndName == AdminPermission.ADD_ADMIN_ACTIONSTATUSCONFIGURATION).Select(X => X.Constraint).ToList();
+    var ActionStatusConfigNotificationcolumnList = Model.UiControlItems.Where(x => x.Constraint.ShowInGrid == true && x.Constraint.Permission.BackEndName == AdminPermission.ADD_ADMIN_ACTIONSTATUSCONFIGURATION_NOTIFICATION).Select(X => X.Constraint).ToList();
+    var ActionConditioncolumnList = Model.UiControlItems.Where(x => x.Constraint.ShowInGrid == true && x.Constraint.Permission.BackEndName == AdminPermission.ADD_ADMIN_ACTIONCONDITION).Select(X => X.Constraint).ToList();
+}
+
+@section Styles {
+
+    <link href="~/css/admin/serviceaction.css" rel="stylesheet" />
+    
+}
+
+
+<div class="row">
+
+
+    <div class="col-4 position-relative mb-3">
+        <div class="sub-page-container">
+            <section class="section-container">
+                <div class="card app-card">
+
+                    <div class="card-header justify-content-end d-flex align-items-center bg-light">
+                    </div>
+
+                    <div class="card-body">
+
+
+                        <div class=" row">
+                            <div class="col-auto">
+                                <h4>@controlsList.GetUiControlText(AdminBackendUI.EvaluationActionsService)</h4>
+                            </div>
+
+                            <div class="col-auto">
+                                <select class="select2 form-control" required="required" id="ServiceId"></select>
+                            </div>
+
+                        </div>
+
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <h3 class="heading lg">@controlsList.GetUiControlText(AdminBackendUI.EvaluationActionsRoster)</h3>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <form class="d-flex" role="search">
+
+                                    <input type="text" id="searchTxt" class="form-control me-2" placeholder="@controlsList.GetUiControlText(AdminBackendUI.lblSearchForNames)" />
+
+                                    @if (permissionsList.IsPermissionAvailabe(AdminPermission.ADD_ADMIN_ACTION))
+                                    {
+                                        <button type="button" id="AddEvaluationAction" class="btn btn-primary btn-lg btn-block">+</button>
+                                    }
+                                </form>
+                            </div>
+                        </div>
+
+                        <div class=" row">
+                            <div class="col-auto listclass">
+                                <ul id="filteredList" class="list-group">
+                                </ul>
+
+                                <div class="offcanvas offcanvas-start  border-0" tabindex="-1" id="offcanvas" aria-labelledby="offcanvasLabel">
+                                    <div class="offcanvas-body p-0" id="offcanvas-body">
+                                        <div id="statusesTable">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+        </div>
+    </div>
+
+
+    <div class="col-8">
+
+
+
+        <div class="sub-page-container EvaluationActionDetails" style="display:none;">
+            <section class="section-container">
+                <div class="card app-card">
+                    <div class="card-header bg-light">
+
+                        <div class=" row">
+                            <div class="col-md-12">
+                                <h4 class="heading m-0">
+                                    @controlsList.GetUiControlText(AdminBackendUI.EvaluationActionDetails)
+                                    <button type="button" id="btnshowdetailsDiv1" class="btn btn-sm btn-primary fas fa-chevron-down"></button>
+                                </h4>
+                            </div>
+
+
+                            <div class="col-md-12 d-flex justify-content-end">
+                                <div id="DeleteOrEdit">
+                                    @if (permissionsList.IsPermissionAvailabe(AdminPermission.DELETE_ADMIN_ACTION))
+                                    {
+                                        <button id="DeleteEvaluationAction" type="button" class="btn btn-secondary btn-sm">@controlsList.GetUiControlText(AdminBackendUI.DELETE_BUTTON)</button>
+                                    }
+                                    @if (permissionsList.IsPermissionAvailabe(AdminPermission.EDIT_ADMIN_ACTION))
+                                    {
+                                        <button id="openEditModeForm" type="button" class="btn btn-primary btn-sm">@controlsList.GetUiControlText(AdminBackendUI.EDIT_BUTTON)</button>
+                                    }
+
+                                </div>
+                                <div id="CancelOrSave" style="display:none;">
+                                    @if (permissionsList.IsPermissionAvailabe(AdminPermission.EDIT_ADMIN_ACTION))
+                                    {
+                                        <button id="cancelEvaluationAction" type="button" class="btn btn-secondary btn-sm">@controlsList.GetUiControlText(AdminBackendUI.ADMIN_CANCEL)</button>
+                                        <button id="saveEvaluationAction" type="button" class="btn btn-primary btn-sm">@controlsList.GetUiControlText(AdminBackendUI.SAVE_BUTTON)</button>
+                                    }
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+
+                    <div class="card-body EvaluationActionDetailsDiv">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <form id="UpdateEvaluationActionForm" method="post">
+
+                                    <input type="hidden" id="EvaluationActionId" class="form-control" />
+
+                                    @*   @foreach (var rowGroup in uiControlItems.GroupBy(item => item.Constraint.RowOrder))
+                                    {
+                                    <div class="row">
+                                    @foreach (var model in rowGroup.OrderBy(item => item.Constraint.ColumnOrder))
+                                    {
+
+
+                                    <div class="col-12">
+                                    <div class="mb-3">
+                                    @{
+                                    @await Component.InvokeAsync("UiControl", model)
+                                    }
+                                    </div>
+                                    </div>
+                                    }
+                                    </div>
+                                    } *@
+
+
+
+
+                                    @{
+
+                                        var control = uiControlItems.Where(item => item.Control.BackEndName == "EvaluationActionNameEn").FirstOrDefault();
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <div class="mb-3">
+                                                    @{
+                                                        @await Component.InvokeAsync("UiControl", control)
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        control = uiControlItems.Where(item => item.Control.BackEndName == "EvaluationActionNameAr").FirstOrDefault();
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <div class="mb-3">
+                                                    @{
+                                                        @await Component.InvokeAsync("UiControl", control)
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        control = uiControlItems.Where(item => item.Control.BackEndName == "EvaluationActionActionTypeId").FirstOrDefault();
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <div class="mb-3">
+                                                    @{
+                                                        @await Component.InvokeAsync("UiControl", control)
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        control = uiControlItems.Where(item => item.Control.BackEndName == "EvaluationActionSchStatusId").FirstOrDefault();
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <div class="mb-3">
+                                                    @{
+                                                        @await Component.InvokeAsync("UiControl", control)
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+                                        control = uiControlItems.Where(item => item.Control.BackEndName == "EvaluationActionIsActive").FirstOrDefault();
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <div class="mb-3">
+                                                    @{
+                                                        @await Component.InvokeAsync("UiControl", control)
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        control = uiControlItems.Where(item => item.Control.BackEndName == "EvaluationActionIsInitialAction").FirstOrDefault();
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <div class="mb-3">
+                                                    @{
+                                                        @await Component.InvokeAsync("UiControl", control)
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                        control = uiControlItems.Where(item => item.Control.BackEndName == "EvaluationActionAllowDraft").FirstOrDefault();
+                                        <div class="row ActionAllowDraftClass">
+                                            <div class="col-12">
+                                                <div class="mb-3">
+                                                    @{
+                                                        @await Component.InvokeAsync("UiControl", control)
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                        control = uiControlItems.Where(item => item.Control.BackEndName == "EvaluationActionIsConfirmationAction").FirstOrDefault();
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <div class="mb-3">
+                                                    @{
+                                                        @await Component.InvokeAsync("UiControl", control)
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+
+                                        control = uiControlItems.Where(item => item.Control.BackEndName == "EvaluationActionConfirmationTitleEn").FirstOrDefault();
+                                        <div class="row ActionConfirmationClass">
+                                            <div class="col-12">
+                                                <div class="mb-3">
+                                                    @{
+                                                        @await Component.InvokeAsync("UiControl", control)
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        control = uiControlItems.Where(item => item.Control.BackEndName == "EvaluationActionConfirmationTitleAr").FirstOrDefault();
+                                        <div class="row ActionConfirmationClass">
+                                            <div class="col-12">
+                                                <div class="mb-3">
+                                                    @{
+                                                        @await Component.InvokeAsync("UiControl", control)
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        control = uiControlItems.Where(item => item.Control.BackEndName == "EvaluationActionConfirmationBodyEn").FirstOrDefault();
+
+                                        <div class="row ActionConfirmationClass">
+                                            <div class="col-12">
+                                                <div class="mb-3">
+                                                    @{
+                                                        @await Component.InvokeAsync("UiControl", control)
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                        control = uiControlItems.Where(item => item.Control.BackEndName == "EvaluationActionConfirmationBodyAr").FirstOrDefault();
+                                        <div class="row ActionConfirmationClass">
+                                            <div class="col-12">
+                                                <div class="mb-3">
+                                                    @{
+                                                        @await Component.InvokeAsync("UiControl", control)
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                       
+
+                                        control = uiControlItems.Where(item => item.Control.BackEndName == "ActionPartyType").FirstOrDefault();
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <div class="mb-3">
+                                                    @{
+                                                        @await Component.InvokeAsync("UiControl", control)
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                        control = uiControlItems.Where(item => item.Control.BackEndName == "AssignActionPartyType").FirstOrDefault();
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <div class="mb-3">
+                                                    @{
+                                                        @await Component.InvokeAsync("UiControl", control)
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        control = uiControlItems.Where(item => item.Control.BackEndName == "ActionShowLogPartyType").FirstOrDefault();
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <div class="mb-3">
+                                                    @{
+                                                        @await Component.InvokeAsync("UiControl", control)
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        control = uiControlItems.Where(item => item.Control.BackEndName == "ActionTemplateDoc").FirstOrDefault();
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <div class="mb-3">
+                                                    @{
+                                                        @await Component.InvokeAsync("UiControl", control)
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+
+
+                                        // control = uiControlItems.Where(item => item.Control.BackEndName == "EvaluationActionServiceId").FirstOrDefault();
+                                        // <div class="row">
+                                        //     <div class="col-12">
+                                        //         <div class="mb-3">
+                                        //             @{
+                                        //                 @await Component.InvokeAsync("UiControl", control)
+                                        //             }
+                                        //         </div>
+                                        //     </div>
+                                        // </div>
+
+                                        // control = uiControlItems.Where(item => item.Control.BackEndName == "EvaluationActionStatusId").FirstOrDefault();
+                                        // <div class="row">
+                                        //     <div class="col-12">
+                                        //         <div class="mb-3">
+                                        //             @{
+                                        //                 @await Component.InvokeAsync("UiControl", control)
+                                        //             }
+                                        //         </div>
+                                        //     </div>
+                                        // </div>
+
+                                        // control = uiControlItems.Where(item => item.Control.BackEndName == "EvaluationActionStatusPartyTypeDisplayId").FirstOrDefault();
+                                        // <div class="row">
+                                        //     <div class="col-12">
+                                        //         <div class="mb-3">
+                                        //             @{
+                                        //                 @await Component.InvokeAsync("UiControl", control)
+                                        //             }
+                                        //         </div>
+                                        //     </div>
+                                        // </div>
+
+                                        // control = uiControlItems.Where(item => item.Control.BackEndName == "EvaluationActionServiceStatusPreventPartyTypeId").FirstOrDefault();
+                                        // <div class="row">
+                                        //     <div class="col-12">
+                                        //         <div class="mb-3">
+                                        //             @{
+                                        //                 @await Component.InvokeAsync("UiControl", control)
+                                        //             }
+                                        //         </div>
+                                        //     </div>
+                                        // </div>
+                                    }
+
+
+                                </form>
+                            </div>
+                        </div>
+
+
+                    </div>
+
+                </div>
+            </section>
+        </div>
+
+    </div>
+
+</div>
+<div class="row">
+    <div class="col-12">
+        <div class="card app-card">
+            
+    <div class="sub-page-container EvaluationActionDetails" id="EvaluationActionsDivId" style="display:none;">
+        <section class="section-container">
+            <div class="card app-card">
+
+                <div class="card-header bg-light">
+                    <div class=" row">
+                        <div class="col-md-4">
+                            <h4 class="heading m-0">
+                                @controlsList.GetUiControlText(AdminBackendUI.EvaluationActionDetails)
+                                <button type="button" id="btnshowdetailsDiv2" class="btn btn-sm btn-primary fas fa-chevron-down"></button>
+                            </h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="nav nav-tabs tab">
+                    <button type="button" id="defaultOpen" class="nav-link tablinks " onclick="opentab(event, 'EvaluationActionDtepDiv')">@controlsList.GetUiControlText(AdminBackendUI.ActionTab) </button>
+                    @if (permissionsList.IsPermissionAvailabe(AdminPermission.VIEW_ADMIN_ACTIONSTATUSCONFIGURATION))
+                    {
+                        <button type="button" class="nav-link tablinks" onclick="opentab(event, 'EvaluationActionStatusConfigDiv')">@controlsList.GetUiControlText(AdminBackendUI.ActionStatusConfigTab) </button>
+                    }
+                    @if (permissionsList.IsPermissionAvailabe(AdminPermission.VIEW_ADMIN_ACTIONCONDITION))
+                    {
+                        <button type="button" class="nav-link tablinks" onclick="opentab(event, 'EvaluationActionConditionDiv')">@controlsList.GetUiControlText(AdminBackendUI.ActionConditionTab) </button>
+                    }
+                </div>
+                <div id="EvaluationActionDtepDiv" class="card-body EvaluationActionDtepDiv tabcontent">
+
+
+                    <div class=" row">
+                               
+                        @if (permissionsList.IsPermissionAvailabe(AdminPermission.UPDATE_ADMIN_ACTION_FIELD))
+                        {
+                                    <div class="col-md-12 d-flex justify-content-end">
+                                <button id="saveActionFieldBtnId" type="button" class="btn btn-primary btn-sm">@controlsList.GetUiControlText(AdminBackendUI.SAVE_BUTTON)</button>
+
+                            </div>
+                        }
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <h3 class="heading lg">@controlsList.GetUiControlText(AdminBackendUI.EvaluationActionsFieldsRoster)</h3>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <input type="text" id="tree-search" placeholder="@controlsList.GetUiControlText(AdminBackendUI.lblSearchTree)" class="form-control mb-2">
+                            <div id="tree-container"></div>
+                        </div>
+                        <div class="col-md-8">
+                            <input type="text" id="table-search" placeholder="@controlsList.GetUiControlText(AdminBackendUI.lblSearchTable)" class="form-control mb-2">
+                            <div id="table"></div>
+                        </div>
+                    </div>
+
+                </div>
+                @if (permissionsList.IsPermissionAvailabe(AdminPermission.VIEW_ADMIN_ACTIONSTATUSCONFIGURATION))
+                {
+                    <div id="EvaluationActionStatusConfigDiv" class="card-body  tabcontent">
+                        <div class="card-header justify-content-end d-flex align-items-center bg-light">
+                            @if (permissionsList.IsPermissionAvailabe(AdminPermission.ADD_ADMIN_ACTIONSTATUSCONFIGURATION))
+                            {
+                                <button id="btnActionStatusConfigAdd" type="button" class="btn btn-primary">
+                                    <i class="fa fa-plus-circle"></i> &nbsp;@controlsList.GetUiControlText(AdminBackendUI.ADD_RECORD)
+                                </button>
+                            }
+
+                        </div>
+                        <div id="ActionStatusConfigtable"></div>
+
+
+                    </div>
+                }
+                @if (permissionsList.IsPermissionAvailabe(AdminPermission.VIEW_ADMIN_ACTIONCONDITION))
+                {
+                    <div id="EvaluationActionConditionDiv" class="card-body  tabcontent">
+                        <div class="card-header justify-content-end d-flex align-items-center bg-light">
+                            @if (permissionsList.IsPermissionAvailabe(AdminPermission.ADD_ADMIN_ACTIONCONDITION))
+                            {
+                                <button id="btnActionConditionAdd" type="button" class="btn btn-primary">
+                                    <i class="fa fa-plus-circle"></i> &nbsp;@controlsList.GetUiControlText(AdminBackendUI.ADD_RECORD)
+                                </button>
+                            }
+
+                        </div>
+                        <div id="ActionConditiontable"></div>
+
+
+                    </div>
+                }
+            </div>
+        </section>
+    </div>
+    </div>
+    </div>
+</div>
+
+
+
+<div class="row">
+
+    <div class="col-12 position-relative mb-3">
+    </div>
+
+
+
+
+</div>
+<div>
+    <input id="Id" hidden />
+    <input id="fieldid" hidden />
+    <input id="actionfieldid" hidden />
+    <input id="actionstatusconfigid" hidden />
+</div>
+
+
+@section Scripts {
+    
+    <script src="~/js/admin/TreeTabulator.js" asp-append-version="true"></script>
+    <script>
+
+        var lang = `@Html.Raw(Lang)`;
+
+
+        var uiControlItemsList = @Json.Serialize(uiControlItems);
+        let txtDir = '@textDir';
+
+        var controlsList = @Json.Serialize(controlsList);
+        var columnList = @Json.Serialize(columnList);
+        const settingList = @Json.Serialize(settingList);
+
+        const services = @Json.Serialize(Model.Services);
+        const actionTypes = @Json.Serialize(Model.ActionTypes);
+
+       
+        var ActionFieldAttributecolumnList = @Html.Raw(Json.Serialize(ActionFieldAttributecolumnList));
+        const ActionFieldAttributecontrolvalidationlist = @Html.Raw(Json.Serialize(ActionFieldAttributeControlItems));
+         const IsView_ActionFieldAttribute='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.VIEW_ADMIN_ACTION_FIELD_ATTRIBUTE))';
+        const IsEdit_ActionFieldAttribute='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.EDIT_ADMIN_ACTION_FIELD_ATTRIBUTE))';
+        const IsDelete_ActionFieldAttribute='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.DELETE_ADMIN_ACTION_FIELD_ATTRIBUTE))';
+
+         var ActionStatusConfigcolumnList = @Html.Raw(Json.Serialize(ActionStatusConfigcolumnList));
+        const ActionStatusConfigcontrolvalidationlist = @Html.Raw(Json.Serialize(ActionStatusConfigControlItems));
+         const IsView_ActionStatusConfig='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.VIEW_ADMIN_ACTIONSTATUSCONFIGURATION))';
+        const IsEdit_ActionStatusConfig='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.EDIT_ADMIN_ACTIONSTATUSCONFIGURATION))';
+        const IsDelete_ActionStatusConfig='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.DELETE_ADMIN_ACTIONSTATUSCONFIGURATION))';
+
+        var ActionStatusConfigNotificationcolumnList = @Html.Raw(Json.Serialize(ActionStatusConfigNotificationcolumnList));
+        const ActionStatusConfigNotificationcontrolvalidationlist = @Html.Raw(Json.Serialize(ActionStatusConfigNotificationControlItems));
+         const IsView_ActionStatusConfigNotification='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.VIEW_ADMIN_ACTIONSTATUSCONFIGURATION_NOTIFICATION))';
+        const IsEdit_ActionStatusConfigNotification='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.EDIT_ADMIN_ACTIONSTATUSCONFIGURATION_NOTIFICATION))';
+        const IsDelete_ActionStatusConfigNotification='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.DELETE_ADMIN_ACTIONSTATUSCONFIGURATION_NOTIFICATION))';
+
+         var ActionConditioncolumnList = @Html.Raw(Json.Serialize(ActionConditioncolumnList));
+        const ActionConditioncontrolvalidationlist = @Html.Raw(Json.Serialize(ActionConditionControlItems));
+         const IsView_ActionCondition='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.VIEW_ADMIN_ACTIONCONDITION))';
+        const IsEdit_ActionCondition='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.EDIT_ADMIN_ACTIONCONDITION))';
+        const IsDelete_ActionCondition='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.DELETE_ADMIN_ACTIONCONDITION))';
+
+        sharedFn().PopulateUiControl(controlsList);
+       
+
+    </script>
+
+    <script src="~/js/admin/ServiceAction.js" asp-append-version="true"></script>
+}
+
+
