@@ -190,6 +190,7 @@ public static class ConstantKeys
             public static readonly string AdminActionCondition = "AdminActionCondition";
         public static readonly string AdminAcademicYear = "AdminAcademicYear";
         public static readonly string AdminAcademicYearScope = "AdminAcademicYearScope";
+        public static readonly string AdminScopeAcademicYear = "AdminScopeAcademicYear";
     }
 
     public static class AdminPermission
@@ -347,6 +348,15 @@ public static class ConstantKeys
         public const string ADD_ADMIN_ACADEMIC_YEAR_SCOPE = "ADD_ADMIN_ACADEMIC_YEAR_SCOPE";
         public const string EDIT_ADMIN_ACADEMIC_YEAR_SCOPE = "EDIT_ADMIN_ACADEMIC_YEAR_SCOPE";
         public const string VIEW_ADMIN_ACADEMIC_YEAR_SCOPE = "VIEW_ADMIN_ACADEMIC_YEAR_SCOPE";
+
+        #endregion
+
+        #region SCOPE_ACADEMIC_YEAR
+
+        public const string DELETE_ADMIN_SCOPE_ACADEMIC_YEAR_SCOPE = "DELETE_ADMIN_SCOPE_ACADEMIC_YEAR_SCOPE";
+        public const string ADD_ADMIN_SCOPE_ACADEMIC_YEAR_SCOPE = "ADD_ADMIN_SCOPE_ACADEMIC_YEAR_SCOPE";
+        public const string EDIT_ADMIN_SCOPE_ACADEMIC_YEAR_SCOPE = "EDIT_ADMIN_SCOPE_ACADEMIC_YEAR_SCOPE";
+        public const string VIEW_ADMIN_SCOPE_ACADEMIC_YEAR_SCOPE = "VIEW_ADMIN_SCOPE_ACADEMIC_YEAR_SCOPE";
 
         #endregion
 
