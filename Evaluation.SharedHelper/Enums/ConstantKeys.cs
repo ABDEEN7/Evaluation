@@ -97,6 +97,8 @@ public static class ConstantKeys
         public static readonly string FieldExistsFieldPartyType = "FieldExistsFieldPartyType";
         public static readonly string FieldExistsFieldViewCondition = "FieldExistsFieldViewCondition";
         public static readonly string FieldExistsPlaceHolder = "FieldExistsPlaceHolder";
+        public static readonly string AcademicYearExistsScope = "AcademicYearExistsScope";
+        public static readonly string DepartmentExistsAcademicYear = "DepartmentExistsAcademicYear";
     }
 
         public static class AdminSettings
@@ -186,7 +188,9 @@ public static class ConstantKeys
             public static readonly string AdminEvaluationAction = "AdminEvaluationAction";
             public static readonly string AdminActionFieldAttribute = "AdminActionFieldAttribute";
             public static readonly string AdminActionCondition = "AdminActionCondition";
-        }
+        public static readonly string AdminAcademicYear = "AdminAcademicYear";
+        public static readonly string AdminAcademicYearScope = "AdminAcademicYearScope";
+    }
 
     public static class AdminPermission
     {
@@ -325,6 +329,24 @@ public static class ConstantKeys
         public const string ADD_ADMIN_ACTIONCONDITION = "ADD_ADMIN_ACTIONCONDITION";
         public const string EDIT_ADMIN_ACTIONCONDITION = "EDIT_ADMIN_ACTIONCONDITION";
         public const string DELETE_ADMIN_ACTIONCONDITION = "DELETE_ADMIN_ACTIONCONDITION";
+
+        #endregion
+
+        #region ACADEMIC_YEAR
+
+        public const string DELETE_ADMIN_ACADEMIC_YEAR = "DELETE_ADMIN_ACADEMIC_YEAR";
+        public const string ADD_ADMIN_ACADEMIC_YEAR = "ADD_ADMIN_ACADEMIC_YEAR";
+        public const string EDIT_ADMIN_ACADEMIC_YEAR = "EDIT_ADMIN_ACADEMIC_YEAR";
+        public const string VIEW_ADMIN_ACADEMIC_YEAR = "VIEW_ADMIN_ACADEMIC_YEAR";
+
+        #endregion
+
+        #region ACADEMIC_YEAR_SCOPE
+
+        public const string DELETE_ADMIN_ACADEMIC_YEAR_SCOPE = "DELETE_ADMIN_ACADEMIC_YEAR_SCOPE";
+        public const string ADD_ADMIN_ACADEMIC_YEAR_SCOPE = "ADD_ADMIN_ACADEMIC_YEAR_SCOPE";
+        public const string EDIT_ADMIN_ACADEMIC_YEAR_SCOPE = "EDIT_ADMIN_ACADEMIC_YEAR_SCOPE";
+        public const string VIEW_ADMIN_ACADEMIC_YEAR_SCOPE = "VIEW_ADMIN_ACADEMIC_YEAR_SCOPE";
 
         #endregion
 

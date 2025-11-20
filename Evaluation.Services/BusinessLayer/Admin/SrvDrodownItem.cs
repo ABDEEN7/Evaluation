@@ -98,7 +98,7 @@ namespace Evaluation.Services.Models.Admin
                             // Dynamically find the entity type
                             Type? entityType = AppDomain.CurrentDomain
                         .GetAssemblies()
-                        .Where(a => !a.IsDynamic)//&& a.GetName().Name=="Scholarship.DAL"
+                        .Where(a => !a.IsDynamic&& a.GetName().Name=="Evaluation.DAL")
                         .SelectMany(a => a.GetTypes())
                         .FirstOrDefault(t => t.Name.Equals(dropdownJsonConfig.TableNameSource, StringComparison.OrdinalIgnoreCase));
 

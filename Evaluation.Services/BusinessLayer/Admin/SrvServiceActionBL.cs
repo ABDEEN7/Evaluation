@@ -1,10 +1,4 @@
 ﻿using AutoMapper;
-using Evaluation.DAL.Entities.ActionEntities;
-using Evaluation.DAL.Entities.Authentication;
-using Evaluation.DAL.Entities.FormBuilder;
-using Evaluation.DAL.Entities.ServicesEntities;
-using Evaluation.DAL.Entities.SystemModulesEntities;
-using Evaluation.DAL.Entities.Template;
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.ActionEntities;
 using Evaluation.DAL.Models.FormBuilder;
@@ -20,7 +14,6 @@ using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Admin;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json;
 namespace Evaluation.Services.Models.Admin
 {
     public class SrvServiceActionBL : AdminBase
