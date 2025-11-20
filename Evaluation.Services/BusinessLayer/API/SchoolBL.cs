@@ -44,13 +44,12 @@ public class SchoolBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvide
     }
     public async Task<List<SchoolVisits>> GetVisitsAsync()
     {
-        var responses = await schoolRepository.GetVisitTypes();
-        List<SchoolVisits> schoolVisits = responses.Select(x => new SchoolVisits
+        var responses = schoolRepository.GetVisitTypes();
+        return await responses.Select(x => new SchoolVisits
         {
             Id = x.Id,
             Name = LanguageStatic.SelectLang(requestInfo.Lang, x.NameAr, x.NameEn)
-        }).ToList();
-        return schoolVisits;
+        }).ToListAsync();
     }
     private static Expression<Func<School, ResponseSchools>> SchoolProjection(string lang)
     {

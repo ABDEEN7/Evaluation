@@ -32,11 +32,9 @@ public class SchoolRepository(IServiceScopeFactory serviceScopeFactory,
             .GetRepository<School>()
             .GetAllActiveNonDeleted();
 
-    public async Task<List<VisitType>> GetVisitTypes()
-    {
-        return await unitOfWork
+    public IQueryable<VisitType> GetVisitTypes()
+        => unitOfWork
             .GetRepository<VisitType>()
-            .GetAllActiveNonDeleted()
-            .ToListAsync();
-    }
+            .GetAllActiveNonDeleted();
+
 }
