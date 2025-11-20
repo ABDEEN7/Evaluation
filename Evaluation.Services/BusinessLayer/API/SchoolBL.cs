@@ -1,17 +1,16 @@
-﻿using Evaluation.DAL.Helper;
+﻿using System.Linq.Expressions;
+using AutoMapper;
+using Evaluation.DAL.Helper;
+using Evaluation.DAL.Models.Org;
+using Evaluation.DAL.Repositories;
 using Evaluation.Services.BusinessLayer.API.SchooLayer;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper;
+using Evaluation.SharedHelper.Consts;
 using Evaluation.SharedHelper.Dtos.SchoolDto;
-using Evaluation.SharedHelper.Helper;
 using Evaluation.SharedHelper.Models;
-using FluentResults;
-using Mapster;
-using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Evaluation.DAL.Models.Org;
-using Evaluation.DAL.Repositories;
 
 namespace Evaluation.Services.BusinessLayer.API;
 
@@ -35,19 +34,13 @@ public class SchoolBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvide
     }
     public async Task<List<ResponseSchools>> GetSchools()
     {
+        var schools = schoolRepository.GetSchools();
 
-        var schoolsRequest = await schoolRepository.GetSchoolsAsync();
-        //var schoolResponse = schoolsRequest.Adapt<List<ResponseSchools>>();
-        //var schoolResponse = schoolsRequest.Select(x => new ResponseSchools
-        //{
-        //    Id = x.Id,
-        //    Name = x.NameEn,
-        //    Rating = "Aecctable",
-        //    AcademicYear = new DateTime(2025).Year,
-        //    LastEvaluationDate = DateTime.Now
-        //}).ToList();
-        return schoolsRequest;
-
+        return await
+            schools
+            .OrderByDescending(s => s.EstablishmentDate)
+            .Select(SchoolProjection(requestInfo.Lang))
+            .ToListAsync();
     }
     public async Task<List<SchoolVisits>> GetVisitsAsync()
     {
@@ -55,9 +48,21 @@ public class SchoolBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvide
         List<SchoolVisits> schoolVisits = responses.Select(x => new SchoolVisits
         {
             Id = x.Id,
-            Name = requestInfo.Lang == "ar" ? x.NameAr : x.NameEn
+            Name = LanguageStatic.SelectLang(requestInfo.Lang, x.NameAr, x.NameEn)
         }).ToList();
         return schoolVisits;
+    }
+    private static Expression<Func<School, ResponseSchools>> SchoolProjection(string lang)
+    {
+        return s => new ResponseSchools
+        {
+            Id = s.Id,
+            Name = LanguageStatic.SelectLang(lang, s.NameAr, s.NameEn),
+            Rating = s.SchoolLevel
+            .OrderByDescending(c => c.CreateDate)
+            .Select(c => c.EducationLevel.BackendName)
+            .FirstOrDefault()
+        };
     }
 
 }

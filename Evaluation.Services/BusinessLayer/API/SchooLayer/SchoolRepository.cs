@@ -27,25 +27,11 @@ public class SchoolRepository(IServiceScopeFactory serviceScopeFactory,
     ) : ApiBase(serviceScopeFactory, cacheDataProvider, unitOfWork, loggingServices, mapper, userInfo,
         serviceProvider, requestInfo)
 {
-    public async Task<List<ResponseSchools>> GetSchoolsAsync()
-    {
-        var schools = await unitOfWork
+    public IQueryable<School> GetSchools()
+          => unitOfWork
             .GetRepository<School>()
-            .GetAllActiveNonDeleted()
-            .OrderByDescending(x => x.EstablishmentDate)
-            .Select(s => new ResponseSchools
-            {
-                Id = s.Id,
-                Name = LanguageStatic.SelectLang(requestInfo.Lang, s.NameAr, s.NameEn),
-                Rating = s.SchoolLevel
-            .OrderByDescending(c => c.CreateDate)
-            .Select(c => c.EducationLevel.BackendName)
-            .FirstOrDefault()
+            .GetAllActiveNonDeleted();
 
-            })
-            .ToListAsync();
-        return schools;
-    }
     public async Task<List<VisitType>> GetVisitTypes()
     {
         return await unitOfWork
