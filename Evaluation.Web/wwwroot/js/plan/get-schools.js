@@ -9,8 +9,9 @@ let visitTypes = [];
 
 // Initialize when DOM is ready
 $(document).ready(function () {
-    loadVisitTypes();
-    loadSchoolsData();
+    loadVisitTypes().then(() => {
+        loadSchoolsData();
+    });
     initializeSearch();
     initializeFilters();
     //initializeFlatpickr(); // Initialize Flatpickr on page load
@@ -266,11 +267,11 @@ function getRatingClass(rating) {
     return map[rating] || 'bg-light';
 }
 function loadVisitTypes() {
-    jqClient().Get('/School/GetVisits').done(result => {
-        const data = (result && result.result) ? result.result : [];
+    return jqClient().Get('/School/GetVisits')
+        .done(result => {
+            visitTypes = result?.result || [];
         visitTypes = data;
     }).fail((jqXHR, textStatus, err) => {
         console.error('Get Visits failed', textStatus, err);
     });
 }
-

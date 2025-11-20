@@ -37,10 +37,10 @@ public class SchoolRepository(IServiceScopeFactory serviceScopeFactory,
             {
                 Id = s.Id,
                 Name = LanguageStatic.SelectLang(requestInfo.Lang, s.NameAr, s.NameEn),
-                Rating = (s.SchoolLevel ?? Enumerable.Empty<SchoolLevel>())
-                .OrderByDescending(c => c.CreateDate)
-                .Select(c => c.EducationLevel.BackendName)
-                .FirstOrDefault(),
+                Rating = s.SchoolLevel
+            .OrderByDescending(c => c.CreateDate)
+            .Select(c => c.EducationLevel.BackendName)
+            .FirstOrDefault()
 
             })
             .ToListAsync();
