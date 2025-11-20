@@ -64,14 +64,7 @@ public class PlanController(MasterBL masterBL) : ControllerBase
               .UpdatePlanAsync(id, planDto);
         return Ok(result);
     }
-    [HttpPost]
-    //public async Task<IActionResult> ApproveDeleteSchool(Guid id, Guid schoolId)
-    //{
-    //    var deletedSchool = await masterBL.
-    //        GetApiService<PlanServiceRequestServices>()
-    //        .ApproveDeleteSchool(id, schoolId);
-    //    return Ok(deletedSchool);
-    //}
+
     [HttpGet]
     public IActionResult GetPlanType()
     {
