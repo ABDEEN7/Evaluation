@@ -1,5 +1,4 @@
-﻿using Evaluation.API.Extensions;
-using Evaluation.DAL.DTOs;
+﻿using Evaluation.DAL.DTOs;
 using Evaluation.DAL.Models.Org;
 using Evaluation.Services.BusinessLayer;
 using Evaluation.Services.BusinessLayer.API;
@@ -43,20 +42,12 @@ public class SchoolController : ControllerBase
 
     [HttpGet]
     public async Task<IActionResult> GetVisits()
-    {
-        var visits = await _masterBl.GetApiService<SchoolBL>().GetVisitsAsync();
-        //return visit.ToActionResult();
-        return Ok(new { result = visits });
-    }
+        => Ok(new { result = await _masterBl.GetApiService<SchoolBL>().GetVisitsAsync() });
+
     [HttpGet]
     public async Task<IActionResult> GetSchools([FromQuery] SchoolRequest request)
     {
         var schooldetails = await _masterBl.GetApiService<SchoolBL>().GetSchools();
-
         return Ok(new { result = schooldetails });
     }
-    //private List<ResponseSchools> GetListSchool()
-    //{
-    //    var schooldetails = await _masterBl.GetApiService<SchoolBL>().GetSchools());
-    //}
 }
