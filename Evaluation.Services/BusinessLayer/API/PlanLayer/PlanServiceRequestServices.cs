@@ -16,6 +16,7 @@ using Mapster;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
+using static Evaluation.SharedHelper.Enums.ConstantKeys;
 
 namespace Evaluation.Services.BusinessLayer.API.PlanLayer;
 
@@ -42,7 +43,7 @@ public class PlanServiceRequestServices(
             var academicYearIdForCurrentUser = unitOfWork
                  .GetRepository<Department>()
                  .GetAllActiveNonDeleted(d => d.TargetOrgTreeId == userInfo.UserId)
-                 .SelectMany(d => d.AcademicYears) 
+                 .SelectMany(d => d.AcademicYears)
                  .OrderByDescending(a => a.CreateDate)
                  .Select(a => a.Id)
                  .FirstOrDefault();
@@ -103,8 +104,12 @@ public class PlanServiceRequestServices(
     //Plan Type Module
     public async Task<List<PlanTypeDto>> GetPlanTypes()
     {
-        var result = await planRepository.GetPlanTypeAsync();
-        return result;
+        return await planRepository.GetPlanType().Select(s => new PlanTypeDto
+        {
+            Id = s.Id,
+            Name = requestInfo.Lang == LanguageConst.Ar ? s.NameAr : s.NameEn,
+            BackendName = s.BackendName,
+        }).ToListAsync();
     }
     //Validation Plans
     private async Task ValidateUpdatePlan(UpdatePlanDto model)

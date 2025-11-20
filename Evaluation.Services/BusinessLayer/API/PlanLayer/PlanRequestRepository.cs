@@ -1,10 +1,7 @@
-﻿using AutoMapper;
-using Evaluation.DAL.Helper;
-using Evaluation.DAL.Models.Calendars;
+﻿using Evaluation.DAL.Models.Calendars;
 using Evaluation.DAL.Models.Org;
 using Evaluation.DAL.Models.Planing;
 using Evaluation.DAL.Repositories;
-using Evaluation.Services.Special;
 using Evaluation.SharedHelper;
 using Evaluation.SharedHelper.Dtos.PlanDto;
 using Evaluation.SharedHelper.Enums;
@@ -89,17 +86,10 @@ public class PlanRequestRepository(IServiceScopeFactory serviceScopeFactory,
     //    await unitOfWork.CommitAsync();
     //    return true;
     //}
-    public async Task<List<PlanTypeDto>> GetPlanTypeAsync()
+    public IQueryable<PlanType> GetPlanType()
     {
-        return await serviceScopeFactory.CreateScopedUow().GetRepository<PlanType>()
-            .GetAllActiveNonDeleted()
-            .Select(s => new PlanTypeDto
-            {
-                Id = s.Id,
-                Name = requestInfo.Lang == LanguageConst.Ar ? s.NameAr : s.NameEn,
-                BackendName = s.BackendName,
-            }).
-            ToListAsync();
+        return  serviceScopeFactory.CreateScopedUow().GetRepository<PlanType>()
+            .GetAllActiveNonDeleted();            
     }
     private async Task<bool> IsThereExistingDraftPlanForSameAcadmicYear(PlanServiceRequest model)
     {
