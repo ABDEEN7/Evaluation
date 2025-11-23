@@ -290,6 +290,7 @@ public static class ConstantKeys
     }
     public static class WebAppSettings
     {
+        public static readonly string PAGE_SIZE = "PAGE_SIZE";
     }
     public static class WebAppCommon
     {

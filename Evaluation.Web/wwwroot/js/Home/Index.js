@@ -169,3 +169,7 @@ function renderDepartmentsTable(departments) {
         `);
     });
 }
+
+$(document).ready(function () {
+    loadDepartments();
+});
