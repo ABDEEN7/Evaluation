@@ -4,11 +4,17 @@ using Evaluation.DAL.Models.FormsModules;
 
 namespace Evaluation.Services.MappingProfiles;
 
-public class FormProfile: Profile
+public class FormProfile : Profile
 {
     public FormProfile()
     {
         CreateMap<FormItem, FormItemDto>()
+            .ForMember(d => d.Id, opt => opt.MapFrom(src => src.Id))
+            .ForMember(d => d.Name, opt => opt.MapFrom(src => src.NameEn))
+            .ForMember(d => d.SubFormItems, opt => opt.MapFrom(src => src.SubFormItems))
+            .ReverseMap();
+
+        CreateMap<SubFormItem, SubFormItemDto>()
             .ForMember(d => d.Id, opt => opt.MapFrom(src => src.Id))
             .ForMember(d => d.Name, opt => opt.MapFrom(src => src.NameEn))
             .ReverseMap();
