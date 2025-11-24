@@ -1,0 +1,14 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Evaluation.DAL.Dtos.Form;
+
+public class SubFormItemEvaluationDto
+{
+    public Guid Id { get; set; }
+    public string? Value { get; set; }
+    public string? Note { get; set; }
+}

@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
 using Evaluation.DAL.Dtos;
+using Evaluation.DAL.Dtos.Form;
 using Evaluation.DAL.Models.FormsModules;
 using Evaluation.Services.BusinessLayer;
 using Evaluation.Services.BusinessLayer.API.FormLayer;
+using FluentResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Evaluation.API.Controllers;
@@ -21,9 +23,15 @@ public class FormController : ControllerBase
 
 
     [HttpGet]
-    public async Task<List<FormItemDto>> GetItems(Guid formId)
+    public async Task<Result<List<FormItemDto>>> GetItems([FromQuery] Guid formId)
     {
         return await _masterBl.GetApiService<FormBL>().GetFormItems(formId);
+    }
+
+    [HttpPost]
+    public async Task<Result<FormEvaluationDto>> SaveEvaluation([FromBody] FormEvaluationDto formEvaluation)
+    {
+        return await _masterBl.GetApiService<FormBL>().SaveEvaluationForm(formEvaluation);
     }
 
 }

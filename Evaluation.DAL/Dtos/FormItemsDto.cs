@@ -8,8 +8,3 @@ public class FormItemDto
     public string Name { get; set; } = null!;
     public List<SubFormItemDto>? SubFormItems { get; set; }
 }
-public class SubFormItemDto
-{
-    public Guid Id { get; set; }
-    public string Name { get; set; } = null!;
-}
