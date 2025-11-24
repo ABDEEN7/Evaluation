@@ -19,7 +19,10 @@ public class FormItem : EntityBase, IAuditLogEntity
     //public Guid DropDownType { get; set; } // if activate Min Max or not and if mkae questioning or not
     public Guid CalcMethodId { get; set; }
     public CalcMethod? CalcMethod { get; set; }
-
+    public string OrderNo { get; set; } = null!;
+    public bool HasNote { get; set; }
     public ICollection<SubFormItem>? SubFormItems { get; set; }
+
+
 
 }
