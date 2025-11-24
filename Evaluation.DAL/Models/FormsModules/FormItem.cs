@@ -21,4 +21,5 @@ public class FormItem : EntityBase, IAuditLogEntity
     public CalcMethod? CalcMethod { get; set; }
 
     public ICollection<SubFormItem>? SubFormItems { get; set; }
+
 }
