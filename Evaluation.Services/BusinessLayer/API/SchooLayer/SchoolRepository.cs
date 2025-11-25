@@ -13,6 +13,7 @@ using Evaluation.DAL.Models.Org;
 using Evaluation.DAL.Models.Planing;
 using Evaluation.DAL.Repositories;
 using Evaluation.SharedHelper.Consts;
+using System.Linq.Expressions;
 
 namespace Evaluation.Services.BusinessLayer.API.SchooLayer;
 
@@ -27,10 +28,10 @@ public class SchoolRepository(IServiceScopeFactory serviceScopeFactory,
     ) : ApiBase(serviceScopeFactory, cacheDataProvider, unitOfWork, loggingServices, mapper, userInfo,
         serviceProvider, requestInfo)
 {
-    public IQueryable<School> GetSchools()
+    public IQueryable<School> GetSchools(Expression<Func<School, bool>>? filter = null)
           => unitOfWork
             .GetRepository<School>()
-            .GetAllActiveNonDeleted();
+            .GetAllActiveNonDeleted(filter);
 
     public IQueryable<VisitType> GetVisitTypes()
         => unitOfWork

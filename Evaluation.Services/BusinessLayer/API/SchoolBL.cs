@@ -8,6 +8,7 @@ using Evaluation.Services.Special;
 using Evaluation.SharedHelper;
 using Evaluation.SharedHelper.Consts;
 using Evaluation.SharedHelper.Dtos.SchoolDto;
+using Evaluation.SharedHelper.Helper;
 using Evaluation.SharedHelper.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,8 +24,6 @@ public class SchoolBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvide
 
     public async Task<School> GetSchoolDetails(Guid SchoolID)
     {
-        var schoollist = await uow.GetRepository<School>().GetAllActiveNonDeleted().ToListAsync();
-
         var schoolData = await serviceProvider.CreateScopedUow().GetRepository<School>()
             .GetAllQueryFiltered()
             .AsNoTracking()
@@ -32,9 +31,10 @@ public class SchoolBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvide
                .FirstOrDefaultAsync();
         return schoolData;
     }
-    public async Task<List<ResponseSchools>> GetSchools()
+    public async Task<List<ResponseSchools>> GetSchools(SchoolRequest request)
     {
-        var schools = schoolRepository.GetSchools();
+        var filter = BuildFilterExpression(request);
+        var schools = schoolRepository.GetSchools(filter);
 
         return await
             schools
@@ -63,5 +63,16 @@ public class SchoolBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvide
             .FirstOrDefault()
         };
     }
+    private Expression<Func<School, bool>> BuildFilterExpression(SchoolRequest request)
+    {
+        Expression<Func<School, bool>> filter = s => true;
+        if (!string.IsNullOrWhiteSpace(request.Name))
+            filter = filter.And(s => s.NameEn.Contains(request.Name));
+        //if(request.VisitDateFrom.HasValue)
+        //    filter = filter.Date
+        //if(request.VisitType != null)
+        //    filter = filter.And(x=>x.)
+        return filter;
 
+    }
 }
