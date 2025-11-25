@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using Evaluation.DAL.Dtos;
+using Evaluation.DAL.Dtos.Form;
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.FormsModules;
 using Evaluation.DAL.Repositories;
@@ -26,4 +28,15 @@ public class FormService(IServiceScopeFactory serviceScopeFactory,
 
         return formItems;
     }
+
+    public async Task<FormEvaluationValueDto> SaveFormItemsAndSubs(FormEvaluationValueDto form)
+    {
+
+        await unitOfWork.GetRepository<FormItemValue>().InsertRange(form.Items);
+        await unitOfWork.GetRepository<SubFormItemValue>().InsertRange(form.SubItems);
+        await uow.CommitAsync();
+
+        return form;
+    }
+
 }

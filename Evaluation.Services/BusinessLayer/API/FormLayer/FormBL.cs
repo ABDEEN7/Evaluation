@@ -2,6 +2,7 @@
 using Evaluation.DAL.Dtos;
 using Evaluation.DAL.Dtos.Form;
 using Evaluation.DAL.Helper;
+using Evaluation.DAL.Models.FormsModules;
 using Evaluation.DAL.Repositories;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Models;
@@ -24,8 +25,28 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
 
     public async Task<Result<FormEvaluationDto>> SaveEvaluationForm(FormEvaluationDto formEvaluationDto)
     {
-        //Mapping
-        //Save Data
+        if (formEvaluationDto == null)
+            return Result.Fail<FormEvaluationDto>("Form data is null.");
+
+        var userId = userInfo.UserId;
+
+        if (userId == null)
+            return Result.Fail<FormEvaluationDto>("User ID is missing.");
+
+        var form = mapper.Map<FormEvaluationValueDto>(formEvaluationDto);
+
+        foreach (var item in form.Items)
+        {
+            item.UserId = userId.Value;
+        }
+
+        foreach (var item in form.SubItems)
+        {
+            item.UserId = userId.Value;
+        }
+
+        var formItems = await formService.SaveFormItemsAndSubs(form);
+
         return Result.Ok(formEvaluationDto);
     }
 }

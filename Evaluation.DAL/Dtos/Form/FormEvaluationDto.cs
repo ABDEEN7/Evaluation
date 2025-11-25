@@ -1,5 +1,4 @@
-﻿
-namespace Evaluation.DAL.Dtos.Form;
+﻿namespace Evaluation.DAL.Dtos.Form;
 
 public class FormEvaluationDto
 {
