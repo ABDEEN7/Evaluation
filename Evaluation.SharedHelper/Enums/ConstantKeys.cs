@@ -103,6 +103,16 @@ public static class ConstantKeys
         public static readonly string UserPartyTypeExistsUserPartyTypeSignature = "UserPartyTypeExistsUserPartyTypeSignature";
         public static readonly string UserPartyTypeSignatureWidthError = "UserPartyTypeSignatureWidthError";
         public static readonly string UserPartyTypeSignatureHeightError = "UserPartyTypeSignatureHeightError";
+        public static readonly string PartyTypeCannotDelete = "PartyTypeCannotDelete";
+        public static readonly string PartyTypeExistsServiceInitiatorPartyType = "PartyTypeExistsServiceInitiatorPartyType";
+        public static readonly string PartyTypeExistsServiceStatusPartyTypeDisplayName = "PartyTypeExistsServiceStatusPartyTypeDisplayName";
+        public static readonly string PartyTypeExistsServiceRequestShowPartyType = "PartyTypeExistsServiceRequestShowPartyType";
+        public static readonly string PartyTypeExistsServiceStatusPreventPartyType = "PartyTypeExistsServiceStatusPreventPartyType";
+        public static readonly string PartyTypeExistsActionAssignPartyType = "PartyTypeExistsActionAssignPartyType";
+        public static readonly string PartyTypeExistsActionPartyType = "PartyTypeExistsActionPartyType";
+        public static readonly string PartyTypeExistsActionShowLogPartyType = "PartyTypeExistsActionShowLogPartyType";
+        public static readonly string PartyTypeExistsFieldPartyType = "PartyTypeExistsFieldPartyType";
+        public static readonly string PartyTypeExistsActionStatusConfigNotification = "PartyTypeExistsActionStatusConfigNotification";
     }
 
         public static class AdminSettings
@@ -199,6 +209,7 @@ public static class ConstantKeys
         public static readonly string AdminScopeAcademicYear = "AdminScopeAcademicYear";
         public static readonly string AdminUserPartyType = "AdminUserPartyType";
         public static readonly string AdminUserPartyTypeSignature = "AdminUserPartyTypeSignature";
+        public static readonly string AdminPartyType = "AdminPartyType";
     }
 
     public static class AdminPermission
@@ -383,6 +394,15 @@ public static class ConstantKeys
         public const string ADD_ADMIN_USERPARTYTYPE_SIGNATURE = "ADD_ADMIN_USERPARTYTYPE_SIGNATURE";
         public const string EDIT_ADMIN_USERPARTYTYPE_SIGNATURE = "EDIT_ADMIN_USERPARTYTYPE_SIGNATURE";
         public const string DELETE_ADMIN_USERPARTYTYPE_SIGNATURE = "DELETE_ADMIN_USERPARTYTYPE_SIGNATURE";
+
+        #endregion
+
+        #region PARTYTYPE
+
+        public const string VIEW_ADMIN_PARTYTYPE = "VIEW_ADMIN_PARTYTYPE";
+        public const string ADD_ADMIN_PARTYTYPE = "ADD_ADMIN_PARTYTYPE";
+        public const string EDIT_ADMIN_PARTYTYPE = "EDIT_ADMIN_PARTYTYPE";
+        public const string DELETE_ADMIN_PARTYTYPE = "DELETE_ADMIN_PARTYTYPE";
 
         #endregion
 
