@@ -99,6 +99,10 @@ public static class ConstantKeys
         public static readonly string FieldExistsPlaceHolder = "FieldExistsPlaceHolder";
         public static readonly string AcademicYearExistsScope = "AcademicYearExistsScope";
         public static readonly string DepartmentExistsAcademicYear = "DepartmentExistsAcademicYear";
+        public static readonly string SameUserpartyTypeExists = "SameUserpartyTypeExists";
+        public static readonly string UserPartyTypeExistsUserPartyTypeSignature = "UserPartyTypeExistsUserPartyTypeSignature";
+        public static readonly string UserPartyTypeSignatureWidthError = "UserPartyTypeSignatureWidthError";
+        public static readonly string UserPartyTypeSignatureHeightError = "UserPartyTypeSignatureHeightError";
     }
 
         public static class AdminSettings
@@ -122,6 +126,8 @@ public static class ConstantKeys
         public static readonly string SignatureUploadHeight = "SignatureUploadHeight";
         public static readonly string OPERATORS_LIST = "OPERATORS_LIST";
         public static readonly string ActionConditionType = "ActionConditionType";
+        public static readonly string UserPartyTypeSignatureHeight = "UserPartyTypeSignatureHeight";
+        public static readonly string UserPartyTypeSignatureWidth = "UserPartyTypeSignatureWidth";
         
 
     }
@@ -191,6 +197,8 @@ public static class ConstantKeys
         public static readonly string AdminAcademicYear = "AdminAcademicYear";
         public static readonly string AdminAcademicYearScope = "AdminAcademicYearScope";
         public static readonly string AdminScopeAcademicYear = "AdminScopeAcademicYear";
+        public static readonly string AdminUserPartyType = "AdminUserPartyType";
+        public static readonly string AdminUserPartyTypeSignature = "AdminUserPartyTypeSignature";
     }
 
     public static class AdminPermission
@@ -357,6 +365,24 @@ public static class ConstantKeys
         public const string ADD_ADMIN_SCOPE_ACADEMIC_YEAR_SCOPE = "ADD_ADMIN_SCOPE_ACADEMIC_YEAR_SCOPE";
         public const string EDIT_ADMIN_SCOPE_ACADEMIC_YEAR_SCOPE = "EDIT_ADMIN_SCOPE_ACADEMIC_YEAR_SCOPE";
         public const string VIEW_ADMIN_SCOPE_ACADEMIC_YEAR_SCOPE = "VIEW_ADMIN_SCOPE_ACADEMIC_YEAR_SCOPE";
+
+        #endregion
+
+        #region USERPARTYTYPE
+
+        public const string VIEW_ADMIN_USERPARTYTYPE = "VIEW_ADMIN_USERPARTYTYPE";
+        public const string ADD_ADMIN_USERPARTYTYPE = "ADD_ADMIN_USERPARTYTYPE";
+        public const string EDIT_ADMIN_USERPARTYTYPE = "EDIT_ADMIN_USERPARTYTYPE";
+        public const string DELETE_ADMIN_USERPARTYTYPE = "DELETE_ADMIN_USERPARTYTYPE";
+
+        #endregion
+
+        #region SIGNATUREUSERPARTYTYPE
+
+        public const string VIEW_ADMIN_USERPARTYTYPE_SIGNATURE = "VIEW_ADMIN_USERPARTYTYPE_SIGNATURE";
+        public const string ADD_ADMIN_USERPARTYTYPE_SIGNATURE = "ADD_ADMIN_USERPARTYTYPE_SIGNATURE";
+        public const string EDIT_ADMIN_USERPARTYTYPE_SIGNATURE = "EDIT_ADMIN_USERPARTYTYPE_SIGNATURE";
+        public const string DELETE_ADMIN_USERPARTYTYPE_SIGNATURE = "DELETE_ADMIN_USERPARTYTYPE_SIGNATURE";
 
         #endregion
 
