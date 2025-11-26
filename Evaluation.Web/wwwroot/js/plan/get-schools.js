@@ -6,6 +6,9 @@ let filteredSchools = [];
 let currentPage = 1;
 let pageSize = 10;
 let visitTypes = [];
+let currentSearchTerm = '';
+let currentFilters = {};
+
 
 // Initialize when DOM is ready
 $(document).ready(function () {
@@ -82,9 +85,34 @@ function initializeFlatpickr() {
 
 // ============= LOAD SCHOOLS DATA (REAL API) =============
 function loadSchoolsData(page = 1) {
-    currentPage = page;
+    const params = new URLSearchParams({
+        page: page,
+        pageSize: pageSize
+    });
+    //Added filters if they exist
+    if (currentFilters.SchoolName) {
+        params.append('Name', currentFilters.SchoolName);
+    }
+    if (currentFilters.lastEvaluationDate) {
+        params.append('lastEvalDate', currentFilters.lastEvaluationDate);
+    }
+    if (currentFilters.CreatedDate) {
+        params.append('establishmentDate', currentFilters.CreatedDate);
+    }
+    if (currentFilters.NextEvalDate) {
+        params.append('nextEvalDate', currentFilters.NextEvalDate);
+    }
+    if (currentFilters.PreviousResult) {
+        params.append('previousResult', currentFilters.PreviousResult);
+    }
+    if (currentFilters.VisitType) {
+        params.append('visitType', currentFilters.VisitType);
+    }
+    //Show loading state
+    showLoadingState();
+    //currentPage = page;
 
-    jqClient().Get(`/School/GetSchools?page=${page}&pageSize=${pageSize}`)
+    jqClient().Get(`/School/GetSchools?page=${params.toString()}`)
         .done((result) => {
             console.log("Schools data:", result);
 
@@ -102,6 +130,19 @@ function loadSchoolsData(page = 1) {
         .fail((jqXHR, textStatus, err) => {
             console.error('GetAll schools failed', textStatus, err);
         });
+}
+//============== Show Loading State ===============
+function showLoadingState() {
+    const tbody = $('#planTable tbody');
+    tbody.html(`
+     <tr>
+            <td colspan="7" class="text-center py-5">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">جاري التحميل...</span>
+                </div>
+                <p class="mt-2 text-muted">جاري تحميل البيانات...</p>
+            </td>
+        </tr>`)
 }
 
 // ============= RENDER SCHOOLS TABLE =============
@@ -254,6 +295,46 @@ function initializeFilters() {
         renderPagination(filteredSchools.length);
     });
 }
+//Handle filter form submision
+$("#filterForm").on('submit', function (e) {
+    e.preventDefault();
+
+    // Collect all filter values
+    currentFilters = {
+        SchoolName: $('#filterSchoolName').val().trim(),
+        LastEvalDate: $('#filterLastEvalDate').val(),
+        CreatedDate: $('#filterCreatedDate').val(),
+        NextEvalDate: $('#filterNextEvalDate').val(),
+        PreviousResult: $('#filterPreviousResult').val(),
+        VisitType: $('#filterVisitType').val()
+    };
+
+    // Remove empty filters
+    Object.keys(currentFilters).forEach(key => {
+        if (!currentFilters[key]) delete currentFilters[key];
+    });
+    // Update filter badge count
+    updateFilterBadge();
+    currentPage = 1;
+    loadSchoolsData(1);
+    //Close the offcanvas
+    const offcanvas = bootstrap.Offcanvas.getInstance(document.getElementById('filterOffcanvas'));
+    if (offcanvas) offcanvas.hide();
+});
+// Handle clear filters
+$('#clearFiltersBtn').on('click', function () {
+    $('#filterForm')[0].reset();
+    currentFilters = {};
+    updateFilterBadge();
+    currentPage = 1;
+    loadSchoolsData(1);
+});
+
+//============ Update Filter BADGE =================
+function updateFilterBadge() {
+    const filterCount = Object.keys(currentFilters).length;
+    $('.filterbtn .badge').text(filterCount);
+}
 
 // ============= HELPERS =============
 function getRatingClass(rating) {
@@ -270,8 +351,7 @@ function loadVisitTypes() {
     return jqClient().Get('/School/GetVisits')
         .done(result => {
             visitTypes = result?.result || [];
-        visitTypes = data;
-    }).fail((jqXHR, textStatus, err) => {
-        console.error('Get Visits failed', textStatus, err);
-    });
+        }).fail((jqXHR, textStatus, err) => {
+            console.error('Get Visits failed', textStatus, err);
+        });
 }

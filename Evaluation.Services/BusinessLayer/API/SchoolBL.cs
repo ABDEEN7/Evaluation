@@ -67,9 +67,12 @@ public class SchoolBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvide
     {
         Expression<Func<School, bool>> filter = s => true;
         if (!string.IsNullOrWhiteSpace(request.Name))
-            filter = filter.And(s => s.NameEn.Contains(request.Name));
-        //if(request.VisitDateFrom.HasValue)
-        //    filter = filter.Date
+            filter = filter.And(s => s.NameEn.Contains(request.Name) || s.NameAr.Contains(request.Name));
+        if (request.EstablishmentDate != null)
+        {
+            int year = request.EstablishmentDate.Value.Year;
+            filter = filter.And(s => s.EstablishmentDate.Year == year);
+        }
         //if(request.VisitType != null)
         //    filter = filter.And(x=>x.)
         return filter;
