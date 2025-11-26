@@ -144,6 +144,7 @@ public static class ConstantKeys
         public static readonly string NumberOfNavbars = "NumberOfNavbars";
         public static readonly string NavBarPermissionList = "NavBarPermissionList";
         public static readonly string RoutingValue = "RoutingValue";
+        public static readonly string WebAppSitePath = "WebAppSitePath";
         
 
     }
@@ -218,6 +219,7 @@ public static class ConstantKeys
         public static readonly string AdminPartyType = "AdminPartyType";
         public static readonly string AdminBanner = "AdminBanner";
         public static readonly string AdminNavbar = "AdminNavbar";
+        public static readonly string AdminSiteDocument = "AdminSiteDocument";
     }
 
     public static class AdminPermission
@@ -425,6 +427,14 @@ public static class ConstantKeys
         public const string ADD_ADMIN_NAVBAR = "ADD_ADMIN_NAVBAR";
         public const string EDIT_ADMIN_NAVBAR = "EDIT_ADMIN_NAVBAR";
         public const string DELETE_ADMIN_NAVBAR = "DELETE_ADMIN_NAVBAR";
+
+        #endregion
+        #region SITEDOCUMENT
+
+        public const string VIEW_ADMIN_SITEDOCUMENT = "VIEW_ADMIN_SITEDOCUMENT";
+        public const string ADD_ADMIN_SITEDOCUMENT = "ADD_ADMIN_SITEDOCUMENT";
+        public const string EDIT_ADMIN_SITEDOCUMENT = "EDIT_ADMIN_SITEDOCUMENT";
+        public const string DELETE_ADMIN_SITEDOCUMENT = "DELETE_ADMIN_SITEDOCUMENT";
 
         #endregion
 
