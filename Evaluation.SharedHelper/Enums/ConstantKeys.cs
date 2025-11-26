@@ -138,6 +138,8 @@ public static class ConstantKeys
         public static readonly string ActionConditionType = "ActionConditionType";
         public static readonly string UserPartyTypeSignatureHeight = "UserPartyTypeSignatureHeight";
         public static readonly string UserPartyTypeSignatureWidth = "UserPartyTypeSignatureWidth";
+        public static readonly string NumberOfBanners = "NumberOfBanners";
+        public static readonly string TargetValue = "TargetValue";
         
 
     }
@@ -210,6 +212,7 @@ public static class ConstantKeys
         public static readonly string AdminUserPartyType = "AdminUserPartyType";
         public static readonly string AdminUserPartyTypeSignature = "AdminUserPartyTypeSignature";
         public static readonly string AdminPartyType = "AdminPartyType";
+        public static readonly string AdminBanner = "AdminBanner";
     }
 
     public static class AdminPermission
@@ -404,6 +407,12 @@ public static class ConstantKeys
         public const string EDIT_ADMIN_PARTYTYPE = "EDIT_ADMIN_PARTYTYPE";
         public const string DELETE_ADMIN_PARTYTYPE = "DELETE_ADMIN_PARTYTYPE";
 
+        #endregion
+        #region BANNER
+        public const string VIEW_ADMIN_BANNER = "VIEW_ADMIN_BANNER";
+        public const string ADD_ADMIN_BANNER = "ADD_ADMIN_BANNER";
+        public const string EDIT_ADMIN_BANNER = "EDIT_ADMIN_BANNER";
+        public const string DELETE_ADMIN_BANNER = "DELETE_ADMIN_BANNER";
         #endregion
 
     }
