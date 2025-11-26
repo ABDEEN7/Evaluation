@@ -35,6 +35,18 @@ public class SchoolController : ControllerBase
     }
 
     [HttpGet]
+    public async Task<List<HREmployeeInfoDto>> GetHREmployees(long? qID = null, string email = null, string orgno = null)
+    {
+        return await _hrService.GetHRUsersAsync(qID, email, orgno);
+    }
+
+    [HttpGet]
+    public async Task<bool> AddUpdateOrgTree(string? hrCode = null ,long? qID = null)
+    {
+        return await _hrService.AddUpdateOrgTree(hrCode, qID);
+    }
+
+    [HttpGet]
     public async Task<List<HROrganizationInfoDto>> GetHROrgDetailsAsync(int page)
     {
         return await _hrService.GetAllHROrgAsync(page);
