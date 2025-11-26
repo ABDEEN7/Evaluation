@@ -25,8 +25,8 @@ public class MinistryUser : EntityBase
     public string JobTitleAr { get; set; } = null!;
     public string JobTitleCode { get; set; } = string.Empty;
     public string DirectManagerQId { get; set; } = string.Empty;
-    public int EmployeeNo { get; set; }
-    public int OrganizationNo { get; set; }
+    public string? EmployeeNo { get; set; }
+    public string? OrganizationNo { get; set; }
     public ICollection<UserPartyType>? UserPartTypes { get; set; } = new List<UserPartyType>();
     public ICollection<UserRole>? UserRoles { get; set; } = new List<UserRole>();
 }
