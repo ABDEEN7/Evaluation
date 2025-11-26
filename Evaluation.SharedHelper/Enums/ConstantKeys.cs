@@ -113,6 +113,7 @@ public static class ConstantKeys
         public static readonly string PartyTypeExistsActionShowLogPartyType = "PartyTypeExistsActionShowLogPartyType";
         public static readonly string PartyTypeExistsFieldPartyType = "PartyTypeExistsFieldPartyType";
         public static readonly string PartyTypeExistsActionStatusConfigNotification = "PartyTypeExistsActionStatusConfigNotification";
+        public static readonly string NavbarExistsSiteContent = "NavbarExistsSiteContent";
     }
 
         public static class AdminSettings
@@ -140,6 +141,9 @@ public static class ConstantKeys
         public static readonly string UserPartyTypeSignatureWidth = "UserPartyTypeSignatureWidth";
         public static readonly string NumberOfBanners = "NumberOfBanners";
         public static readonly string TargetValue = "TargetValue";
+        public static readonly string NumberOfNavbars = "NumberOfNavbars";
+        public static readonly string NavBarPermissionList = "NavBarPermissionList";
+        public static readonly string RoutingValue = "RoutingValue";
         
 
     }
@@ -213,6 +217,7 @@ public static class ConstantKeys
         public static readonly string AdminUserPartyTypeSignature = "AdminUserPartyTypeSignature";
         public static readonly string AdminPartyType = "AdminPartyType";
         public static readonly string AdminBanner = "AdminBanner";
+        public static readonly string AdminNavbar = "AdminNavbar";
     }
 
     public static class AdminPermission
@@ -413,6 +418,14 @@ public static class ConstantKeys
         public const string ADD_ADMIN_BANNER = "ADD_ADMIN_BANNER";
         public const string EDIT_ADMIN_BANNER = "EDIT_ADMIN_BANNER";
         public const string DELETE_ADMIN_BANNER = "DELETE_ADMIN_BANNER";
+        #endregion
+        #region NAVBAR
+
+        public const string VIEW_ADMIN_NAVBAR = "VIEW_ADMIN_NAVBAR";
+        public const string ADD_ADMIN_NAVBAR = "ADD_ADMIN_NAVBAR";
+        public const string EDIT_ADMIN_NAVBAR = "EDIT_ADMIN_NAVBAR";
+        public const string DELETE_ADMIN_NAVBAR = "DELETE_ADMIN_NAVBAR";
+
         #endregion
 
     }
