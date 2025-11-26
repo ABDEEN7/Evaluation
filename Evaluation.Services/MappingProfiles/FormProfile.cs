@@ -26,15 +26,17 @@ public class FormProfile : Profile
           .ForMember(d => d.Value, opt => opt.MapFrom(src => src.Value))
           .ForMember(d => d.Note, opt => opt.MapFrom(src => src.Note))
           .ForMember(d => d.Id, opt => opt.MapFrom(src => src.FormItemId))
+          .ForMember(d => d.ValueId, opt => opt.MapFrom(src => src.Id))
           .ReverseMap();
 
         CreateMap<SubFormItemValue, SubFormItemEvaluationDto>()
          .ForMember(d => d.Value, opt => opt.MapFrom(src => src.FieldDropDownValueId))
          .ForMember(d => d.Note, opt => opt.MapFrom(src => src.Note))
          .ForMember(d => d.Id, opt => opt.MapFrom(src => src.SubFormItemId))
+         .ForMember(d => d.ValueId, opt => opt.MapFrom(src => src.Id))
          .ReverseMap();
 
-        CreateMap<FormEvaluationDto, FormEvaluationValueDto>()
+        CreateMap<FormEvaluationDto, FormEvaluationValue>()
               .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.Items))
               .ForMember(dest => dest.SubItems, opt => opt.Ignore()) // filled manually
               .AfterMap((src, dest, ctx) =>

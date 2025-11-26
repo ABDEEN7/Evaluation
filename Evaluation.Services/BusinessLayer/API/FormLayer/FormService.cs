@@ -29,7 +29,22 @@ public class FormService(IServiceScopeFactory serviceScopeFactory,
         return formItems;
     }
 
-    public async Task<FormEvaluationValueDto> SaveFormItemsAndSubs(FormEvaluationValueDto form)
+    public async Task<FormItemValue> UpdateFormItemValue(FormItemValue formItemValue)
+    {
+        unitOfWork.GetRepository<FormItemValue>().Update(formItemValue);
+        await uow.CommitAsync();
+
+        return formItemValue;
+    }
+    public async Task<SubFormItemValue> UpdateSubFormItemValue(SubFormItemValue subFormItemValue)
+    {
+        unitOfWork.GetRepository<SubFormItemValue>().Update(subFormItemValue);
+        await uow.CommitAsync();
+
+        return subFormItemValue;
+    }
+
+    public async Task<FormEvaluationValue> SaveFormItemsAndSubs(FormEvaluationValue form)
     {
 
         await unitOfWork.GetRepository<FormItemValue>().InsertRange(form.Items);
@@ -37,6 +52,16 @@ public class FormService(IServiceScopeFactory serviceScopeFactory,
         await uow.CommitAsync();
 
         return form;
+    }
+
+    public async Task<FormItemValue> GetFormItemValue(Guid ValueId)
+    {
+        return await unitOfWork.GetRepository<FormItemValue>().GetByIDActiveNonDeleted(ValueId!);
+    }
+
+    public async Task<SubFormItemValue> GetSubFormItemValue(Guid ValueId)
+    {
+        return await unitOfWork.GetRepository<SubFormItemValue>().GetByIDActiveNonDeleted(ValueId!);
     }
 
 }

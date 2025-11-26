@@ -2,7 +2,7 @@
 
 namespace Evaluation.DAL.Dtos;
 
-public class FormEvaluationValueDto
+public class FormEvaluationValue
 {
     public Guid Id { get; set; }
     public List<FormItemValue>? Items { get; set; }

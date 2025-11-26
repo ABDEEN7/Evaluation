@@ -9,6 +9,8 @@ namespace Evaluation.DAL.Dtos.Form;
 public class SubFormItemEvaluationDto
 {
     public Guid Id { get; set; }
+    public Guid ValueId { get; set; }
+
     public Guid Value { get; set; }
     public string? Note { get; set; }
 }

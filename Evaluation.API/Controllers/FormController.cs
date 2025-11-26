@@ -34,4 +34,9 @@ public class FormController : ControllerBase
         return await _masterBl.GetApiService<FormBL>().SaveEvaluationForm(formEvaluation);
     }
 
+    [HttpPost]
+    public async Task<Result<FormEvaluationDto>> UpdateEvaluation([FromBody] FormEvaluationDto formEvaluation)
+    {
+        return await _masterBl.GetApiService<FormBL>().UpdateEvaluationForm(formEvaluation);
+    }
 }

@@ -33,7 +33,7 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
         if (userId == null)
             return Result.Fail<FormEvaluationDto>("User ID is missing.");
 
-        var form = mapper.Map<FormEvaluationValueDto>(formEvaluationDto);
+        var form = mapper.Map<FormEvaluationValue>(formEvaluationDto);
 
         foreach (var item in form.Items)
         {
@@ -45,8 +45,52 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
             item.UserId = userId.Value;
         }
 
-        var formItems = await formService.SaveFormItemsAndSubs(form);
+        await formService.SaveFormItemsAndSubs(form);
 
         return Result.Ok(formEvaluationDto);
+    }
+
+    public async Task<Result<FormEvaluationDto>> UpdateEvaluationForm(FormEvaluationDto formEvaluationDto)
+    {
+        if (formEvaluationDto == null)
+            return Result.Fail<FormEvaluationDto>("Form data is null.");
+
+        var userId = userInfo.UserId;
+
+        if (userId == null)
+            return Result.Fail<FormEvaluationDto>("User ID is missing.");
+
+        var form = mapper.Map<FormEvaluationValue>(formEvaluationDto);
+
+        foreach (var item in form.Items)
+        {
+            var formItemsValue = await formService.GetFormItemValue(item.Id);
+            if (formItemsValue != null)
+            {
+                formItemsValue.Value = item.Value;
+                formItemsValue.Note = item.Note;
+            }
+            await formService.UpdateFormItemValue(formItemsValue);
+        }
+
+        foreach (var item in form.SubItems)
+        {
+            var subFormItemsValue = await formService.GetSubFormItemValue(item.Id);
+            if (subFormItemsValue != null)
+            {
+                subFormItemsValue.FieldDropDownValueId = item.FieldDropDownValueId;
+                subFormItemsValue.Note = item.Note;
+            }
+            await formService.UpdateSubFormItemValue(subFormItemsValue);
+        }
+
+        return Result.Ok(formEvaluationDto);
+    }
+
+    public async Task<Result<List<FormItemDto>>> GetForm(Guid FormId)
+    {
+        var formItems = await formService.GetFormItems();
+
+        return mapper.Map<List<FormItemDto>>(formItems.Where(s => s.EvalFormId == FormId).ToList());
     }
 }
