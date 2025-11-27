@@ -4,9 +4,14 @@ namespace Evaluation.Web.Controllers
 {
     public class PlanController : Controller
     {
-        public IActionResult Create()
+		public IActionResult Index()
+		{
+			return View();
+		}
+		public IActionResult Create()
         {
             return View();
         }
-    }
+		
+	}
 }

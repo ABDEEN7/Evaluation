@@ -218,8 +218,39 @@ public static class ConstantKeys
     }
     public static class WebAppCommon
     {
-    }
-    public static class WebAppLoginPage
+		public const string lblOk = "lblOk";
+		public const string lblCancel = "lblCancel";
+		public const string lblShowingEntries = "lblShowingEntries";
+		public const string lblprevious = "lblprevious";
+		public const string lblnext = "lblnext";
+	}
+
+	public static class EvaluationPlanRequests
+	{
+		public const string lblPlansListTitle = "lblPlansListTitle";
+		public const string lblFilter = "lblFilter";
+		public const string lblSearchPlan = "lblSearchPlan";
+		public const string lblCreateNewPlan = "lblCreateNewPlan";
+
+		public const string lblPlanEndDate = "lblPlanEndDate";
+		public const string lblPlanStartDate = "lblPlanStartDate";
+		public const string lblPlanCreatedOn = "lblPlanCreatedOn";
+		public const string lblPlanSchoolsCount = "lblPlanSchoolsCount";
+		public const string lblPlanStatus = "lblPlanStatus";
+		public const string lblPlanName = "lblPlanName";
+
+		public const string lblActions = "lblActions";
+		public const string lblView = "lblView";
+		public const string lblEdit = "lblEdit";
+		public const string lblDelete = "lblDelete";
+
+		public const string lblConfirmDelete = "lblConfirmDelete";
+		public const string lblDeletePlanConfirm = "lblDeletePlanConfirm";
+
+		public const string lblApplyFilter = "lblApplyFilter";
+		public const string lblClear = "lblClear";
+	}
+	public static class WebAppLoginPage
     {
         public static readonly string lblEmail = "lblEmail";
         public static readonly string lblPassword = "lblPassword";
