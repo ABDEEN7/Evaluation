@@ -77,38 +77,7 @@ $(document).ready(function () {
     });
   
 
-    const GetServiceStatusGroup = () => {
-
-        let serviceId = $('#ServiceId').val();
-
-        if (serviceId) {
-
-            const options = {
-                success: function (result) {
-                    let data = [];
-                    if (result) {
-
-                        data = result
-                            .map(item => ({
-                                id: item.id,
-                                text: lang == "ar" ? item.nameAr : item.nameEn
-                            }));
-
-                    }
-                    $("#ServiceStatusStatusGroupId").empty();
-                    $("#ServiceStatusStatusGroupId").select2({
-                        width: '100%',
-                        allowClear: false,
-                        data: data,
-                        dropdownCssClass: "manageselect2zindex",
-                        placeholder: sharedFn().GetUiControlText('PleaseSelect'),
-
-                    });
-                }
-            };
-            jqClientAdvanced(options).Get("ServiceStatus/GetServiceStatusGroups".concat("?serviceId=", serviceId));
-        }
-    }
+  
     let tabulatorTable;
     const GetServiceStatusPartyTypeDisplayNameList = (serviceStatusId, disableTable) => {
 
@@ -536,7 +505,7 @@ $(document).ready(function () {
 
     $('#ServiceId').change(function () {
         LoadAllStatuses();
-        GetServiceStatusGroup();
+      
         $('.StatusDetails').hide();
 
 

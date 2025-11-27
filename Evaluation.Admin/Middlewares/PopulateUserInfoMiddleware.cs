@@ -35,7 +35,7 @@ namespace Evaluation.Admin.Middlewares
                         var _UserObj = await scope.GetRepository<UserRole>()
                                                   .GetAll()
                                                   .Include(x=>x.User)
-                                                  .Where(c => c.User.Email == userInfo.Email).FirstOrDefaultAsync();
+                                                  .Where(c => c.User.Email == userInfo.Email && c.User.IsActive==true).FirstOrDefaultAsync();
                         if (_UserObj != null)
                         {
                             userInfo.PermissionList = GetPermissions(_UserObj.RoleId);

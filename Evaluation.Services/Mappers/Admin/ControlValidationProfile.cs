@@ -11,7 +11,9 @@ namespace Evaluation.Services.Mappers
         {
             CreateMap<ControlValidation, ControlValidationDTO>()
                  .ForMember(dest => dest.ControlName, opt => opt.MapFrom(src => src.Name))
-                   .ForMember(dest => dest.TabulatorConfig, opt => opt.MapFrom(src => src.TabulatorConfigJson));
+                   .ForMember(dest => dest.TabulatorConfig, opt => opt.MapFrom(src => src.TabulatorConfigJson))
+                   .ForMember(dest => dest.FileCount, opt => opt.MapFrom(src => src.MaxFileCount))
+                   .ForMember(dest => dest.FileSize, opt => opt.MapFrom(src => src.MaxFileSize));
         }
     }
 }
