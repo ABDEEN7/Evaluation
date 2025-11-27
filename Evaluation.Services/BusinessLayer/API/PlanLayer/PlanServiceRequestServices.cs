@@ -90,7 +90,7 @@ public class PlanServiceRequestServices(
             return result;
         });
     }
-    public async Task<Result<CreateEvaluationPlanDto>> ApprovePlan(ApproveEvaluationPlanDto? modelDto)
+    public async Task<Result<CreateEvaluationPlanDto>> ApprovePlan(CreateEvaluationPlanDto? modelDto)
     {
         //await ValidateApprovePlan(modelDto);
 
@@ -123,6 +123,19 @@ public class PlanServiceRequestServices(
 
         if (selectedYear?.Year < DateTime.Now.Year)
             throw new BusinessException(ConstantKeys.ExceptionMessage.PlanInThePastIsNotAllowed);
+    }
+    private Plan ConvertFromPlanToDto(CreateEvaluationPlanDto model)
+    {
+        return new Plan
+        {
+            Id = model.Id,
+            AcademicYearId = model.AcademicYearId,
+            PlanName = model.Name,
+            PlanJsonValue = JsonConvert.SerializeObject(model),
+            PlanStatusId = model.PlanStatusId,
+            PlanTypeDepartmentId = 
+
+        };
     }
     private void UpdatePlanEntity(Plan plan, UpdatePlanDto dto)
     {

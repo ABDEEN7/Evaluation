@@ -47,15 +47,12 @@ public class PlanController(MasterBL masterBL) : ControllerBase
         //var
         return Ok();
     }
-    //[HttpPost]
-    //public async Task<IActionResult> Approve(string approveDto)
-    //{
-    //    ApproveEvaluationPlanDto? planDto = JsonConvert.DeserializeObject<ApproveEvaluationPlanDto>(approveDto.ToString());
-    //    if (planDto == null)
-    //        return BadRequest(new { error = "Invalid JSON structure." });
-    //    await masterBL.GetApiService<PlanServiceRequestServices>().ApprovePlan(planDto);
-    //    return Ok();
-    //}
+    [HttpPost]
+    public async Task<IActionResult> Approve(CreateEvaluationPlanDto approveDto)
+    {
+        await masterBL.GetApiService<PlanServiceRequestServices>().ApprovePlan(approveDto);
+        return Ok();
+    }
     [HttpPut("{id:guid}")]
     public async Task<IActionResult> UpdatePlan(Guid id, [FromBody] UpdatePlanDto planDto)
     {
@@ -66,21 +63,6 @@ public class PlanController(MasterBL masterBL) : ControllerBase
     }
 
     [HttpGet]
-    public IActionResult GetPlanType()
-    {
-        return Ok(new { result = GetPlanTypes() });
-    }
-    private List<PlanTypeDto> GetPlanTypes()
-    {
-        return new List<PlanTypeDto>
-    {
-        new PlanTypeDto { Id = Guid.Parse("11111111-1111-1111-1111-111111111111"), Name = "Month", BackendName = "Month" },
-        new PlanTypeDto { Id = Guid.Parse("22222222-2222-2222-2222-222222222222"), Name = "Year", BackendName = "Year" },
-        new PlanTypeDto { Id = Guid.Parse("33333333-2222-2222-2222-222222222222"), Name = "Semester" , BackendName = "Semester"},
-        new PlanTypeDto { Id = Guid.Parse("44444444-2222-2222-2222-222222222222"), Name = "Custom" , BackendName = "Custom"}
-    };
-    }
-    [HttpGet]
     public async Task<IActionResult> GetSemesters()
     {
         //var semester = await masterBL.GetApiService<SemesterRequestServices>().GetSemestersAsync(new Guid("37689d34-4928-4bb9-92b4-8a11abc0dbaf"));
@@ -88,13 +70,4 @@ public class PlanController(MasterBL masterBL) : ControllerBase
         return Ok(new { result = semester });
         //return semester.ToActionResult();
     }
-
-    public class PlanTypeDto
-    {
-        public Guid Id { get; set; }
-        public string Name { get; set; } = null!;
-        public string BackendName { get; set; }
-    }
-
-
 }
