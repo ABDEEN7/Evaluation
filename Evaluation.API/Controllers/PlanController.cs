@@ -79,5 +79,10 @@ public class PlanController(MasterBL masterBL) : ControllerBase
         public Guid Id { get; set; }
         public string Name { get; set; } = null!;
     }
-
+    [HttpGet]
+    public IActionResult GetPlans()
+    {
+        var evaluation = masterBL.GetApiService<PlanServiceRequestServices>();
+        return Ok(evaluation);
+    }
 }
