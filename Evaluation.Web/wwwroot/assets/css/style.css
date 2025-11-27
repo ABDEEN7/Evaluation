@@ -1,19 +1,15 @@
 /**
-* Template Name: MOE Web Site
+* Template Name: Evaluation Web Site
 * Bootstrap Version:v5.3.1
 */
 
 /* Vendor CSS Files */
-@import url('../vendor/fontawesome-free/css/all.min.css');
-@import url('../vendor/bootstrap-icons/bootstrap-icons.css');
 
-@import url('https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css');
-@import url('../vendor/fontawesome-free/css/all.min.css');
 @import url('../vendor/swiper/swiper-bundle.min.css');
+@import url("../vendor/line-awesome/css/line-awesome.min.css"); /*Line Awesome*/
 
 
-
-
+@import url('../css/cairo.css');
 
 
 

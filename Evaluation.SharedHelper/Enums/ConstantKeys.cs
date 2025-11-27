@@ -461,9 +461,11 @@ public static class ConstantKeys
     public static class WebAppSettings
     {
         public static readonly string PAGE_SIZE = "PAGE_SIZE";
+        public static readonly string DefaultWebsiteBannerImage = "DefaultWebsiteBannerImage";
     }
     public static class WebAppCommon
     {
+        public static readonly string lblLoginMenu = "lblLoginMenu";
     }
     public static class WebAppLoginPage
     {
