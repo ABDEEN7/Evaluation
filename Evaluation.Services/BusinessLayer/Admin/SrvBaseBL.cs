@@ -8,6 +8,7 @@ using Evaluation.DAL.Repositories;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper;
 using Evaluation.SharedHelper.Enums;
+using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Helper;
 using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Admin;
@@ -115,7 +116,7 @@ namespace Evaluation.Services.Models.Admin
                         var propValue = propInfo.GetValue(obj);
                         if (validation.IsRequired && (validation.Dbrequired ?? false) && (propValue == null || string.IsNullOrEmpty(propValue.ToString()) || string.IsNullOrWhiteSpace(propValue.ToString())))
                         {
-                            return false;
+                            throw new BusinessException(ConstantKeys.ExceptionMessage.Requiredfield);
                         }
 
 
@@ -126,7 +127,7 @@ namespace Evaluation.Services.Models.Admin
                             {
                                 if (MaxstringValue.Length > validation.MaxLength)
                                 {
-                                    return false;
+                                    throw new BusinessException(ConstantKeys.ExceptionMessage.ExceedMaxlength);
                                 }
                             }
                         }
@@ -137,7 +138,7 @@ namespace Evaluation.Services.Models.Admin
                             {
 
                                 if (MinstringValue.Length < validation.MinLength)
-                                    return false;
+                                    throw new BusinessException(ConstantKeys.ExceptionMessage.BelowMinlength);
                             }
                         }
 
@@ -146,7 +147,7 @@ namespace Evaluation.Services.Models.Admin
                             bool isValid = Regex.IsMatch(RegexstringValue, validation.Regex);
                             if (!isValid)
                             {
-                                return false;
+                                throw new BusinessException(ConstantKeys.ExceptionMessage.InvalidRegex);
                             }
                         }
                         if (validation.ControlType == "JSON_AREA" && propValue is string jsonstringValue)
@@ -154,7 +155,7 @@ namespace Evaluation.Services.Models.Admin
                             bool isValid = IsValidJson(jsonstringValue);
                             if (!isValid)
                             {
-                                return false;
+                                throw new BusinessException(ConstantKeys.ExceptionMessage.InvalidJson);
                             }
                         }
                     }

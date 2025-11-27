@@ -39,7 +39,7 @@ namespace Evaluation.SharedHelper.Models.Admin
         public long? FileNameEn_Size { get; set; }
 
         public int? OrderNo { get; set; }
-        public Guid[]? SiteContentFaq { get; set; }
+
 
         
 
