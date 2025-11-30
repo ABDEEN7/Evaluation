@@ -40,17 +40,10 @@ public class PlanRequestRepository(IServiceScopeFactory serviceScopeFactory,
 }
     public async Task<bool> ApprovePlans(Plan model)
     {
-
-        model.PlanJsonValue = JsonConvert.SerializeObject(model);
-        Guid departmentId = unitOfWork
-            .GetRepository<AcademicYear>()
-            .GetAllActiveNonDeleted(x => x.Id == model.AcademicYearId)
-            .Select(x => x.DepartmentId)
-            .FirstOrDefault();
         //Get id of school that we will evaluate
         //List<Guid> schoolIds = plan.Schools.Select(s => s.Id).ToList();
-        var selectedSchool = unitOfWork
-            .GetRepository<School>();
+        //var selectedSchool = unitOfWork
+        //    .GetRepository<School>();
 
         //.GetAllActiveNonDeleted(x => schoolIds.Contains(x.Id));
 
@@ -60,9 +53,18 @@ public class PlanRequestRepository(IServiceScopeFactory serviceScopeFactory,
         //    SchoolId = school.Id,
         //    School = school
         //}).ToList();
-        //await unitOfWork.GetRepository<Plan>().InsertAsync(plan);
-        await unitOfWork.CommitAsync();
-        return true;
+        try
+        {
+
+            await unitOfWork.GetRepository<Plan>().InsertAsync(model);
+            await unitOfWork.CommitAsync();
+            return true;
+        }
+        catch (Exception ex)
+        {
+
+            throw ex;
+        }
     }
     public async Task<bool> DeleteEvaluationPlan(Guid? id)
     {

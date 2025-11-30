@@ -5,6 +5,8 @@ using Evaluation.DAL.Models.Calendars;
 using Evaluation.DAL.Models.DepartementEntites;
 using Evaluation.DAL.Models.Planing;
 using Evaluation.DAL.Repositories;
+using Evaluation.Services.BusinessLayer.API.AcademicYearLayer;
+using Evaluation.Services.BusinessLayer.API.DepartmentLayer;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper;
 using Evaluation.SharedHelper.Dtos.PlanDto;
@@ -29,7 +31,9 @@ public class PlanServiceRequestServices(
     UserInfo userInfo,
     IServiceProvider serviceProvider,
     RequestInfo requestInfo,
-    PlanRequestRepository planRepository
+    PlanRequestRepository planRepository,
+    AcademicYearRepository academicYearRepository,
+    DepartmentService departmentService
     ) : ApiBase(serviceScopeFactory, cacheDataProvider, unitOfWork, loggingServices, mapper, userInfo,
         serviceProvider, requestInfo)
 {
@@ -96,7 +100,20 @@ public class PlanServiceRequestServices(
 
         return await ExecuteWithResult(async () =>
         {
-            Plan plan = modelDto.Adapt<Plan>();
+            Guid? departmentId = await departmentService.GetDepartmentIdAsync();
+            Guid academicYearId = await academicYearRepository.GetAcademicYearId(departmentId);
+            Guid statusId = await
+            unitOfWork
+            .GetRepository<PlanStatus>()
+            .GetAllActiveNonDeleted(x => x.NameEN == "Approved")
+            .Select(x=>x.Id)
+            .FirstOrDefaultAsync();
+            modelDto.PlanStatusId = statusId;
+            modelDto.AcademicYearId = academicYearId;
+            Plan plan = modelDto.ToPlan();
+
+            plan.PlanJsonValue = JsonConvert.SerializeObject(modelDto);
+
             var result = await planRepository.ApprovePlans(plan);
         });
     }

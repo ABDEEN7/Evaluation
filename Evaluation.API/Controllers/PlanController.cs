@@ -48,7 +48,7 @@ public class PlanController(MasterBL masterBL) : ControllerBase
         return Ok();
     }
     [HttpPost]
-    public async Task<IActionResult> Approve(CreateEvaluationPlanDto approveDto)
+    public async Task<IActionResult> Approve([FromBody] CreateEvaluationPlanDto approveDto)
     {
         await masterBL.GetApiService<PlanServiceRequestServices>().ApprovePlan(approveDto);
         return Ok();

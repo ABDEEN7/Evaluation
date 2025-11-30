@@ -167,7 +167,7 @@ async function submitEvaluationData(data) {
         //jqClient().Post(`/Plan/Create`, data).fail((jqXHR, textStatus, errorThrown) => {
         //    console.error('Error: [Create Plan Condition]', textStatus, errorThrown);
         //});
-        const result = await jqClient().Post(`/Plan/Create`, data);
+        const result = await jqClient().Post(`/Plan/Approve`, data);
 
         // Handle success
         console.log('Object Json:', result);

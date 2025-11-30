@@ -21,7 +21,7 @@ public class AcademicYearRepository(IServiceScopeFactory serviceScopeFactory,
     ) : ApiBase(serviceScopeFactory, cacheDataProvider, unitOfWork, loggingServices, mapper, userInfo,
         serviceProvider, requestInfo)
 {
-    public async Task<Guid> GetAcademicYearId(Guid academicYearId)
+    public async Task<Guid> GetAcademicYearId(Guid? academicYearId)
     {
         return await unitOfWork.GetRepository<AcademicYear>()
             .GetAllActiveNonDeleted(x => x.DepartmentId == academicYearId)

@@ -14,7 +14,7 @@ public class Plan : EntityBase
     public AcademicYear? AcademicYear { get; set; }
     public Guid PlanStatusId { get; set; }
     public PlanStatus? PlanStatus { get; set; }
-    public Guid PlanTypeDepartmentId { get; set; }
+    public Guid? PlanTypeDepartmentId { get; set; }
     public PlanTypeDepartment? PlanTypeDepartment { get; set; }
     public Guid? SemesterId { get; set; }
     public Semester? Semester { get; set; }
