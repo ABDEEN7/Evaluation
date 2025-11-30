@@ -142,7 +142,6 @@ public class PlanServiceRequestServices(
         plan.PlanName = dto.Name;
         plan.StartDate = dto.StartDate;
         plan.EndDate = dto.EndDate;
-        plan.DepartmentId = dto.DepartmentId;
         plan.AcademicYearId = dto.AcademicYearId;
         plan.PlanStatusId = dto.PlanStatusId;
         plan.PlanTypeDepartmentId = dto.PlanTypeDepartmentId;
