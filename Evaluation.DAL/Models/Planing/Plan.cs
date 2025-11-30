@@ -9,8 +9,7 @@ public class Plan : EntityBase
     public string PlanName { get; set; } = null!;
     public DateOnly StartDate { get; set; }
     public DateOnly EndDate { get; set; }
-    public Guid DepartmentId { get; set; }
-    public Department? Department { get; set; }
+  
     public Guid AcademicYearId { get; set; }
     public AcademicYear? AcademicYear { get; set; }
     public Guid PlanStatusId { get; set; }
