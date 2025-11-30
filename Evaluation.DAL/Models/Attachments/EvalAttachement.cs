@@ -2,6 +2,7 @@
 using Evaluation.DAL.Models.BaseModule;
 using Evaluation.DAL.Models.FormBuilder;
 using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
+using Evaluation.DAL.Models.SystemLog;
 
 namespace Evaluation.DAL.Models.Attachments
 {

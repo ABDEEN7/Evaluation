@@ -133,7 +133,7 @@ public class PlanServiceRequestServices(
             PlanName = model.Name,
             PlanJsonValue = JsonConvert.SerializeObject(model),
             PlanStatusId = model.PlanStatusId,
-            PlanTypeDepartmentId = 
+            //PlanTypeDepartmentId = 
 
         };
     }
