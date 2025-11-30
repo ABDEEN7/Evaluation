@@ -19,5 +19,7 @@ namespace Evaluation.SharedHelper.Models.Admin
         public string? ParentId { get; set; }
         public string? FieldType { get; set; }
 
+       
+
     }
 }

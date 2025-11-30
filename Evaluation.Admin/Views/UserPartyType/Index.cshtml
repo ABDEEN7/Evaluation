@@ -1,0 +1,104 @@
+﻿@using Evaluation.Admin.Extensions
+@using static Evaluation.SharedHelper.Enums.ConstantKeys
+
+
+@model UserPartyTypeVM
+@{
+
+    string Lang = Model.CurrentLanguage;
+    var SearchuiControlItems = Model.UiControlItems.Where(x => x.RowOrder == 0 && x.Constraint.Permission.BackEndName == AdminPermission.ADD_ADMIN_USERPARTYTYPE).ToList();
+    var uiControlItems = Model.UiControlItems.Where(x => x.RowOrder > 0 && x.Constraint.Permission.BackEndName == AdminPermission.ADD_ADMIN_USERPARTYTYPE).ToList();
+    var SignatureuiControlItems = Model.UiControlItems.Where(x => x.RowOrder > 0 && x.Constraint.Permission.BackEndName == AdminPermission.ADD_ADMIN_USERPARTYTYPE_SIGNATURE).ToList();
+    var textDir = Lang == "ar" ? "RTL" : "LTR";
+    var permissionsList = Model.PermissionsList;
+    var controlsList = Model.ControlsList;
+    var settingList = Model.SettingList;
+    var containsOrderNo = Model.containsOrderNo;
+    var columnList = Model.UiControlItems.Where(x => x.Constraint.ShowInGrid == true && x.Constraint.Permission.BackEndName == AdminPermission.ADD_ADMIN_USERPARTYTYPE).ToList();
+    var SignaturecolumnList = Model.UiControlItems.Where(x => x.Constraint.ShowInGrid == true && x.Constraint.Permission.BackEndName == AdminPermission.ADD_ADMIN_USERPARTYTYPE_SIGNATURE).ToList();
+}
+@section Styles {
+  
+           }
+<div class="sub-page-container">
+    <section id="tbl-template-container" class="section-container">
+        <div class="card app-card">
+        <div class="card-header justify-content-end d-flex align-items-center bg-light">
+            @if (permissionsList.IsPermissionAvailabe(AdminPermission.ADD_ADMIN_USERPARTYTYPE))
+            {
+                <button id="btn-add-content" type="button" class="btn btn-primary">
+                    <i class="fa fa-plus-circle"></i> &nbsp;@controlsList.GetUiControlText(AdminBackendUI.ADD_RECORD)
+                </button>
+            }
+
+        </div>
+        <div class="card-body">
+               
+                @*<div class="row">*@
+                <div id="search-panel-section" class="mb-3"></div>
+                <div class="center-header">
+                    <div id="view-container"></div>
+                </div>
+                <div id="scroll-progress-bar"></div>
+                @*</div>*@
+        </div>
+    </div>
+</section>
+
+<section class="display-none" id="form-section">
+    <div class="card app-card">
+        <form enctype="multipart/form-data" id="app-form">
+            <input id="Id" hidden />
+            <div class="card-header justify-content-end d-flex align-items-center bg-light"><div class="closeit">  <i class="fa fa-close"></i></div></div>
+            <div class="card-body">
+                    @if (uiControlItems!=null)
+                {
+                        <div class="row">
+                        @{
+                                @await Component.InvokeAsync("UiControlList", uiControlItems)
+                        }
+                    </div>
+                }
+
+
+                <div class="btns-group mb-0 mt-3" id="action-container">
+                    <button type="button" id="btn-back" class="btn btn-secondary">@controlsList.GetUiControlText(AdminBackendUI.BACK_BUTTON)</button>
+                    <button type="button" id="btn-submit" class="btn btn-primary">@controlsList.GetUiControlText(AdminBackendUI.SAVE_BUTTON)</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+</div>
+<div>
+    <input id="userpartytypeid" hidden />
+</div>
+
+@section Scripts {
+   
+    <script src="~/js/admin/UserPartyType.js" asp-append-version="true"></script>
+    <script>
+         var controlsList = JSON.parse(`@Html.Raw(Json.Serialize(controlsList))`);
+         var columnList = @Html.Raw(Json.Serialize(columnList));
+           var SignaturecolumnList = @Html.Raw(Json.Serialize(SignaturecolumnList));
+        const settingList = JSON.parse(`@Html.Raw(Json.Serialize(settingList))`);
+         sharedFn().PopulateUiControl(controlsList);
+         var lang='@Lang';
+        let txtDir = '@textDir';
+        let containsOrderNo='@containsOrderNo';
+          const controlvalidationlist = @Html.Raw(Json.Serialize(uiControlItems));
+          const Signaturecontrolvalidationlist = @Html.Raw(Json.Serialize(SignatureuiControlItems));
+          const searchcontrolvalidationlist = @Html.Raw(Json.Serialize(SearchuiControlItems));
+        let IsEdit='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.EDIT_ADMIN_USERPARTYTYPE))';
+        let IsDelete='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.DELETE_ADMIN_USERPARTYTYPE))';
+        let IsView='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.VIEW_ADMIN_USERPARTYTYPE))';
+         let IsEdit_Signature='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.EDIT_ADMIN_USERPARTYTYPE_SIGNATURE))';
+        let IsDelete_Signature='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.DELETE_ADMIN_USERPARTYTYPE_SIGNATURE))';
+        let IsView_Signature='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.VIEW_ADMIN_USERPARTYTYPE_SIGNATURE))';
+
+        sharedFn().InitializeControl(controlvalidationlist, settingList);
+       
+   </script>
+    
+    
+}

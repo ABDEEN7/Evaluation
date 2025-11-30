@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Evaluation.DAL.Helper;
+using Evaluation.DAL.Models.Calendars;
 using Evaluation.DAL.Models.DepartementEntites;
 using Evaluation.DAL.Repositories;
 using Evaluation.Services.Special;
@@ -156,6 +157,15 @@ namespace Evaluation.Services.Models.Admin
                 if (SystemModule.Count > 0)
                 {
                     throw new BusinessException(ConstantKeys.ExceptionMessage.DepartmentExistsSystemModule);
+                }
+
+                var AcademicYear = await uow.GetRepository<AcademicYear>()
+ .GetAllNonDeleted()
+                       .Where(x => x.DepartmentId == obj.Id)
+                       .ToListAsync();
+                if (AcademicYear.Count > 0)
+                {
+                    throw new BusinessException(ConstantKeys.ExceptionMessage.DepartmentExistsAcademicYear);
                 }
                 uow.GetRepository<Department>().Delete(obj);
                     await uow.CommitAsync();

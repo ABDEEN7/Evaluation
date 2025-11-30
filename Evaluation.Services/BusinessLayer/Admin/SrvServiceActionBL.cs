@@ -14,7 +14,6 @@ using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Admin;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json;
 namespace Evaluation.Services.Models.Admin
 {
     public class SrvServiceActionBL : AdminBase
@@ -38,14 +37,14 @@ namespace Evaluation.Services.Models.Admin
                 .Include(x => x.CreateBy)
                 .OrderByDescending(x => x.CreateDate)
                 // .Skip((Page-1)*PageSize)
-                // .Take(PageSize)
+               // .Take(PageSize)
                 .ToListAsync();
 
             var result = mapper.Map<List<ServiceActionDTO>>(list);
 
             return result;
         }
-        private static string LangSelector(bool isArabic, string ar, string en) => isArabic ? ar : en;
+        private static string LangSelector(bool isArabic,string ar, string en) => isArabic ? ar : en;
 
         public async Task<List<ActionConditionDTO>> GetActionConditionByActionList(Guid actionId)
         {
@@ -53,7 +52,7 @@ namespace Evaluation.Services.Models.Admin
             var isArabic = _requestInfo.Lang == "ar";
             var Fields = uow.GetRepository<Field>()
         .GetAllActiveNonDeleted()
-        .ToDictionary(x => x.Id, x => LangSelector(isArabic, x.TitleAr, x.TitleEn));
+        .ToDictionary(x => x.Id, x => LangSelector(isArabic,x.TitleAr, x.TitleEn));
 
 
             var list = await uow.GetRepository<ActionCondition>()
@@ -69,12 +68,12 @@ namespace Evaluation.Services.Models.Admin
             {
                 Id = x.Id,
                 Type = x.Type,
-                operators = x.operators,
-                IsActive = x.IsActive,
-                RefID = x.RefID ?? Guid.Empty,
+                operators=x.operators,
+                IsActive=x.IsActive,
+                RefID=x.RefID ?? Guid.Empty,
                 Ref = (Fields.TryGetValue(x.RefID.Value, out var val) ? val : ""),
-                FieldValue = x.FieldValue,
-                FieldValueDisplay = GetFieldValue(x.Type, x.FieldValue, x.RefID, isArabic, serviceProvider),
+                FieldValue=x.FieldValue,
+                FieldValueDisplay = GetFieldValue(x.Type, x.FieldValue, x.RefID, isArabic,serviceProvider),
                 UpdateBy = x.UpdateBy != null
         ? (isArabic ? x.UpdateBy.NameAr : x.UpdateBy.NameEn)
         : (isArabic ? x.CreateBy?.NameAr : x.CreateBy?.NameEn),
@@ -86,22 +85,22 @@ namespace Evaluation.Services.Models.Admin
             return mapper.Map<List<ActionConditionDTO>>(result);
         }
 
-
+        
         public static string GetFieldValue(
       string type,
       string fieldValue,
       Guid? refId,
       bool isArabic,
       IServiceProvider serviceProvider)
-        {
-            var uow = serviceProvider.CreateScopedUow();
+            {
+            var uow=serviceProvider.CreateScopedUow();
             if (refId == null) return fieldValue;
 
-            var fieldvaluelist = fieldValue.Split(",");
+            var fieldvaluelist=fieldValue.Split(",");
 
+            
 
-
-            var fieldType = "";
+            var fieldType="";
             Guid? fielddropdowntype;
 
             var field = uow.GetRepository<Field>()
@@ -114,7 +113,7 @@ namespace Evaluation.Services.Models.Admin
 
             if (fieldType is "select2" or "dropdown" or "VacancySeat")
             {
-
+               
                 var dataSource = uow.GetRepository<DropDownType>()
             .GetAllNonDeleted()
             .Where(x => x.Id == fielddropdowntype)
@@ -124,10 +123,10 @@ namespace Evaluation.Services.Models.Admin
                 //if (!string.IsNullOrEmpty(dataSource))
                 //    return GetDataFromTable(dataSource, isArabic,serviceProvider, fieldvaluelist);
 
-                var result = uow.GetRepository<FieldDropDownValue>()
+                var result= uow.GetRepository<FieldDropDownValue>()
                     .GetAllNonDeleted()
                     .Where(x => x.DropDownTypeId == fielddropdowntype && fieldvaluelist.Contains(x.Id.ToString()))
-                    .Select(c => LangSelector(isArabic, c.TitleAr, c.TitleEn))
+                    .Select(c => LangSelector(isArabic,c.TitleAr, c.TitleEn))
                     .ToListAsync();
                 return string.Join(", ", result.Result);
             }
@@ -326,7 +325,7 @@ namespace Evaluation.Services.Models.Admin
 
         //    return finalresult;
         //}
-
+    
         public async Task<List<DropdownItem>> GetServicesForServiceAction()
         {
             using (var uow = serviceScopeFactory.CreateScopedUow())
@@ -340,6 +339,7 @@ namespace Evaluation.Services.Models.Admin
                         NameEn = x.NameEn,
                         OrderNo = x.OrderNo,
                         Type = "Service",
+                        
                     })
                     .OrderBy(x => x.OrderNo)
                     .ToListAsync();
@@ -348,6 +348,8 @@ namespace Evaluation.Services.Models.Admin
             }
 
         }
+
+      
         public async Task<List<DropdownItem>> GetServiceActionTypes()
         {
             using (var uow = serviceScopeFactory.CreateScopedUow())
@@ -369,7 +371,7 @@ namespace Evaluation.Services.Models.Admin
                 return list;
             }
         }
-
+     
         public async Task<List<DropdownItem>> GetPartyTypesList()
         {
             using (var uow = serviceScopeFactory.CreateScopedUow())
@@ -383,7 +385,7 @@ namespace Evaluation.Services.Models.Admin
                                         NameAr = x.NameAr,
                                         NameEn = x.NameEn,
                                         Type = "PartyType",
-                                        BackendName = x.BackendName ?? string.Empty
+                                        BackendName = x.BackendName??string.Empty
                                     })
                                     //.OrderBy(x => x.OrderNo)
                                     .ToListAsync();
@@ -419,7 +421,7 @@ namespace Evaluation.Services.Models.Admin
             {
                 throw new BusinessException(ConstantKeys.ExceptionMessage.InvalidRequest);
             }
-
+            
 
             bool validateObject = await srvApplicationBL.ValidateObject(model, ConstantKeys.AdminPermission.ADD_ADMIN_SERVICE_STATUS);
             if (!validateObject)
@@ -432,14 +434,14 @@ namespace Evaluation.Services.Models.Admin
 .GetAllNonDeleted()
                       .Where(x => x.Id == model.action.ServiceId && x.IsFreez == true).ToListAsync();
 
-            //            if (servicefreezecount.Count > 0)
-            //            {
-            //                throw new BusinessException(ConstantKeys.ExceptionMessage.SERVICE_FREEZED_CANNOT_ADD);
-            //            }
+//            if (servicefreezecount.Count > 0)
+//            {
+//                throw new BusinessException(ConstantKeys.ExceptionMessage.SERVICE_FREEZED_CANNOT_ADD);
+//            }
 
             var entity = mapper.Map<ServiceAction>(model.action);
 
-            // entity.BackendName = $"{model.action.ServiceId}_{model.action.NameEn}";
+           // entity.BackendName = $"{model.action.ServiceId}_{model.action.NameEn}";
             entity.BackendName = await GenerateBackendName(model.action.NameEn, model.action.ServiceId, "A");
             var existBackendName = await uow
              .GetRepository<PartyType>()
@@ -452,7 +454,7 @@ namespace Evaluation.Services.Models.Admin
                 model.action.ResponseStatus = DBResult.Exist;
                 return model.action;
             }
-            if (!entity.IsInitialAction)
+            if(!entity.IsInitialAction)
             {
                 entity.AllowDraft = false;
             }
@@ -527,7 +529,7 @@ namespace Evaluation.Services.Models.Admin
                 throw new BusinessException(ConstantKeys.ExceptionMessage.InvalidRequest);
             }
 
-            if (model.action.Id is null)
+            if (model.action.Id is  null)
             {
                 throw new BusinessException(ConstantKeys.ExceptionMessage.InvalidRequest);
             }
@@ -716,7 +718,7 @@ namespace Evaluation.Services.Models.Admin
 
         public async Task<bool> DeleteServiceAction(Guid? Id)
         {
-            if (Id is null)
+            if (Id is  null)
             {
                 throw new BusinessException(ConstantKeys.ExceptionMessage.InvalidRequest);
             }
@@ -742,7 +744,7 @@ namespace Evaluation.Services.Models.Admin
                                 .GetAllNonDeleted()
                                 .Where(x => x.ServiceActionId == Id)
                                 .ToListAsync();
-            if (existentity.Count > 0)
+            if(existentity.Count>0)
             {
                 throw new BusinessException(ConstantKeys.ExceptionMessage.ServiceActionUsed);
             }
@@ -778,8 +780,8 @@ namespace Evaluation.Services.Models.Admin
             {
                 throw new BusinessException(ConstantKeys.ExceptionMessage.ActionExistsActionShowLogPartyType);
             }
-
-
+            
+            
             var ActionTemplateDoc = await uow.GetRepository<ActionTemplateDoc>()
 .GetAllNonDeleted()
                       .Where(x => x.ServiceActionId == entity.Id)
@@ -837,7 +839,7 @@ namespace Evaluation.Services.Models.Admin
             ServiceAction.ActionPartyTypeList = await uow.GetRepository<ActionPartyType>()
                     .GetAllNonDeleted()
                     .Include(x => x.PartyType)
-                    .Where(x => x.ServiceActionId == ServiceActionId)
+                    .Where(x => x.ServiceActionId == ServiceActionId )
                     .Where(x => x.PartyType != null && x.PartyType.IsDeleted == false)
                     .Select(x => x.PartyTypeId)
                     .ToListAsync();
@@ -865,7 +867,7 @@ namespace Evaluation.Services.Models.Admin
                     .GetAllNonDeleted()
                     .Include(x => x.TemplateDoc)
                     .Where(x => x.ServiceActionId == ServiceActionId)
-                    .Where(x => x.TemplateDoc != null && x.TemplateDoc.IsDeleted == false)
+                    .Where(x => x.TemplateDoc != null && x.TemplateDoc.IsDeleted == false )
                     .Select(x => x.TemplateDocId)
                     .ToListAsync();
 
@@ -873,7 +875,8 @@ namespace Evaluation.Services.Models.Admin
             return result;
         }
 
-        public async Task<ActionFieldTreeDTO> GetActionFieldTree(Guid? actionId, Guid? stepId)
+       
+        public async Task<ActionFieldTreeDTO> GetActionFieldTree(Guid? actionId)
         {
             if (actionId is null)
             {
@@ -904,7 +907,7 @@ namespace Evaluation.Services.Models.Admin
                 .GetAllNonDeleted(x => x.ServiceId == service.Id)
                 .Include(x => x.Fields)
                 .Include(x => x.FormGroupType)
-                .Where(x => x.FormGroupType != null && x.FormGroupType.BackendName != "List")
+                .Where(x => x.FormGroupType!=null && x.FormGroupType.BackendName != "List")
                 .Select(x => new ActionFormGroupDTO
                 {
                     id = x.Id,
@@ -925,18 +928,325 @@ namespace Evaluation.Services.Models.Admin
 
             var fieldIdsList = formGroups.SelectMany(x => x.children).Select(x => x.id).ToList();
 
+            var actionFields = await uow.GetRepository<ActionField>()
+                .GetAllNonDeleted()
+                .Where(x => fieldIdsList.Contains(x.FieldId) && x.ServiceActionId == actionId)
+                .ToListAsync();
 
 
 
 
+            foreach (var formGroup in formGroups)
+            {
+                foreach (var field in formGroup.children)
+                {
+                    var actionField = actionFields
+                         .Where(x => x.FieldId == field.id && x.ServiceActionId == actionId)
+                         .FirstOrDefault();
 
+                    if (actionField != null)
+                    {
 
+                        field.ActionFieldId = actionField.Id;
+                        field.state.selected = true;
+                        field.IsEditable = actionField.IsEditable;
+                        field.IsActive = actionField.IsActive ?? false;
+                    }
+                    else
+                    {
+
+                        field.state.selected = false;
+                        field.IsEditable = true;
+                        field.IsActive = true;
+                    }
+
+                }
+            }
 
             var result = new ActionFieldTreeDTO { ActionId = actionId.Value, FormGroups = formGroups };
 
             return result;
         }
+        #region Action Step Field Attribute
+        public async Task<List<ActionFieldAttributeDTO>> GetActionFieldAttributeList(Guid actionfieldid)
+        {
+            var mapper = await CreateMapperForAdmin<ActionFieldAttribute, ActionFieldAttributeDTO>();
+            var list = await uow.GetRepository<ActionFieldAttribute>()
+                                .GetAllNonDeleted()
+                                .Include(x => x.CreateBy)
+                                .Where(x => x.ActionFieldId == actionfieldid)
+                                .OrderByDescending(x => x.CreateDate)
+                                .ToListAsync();
+            var result = mapper.Map<List<ActionFieldAttributeDTO>>(list);
 
+
+            return result;
+
+
+
+
+        }
+        public async Task<bool> UpdateActionFieldStepList(UpdateActionFieldDTO model)
+        {
+            var ServiceAction = await uow.GetRepository<ServiceAction>()
+                                .GetAllNonDeleted()
+                                .Where(x => x.Id == model.actionId)
+                                .FirstOrDefaultAsync();
+
+            if (ServiceAction == null)
+            {
+                throw new BusinessException("no scholarship action found");
+            }
+
+            var list = new List<ActionStepFieldJsonDTO>();
+
+            if (!string.IsNullOrEmpty(model.json))
+            {
+                list = Newtonsoft.Json.JsonConvert.DeserializeObject<List<ActionStepFieldJsonDTO>>(model.json);
+            }
+            List<Guid> fieldIdsListToBeInsertedOrUpdate = new List<Guid>(); // assuming id is int
+            if (list != null)
+                fieldIdsListToBeInsertedOrUpdate = list.Select(x => x.id).Distinct().ToList();
+
+            var actionFields = await uow.GetRepository<ActionField>()
+            .GetAllNonDeleted()
+            .Where(x => x.ServiceActionId == model.actionId)
+            .ToListAsync();
+
+            var existactionFields = await uow.GetRepository<ActionField>()
+            .GetAllNonDeleted()
+            .Where(x => x.ServiceActionId == model.actionId)
+            .ToListAsync();
+            var existingFieldIdsList = existactionFields.Select(x => x.FieldId).Distinct().ToList();
+            var fieldIdsListToBeDeleted = existingFieldIdsList.Except(fieldIdsListToBeInsertedOrUpdate);
+
+            foreach (var fieldId in fieldIdsListToBeDeleted)
+            {
+                var item = actionFields.Where(x => x.FieldId == fieldId).FirstOrDefault();
+                if (item != null)
+                {
+                    uow.GetRepository<ActionField>().Delete(item);
+                }
+            }
+            foreach (var fieldId in fieldIdsListToBeInsertedOrUpdate)
+            {
+
+                var entity = actionFields.Where(x => x.FieldId == fieldId).FirstOrDefault();
+
+
+                var item = list?.Where(x => x.id == fieldId).FirstOrDefault();
+
+                if (entity != null)
+                {
+
+                    
+                    entity.IsEditable = item != null ? item.isEditable : false;
+                    entity.IsActive = item != null ? item.isActive : false;
+                    uow.GetRepository<ActionField>().Update(entity);
+
+                }
+                else
+                {
+
+
+                    entity = new ActionField
+                    {
+                        FieldId = item!.id,
+                        IsEditable = item.isEditable,
+                        IsActive = item.isActive,
+                        ServiceActionId = model.actionId,
+
+                    };
+
+                    uow.GetRepository<ActionField>().Insert(entity);
+                }
+            }
+
+            await uow.CommitAsync();
+
+            return true;
+
+        }
+        public async Task<ActionFieldAttributeDTO> SaveActionFieldAttribute(ActionFieldAttributeDTO message)
+        {
+
+
+
+            var mapper = await CreateMapperForAdmin<ActionFieldAttribute, ActionFieldAttributeDTO>();
+
+            ActionFieldAttribute obj = new ActionFieldAttribute();
+
+            obj.AttributeKey = message.AttributeKey;
+            obj.AttributeValue = message.AttributeValue;
+            obj.MessageAr = message.MessageAr;
+            obj.MessageEn = message.MessageEn;
+            obj.IsActive = message.IsActive;
+            obj.FieldId = message.FieldId;
+            obj.ActionFieldId = message.ActionFieldId;
+            obj.Description = message.Description;
+
+            uow.GetRepository<ActionFieldAttribute>().Insert(obj);
+            await uow.CommitAsync();
+            var result = mapper.Map<ActionFieldAttributeDTO>(obj);
+            result.ResponseStatus = DBResult.Inserted;
+
+            return result;
+
+        }
+        public async Task<ActionFieldAttributeDTO> UpdateActionFieldAttribute(ActionFieldAttributeDTO message)
+        {
+
+
+            var mapper = await CreateMapperForAdmin<ActionFieldAttribute, ActionFieldAttributeDTO>();
+            var result = new ActionFieldAttributeDTO();
+            if (message.Id is not null)
+            {
+
+
+                ActionFieldAttribute obj = await uow.GetRepository<ActionFieldAttribute>()
+                               .GetAllNonDeleted()
+                               .Include(x => x.CreateBy)
+                               .Where(x => x.Id == message.Id)
+                               .FirstAsync();
+
+                obj.AttributeKey = message.AttributeKey;
+                obj.AttributeValue = message.AttributeValue;
+                obj.MessageAr = message.MessageAr;
+                obj.MessageEn = message.MessageEn;
+                obj.IsActive = message.IsActive;
+                obj.FieldId = message.FieldId;
+                obj.ActionFieldId = message.ActionFieldId;
+                obj.Description = message.Description;
+                uow.GetRepository<ActionFieldAttribute>().Update(obj);
+                await uow.CommitAsync();
+                result = mapper.Map<ActionFieldAttributeDTO>(obj);
+                result.ResponseStatus = DBResult.Updated;
+            }
+            return result;
+
+        }
+        public async Task<ActionFieldAttributeDTO> DeleteActionFieldAttribute(Guid? Id)
+        {
+
+
+            var mapper = await CreateMapperForAdmin<ActionFieldAttribute, ActionFieldAttributeDTO>();
+            var result = new ActionFieldAttributeDTO();
+            if (Id is not null)
+            {
+
+
+                ActionFieldAttribute obj = await uow.GetRepository<ActionFieldAttribute>()
+                               .GetAllNonDeleted()
+                               .Where(x => x.Id == Id)
+                               .FirstAsync();
+                uow.GetRepository<ActionFieldAttribute>().Delete(obj);
+                await uow.CommitAsync();
+                result = mapper.Map<ActionFieldAttributeDTO>(obj);
+                result.ResponseStatus = DBResult.Deleted;
+            }
+            return result;
+
+
+        }
+
+
+        public async Task<ActionConditionDTO> SaveActionCondition(ActionConditionDTO message)
+        {
+
+            var isArabic = _requestInfo.Lang == "ar";
+
+
+            ActionCondition obj = new ActionCondition();
+            if (message.FieldDropDownValueIds.Any())
+            {
+                obj.FieldValue = string.Join(",", message.FieldDropDownValueIds);
+
+
+            }
+            else
+            {
+                obj.FieldValue = message.FieldValue;
+            }
+            obj.ServiceActionId = message.ServiceActionId;
+            obj.Type = message.Type;
+            obj.RefID = message.RefID;
+            obj.operators = message.operators;
+
+            obj.IsActive = message.IsActive;
+
+
+            uow.GetRepository<ActionCondition>().Insert(obj);
+            await uow.CommitAsync();
+            var result = mapper.Map<ActionConditionDTO>(obj, opts => opts.Items["Language"] = _requestInfo.Lang);
+            result.ResponseStatus = DBResult.Inserted;
+            result.FieldValueDisplay = GetFieldValue(result.Type, result.FieldValue, message.RefID, isArabic, serviceProvider);
+            return result;
+
+        }
+        public async Task<ActionConditionDTO> UpdateActionCondition(ActionConditionDTO message)
+        {
+
+            var isArabic = _requestInfo.Lang == "ar";
+
+            var result = new ActionConditionDTO();
+            if (message.Id is not null)
+            {
+
+
+                ActionCondition obj = await uow.GetRepository<ActionCondition>()
+                               .GetAllNonDeleted()
+                               .Include(x=>x.CreateBy)
+                               .Where(x => x.Id == message.Id)
+                               .FirstAsync();
+                if (message.FieldDropDownValueIds.Any())
+                {
+                    obj.FieldValue = string.Join(",", message.FieldDropDownValueIds);
+
+
+                }
+                else
+                {
+                    obj.FieldValue = message.FieldValue;
+                }
+                obj.ServiceActionId = message.ServiceActionId;
+                obj.Type = message.Type;
+                obj.RefID = message.RefID;
+                obj.operators = message.operators;
+
+                obj.IsActive = message.IsActive;
+                uow.GetRepository<ActionCondition>().Update(obj);
+                await uow.CommitAsync();
+                result = mapper.Map<ActionConditionDTO>(obj, opts => opts.Items["Language"] = _requestInfo.Lang);
+                result.ResponseStatus = DBResult.Updated;
+                result.FieldValueDisplay = GetFieldValue(result.Type, result.FieldValue, message.RefID, isArabic, serviceProvider);
+            }
+            return result;
+
+        }
+        public async Task<ActionConditionDTO> DeleteActionCondition(Guid? Id)
+        {
+
+
+
+            var result = new ActionConditionDTO();
+            if (Id is not null)
+            {
+
+
+                ActionCondition obj = await uow.GetRepository<ActionCondition>()
+                               .GetAllNonDeleted()
+                               .Where(x => x.Id == Id)
+                               .FirstAsync();
+                uow.GetRepository<ActionCondition>().Delete(obj);
+                await uow.CommitAsync();
+                result = mapper.Map<ActionConditionDTO>(obj, opts => opts.Items["Language"] = _requestInfo.Lang);
+                result.ResponseStatus = DBResult.Deleted;
+            }
+            return result;
+
+
+        }
+        #endregion
 
 
 
