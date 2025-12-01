@@ -201,7 +201,7 @@ const loadMainBanner = () => {
 $(document).ready(function () {
     loadDepartments();
     loadMainBanner().then(() => {
-        new Swiper('.init-swiper', {
+        new Swiper('.mySwiper', {
             loop: bannerLoop,
             speed: 1000,
             autoplay: {

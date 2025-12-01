@@ -119,6 +119,7 @@ public static class ConstantKeys
         public static readonly string BelowMinlength = "BelowMinlength";
         public static readonly string InvalidRegex = "InvalidRegex";
         public static readonly string InvalidJson = "InvalidJson";
+        public static readonly string NotoficationTemplateExistsActionStatusConfigNotification = "NotoficationTemplateExistsActionStatusConfigNotification";
     }
 
         public static class AdminSettings
@@ -227,6 +228,7 @@ public static class ConstantKeys
         public static readonly string AdminNavbar = "AdminNavbar";
         public static readonly string AdminSiteDocument = "AdminSiteDocument";
         public static readonly string AdminSiteContent = "AdminSiteContent";
+        public static readonly string AdminNotificationTemplate = "AdminNotificationTemplate";
     }
 
     public static class AdminPermission
@@ -451,6 +453,15 @@ public static class ConstantKeys
         public const string ADD_ADMIN_SITECONTENT = "ADD_ADMIN_SITECONTENT";
         public const string EDIT_ADMIN_SITECONTENT = "EDIT_ADMIN_SITECONTENT";
         public const string DELETE_ADMIN_SITECONTENT = "DELETE_ADMIN_SITECONTENT";
+
+        #endregion
+
+        #region NOTIFICATION_TEMPLATE
+
+        public const string VIEW_ADMIN_NOTIFICATION_TEMPLATE = "VIEW_ADMIN_NOTIFICATION_TEMPLATE";
+        public const string ADD_ADMIN_NOTIFICATION_TEMPLATE = "ADD_ADMIN_NOTIFICATION_TEMPLATE";
+        public const string EDIT_ADMIN_NOTIFICATION_TEMPLATE = "EDIT_ADMIN_NOTIFICATION_TEMPLATE";
+        public const string DELETE_ADMIN_NOTIFICATION_TEMPLATE = "DELETE_ADMIN_NOTIFICATION_TEMPLATE";
 
         #endregion
 
