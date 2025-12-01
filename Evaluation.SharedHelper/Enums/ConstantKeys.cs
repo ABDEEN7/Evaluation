@@ -120,6 +120,7 @@ public static class ConstantKeys
         public static readonly string InvalidRegex = "InvalidRegex";
         public static readonly string InvalidJson = "InvalidJson";
         public static readonly string NotoficationTemplateExistsActionStatusConfigNotification = "NotoficationTemplateExistsActionStatusConfigNotification";
+        public static readonly string SmsTemplateExistsActionStatusConfigNotification = "SmsTemplateExistsActionStatusConfigNotification";
     }
 
         public static class AdminSettings
@@ -229,6 +230,7 @@ public static class ConstantKeys
         public static readonly string AdminSiteDocument = "AdminSiteDocument";
         public static readonly string AdminSiteContent = "AdminSiteContent";
         public static readonly string AdminNotificationTemplate = "AdminNotificationTemplate";
+        public static readonly string AdminSMSTemplate = "AdminSMSTemplate";
     }
 
     public static class AdminPermission
@@ -462,6 +464,15 @@ public static class ConstantKeys
         public const string ADD_ADMIN_NOTIFICATION_TEMPLATE = "ADD_ADMIN_NOTIFICATION_TEMPLATE";
         public const string EDIT_ADMIN_NOTIFICATION_TEMPLATE = "EDIT_ADMIN_NOTIFICATION_TEMPLATE";
         public const string DELETE_ADMIN_NOTIFICATION_TEMPLATE = "DELETE_ADMIN_NOTIFICATION_TEMPLATE";
+
+        #endregion
+
+        #region SMSTEMPLATE
+
+        public const string VIEW_ADMIN_SMSTEMPLATE = "VIEW_ADMIN_SMSTEMPLATE";
+        public const string ADD_ADMIN_SMSTEMPLATE = "ADD_ADMIN_SMSTEMPLATE";
+        public const string EDIT_ADMIN_SMSTEMPLATE = "EDIT_ADMIN_SMSTEMPLATE";
+        public const string DELETE_ADMIN_SMSTEMPLATE = "DELETE_ADMIN_SMSTEMPLATE";
 
         #endregion
 
