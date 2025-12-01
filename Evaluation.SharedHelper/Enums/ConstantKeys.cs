@@ -121,6 +121,8 @@ public static class ConstantKeys
         public static readonly string InvalidJson = "InvalidJson";
         public static readonly string NotoficationTemplateExistsActionStatusConfigNotification = "NotoficationTemplateExistsActionStatusConfigNotification";
         public static readonly string SmsTemplateExistsActionStatusConfigNotification = "SmsTemplateExistsActionStatusConfigNotification";
+        public static readonly string EmailTemplateExistsEmailTemplateDocument = "EmailTemplateExistsEmailTemplateDocument";
+        public static readonly string EmailTemplateExistsActionStatusConfigNotification = "EmailTemplateExistsActionStatusConfigNotification";
     }
 
         public static class AdminSettings
@@ -231,6 +233,7 @@ public static class ConstantKeys
         public static readonly string AdminSiteContent = "AdminSiteContent";
         public static readonly string AdminNotificationTemplate = "AdminNotificationTemplate";
         public static readonly string AdminSMSTemplate = "AdminSMSTemplate";
+        public static readonly string AdminEmailTemplate = "AdminEmailTemplate";
     }
 
     public static class AdminPermission
@@ -473,6 +476,14 @@ public static class ConstantKeys
         public const string ADD_ADMIN_SMSTEMPLATE = "ADD_ADMIN_SMSTEMPLATE";
         public const string EDIT_ADMIN_SMSTEMPLATE = "EDIT_ADMIN_SMSTEMPLATE";
         public const string DELETE_ADMIN_SMSTEMPLATE = "DELETE_ADMIN_SMSTEMPLATE";
+
+        #endregion
+        #region EMAILTEMPLATE
+
+        public const string VIEW_ADMIN_EMAILTEMPLATE = "VIEW_ADMIN_EMAILTEMPLATE";
+        public const string ADD_ADMIN_EMAILTEMPLATE = "ADD_ADMIN_EMAILTEMPLATE";
+        public const string EDIT_ADMIN_EMAILTEMPLATE = "EDIT_ADMIN_EMAILTEMPLATE";
+        public const string DELETE_ADMIN_EMAILTEMPLATE = "DELETE_ADMIN_EMAILTEMPLATE";
 
         #endregion
 
