@@ -28,6 +28,7 @@ public static class ConstantKeys
         public static readonly string ParentDoesNotExist = "ParentDoesNotExist";
         public static readonly string CannotDeleteItsParent = "CannotDeleteItsParent";
         public static readonly string InvalidRequest = "InvalidRequest";
+        public static readonly string MissingPlan = "MissingPlan";
         public static readonly string NoDataFound = "NoDataFound";
         public static readonly string ServiceActionUsed = "ServiceActionUsed";
         public static readonly string ActionExistsActionAssignPartyType = "ActionExistsActionAssignPartyType";

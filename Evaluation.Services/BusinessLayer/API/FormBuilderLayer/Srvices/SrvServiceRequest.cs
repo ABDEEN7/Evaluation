@@ -84,17 +84,14 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 										.GetAllActiveNonDeleted(x => x.Id == reqId).FirstOrDefaultAsync();
 			return request?.OrgTreeId;
 		}
-		//public Guid? GetStudentLoginId(ServiceRequest? request)
-		//{
-		//	if (request != null)
-		//	{
-		//		return request.StudentId;
-		//	}
-		//	else
-		//	{
-		//		return userInfo.UserId;
-		//	}
-		//}
+		public Guid? GetOrgTreeRequestId(ServiceRequest? request)
+		{
+			if (request != null)
+			{
+				return request.OrgTreeId;
+			}
+			return null;
+		}
 		public ServiceRequest InsertRequest(ServiceRequest request)
 		{
 			return uow.GetRepository<ServiceRequest>().Insert(request, false);
@@ -203,7 +200,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 			var request = await GetRequestByIdAsync(id);
 			if (request == null) throw new BusinessException(ExceptionMessage.lblRequestNotValid);
 
-			var userTask = srvUser.GetByIDActiveNonDeleted(userId!.Value);
+			var userTask = srvUser.GetByIDActiveNonDeleted(userId!);
 			var RequestFieldsValueTask = GetRequestFieldsValueAsync(request);
 
 			var ModuleTask = SrvSystemModule.GetSystemModuleByIdAsync(request.Service!.SystemModuleId);
@@ -227,7 +224,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 			if (isMinistry)
 			{
 				
-				if (user.Id != request.CreateById && !await ValidateMinistryUserAccessAsync(userId.Value, Module?.Id,   request.Id))
+				if (user.Id != request.CreateById && !await ValidateMinistryUserAccessAsync(userId, Module?.Id,   request.Id))
 				{
 					throw new UnauthorizedAccessException(ExceptionMessage.lblNoPermissionForViewRequest);
 				}
@@ -372,7 +369,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 			{
 				IsAllowedToViewAllRequests = IsAllowedToViewAllRequestsAsync(userId, module?.Id),
 				IsAllowedToViewAllRequestsWithoutFiltration = SrvPartyType.IsAllowedToViewAllRequestsWitoutFilterationAsync(userId, module?.Id),
-				UserPartyTypeData = SrvPartyType.GetUserPartyTypeData(userInfo.UserId!.Value, module?.Id)
+				UserPartyTypeData = SrvPartyType.GetUserPartyTypeData(userInfo.UserId!, module?.Id)
 			};
 
 			IQueryable<ServiceRequest> baseQuery = uow
@@ -466,7 +463,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
 			var uow = serviceScopeFactory.CreateScopedUow();
 
-			var userPartyDataTask = SrvPartyType.GetUserPartyTypeData(userInfo.UserId!.Value, moduleId);
+			var userPartyDataTask = SrvPartyType.GetUserPartyTypeData(userInfo.UserId!, moduleId);
 
 
 
@@ -930,7 +927,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 		}
 		public async Task<IList<FieldTransactionDTO>> GetFieldHistoryAsync(Guid fieldId, Guid requestId, string lang = "ar")
 		{
-			var user = await srvUser.GetByIDActiveNonDeleted(userInfo.UserId!.Value);
+			var user = await srvUser.GetByIDActiveNonDeleted(userInfo.UserId!);
 
 			var isMinistry = user is MinistryUser;
 
@@ -938,7 +935,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
 			if (isMinistry)
 			{
-				hasFieldHistoryPermission = await srvUser.HasPermission(userInfo.UserId.Value, AdminPermission.CanViewFieldHistory);
+				hasFieldHistoryPermission = await srvUser.HasPermission(userInfo.UserId, AdminPermission.CanViewFieldHistory);
 			}
 
 			if (!hasFieldHistoryPermission)

@@ -1,11 +1,9 @@
 ﻿using System.Threading.Tasks;
 using AutoMapper;
-using Evaluation.DAL.Entities.Calendars;
-using Evaluation.DAL.Entities.Org;
-using Evaluation.DAL.Entities.Planing;
-using Evaluation.DAL.Entities.Planing.EvaluationRequestEntity;
 using Evaluation.DAL.Helper;
-using Evaluation.DAL.UnitOfWork;
+using Evaluation.DAL.Models.Calendars;
+using Evaluation.DAL.Models.Planing;
+using Evaluation.DAL.Repositories;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper;
 using Evaluation.SharedHelper.Dtos.PlanDto;
