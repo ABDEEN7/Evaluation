@@ -123,6 +123,8 @@ public static class ConstantKeys
         public static readonly string SmsTemplateExistsActionStatusConfigNotification = "SmsTemplateExistsActionStatusConfigNotification";
         public static readonly string EmailTemplateExistsEmailTemplateDocument = "EmailTemplateExistsEmailTemplateDocument";
         public static readonly string EmailTemplateExistsActionStatusConfigNotification = "EmailTemplateExistsActionStatusConfigNotification";
+        public static readonly string TemplateDocExistsEmailTemplateDocument = "TemplateDocExistsEmailTemplateDocument";
+        public static readonly string TemplateDocExistsActionTemplateDoc = "TemplateDocExistsActionTemplateDoc";
     }
 
         public static class AdminSettings
@@ -234,6 +236,7 @@ public static class ConstantKeys
         public static readonly string AdminNotificationTemplate = "AdminNotificationTemplate";
         public static readonly string AdminSMSTemplate = "AdminSMSTemplate";
         public static readonly string AdminEmailTemplate = "AdminEmailTemplate";
+        public static readonly string AdminTemplateDocument = "AdminTemplateDocument";
     }
 
     public static class AdminPermission
@@ -484,6 +487,15 @@ public static class ConstantKeys
         public const string ADD_ADMIN_EMAILTEMPLATE = "ADD_ADMIN_EMAILTEMPLATE";
         public const string EDIT_ADMIN_EMAILTEMPLATE = "EDIT_ADMIN_EMAILTEMPLATE";
         public const string DELETE_ADMIN_EMAILTEMPLATE = "DELETE_ADMIN_EMAILTEMPLATE";
+
+        #endregion
+
+        #region TEMPLATEDOC
+
+        public const string VIEW_ADMIN_TEMPLATEDOC = "VIEW_ADMIN_TEMPLATEDOC";
+        public const string ADD_ADMIN_TEMPLATEDOC = "ADD_ADMIN_TEMPLATEDOC";
+        public const string EDIT_ADMIN_TEMPLATEDOC = "EDIT_ADMIN_TEMPLATEDOC";
+        public const string DELETE_ADMIN_TEMPLATEDOC = "DELETE_ADMIN_TEMPLATEDOC";
 
         #endregion
 
