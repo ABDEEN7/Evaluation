@@ -1,8 +1,11 @@
-﻿using AutoMapper;
+﻿using System.Threading.Tasks;
+using AutoMapper;
+using Evaluation.DAL.Entities.Calendars;
+using Evaluation.DAL.Entities.Org;
+using Evaluation.DAL.Entities.Planing;
+using Evaluation.DAL.Entities.Planing.EvaluationRequestEntity;
 using Evaluation.DAL.Helper;
-using Evaluation.DAL.Models.Calendars;
-using Evaluation.DAL.Models.Planing;
-using Evaluation.DAL.Repositories;
+using Evaluation.DAL.UnitOfWork;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper;
 using Evaluation.SharedHelper.Dtos.PlanDto;
@@ -49,7 +52,7 @@ public class PlanServiceRequestRepository(IServiceScopeFactory serviceScopeFacto
         await unitOfWork.CommitAsync();
         return true;
     }
-    
+
     //public async Task<bool> DeleteSchoolFromPlan(Guid requestId, Guid schoolId)
     //{
     //    var plan = await unitOfWork.GetRepository<Plan>().GetByIdAsync(changeRequest.PlanId);
@@ -79,5 +82,11 @@ public class PlanServiceRequestRepository(IServiceScopeFactory serviceScopeFacto
             .GetAllActiveNonDeleted()
             .AnyAsync(x => (x.AcademicYear.DepartmentId == model.AcademicYear.DepartmentId) && x.HasOnePlan);
     }
-
+    public async Task<List<Plan>> GetPlans()
+    {
+        var model = await unitOfWork
+            .GetRepository<Plan>()
+                .GetAllActiveNonDeleted().ToListAsync();
+        return model;
+    }
 }

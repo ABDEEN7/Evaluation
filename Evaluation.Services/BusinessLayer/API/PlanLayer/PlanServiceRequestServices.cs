@@ -1,8 +1,9 @@
-﻿using AutoMapper;
+﻿using System.Threading.Tasks;
+using AutoMapper;
+using Evaluation.DAL.Entities.Calendars;
+using Evaluation.DAL.Entities.Planing;
 using Evaluation.DAL.Helper;
-using Evaluation.DAL.Models.Calendars;
-using Evaluation.DAL.Models.Planing;
-using Evaluation.DAL.Repositories;
+using Evaluation.DAL.UnitOfWork;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper;
 using Evaluation.SharedHelper.Dtos.PlanDto;
@@ -96,7 +97,7 @@ public class PlanServiceRequestServices(
 
         });
     }
-   
+
     public async Task<Result<List<PlanTypeDto>>> GetPlansTypes()
     {
         return await ExecuteWithResult(async () =>
@@ -144,5 +145,8 @@ public class PlanServiceRequestServices(
         if (selectedYear?.Year < DateTime.Now.Year)
             throw new BusinessException(ConstantKeys.ExceptionMessage.PlanInThePastIsNotAllowed);
     }
-
+    public async Task<List<Plan>> GetPlans()
+    {
+        return await planRepository.GetPlans();
+    } 
 }

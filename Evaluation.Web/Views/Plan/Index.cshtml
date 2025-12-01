@@ -125,11 +125,9 @@
 </section>
 
 @section Scripts {
-    <script src="~/plan-assets/vendor/datatables/js/jquery.datatables.min.js"></script>
-    <script src="~/lib/select2/dist/js/select2.min.js" asp-append-version="true"></script>
-
+    @* <script src="~/plan-assets/vendor/datatables/js/jquery.datatables.min.js"></script>
+    <script src="~/lib/select2/dist/js/select2.min.js" asp-append-version="true"></script> *@
     <script src="~/js/evaluation/plans-listing.js" asp-append-version="true"></script>
-
     <script>
         $(document).ready(async function () {
             await webAppConfigsSetup().Init({
