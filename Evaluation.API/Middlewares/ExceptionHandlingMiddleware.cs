@@ -1,5 +1,4 @@
-﻿using Evaluation.DAL.Entities.Exception;
-using Evaluation.DAL.Exceptions;
+﻿using Evaluation.DAL.Exceptions;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Exceptions;
@@ -7,6 +6,7 @@ using Evaluation.SharedHelper;
 using Newtonsoft.Json;
 using System.Net;
 using System.Security;
+using Evaluation.DAL.Models.Exception;
 
 namespace Evaluation.API.Middlewares
 {

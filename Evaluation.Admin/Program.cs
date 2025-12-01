@@ -5,6 +5,7 @@ using Evaluation.Admin.Middlewares;
 using Evaluation.DAL.Context;
 using Evaluation.Services.BusinessLayer;
 using Evaluation.Services.Extensions;
+using Evaluation.Services.Special;
 using Evaluation.SharedHelper;
 using Evaluation.SharedHelper.Helper;
 using Evaluation.SharedHelper.Middlewares;
@@ -80,7 +81,8 @@ internal class Program
         builder.Services.AddScoped<MasterBL>();
         builder.Services.AddScoped<ResponseInfo>();
         builder.Services.AddScoped<PopulateResponseInfoFilter>();
-
+        builder.Services.AddScoped<IEmailServices, EmailServices>();
+        builder.Services.AddScoped<EmailTemplateProvider, EmailTemplateProvider>();
         builder.Services.AddControllersWithViews(options =>
         {
             options.Filters.Add<PopulateRequestInfoFilter>(); // Register globally

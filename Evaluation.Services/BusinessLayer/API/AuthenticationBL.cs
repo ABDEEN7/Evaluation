@@ -1,8 +1,4 @@
-using Evaluation.DAL.Entities.Authentication;
-using Evaluation.DAL.Entities.PermissionEntity;
-using Evaluation.DAL.Entities.UserEntiy;
 using Evaluation.DAL.Helper;
-using Evaluation.DAL.UnitOfWork;
 using Evaluation.Services.BusinessLayer.API;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper;
@@ -17,6 +13,10 @@ using Microsoft.Extensions.DependencyInjection;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using UserType = Evaluation.SharedHelper.Enums.UserType;
+using Evaluation.DAL.Models.Authentication;
+using Evaluation.DAL.Models.PermissionEntity;
+using Evaluation.DAL.Models.UserEntiy;
+using Evaluation.DAL.Repositories;
 
 public class AuthenticationBL : ApiBase
 {

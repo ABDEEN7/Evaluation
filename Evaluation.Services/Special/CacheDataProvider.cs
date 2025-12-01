@@ -1,16 +1,19 @@
-﻿using Evaluation.DAL.Entities.ActionEntities;
-using Evaluation.DAL.Entities.ServicesEntities;
-using Evaluation.DAL.Entities.StatusEntities;
-using Evaluation.DAL.Entities.Template;
-using Evaluation.DAL.SystemSetting;
-using Evaluation.DAL.UnitOfWork;
+﻿using AutoMapper;
+using Evaluation.DAL.Models.ActionEntities;
+using Evaluation.DAL.Models.ServiceEnities;
+using Evaluation.DAL.Models.StatusEntities;
+using Evaluation.DAL.Models.SystemSetting;
+using Evaluation.DAL.Models.Template;
+using Evaluation.DAL.Repositories;
 using Evaluation.SharedHelper;
 using Evaluation.SharedHelper.Enums;
+using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Api;
 using Evaluation.SharedHelper.Models.Api.ActionEntitiesDTOs;
 using Evaluation.SharedHelper.Models.Api.ProfileDTO;
 using Evaluation.SharedHelper.Models.Api.TemplatesDTO;
 using Mapster;
+using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -28,7 +31,6 @@ namespace Evaluation.Services.Special
         private readonly UnitOfWork uow;
         private readonly IServiceScopeFactory serviceScopeFactory;
         private readonly ILogger<CacheDataProvider> logger;
-
         public CacheDataProvider(CacheManager cacheManager, UnitOfWork uow, 
             IServiceScopeFactory serviceScopeFactory, ILogger<CacheDataProvider> logger)
         {
@@ -67,24 +69,29 @@ namespace Evaluation.Services.Special
         }
         private async Task<List<SystemSettingDTO>> GetSystemSettings(List<string> keys)
         {
-            //using (var uow = serviceScopeFactory.CreateScopedUow())
-            //{
-            //    var result = new List<SystemSettingDTO>();
+			using (var uow = serviceScopeFactory.CreateScopedUow())
+			{
+				var result = new List<SystemSettingDTO>();
 
-            //    if (keys != null)
-            //    {
-            //        var list = await uow.GetRepository<SystemSetting>()
-            //            .GetAllActiveNonDeleted()
-            //            .Where(x => keys.Contains(x.SettingKey))
-            //            .ToListAsync();
+				if (keys != null)
+				{
+					var list = await uow.GetRepository<SystemSetting>()
+						.GetAllActiveNonDeleted()
+						.Where(x => keys.Contains(x.SettingKey))
+						.Select(x=>new SystemSettingDTO
+						{
+							SettingGroup = x.SettingGroup,
+							SettingKey = x.SettingKey,
+							SettingValue = x.SettingValue
+						}).ToListAsync();
 
-            //        result = mapper.Map<List<SystemSettingDTO>>(list);
-            //    }
+                   
+                }
 
-            //    return result;
-            //}
+				return result;
+			}
 
-            return null;
+			
         }
 
         private async Task<List<T>> GetOrSetCacheAsync<T>(string key, Func<Task<List<T>>> dataFetcher)
@@ -142,8 +149,9 @@ namespace Evaluation.Services.Special
                         PageName = x.PageName,
                         UserUiname = x.UserUiname,
                         ControlName = x.ControlName,
-                        EnValue = x.ValueAr,
-                        ArValue = x.ValueEn,
+						BackEndName=x.BackendName,
+                        EnValue = x.ValueEn,
+                        ArValue = x.ValueAr,
                         Url = x.Url,
                         txtValue = lang == "ar" ? x.ValueAr : x.ValueEn,
                         

@@ -1,5 +1,5 @@
-﻿using Evaluation.DAL.Entities.Exception;
-using Evaluation.DAL.UnitOfWork;
+﻿using Evaluation.DAL.Models.Exception;
+using Evaluation.DAL.Repositories;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Exceptions;
 using Newtonsoft.Json;

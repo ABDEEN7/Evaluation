@@ -1,8 +1,12 @@
+using Evaluation.Admin.ActionFilter;
+using Evaluation.Admin.Extensions;
 using Evaluation.Admin.Models;
+using Evaluation.DAL.Helper;
 using Evaluation.Services.BusinessLayer;
 using Evaluation.Services.Models.Admin;
 using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Models;
+using Evaluation.SharedHelper.Models.Admin;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
@@ -15,15 +19,24 @@ namespace Evaluation.Admin.Controllers
         private readonly ILogger<HomeController> _logger;
         private readonly MasterBL _masterBL;
         private readonly RequestInfo _requestInfo;
-        public HomeController(ILogger<HomeController> logger, MasterBL masterBL, RequestInfo requestInfo)
+        private readonly UserInfo userInfoSession;
+        public HomeController(ILogger<HomeController> logger, MasterBL masterBL, RequestInfo requestInfo, UserInfo userInfoSession)
         {
+            this.userInfoSession = userInfoSession;
             _logger = logger;
             _masterBL = masterBL;
             _requestInfo = requestInfo;
         }
-
+        [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.AdminPermission.VIEW_ADMIN_HOME })]
         public IActionResult Index()
         {
+            var data = userInfoSession;
+           
+            _requestInfo.Lang = string.IsNullOrEmpty(_requestInfo.Lang) ? "ar" : _requestInfo.Lang;
+
+            ViewBag.Lang = _requestInfo.Lang;
+
+
             return View();
         }
         public IActionResult SetLanguage()
@@ -98,6 +111,13 @@ namespace Evaluation.Admin.Controllers
             // Let's say you fetch this from DB
             int idleMinutes =20; //Convert.ToInt32(_masterBL.GetAdminService<SrvSystemSettingBL>().GetSetting(ConstantKeys.AdminSettings.SessionExpireTime)??"20");
             return Ok(idleMinutes);
+        }
+        [HttpPost]
+        public IActionResult UiControlList()
+        {
+            var model = Request.Form["request"][0]?.StringToObject<List<UiControlItemDTO>>();
+
+            return ViewComponent("UiControlList", model);
         }
     }
 }

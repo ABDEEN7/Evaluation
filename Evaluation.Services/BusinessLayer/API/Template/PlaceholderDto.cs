@@ -1,5 +1,4 @@
-
-using Evaluation.DAL.Entities.FormBuilder;
+using Evaluation.DAL.Models.FormBuilder;
 
 namespace Evaluation.Services.BusinessLayer.API.Template;
 

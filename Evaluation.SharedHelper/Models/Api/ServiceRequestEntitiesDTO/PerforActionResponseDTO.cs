@@ -1,6 +1,5 @@
-﻿
-using Evaluation.DAL.Entities.ActionEntities;
-using Evaluation.DAL.Entities.ServiceRequestEntities;
+﻿using Evaluation.DAL.Models.ActionEntities;
+using Evaluation.DAL.Models.ServiceRequestEntities;
 using System;
 using System.Collections.Generic;
 using System.Linq;

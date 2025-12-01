@@ -1,21 +1,20 @@
-﻿using Evaluation.DAL.Entities.Audit;
-using Evaluation.DAL.Entities.Authentication;
-using  Evaluation.DAL.Entities.BaseModule;
-using Evaluation.DAL.Entities.Calendars;
-using Evaluation.DAL.Entities.DepartementEntites;
-using Evaluation.DAL.Entities.FormsModules;
-using Evaluation.DAL.Entities.Masters;
-using Evaluation.DAL.Entities.Org;
-using Evaluation.DAL.Entities.PermissionEntity;
-using Evaluation.DAL.Entities.Planing;
-using Evaluation.DAL.Entities.Planing.EvaluationRequestEntity;
-using Evaluation.DAL.Entities.ServiceRequestEntities;
-using Evaluation.DAL.Entities.ServicesEntities;
-using Evaluation.DAL.Entities.SystemModulesEntities;
-using Evaluation.DAL.Entities.Template;
-using Evaluation.DAL.Entities.UserEntiy;
-using Evaluation.DAL.Extensions;
-using Evaluation.DAL.SystemSetting;
+﻿using Evaluation.DAL.Extensions;
+using Evaluation.DAL.Models.Audit;
+using Evaluation.DAL.Models.Authentication;
+using Evaluation.DAL.Models.BaseModule;
+using Evaluation.DAL.Models.Calendars;
+using Evaluation.DAL.Models.DepartementEntites;
+using Evaluation.DAL.Models.FormsModules;
+using Evaluation.DAL.Models.Master;
+using Evaluation.DAL.Models.Org;
+using Evaluation.DAL.Models.PermissionEntity;
+using Evaluation.DAL.Models.Planing;
+using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
+using Evaluation.DAL.Models.ServiceEnities;
+using Evaluation.DAL.Models.ServiceRequestEntities;
+using Evaluation.DAL.Models.SystemSetting;
+using Evaluation.DAL.Models.Template;
+using Evaluation.DAL.Models.UserEntiy;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 
@@ -49,10 +48,10 @@ public partial class EvaluationDbContext : DbContext
     public virtual DbSet<AcademicYear> AcademicYears { get; set; }
     public virtual DbSet<CalcMethod> CalcMethods { get; set; }
     public virtual DbSet<EvaluationParty> EvaluationParties { get; set; }
-    public virtual DbSet<Form> Forms { get; set; }
+    public virtual DbSet<EvalForm> EvalForms { get; set; }
     public virtual DbSet<FormScope> FormScopes { get; set; }
-    public virtual DbSet<Item> Items { get; set; }
-    public virtual DbSet<ItemValue> ItemValues { get; set; }
+    public virtual DbSet<FormItem> FormItems { get; set; }
+    public virtual DbSet<FormItemValue> FormItemValues { get; set; }
     public virtual DbSet<Scope> Scopes { get; set; }
     public virtual DbSet<ScopeType> ScopeTypes { get; set; }
     public virtual DbSet<DepartmentOrgTree> DepartmentOrgTrees { get; set; }
@@ -95,6 +94,10 @@ public partial class EvaluationDbContext : DbContext
     public virtual DbSet<EvaluationType> EvaluationType { get; set; }
     public virtual DbSet<DepartmentHoliday> DepartmentHolidays { get; set; }
     public virtual DbSet<Semester> Semesters { get; set; }
+    public virtual DbSet<FormItem> FormItem { get; set; }
+    public virtual DbSet<EvalFormType> EvalFormType { get; set; }
+    public virtual DbSet<SubFormItem> SubFormItems { get; set; }
+    public virtual DbSet<SubFormItemValue> SubFormItemValues { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -125,6 +128,45 @@ public partial class EvaluationDbContext : DbContext
 
     private void ApplyGeneralConfigurations(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<OrgTree>()
+           .HasOne(x => x.OrgType)
+                   .WithMany()
+                   .HasForeignKey(x => x.OrgTypeId)
+                   .IsRequired()
+                   .OnDelete(DeleteBehavior.Restrict);
+
+        // Employee relations
+        modelBuilder.Entity<Employee>()
+            .HasOne(e => e.UserGender)
+            .WithMany()
+            .HasForeignKey(e => e.UserGenderId);
+
+        modelBuilder.Entity<Employee>()
+            .HasOne(e => e.JobTitle)
+            .WithMany()
+            .HasForeignKey(e => e.JobTitleId);
+
+        // Organization relations
+        modelBuilder.Entity<Organization>()
+            .HasOne(o => o.SchoolType)
+            .WithMany()
+            .HasForeignKey(o => o.TypeId);
+
+        // School relations
+        modelBuilder.Entity<School>()
+            .HasOne(s => s.SchoolType)
+            .WithMany()
+            .HasForeignKey(s => s.TypeId);
+
+        var baseType = typeof(OrgTree);
+        var derivedTypes =
+            Assembly.GetExecutingAssembly()
+            .GetTypes()
+            .Where(t => t.IsClass && !t.IsAbstract && t.IsSubclassOf(baseType));
+        foreach (var type in derivedTypes)
+        {
+            modelBuilder.Entity(type).ToTable(type.Name + "s");
+        }
 
         foreach (var relationship in modelBuilder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys()))
         {
@@ -141,7 +183,7 @@ public partial class EvaluationDbContext : DbContext
             typeof(Organization),
             typeof(Employee),
             typeof(School),
-            
+
         };
 
         foreach (var entityType in entityTypes)

@@ -1,0 +1,23 @@
+﻿using Evaluation.DAL.Models.Audit;
+using Evaluation.DAL.Models.BaseModule;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Evaluation.DAL.Models.FormBuilder
+{
+    public class FieldDropDownValue : EntityBase, IAuditLogEntity
+    {
+
+        public string TitleEn { get; set; } = null!;
+        public string TitleAr { get; set; } = null!;
+        public string? DropDownBackendName { get; set; }
+        public Guid DropDownTypeId { get; set; }
+        public DropDownType? dropDownType { get; set; }
+        public Guid? ParentDropDownId { get; set; }
+        public FieldDropDownValue? ParentDropDown { get; set; }
+        public int? OrderNo { get; set; }
+    }
+}

@@ -89,28 +89,65 @@ public static class ConstantKeys
         public static readonly string UserPartyTypeNotFound = "UserPartyTypeNotFound";
         public static readonly string UserNotFound = "UserNotFound";
         public static readonly string lblNoPermissionForViewRequest = "lblNoPermissionForViewRequest";
+        public static readonly string DepartmentExistsSystemModule = "DepartmentExistsSystemModule";
+        public static readonly string DropDownTypeHasDataSource = "DropDownTypeHasDataSource";
+        public static readonly string FieldExistsFieldVisabilityConfig = "FieldExistsFieldVisabilityConfig";
+        public static readonly string FieldExistsFieldAttributeValue = "FieldExistsFieldAttributeValue";
+        public static readonly string FieldExistsDropDownParentField = "FieldExistsDropDownParentField";
+        public static readonly string FieldExistsFieldPartyType = "FieldExistsFieldPartyType";
+        public static readonly string FieldExistsFieldViewCondition = "FieldExistsFieldViewCondition";
+        public static readonly string FieldExistsPlaceHolder = "FieldExistsPlaceHolder";
+        public static readonly string AcademicYearExistsScope = "AcademicYearExistsScope";
+        public static readonly string DepartmentExistsAcademicYear = "DepartmentExistsAcademicYear";
+        public static readonly string SameUserpartyTypeExists = "SameUserpartyTypeExists";
+        public static readonly string UserPartyTypeExistsUserPartyTypeSignature = "UserPartyTypeExistsUserPartyTypeSignature";
+        public static readonly string UserPartyTypeSignatureWidthError = "UserPartyTypeSignatureWidthError";
+        public static readonly string UserPartyTypeSignatureHeightError = "UserPartyTypeSignatureHeightError";
+        public static readonly string PartyTypeCannotDelete = "PartyTypeCannotDelete";
+        public static readonly string PartyTypeExistsServiceInitiatorPartyType = "PartyTypeExistsServiceInitiatorPartyType";
+        public static readonly string PartyTypeExistsServiceStatusPartyTypeDisplayName = "PartyTypeExistsServiceStatusPartyTypeDisplayName";
+        public static readonly string PartyTypeExistsServiceRequestShowPartyType = "PartyTypeExistsServiceRequestShowPartyType";
+        public static readonly string PartyTypeExistsServiceStatusPreventPartyType = "PartyTypeExistsServiceStatusPreventPartyType";
+        public static readonly string PartyTypeExistsActionAssignPartyType = "PartyTypeExistsActionAssignPartyType";
+        public static readonly string PartyTypeExistsActionPartyType = "PartyTypeExistsActionPartyType";
+        public static readonly string PartyTypeExistsActionShowLogPartyType = "PartyTypeExistsActionShowLogPartyType";
+        public static readonly string PartyTypeExistsFieldPartyType = "PartyTypeExistsFieldPartyType";
+        public static readonly string PartyTypeExistsActionStatusConfigNotification = "PartyTypeExistsActionStatusConfigNotification";
+        public static readonly string NavbarExistsSiteContent = "NavbarExistsSiteContent";
     }
 
-    public static class AdminSettings
-    {
-        public static readonly string EnableCaching = "EnableCaching";
-        public static readonly string ClearCacheDuration = "ClearCacheDuration";
-        public static readonly string ADMIN_FILE_SIZE = "ADMIN_FILE_SIZE";
-        public static readonly string ADMIN_FILE_EXTENSION = "ADMIN_FILE_EXTENSION";
-        public static readonly string ADMIN_FILE_COUNT = "ADMIN_FILE_COUNT";
-        public static readonly string ADMIN_PAGE_SIZE = "ADMIN_PAGE_SIZE";
-        public static readonly string AdminLogoAr = "AdminLogoAr";
-        public static readonly string AdminLogoEn = "AdminLogoEn";
-        public static readonly string WebLogoAr = "WebLogoAr";
-        public static readonly string WebLogoEn = "WebLogoEn";
-        public static readonly string Favicon = "Favicon";
-        public static readonly string RequestColumn = "RequestColumn";
-        public static readonly string EvaluationRequestColumn = "EvaluationRequestColumn";
-		public static readonly string SignatureUploadWidth = "SignatureUploadWidth";
-		public static readonly string SignatureUploadHeight = "SignatureUploadHeight";
-		public static readonly string SessionExpireTime = "SessionExpireTime";
+        public static class AdminSettings
+        {
+            public static readonly string EnableCaching = "EnableCaching";
+            public static readonly string ClearCacheDuration = "ClearCacheDuration";
+            public static readonly string ADMIN_FILE_SIZE = "ADMIN_FILE_SIZE";
+            public static readonly string ADMIN_FILE_EXTENSION = "ADMIN_FILE_EXTENSION";
+            public static readonly string ADMIN_FILE_COUNT = "ADMIN_FILE_COUNT";
+            public static readonly string ADMIN_PAGE_SIZE = "ADMIN_PAGE_SIZE";
+            public static readonly string AdminLogoAr = "AdminLogoAr";
+            public static readonly string AdminLogoEn = "AdminLogoEn";
+            public static readonly string WebLogoAr = "WebLogoAr";
+            public static readonly string WebLogoEn = "WebLogoEn";
+            public static readonly string Favicon = "Favicon";
+            public static readonly string RequestColumn = "RequestColumn";
+            public static readonly string EvaluationColumn = "EvaluationColumn";
+            public static readonly string SessionExpireTime = "SessionExpireTime";
+            public static readonly string PlaceHolderType = "PlaceHolderType";
+        public static readonly string SignatureUploadWidth = "SignatureUploadWidth";
+        public static readonly string SignatureUploadHeight = "SignatureUploadHeight";
+        public static readonly string OPERATORS_LIST = "OPERATORS_LIST";
+        public static readonly string ActionConditionType = "ActionConditionType";
+        public static readonly string UserPartyTypeSignatureHeight = "UserPartyTypeSignatureHeight";
+        public static readonly string UserPartyTypeSignatureWidth = "UserPartyTypeSignatureWidth";
+        public static readonly string NumberOfBanners = "NumberOfBanners";
+        public static readonly string TargetValue = "TargetValue";
+        public static readonly string NumberOfNavbars = "NumberOfNavbars";
+        public static readonly string NavBarPermissionList = "NavBarPermissionList";
+        public static readonly string RoutingValue = "RoutingValue";
+        public static readonly string WebAppSitePath = "WebAppSitePath";
+        
 
-	}
+    }
 
     public static class AdminBackendUI
     {
@@ -139,21 +176,56 @@ public static class ConstantKeys
         public static readonly string StatusTab = "StatusTab";
         public static readonly string ActionStatusConfigTab = "ActionStatusConfigTab";
         public static readonly string lblStatusPartyTypeDisplayList = "lblStatusPartyTypeDisplayList";
+        public static readonly string ADD_NEW_FORM_GROUP = "ADD_NEW_FORM_GROUP";
+        public static readonly string FormGroupTabTitle = "FormGroupTabTitle";
+        public static readonly string ListTabTitle = "ListTabTitle";
+        public static readonly string SearchFormGroup = "SearchFormGroup";
+        public static readonly string EvaluationActionDetails = "EvaluationActionDetails";
+        public static readonly string EvaluationActionFieldDetails = "EvaluationActionFieldDetails";
+        public static readonly string ActionConditionTab = "ActionConditionTab";
+        public static readonly string EvaluationActionsField = "EvaluationActionsField";
+        public static readonly string ActionTab = "ActionTab";
+        public static readonly string EvaluationActionsService = "EvaluationActionsService";
+        public static readonly string EvaluationActionsRoster = "EvaluationActionsRoster";
+        public static readonly string EvaluationActionsFieldsRoster = "EvaluationActionsFieldsRoster";
+        public static readonly string lblSearchTable = "lblSearchTable";
+        public static readonly string lblSearchForNames = "lblSearchForNames";
+        public static readonly string lblSearchTree = "lblSearchTree";
     }
 
-    public static class AdminPages
-    {
-        public static readonly string AdminCommon = "AdminCommon";
-        public static readonly string AdminService = "AdminService";
-        public static readonly string AdminPlaceHolder = "AdminPlaceHolder";
-        public static readonly string AdminServiceFreeze = "AdminServiceFreeze";
-        public static readonly string AdminActionStatusConfiguration = "AdminActionStatusConfiguration";
-        public static readonly string AdminActionStatusConfigurationNotification = "AdminActionStatusConfigurationNotification";
-        public static readonly string AdminServiceStatus = "AdminServiceStatus";
+        public static class AdminPages
+        {
+            public static readonly string AdminCommon = "AdminCommon";
+            public static readonly string AdminService = "AdminService";
+            public static readonly string AdminPlaceHolder = "AdminPlaceHolder";
+            public static readonly string AdminServiceFreeze = "AdminServiceFreeze";
+            public static readonly string AdminActionStatusConfiguration = "AdminActionStatusConfiguration";
+            public static readonly string AdminActionStatusConfigurationNotification = "AdminActionStatusConfigurationNotification";
+            public static readonly string AdminServiceStatus = "AdminServiceStatus";
+            public static readonly string AdminDropDown = "AdminDropDown";
+            public static readonly string AdminDepartment = "AdminDepartment";
+            public static readonly string AdminFormGroup = "AdminFormGroup";
+            public static readonly string AdminField = "AdminField";
+            public static readonly string AdminFieldAttribute = "AdminFieldAttribute";
+            public static readonly string AdminFieldCondition = "AdminFieldCondition";
+            public static readonly string AdminEvaluationAction = "AdminEvaluationAction";
+            public static readonly string AdminActionFieldAttribute = "AdminActionFieldAttribute";
+            public static readonly string AdminActionCondition = "AdminActionCondition";
+        public static readonly string AdminAcademicYear = "AdminAcademicYear";
+        public static readonly string AdminAcademicYearScope = "AdminAcademicYearScope";
+        public static readonly string AdminScopeAcademicYear = "AdminScopeAcademicYear";
+        public static readonly string AdminUserPartyType = "AdminUserPartyType";
+        public static readonly string AdminUserPartyTypeSignature = "AdminUserPartyTypeSignature";
+        public static readonly string AdminPartyType = "AdminPartyType";
+        public static readonly string AdminBanner = "AdminBanner";
+        public static readonly string AdminNavbar = "AdminNavbar";
+        public static readonly string AdminSiteDocument = "AdminSiteDocument";
     }
 
     public static class AdminPermission
     {
+        public const string VIEW_ADMIN_HOME = "VIEW_ADMIN_HOME";
+        
         #region  Service
         public const string ADD_ADMIN_SERVICE = "ADD_ADMIN_SERVICE";
         public const string EDIT_ADMIN_SERVICE = "EDIT_ADMIN_SERVICE";
@@ -205,6 +277,23 @@ public static class ConstantKeys
             "UPDATE_STATUS_PARTY_TYPE_DISPLAY_NAME_STATUS";
 
         #endregion
+        #region DROPDOWN
+
+        public const string VIEW_ADMIN_DROPDOWN = "VIEW_ADMIN_DROPDOWN";
+        public const string ADD_ADMIN_DROPDOWN = "ADD_ADMIN_DROPDOWN";
+        public const string EDIT_ADMIN_DROPDOWN = "EDIT_ADMIN_DROPDOWN";
+        public const string DELETE_ADMIN_DROPDOWN = "DELETE_ADMIN_DROPDOWN";
+
+        #endregion
+
+        #region DEPARTMENT
+
+        public const string VIEW_ADMIN_DEPARTMENT = "VIEW_ADMIN_DEPARTMENT";
+        public const string ADD_ADMIN_DEPARTMENT = "ADD_ADMIN_DEPARTMENT";
+        public const string EDIT_ADMIN_DEPARTMENT = "EDIT_ADMIN_DEPARTMENT";
+        public const string DELETE_ADMIN_DEPARTMENT = "DELETE_ADMIN_DEPARTMENT";
+
+        #endregion
 
         #region EvaluationRequest
         public const string CanViewFieldHistory = "CanViewFieldHistory";
@@ -212,9 +301,150 @@ public static class ConstantKeys
         public const string CanViewEvalFieldHistory = "CanViewEvalFieldHistory";
         #endregion
 
+        #region FormGroup
+        public const string VIEW_ADMIN_FORMGROUP = "VIEW_ADMIN_FORMGROUP";
+        public const string ADD_ADMIN_FORMGROUP = "ADD_ADMIN_FORMGROUP";
+        public const string EDIT_ADMIN_FORMGROUP = "EDIT_ADMIN_FORMGROUP";
+        public const string DELETE_ADMIN_FORMGROUP = "DELETE_ADMIN_FORMGROUP";
+        #endregion
+        #region FIELD
+
+        public const string VIEW_ADMIN_FIELD = "VIEW_ADMIN_FIELD";
+        public const string ADD_ADMIN_FIELD = "ADD_ADMIN_FIELD";
+        public const string EDIT_ADMIN_FIELD = "EDIT_ADMIN_FIELD";
+        public const string DELETE_ADMIN_FIELD = "DELETE_ADMIN_FIELD";
+
+        #endregion
+        #region FIELD_ATTRIBUTE
+
+        public const string VIEW_ADMIN_FIELD_ATTRIBUTE = "VIEW_ADMIN_FIELD_ATTRIBUTE";
+        public const string ADD_ADMIN_FIELD_ATTRIBUTE = "ADD_ADMIN_FIELD_ATTRIBUTE";
+        public const string EDIT_ADMIN_FIELD_ATTRIBUTE = "EDIT_ADMIN_FIELD_ATTRIBUTE";
+        public const string DELETE_ADMIN_FIELD_ATTRIBUTE = "DELETE_ADMIN_FIELD_ATTRIBUTE";
+
+        #endregion
+
+        #region FIELD_CONDITION
+
+        public const string VIEW_ADMIN_FIELD_CONDITION = "VIEW_ADMIN_FIELD_CONDITION";
+        public const string ADD_ADMIN_FIELD_CONDITION = "ADD_ADMIN_FIELD_CONDITION";
+        public const string EDIT_ADMIN_FIELD_CONDITION = "EDIT_ADMIN_FIELD_CONDITION";
+        public const string DELETE_ADMIN_FIELD_CONDITION = "DELETE_ADMIN_FIELD_CONDITION";
+
+        #endregion
+
+        #region ACTION
+
+        public const string VIEW_ADMIN_ACTION = "VIEW_ADMIN_ACTION";
+        public const string ADD_ADMIN_ACTION = "ADD_ADMIN_ACTION";
+        public const string EDIT_ADMIN_ACTION = "EDIT_ADMIN_ACTION";
+        public const string DELETE_ADMIN_ACTION = "DELETE_ADMIN_ACTION";
+        public const string VIEW_ADMIN_ACTION_FIELD = "VIEW_ADMIN_ACTION_FIELD";
+        public const string UPDATE_ADMIN_ACTION_FIELD = "UPDATE_ADMIN_ACTION_FIELD";
+
+        #endregion
+
+        #region ACTION_FIELD_ATTRIBUTE
+
+        public const string VIEW_ADMIN_ACTION_FIELD_ATTRIBUTE = "VIEW_ADMIN_ACTION_FIELD_ATTRIBUTE";
+        public const string ADD_ADMIN_ACTION_FIELD_ATTRIBUTE = "ADD_ADMIN_ACTION_FIELD_ATTRIBUTE";
+        public const string EDIT_ADMIN_ACTION_FIELD_ATTRIBUTE = "EDIT_ADMIN_ACTION_FIELD_ATTRIBUTE";
+        public const string DELETE_ADMIN_ACTION_FIELD_ATTRIBUTE = "DELETE_ADMIN_ACTION_FIELD_ATTRIBUTE";
+
+        #endregion
+
+        #region ACTIONCONDITION
+
+        public const string VIEW_ADMIN_ACTIONCONDITION = "VIEW_ADMIN_ACTIONCONDITION";
+        public const string ADD_ADMIN_ACTIONCONDITION = "ADD_ADMIN_ACTIONCONDITION";
+        public const string EDIT_ADMIN_ACTIONCONDITION = "EDIT_ADMIN_ACTIONCONDITION";
+        public const string DELETE_ADMIN_ACTIONCONDITION = "DELETE_ADMIN_ACTIONCONDITION";
+
+        #endregion
+
+        #region ACADEMIC_YEAR
+
+        public const string DELETE_ADMIN_ACADEMIC_YEAR = "DELETE_ADMIN_ACADEMIC_YEAR";
+        public const string ADD_ADMIN_ACADEMIC_YEAR = "ADD_ADMIN_ACADEMIC_YEAR";
+        public const string EDIT_ADMIN_ACADEMIC_YEAR = "EDIT_ADMIN_ACADEMIC_YEAR";
+        public const string VIEW_ADMIN_ACADEMIC_YEAR = "VIEW_ADMIN_ACADEMIC_YEAR";
+
+        #endregion
+
+        #region ACADEMIC_YEAR_SCOPE
+
+        public const string DELETE_ADMIN_ACADEMIC_YEAR_SCOPE = "DELETE_ADMIN_ACADEMIC_YEAR_SCOPE";
+        public const string ADD_ADMIN_ACADEMIC_YEAR_SCOPE = "ADD_ADMIN_ACADEMIC_YEAR_SCOPE";
+        public const string EDIT_ADMIN_ACADEMIC_YEAR_SCOPE = "EDIT_ADMIN_ACADEMIC_YEAR_SCOPE";
+        public const string VIEW_ADMIN_ACADEMIC_YEAR_SCOPE = "VIEW_ADMIN_ACADEMIC_YEAR_SCOPE";
+
+        #endregion
+
+        #region SCOPE_ACADEMIC_YEAR
+
+        public const string DELETE_ADMIN_SCOPE_ACADEMIC_YEAR_SCOPE = "DELETE_ADMIN_SCOPE_ACADEMIC_YEAR_SCOPE";
+        public const string ADD_ADMIN_SCOPE_ACADEMIC_YEAR_SCOPE = "ADD_ADMIN_SCOPE_ACADEMIC_YEAR_SCOPE";
+        public const string EDIT_ADMIN_SCOPE_ACADEMIC_YEAR_SCOPE = "EDIT_ADMIN_SCOPE_ACADEMIC_YEAR_SCOPE";
+        public const string VIEW_ADMIN_SCOPE_ACADEMIC_YEAR_SCOPE = "VIEW_ADMIN_SCOPE_ACADEMIC_YEAR_SCOPE";
+
+        #endregion
+
+        #region USERPARTYTYPE
+
+        public const string VIEW_ADMIN_USERPARTYTYPE = "VIEW_ADMIN_USERPARTYTYPE";
+        public const string ADD_ADMIN_USERPARTYTYPE = "ADD_ADMIN_USERPARTYTYPE";
+        public const string EDIT_ADMIN_USERPARTYTYPE = "EDIT_ADMIN_USERPARTYTYPE";
+        public const string DELETE_ADMIN_USERPARTYTYPE = "DELETE_ADMIN_USERPARTYTYPE";
+
+        #endregion
+
+        #region SIGNATUREUSERPARTYTYPE
+
+        public const string VIEW_ADMIN_USERPARTYTYPE_SIGNATURE = "VIEW_ADMIN_USERPARTYTYPE_SIGNATURE";
+        public const string ADD_ADMIN_USERPARTYTYPE_SIGNATURE = "ADD_ADMIN_USERPARTYTYPE_SIGNATURE";
+        public const string EDIT_ADMIN_USERPARTYTYPE_SIGNATURE = "EDIT_ADMIN_USERPARTYTYPE_SIGNATURE";
+        public const string DELETE_ADMIN_USERPARTYTYPE_SIGNATURE = "DELETE_ADMIN_USERPARTYTYPE_SIGNATURE";
+
+        #endregion
+
+        #region PARTYTYPE
+
+        public const string VIEW_ADMIN_PARTYTYPE = "VIEW_ADMIN_PARTYTYPE";
+        public const string ADD_ADMIN_PARTYTYPE = "ADD_ADMIN_PARTYTYPE";
+        public const string EDIT_ADMIN_PARTYTYPE = "EDIT_ADMIN_PARTYTYPE";
+        public const string DELETE_ADMIN_PARTYTYPE = "DELETE_ADMIN_PARTYTYPE";
+
+        #endregion
+        #region BANNER
+        public const string VIEW_ADMIN_BANNER = "VIEW_ADMIN_BANNER";
+        public const string ADD_ADMIN_BANNER = "ADD_ADMIN_BANNER";
+        public const string EDIT_ADMIN_BANNER = "EDIT_ADMIN_BANNER";
+        public const string DELETE_ADMIN_BANNER = "DELETE_ADMIN_BANNER";
+        #endregion
+        #region NAVBAR
+
+        public const string VIEW_ADMIN_NAVBAR = "VIEW_ADMIN_NAVBAR";
+        public const string ADD_ADMIN_NAVBAR = "ADD_ADMIN_NAVBAR";
+        public const string EDIT_ADMIN_NAVBAR = "EDIT_ADMIN_NAVBAR";
+        public const string DELETE_ADMIN_NAVBAR = "DELETE_ADMIN_NAVBAR";
+
+        #endregion
+        #region SITEDOCUMENT
+
+        public const string VIEW_ADMIN_SITEDOCUMENT = "VIEW_ADMIN_SITEDOCUMENT";
+        public const string ADD_ADMIN_SITEDOCUMENT = "ADD_ADMIN_SITEDOCUMENT";
+        public const string EDIT_ADMIN_SITEDOCUMENT = "EDIT_ADMIN_SITEDOCUMENT";
+        public const string DELETE_ADMIN_SITEDOCUMENT = "DELETE_ADMIN_SITEDOCUMENT";
+
+        #endregion
+
+    }
+    public static class CustomDataSource
+    {
     }
     public static class WebAppSettings
     {
+        public static readonly string PAGE_SIZE = "PAGE_SIZE";
     }
     public static class WebAppCommon
     {

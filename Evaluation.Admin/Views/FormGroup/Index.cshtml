@@ -1,0 +1,100 @@
+﻿@using Evaluation.Admin.Extensions
+@using static Evaluation.SharedHelper.Enums.ConstantKeys
+
+
+
+@model FormGroupVM
+@{
+    string Lang = Model.CurrentLanguage;
+
+    var FormGroupControlItems = Model.UiControlItems.Where(x => x.RowOrder >0 && x.Constraint.Permission.BackEndName==AdminPermission.ADD_ADMIN_FORMGROUP).ToList();
+    var FieldControlItems = Model.UiControlItems.Where(x => x.RowOrder > 0 && x.Constraint.Permission.BackEndName == AdminPermission.ADD_ADMIN_FIELD).ToList();
+
+    var FieldAttributeControlItems = Model.UiControlItems.Where(x => x.RowOrder > 0 && x.Constraint.Permission.BackEndName == AdminPermission.ADD_ADMIN_FIELD_ATTRIBUTE).ToList();
+
+    var FieldConditionControlItems = Model.UiControlItems.Where(x => x.RowOrder > 0 && x.Constraint.Permission.BackEndName == AdminPermission.ADD_ADMIN_FIELD_CONDITION).ToList();
+    
+    var textDir = Lang == "ar" ? "RTL" : "LTR";
+    var permissionsList = Model.PermissionsList;
+    var controlsList = Model.ControlsList;
+    var settingList = Model.SettingList;
+    var FieldcolumnList = Model.UiControlItems.Where(x => x.Constraint.ShowInGrid == true && x.Constraint.Permission.BackEndName == AdminPermission.ADD_ADMIN_FIELD).Select(X => X.Constraint).ToList();
+
+    var FieldAttributecolumnList = Model.UiControlItems.Where(x => x.Constraint.ShowInGrid == true && x.Constraint.Permission.BackEndName == AdminPermission.ADD_ADMIN_FIELD_ATTRIBUTE).Select(X => X.Constraint).ToList();
+
+    var FieldConditioncolumnList = Model.UiControlItems.Where(x => x.Constraint.ShowInGrid == true && x.Constraint.Permission.BackEndName == AdminPermission.ADD_ADMIN_FIELD_CONDITION).Select(X => X.Constraint).ToList();
+
+}
+
+@section Styles {
+
+}
+@await Component.InvokeAsync("ServiceSelection")
+<section id="divFormGroup" style="display:none;">
+    
+    
+    <div class="card app-card">
+        <div class="card-header justify-content-end d-flex align-items-center bg-light">
+            @if (permissionsList.IsPermissionAvailabe(AdminPermission.ADD_ADMIN_FORMGROUP))
+            {
+                <button id="btn-add-content-formgroup" type="button" class="btn btn-primary">
+                    <i class="fa fa-plus-circle"></i> &nbsp;@controlsList.GetUiControlText(AdminBackendUI.ADD_NEW_FORM_GROUP)
+                </button>
+            }
+
+        </div>
+        <div class="nav nav-tabs tab border-0 bg-white">
+            <button class="nav-link tablinks active" id="firstbutton" onclick="clickHandle(event,'FormGroup')">@controlsList.GetUiControlText(AdminBackendUI.FormGroupTabTitle)</button>
+            <button class="nav-link tablinks" id="secondbutton" onclick="clickHandle(event,'List')">@controlsList.GetUiControlText(AdminBackendUI.ListTabTitle)</button>
+        </div>
+        <div class="card-body">
+            <div class="col-12 mb-3">
+                <div class="search-container">
+                    <input type="text" id="searchInput" class="form-control " placeholder=@controlsList.GetUiControlText(AdminBackendUI.SearchFormGroup) onkeyup="searchFormGroup()">
+                </div>
+            </div>
+            <div id="divaccordian" >
+            </div>
+        </div>
+    </div>
+</section>
+<div>
+    <input id="Id" hidden />
+    <input id="formgroupid" hidden />
+    <input id="fieldid" hidden />
+</div>
+
+
+
+@section Scripts {
+    <script>
+        var controlsList = JSON.parse(`@Html.Raw(Json.Serialize(controlsList))`); sharedFn().PopulateUiControl(controlsList);
+        const settingList = JSON.parse(`@Html.Raw(Json.Serialize(settingList))`);
+       
+         var FieldcolumnList = @Html.Raw(Json.Serialize(FieldcolumnList));
+         var FieldAttributecolumnList = @Html.Raw(Json.Serialize(FieldAttributecolumnList));
+         var FieldConditioncolumnList = @Html.Raw(Json.Serialize(FieldConditioncolumnList));
+         var Lang = '@Lang';
+         let txtDir = '@textDir';
+          const FormGroupcontrolvalidationlist = @Html.Raw(Json.Serialize(FormGroupControlItems));
+           const Fieldcontrolvalidationlist = @Html.Raw(Json.Serialize(FieldControlItems));
+            const FieldAttributecontrolvalidationlist = @Html.Raw(Json.Serialize(FieldAttributeControlItems));
+             const FieldConditioncontrolvalidationlist = @Html.Raw(Json.Serialize(FieldConditionControlItems));
+
+           const IsEdit_FormGroup='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.EDIT_ADMIN_FORMGROUP))';
+        const IsDelete_FormGroup='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.DELETE_ADMIN_FORMGROUP))';
+
+        const IsEdit_Field='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.EDIT_ADMIN_FIELD))';
+         const IsDelete_Field='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.DELETE_ADMIN_FIELD))';
+
+         const IsView_Field_ATTRIBUTE='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.VIEW_ADMIN_FIELD_ATTRIBUTE))';
+          const IsEdit_Field_ATTRIBUTE='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.EDIT_ADMIN_FIELD_ATTRIBUTE))';
+           const IsDelete_Field_ATTRIBUTE='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.DELETE_ADMIN_FIELD_ATTRIBUTE))';
+
+          const IsView_Field_CONDITION='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.VIEW_ADMIN_FIELD_CONDITION))';
+            const IsEdit_Field_CONDITION='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.EDIT_ADMIN_FIELD_CONDITION))';
+           const IsDelete_Field_CONDITION='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.DELETE_ADMIN_FIELD_CONDITION))';
+    </script>
+    <script src="~/js/admin/formgroup.js" asp-append-version="true"></script>
+
+}

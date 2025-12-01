@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Evaluation.DAL.Entities.ActionEntities;
+using Evaluation.DAL.Models.ActionEntities;
 
 namespace Evaluation.DAL.EFConfiguration.FormBuilderConfiguration
 {

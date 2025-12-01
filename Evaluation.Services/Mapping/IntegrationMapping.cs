@@ -5,7 +5,7 @@ namespace Evaluation.Services.Mapping;
 
 public static class IntegrationMapping
 {
-    public static HROrganizationInfoDto MapToOrganizationInfoDto(OracleDataReader reader)
+    public static HROrganizationInfoDto ToOrganizationInfoDto(this OracleDataReader reader)
     {
         return new HROrganizationInfoDto
         {
@@ -28,7 +28,7 @@ public static class IntegrationMapping
         };
     }
 
-    public static HREmployeeInfoDto MapToHREmployeeInfoDto(OracleDataReader reader)
+    public static HREmployeeInfoDto ToHREmployeeInfoDto(this OracleDataReader reader)
     {
         return new HREmployeeInfoDto
         {
@@ -70,8 +70,8 @@ public static class IntegrationMapping
             Nationality = reader["NATIONALITY"]?.ToString(),
             NationalityE = reader["NATIONALITY_E"]?.ToString(),
             MarStat = reader["MARSTAT"]?.ToString(),
-            MarStatDesc = reader["MARSTAT_DESC"]?.ToString(),
             MarStatDescE = reader["MARSTAT_DESC_E"]?.ToString(),
+            MarStatDesc = reader["MARSTAT_DESC"]?.ToString(),
             EqLevelDescA = reader["EQLEVEL_DESC_A"]?.ToString(),
             EqLevelDescE = reader["EQLEVEL_DESC_E"]?.ToString(),
             CertNameA = reader["CERT_NAME_A"]?.ToString(),
@@ -81,6 +81,7 @@ public static class IntegrationMapping
             ContractType = reader["CONTRACT_TYPE"]?.ToString(),
             ContractTypeDesc = reader["CONTRACT_TYPE_DESC"]?.ToString(),
             ContractTypeDescE = reader["CONTRACT_TYPE_DESC_E"]?.ToString(),
+            JoiningDate = reader["DATE_OF_JOINING"]?.ToString(),
         };
     }
 }

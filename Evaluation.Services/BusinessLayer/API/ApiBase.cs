@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Evaluation.DAL.Helper;
-using Evaluation.DAL.UnitOfWork;
+using Evaluation.DAL.Repositories;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Helper;
 using Evaluation.SharedHelper.Models;
@@ -47,6 +47,7 @@ namespace Evaluation.Services.BusinessLayer.API
             this.userInfo = userInfo ?? throw new ArgumentNullException(nameof(userInfo));
             this.serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
             this.requestInfo = requestInfo ?? throw new ArgumentNullException(nameof(requestInfo));
+            this.mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
       

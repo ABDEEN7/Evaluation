@@ -1,6 +1,6 @@
-﻿using Evaluation.DAL.Entities.PermissionEntity;
-using Evaluation.DAL.Entities.UserEntiy;
-using Evaluation.DAL.Helper;
+﻿using Evaluation.DAL.Helper;
+using Evaluation.DAL.Models.PermissionEntity;
+using Evaluation.DAL.Models.UserEntiy;
 using Evaluation.SharedHelper;
 using Evaluation.SharedHelper.Models;
 using Microsoft.EntityFrameworkCore;
@@ -35,7 +35,7 @@ namespace Evaluation.Admin.Middlewares
                         var _UserObj = await scope.GetRepository<UserRole>()
                                                   .GetAll()
                                                   .Include(x=>x.User)
-                                                  .Where(c => c.User.Email == userInfo.Email).FirstOrDefaultAsync();
+                                                  .Where(c => c.User.Email == userInfo.Email && c.User.IsActive==true).FirstOrDefaultAsync();
                         if (_UserObj != null)
                         {
                             userInfo.PermissionList = GetPermissions(_UserObj.RoleId);
