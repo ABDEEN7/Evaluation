@@ -41,7 +41,7 @@ namespace Evaluation.Services.Models.API
 		public async Task<WebAppRequestsDTO> GetUserRequestsAsync(FilterRequestsDTO filter)
 		{
 			var userId = userInfo.UserId;
-			return await _srvServiceRequest.GetRequestsAsync(userId, filter);
+			return await _srvServiceRequest.GetRequestsAsync(userId!.Value, filter);
 		}
 
 		public async Task<ServiceRequestDTO> GetApplicationDetailsAsync(Guid requestId)
@@ -314,7 +314,7 @@ namespace Evaluation.Services.Models.API
 			var userId = userInfo.UserId;
 
 			if (requestId != Guid.Empty &&
-				!await _srvServiceRequest.HasAccessToRequestAsync(requestId, userId))
+				!await _srvServiceRequest.HasAccessToRequestAsync(requestId, userId!.Value))
 			{
 				throw new UnauthorizedAccessException("You do not have permission to view this request.");
 			}

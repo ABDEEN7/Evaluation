@@ -646,7 +646,7 @@ namespace Evaluation.Services.BusinessLayer.API
 		{
 			var userId = userInfo.UserId;
 
-			if (!await _srvServiceRequest.HasAccessToRequestAsync(requestId, userId))
+			if (!await _srvServiceRequest.HasAccessToRequestAsync(requestId, userId!.Value))
 			{
 				throw new UnauthorizedAccessException("You do not have permission to view this request.");
 			}
@@ -672,7 +672,7 @@ namespace Evaluation.Services.BusinessLayer.API
 				? _srvServiceRequest.GetRequestByIdAsync(requestId.Value)
 				: Task.FromResult<ServiceRequest?>(null);
 			var hasAccessTask = requestId is not null
-				? _srvServiceRequest.HasAccessToRequestAsync(requestId.Value, userId)
+				? _srvServiceRequest.HasAccessToRequestAsync(requestId.Value, userId!.Value)
 				: Task.FromResult(true);
 
 			await Task.WhenAll(serviceTask, actionTask, statusIdTask, hasAccessTask);
@@ -709,14 +709,14 @@ namespace Evaluation.Services.BusinessLayer.API
 				? requestObj?.StatusId ?? throw new BusinessException(ExceptionMessage.InvalidRequest)
 				: await statusIdTask ?? throw new BusinessException(ExceptionMessage.lblNoServiceStatusFound);
 
-			var studentUserId = requestId != null ? requestObj!.OrgTreeId : userId;
+			var OrgTreeId = requestId != null ? requestObj!.OrgTreeId : userId;
 
-			if (studentUserId == Guid.Empty)
+			if (OrgTreeId == Guid.Empty)
 				throw new BusinessException(ExceptionMessage.UserNotFound);
 
 			var dropDownTask = _srvDropdown.GetDropDownValuesForAction(
 				PlanId ?? requestObj?.PlanId,
-				studentUserId,
+				OrgTreeId,
 				action.Id,
 				null,
 				lang,

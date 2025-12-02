@@ -8,7 +8,7 @@
                 dropdowns = data;
             }
         };
-        const url = "/ServiceRequest/GetDropDownValues";
+        const url = "/FormRender/GetDropDownValues";
         jqClient(options).Get(url);
     };
 
@@ -17,7 +17,7 @@
             const scholarshipId = new URLSearchParams(window.location.search)
                 .get("scholarshipId")?.replace("#", "");
             const url =
-                `/ServiceRequest/GetDropDownValuesByTypeId?dropDownTypeId=${encodeURIComponent(dropDownTypeId)}`
+                `/FormRender/GetDropDownValuesByTypeId?dropDownTypeId=${encodeURIComponent(dropDownTypeId)}`
                 + `&requestId=${encodeURIComponent(requestId || '')}`
                 + `&schId=${encodeURIComponent(scholarshipId || '')}`
                 + `&parentDropDownId=${encodeURIComponent(parentDropDownId || '')}`;
@@ -49,7 +49,7 @@
             const scholarshipId = new URLSearchParams(window.location.search)
                 .get("scholarshipId")?.replace("#", "");
             const url =
-                `/ServiceRequest/GetDropDownValuesById?dropDownTypeId=${encodeURIComponent(dropDownTypeId)}`
+                `/FormRender/GetDropDownValuesById?dropDownTypeId=${encodeURIComponent(dropDownTypeId)}`
                 + `&requestId=${encodeURIComponent(requestId || '')}`
                 + `&schId=${encodeURIComponent(scholarshipId || '')}`
                 + `&value=${encodeURIComponent(value || '')}`;
@@ -69,7 +69,7 @@
 
   
     async function getCountry(reqId, enrollmentTypeId, $dropdown, selectedValue) {
-        const url = `/ServiceRequest/GetCountry?reqId=${reqId}`
+        const url = `/FormRender/GetCountry?reqId=${reqId}`
             + `&EnrollmentTypeId=${enrollmentTypeId}`;
         return await fetchJSON(url);
     }

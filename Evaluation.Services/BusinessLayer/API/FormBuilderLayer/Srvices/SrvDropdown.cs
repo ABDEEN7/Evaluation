@@ -286,7 +286,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             return dropdownValue;
         }
 
-        public async Task<List<DropDownValueDTO?>> GetDropDownValuesForAction(Guid? SchId, Guid studentId, Guid actionId, string? dropDownTypeIds, string lang, Guid? requestId)
+        public async Task<List<DropDownValueDTO?>> GetDropDownValuesForAction(Guid? SchId, Guid? studentId, Guid actionId, string? dropDownTypeIds, string lang, Guid? requestId)
         {
             var dropDownTypeIdsList = ParseDropDownTypeIds(dropDownTypeIds);
 
@@ -294,12 +294,12 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
             var tasks = new List<Task<List<DropDownValueDTO>>>
                                 {
-                                    LoadRegularDropDowns(allFields, dropDownTypeIdsList, studentId,SchId, lang),
+                                    LoadRegularDropDowns(allFields, dropDownTypeIdsList, studentId.Value,SchId, lang),
                                 };
 
             if (requestId.HasValue)
             {
-                tasks.Add(LoadLazyDropDownsWithValues(allFields, requestId.Value, studentId));
+                tasks.Add(LoadLazyDropDownsWithValues(allFields, requestId.Value, studentId.Value));
             }
 
             var results = await Task.WhenAll(tasks);

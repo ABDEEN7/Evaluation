@@ -200,7 +200,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 			var request = await GetRequestByIdAsync(id);
 			if (request == null) throw new BusinessException(ExceptionMessage.lblRequestNotValid);
 
-			var userTask = srvUser.GetByIDActiveNonDeleted(userId!);
+			var userTask = srvUser.GetByIDActiveNonDeleted(userId!.Value);
 			var RequestFieldsValueTask = GetRequestFieldsValueAsync(request);
 
 			var ModuleTask = SrvSystemModule.GetSystemModuleByIdAsync(request.Service!.SystemModuleId);
@@ -224,7 +224,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 			if (isMinistry)
 			{
 				
-				if (user.Id != request.CreateById && !await ValidateMinistryUserAccessAsync(userId, Module?.Id,   request.Id))
+				if (user.Id != request.CreateById && !await ValidateMinistryUserAccessAsync(userId!.Value, Module?.Id,   request.Id))
 				{
 					throw new UnauthorizedAccessException(ExceptionMessage.lblNoPermissionForViewRequest);
 				}
@@ -927,7 +927,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 		}
 		public async Task<IList<FieldTransactionDTO>> GetFieldHistoryAsync(Guid fieldId, Guid requestId, string lang = "ar")
 		{
-			var user = await srvUser.GetByIDActiveNonDeleted(userInfo.UserId!);
+			var user = await srvUser.GetByIDActiveNonDeleted(userInfo.UserId!.Value);
 
 			var isMinistry = user is MinistryUser;
 
@@ -935,7 +935,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
 			if (isMinistry)
 			{
-				hasFieldHistoryPermission = await srvUser.HasPermission(userInfo.UserId, AdminPermission.CanViewFieldHistory);
+				hasFieldHistoryPermission = await srvUser.HasPermission(userInfo.UserId.Value, AdminPermission.CanViewFieldHistory);
 			}
 
 			if (!hasFieldHistoryPermission)
