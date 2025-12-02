@@ -443,7 +443,12 @@ public static class ConstantKeys
     public static class CustomDataSource
     {
     }
-
+    public static class WebPermissions
+    {
+        public const string GET_FORM_ITEMS = "GET_FORM_ITEMS";
+        public const string SAVE_EVALUATION = "SAVE_EVALUATION";
+        public const string UPDATE_EVALUATION = "UPDATE_EVALUATION";
+    }
     public static class WebAppSettings
     {
         public static readonly string PAGE_SIZE = "PAGE_SIZE";
