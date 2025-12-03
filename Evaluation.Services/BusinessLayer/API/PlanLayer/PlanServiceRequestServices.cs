@@ -141,19 +141,19 @@ public class PlanServiceRequestServices(
         if (selectedYear?.Year < DateTime.Now.Year)
             throw new BusinessException(ConstantKeys.ExceptionMessage.PlanInThePastIsNotAllowed);
     }
-    private Plan ConvertFromPlanToDto(CreateEvaluationPlanDto model)
-    {
-        return new Plan
-        {
-            Id = model.Id,
-            AcademicYearId = model.AcademicYearId,
-            PlanName = model.Name,
-            PlanJsonValue = JsonConvert.SerializeObject(model),
-            PlanStatusId = model.PlanStatusId,
-            //PlanTypeDepartmentId = 
+    //private Plan ConvertFromPlanToDto(CreateEvaluationPlanDto model)
+    //{
+    //    return new Plan
+    //    {
+    //        Id = model.Id,
+    //        AcademicYearId = model.AcademicYearId,
+    //        PlanName = model.Name,
+    //        PlanJsonValue = JsonConvert.SerializeObject(model),
+    //        PlanStatusId = model.PlanStatusId,
+    //        //PlanTypeDepartmentId = 
 
-        };
-    }
+    //    };
+    //}
     private void UpdatePlanEntity(Plan plan, UpdatePlanDto dto)
     {
         plan.PlanName = dto.Name;

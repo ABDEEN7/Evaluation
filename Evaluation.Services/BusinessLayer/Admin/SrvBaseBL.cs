@@ -8,6 +8,7 @@ using Evaluation.DAL.Repositories;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper;
 using Evaluation.SharedHelper.Enums;
+using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Helper;
 using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Admin;
@@ -115,7 +116,7 @@ namespace Evaluation.Services.Models.Admin
                         var propValue = propInfo.GetValue(obj);
                         if (validation.IsRequired && (validation.Dbrequired ?? false) && (propValue == null || string.IsNullOrEmpty(propValue.ToString()) || string.IsNullOrWhiteSpace(propValue.ToString())))
                         {
-                            return false;
+                            throw new BusinessException(ConstantKeys.ExceptionMessage.Requiredfield);
                         }
 
 
@@ -126,7 +127,7 @@ namespace Evaluation.Services.Models.Admin
                             {
                                 if (MaxstringValue.Length > validation.MaxLength)
                                 {
-                                    return false;
+                                    throw new BusinessException(ConstantKeys.ExceptionMessage.ExceedMaxlength);
                                 }
                             }
                         }
@@ -137,7 +138,7 @@ namespace Evaluation.Services.Models.Admin
                             {
 
                                 if (MinstringValue.Length < validation.MinLength)
-                                    return false;
+                                    throw new BusinessException(ConstantKeys.ExceptionMessage.BelowMinlength);
                             }
                         }
 
@@ -146,7 +147,7 @@ namespace Evaluation.Services.Models.Admin
                             bool isValid = Regex.IsMatch(RegexstringValue, validation.Regex);
                             if (!isValid)
                             {
-                                return false;
+                                throw new BusinessException(ConstantKeys.ExceptionMessage.InvalidRegex);
                             }
                         }
                         if (validation.ControlType == "JSON_AREA" && propValue is string jsonstringValue)
@@ -154,7 +155,7 @@ namespace Evaluation.Services.Models.Admin
                             bool isValid = IsValidJson(jsonstringValue);
                             if (!isValid)
                             {
-                                return false;
+                                throw new BusinessException(ConstantKeys.ExceptionMessage.InvalidJson);
                             }
                         }
                     }
@@ -279,9 +280,65 @@ namespace Evaluation.Services.Models.Admin
             return response;
 
         }
-       
-       
-      
+
+
+        public async Task<CustomFileResponseWeb> ValidateWebsiteAttachment(IEnumerable<ControlValidationDTO> constraintList, List<IFormFile> FinalFiles)
+        {
+            var response = new CustomFileResponseWeb();
+            response.ResponseStatus = true;
+            var fileControlList = constraintList.Where(x => x.ControlType == "FILEUPLOAD" || x.ControlType == "DROPZONE").ToList();
+            List<WebsiteAttachmentDTO> model = new List<WebsiteAttachmentDTO>();
+            foreach (var item in FinalFiles)
+            {
+                WebsiteAttachmentDTO attachment = new WebsiteAttachmentDTO();
+                var controlsetting = fileControlList.Where(x => (x.ControlType == "FILEUPLOAD" ? x.UibackendName == item.Name : x.ControlName == item.Name)).FirstOrDefault();
+                if (controlsetting != null)
+                {
+                    var MaxFileSize = controlsetting.FileSize ?? long.Parse(srvSystemSettingBL.GetSetting(ConstantKeys.AdminSettings.ADMIN_FILE_SIZE));
+                    var AttachmentType = controlsetting.FileExtention ?? srvSystemSettingBL.GetSetting(ConstantKeys.AdminSettings.ADMIN_FILE_EXTENSION);
+
+                    long Filesize = item.Length;
+                    if (Filesize > 0 && Filesize > MaxFileSize * 1024)
+                    {
+                        var msg = await GetUiMessage(ConstantKeys.AdminBackendUI.ADMIN_MSG_FILE_SIZE);
+                        response.ResponseMessage = string.Format(msg, MaxFileSize / 1024);
+
+                        response.ResponseStatus = false;
+
+
+                    }
+
+                    string EXT = Path.GetExtension(item.FileName).Replace(".", "").ToLower();
+
+                    if (!CheckUploadExt(EXT, AttachmentType))
+                    {
+                        var message = await GetUiMessage(ConstantKeys.AdminBackendUI.VALID_UPLOAD_TYPE);
+                        response.ResponseMessage = string.Format(message, AttachmentType);
+                        response.ResponseStatus = false;
+
+
+                    }
+                }
+
+                FileVm uploads = await _blobService.UploadFileAsync(item,StorageContainerType.website);
+                if (uploads != null)
+                {
+                    long fileLength = uploads.FileLength ?? 0;
+                    string BlobUrl = _blobService.GenerateSasToken(uploads.CustomFileName, 0,uploads.FileName,false,StorageContainerType.website);
+                    attachment.FileName = uploads.CustomFileName;
+                    attachment.UiFileName = uploads.FileName;
+                    attachment.BlobUrl = BlobUrl;
+                    attachment.FileExtension = uploads.FileType.Replace(".", "").ToLower();
+                    attachment.FileSize = fileLength;
+                    attachment.ControlFileName = item.Name;
+                    model.Add(attachment);
+
+                }
+            }
+            response.Data = model;
+            return response;
+
+        }
 
         public async Task<FileResponse> ValidateSysLogo(SysLogoDTO model, IEnumerable<ControlValidationDTO> constraintList, List<IFormFile> FinalFiles)
         {

@@ -24,7 +24,7 @@ public class CreateEvaluationPlanDto
             StartDate = StartDate,
             EndDate = EndDate,
             //PlanTypeDepartmentId = PlanTypeId,
-            PlanTypeId = PlanTypeId,
+            //PlanTypeId = PlanTypeId,
             AcademicYearId = AcademicYearId,
             PlanStatusId = PlanStatusId.Value,
             SemesterId = SemesterId,
