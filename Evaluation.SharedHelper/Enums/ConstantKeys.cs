@@ -127,23 +127,23 @@ public static class ConstantKeys
         public static readonly string TemplateDocExistsActionTemplateDoc = "TemplateDocExistsActionTemplateDoc";
     }
 
-        public static class AdminSettings
-        {
-            public static readonly string EnableCaching = "EnableCaching";
-            public static readonly string ClearCacheDuration = "ClearCacheDuration";
-            public static readonly string ADMIN_FILE_SIZE = "ADMIN_FILE_SIZE";
-            public static readonly string ADMIN_FILE_EXTENSION = "ADMIN_FILE_EXTENSION";
-            public static readonly string ADMIN_FILE_COUNT = "ADMIN_FILE_COUNT";
-            public static readonly string ADMIN_PAGE_SIZE = "ADMIN_PAGE_SIZE";
-            public static readonly string AdminLogoAr = "AdminLogoAr";
-            public static readonly string AdminLogoEn = "AdminLogoEn";
-            public static readonly string WebLogoAr = "WebLogoAr";
-            public static readonly string WebLogoEn = "WebLogoEn";
-            public static readonly string Favicon = "Favicon";
-            public static readonly string RequestColumn = "RequestColumn";
-            public static readonly string EvaluationColumn = "EvaluationColumn";
-            public static readonly string SessionExpireTime = "SessionExpireTime";
-            public static readonly string PlaceHolderType = "PlaceHolderType";
+    public static class AdminSettings
+    {
+        public static readonly string EnableCaching = "EnableCaching";
+        public static readonly string ClearCacheDuration = "ClearCacheDuration";
+        public static readonly string ADMIN_FILE_SIZE = "ADMIN_FILE_SIZE";
+        public static readonly string ADMIN_FILE_EXTENSION = "ADMIN_FILE_EXTENSION";
+        public static readonly string ADMIN_FILE_COUNT = "ADMIN_FILE_COUNT";
+        public static readonly string ADMIN_PAGE_SIZE = "ADMIN_PAGE_SIZE";
+        public static readonly string AdminLogoAr = "AdminLogoAr";
+        public static readonly string AdminLogoEn = "AdminLogoEn";
+        public static readonly string WebLogoAr = "WebLogoAr";
+        public static readonly string WebLogoEn = "WebLogoEn";
+        public static readonly string Favicon = "Favicon";
+        public static readonly string RequestColumn = "RequestColumn";
+        public static readonly string EvaluationColumn = "EvaluationColumn";
+        public static readonly string SessionExpireTime = "SessionExpireTime";
+        public static readonly string PlaceHolderType = "PlaceHolderType";
         public static readonly string SignatureUploadWidth = "SignatureUploadWidth";
         public static readonly string SignatureUploadHeight = "SignatureUploadHeight";
         public static readonly string OPERATORS_LIST = "OPERATORS_LIST";
@@ -205,24 +205,24 @@ public static class ConstantKeys
         public static readonly string lblSearchTree = "lblSearchTree";
     }
 
-        public static class AdminPages
-        {
-            public static readonly string AdminCommon = "AdminCommon";
-            public static readonly string AdminService = "AdminService";
-            public static readonly string AdminPlaceHolder = "AdminPlaceHolder";
-            public static readonly string AdminServiceFreeze = "AdminServiceFreeze";
-            public static readonly string AdminActionStatusConfiguration = "AdminActionStatusConfiguration";
-            public static readonly string AdminActionStatusConfigurationNotification = "AdminActionStatusConfigurationNotification";
-            public static readonly string AdminServiceStatus = "AdminServiceStatus";
-            public static readonly string AdminDropDown = "AdminDropDown";
-            public static readonly string AdminDepartment = "AdminDepartment";
-            public static readonly string AdminFormGroup = "AdminFormGroup";
-            public static readonly string AdminField = "AdminField";
-            public static readonly string AdminFieldAttribute = "AdminFieldAttribute";
-            public static readonly string AdminFieldCondition = "AdminFieldCondition";
-            public static readonly string AdminEvaluationAction = "AdminEvaluationAction";
-            public static readonly string AdminActionFieldAttribute = "AdminActionFieldAttribute";
-            public static readonly string AdminActionCondition = "AdminActionCondition";
+    public static class AdminPages
+    {
+        public static readonly string AdminCommon = "AdminCommon";
+        public static readonly string AdminService = "AdminService";
+        public static readonly string AdminPlaceHolder = "AdminPlaceHolder";
+        public static readonly string AdminServiceFreeze = "AdminServiceFreeze";
+        public static readonly string AdminActionStatusConfiguration = "AdminActionStatusConfiguration";
+        public static readonly string AdminActionStatusConfigurationNotification = "AdminActionStatusConfigurationNotification";
+        public static readonly string AdminServiceStatus = "AdminServiceStatus";
+        public static readonly string AdminDropDown = "AdminDropDown";
+        public static readonly string AdminDepartment = "AdminDepartment";
+        public static readonly string AdminFormGroup = "AdminFormGroup";
+        public static readonly string AdminField = "AdminField";
+        public static readonly string AdminFieldAttribute = "AdminFieldAttribute";
+        public static readonly string AdminFieldCondition = "AdminFieldCondition";
+        public static readonly string AdminEvaluationAction = "AdminEvaluationAction";
+        public static readonly string AdminActionFieldAttribute = "AdminActionFieldAttribute";
+        public static readonly string AdminActionCondition = "AdminActionCondition";
         public static readonly string AdminAcademicYear = "AdminAcademicYear";
         public static readonly string AdminAcademicYearScope = "AdminAcademicYearScope";
         public static readonly string AdminScopeAcademicYear = "AdminScopeAcademicYear";
@@ -242,7 +242,7 @@ public static class ConstantKeys
     public static class AdminPermission
     {
         public const string VIEW_ADMIN_HOME = "VIEW_ADMIN_HOME";
-        
+
         #region  Service
         public const string ADD_ADMIN_SERVICE = "ADD_ADMIN_SERVICE";
         public const string EDIT_ADMIN_SERVICE = "EDIT_ADMIN_SERVICE";
@@ -500,18 +500,22 @@ public static class ConstantKeys
         #endregion
 
     }
+
     public static class CustomDataSource
     {
     }
+
     public static class WebAppSettings
     {
         public static readonly string PAGE_SIZE = "PAGE_SIZE";
         public static readonly string DefaultWebsiteBannerImage = "DefaultWebsiteBannerImage";
     }
+
     public static class WebAppCommon
     {
         public static readonly string lblLoginMenu = "lblLoginMenu";
     }
+
     public static class WebAppLoginPage
     {
         public static readonly string lblEmail = "lblEmail";
@@ -545,6 +549,7 @@ public static class ConstantKeys
         public static readonly string CACHE_DROPDOWNVALUE = "CACHE_DROPDOWNVALUE";
         public static readonly string CACHE_ACADEMICYEAR = "CACHE_ACADEMICYEAR";
     }
+
     public static class LanguageConst
     {
         public static readonly string En = "En";
@@ -570,7 +575,6 @@ public static class ConstantKeys
         public static readonly string useAsposeLib = "useAsposeLib";
     }
 
-
     public static class FieldTypeConstant
     {
         public const string label = "label";
@@ -592,6 +596,7 @@ public static class ConstantKeys
         public const string table = "table";
         public const string list = "list";
     }
+
     public static class Module
     {
         public static readonly string AuthenticationModule = "AuthenticationModule";
@@ -622,24 +627,25 @@ public static class ConstantKeys
         public const string INFO_WITH_DRAFT = "INFO_WITH_DRAFT";
     }
 
-
     public static class ServiceSettings
     {
         public static readonly string MaxCountOpen = "50";
     }
+
     public static class WebAppAccountConfigurations
     {
         public static readonly string ClearCacheDuration = "ClearCacheDuration";
     }
 
-	public static class PlaceHolderTypes
-	{
+    public static class PlaceHolderTypes
+    {
 
-		public const string EvaluationField = "EvaluationField";
-		public const string RequestField = "Request";
-	}
-	public static class EmailTemplateList
-	{
-		public static readonly string TestEmail = "TestEmail";
-	}
+        public const string EvaluationField = "EvaluationField";
+        public const string RequestField = "Request";
+    }
+
+    public static class EmailTemplateList
+    {
+        public static readonly string TestEmail = "TestEmail";
+    }
 }
