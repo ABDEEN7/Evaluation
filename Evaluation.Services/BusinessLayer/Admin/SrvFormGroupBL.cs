@@ -165,7 +165,7 @@ namespace Evaluation.Services.Models.Admin
                     FormGroupListId=g.FormGroupListId,
                     FormGroupName=_requestInfo.Lang == "ar" ? g.FormGroup!.TitleAr:g.FormGroup!.TitleEn
                 }). ToList();
-            return list;
+            return list.OrderBy(x=>x.Row).ThenBy(x=>x.Column).ToList();
 
         }
 

@@ -114,6 +114,17 @@ public static class ConstantKeys
         public static readonly string PartyTypeExistsFieldPartyType = "PartyTypeExistsFieldPartyType";
         public static readonly string PartyTypeExistsActionStatusConfigNotification = "PartyTypeExistsActionStatusConfigNotification";
         public static readonly string NavbarExistsSiteContent = "NavbarExistsSiteContent";
+        public static readonly string Requiredfield = "Requiredfield";
+        public static readonly string ExceedMaxlength = "ExceedMaxlength";
+        public static readonly string BelowMinlength = "BelowMinlength";
+        public static readonly string InvalidRegex = "InvalidRegex";
+        public static readonly string InvalidJson = "InvalidJson";
+        public static readonly string NotoficationTemplateExistsActionStatusConfigNotification = "NotoficationTemplateExistsActionStatusConfigNotification";
+        public static readonly string SmsTemplateExistsActionStatusConfigNotification = "SmsTemplateExistsActionStatusConfigNotification";
+        public static readonly string EmailTemplateExistsEmailTemplateDocument = "EmailTemplateExistsEmailTemplateDocument";
+        public static readonly string EmailTemplateExistsActionStatusConfigNotification = "EmailTemplateExistsActionStatusConfigNotification";
+        public static readonly string TemplateDocExistsEmailTemplateDocument = "TemplateDocExistsEmailTemplateDocument";
+        public static readonly string TemplateDocExistsActionTemplateDoc = "TemplateDocExistsActionTemplateDoc";
     }
 
     public static class AdminSettings
@@ -145,7 +156,8 @@ public static class ConstantKeys
         public static readonly string NavBarPermissionList = "NavBarPermissionList";
         public static readonly string RoutingValue = "RoutingValue";
         public static readonly string WebAppSitePath = "WebAppSitePath";
-
+        public static readonly string SubSiteContentMaxCount = "SubSiteContentMaxCount";
+        
 
     }
 
@@ -220,6 +232,11 @@ public static class ConstantKeys
         public static readonly string AdminBanner = "AdminBanner";
         public static readonly string AdminNavbar = "AdminNavbar";
         public static readonly string AdminSiteDocument = "AdminSiteDocument";
+        public static readonly string AdminSiteContent = "AdminSiteContent";
+        public static readonly string AdminNotificationTemplate = "AdminNotificationTemplate";
+        public static readonly string AdminSMSTemplate = "AdminSMSTemplate";
+        public static readonly string AdminEmailTemplate = "AdminEmailTemplate";
+        public static readonly string AdminTemplateDocument = "AdminTemplateDocument";
     }
 
     public static class AdminPermission
@@ -438,6 +455,50 @@ public static class ConstantKeys
 
         #endregion
 
+        #region SITECONTENT
+
+        public const string VIEW_ADMIN_SITECONTENT = "VIEW_ADMIN_SITECONTENT";
+        public const string ADD_ADMIN_SITECONTENT = "ADD_ADMIN_SITECONTENT";
+        public const string EDIT_ADMIN_SITECONTENT = "EDIT_ADMIN_SITECONTENT";
+        public const string DELETE_ADMIN_SITECONTENT = "DELETE_ADMIN_SITECONTENT";
+
+        #endregion
+
+        #region NOTIFICATION_TEMPLATE
+
+        public const string VIEW_ADMIN_NOTIFICATION_TEMPLATE = "VIEW_ADMIN_NOTIFICATION_TEMPLATE";
+        public const string ADD_ADMIN_NOTIFICATION_TEMPLATE = "ADD_ADMIN_NOTIFICATION_TEMPLATE";
+        public const string EDIT_ADMIN_NOTIFICATION_TEMPLATE = "EDIT_ADMIN_NOTIFICATION_TEMPLATE";
+        public const string DELETE_ADMIN_NOTIFICATION_TEMPLATE = "DELETE_ADMIN_NOTIFICATION_TEMPLATE";
+
+        #endregion
+
+        #region SMSTEMPLATE
+
+        public const string VIEW_ADMIN_SMSTEMPLATE = "VIEW_ADMIN_SMSTEMPLATE";
+        public const string ADD_ADMIN_SMSTEMPLATE = "ADD_ADMIN_SMSTEMPLATE";
+        public const string EDIT_ADMIN_SMSTEMPLATE = "EDIT_ADMIN_SMSTEMPLATE";
+        public const string DELETE_ADMIN_SMSTEMPLATE = "DELETE_ADMIN_SMSTEMPLATE";
+
+        #endregion
+        #region EMAILTEMPLATE
+
+        public const string VIEW_ADMIN_EMAILTEMPLATE = "VIEW_ADMIN_EMAILTEMPLATE";
+        public const string ADD_ADMIN_EMAILTEMPLATE = "ADD_ADMIN_EMAILTEMPLATE";
+        public const string EDIT_ADMIN_EMAILTEMPLATE = "EDIT_ADMIN_EMAILTEMPLATE";
+        public const string DELETE_ADMIN_EMAILTEMPLATE = "DELETE_ADMIN_EMAILTEMPLATE";
+
+        #endregion
+
+        #region TEMPLATEDOC
+
+        public const string VIEW_ADMIN_TEMPLATEDOC = "VIEW_ADMIN_TEMPLATEDOC";
+        public const string ADD_ADMIN_TEMPLATEDOC = "ADD_ADMIN_TEMPLATEDOC";
+        public const string EDIT_ADMIN_TEMPLATEDOC = "EDIT_ADMIN_TEMPLATEDOC";
+        public const string DELETE_ADMIN_TEMPLATEDOC = "DELETE_ADMIN_TEMPLATEDOC";
+
+        #endregion
+
     }
 
     public static class CustomDataSource
@@ -447,10 +508,12 @@ public static class ConstantKeys
     public static class WebAppSettings
     {
         public static readonly string PAGE_SIZE = "PAGE_SIZE";
+        public static readonly string DefaultWebsiteBannerImage = "DefaultWebsiteBannerImage";
     }
 
     public static class WebAppCommon
     {
+        public static readonly string lblLoginMenu = "lblLoginMenu";
     }
 
     public static class WebAppLoginPage
