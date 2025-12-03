@@ -281,7 +281,7 @@
         $(document).on('click', '#dtPagination .page-link', handlePaginationClick);
 
         // Save button
-        $(document).on('click', '#btn-submit', handleSavePlan);
+        //$(document).on('click', '#btn-submit', handleSavePlan);
 
         // Open confirmation modal
         $(document).on('click', '[data-bs-target="#confirmation-modal"]', handleOpenConfirmation);
@@ -649,7 +649,7 @@
     };
 
     const savePlan = (planData) => {
-        const endpoint = planData.id ? API_ENDPOINTS.UPDATE_PLAN : API_ENDPOINTS.CREATE_PLAN;
+        const endpoint = planData.id ? API_ENDPOINTS.UPDATE_PLAN : API_ENDPOINTS.APPROVE_PLAN;
 
         jqClient().Post(endpoint, planData)
             .done(result => {
