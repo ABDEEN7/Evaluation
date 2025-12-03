@@ -10,8 +10,8 @@ public class PlanDto
     public DateOnly EndDate { get; set; }
     public Guid PlanTypeId { get; set; }
     //public List<SelectedSchool>? Schools { get; set; }
-    public Guid AcademicYearId { get; set; }
-    public Guid PlanStatusId { get; set; }
+    public Guid? AcademicYearId { get; set; }
+    public Guid? PlanStatusId { get; set; }
     public Guid? SemesterId { get; set; }
     public static PlanDto FromEntity(Plan plan)
     {

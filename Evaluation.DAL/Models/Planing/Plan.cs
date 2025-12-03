@@ -10,9 +10,9 @@ public class Plan : EntityBase
     public DateOnly StartDate { get; set; }
     public DateOnly EndDate { get; set; }
   
-    public Guid AcademicYearId { get; set; }
+    public Guid? AcademicYearId { get; set; }
     public AcademicYear? AcademicYear { get; set; }
-    public Guid PlanStatusId { get; set; }
+    public Guid? PlanStatusId { get; set; }
     public PlanStatus? PlanStatus { get; set; }
     public Guid? PlanTypeDepartmentId { get; set; }
     public PlanTypeDepartment? PlanTypeDepartment { get; set; }

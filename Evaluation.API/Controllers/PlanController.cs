@@ -1,8 +1,9 @@
-﻿using Evaluation.API.Extensions;
+﻿using Evaluation.API.ActionFilter;
+using Evaluation.API.Extensions;
+using Evaluation.DAL;
 using Evaluation.Services.BusinessLayer;
 using Evaluation.Services.BusinessLayer.API.PlanLayer;
 using Evaluation.Services.BusinessLayer.API.SteamerLayer;
-using Evaluation.Services.Models.Planing;
 using Evaluation.SharedHelper.Dtos.PlanDto;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,6 +20,7 @@ public class PlanController(MasterBL masterBL) : ControllerBase
     }
 
     [HttpPost]
+    [CheckRolePermisionFilter(true, ConstantKeys.WebPermission.ADD_WEB_PLAN_REQUEST)]
     public async Task<IActionResult> Create([FromBody] CreateEvaluationPlanDto planRequest)
     {
         var jsonPlan = await masterBL.GetApiService<PlanServiceRequestServices>().AddEvaulationPlan(planRequest);
@@ -35,19 +37,8 @@ public class PlanController(MasterBL masterBL) : ControllerBase
     //    var isDeleted = await masterBL.GetApiService<PlanServiceRequestServices>().DeletePlanDraft(id);
     //    return isDeleted.ToActionResult();
     //}
-
     [HttpPost]
-    public IActionResult RequestDeleteSchool(RequestDeleteSchoolDto requestDelete)
-    {
-        return Ok();
-    }
-    [HttpPost]
-    public IActionResult ApproveDeleteSchoolFromPlan(Guid requestId)
-    {
-        //var
-        return Ok();
-    }
-    [HttpPost]
+    [CheckRolePermisionFilter(true, ConstantKeys.WebPermission.APPROVE_WEB_PLAN_REQUEST)]
     public async Task<IActionResult> Approve([FromBody] CreateEvaluationPlanDto approveDto)
     {
         await masterBL.GetApiService<PlanServiceRequestServices>().ApprovePlan(approveDto);
@@ -63,6 +54,7 @@ public class PlanController(MasterBL masterBL) : ControllerBase
     }
 
     [HttpGet]
+    [CheckRolePermisionFilter(true, ConstantKeys.WebPermission.GET_SEMESTERS_REQUEST)]
     public async Task<IActionResult> GetSemesters()
     {
         //var semester = await masterBL.GetApiService<SemesterRequestServices>().GetSemestersAsync(new Guid("37689d34-4928-4bb9-92b4-8a11abc0dbaf"));
