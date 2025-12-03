@@ -246,6 +246,7 @@ public static class ConstantKeys
         public static readonly string AdminEmailProfile = "AdminEmailProfile";
         public static readonly string AdminUserPermission = "AdminUserPermission";
         public static readonly string AdminPermission = "AdminPermission";
+        public static readonly string AdminRole = "AdminRole";
     }
 
     public static class AdminPermission
@@ -523,6 +524,13 @@ public static class ConstantKeys
         #region ROLE_PERMISSION
         public const string VIEW_ADMIN_ROLE_PERMISSION = "VIEW_ADMIN_ROLE_PERMISSION";
         public const string ADD_ADMIN_ROLE_PERMISSION = "ADD_ADMIN_ROLE_PERMISSION";
+        #endregion
+
+        #region ROLE
+        public const string VIEW_ADMIN_ROLE = "VIEW_ADMIN_ROLE";
+        public const string ADD_ADMIN_ROLE = "ADD_ADMIN_ROLE";
+        public const string EDIT_ADMIN_ROLE = "EDIT_ADMIN_ROLE";
+        public const string DELETE_ADMIN_ROLE = "DELETE_ADMIN_ROLE";
         #endregion
 
     }
