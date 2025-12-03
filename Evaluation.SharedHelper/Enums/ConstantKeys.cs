@@ -206,6 +206,9 @@ public static class ConstantKeys
         public static readonly string lblSearchTable = "lblSearchTable";
         public static readonly string lblSearchForNames = "lblSearchForNames";
         public static readonly string lblSearchTree = "lblSearchTree";
+        public static readonly string SELECTALL = "SELECTALL";
+        public static readonly string EXPANDALL = "EXPANDALL";
+        public static readonly string COLLAPSEALL = "COLLAPSEALL";
     }
 
     public static class AdminPages
@@ -242,6 +245,7 @@ public static class ConstantKeys
         public static readonly string AdminTemplateDocument = "AdminTemplateDocument";
         public static readonly string AdminEmailProfile = "AdminEmailProfile";
         public static readonly string AdminUserPermission = "AdminUserPermission";
+        public static readonly string AdminPermission = "AdminPermission";
     }
 
     public static class AdminPermission
@@ -514,6 +518,11 @@ public static class ConstantKeys
         public const string VIEW_ADMIN_USER_PERMISSION = "VIEW_ADMIN_USER_PERMISSION";
         public const string ADD_ADMIN_USER_PERMISSION = "ADD_ADMIN_USER_PERMISSION";
         public const string EDIT_ADMIN_USER_PERMISSION = "EDIT_ADMIN_USER_PERMISSION";
+        #endregion
+
+        #region ROLE_PERMISSION
+        public const string VIEW_ADMIN_ROLE_PERMISSION = "VIEW_ADMIN_ROLE_PERMISSION";
+        public const string ADD_ADMIN_ROLE_PERMISSION = "ADD_ADMIN_ROLE_PERMISSION";
         #endregion
 
     }
