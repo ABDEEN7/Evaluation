@@ -128,6 +128,11 @@ public class PlanServiceRequestServices(
             BackendName = s.BackendName,
         }).ToListAsync();
     }
+    public async Task<PlanDto> GetPlanByIdAsyncAutoMapper(Guid planId)
+    {
+        Plan? plan = await planRepository.GetPlanAsync(planId);
+        return plan.Adapt<PlanDto>();
+    }
     //Validation Plans
     private async Task ValidateUpdatePlan(UpdatePlanDto model)
     {

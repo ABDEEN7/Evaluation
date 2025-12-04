@@ -1,6 +1,7 @@
 ﻿using Evaluation.API.ActionFilter;
 using Evaluation.API.Extensions;
 using Evaluation.DAL;
+using Evaluation.DAL.Models.Planing;
 using Evaluation.Services.BusinessLayer;
 using Evaluation.Services.BusinessLayer.API.PlanLayer;
 using Evaluation.Services.BusinessLayer.API.SteamerLayer;
@@ -61,5 +62,11 @@ public class PlanController(MasterBL masterBL) : ControllerBase
         var semester = await masterBL.GetApiService<SemesterRequestServices>().GetSemestersAsync();
         return Ok(new { result = semester });
         //return semester.ToActionResult();
+    }
+    [HttpGet("{planId:guid}")]
+    public async Task<IActionResult> GetPlanDetails(Guid planId)
+    {
+        var plan = await masterBL.GetApiService<PlanServiceRequestServices>().GetPlanByIdAsync(planId);
+        return Ok(new { result = plan });
     }
 }
