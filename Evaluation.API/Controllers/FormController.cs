@@ -31,17 +31,17 @@ public class FormController : ControllerBase
     }
 
     [HttpPost]
-    [CheckRolePermisionFilter(true, PermisionNames: [ConstantKeys.WebPermissions.SAVE_EVALUATION])]
+    [CheckRolePermisionFilter(true, PermisionNames: [ConstantKeys.WebPermissions.SAVE_EVALUATION_FORM])]
 
-    public async Task<Result<FormEvaluationDto>> SaveEvaluation([FromBody] FormEvaluationDto formEvaluation)
+    public async Task<Result<FormEvaluationDto>> SaveEvaluationForm([FromBody] FormEvaluationDto formEvaluation)
     {
         return await _masterBl.GetApiService<FormBL>().SaveEvaluationForm(formEvaluation);
     }
 
     [HttpPost]
-    [CheckRolePermisionFilter(true, PermisionNames: [ConstantKeys.WebPermissions.UPDATE_EVALUATION])]
+    [CheckRolePermisionFilter(true, PermisionNames: [ConstantKeys.WebPermissions.UPDATE_EVALUATION_FORM])]
 
-    public async Task<Result<FormEvaluationDto>> UpdateEvaluation([FromBody] FormEvaluationDto formEvaluation)
+    public async Task<Result<FormEvaluationDto>> UpdateEvaluationForm([FromBody] FormEvaluationDto formEvaluation)
     {
         return await _masterBl.GetApiService<FormBL>().UpdateEvaluationForm(formEvaluation);
     }
