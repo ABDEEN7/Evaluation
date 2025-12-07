@@ -16,6 +16,6 @@ public class Employee : OrgTree
     public JobTitle JobTitle { get; set; } = null!;
     public string? Email { get; set; }
     public string QID { get; set; } = null!;
-
+    public bool IsOrgManager { get; set; }
 
 }

@@ -24,7 +24,7 @@ namespace Evaluation.DAL.Models.ServiceRequestEntities
 		public Service? Service { get; set; }
 		public Guid OrgTreeId { get; set; }
 		public OrgTree? OrgTree { get; set; }
-		public int Sequence { get; set; }
+		public long Sequence { get; set; }
 		public Guid? PlanId { get; set; }
 		public Plan? Plan { get; set; }
 		public Guid? EvaluationRequestId { get; set; }
@@ -35,8 +35,10 @@ namespace Evaluation.DAL.Models.ServiceRequestEntities
 		public EvaluationRequestHistory? EvaluationRequestHistory { get; set; }
 		public Guid? PlanHistoryId { get; set; }
 		public PlanHistory? PlanHistory { get; set; }
+        public DateTime? VisitDateFrom { get; set; }
+        public DateTime? VisitDateTo { get; set; }
 
-		public virtual ICollection<EvaluationRequestFieldsValue>? ServiceRequestFieldsValues { get; set; }
+        public virtual ICollection<EvaluationRequestFieldsValue>? ServiceRequestFieldsValues { get; set; }
 		public virtual ICollection<RequestAssignment>? Assignments { get; set; }
 	}
 }

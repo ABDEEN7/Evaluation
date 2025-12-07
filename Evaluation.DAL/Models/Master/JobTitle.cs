@@ -8,6 +8,7 @@ namespace Evaluation.DAL.Models.Master
         public string NameAr { get; set; } = null!;
         public string NameEn { get; set; } = null!;
         public string? HRCode { get; set; }
+        public bool IsOrgManager { get; set; }
         public int OrderNo { get; set; } = 999!;
 
     }

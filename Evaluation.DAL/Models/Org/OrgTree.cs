@@ -14,6 +14,10 @@ public class OrgTree : EntityBase , IAuditLogEntity
     public string? NSISCode { get; set; }
     public Guid OrgTypeId { get; set; }
     public OrgType? OrgType { get; set; }
-    public Guid OrgClassId { get; set; } 
+    public Guid OrgClassId { get; set; }
     public OrgClass? OrgClass { get; set; }
+    public bool IsAccredited { get; set; }
+    public DateOnly? AcceditedDate { get; set; }
+    public bool SupportIdentity { get; set; }
+    public DateOnly SupportIdentityDate { get; set; }
 }
