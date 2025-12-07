@@ -509,7 +509,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 									   .Select(c => c.Value).ToListAsync();
 
 			var attachments = await serviceScopeFactory.CreateScopedUow()
-									   .GetRepository<Attachment>()
+									   .GetRepository<EvalAttachment>()
 									   .GetAllQueryFiltered()
 									   .Where(c => c.ServiceRequestId == id || fields.Contains(c.Id.ToString()))
 									   .Select(m => new AttachementDTO()
@@ -573,7 +573,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 				.Distinct()
 				.ToList();
 
-			var attachments = await uow.GetRepository<Attachment>()
+			var attachments = await uow.GetRepository<EvalAttachment>()
 				.GetAllQueryFiltered()
 				.Where(a => a.ServiceRequestId == id || allAttachmentIds.Contains(a.Id.ToString()))
 				.Select(a => new AttachementDTO

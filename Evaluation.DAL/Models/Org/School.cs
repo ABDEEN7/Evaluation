@@ -16,6 +16,6 @@ public class School : OrgTree , IAuditLogEntity
     public string Code { get; set; } = null!;
     public string? Region { get; set; }
 
-    public ICollection<SchoolLevel>? SchoolLevel { get; set; }
+    public virtual ICollection<SchoolLevel>? SchoolLevel { get; set; }
     
 }

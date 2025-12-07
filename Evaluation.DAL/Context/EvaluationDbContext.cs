@@ -1,4 +1,5 @@
 ﻿using Evaluation.DAL.Extensions;
+using Evaluation.DAL.Models.Attachments;
 using Evaluation.DAL.Models.Audit;
 using Evaluation.DAL.Models.Authentication;
 using Evaluation.DAL.Models.BaseModule;
@@ -104,6 +105,8 @@ public partial class EvaluationDbContext : DbContext
     public virtual DbSet<OrgEvalResult> OrgEvalResults { get; set; }
     public virtual DbSet<UserTeam> UserTeams { get; set; }
     public virtual DbSet<RequestAssignmentScope> RequestAssignmentScopes { get; set; }
+    public virtual DbSet<EvalAttachment> EvalAttachments { get; set; }
+    public virtual DbSet<PlanTypeDep> PlanTypeDep { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {

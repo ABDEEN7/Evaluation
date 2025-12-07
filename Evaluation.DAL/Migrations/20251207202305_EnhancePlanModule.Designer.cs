@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Evaluation.DAL.Migrations
 {
     [DbContext(typeof(EvaluationDbContext))]
-    [Migration("20251127111358_deleted-un-needed-academicYearId")]
-    partial class deletedunneededacademicYearId
+    [Migration("20251207202305_EnhancePlanModule")]
+    partial class EnhancePlanModule
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -670,7 +670,7 @@ namespace Evaluation.DAL.Migrations
                     b.ToTable("ServiceAction");
                 });
 
-            modelBuilder.Entity("Evaluation.DAL.Models.Attachments.Attachment", b =>
+            modelBuilder.Entity("Evaluation.DAL.Models.Attachments.EvalAttachment", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -729,6 +729,9 @@ namespace Evaluation.DAL.Migrations
                     b.Property<bool>("IsOthers")
                         .HasColumnType("bit");
 
+                    b.Property<Guid>("OrgTreeId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid?>("ServiceRequestId")
                         .HasColumnType("uniqueidentifier");
 
@@ -756,9 +759,11 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("FieldId");
 
+                    b.HasIndex("OrgTreeId");
+
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("Attachment");
+                    b.ToTable("EvalAttachments");
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.Attachments.PlaceHolder", b =>
@@ -1158,8 +1163,8 @@ namespace Evaluation.DAL.Migrations
                     b.Property<Guid>("DepartmentId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("EndDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateOnly>("EndDate")
+                        .HasColumnType("date");
 
                     b.Property<bool?>("IsActive")
                         .ValueGeneratedOnAdd()
@@ -1182,8 +1187,8 @@ namespace Evaluation.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateOnly>("StartDate")
+                        .HasColumnType("date");
 
                     b.Property<Guid?>("UpdateById")
                         .HasColumnType("uniqueidentifier");
@@ -1346,7 +1351,7 @@ namespace Evaluation.DAL.Migrations
                     b.ToTable("PlanType");
                 });
 
-            modelBuilder.Entity("Evaluation.DAL.Models.Calendars.PlanTypeDepartment", b =>
+            modelBuilder.Entity("Evaluation.DAL.Models.Calendars.PlanTypeDep", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -1411,7 +1416,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("PlanTypeDepartment");
+                    b.ToTable("PlanTypeDep");
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.Calendars.Semester", b =>
@@ -1422,6 +1427,10 @@ namespace Evaluation.DAL.Migrations
 
                     b.Property<Guid>("AcademicYearId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("BackendName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
@@ -1450,6 +1459,9 @@ namespace Evaluation.DAL.Migrations
                         .HasColumnType("bit")
                         .HasDefaultValueSql("0");
 
+                    b.Property<string>("NSISCode")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("NameAr")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -1457,6 +1469,9 @@ namespace Evaluation.DAL.Migrations
                     b.Property<string>("NameEn")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("OrderNo")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
@@ -1841,6 +1856,150 @@ namespace Evaluation.DAL.Migrations
                     b.HasIndex("UpdateById");
 
                     b.ToTable("SystemModuleType");
+                });
+
+            modelBuilder.Entity("Evaluation.DAL.Models.EvalResult.DepEvalMatrix", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("AcademicYearId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("BackendName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("CreateById")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreateDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("getdate()");
+
+                    b.Property<Guid?>("DeleteById")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("DeleteDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool?>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValueSql("1");
+
+                    b.Property<bool?>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValueSql("0");
+
+                    b.Property<decimal>("MaxValue")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("MinValue")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("NameAr")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NameEn")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("NextEvaluationDays")
+                        .HasColumnType("int");
+
+                    b.Property<int>("NextFollowUpDays")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("RequiredFollowUp")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid?>("UpdateById")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("UpdateDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AcademicYearId");
+
+                    b.HasIndex("CreateById");
+
+                    b.HasIndex("DeleteById");
+
+                    b.HasIndex("UpdateById");
+
+                    b.ToTable("DepEvalMatrixs");
+                });
+
+            modelBuilder.Entity("Evaluation.DAL.Models.EvalResult.OrgEvalResult", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("AcademicYearId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("CreateById")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreateDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("getdate()");
+
+                    b.Property<Guid?>("DeleteById")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("DeleteDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("DepEvalMatrixId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("FinalEvalValue")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<bool?>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValueSql("1");
+
+                    b.Property<bool?>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValueSql("0");
+
+                    b.Property<Guid>("OrgTreeId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("UpdateById")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("UpdateDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AcademicYearId");
+
+                    b.HasIndex("CreateById");
+
+                    b.HasIndex("DeleteById");
+
+                    b.HasIndex("DepEvalMatrixId");
+
+                    b.HasIndex("OrgTreeId");
+
+                    b.HasIndex("UpdateById");
+
+                    b.ToTable("OrgEvalResults");
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.Exception.ExceptionLog", b =>
@@ -4047,6 +4206,9 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("BackendName")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
@@ -4413,6 +4575,9 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
                         .HasDefaultValueSql("0");
+
+                    b.Property<bool>("IsOrgManager")
+                        .HasColumnType("bit");
 
                     b.Property<string>("NameAr")
                         .IsRequired()
@@ -4824,6 +4989,9 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<DateOnly?>("AcceditedDate")
+                        .HasColumnType("date");
+
                     b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
@@ -4840,6 +5008,9 @@ namespace Evaluation.DAL.Migrations
 
                     b.Property<string>("HrCode")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsAccredited")
+                        .HasColumnType("bit");
 
                     b.Property<bool?>("IsActive")
                         .ValueGeneratedOnAdd()
@@ -4870,6 +5041,12 @@ namespace Evaluation.DAL.Migrations
 
                     b.Property<Guid>("OrgTypeId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("SupportIdentity")
+                        .HasColumnType("bit");
+
+                    b.Property<DateOnly>("SupportIdentityDate")
+                        .HasColumnType("date");
 
                     b.Property<Guid?>("UpdateById")
                         .HasColumnType("uniqueidentifier");
@@ -4928,6 +5105,9 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
                         .HasDefaultValueSql("0");
+
+                    b.Property<string>("NSISCode")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("SchoolId")
                         .HasColumnType("uniqueidentifier");
@@ -5839,7 +6019,7 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("AcademicYearId")
+                    b.Property<Guid?>("AcademicYearId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid?>("CreateById")
@@ -5876,10 +6056,10 @@ namespace Evaluation.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("PlanStatusId")
+                    b.Property<Guid?>("PlanStatusId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("PlanTypeDepartmentId")
+                    b.Property<Guid?>("PlanTypeDepId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid?>("SemesterId")
@@ -5904,7 +6084,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("PlanStatusId");
 
-                    b.HasIndex("PlanTypeDepartmentId");
+                    b.HasIndex("PlanTypeDepId");
 
                     b.HasIndex("SemesterId");
 
@@ -6077,6 +6257,10 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("BackendName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
@@ -6108,6 +6292,9 @@ namespace Evaluation.DAL.Migrations
                     b.Property<string>("NameEN")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("OrderNo")
+                        .HasColumnType("int");
 
                     b.Property<Guid?>("UpdateById")
                         .HasColumnType("uniqueidentifier");
@@ -6182,68 +6369,6 @@ namespace Evaluation.DAL.Migrations
                     b.ToTable("RequestAssign");
                 });
 
-            modelBuilder.Entity("Evaluation.DAL.Models.Planing.TeamsModule.ScopeUserTeam", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("CreateById")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreateDate")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("getdate()");
-
-                    b.Property<Guid?>("DeleteById")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("DeleteDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool?>("IsActive")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValueSql("1");
-
-                    b.Property<bool?>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValueSql("0");
-
-                    b.Property<Guid>("ScopeId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("TeamId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("UpdateById")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("UpdateDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreateById");
-
-                    b.HasIndex("DeleteById");
-
-                    b.HasIndex("ScopeId");
-
-                    b.HasIndex("TeamId");
-
-                    b.HasIndex("UpdateById");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("ScopeUserTeam");
-                });
-
             modelBuilder.Entity("Evaluation.DAL.Models.Planing.TeamsModule.Team", b =>
                 {
                     b.Property<Guid>("Id")
@@ -6304,6 +6429,63 @@ namespace Evaluation.DAL.Migrations
                     b.ToTable("Team");
                 });
 
+            modelBuilder.Entity("Evaluation.DAL.Models.Planing.TeamsModule.UserTeam", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("CreateById")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreateDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("getdate()");
+
+                    b.Property<Guid?>("DeleteById")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("DeleteDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool?>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValueSql("1");
+
+                    b.Property<bool?>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValueSql("0");
+
+                    b.Property<Guid>("TeamId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("UpdateById")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("UpdateDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreateById");
+
+                    b.HasIndex("DeleteById");
+
+                    b.HasIndex("TeamId");
+
+                    b.HasIndex("UpdateById");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserTeams");
+                });
+
             modelBuilder.Entity("Evaluation.DAL.Models.Planing.TeamsModule.UserTeamScope", b =>
                 {
                     b.Property<Guid>("Id")
@@ -6337,16 +6519,13 @@ namespace Evaluation.DAL.Migrations
                     b.Property<Guid>("ScopeId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("TeamId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<Guid?>("UpdateById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("UpdateDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<Guid>("UserTeamId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
@@ -6357,11 +6536,9 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("ScopeId");
 
-                    b.HasIndex("TeamId");
-
                     b.HasIndex("UpdateById");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserTeamId");
 
                     b.ToTable("UserTeamScope");
                 });
@@ -6560,6 +6737,9 @@ namespace Evaluation.DAL.Migrations
 
                     b.Property<string>("ServiceSettings")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("ShowInCalendar")
+                        .HasColumnType("bit");
 
                     b.Property<bool>("ShowInWebSite")
                         .HasColumnType("bit");
@@ -6785,6 +6965,63 @@ namespace Evaluation.DAL.Migrations
                     b.ToTable("RequestAssignment");
                 });
 
+            modelBuilder.Entity("Evaluation.DAL.Models.ServiceRequestEntities.RequestAssignmentScope", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("CreateById")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreateDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("getdate()");
+
+                    b.Property<Guid?>("DeleteById")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("DeleteDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool?>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValueSql("1");
+
+                    b.Property<bool?>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValueSql("0");
+
+                    b.Property<Guid>("RequestAssignmentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ScopeId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("UpdateById")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("UpdateDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreateById");
+
+                    b.HasIndex("DeleteById");
+
+                    b.HasIndex("RequestAssignmentId");
+
+                    b.HasIndex("ScopeId");
+
+                    b.HasIndex("UpdateById");
+
+                    b.ToTable("RequestAssignmentScopes");
+                });
+
             modelBuilder.Entity("Evaluation.DAL.Models.ServiceRequestEntities.ServiceRequest", b =>
                 {
                     b.Property<Guid>("Id")
@@ -6837,8 +7074,8 @@ namespace Evaluation.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Sequence")
-                        .HasColumnType("int");
+                    b.Property<long>("Sequence")
+                        .HasColumnType("bigint");
 
                     b.Property<Guid>("ServiceId")
                         .HasColumnType("uniqueidentifier");
@@ -6850,6 +7087,12 @@ namespace Evaluation.DAL.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("UpdateDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("VisitDateFrom")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("VisitDateTo")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
@@ -9339,6 +9582,9 @@ namespace Evaluation.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IsOrgManager")
+                        .HasColumnType("bit");
+
                     b.Property<Guid>("JobTitleId")
                         .HasColumnType("uniqueidentifier");
 
@@ -9797,35 +10043,48 @@ namespace Evaluation.DAL.Migrations
                     b.Navigation("UpdateBy");
                 });
 
-            modelBuilder.Entity("Evaluation.DAL.Models.Attachments.Attachment", b =>
+            modelBuilder.Entity("Evaluation.DAL.Models.Attachments.EvalAttachment", b =>
                 {
                     b.HasOne("Evaluation.DAL.Models.SystemLog.ActionTransactionsLog", "ActionTransactionsLog")
-                        .WithMany("ActionTransactionAttachments")
-                        .HasForeignKey("ActionTransactionsLogId");
+                        .WithMany("EvalAttachments")
+                        .HasForeignKey("ActionTransactionsLogId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Models.FormBuilder.Field", "ChildField")
                         .WithMany()
-                        .HasForeignKey("ChildFieldId");
+                        .HasForeignKey("ChildFieldId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "CreateBy")
                         .WithMany()
-                        .HasForeignKey("CreateById");
+                        .HasForeignKey("CreateById")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "DeleteBy")
                         .WithMany()
-                        .HasForeignKey("DeleteById");
+                        .HasForeignKey("DeleteById")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Models.Planing.EvaluationRequestEntity.EvaluationRequest", "EvaluationRequest")
                         .WithMany()
-                        .HasForeignKey("EvaluationRequestId");
+                        .HasForeignKey("EvaluationRequestId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Models.FormBuilder.Field", "Field")
                         .WithMany()
-                        .HasForeignKey("FieldId");
+                        .HasForeignKey("FieldId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Evaluation.DAL.Models.Org.OrgTree", "OrgTree")
+                        .WithMany()
+                        .HasForeignKey("OrgTreeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "UpdateBy")
                         .WithMany()
-                        .HasForeignKey("UpdateById");
+                        .HasForeignKey("UpdateById")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("ActionTransactionsLog");
 
@@ -9838,6 +10097,8 @@ namespace Evaluation.DAL.Migrations
                     b.Navigation("EvaluationRequest");
 
                     b.Navigation("Field");
+
+                    b.Navigation("OrgTree");
 
                     b.Navigation("UpdateBy");
                 });
@@ -9999,7 +10260,7 @@ namespace Evaluation.DAL.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Models.DepartementEntites.Department", "Department")
-                        .WithMany()
+                        .WithMany("AcademicYears")
                         .HasForeignKey("DepartmentId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -10074,7 +10335,7 @@ namespace Evaluation.DAL.Migrations
                     b.Navigation("UpdateBy");
                 });
 
-            modelBuilder.Entity("Evaluation.DAL.Models.Calendars.PlanTypeDepartment", b =>
+            modelBuilder.Entity("Evaluation.DAL.Models.Calendars.PlanTypeDep", b =>
                 {
                     b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "CreateBy")
                         .WithMany()
@@ -10290,6 +10551,86 @@ namespace Evaluation.DAL.Migrations
                     b.Navigation("DeleteBy");
 
                     b.Navigation("ParentModuleType");
+
+                    b.Navigation("UpdateBy");
+                });
+
+            modelBuilder.Entity("Evaluation.DAL.Models.EvalResult.DepEvalMatrix", b =>
+                {
+                    b.HasOne("Evaluation.DAL.Models.Calendars.AcademicYear", "AcademicYear")
+                        .WithMany()
+                        .HasForeignKey("AcademicYearId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "CreateBy")
+                        .WithMany()
+                        .HasForeignKey("CreateById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "DeleteBy")
+                        .WithMany()
+                        .HasForeignKey("DeleteById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "UpdateBy")
+                        .WithMany()
+                        .HasForeignKey("UpdateById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("AcademicYear");
+
+                    b.Navigation("CreateBy");
+
+                    b.Navigation("DeleteBy");
+
+                    b.Navigation("UpdateBy");
+                });
+
+            modelBuilder.Entity("Evaluation.DAL.Models.EvalResult.OrgEvalResult", b =>
+                {
+                    b.HasOne("Evaluation.DAL.Models.Calendars.AcademicYear", "AcademicYear")
+                        .WithMany()
+                        .HasForeignKey("AcademicYearId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "CreateBy")
+                        .WithMany()
+                        .HasForeignKey("CreateById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "DeleteBy")
+                        .WithMany()
+                        .HasForeignKey("DeleteById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Evaluation.DAL.Models.EvalResult.DepEvalMatrix", "DepEvalMatrix")
+                        .WithMany()
+                        .HasForeignKey("DepEvalMatrixId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Evaluation.DAL.Models.Org.OrgTree", "OrgTree")
+                        .WithMany()
+                        .HasForeignKey("OrgTreeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "UpdateBy")
+                        .WithMany()
+                        .HasForeignKey("UpdateById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("AcademicYear");
+
+                    b.Navigation("CreateBy");
+
+                    b.Navigation("DeleteBy");
+
+                    b.Navigation("DepEvalMatrix");
+
+                    b.Navigation("OrgTree");
 
                     b.Navigation("UpdateBy");
                 });
@@ -11888,8 +12229,8 @@ namespace Evaluation.DAL.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Evaluation.DAL.Models.Org.OrgTree", "School")
-                        .WithMany()
+                    b.HasOne("Evaluation.DAL.Models.Org.School", "School")
+                        .WithMany("SchoolLevel")
                         .HasForeignKey("SchoolId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -12409,8 +12750,7 @@ namespace Evaluation.DAL.Migrations
                     b.HasOne("Evaluation.DAL.Models.Calendars.AcademicYear", "AcademicYear")
                         .WithMany()
                         .HasForeignKey("AcademicYearId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "CreateBy")
                         .WithMany()
@@ -12425,14 +12765,12 @@ namespace Evaluation.DAL.Migrations
                     b.HasOne("Evaluation.DAL.Models.Planing.PlanStatus", "PlanStatus")
                         .WithMany()
                         .HasForeignKey("PlanStatusId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Evaluation.DAL.Models.Calendars.PlanTypeDepartment", "PlanTypeDepartment")
+                    b.HasOne("Evaluation.DAL.Models.Calendars.PlanTypeDep", "PlanTypeDep")
                         .WithMany()
-                        .HasForeignKey("PlanTypeDepartmentId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .HasForeignKey("PlanTypeDepId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Models.Calendars.Semester", "Semester")
                         .WithMany()
@@ -12452,7 +12790,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.Navigation("PlanStatus");
 
-                    b.Navigation("PlanTypeDepartment");
+                    b.Navigation("PlanTypeDep");
 
                     b.Navigation("Semester");
 
@@ -12595,70 +12933,28 @@ namespace Evaluation.DAL.Migrations
                     b.Navigation("UpdateBy");
                 });
 
-            modelBuilder.Entity("Evaluation.DAL.Models.Planing.TeamsModule.ScopeUserTeam", b =>
-                {
-                    b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "CreateBy")
-                        .WithMany()
-                        .HasForeignKey("CreateById");
-
-                    b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "DeleteBy")
-                        .WithMany()
-                        .HasForeignKey("DeleteById");
-
-                    b.HasOne("Evaluation.DAL.Models.FormsModules.Scope", "Scope")
-                        .WithMany()
-                        .HasForeignKey("ScopeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Evaluation.DAL.Models.Planing.TeamsModule.Team", "Team")
-                        .WithMany()
-                        .HasForeignKey("TeamId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "UpdateBy")
-                        .WithMany()
-                        .HasForeignKey("UpdateById");
-
-                    b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("CreateBy");
-
-                    b.Navigation("DeleteBy");
-
-                    b.Navigation("Scope");
-
-                    b.Navigation("Team");
-
-                    b.Navigation("UpdateBy");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("Evaluation.DAL.Models.Planing.TeamsModule.Team", b =>
                 {
                     b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "CreateBy")
                         .WithMany()
-                        .HasForeignKey("CreateById");
+                        .HasForeignKey("CreateById")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "DeleteBy")
                         .WithMany()
-                        .HasForeignKey("DeleteById");
+                        .HasForeignKey("DeleteById")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Models.DepartementEntites.Department", "Department")
                         .WithMany()
                         .HasForeignKey("DepartmentId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "UpdateBy")
                         .WithMany()
-                        .HasForeignKey("UpdateById");
+                        .HasForeignKey("UpdateById")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("CreateBy");
 
@@ -12667,6 +12963,46 @@ namespace Evaluation.DAL.Migrations
                     b.Navigation("Department");
 
                     b.Navigation("UpdateBy");
+                });
+
+            modelBuilder.Entity("Evaluation.DAL.Models.Planing.TeamsModule.UserTeam", b =>
+                {
+                    b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "CreateBy")
+                        .WithMany()
+                        .HasForeignKey("CreateById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "DeleteBy")
+                        .WithMany()
+                        .HasForeignKey("DeleteById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Evaluation.DAL.Models.Planing.TeamsModule.Team", "Team")
+                        .WithMany()
+                        .HasForeignKey("TeamId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "UpdateBy")
+                        .WithMany()
+                        .HasForeignKey("UpdateById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("CreateBy");
+
+                    b.Navigation("DeleteBy");
+
+                    b.Navigation("Team");
+
+                    b.Navigation("UpdateBy");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.Planing.TeamsModule.UserTeamScope", b =>
@@ -12685,19 +13021,13 @@ namespace Evaluation.DAL.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Evaluation.DAL.Models.Planing.TeamsModule.Team", "Team")
-                        .WithMany()
-                        .HasForeignKey("TeamId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "UpdateBy")
                         .WithMany()
                         .HasForeignKey("UpdateById");
 
-                    b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "User")
+                    b.HasOne("Evaluation.DAL.Models.Planing.TeamsModule.UserTeam", "UserTeam")
                         .WithMany()
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("UserTeamId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -12707,37 +13037,38 @@ namespace Evaluation.DAL.Migrations
 
                     b.Navigation("Scope");
 
-                    b.Navigation("Team");
-
                     b.Navigation("UpdateBy");
 
-                    b.Navigation("User");
+                    b.Navigation("UserTeam");
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.Planing.UserDepartment", b =>
                 {
                     b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "CreateBy")
                         .WithMany()
-                        .HasForeignKey("CreateById");
+                        .HasForeignKey("CreateById")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "DeleteBy")
                         .WithMany()
-                        .HasForeignKey("DeleteById");
+                        .HasForeignKey("DeleteById")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Models.DepartementEntites.Department", "Department")
-                        .WithMany()
+                        .WithMany("UserDepartments")
                         .HasForeignKey("DepartmentId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "UpdateBy")
                         .WithMany()
-                        .HasForeignKey("UpdateById");
+                        .HasForeignKey("UpdateById")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("CreateBy");
@@ -12815,26 +13146,29 @@ namespace Evaluation.DAL.Migrations
                 {
                     b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "CreateBy")
                         .WithMany()
-                        .HasForeignKey("CreateById");
+                        .HasForeignKey("CreateById")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "DeleteBy")
                         .WithMany()
-                        .HasForeignKey("DeleteById");
+                        .HasForeignKey("DeleteById")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Models.UserEntiy.PartyType", "PartyType")
                         .WithMany()
                         .HasForeignKey("PartyTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "UpdateBy")
                         .WithMany()
-                        .HasForeignKey("UpdateById");
+                        .HasForeignKey("UpdateById")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Models.ServiceEnities.Service", "service")
-                        .WithMany()
+                        .WithMany("ServiceInitiatorPartyType")
                         .HasForeignKey("serviceId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("CreateBy");
@@ -12932,6 +13266,46 @@ namespace Evaluation.DAL.Migrations
                     b.Navigation("PartyType");
 
                     b.Navigation("ServiceRequest");
+
+                    b.Navigation("UpdateBy");
+                });
+
+            modelBuilder.Entity("Evaluation.DAL.Models.ServiceRequestEntities.RequestAssignmentScope", b =>
+                {
+                    b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "CreateBy")
+                        .WithMany()
+                        .HasForeignKey("CreateById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "DeleteBy")
+                        .WithMany()
+                        .HasForeignKey("DeleteById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Evaluation.DAL.Models.ServiceRequestEntities.RequestAssignment", "RequestAssignment")
+                        .WithMany()
+                        .HasForeignKey("RequestAssignmentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Evaluation.DAL.Models.FormsModules.Scope", "Scope")
+                        .WithMany()
+                        .HasForeignKey("ScopeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "UpdateBy")
+                        .WithMany()
+                        .HasForeignKey("UpdateById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("CreateBy");
+
+                    b.Navigation("DeleteBy");
+
+                    b.Navigation("RequestAssignment");
+
+                    b.Navigation("Scope");
 
                     b.Navigation("UpdateBy");
                 });
@@ -13175,31 +13549,35 @@ namespace Evaluation.DAL.Migrations
                 {
                     b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "CreateBy")
                         .WithMany()
-                        .HasForeignKey("CreateById");
+                        .HasForeignKey("CreateById")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "DeleteBy")
                         .WithMany()
-                        .HasForeignKey("DeleteById");
+                        .HasForeignKey("DeleteById")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Models.ActionEntities.ServiceAction", "ServiceAction")
                         .WithMany()
                         .HasForeignKey("ServiceActionId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Evaluation.DAL.Models.ServiceRequestEntities.ServiceRequest", "ServiceRequest")
                         .WithMany()
                         .HasForeignKey("ServiceRequestId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Evaluation.DAL.Models.DepartementEntites.SystemModule", "SystemModule")
                         .WithMany()
-                        .HasForeignKey("SystemModuleId");
+                        .HasForeignKey("SystemModuleId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "UpdateBy")
                         .WithMany()
-                        .HasForeignKey("UpdateById");
+                        .HasForeignKey("UpdateById")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("CreateBy");
 
@@ -14128,6 +14506,13 @@ namespace Evaluation.DAL.Migrations
                     b.Navigation("NextStatusConfiguration");
                 });
 
+            modelBuilder.Entity("Evaluation.DAL.Models.DepartementEntites.Department", b =>
+                {
+                    b.Navigation("AcademicYears");
+
+                    b.Navigation("UserDepartments");
+                });
+
             modelBuilder.Entity("Evaluation.DAL.Models.DepartementEntites.SystemModule", b =>
                 {
                     b.Navigation("Services");
@@ -14181,6 +14566,8 @@ namespace Evaluation.DAL.Migrations
 
                     b.Navigation("RequestShowPartyType");
 
+                    b.Navigation("ServiceInitiatorPartyType");
+
                     b.Navigation("Statuses");
                 });
 
@@ -14204,7 +14591,7 @@ namespace Evaluation.DAL.Migrations
 
             modelBuilder.Entity("Evaluation.DAL.Models.SystemLog.ActionTransactionsLog", b =>
                 {
-                    b.Navigation("ActionTransactionAttachments");
+                    b.Navigation("EvalAttachments");
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.UserEntiy.MinistryUser", b =>
@@ -14212,6 +14599,11 @@ namespace Evaluation.DAL.Migrations
                     b.Navigation("UserPartTypes");
 
                     b.Navigation("UserRoles");
+                });
+
+            modelBuilder.Entity("Evaluation.DAL.Models.Org.School", b =>
+                {
+                    b.Navigation("SchoolLevel");
                 });
 #pragma warning restore 612, 618
         }

@@ -3,7 +3,7 @@ using Evaluation.DAL.Models.DepartementEntites;
 
 namespace Evaluation.DAL.Models.Calendars;
 
-public class PlanTypeDepartment : EntityBase
+public class PlanTypeDep : EntityBase
 {
     public string NameAr { get; set; } = null!;
     public string NameEn { get; set; } = null!;

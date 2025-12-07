@@ -14,12 +14,12 @@ public class Department : EntityBase
     public string DepIcon { get; set; } = null!;
     public Guid? TargetOrgTreeId { get; set; }
     public OrgTree? TargetOrgTree { get; set; }
-    public Category? Category { get; set; }
     public Guid CategoryId { get; set; }
+    public Category? Category { get; set; }
     public bool IsNDA { get; set; }
     public string? DescAr { get; set; }
     public string? DescEn { get; set; }
     public int OrderNo { get; set; } = 0;
-    public ICollection<UserDepartment> UserDepartments { get; set; }
-    public ICollection<AcademicYear> AcademicYears { get; set; }
+    public virtual ICollection<UserDepartment>? UserDepartments { get; set; }
+    public virtual ICollection<AcademicYear>? AcademicYears { get; set; }
 }

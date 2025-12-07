@@ -25,7 +25,7 @@ namespace Evaluation.SharedHelper.Enums
     public enum UserType
     {
         Ministry = 0,
-        API = 1,
+        SchoolManager=1,
     }
 
     public enum DBResult

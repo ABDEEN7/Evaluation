@@ -28,7 +28,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
         public async Task<string?> GetAttachmentById(Guid attachmentId, Guid requestId)
         {
             var attachment = await serviceScopeFactory.CreateScopedUow()
-                                    .GetRepository<Attachment>()
+                                    .GetRepository<EvalAttachment>()
                                     .GetAllQueryFiltered(x => x.Id == attachmentId ).FirstOrDefaultAsync();
             if (null == attachment)
             {
@@ -38,10 +38,10 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                 return StorageService.GenerateSasToken(attachment.FileName, uiFileName: attachment.UiFileName);
 
         } 
-        public async Task<Attachment?> GetRequestAttachmentsByfieldId(Guid fieldId, Guid requestId)
+        public async Task<EvalAttachment?> GetRequestAttachmentsByfieldId(Guid fieldId, Guid requestId)
         {
             var attachment = await serviceScopeFactory.CreateScopedUow()
-                                    .GetRepository<Attachment>()
+                                    .GetRepository<EvalAttachment>()
                                     .GetAllQueryFiltered(x => x.FieldId == fieldId && x.ServiceRequestId == requestId).FirstOrDefaultAsync();
             
                 return attachment;
@@ -60,7 +60,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                         throw new BusinessException(ConstantKeys.ExceptionMessage.IncompleteRequest);
                     }
 
-                    var attachmentsToBeInserted = new List<Attachment>();
+                    var attachmentsToBeInserted = new List<EvalAttachment>();
                     uploadedFiles.ForEach(fileDTO =>
                     {
 
@@ -69,7 +69,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
                         if (field != null)
                         {
-                            var attachment = new Attachment
+                            var attachment = new EvalAttachment
                             {
                                 FieldId = field.FieldId,
                                 FileName = fileDTO.CustomFileName,
@@ -122,7 +122,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             }
             return FieldValueDTOs;
         }
-        public async Task<List<Attachment>> UploadAndInsertOtherAttachments(List<IFormFile> files, Guid? actionlog,Guid? EvaluationRequestId)
+        public async Task<List<EvalAttachment>> UploadAndInsertOtherAttachments(List<IFormFile> files, Guid? actionlog,Guid? EvaluationRequestId)
         {
             if (files.Any())
             {
@@ -135,10 +135,10 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                     {
                         throw new BusinessException(ConstantKeys.ExceptionMessage.IncompleteRequest);
                     }
-                    var attachmentsToBeInserted = new List<Attachment>();
+                    var attachmentsToBeInserted = new List<EvalAttachment>();
                     uploadedFiles.ForEach(fileDTO =>
                     {
-                        var attachment = new Attachment()
+                        var attachment = new EvalAttachment()
                         {
                             ActionTransactionsLogId = actionlog,
                             FileName = fileDTO.CustomFileName,
@@ -163,9 +163,9 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             return null!;
 
         }
-        public async Task<IEnumerable<Attachment>> InsertAttachments(List<Attachment> attachments)
+        public async Task<IEnumerable<EvalAttachment>> InsertAttachments(List<EvalAttachment> attachments)
         {
-            return await uow.GetRepository<Attachment>().InsertRange(attachments);
+            return await uow.GetRepository<EvalAttachment>().InsertRange(attachments);
         }
         public Guid? GetFieldIdFromFile(string contentDisposition, int index)
         {
@@ -254,7 +254,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             if (uploadedFile == null)
                 return null;
 
-            var attachment = new Attachment
+            var attachment = new EvalAttachment
             {
                 FieldId = parentFieldId,
                 ChildFieldId = childFieldId,
@@ -266,7 +266,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                 ServiceRequestId = ServiceRequestId
             };
 
-            var inserted = await InsertAttachments(new List<Attachment> { attachment });
+            var inserted = await InsertAttachments(new List<EvalAttachment> { attachment });
             var savedAttachment = inserted.FirstOrDefault();
 
             return savedAttachment?.Id.ToString();
@@ -282,7 +282,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                 .ToList();
 
             var attachments = await serviceScopeFactory.CreateScopedUow()
-                .GetRepository<Attachment>()
+                .GetRepository<EvalAttachment>()
                 .GetAllQueryFiltered()
                 .Where(c => attachmentGuids.Contains(c.Id))
                 .Select(m => new AttachementDTO
@@ -298,7 +298,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             if (!Guid.TryParse(attachmentId, out var id))
                 throw new BusinessException("Invalid attachment id.");
 
-            var repo = serviceScopeFactory.CreateScopedUow().GetRepository<Attachment>();
+            var repo = serviceScopeFactory.CreateScopedUow().GetRepository<EvalAttachment>();
             var attachment = await repo.GetAllQueryFiltered(x => x.Id == id).FirstOrDefaultAsync();
 
             if (attachment == null)
@@ -309,10 +309,10 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
             return bytes;
         }
-        public async Task<IReadOnlyList<Attachment>> UpdateRequestAttachmentsAsync(Guid requestId,Guid EvaluationRequestId)
+        public async Task<IReadOnlyList<EvalAttachment>> UpdateRequestAttachmentsAsync(Guid requestId,Guid EvaluationRequestId)
         {
             using var scopedUow = serviceScopeFactory.CreateScopedUow();
-            var repo = scopedUow.GetRepository<Attachment>();
+            var repo = scopedUow.GetRepository<EvalAttachment>();
 
             var attachments = await repo
                 .GetAllQueryFiltered(a => a.ServiceRequestId == requestId)

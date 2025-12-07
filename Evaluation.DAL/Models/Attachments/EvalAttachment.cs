@@ -1,16 +1,19 @@
 ﻿using Evaluation.DAL.Models.Audit;
 using Evaluation.DAL.Models.BaseModule;
 using Evaluation.DAL.Models.FormBuilder;
+using Evaluation.DAL.Models.Org;
 using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
 using Evaluation.DAL.Models.SystemLog;
 
 namespace Evaluation.DAL.Models.Attachments
 {
-    public class Attachment : EntityBase, IAuditLogEntity
+    public class EvalAttachment : EntityBase, IAuditLogEntity
     {
       
         public Guid? ActionTransactionsLogId { get; set; }
         public ActionTransactionsLog? ActionTransactionsLog { get; set; }
+        public Guid OrgTreeId { get; set; }
+        public OrgTree? OrgTree { get; set; }
         public Guid? FieldId { get; set; }
         public Field? Field { get; set; }
         public Guid? ServiceRequestId { get; set; }
