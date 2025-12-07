@@ -35,17 +35,50 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
 
         var form = mapper.Map<FormEvaluationValue>(formEvaluationDto);
 
-        foreach (var item in form.Items)
-        {
-            item.UserId = userId.Value;
-        }
+        var evalForm = await formService.GetEvalForm(formEvaluationDto.Id);
 
-        foreach (var item in form.SubItems)
+        if (evalForm != null)
         {
-            item.UserId = userId.Value;
-        }
+            if (evalForm.HasOneValue)
+            {
+                foreach (var item in form.Items)
+                {
+                    var formItemsValue = await formService.GetFormItemValue(item.Id);
+                    if (formItemsValue != null)
+                    {
+                        formItemsValue.Value = item.Value;
+                        formItemsValue.Note = item.Note;
+                    }
+                    await formService.UpdateFormItemValue(formItemsValue);
+                }
 
-        await formService.SaveFormItemsAndSubs(form);
+                foreach (var item in form.SubItems)
+                {
+                    var subFormItemsValue = await formService.GetSubFormItemValue(item.Id);
+                    if (subFormItemsValue != null)
+                    {
+                        subFormItemsValue.FieldDropDownValueId = item.FieldDropDownValueId;
+                        subFormItemsValue.Note = item.Note;
+                    }
+                    await formService.UpdateSubFormItemValue(subFormItemsValue);
+                }
+                await formService.SaveFormItemsAndSubs(form);
+            }
+        }
+        else
+        {
+            foreach (var item in form.Items)
+            {
+                item.UserId = userId.Value;
+            }
+
+            foreach (var item in form.SubItems)
+            {
+                item.UserId = userId.Value;
+            }
+
+            await formService.SaveFormItemsAndSubs(form);
+        }
 
         return Result.Ok(formEvaluationDto);
     }

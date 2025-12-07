@@ -21,6 +21,11 @@ public class FormService(IServiceScopeFactory serviceScopeFactory,
     RequestInfo requestInfo
     ) : ApiBase(serviceScopeFactory, cacheDataProvider, unitOfWork, loggingServices, mapper, userInfo, serviceProvider, requestInfo)
 {
+    public async Task<EvalForm> GetEvalForm(Guid id)
+    {
+        return await unitOfWork.GetRepository<EvalForm>().GetByIdAsync(id);
+    }
+
     public async Task<List<FormItem>> GetFormItems()
     {
         var formItems = await unitOfWork.GetRepository<FormItem>()
