@@ -40,7 +40,10 @@ namespace Evaluation.API.Middlewares
 				"CreateEvaluationPlan",
 				"EditEvaluationPlan",
 				"DeleteEvaluationPlan",
-				"ApproveEvaluation"
+				"ApproveEvaluation",
+                "GET_FORM_ITEMS",
+                "SAVE_EVALUATION",
+                "UPDATE_EVALUATION"
 			};
 
 			await _next(context);

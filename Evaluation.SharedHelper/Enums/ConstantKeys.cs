@@ -504,7 +504,12 @@ public static class ConstantKeys
     public static class CustomDataSource
     {
     }
-
+    public static class WebPermissions
+    {
+        public const string GET_FORM_ITEMS = "GET_FORM_ITEMS";
+        public const string SAVE_EVALUATION_FORM = "SAVE_EVALUATION_FORM";
+        public const string UPDATE_EVALUATION_FORM = "UPDATE_EVALUATION_FORM";
+    }
     public static class WebAppSettings
     {
         public static readonly string PAGE_SIZE = "PAGE_SIZE";

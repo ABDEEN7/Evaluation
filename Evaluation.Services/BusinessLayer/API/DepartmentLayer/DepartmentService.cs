@@ -21,10 +21,10 @@ public class DepartmentService(IServiceScopeFactory serviceScopeFactory,
 {
     public async Task<List<Department>> GetAllDepartments()
     {
-        var x = await unitOfWork.GetRepository<Department>()
+        var departments = await unitOfWork.GetRepository<Department>()
             .GetAllActiveNonDeleted().Include(d=>d.Category)
             .ToListAsync();
-        return x;
+        return departments;
     }
     public async Task<Guid?> GetDepartmentIdAsync()
     {

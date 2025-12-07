@@ -29,14 +29,6 @@ namespace Evaluation.API.ActionFilter
             var actionName = context.ActionDescriptor.RouteValues["action"];
             var controllerName = context.ActionDescriptor.RouteValues["controller"];
 
-            // ✅ Skip permission check for students ONLY on SetAllNotificationsAsRead
-            if (userBasicInfo.UserType == "Student" &&
-                controllerName == "Notification")
-            {
-                await next();
-                return;
-            }
-
             bool CheckPermision = false;
 
             if (PermisionNames != null && PermisionNames.Count() > 0)
