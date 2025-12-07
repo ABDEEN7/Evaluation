@@ -54,6 +54,7 @@ public static class ConstantKeys
         //Plan 
         public const string ADD_WEB_PLAN_REQUEST = "ADD_WEB_PLAN_REQUEST";
         public const string UPDATE_WEB_PLAN_REQUEST = "UPDATE_WEB_PLAN_REQUEST";
+        public const string GET_WEB_PLAN_DETAILS_REQUEST = "GET_WEB_PLAN_DETAILS_REQUEST";
         public const string APPROVE_WEB_PLAN_REQUEST = "APPROVE_WEB_PLAN_REQUEST";
         public const string GET_SEMESTERS_REQUEST = "GET_SEMESTERS_REQUEST";
 

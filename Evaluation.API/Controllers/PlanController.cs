@@ -12,13 +12,6 @@ namespace Evaluation.API.Controllers;
 [Route("api/[controller]/[action]")]
 public class PlanController(MasterBL masterBL) : ControllerBase
 {
-    [HttpGet]
-    public async Task<IActionResult> GetPlanById(Guid planId)
-    {
-        var plan = await masterBL.GetApiService<PlanServiceRequestServices>().GetPlanByIdAsync(planId);
-        return Ok(new { result = plan });
-    }
-
     [HttpPost]
     [CheckRolePermisionFilter(true, ConstantKeys.WebPermission.ADD_WEB_PLAN_REQUEST)]
     public async Task<IActionResult> Create([FromBody] CreateEvaluationPlanDto planRequest)
@@ -56,6 +49,7 @@ public class PlanController(MasterBL masterBL) : ControllerBase
         //return semester.ToActionResult();
     }
     [HttpGet("{planId:guid}")]
+    [CheckRolePermisionFilter(true,ConstantKeys.WebPermission.GET_WEB_PLAN_DETAILS_REQUEST)]
     public async Task<IActionResult> GetPlanDetails(Guid planId)
     {
         var plan = await masterBL.GetApiService<PlanServiceRequestServices>().GetPlanByIdAsync(planId);

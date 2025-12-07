@@ -23,7 +23,7 @@ $(document).ready(function () {
  * Load plan data by ID
  */
 function loadPlanData(planId) {
-    jqClient().Get(`/PlanMocks/GetPlanById?planId=${planId}`)
+    jqClient().Get(`/PlanMocks/GetPlanDetails?planId=${planId}`)
         .done((result) => {
             if (result && result.result) {
                 existingPlanData = result.result;
