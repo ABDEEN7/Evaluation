@@ -100,21 +100,27 @@ public class PlanServiceRequestServices(
 
         return await ExecuteWithResult(async () =>
         {
+            // Get department id
             Guid? departmentId = await departmentService.GetDepartmentIdAsync();
+            // Get academic year id
             Guid academicYearId = await academicYearRepository.GetAcademicYearId(departmentId);
+            // Get status 'Approved'
             Guid statusId = await
             unitOfWork
             .GetRepository<PlanStatus>()
             .GetAllActiveNonDeleted(x => x.NameEN == "Approved")
             .Select(x=>x.Id)
             .FirstOrDefaultAsync();
+
+            // Assign system-generated values
             modelDto.PlanStatusId = statusId;
             modelDto.AcademicYearId = academicYearId;
-            Plan plan = modelDto.ToPlan();
 
+            // Convert DTO to entity
+            Plan plan = modelDto.ToPlan();
             plan.PlanJsonValue = JsonConvert.SerializeObject(modelDto);
 
-            var result = await planRepository.ApprovePlans(plan);
+            var result = await planRepository.ApprovePlansAsync(plan);
         });
     }
 

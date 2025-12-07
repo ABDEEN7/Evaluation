@@ -38,33 +38,15 @@ public class PlanRequestRepository(IServiceScopeFactory serviceScopeFactory,
         await unitOfWork.CommitAsync();
     return  true;
 }
-    public async Task<bool> ApprovePlans(Plan model)
+    public async Task<Plan> ApprovePlansAsync(Plan model)
     {
-        //Get id of school that we will evaluate
-        //List<Guid> schoolIds = plan.Schools.Select(s => s.Id).ToList();
-        //var selectedSchool = unitOfWork
-        //    .GetRepository<School>();
+        if (model == null)
+            throw new ArgumentNullException(nameof(model));
 
-        //.GetAllActiveNonDeleted(x => schoolIds.Contains(x.Id));
+        await unitOfWork.GetRepository<Plan>().InsertAsync(model);
+        await unitOfWork.CommitAsync();
 
-        //added selected school to the plan 
-        //plan.PlanSchedules = selectedSchool.Select(school => new PlanSchedule
-        //{
-        //    SchoolId = school.Id,
-        //    School = school
-        //}).ToList();
-        try
-        {
-
-            await unitOfWork.GetRepository<Plan>().InsertAsync(model);
-            await unitOfWork.CommitAsync();
-            return true;
-        }
-        catch (Exception ex)
-        {
-
-            throw ex;
-        }
+        return model;
     }
     public async Task<bool> DeleteEvaluationPlan(Guid? id)
     {
