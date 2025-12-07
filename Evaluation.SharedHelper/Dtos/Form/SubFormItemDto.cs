@@ -1,4 +1,4 @@
-﻿namespace Evaluation.DAL.Dtos;
+﻿namespace Evaluation.DAL.Dtos.Form;
 
 public class SubFormItemDto
 {

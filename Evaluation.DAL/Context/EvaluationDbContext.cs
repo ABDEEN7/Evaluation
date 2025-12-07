@@ -53,7 +53,7 @@ public partial class EvaluationDbContext : DbContext
     public virtual DbSet<EvaluationParty> EvaluationParties { get; set; }
     public virtual DbSet<EvalForm> EvalForms { get; set; }
     public virtual DbSet<FormScope> FormScopes { get; set; }
-    public virtual DbSet<FormItem> FormItems { get; set; }
+    public virtual DbSet<FormItem> FormItem { get; set; }
     public virtual DbSet<FormItemValue> FormItemValues { get; set; }
     public virtual DbSet<Scope> Scopes { get; set; }
     public virtual DbSet<ScopeType> ScopeTypes { get; set; }
@@ -97,7 +97,6 @@ public partial class EvaluationDbContext : DbContext
     public virtual DbSet<EvaluationType> EvaluationType { get; set; }
     public virtual DbSet<DepartmentHoliday> DepartmentHolidays { get; set; }
     public virtual DbSet<Semester> Semesters { get; set; }
-    public virtual DbSet<FormItem> FormItem { get; set; }
     public virtual DbSet<EvalFormType> EvalFormType { get; set; }
     public virtual DbSet<SubFormItem> SubFormItems { get; set; }
     public virtual DbSet<SubFormItemValue> SubFormItemValues { get; set; }

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Evaluation.DAL.Models.FormsModules
 {
-    public class FormEvalMarix :EntityBase,IAuditLogEntity
+    public class FormEvalMatrix :EntityBase,IAuditLogEntity
     {
         public Guid DepartmentId { get; set; }
         public Department? Department { get; set; }

@@ -4,6 +4,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+	<NoWarn>$(NoWarn);S101;S6960;S6932,S2325</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

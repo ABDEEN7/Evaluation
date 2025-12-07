@@ -13,6 +13,6 @@ namespace Evaluation.DAL.Models.FormsModules
         public string NameAr { get; set; } = null!;
         public string NameEn { get; set; } = null!;
         public string BackendName { get; set; } = null!;
-        public string OrderNo { get; set; } = null!;
+        public int OrderNo { get; set; } = 0;
     }
 }

@@ -2,6 +2,7 @@
 using Evaluation.DAL.Models.Calendars;
 using Evaluation.DAL.Models.Org;
 using Evaluation.DAL.Models.Planing;
+using Evaluation.DAL.Models.Website;
 
 namespace Evaluation.DAL.Models.DepartementEntites;
 
@@ -12,6 +13,8 @@ public class Department : EntityBase
     public string RoutingPath { get; set; } = null!;
     public string BackendName { get; set; } = null!;
     public string DepIcon { get; set; } = null!;
+    public Guid? WebsiteAttachmentId { get; set; }
+    public WebsiteAttachment? WebsiteAttachment { get; set; }
     public Guid? TargetOrgTreeId { get; set; }
     public OrgTree? TargetOrgTree { get; set; }
     public Guid CategoryId { get; set; }
