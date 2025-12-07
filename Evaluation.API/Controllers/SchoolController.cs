@@ -41,7 +41,7 @@ public class SchoolController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<bool> AddUpdateOrgTree(string? hrCode = null ,long? qID = null)
+    public async Task<bool> AddUpdateOrgTree(string? hrCode = null, long? qID = null)
     {
         return await _hrService.AddUpdateOrgTree(hrCode, qID);
     }
@@ -59,7 +59,7 @@ public class SchoolController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetSchools([FromQuery] SchoolRequest request)
     {
-        List<ResponseSchools> schooldetails = await _masterBl.GetApiService<SchoolBL>().GetSchools(request);
-        return Ok(new { result = schooldetails });
+        var result = await _masterBl.GetApiService<SchoolBL>().GetSchools(request);
+        return Ok(result);
     }
 }

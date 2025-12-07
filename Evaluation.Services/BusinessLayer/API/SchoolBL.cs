@@ -8,8 +8,10 @@ using Evaluation.Services.Special;
 using Evaluation.SharedHelper;
 using Evaluation.SharedHelper.Consts;
 using Evaluation.SharedHelper.Dtos.SchoolDto;
+using Evaluation.SharedHelper.Extensions;
 using Evaluation.SharedHelper.Helper;
 using Evaluation.SharedHelper.Models;
+using FluentResults;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -31,16 +33,10 @@ public class SchoolBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvide
                .FirstOrDefaultAsync();
         return schoolData;
     }
-    public async Task<List<ResponseSchools>> GetSchools(SchoolRequest request)
+    public async Task<PaginatedResult<ResponseSchools>> GetSchools(SchoolRequest request)
     {
-        var filter = BuildFilterExpression(request);
-        var schools = schoolRepository.GetSchools(filter);
-
-        return await
-            schools
-            .OrderByDescending(s => s.EstablishmentDate)
-            .Select(SchoolProjection(requestInfo.Lang))
-            .ToListAsync();
+        var result = await schoolRepository.GetSchoolsAsync(request);
+        return mapper.Map<PaginatedResult<ResponseSchools>>(result);
     }
     public async Task<List<SchoolVisits>> GetVisitsAsync()
     {
@@ -50,32 +46,5 @@ public class SchoolBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvide
             Id = x.Id,
             Name = LanguageStatic.SelectLang(requestInfo.Lang, x.NameAr, x.NameEn)
         }).ToListAsync();
-    }
-    private static Expression<Func<School, ResponseSchools>> SchoolProjection(string lang)
-    {
-        return s => new ResponseSchools
-        {
-            Id = s.Id,
-            Name = LanguageStatic.SelectLang(lang, s.NameAr, s.NameEn),
-            Rating = s.SchoolLevel
-            .OrderByDescending(c => c.CreateDate)
-            .Select(c => c.EducationLevel.BackendName)
-            .FirstOrDefault()
-        };
-    }
-    private Expression<Func<School, bool>> BuildFilterExpression(SchoolRequest request)
-    {
-        Expression<Func<School, bool>> filter = s => true;
-        if (!string.IsNullOrWhiteSpace(request.Name))
-            filter = filter.And(s => s.NameEn.Contains(request.Name) || s.NameAr.Contains(request.Name));
-        if (request.EstablishmentDate != null)
-        {
-            int year = request.EstablishmentDate.Value.Year;
-            filter = filter.And(s => s.EstablishmentDate.Year == year);
-        }
-        //if(request.VisitType != null)
-        //    filter = filter.And(x=>x.)
-        return filter;
-
     }
 }

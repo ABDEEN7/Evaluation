@@ -109,7 +109,7 @@
 
         return jqClient().Get(`${API_ENDPOINTS.GET_SCHOOLS}?${params.toString()}`)
             .done(result => {
-                const data = result?.result || [];
+                const data = result?.items || [];
                 ns.allSchools = data;
                 ns.filteredSchools = data;
 
