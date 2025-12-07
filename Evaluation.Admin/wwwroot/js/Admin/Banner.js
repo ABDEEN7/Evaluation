@@ -104,7 +104,7 @@ const deleteData = (id) => {
         }    });
 
 
-    dialogElem = commonUtil.createDailog({ dailogId: dailogId });    loadData();        document.getElementById(btnAddContentId).addEventListener('click', event => {        sharedFn().ClearForm();        sharedFn().EditMode();
+    dialogElem = commonUtil.createDailog({ dailogId: dailogId });    loadData();        $(`#${btnAddContentId}`).click(function (e) {        sharedFn().ClearForm();        sharedFn().EditMode();
         sharedFn().SetDefaultValueFromConfig();
     });
        $("#btn-submit").click(function (e) {

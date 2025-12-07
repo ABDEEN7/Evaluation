@@ -1,10 +1,9 @@
 ﻿
-let showMore = false, table = null, dialogElem = null, tree = null, selectedtree=null;
+let showMore = false, table = null, dialogElem = null;
 const dailogId = commonUtil.CONTENT_DAILOG_ID;
 let currentPage = 0;
 let isSearch = false;
 let isLoading = true;
-let isfirstload = true;
 
 
 const btnAddContentId = 'btn-add-content',
@@ -17,45 +16,48 @@ const gridContainerId = "view-container",
     $tblContentContainer = $('#' + tblContentContainerId),
     $btnAddContent = $('#' + btnAddContentId);
 
-IconPicker.Init({
-    jsonUrl: '../lib/iconpicker/dist/iconpicker-1.5.0.json',
-    searchPlaceholder: 'Search Icon',
-    showAllButton: 'Show All',
-    cancelButton: 'Cancel',
-    noResultsFound: 'No results found.',
-    borderRadius: '20px',
-});
+function ClearControlByPage() {
+    $("#RoleCloneRole").parent().hide();
+}
 
-const loadData = (isSearch) => {
-    isLoading = true;
+
+const loadData = (isScroll) => {
    
+    isLoading = true;
     const options = {
         success: function (data) {
+            if (isScroll) {
+                showMore = true;
+            } else {
+
+                showMore = true;
+            }
             if (data) {
 
+                const _isInit = isScroll ? false : true;
+                if (!data || data.length <= 0) {
+                    showMore = false;
 
-                if (data && data.length > 0) {
-                    if (isSearch) {
-                        table.setData([]).then(function () {
-                            setAllColumnWidths(table, columnWidths);
-                        });
-                        currentPage = 1;
+                    if (!isScroll) {
+                        table.setData([]);
                     }
-
-                    table.addData(data).then(function () {
-                        setAllColumnWidths(table, columnWidths);
-                    });
-                    currentPage = currentPage + 1;
+                    return;
+                } else {
                     isLoading = false;
+                    currentPage++;
+                    showMore = true;
+                    if (_isInit) {
+                        table.setData(data);
+                    } else {
+                        table.addData(data);
+                    }
                 }
-               
             }
         }
     };
+    jqClientAdvanced(options).Get("Role/GetAllRole".concat('?Page=', currentPage));
 
-    jqClientAdvanced(options).Get("Department/GetAllDepartment".concat('?page=', currentPage));
 };
-
 
 
 
@@ -75,14 +77,16 @@ const deleteData = (id) => {
                         table.deleteRow(id);
                         notificationUtil.success(sharedFn().GetUiControlText('ADMIN_MSG_DELETE'));
                     }
-
+                    else if (data.responseStatus == '4') {
+                        notificationUtil.error(sharedFn().GetUiControlText('ROLE_CANNOT_BE_DELETED'));
+                    }
                     else {
                         notificationUtil.error(data.message);
                     }
                 }
             }
         };
-        jqClientAdvanced(options).Post("Department/DeleteDepartment".concat('?Id=', id));
+        jqClientAdvanced(options).Post("Role/DeleteRole".concat('?Id=', id));
 
     });
 
@@ -92,22 +96,16 @@ const deleteData = (id) => {
 
 
 
-
-
-
-
 $(window).scroll(function () {
     if ($(window).scrollTop() >= ($(document).height() - $(window).height()) * .60) {
         if (!isLoading) {
-            loadData();
+            loadData(true);
         }
     }
 });
-
-
 $(document).ready(function () {
-    
-    
+
+   
     table = tableUtil.createTabulator({
         id: gridContainerId,
         config: {
@@ -121,71 +119,35 @@ $(document).ready(function () {
         sortColumn: "updateDate",
         sortDir: "desc",
         columns: TableColumns,
-        rowMoved: function (row) {
-            var request = [];
-            table.getData().map(function (d, index) {
-
-                request.push({
-                    "Id": d.id,
-                    "OrderNo": index
-                });
-            });
-            var formData = new FormData();
-            //debugger
-            formData.append('OrderObj', JSON.stringify(request));
-            const options = {
-                success: function (data) {
-                    notificationUtil.success(sharedFn().GetUiControlText('ADMIN_MSG_UPDATE'));
-                }
-            };
-            jqClientAdvanced(options).PostFormData("Department/UpdateDepartmentOrder", formData);
-
-        }
+        
     });
-    
+
     dialogElem = commonUtil.createDailog({ dailogId: dailogId });
-    if (controlvalidationlist) {
 
-        //initializing ICON
-        var iconlist = controlvalidationlist.filter(c => c.constraint.controlType == 'ICON');
-        if (iconlist.length > 0) {
-
-            iconlist.forEach(item => {
-                var constrain = item.constraint;
-                var id = '#' + constrain.uibackendName;
-                IconPicker.Run(id, function (e) {
-                    document.getElementById('IconPreview').className = document.getElementById(constrain.uibackendName).value;
-                    var selectedIcon = document.getElementById(constrain.uibackendName).value;
-                    if (selectedIcon) {
-                        sharedFn().NewvalidateInput($('#' + constrain.uibackendName).attr('id'), sharedFn().GetUiControlText('ADMIN_CNTRL_REQUIRED'), sharedFn().GetUiControlText('ADMIN_MSG_MAX_CHAR_LENGTH'), sharedFn().GetUiControlText('ADMIN_MSG_MIN_CHAR_LENGTH'));
-
-
-                    }
-                });
-            });
-        }
-    }
    
+
+    loadData();
+
+
+
 
     $(`#${btnAddContentId}`).click(function (e) {
         sharedFn().ClearForm();
         sharedFn().EditMode();
         sharedFn().SetDefaultValueFromConfig();
-
     });
 
-    loadData();
 
-    
     $("#btn-submit").click(function (e) {
-        
-        
+
+
         if (sharedFn().NewvalidateForm("form-control", sharedFn().GetUiControlText('ADMIN_CNTRL_REQUIRED'), sharedFn().GetUiControlText('ADMIN_MSG_MAX_CHAR_LENGTH'), sharedFn().GetUiControlText('ADMIN_MSG_MIN_CHAR_LENGTH'))) {
 
 
             commonUtil.btnProgress(btnSubmitId);
             var requestdata = sharedFn().GetSaveObject(controlvalidationlist, $('#Id').val());
-
+            //requestdata.append('CloneRole', JSON.stringify($("#RoleCloneRole").val()));
+            requestdata.append('CloneRole', $("#RoleCloneRole").val());
             const options = {
                 success: function (response) {
                     if (response) {
@@ -208,18 +170,14 @@ $(document).ready(function () {
                                     notificationUtil.success(sharedFn().GetUiControlText('ADMIN_MSG_UPDATE'));
                                     sharedFn().ViewMode();
                                     break;
-                                case 12:
-                                    notificationUtil.error(sharedFn().GetUiControlText('BACKENDNAME_ALREADY_EXISTS'));
-                                    $('#btn-submit').removeAttr("disabled");
-                                    break;
-                               
+                                
                                 default:
                                     notificationUtil.error(data.message);
-                                    $('#btn-submit').removeAttr("disabled");
+
                                     break;
                             }
                         }
-
+                        $('#btn-submit').removeAttr("disabled");
                     }
 
 
@@ -232,9 +190,9 @@ $(document).ready(function () {
             let id = $('#Id').val();
 
             if (id) {
-                url = "Department/UpdateDepartment";
+                url = "Role/UpdateRole";
             } else {
-                url = "Department/SaveDepartment";
+                url = "Role/SaveRole";
 
             }
 

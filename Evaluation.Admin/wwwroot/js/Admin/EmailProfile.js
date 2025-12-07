@@ -17,16 +17,11 @@ const gridContainerId = "view-container",
     $btnAddContent = $('#' + btnAddContentId);
 
 
-
-
-
-
-
 const loadData = (isScroll) => {
-    var systemmoduleid = $('#NotificationTemplateSystemModuleSearch').val() == null ? "-1" : $('#NotificationTemplateSystemModuleSearch').val();
     isLoading = true;
     const options = {
         success: function (data) {
+
             if (isScroll) {
                 showMore = true;
             } else {
@@ -56,13 +51,13 @@ const loadData = (isScroll) => {
             }
         }
     };
-    jqClientAdvanced(options).Get("NotificationTemplate/GetAllNotificationTemplate".concat('?systemmoduleid=', systemmoduleid).concat('&Page=', currentPage));
+    jqClientAdvanced(options).Get("EmailProfile/GetAllEmailProfile".concat('?Page=', currentPage));
 
 };
 
 
 
-const deleteData = (id) => {
+const deleteData = (id, event, cell) => {
     if (!id) return;
 
     const obj = table.getData().find(f => f.id == id);
@@ -71,21 +66,11 @@ const deleteData = (id) => {
         if (!id) return;
         const options = {
             success: function (data) {
-                if (data) {
-
-
-                    if (data.responseStatus == '3') {
-                        table.deleteRow(id);
-                        notificationUtil.success(sharedFn().GetUiControlText('ADMIN_MSG_DELETE'));
-                    }
-
-                    else {
-                        notificationUtil.error(data.message);
-                    }
-                }
+                table.deleteRow(id);
+                notificationUtil.success(sharedFn().GetUiControlText('ADMIN_MSG_DELETE'));
             }
         };
-        jqClientAdvanced(options).Post("NotificationTemplate/DeleteNotificationTemplate".concat('?Id=', id));
+        jqClientAdvanced(options).Get("EmailProfile/DeleteEmailProfile".concat('?Id=', id));
 
     });
 
@@ -101,9 +86,50 @@ $(window).scroll(function () {
         }
     }
 });
+function SaveEmailProfile() {
+    var requestdata = sharedFn().GetSaveObject(controlvalidationlist, $('#Id').val());
+    const options = {
+        success: function (data) {
+            //debugger
+            switch (data.responseStatus) {
+                case 1:
+
+                    table.addData([data], true);
+                    table.deselectRow();
+                    table.getRows()[0].select();
+                    notificationUtil.success(sharedFn().GetUiControlText('ADMIN_MSG_SAVE'));
+
+                    break;
+
+                case 2:
+                    table.updateData([data]);
+                    notificationUtil.success(sharedFn().GetUiControlText('ADMIN_MSG_UPDATE'));
+
+                    break;
+
+                default:
+                    notificationUtil.error(data.message);
+
+                    break;
+            }
+
+            sharedFn().ViewMode();
+        }
+    };
+
+    let url = '';
+    let id = $('#Id').val();
+
+    if (id) {
+        url = "EmailProfile/UpdateEmailProfile";
+    } else {
+        url = "EmailProfile/SaveEmailProfile";
+
+    }
+    jqClientAdvanced(options).PostFormData(url, requestdata);
+}
 $(document).ready(function () {
 
-   
     table = tableUtil.createTabulator({
         id: gridContainerId,
         config: {
@@ -117,33 +143,19 @@ $(document).ready(function () {
         sortColumn: "updateDate",
         sortDir: "desc",
         columns: TableColumns,
-        
     });
 
     dialogElem = commonUtil.createDailog({ dailogId: dailogId });
 
-    $("#NotificationTemplateSystemModuleSearch").on("change", function () {
-        currentPage = 0;
-        isLoading = false;
-        if (table) {
-            table.setData([]);
-
-        }
-
-        loadData();
-
-    });
-    
-
-
-
+    loadData(false);
 
 
     $(`#${btnAddContentId}`).click(function (e) {
+
         sharedFn().ClearForm();
         sharedFn().EditMode();
         sharedFn().SetDefaultValueFromConfig();
-       
+
     });
 
 
@@ -153,55 +165,37 @@ $(document).ready(function () {
         if (sharedFn().NewvalidateForm("form-control", sharedFn().GetUiControlText('ADMIN_CNTRL_REQUIRED'), sharedFn().GetUiControlText('ADMIN_MSG_MAX_CHAR_LENGTH'), sharedFn().GetUiControlText('ADMIN_MSG_MIN_CHAR_LENGTH'))) {
 
 
-            commonUtil.btnProgress(btnSubmitId);
-            var requestdata = sharedFn().GetSaveObject(controlvalidationlist, $('#Id').val());
-            const options = {
-                success: function (response) {
-                    commonUtil.btnProgress(btnSubmitId, true);
-
-                    let { data } = response;
-                    if (data.responseStatus == '1') {
-                        table.addData([data], true);
-                        table.deselectRow();
-                        table.getRows()[0].select();
+            if ($("#EmailProfileIsDefault").prop("checked")) {
+                const Defaultoptions = {
+                    success: function (response) {
                         if (response) {
-                            notificationUtil.success(sharedFn().GetUiControlText('ADMIN_MSG_SAVE'));
-
-
+                            if (response.id != $("#Id").val()) {
+                                notificationUtil.confirmation({ title: sharedFn().GetUiControlText('ADMIN_WARNING_COMFIRM'), okText: sharedFn().GetUiControlText('CONFIRM_BUTTON'), cancelText: sharedFn().GetUiControlText('ADMIN_CANCEL') }, result => {
+                                    var tablerow = table.getRows()
+                                        .filter(row => row.getData().isDefault == true)[0];
+                                    table.updateRow(tablerow, { isDefault: false });
+                                    SaveEmailProfile();
+                                    
+                                });
+                            }
+                            else {
+                                SaveEmailProfile();
+                                
+                            }
+                        }
+                        else {
+                            SaveEmailProfile();
                         }
                     }
-                    else if (data.responseStatus == '2') {
-                        table.updateData([data]);
-                        if (response) {
-                            notificationUtil.success(sharedFn().GetUiControlText('ADMIN_MSG_UPDATE'));
-
-                        }
-
-                    }
-                    else if (data.responseStatus == '12') {
-                        notificationUtil.error(sharedFn().GetUiControlText('NOTIFICATION_TEMPLATE_BACKENDNAME_ALREADY_EXISTS'));
-                        return;
-                    }
-                    else {
-                        notificationUtil.error(data.message);
-
-                    }
-                    sharedFn().ViewMode();
-                }
-            };
-
-            let url = '';
-            let id = $('#Id').val();
-
-            if (id) {
-                url = "NotificationTemplate/UpdateNotificationTemplate";
-            } else {
-                url = "NotificationTemplate/SaveNotificationTemplate";
-
+                };
+                jqClientAdvanced(Defaultoptions).Get("EmailProfile/GetDefaultEmailProfile");
             }
+            else {
+                SaveEmailProfile();
+            }
+           
+           
 
-            jqClientAdvanced(options).PostFormData(url, requestdata);
-          
 
         }
     });

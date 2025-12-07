@@ -661,7 +661,7 @@ $(document).ready(function () {
    
    
     
-    document.getElementById(btnAddContentId).addEventListener('click', event => {
+    $(`#${btnAddContentId}`).click(function (e) {
         table = Tabulator.prototype.findTable("#" + gridContainerId)[0];
         sharedFn().ClearForm();
         sharedFn().EditMode();

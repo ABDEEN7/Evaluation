@@ -125,6 +125,9 @@ public static class ConstantKeys
         public static readonly string EmailTemplateExistsActionStatusConfigNotification = "EmailTemplateExistsActionStatusConfigNotification";
         public static readonly string TemplateDocExistsEmailTemplateDocument = "TemplateDocExistsEmailTemplateDocument";
         public static readonly string TemplateDocExistsActionTemplateDoc = "TemplateDocExistsActionTemplateDoc";
+        public static readonly string BackendNameAlreadyExists = "BackendNameAlreadyExists";
+        public static readonly string EmailAlreadyExists = "EmailAlreadyExists";
+        public static readonly string EmailProfileExistsEmailTemplate = "EmailProfileExistsEmailTemplate";
     }
 
     public static class AdminSettings
@@ -203,6 +206,9 @@ public static class ConstantKeys
         public static readonly string lblSearchTable = "lblSearchTable";
         public static readonly string lblSearchForNames = "lblSearchForNames";
         public static readonly string lblSearchTree = "lblSearchTree";
+        public static readonly string SELECTALL = "SELECTALL";
+        public static readonly string EXPANDALL = "EXPANDALL";
+        public static readonly string COLLAPSEALL = "COLLAPSEALL";
     }
 
     public static class AdminPages
@@ -237,6 +243,10 @@ public static class ConstantKeys
         public static readonly string AdminSMSTemplate = "AdminSMSTemplate";
         public static readonly string AdminEmailTemplate = "AdminEmailTemplate";
         public static readonly string AdminTemplateDocument = "AdminTemplateDocument";
+        public static readonly string AdminEmailProfile = "AdminEmailProfile";
+        public static readonly string AdminUserPermission = "AdminUserPermission";
+        public static readonly string AdminPermission = "AdminPermission";
+        public static readonly string AdminRole = "AdminRole";
     }
 
     public static class AdminPermission
@@ -497,6 +507,30 @@ public static class ConstantKeys
         public const string EDIT_ADMIN_TEMPLATEDOC = "EDIT_ADMIN_TEMPLATEDOC";
         public const string DELETE_ADMIN_TEMPLATEDOC = "DELETE_ADMIN_TEMPLATEDOC";
 
+        #endregion
+
+        #region EMAILPROFILE
+        public const string VIEW_ADMIN_EMAILPROFILE = "VIEW_ADMIN_EMAILPROFILE";
+        public const string ADD_ADMIN_EMAILPROFILE = "ADD_ADMIN_EMAILPROFILE";
+        public const string EDIT_ADMIN_EMAILPROFILE = "EDIT_ADMIN_EMAILPROFILE";
+        public const string DELETE_ADMIN_EMAILPROFILE = "DELETE_ADMIN_EMAILPROFILE";
+        #endregion
+        #region USER_PERMISSION
+        public const string VIEW_ADMIN_USER_PERMISSION = "VIEW_ADMIN_USER_PERMISSION";
+        public const string ADD_ADMIN_USER_PERMISSION = "ADD_ADMIN_USER_PERMISSION";
+        public const string EDIT_ADMIN_USER_PERMISSION = "EDIT_ADMIN_USER_PERMISSION";
+        #endregion
+
+        #region ROLE_PERMISSION
+        public const string VIEW_ADMIN_ROLE_PERMISSION = "VIEW_ADMIN_ROLE_PERMISSION";
+        public const string ADD_ADMIN_ROLE_PERMISSION = "ADD_ADMIN_ROLE_PERMISSION";
+        #endregion
+
+        #region ROLE
+        public const string VIEW_ADMIN_ROLE = "VIEW_ADMIN_ROLE";
+        public const string ADD_ADMIN_ROLE = "ADD_ADMIN_ROLE";
+        public const string EDIT_ADMIN_ROLE = "EDIT_ADMIN_ROLE";
+        public const string DELETE_ADMIN_ROLE = "DELETE_ADMIN_ROLE";
         #endregion
 
     }
