@@ -1,7 +1,6 @@
 ﻿using Evaluation.API.ActionFilter;
 using Evaluation.API.Extensions;
 using Evaluation.DAL;
-using Evaluation.DAL.Models.Planing;
 using Evaluation.Services.BusinessLayer;
 using Evaluation.Services.BusinessLayer.API.PlanLayer;
 using Evaluation.Services.BusinessLayer.API.SteamerLayer;
@@ -27,17 +26,7 @@ public class PlanController(MasterBL masterBL) : ControllerBase
         var jsonPlan = await masterBL.GetApiService<PlanServiceRequestServices>().AddEvaulationPlan(planRequest);
         return jsonPlan.ToActionResult();
     }
-    //[HttpPost]
-    //public async Task<IActionResult> CreatePlan([FromBody] CreateEvaluationPlanDto planApproved)
-    //{
-    //    var plan = await masterBL.GetAdminService<PlanServiceRequestServices>().AddEvaulationPlan
-    //}
-    //[HttpDelete]
-    //public async Task<IActionResult> DeletePlan(Guid id)
-    //{
-    //    var isDeleted = await masterBL.GetApiService<PlanServiceRequestServices>().DeletePlanDraft(id);
-    //    return isDeleted.ToActionResult();
-    //}
+
     [HttpPost]
     [CheckRolePermisionFilter(true, ConstantKeys.WebPermission.APPROVE_WEB_PLAN_REQUEST)]
     public async Task<IActionResult> Approve([FromBody] CreateEvaluationPlanDto approveDto)
@@ -45,7 +34,10 @@ public class PlanController(MasterBL masterBL) : ControllerBase
         await masterBL.GetApiService<PlanServiceRequestServices>().ApprovePlan(approveDto);
         return Ok();
     }
+
+  
     [HttpPut("{id:guid}")]
+    [CheckRolePermisionFilter(true, ConstantKeys.WebPermission.UPDATE_WEB_PLAN_REQUEST)]
     public async Task<IActionResult> UpdatePlan(Guid id, [FromBody] UpdatePlanDto planDto)
     {
         var result = await masterBL
