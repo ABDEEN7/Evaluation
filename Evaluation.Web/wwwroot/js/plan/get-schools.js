@@ -5,19 +5,114 @@ let allSchools = [];
 let filteredSchools = [];
 let currentPage = 1;
 let pageSize = 10;
+let visitTypes = [];
+let currentSearchTerm = '';
+let currentFilters = {};
+
 
 // Initialize when DOM is ready
 $(document).ready(function () {
-    loadSchoolsData();
+    loadVisitTypes().then(() => {
+        loadSchoolsData();
+    });
     initializeSearch();
     initializeFilters();
+    //initializeFlatpickr(); // Initialize Flatpickr on page load
 });
+
+// ============= INITIALIZE FLATPICKR =============
+function initializeFlatpickr() {
+    flatpickr(".childDate", {
+        mode: "range",
+        locale: "ar",
+        dateFormat: "Y-m-d",
+        allowInput: true,
+        onChange: function (selectedDates, dateStr, instance) {
+            // Get the school ID from the input's closest row
+            const schoolId = $(instance.input).closest('tr').find('.selectRow').data('id');
+            console.log('Date selected for school:', schoolId, dateStr);
+            // You can save the date here via API if needed
+        },
+        onReady: function (selectedDates, dateStr, instance) {
+            const monthsContainer = instance.calendarContainer.querySelector('.flatpickr-months');
+
+            // Create arrow stack container
+            const prev = instance.calendarContainer.querySelector('.flatpickr-prev-month');
+            const next = instance.calendarContainer.querySelector('.flatpickr-next-month');
+            const arrowStack = document.createElement('div');
+            arrowStack.className = 'fp-arrow-stack';
+            arrowStack.appendChild(prev);
+            arrowStack.appendChild(next);
+
+            // Insert arrow stack at start (left side in RTL)
+            monthsContainer.insertBefore(arrowStack, monthsContainer.firstChild);
+
+            // Month/year container remains for dropdowns (right side in RTL)
+            const monthYear = monthsContainer.querySelector('.flatpickr-current-month');
+            monthsContainer.appendChild(monthYear);
+
+            // Add Apply/Cancel buttons if not already added
+            if (!instance.calendarContainer.querySelector('.fp-btns')) {
+                const btns = document.createElement('div');
+                btns.className = 'fp-btns';
+
+                const cancel = document.createElement('button');
+                cancel.type = 'button';
+                cancel.className = 'fp-cancel';
+                cancel.textContent = 'إلغاء';
+                cancel.onclick = (e) => {
+                    e.preventDefault();
+                    instance.clear();
+                    instance.close();
+                };
+
+                const apply = document.createElement('button');
+                apply.type = 'button';
+                apply.className = 'fp-apply';
+                apply.textContent = 'تأكيد';
+                apply.onclick = (e) => {
+                    e.preventDefault();
+                    instance.close();
+                };
+
+                btns.appendChild(cancel);
+                btns.appendChild(apply);
+                instance.calendarContainer.appendChild(btns);
+            }
+        }
+    });
+}
 
 // ============= LOAD SCHOOLS DATA (REAL API) =============
 function loadSchoolsData(page = 1) {
-    currentPage = page;
+    const params = new URLSearchParams({
+        page: page,
+        pageSize: pageSize
+    });
+    //Added filters if they exist
+    if (currentFilters.SchoolName) {
+        params.append('Name', currentFilters.SchoolName);
+    }
+    if (currentFilters.lastEvaluationDate) {
+        params.append('lastEvalDate', currentFilters.lastEvaluationDate);
+    }
+    if (currentFilters.CreatedDate) {
+        params.append('establishmentDate', currentFilters.CreatedDate);
+    }
+    if (currentFilters.NextEvalDate) {
+        params.append('nextEvalDate', currentFilters.NextEvalDate);
+    }
+    if (currentFilters.PreviousResult) {
+        params.append('previousResult', currentFilters.PreviousResult);
+    }
+    if (currentFilters.VisitType) {
+        params.append('visitType', currentFilters.VisitType);
+    }
+    //Show loading state
+    showLoadingState();
+    //currentPage = page;
 
-    jqClient().Get(`/School/GetSchools?page=${page}&pageSize=${pageSize}`)
+    jqClient().Get(`/School/GetSchools?page=${params.toString()}`)
         .done((result) => {
             console.log("Schools data:", result);
 
@@ -28,10 +123,26 @@ function loadSchoolsData(page = 1) {
             renderSchoolsTable(filteredSchools);
             const totalRecords = result.totalCount || filteredSchools.length;
             renderPagination(totalRecords);
+
+            // Re-initialize Flatpickr after table is rendered
+            initializeFlatpickr();
         })
         .fail((jqXHR, textStatus, err) => {
             console.error('GetAll schools failed', textStatus, err);
         });
+}
+//============== Show Loading State ===============
+function showLoadingState() {
+    const tbody = $('#planTable tbody');
+    tbody.html(`
+     <tr>
+            <td colspan="7" class="text-center py-5">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">جاري التحميل...</span>
+                </div>
+                <p class="mt-2 text-muted">جاري تحميل البيانات...</p>
+            </td>
+        </tr>`)
 }
 
 // ============= RENDER SCHOOLS TABLE =============
@@ -51,6 +162,9 @@ function renderSchoolsTable(schools) {
     let rows = '';
     paginated.forEach(function (school) {
         const ratingClass = getRatingClass(school.rating);
+        let visitOptions = visitTypes.map(v =>
+            `<option value="${v.id}" ${v.name === school.visitType ? 'selected' : ''}>${v.name}</option>`
+        ).join('');
         rows += `
         <tr>
             <td>
@@ -65,16 +179,26 @@ function renderSchoolsTable(schools) {
                         <h6>${school.name || '-'}</h6>
                         <div class="square-bullet">
                             <div>${school.level || 'ابتدائية'}</div>
-                            <div><span>${school.students || 0}</span> طالب</div>
                         </div>
                     </div>
                     <span class="badge ${ratingClass}">${school.rating || ''}</span>
                 </div>
             </td>
-            <td><p class="m-0 dateRange"><i class="la la-calendar"></i> اختر تاريخ بداية ونهاية الزيارة </p></td>
+            <td>
+                <input type="text" 
+                       class="form-control form-control-sm childDate" 
+                       placeholder="اختر تاريخ بداية ونهاية الزيارة"
+                       data-school-id="${school.id}"
+                       readonly>
+            </td>
             <td>${school.lastEvaluationDate || '-'}</td>
-            <td>${school.visitType || '-'}</td>
-            <td>${school.nextEvalDate || '-'}</td>
+            <td>
+            <select class="form-select visitTypeSelect" data-school-id="${school.id}">
+                    <option value="">اختر نوع الزيارة</option>
+                    ${visitOptions}
+                </select>
+            </td>
+            <td>${school.academicYear || '-'}</td>
             <td>
                 <p class="m-0">
                     <a href="#" class="text-dark" type="button" data-bs-toggle="modal" data-bs-target="#schoolDetailsModal" data-id="${school.id}">
@@ -171,6 +295,46 @@ function initializeFilters() {
         renderPagination(filteredSchools.length);
     });
 }
+//Handle filter form submision
+$("#filterForm").on('submit', function (e) {
+    e.preventDefault();
+
+    // Collect all filter values
+    currentFilters = {
+        SchoolName: $('#filterSchoolName').val().trim(),
+        LastEvalDate: $('#filterLastEvalDate').val(),
+        CreatedDate: $('#filterCreatedDate').val(),
+        NextEvalDate: $('#filterNextEvalDate').val(),
+        PreviousResult: $('#filterPreviousResult').val(),
+        VisitType: $('#filterVisitType').val()
+    };
+
+    // Remove empty filters
+    Object.keys(currentFilters).forEach(key => {
+        if (!currentFilters[key]) delete currentFilters[key];
+    });
+    // Update filter badge count
+    updateFilterBadge();
+    currentPage = 1;
+    loadSchoolsData(1);
+    //Close the offcanvas
+    const offcanvas = bootstrap.Offcanvas.getInstance(document.getElementById('filterOffcanvas'));
+    if (offcanvas) offcanvas.hide();
+});
+// Handle clear filters
+$('#clearFiltersBtn').on('click', function () {
+    $('#filterForm')[0].reset();
+    currentFilters = {};
+    updateFilterBadge();
+    currentPage = 1;
+    loadSchoolsData(1);
+});
+
+//============ Update Filter BADGE =================
+function updateFilterBadge() {
+    const filterCount = Object.keys(currentFilters).length;
+    $('.filterbtn .badge').text(filterCount);
+}
 
 // ============= HELPERS =============
 function getRatingClass(rating) {
@@ -182,4 +346,12 @@ function getRatingClass(rating) {
         'Week': 'bg-danger'
     };
     return map[rating] || 'bg-light';
+}
+function loadVisitTypes() {
+    return jqClient().Get('/School/GetVisits')
+        .done(result => {
+            visitTypes = result?.result || [];
+        }).fail((jqXHR, textStatus, err) => {
+            console.error('Get Visits failed', textStatus, err);
+        });
 }

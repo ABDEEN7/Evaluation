@@ -26,4 +26,13 @@ public class DepartmentService(IServiceScopeFactory serviceScopeFactory,
             .ToListAsync();
         return x;
     }
+    public async Task<Guid?> GetDepartmentIdAsync()
+    {
+        var department = await unitOfWork.GetRepository<Department>()
+            .GetAllActiveNonDeleted(x =>
+                x.UserDepartments.Any(ud => ud.UserId == userInfo.UserId))
+            .OrderByDescending(x=>x.CreateDate)
+            .FirstOrDefaultAsync();
+        return department?.Id;
+    }
 }

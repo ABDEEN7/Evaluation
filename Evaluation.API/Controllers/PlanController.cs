@@ -1,10 +1,11 @@
-﻿using Evaluation.API.Extensions;
+﻿using Evaluation.API.ActionFilter;
+using Evaluation.API.Extensions;
+using Evaluation.DAL;
 using Evaluation.Services.BusinessLayer;
 using Evaluation.Services.BusinessLayer.API.PlanLayer;
-using Evaluation.Services.Models.Planing;
+using Evaluation.Services.BusinessLayer.API.SteamerLayer;
 using Evaluation.SharedHelper.Dtos.PlanDto;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 
 namespace Evaluation.API.Controllers;
 
@@ -12,72 +13,46 @@ namespace Evaluation.API.Controllers;
 public class PlanController(MasterBL masterBL) : ControllerBase
 {
     [HttpPost]
-    //public async Task<IActionResult> CreateAsync([FromBody] CreateEvaluationPlanDto planRequest)
+    [CheckRolePermisionFilter(true, ConstantKeys.WebPermission.ADD_WEB_PLAN_REQUEST)]
     public async Task<IActionResult> Create([FromBody] CreateEvaluationPlanDto planRequest)
     {
-        //CreateEvaluationPlanDto? planDto = JsonConvert.DeserializeObject<CreateEvaluationPlanDto>(planRequest);
-        //if (planDto == null)
-        //return BadRequest(new { error = "Invalid JSON structure." });
         var jsonPlan = await masterBL.GetApiService<PlanServiceRequestServices>().AddEvaulationPlan(planRequest);
         return jsonPlan.ToActionResult();
     }
-    //[HttpDelete]
-    //public async Task<IActionResult> DeletePlan(Guid id)
-    //{
-    //    var isDeleted = await masterBL.GetApiService<PlanServiceRequestServices>().DeletePlanDraft(id);
-    //    return isDeleted.ToActionResult();
-    //}
+
     [HttpPost]
-    public IActionResult RequestDeleteSchool(RequestDeleteSchoolDto requestDelete)
+    [CheckRolePermisionFilter(true, ConstantKeys.WebPermission.APPROVE_WEB_PLAN_REQUEST)]
+    public async Task<IActionResult> Approve([FromBody] CreateEvaluationPlanDto approveDto)
     {
+        await masterBL.GetApiService<PlanServiceRequestServices>().ApprovePlan(approveDto);
         return Ok();
-    }
-    [HttpPost]
-    public IActionResult ApproveDeleteSchoolFromPlan(Guid requestId)
-    {
-        //var
-        return Ok();
-    }
-    //[HttpPost]
-    //public async Task<IActionResult> Approve(string approveDto)
-    //{
-    //    ApproveEvaluationPlanDto? planDto = JsonConvert.DeserializeObject<ApproveEvaluationPlanDto>(approveDto.ToString());
-    //    if (planDto == null)
-    //        return BadRequest(new { error = "Invalid JSON structure." });
-    //    await masterBL.GetApiService<PlanServiceRequestServices>().ApprovePlan(planDto);
-    //    return Ok();
-    //}
-    [HttpPut]
-    public async Task<IActionResult> UpdatePlan(Guid id, [FromBody] string planDto)
-    {
-        var planJson = await masterBL.GetApiService<PlanServiceRequestServices>().UpdatePlanDraft(id, planDto);
-        return Ok(planJson);
-    }
-    [HttpPost]
-    //public async Task<IActionResult> ApproveDeleteSchool(Guid id, Guid schoolId)
-    //{
-    //    var deletedSchool = await masterBL.
-    //        GetApiService<PlanServiceRequestServices>()
-    //        .ApproveDeleteSchool(id, schoolId);
-    //    return Ok(deletedSchool);
-    //}
-    [HttpGet]
-    public IActionResult GetPlanType()
-    {
-        return Ok(new { result = GetPlanTypes() });
-    }
-    private List<PlanTypeDto> GetPlanTypes()
-    {
-        return new List<PlanTypeDto>
-    {
-        new PlanTypeDto { Id = Guid.Parse("11111111-1111-1111-1111-111111111111"), Name = "Month" },
-        new PlanTypeDto { Id = Guid.Parse("22222222-2222-2222-2222-222222222222"), Name = "Year" }
-    };
-    }
-    public class PlanTypeDto
-    {
-        public Guid Id { get; set; }
-        public string Name { get; set; } = null!;
     }
 
+  
+    [HttpPut("{id:guid}")]
+    [CheckRolePermisionFilter(true, ConstantKeys.WebPermission.UPDATE_WEB_PLAN_REQUEST)]
+    public async Task<IActionResult> UpdatePlan(Guid id, [FromBody] UpdatePlanDto planDto)
+    {
+        var result = await masterBL
+              .GetApiService<PlanServiceRequestServices>()
+              .UpdatePlanAsync(id, planDto);
+        return Ok(result);
+    }
+
+    [HttpGet]
+    [CheckRolePermisionFilter(true, ConstantKeys.WebPermission.GET_SEMESTERS_REQUEST)]
+    public async Task<IActionResult> GetSemesters()
+    {
+        //var semester = await masterBL.GetApiService<SemesterRequestServices>().GetSemestersAsync(new Guid("37689d34-4928-4bb9-92b4-8a11abc0dbaf"));
+        var semester = await masterBL.GetApiService<SemesterRequestServices>().GetSemestersAsync();
+        return Ok(new { result = semester });
+        //return semester.ToActionResult();
+    }
+    [HttpGet("{planId:guid}")]
+    [CheckRolePermisionFilter(true,ConstantKeys.WebPermission.GET_WEB_PLAN_DETAILS_REQUEST)]
+    public async Task<IActionResult> GetPlanDetails(Guid planId)
+    {
+        var plan = await masterBL.GetApiService<PlanServiceRequestServices>().GetPlanByIdAsync(planId);
+        return Ok(new { result = plan });
+    }
 }

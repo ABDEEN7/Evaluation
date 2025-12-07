@@ -5,14 +5,15 @@
 function getEvaluationData() {
     try {
         // Get plan name from the title input
-        const planName = document.getElementById('username')?.value?.trim() || '';
-
+        const name = document.getElementById('planTitle')?.value?.trim() || '';
         // Get plan type from the select dropdown
-        const planTypeSelect = document.getElementById('ddlPlanType');
-        const planTypeId = planTypeSelect?.value || '';
+        const planTypeSelect = $('#ddlPlanType');
+        const selectedPlanType = planTypeSelect.select2('data')[0];
+        const planTypeId = selectedPlanType?.id || '';
+        const planTypeBackendName = selectedPlanType?.backendName || '';
 
         // Get date range and parse start/end dates
-        const dateRangeInput = document.getElementById('dateRange');
+        const dateRangeInput = document.getElementById('parentDate');
         let startDate = '';
         let endDate = '';
 
@@ -22,13 +23,27 @@ function getEvaluationData() {
             endDate = parsedDates.endDate;
         }
 
+        //Get semester Id if paln type is semtster
+        let semesterId = null;
+        if (planTypeBackendName === 'Semester') {
+            const semesterSelect = $('#ddlSemester');
+            semesterId = semesterSelect.val() || null;
+        }
+
+        const selectedSchools = getSelectedSchools();
+
         // Return structured data object
-        return {
-            planName,
+        const evaluationData = {
+            name,
             planTypeId,
             startDate,
-            endDate
+            endDate,
+            schools: selectedSchools
         };
+        if (planTypeBackendName === 'Semester' && semesterId) {
+            evaluationData.semesterId = semesterId;
+        }
+        return evaluationData;
 
     } catch (error) {
         console.error('Error collecting evaluation data:', error);
@@ -88,11 +103,7 @@ function parseDateRange(dateRangeValue) {
     };
 }
 
-// Usage examples:
-console.log(parseDateRange("2024-01-01 to 2024-12-31"));
-console.log(parseDateRange("2024-01-01 - 2024-12-31"));
-console.log(parseDateRange("2024-01-01"));
-console.log(parseDateRange(""));
+// Usage examples
 
 /**
  * Validates evaluation data before submission
@@ -107,7 +118,7 @@ function validateEvaluationData(data) {
         return { isValid: false, errors };
     }
 
-    if (!data.planName) {
+    if (!data.name) {
         errors.push('Plan name is required');
     }
 
@@ -147,19 +158,19 @@ function displayErrors(errors) {
 async function submitEvaluationData(data) {
     try {
         // Show loading state
-        const submitBtn = document.getElementById('btn-submit');
-        const originalText = submitBtn?.textContent;
-        if (submitBtn) {
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Submitting...';
-        }
-        jqClient().Post(`/Plan/Create`, data).fail((jqXHR, textStatus, errorThrown) => {
-            console.error('Error: [Create Plan Condition]', textStatus, errorThrown);
-        });
+        //const submitBtn = document.getElementById('btn-submit');
+        //const originalText = submitBtn?.textContent;
+        //if (submitBtn) {
+        //    submitBtn.disabled = true;
+        //    submitBtn.textContent = 'Submitting...';
+        //}
+        //jqClient().Post(`/Plan/Create`, data).fail((jqXHR, textStatus, errorThrown) => {
+        //    console.error('Error: [Create Plan Condition]', textStatus, errorThrown);
+        //});
+        const result = await jqClient().Post(`/Plan/Approve`, data);
 
         // Handle success
-        console.log('Submission successful:', result);
-        alert('Evaluation plan submitted successfully!');
+        console.log('Object Json:', result);
 
         // Optional: Reset form or redirect
         // document.getElementById('evaluationForm')?.reset();
@@ -197,17 +208,29 @@ document.getElementById('btn-submit')?.addEventListener('click', async (event) =
 });
 
 
-// Alternative: jQuery version if you prefer
-$("#btn-submit").click(async function (event) {
-    event.preventDefault();
+function getSelectedSchools() {
+    const selectedSchools = [];
+    $('#planTable tbody .selectRow:checked').each(function () {
+        const checkbox = $(this);
+        const schoolId = checkbox.data('id');
+        const row = checkbox.closest('tr');
 
-    const evaluationData = getEvaluationData();
-    const validation = validateEvaluationData(evaluationData);
+        const dataRangeInput = row.find('.childDate');
+        const dateRangeValue = dataRangeInput.val() || '';
+        const parsedDates = parseDateRange(dateRangeValue);
+        const visitTypeSelect = row.find('.visitTypeSelect');
+        const visitTypeId = visitTypeSelect.val() || '';
+        const visitTypeName = visitTypeSelect.find('option:selected').text() || '';
 
-    if (!validation.isValid) {
-        displayErrors(validation.errors);
-        return;
-    }
-
-    await submitEvaluationData(evaluationData);
-});
+        // Get school name from the table
+        const schoolData =
+        {
+            id: schoolId,
+            startEvaluationDate: parsedDates.startDate,
+            endEvaluationDate: parsedDates.endDate,
+            visitTypeId: visitTypeId
+        };
+        selectedSchools.push(schoolData);
+    });
+    return selectedSchools;
+}

@@ -1,12 +1,10 @@
-﻿using Evaluation.API.Extensions;
-using Evaluation.DAL.DTOs;
+﻿using Evaluation.DAL.DTOs;
 using Evaluation.DAL.Models.Org;
 using Evaluation.Services.BusinessLayer;
 using Evaluation.Services.BusinessLayer.API;
 using Evaluation.Services.Integration;
 using Evaluation.SharedHelper.Dtos.SchoolDto;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
 
 namespace Evaluation.API.Controllers;
 
@@ -26,14 +24,8 @@ public class SchoolController : ControllerBase
     [HttpGet]
     public async Task<School> GetSchoolDetails(Guid SchoolID)
     {
-        //var schooldetails = await _masterBl.GetApiService<SchoolBL>().GetSchoolDetails(SchoolID);
-        
-        var dummyData = new List<School>() {
-            new School() { Id = new Guid("921d891a-e0cb-4fd4-8e53-fb3443ef0199"), NameAr = "مدرسة احمد بن حنبل", NameEn = "Ahmad Bin Hanbal School"},
-            new School() { Id = new Guid("ecd11007-2ff6-42cb-bca2-b168de94afbc"), NameAr = "مدرسة عائشة", NameEn = "Aesha School" }
-        };
-
-        return dummyData.FirstOrDefault(s => s.Id == SchoolID);
+        var schooldetails = await _masterBl.GetApiService<SchoolBL>().GetSchoolDetails(SchoolID);
+        return schooldetails;
     }
 
     [HttpGet]
@@ -49,7 +41,7 @@ public class SchoolController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<bool> AddUpdateOrgTree(string? hrCode = null ,long? qID = null)
+    public async Task<bool> AddUpdateOrgTree(string? hrCode = null, long? qID = null)
     {
         return await _hrService.AddUpdateOrgTree(hrCode, qID);
     }
@@ -62,54 +54,12 @@ public class SchoolController : ControllerBase
 
     [HttpGet]
     public async Task<IActionResult> GetVisits()
-    {
-        var visit = await _masterBl.GetApiService<SchoolBL>().GetVisitsAsync();
-        return visit.ToActionResult();
-    }
+        => Ok(new { result = await _masterBl.GetApiService<SchoolBL>().GetVisitsAsync() });
+
     [HttpGet]
-    public IActionResult GetSchools([FromQuery] SchoolRequest request)
+    public async Task<IActionResult> GetSchools([FromQuery] SchoolRequest request)
     {
-        return Ok(new { result = GetListSchool() });
-    }
-    private List<ResponseSchools> GetListSchool()
-    {
-        return new List<ResponseSchools>
-        {
-            new ResponseSchools
-            {
-                Id = new Guid("921d891a-e0cb-4fd4-8e53-fb3443ef0199"),
-                Name = "Greenwood High School",
-                LastEvaluationDate = new DateTime(2024, 5, 20),
-                Rating = "Perfect"
-            },
-            new ResponseSchools
-            {
-                Id = new Guid("ecd11007-2ff6-42cb-bca2-b168de94afbc"),
-                Name = "Sunrise Elementary",
-                LastEvaluationDate = new DateTime(2023, 11, 10),
-                Rating = "Week"
-            },
-            new ResponseSchools
-            {
-                Id = Guid.NewGuid(),
-                Name = "Riverside Middle School",
-                LastEvaluationDate = new DateTime(2024, 8, 15),
-                Rating = "VeryGood"
-            },
-            new ResponseSchools
-            {
-                Id = Guid.NewGuid(),
-                Name = "Mountainview Academy",
-                LastEvaluationDate = new DateTime(2022, 12, 30),
-                Rating = "Perfect"
-            },
-            new ResponseSchools
-            {
-                Id = Guid.NewGuid(),
-                Name = "Lakeside Primary",
-                LastEvaluationDate = null,
-                Rating = "Aecctable"
-            }
-        };
+        var result = await _masterBl.GetApiService<SchoolBL>().GetSchools(request);
+        return Ok(result);
     }
 }

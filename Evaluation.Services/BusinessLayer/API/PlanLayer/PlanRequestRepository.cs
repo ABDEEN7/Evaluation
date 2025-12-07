@@ -1,14 +1,11 @@
-﻿using AutoMapper;
-using Evaluation.DAL.Helper;
-using Evaluation.DAL.Models.Calendars;
+﻿using Evaluation.DAL.Models.Calendars;
+using Evaluation.DAL.Models.Org;
 using Evaluation.DAL.Models.Planing;
 using Evaluation.DAL.Repositories;
-using Evaluation.Services.Special;
 using Evaluation.SharedHelper;
 using Evaluation.SharedHelper.Dtos.PlanDto;
 using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Exceptions;
-using Evaluation.SharedHelper.Helper;
 using Evaluation.SharedHelper.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,17 +13,14 @@ using Newtonsoft.Json;
 using static Evaluation.SharedHelper.Enums.ConstantKeys;
 namespace Evaluation.Services.BusinessLayer.API.PlanLayer;
 
-public class PlanServiceRequestRepository(IServiceScopeFactory serviceScopeFactory,
-    CacheDataProvider cacheDataProvider,
+public class PlanRequestRepository(IServiceScopeFactory serviceScopeFactory,
     UnitOfWork unitOfWork,
-    LoggingServices loggingServices,
-    IMapper mapper,
-    UserInfo userInfo,
-    IServiceProvider serviceProvider,
     RequestInfo requestInfo
-    ) : ApiBase(serviceScopeFactory, cacheDataProvider, unitOfWork, loggingServices, mapper, userInfo,
-        serviceProvider, requestInfo)
+    ) : ApiServiceBase
 {
+    public async Task<Plan?> GetPlanAsync(Guid id)
+        => await unitOfWork.GetRepository<Plan>().GetByIDActiveNonDeleted(id);
+
     public async Task<string> CreateServicPlan(PlanServiceRequest model)
     {
         if (await IsThereExistingDraftPlanForSameAcadmicYear(model))
@@ -36,6 +30,23 @@ public class PlanServiceRequestRepository(IServiceScopeFactory serviceScopeFacto
         //await unitOfWork.GetRepository<PlanServiceRequest>().InsertAsync(model);
         //await unitOfWork.CommitAsync();
         //return (await unitOfWork.GetRepository<PlanServiceRequest>().GetByIdAsync(model.Id));
+    }
+    public async Task<bool> UpdatePlanAsync(Plan plan)
+{
+    var repo = unitOfWork.GetRepository<Plan>();
+    repo.Update(plan);
+        await unitOfWork.CommitAsync();
+    return  true;
+}
+    public async Task<Plan> ApprovePlansAsync(Plan model)
+    {
+        if (model == null)
+            throw new ArgumentNullException(nameof(model));
+
+        await unitOfWork.GetRepository<Plan>().InsertAsync(model);
+        await unitOfWork.CommitAsync();
+
+        return model;
     }
     public async Task<bool> DeleteEvaluationPlan(Guid? id)
     {
@@ -49,7 +60,7 @@ public class PlanServiceRequestRepository(IServiceScopeFactory serviceScopeFacto
         await unitOfWork.CommitAsync();
         return true;
     }
-    
+
     //public async Task<bool> DeleteSchoolFromPlan(Guid requestId, Guid schoolId)
     //{
     //    var plan = await unitOfWork.GetRepository<Plan>().GetByIdAsync(changeRequest.PlanId);
@@ -59,16 +70,10 @@ public class PlanServiceRequestRepository(IServiceScopeFactory serviceScopeFacto
     //    await unitOfWork.CommitAsync();
     //    return true;
     //}
-    public async Task<List<PlanTypeDto>> GetPlanTypeAsync()
+    public IQueryable<PlanType> GetPlanType()
     {
-        return await serviceScopeFactory.CreateScopedUow().GetRepository<PlanType>()
-            .GetAllActiveNonDeleted()
-            .Select(s => new PlanTypeDto
-            {
-                Id = s.Id,
-                Name = requestInfo.Lang == LanguageConst.Ar ? s.NameAr : s.NameEn,
-            }).
-            ToListAsync();
+        return  serviceScopeFactory.CreateScopedUow().GetRepository<PlanType>()
+            .GetAllActiveNonDeleted();            
     }
     private async Task<bool> IsThereExistingDraftPlanForSameAcadmicYear(PlanServiceRequest model)
     {

@@ -1,5 +1,4 @@
-﻿using System.Reflection.PortableExecutable;
-using Evaluation.DAL.Models.Planing;
+﻿using Evaluation.DAL.Models.Planing;
 using Evaluation.SharedHelper.Dtos.SchoolDto;
 
 namespace Evaluation.SharedHelper.Dtos.PlanDto;

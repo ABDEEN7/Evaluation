@@ -6015,9 +6015,6 @@ namespace Evaluation.DAL.Migrations
                     b.Property<DateTime?>("DeleteDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid>("DepartmentId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<DateOnly>("EndDate")
                         .HasColumnType("date");
 
@@ -6063,8 +6060,6 @@ namespace Evaluation.DAL.Migrations
                     b.HasIndex("CreateById");
 
                     b.HasIndex("DeleteById");
-
-                    b.HasIndex("DepartmentId");
 
                     b.HasIndex("PlanStatusId");
 
@@ -12725,12 +12720,6 @@ namespace Evaluation.DAL.Migrations
                         .HasForeignKey("DeleteById")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Evaluation.DAL.Models.DepartementEntites.Department", "Department")
-                        .WithMany()
-                        .HasForeignKey("DepartmentId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("Evaluation.DAL.Models.Planing.PlanStatus", "PlanStatus")
                         .WithMany()
                         .HasForeignKey("PlanStatusId")
@@ -12758,8 +12747,6 @@ namespace Evaluation.DAL.Migrations
                     b.Navigation("CreateBy");
 
                     b.Navigation("DeleteBy");
-
-                    b.Navigation("Department");
 
                     b.Navigation("PlanStatus");
 
