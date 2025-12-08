@@ -25,6 +25,7 @@ namespace Evaluation.SharedHelper.Helper
         public static string StudentInfoURL { get; set; } = "";
         public static bool IsProduction { get; set; }
         public static string FormJwtConfigKey { get; set; } = "";
+        public static string FormJwtExpirationTime { get; set; } = "";
         public static string OracleDBConnection { get; set; } = "";
     }
 }
