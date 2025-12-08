@@ -235,9 +235,10 @@ function ClearForViewMode() {
     $('#dropzonejs').hide();
 }
 
-const loadData = () => {
-   
+
+const loadData = (isSearch) => {
     isLoading = true;
+
     const options = {
         success: function (data) {
             if (data) {
@@ -245,20 +246,23 @@ const loadData = () => {
 
                 if (data && data.length > 0) {
                     if (isSearch) {
-                        table.setData([]);
+                        table.setData([]).then(function () {
+                            setAllColumnWidths(table, columnWidths);
+                        });
                         currentPage = 1;
                     }
 
-                    table.addData(data);
+                    table.addData(data).then(function () {
+                        setAllColumnWidths(table, columnWidths);
+                    });
                     currentPage = currentPage + 1;
                     isLoading = false;
                 }
-                else {
-                    currentPage = 0;
-                }
+
             }
         }
     };
+
     jqClientAdvanced(options).Get("Department/GetAllDepartment".concat('?page=', currentPage));
 };
 
