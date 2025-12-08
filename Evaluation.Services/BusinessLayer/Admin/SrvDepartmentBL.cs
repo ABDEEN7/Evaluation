@@ -2,6 +2,7 @@
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.Calendars;
 using Evaluation.DAL.Models.DepartementEntites;
+using Evaluation.DAL.Models.Website;
 using Evaluation.DAL.Repositories;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Enums;
@@ -39,7 +40,7 @@ namespace Evaluation.Services.Models.Admin
 
         }
    
-        public async Task<DepartmentDTO> SaveDepartment(DepartmentDTO message)
+        public async Task<DepartmentDTO> SaveDepartment(DepartmentDTO message, List<WebsiteAttachmentDTO>? filemodel)
         {
            
            
@@ -56,7 +57,28 @@ namespace Evaluation.Services.Models.Admin
                 message.ResponseStatus = DBResult.BackendExist;
                 return message;
             }
+            if (filemodel != null)
+            {
+                if (filemodel.Count > 0)
+                {
 
+                    foreach (var item in filemodel)
+                    {
+                        WebsiteAttachment attachment = new WebsiteAttachment();
+                        attachment.FileName = item.FileName;
+                        attachment.UiFileName = item.UiFileName;
+                        attachment.BlobUrl = item.BlobUrl;
+                        attachment.FileExtension = item.FileExtension;
+                        attachment.FileSize = item.FileSize;
+                        attachment.IsActive = true;
+                        await uow.GetRepository<WebsiteAttachment>().InsertAsync(attachment);
+                        message.WebsiteAttachmentId = attachment.Id;
+                    }
+
+
+                }
+
+            }
             Department obj = new Department();
 
             obj.NameAr = message.NameAr;
@@ -69,6 +91,7 @@ namespace Evaluation.Services.Models.Admin
             obj.IsNDA = message.IsNDA;
             obj.DescAr = message.DescAr;
             obj.DescEn = message.DescEn;
+            obj.WebsiteAttachmentId = message.WebsiteAttachmentId;
             obj.IsActive = message.IsActive;
 
             uow.GetRepository<Department>().Insert(obj);
@@ -78,7 +101,7 @@ namespace Evaluation.Services.Models.Admin
                 return result;
             
         }
-        public async Task<DepartmentDTO> UpdateDepartment(DepartmentDTO message)
+        public async Task<DepartmentDTO> UpdateDepartment(DepartmentDTO message, List<WebsiteAttachmentDTO>? filemodel)
         {
            
             
@@ -95,7 +118,30 @@ namespace Evaluation.Services.Models.Admin
                                       .Include(x => x.CreateBy)
                                       .Where(x => x.Id == message.Id)
                                       .FirstAsync();
+                var attachmentinserted = 0;
+                if (filemodel != null)
+                {
+                    if (filemodel.Count > 0)
+                    {
 
+                        foreach (var item in filemodel)
+                        {
+                            WebsiteAttachment attachment = new WebsiteAttachment();
+                            attachment.FileName = item.FileName;
+                            attachment.UiFileName = item.UiFileName;
+                            attachment.BlobUrl = item.BlobUrl;
+                            attachment.FileExtension = item.FileExtension;
+                            attachment.FileSize = item.FileSize;
+                            attachment.IsActive = true;
+                            attachmentinserted = 1;
+                            uow.GetRepository<WebsiteAttachment>().Insert(attachment);
+                            message.WebsiteAttachmentId = attachment.Id;
+                        }
+
+
+                    }
+
+                }
 
                 obj.NameAr = message.NameAr;
                 obj.NameEn = message.NameEn;
@@ -107,6 +153,7 @@ namespace Evaluation.Services.Models.Admin
                 obj.IsNDA = message.IsNDA;
                 obj.DescAr = message.DescAr;
                 obj.DescEn = message.DescEn;
+                obj.WebsiteAttachmentId = (attachmentinserted == 1 ? message.WebsiteAttachmentId : obj.WebsiteAttachmentId);
                 obj.IsActive = message.IsActive;
 
                 uow.GetRepository<Department>().Update(obj);
