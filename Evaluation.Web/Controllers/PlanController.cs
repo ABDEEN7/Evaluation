@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Evaluation.Web.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Evaluation.Web.Controllers
 {
@@ -10,7 +11,19 @@ namespace Evaluation.Web.Controllers
 		}
 		public IActionResult Create()
         {
-            return View();
+            var viewModel = new PlanViewModel
+            {
+                RenderType = "action",
+                ActionType = "CREATE",
+                PlanId = null,
+                OldPlanId = null
+            };
+
+            return View(viewModel);
+        }
+        public IActionResult Update(Guid planId)
+        {
+            return View(planId);
         }
 		
 	}

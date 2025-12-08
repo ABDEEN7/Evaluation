@@ -1,17 +1,19 @@
-﻿using Evaluation.DAL.Helper;
+﻿using System.Linq.Expressions;
+using AutoMapper;
+using Evaluation.DAL.Helper;
+using Evaluation.DAL.Models.Org;
+using Evaluation.DAL.Repositories;
 using Evaluation.Services.BusinessLayer.API.SchooLayer;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper;
+using Evaluation.SharedHelper.Consts;
 using Evaluation.SharedHelper.Dtos.SchoolDto;
+using Evaluation.SharedHelper.Extensions;
 using Evaluation.SharedHelper.Helper;
 using Evaluation.SharedHelper.Models;
 using FluentResults;
-using Mapster;
-using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Evaluation.DAL.Models.Org;
-using Evaluation.DAL.Repositories;
 
 namespace Evaluation.Services.BusinessLayer.API;
 
@@ -24,8 +26,6 @@ public class SchoolBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvide
 
     public async Task<School> GetSchoolDetails(Guid SchoolID)
     {
-        var schoollist = await uow.GetRepository<School>().GetAllActiveNonDeleted().ToListAsync();
-
         var schoolData = await serviceProvider.CreateScopedUow().GetRepository<School>()
             .GetAllQueryFiltered()
             .AsNoTracking()
@@ -33,22 +33,18 @@ public class SchoolBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvide
                .FirstOrDefaultAsync();
         return schoolData;
     }
-    public async Task<Result<List<ResponseSchools>>> GetSchools()
+    public async Task<PaginatedResult<ResponseSchools>> GetSchools(SchoolRequest request)
     {
-        return await ExecuteWithResult(async () =>
-        {
-            var schoolsRequest = await schoolRepository.GetSchoolsAsync();
-            var schoolResponse = schoolsRequest.Adapt<List<ResponseSchools>>();
-            return schoolResponse;
-        });
+        var result = await schoolRepository.GetSchoolsAsync(request);
+        return mapper.Map<PaginatedResult<ResponseSchools>>(result);
     }
-    public async Task<Result<List<SchoolVisits>>> GetVisitsAsync()
+    public async Task<List<SchoolVisits>> GetVisitsAsync()
     {
-        return await ExecuteWithResult(async () =>
+        var responses = schoolRepository.GetVisitTypes();
+        return await responses.Select(x => new SchoolVisits
         {
-            var responses = await schoolRepository.GetVisitTypes();
-            return responses;
-        });
+            Id = x.Id,
+            Name = LanguageStatic.SelectLang(requestInfo.Lang, x.NameAr, x.NameEn)
+        }).ToListAsync();
     }
-
 }

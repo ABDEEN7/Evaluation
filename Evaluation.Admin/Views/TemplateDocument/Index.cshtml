@@ -1,0 +1,85 @@
+﻿@using Evaluation.Admin.Extensions
+@using static Evaluation.SharedHelper.Enums.ConstantKeys
+
+@model TemplateDocumentVM
+@{
+
+    string Lang = Model.CurrentLanguage;
+    var uiControlItems = Model.UiControlItems.Where(x => x.RowOrder > 0).ToList();
+    var textDir = Lang == "ar" ? "RTL" : "LTR";
+    var permissionsList = Model.PermissionsList;
+    var controlsList = Model.ControlsList;
+    var settingList = Model.SettingList;
+    var columnList = Model.Constraints.Where(x => x.ShowInGrid == true).ToList();
+    var containsOrderNo = Model.containsOrderNo;
+}
+
+
+@section Styles {
+
+
+}
+
+@await Component.InvokeAsync("ServiceSelection")
+    <section id="tbl-template-container">
+        <div class="card app-card">
+            <div class="card-header justify-content-end d-flex align-items-center bg-light">
+                @if (permissionsList.IsPermissionAvailabe(AdminPermission.ADD_ADMIN_TEMPLATEDOC))
+                {
+                    <button id="btn-add-content" type="button" class="btn btn-primary">
+                        <i class="fa fa-plus-circle"></i> &nbsp;@controlsList.GetUiControlText(AdminBackendUI.ADD_RECORD)
+                    </button>
+                }
+            </div>
+            <div class="card-body"><div id="view-container"></div></div>
+        </div>
+    </section>
+
+    <section class="display-none" id="form-section">
+        <div class="card app-card">
+            <form enctype="multipart/form-data" id="app-form">
+                <input asp-for="Id" hidden />
+                <div class="card-header justify-content-end d-flex align-items-center bg-light"><div class="closeit"><i class="fa fa-close"></i></div></div>
+            <div class="card-body">
+                @if (uiControlItems != null)
+                {
+                    <div class="row">
+                        @{
+                            @await Component.InvokeAsync("UiControlList", uiControlItems)
+                        }
+                    </div>
+                }
+               
+                <div class="btns-group mb-0 mt-3" id="action-container">
+                    <button type="button" id="btn-back" class="btn btn-secondary">@controlsList.GetUiControlText(AdminBackendUI.BACK_BUTTON)</button>
+                    <button type="button" id="btn-submit" class="btn btn-primary">@controlsList.GetUiControlText(AdminBackendUI.SAVE_BUTTON)</button>
+                </div>
+            </div>
+
+            </form>
+        </div>
+
+    </section>
+<div>
+    <input id="TemplateDocumentAttachmentId" hidden/>
+</div>
+@section Scripts {
+  
+    <script src="~/lib/bootstrap-datepicker/dist/js/bootstrap-datepicker.js" asp-append-version="true"></script>
+  
+    <script>
+         var controlsList = JSON.parse(`@Html.Raw(Json.Serialize(controlsList))`);
+         var columnList = @Html.Raw(Json.Serialize(columnList));
+        const settingList = JSON.parse(`@Html.Raw(Json.Serialize(settingList))`);
+         sharedFn().PopulateUiControl(controlsList);
+        let txtDir = '@textDir';
+        let containsOrderNo='@containsOrderNo';
+          const controlvalidationlist = @Html.Raw(Json.Serialize(uiControlItems));
+        let IsEdit='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.EDIT_ADMIN_TEMPLATEDOC))';
+        let IsDelete='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.DELETE_ADMIN_TEMPLATEDOC))';
+         let IsView='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.VIEW_ADMIN_TEMPLATEDOC))';
+        let TableColumns= sharedFn().PopulateColumn(columnList);
+        sharedFn().InitializeControl(controlvalidationlist, settingList);
+    </script>
+    <script src="~/js/admin/TemplateDocument.js" asp-append-version="true"></script>
+}

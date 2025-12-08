@@ -22,7 +22,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
     public class SrvNotification(IServiceScopeFactory serviceScopeFactory, IEmailServices emailServices, CacheDataProvider cacheDataProvider, MasterBL masterBL, UnitOfWork uow, LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, IServiceProvider serviceProvider, RequestInfo _requestInfo, EmailTemplateProvider emailTemplateProvider)
             : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, _requestInfo)
         {
-        public async Task HandleNotification(IList<ActionStatusConfigNotification> notifications, ServiceRequest request, Guid actionId, string lang, string remarks, List<Attachment>? actionOtherAttachments = null)
+        public async Task HandleNotification(IList<ActionStatusConfigNotification> notifications, ServiceRequest request, Guid actionId, string lang, string remarks, List<EvalAttachment>? actionOtherAttachments = null)
         {
 
             if (notifications != null)
@@ -116,7 +116,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             var student = allUserProfiles.FirstOrDefault(u => u.Id == studentId.Value);
             return student != null ? new List<MinistryUser> { student } : new List<MinistryUser>();
         }
-        private async Task sendEmail( List<MinistryUser> recipients,Guid emailTemplateId,ServiceRequest requestData,  Guid actionId, Guid? partyTypeId = null, string lang = "ar",string remarks = null!, List<Attachment> actionOtherAttachments = null!)
+        private async Task sendEmail( List<MinistryUser> recipients,Guid emailTemplateId,ServiceRequest requestData,  Guid actionId, Guid? partyTypeId = null, string lang = "ar",string remarks = null!, List<EvalAttachment> actionOtherAttachments = null!)
         {
             using var scopedUow = serviceScopeFactory.CreateScopedUow();
 
@@ -150,7 +150,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
             await emailServices.SendEmail(emailModel.messageModel);
         }
-        private async Task AddDynamicAttachments(EmailTemplate template, ServiceRequest requestData, EmailMessageModel emailModel, List<Attachment> actionOtherAttachments, UnitOfWork uow)
+        private async Task AddDynamicAttachments(EmailTemplate template, ServiceRequest requestData, EmailMessageModel emailModel, List<EvalAttachment> actionOtherAttachments, UnitOfWork uow)
         {
             var templateEngine = serviceProvider.GetRequiredService<TemplateBl>();
 

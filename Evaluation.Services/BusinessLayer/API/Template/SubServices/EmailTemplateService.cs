@@ -61,7 +61,7 @@ namespace Evaluation.Services.BusinessLayer.API.Template
                 switch (generationType)
                 {
                     case "AttachmentWithoutPlaceHolder":
-                        var attachment = await scopedUow.GetRepository<Attachment>().GetByIDActiveNonDeleted(templateId);
+                        var attachment = await scopedUow.GetRepository<EvalAttachment>().GetByIDActiveNonDeleted(templateId);
                         if (attachment == null) throw new BusinessException(ConstantKeys.ExceptionMessage.InActiveData);
 
                         var url = blobService.GenerateSasToken(attachment.FileName);

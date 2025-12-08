@@ -1,15 +1,18 @@
 ﻿using Evaluation.DAL.Extensions;
+using Evaluation.DAL.Models.Attachments;
 using Evaluation.DAL.Models.Audit;
 using Evaluation.DAL.Models.Authentication;
 using Evaluation.DAL.Models.BaseModule;
 using Evaluation.DAL.Models.Calendars;
 using Evaluation.DAL.Models.DepartementEntites;
+using Evaluation.DAL.Models.EvalResult;
 using Evaluation.DAL.Models.FormsModules;
 using Evaluation.DAL.Models.Master;
 using Evaluation.DAL.Models.Org;
 using Evaluation.DAL.Models.PermissionEntity;
 using Evaluation.DAL.Models.Planing;
 using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
+using Evaluation.DAL.Models.Planing.TeamsModule;
 using Evaluation.DAL.Models.ServiceEnities;
 using Evaluation.DAL.Models.ServiceRequestEntities;
 using Evaluation.DAL.Models.SystemSetting;
@@ -50,7 +53,7 @@ public partial class EvaluationDbContext : DbContext
     public virtual DbSet<EvaluationParty> EvaluationParties { get; set; }
     public virtual DbSet<EvalForm> EvalForms { get; set; }
     public virtual DbSet<FormScope> FormScopes { get; set; }
-    public virtual DbSet<FormItem> FormItems { get; set; }
+    public virtual DbSet<FormItem> FormItem { get; set; }
     public virtual DbSet<FormItemValue> FormItemValues { get; set; }
     public virtual DbSet<Scope> Scopes { get; set; }
     public virtual DbSet<ScopeType> ScopeTypes { get; set; }
@@ -94,14 +97,19 @@ public partial class EvaluationDbContext : DbContext
     public virtual DbSet<EvaluationType> EvaluationType { get; set; }
     public virtual DbSet<DepartmentHoliday> DepartmentHolidays { get; set; }
     public virtual DbSet<Semester> Semesters { get; set; }
-    public virtual DbSet<FormItem> FormItem { get; set; }
     public virtual DbSet<EvalFormType> EvalFormType { get; set; }
     public virtual DbSet<SubFormItem> SubFormItems { get; set; }
     public virtual DbSet<SubFormItemValue> SubFormItemValues { get; set; }
+    public virtual DbSet<DepEvalMatrix> DepEvalMatrixs { get; set; }
+    public virtual DbSet<OrgEvalResult> OrgEvalResults { get; set; }
+    public virtual DbSet<UserTeam> UserTeams { get; set; }
+    public virtual DbSet<RequestAssignmentScope> RequestAssignmentScopes { get; set; }
+    public virtual DbSet<EvalAttachment> EvalAttachments { get; set; }
+    public virtual DbSet<PlanTypeDep> PlanTypeDep { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        //optionsBuilder.UseSqlServer("Server=DCDCSQL2DNET01;Database=Evaluation;Trust Server Certificate=true;User id=t-m.fatouh-dev;Integrated Security=SSPI;");
+        optionsBuilder.UseSqlServer("Server=DCDCSQL2DNET01;Database=Evaluation;Trust Server Certificate=true;User id=t-m.fatouh-dev;Integrated Security=SSPI;");
         //optionsBuilder.UseSqlServer("Server=DCDCSQL2DNET01;Database=Evaluation;Trust Server Certificate=true;User id=Eval_User; Password=Abc@1234;");
     }
 

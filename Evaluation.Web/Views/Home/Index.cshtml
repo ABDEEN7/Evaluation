@@ -7,26 +7,13 @@
     <!-- Banner Section -->
     <section class="banner p-0 ">
         <div class="swiper mySwiper">
-            <div class="swiper-wrapper">
-                <!-- Slide 1 -->
-                <div class="swiper-slide">
-                    <img src="~/assets/img/slider1.jpg" alt="Banner Image">
-                    <div class="banner-content">
-                        <h1 class="text-white mb-4">منصة تقييم المنشآت التعليمية</h1>
-                        <p>نعمل على الارتقاء بجودة التعليم في قطر من خلال تقييم شامل ومتكامل للمؤسسات التعليمية، استنادًا إلى معايير عالمية ومنسجمًا مع رؤية قطر الوطنية 2030، بما يضمن توفير بيئة تعليمية متميزة لأبنائنا.</p>
-                    </div>
-                </div>
-                <!-- Slide 2 -->
-                <div class="swiper-slide">
-                    <img src="~/assets/img/slider1.jpg" alt="Banner Image">
-                    <div class="banner-content">
-                        <h1 class="text-white mb-4">منصة تقييم المنشآت التعليمية</h1>
-                        <p>نعمل على الارتقاء بجودة التعليم في قطر من خلال تقييم شامل ومتكامل للمؤسسات التعليمية، استنادًا إلى معايير عالمية ومنسجمًا مع رؤية قطر الوطنية 2030، بما يضمن توفير بيئة تعليمية متميزة لأبنائنا.</p>
-                    </div>
-                </div>
+            <div class="swiper-wrapper" id="banner-swiper-wrapper">
+                <div class="swiper-pagination"></div>
 
             </div>
         </div>
+        <div class="swiper-button-prev"></div>
+        <div class="swiper-button-next"></div>
     </section>
     <section>
         <div class="container">
@@ -65,4 +52,5 @@
         </div>
     </section>
 </main>
+<script src="~/assets/vendor/swiper/swiper-bundle.min.js" asp-append-version="true"></script>
 <script src="~/js/home/index.js"></script>

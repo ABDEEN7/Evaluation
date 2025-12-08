@@ -71,7 +71,7 @@ namespace Evaluation.Services.Models.Admin
 
             obj.NameAr = message.NameAr;
             obj.NameEn = message.NameEn;
-            obj.StartDate = message.StartDate;
+            obj.StartDate =message.StartDate;
             obj.EndDate = message.EndDate;
             obj.Year = message.Year;
             obj.DepartmentId = message.DepartmentId;

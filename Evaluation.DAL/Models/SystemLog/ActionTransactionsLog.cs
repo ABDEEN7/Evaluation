@@ -23,6 +23,6 @@ namespace Evaluation.DAL.Models.SystemLog
         public Guid PreviousStatusId { get; set; }
         public Guid NextStatusId { get; set; }
         public string? Remarks { get; set; }
-        public ICollection<Attachment>? ActionTransactionAttachments { get; set; }
+        public virtual ICollection<EvalAttachment>? EvalAttachments { get; set; }
     }
 }

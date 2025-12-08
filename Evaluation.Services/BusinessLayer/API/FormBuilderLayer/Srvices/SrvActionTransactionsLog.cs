@@ -95,7 +95,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                         .Include(c => c.CreateBy)
                         .Include(c => c.ServiceAction)
                         .Include(c => c.ServiceAction!.ActionShowLogPartyTypes)
-                        .Include(c => c.ActionTransactionAttachments)
+                        .Include(c => c.EvalAttachments)
                         .AsSplitQuery()
                         .Where(c => c.ServiceRequestId == id).ToListAsync();
 
@@ -135,7 +135,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
         public async Task<List<AttachementDTO>?> GetActionTransactionAttachments(Guid id)
         {
             var attachments = await serviceScopeFactory.CreateScopedUow()
-                            .GetRepository<Attachment>()
+                            .GetRepository<EvalAttachment>()
                             .GetAllActiveNonDeleted()
                             .Where(c => c.ActionTransactionsLogId == id)
                             .Select(m => new AttachementDTO() { Id = m.Id, UiFileName = m.UiFileName }).ToListAsync();

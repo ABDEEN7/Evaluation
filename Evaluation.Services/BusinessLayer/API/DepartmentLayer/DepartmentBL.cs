@@ -15,7 +15,8 @@ public class DepartmentBL(IServiceScopeFactory serviceScopeFactory, CacheDataPro
 {
     public async Task<List<DepartmentDto>> GetAllDepartments()
     {
-        var x = await departmentService.GetAllDepartments();
-            return mapper.Map<List<DepartmentDto>>(x);
+        var departments = await departmentService.GetAllDepartments();
+
+        return mapper.Map<List<DepartmentDto>>(departments);
     }
 }

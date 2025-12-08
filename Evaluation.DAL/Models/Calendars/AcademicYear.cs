@@ -9,8 +9,8 @@ public class AcademicYear : EntityBase
 {
     public string NameAr { get; set; } = null!;
     public string NameEn { get; set; } = null!;
-    public DateTime StartDate { get; set; }
-    public DateTime EndDate { get; set; }
+    public DateOnly StartDate { get; set; }
+    public DateOnly EndDate { get; set; }
     public int Year { get; set; }
     public Guid DepartmentId { get; set; }
     public Department? Department { get; set; }

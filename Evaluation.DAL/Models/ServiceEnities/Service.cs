@@ -35,10 +35,14 @@ namespace Evaluation.DAL.Models.ServiceEnities
         public bool ShowInWebSite { get; set; }
 
 		public Guid? EvaluationPartyId { get; set; }
-		public EvaluationParty? EvaluationParty { get; set; }
-		public virtual ICollection<FormGroup>? FormGroups { get; set; }
+        public EvaluationParty? EvaluationParty { get; set; }
+
+        public bool ShowInCalendar { get; set; }
+
+        public virtual ICollection<FormGroup>? FormGroups { get; set; }
         public virtual ICollection<ServiceStatus>? Statuses { get; set; }
         public virtual ICollection<ServiceRequestShowPartyType>? RequestShowPartyType { get; set; }
+        public virtual ICollection<ServiceInitiatorPartyType>? ServiceInitiatorPartyType { get; set; }
 
     }
 }

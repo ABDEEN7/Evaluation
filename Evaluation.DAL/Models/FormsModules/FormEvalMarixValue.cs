@@ -10,8 +10,8 @@ namespace Evaluation.DAL.Models.FormsModules
 {
     public  class FormEvalMarixValue : EntityBase , IAuditLogEntity
     {
-        public Guid FormEvalMarixid { get; set; }
-        public FormEvalMarix? FormEvalMarix { get; set; }
+        public Guid FormEvalMatrixId { get; set; }
+        public FormEvalMatrix? FormEvalMatrix { get; set; }
         public string NameAr { get; set; } = null!;
         public string NameEn { get; set; } = null!;
         public decimal MinValue { get; set; } 

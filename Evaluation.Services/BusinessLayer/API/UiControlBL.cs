@@ -37,7 +37,7 @@ namespace Evaluation.Services.Models.API
         }
         //public string GetWebLogo()
         //{
-        //    using (var newuow = serviceProvider.CreateScopedUow())
+        //    using (var newuow = serviceProvider.CreateScopeduow())
         //    {
 
         //        var result = newuow.GetRepository<SystemSetting>()

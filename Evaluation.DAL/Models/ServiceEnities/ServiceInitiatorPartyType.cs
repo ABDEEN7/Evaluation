@@ -12,9 +12,9 @@ namespace Evaluation.DAL.Models.ServiceEnities
     public class ServiceInitiatorPartyType : EntityBase, IAuditLogEntity
     {
         public Guid serviceId { get; set; }
-        public Service service { get; set; }
+        public Service? service { get; set; }
         public Guid PartyTypeId { get; set; }
-        public PartyType PartyType { get; set; }
+        public PartyType? PartyType { get; set; }
 
     }
 }
