@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Azure;
 using Azure.Core;
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.ActionEntities;
@@ -8,12 +9,17 @@ using Evaluation.DAL.Repositories;
 using Evaluation.Services.BusinessLayer.API;
 using Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices;
 using Evaluation.Services.Extensions;
+using Evaluation.Services.Models.API;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Api.ActionEntitiesDTOs;
+using Evaluation.SharedHelper.Models.Api.AttachmentsDTOs;
 using Evaluation.SharedHelper.Models.Api.FormBuilderDTO;
+using Evaluation.SharedHelper.Models.Api.ServiceDTOs;
+using Evaluation.SharedHelper.Models.Api.ServiceRequestEntitiesDTO;
+using Evaluation.SharedHelper.Models.Api.TemplatesDTO;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,15 +30,16 @@ using System.Data.Common;
 using System.Drawing;
 using System.Globalization;
 using System.Reflection.PortableExecutable;
+using static Evaluation.SharedHelper.Enums.ConstantKeys;
 
 
 
 namespace Evaluation.Services.BusinessLayer.API
 {
-    public class  FormRenderBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, SrvUser SrvUser, UnitOfWork uow, LoggingServices loggingServices,
-                  IMapper mapper,UserInfo userInfo,   RequestInfo _requestInfo, SrvServiceRequest SrvServiceRequest
-            , SrvAttachments SrvAttachments, SrvDropdown SrvDropdown,
-                SrvField srvField, IServiceProvider serviceProvider)
+    public class  FormRenderBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, SrvUser _srvUser, UnitOfWork uow, LoggingServices loggingServices, SrvAction _srvAction,
+				  IMapper mapper,UserInfo userInfo,   RequestInfo _requestInfo, SrvServiceRequest _srvServiceRequest, SrvService _srvService, SrvActionStatusConfiguration _srvActionStatusConfiguration
+			, SrvAttachments _srvAttachments, SrvDropdown _srvDropdown, SrvStatus _srvStatus, SrvAssignment _srvAssignment,
+				SrvField _srvField, IServiceProvider serviceProvider)
             : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, _requestInfo)
         {
 
@@ -44,10 +51,10 @@ namespace Evaluation.Services.BusinessLayer.API
 			var integrationFieldsToProcess = new ConcurrentBag<FieldValueDTO>();
 			var schAttachmentIds = new ConcurrentBag<string>();
 
-			var hiddenFieldsTask = srvField.GetHiddenFields(action.ServiceId);
-			var ActionFieldsTask = srvField.GetFieldsByActionId(action.Id, action.ServiceId);
-			var ActionFieldListsTask = srvField.GetFieldsListByActionIdAsync(action.ServiceId);
-			var requestFieldValuesTask = SrvServiceRequest.GetRequestFieldsValueAsync(requestId);
+			var hiddenFieldsTask = _srvField.GetHiddenFields(action.ServiceId);
+			var ActionFieldsTask = _srvField.GetFieldsByActionId(action.Id, action.ServiceId);
+			var ActionFieldListsTask = _srvField.GetFieldsListByActionIdAsync(action.ServiceId);
+			var requestFieldValuesTask = _srvServiceRequest.GetRequestFieldsValueAsync(requestId);
 
 			await Task.WhenAll(hiddenFieldsTask, ActionFieldsTask, ActionFieldListsTask, requestFieldValuesTask);
 
@@ -83,7 +90,7 @@ namespace Evaluation.Services.BusinessLayer.API
 
 					if (field.FormGroupListId.HasValue)
 					{
-						jsonSchemaTask = srvField.GenerateJsonSchemaForFormGroupList(field.FormGroupListId.Value, stepFieldsList);
+						jsonSchemaTask = _srvField.GenerateJsonSchemaForFormGroupList(field.FormGroupListId.Value, stepFieldsList);
 					}
 
 					var isEditable = action.ActionFields!
@@ -218,8 +225,8 @@ namespace Evaluation.Services.BusinessLayer.API
 
 			//var userProfile = await SrvUser.GetStudentByIdAsync(userId.Value);
 
-			//var schFieldValues = (ScholarshipId != Guid.Empty && ScholarshipId != null)
-			//	? await SrvScholarship.GetSchFieldValues(ScholarshipId.Value)
+			//var schFieldValues = (PlanId != Guid.Empty && PlanId != null)
+			//	? await SrvScholarship.GetSchFieldValues(PlanId.Value)
 			//	: new List<SchFieldValue>();
 
 			//// 3. Process each field
@@ -361,8 +368,8 @@ namespace Evaluation.Services.BusinessLayer.API
 			var result = action.Adapt<ActionCustomDTO>();
 
 			// Fetch necessary data in parallel to improve performance
-			var hiddenFieldsTask = srvField.GetHiddenFields(request.ServiceId);
-			var ActionFieldsListTask = srvField.GetFieldsListByActionIdAsync(action.ServiceId);
+			var hiddenFieldsTask = _srvField.GetHiddenFields(request.ServiceId);
+			var ActionFieldsListTask = _srvField.GetFieldsListByActionIdAsync(action.ServiceId);
 
 			await Task.WhenAll(hiddenFieldsTask, ActionFieldsListTask);
 
@@ -414,7 +421,7 @@ namespace Evaluation.Services.BusinessLayer.API
 				}).ToList() ?? [])!,
 				IsApproved = f.IsApproved,
 				JsonSchema = f.Field.FormGroupListId is not null
-					 ? await srvField.GenerateJsonSchemaForFormGroupList(f.Field.FormGroupListId, stepFieldsList)
+					 ? await _srvField.GenerateJsonSchemaForFormGroupList(f.Field.FormGroupListId, stepFieldsList)
 					 : null
 			}).ToList();
 
@@ -443,8 +450,8 @@ namespace Evaluation.Services.BusinessLayer.API
 			string lang = _requestInfo.Lang;
 			var result = action.Adapt<ActionCustomDTO>();
 
-			var hiddenFieldsTask = srvField.GetHiddenFields(request.ServiceId);
-			var ActionFieldsListTask = srvField.GetFieldsListByActionIdAsync(request.ServiceId);
+			var hiddenFieldsTask = _srvField.GetHiddenFields(request.ServiceId);
+			var ActionFieldsListTask = _srvField.GetFieldsListByActionIdAsync(request.ServiceId);
 
 			await Task.WhenAll( hiddenFieldsTask, ActionFieldsListTask);
 
@@ -493,7 +500,7 @@ namespace Evaluation.Services.BusinessLayer.API
 				}).ToList() ?? [])!,
 				IsApproved = f.IsApproved,
 				JsonSchema = f.Field.FormGroupListId is not null
-							 ? await srvField.GenerateJsonSchemaForFormGroupList(f.Field.FormGroupListId, ActionFieldsList)
+							 ? await _srvField.GenerateJsonSchemaForFormGroupList(f.Field.FormGroupListId, ActionFieldsList)
 							 : null
 			}).ToList();
 
@@ -550,6 +557,213 @@ namespace Evaluation.Services.BusinessLayer.API
 				.ToList();
 		}
 
+		public async Task<IList<CssClassesDTO>> GetCssClassesAsync()
+		{
+			return await _srvField.GetCssClasses();
+		}
+		public async Task<ServiceDTO> GetServiceAsync(Guid serviceId)
+		{
+			var lang = _requestInfo.Lang;
+			var userId = userInfo.UserId;
 
+			var service = await _srvService.GetServiceDetailsAsync(serviceId, lang);
+
+			if (service.Initialservice &&
+				service.EligableScholarShips == null &&
+				service.Actions != null &&
+				service.Actions.Any() &&
+				service.Actions.Count == 1)
+			{
+				var action = service.Actions.First();
+				service.ServiceRequestDTO = await GetActionFieldAsync(serviceId, action.BakendName, null, null);
+			}
+
+			return service;
+		}
+
+		public async Task<List<ServiceDTO>> GetServicesWebAppAsync(string? moduleName)
+		{
+			var userId = userInfo.UserId;
+			return await _srvService.GetServicesbyDepartementAndPartyType(moduleName, userId);
+		}
+
+		public async Task<List<DropDownValueDTO>> GetDropDownValuesByTypeIdAsync(
+			Guid? requestId,
+			Guid? schId,
+			Guid dropDownTypeId)
+		{
+			ServiceRequest? requestObj = null;
+			if (requestId.HasValue)
+			{
+				requestObj = await _srvServiceRequest.GetRequestByIdAsync(requestId.Value)
+							 ?? throw new BusinessException($"Service request with ID {requestId} not found.");
+			}
+
+			var OrgTreetId = _srvServiceRequest.GetOrgTreeRequestId(requestObj)
+							?? throw new BusinessException(ExceptionMessage.UserNotFound);
+
+			var lang = _requestInfo.Lang;
+
+			var values = await _srvDropdown.GetDropDownValuesByDropDownTypeId(
+				dropDownTypeId,
+				OrgTreetId,
+				schId);
+
+			return values;
+		}
+
+		public async Task<List<DropDownValueDTO>> GetDropDownValuesByIdAsync(
+			Guid? requestId,
+			Guid? schId,
+			Guid dropDownTypeId,
+			Guid value)
+		{
+			ServiceRequest? requestObj = null;
+			if (requestId.HasValue)
+			{
+				requestObj = await _srvServiceRequest.GetRequestByIdAsync(requestId.Value)
+							 ?? throw new BusinessException($"Service request with ID {requestId} not found.");
+			}
+
+			var OrgTreetId = _srvServiceRequest.GetOrgTreeRequestId(requestObj)
+							?? throw new BusinessException(ExceptionMessage.UserNotFound);
+
+			var lang = _requestInfo.Lang;
+
+			var values = await _srvDropdown.GetDropDownValuesByDropDownTypeId(
+				dropDownTypeId,
+				OrgTreetId,
+				schId,
+				null,
+				value);
+
+			return values;
+		}
+
+		
+
+		public async Task<IEnumerable<TempLateDocDTO>> GetActionTemplatesByStatusAsync(Guid requestId)
+		{
+			var userId = userInfo.UserId;
+
+			if (!await _srvServiceRequest.HasAccessToRequestAsync(requestId, userId!.Value))
+			{
+				throw new UnauthorizedAccessException("You do not have permission to view this request.");
+			}
+
+			return await _srvActionStatusConfiguration.GetActionTemplatesByStatus(requestId);
+		}
+
+		public async Task<ServiceRequestDTO> GetActionFieldAsync(
+			Guid serviceId,
+			string actionBackendKey,
+			Guid? requestId = null,
+			Guid? PlanId = null)
+		{
+			string lang = _requestInfo.Lang;
+			var userId = userInfo.UserId;
+
+			var serviceTask = _srvService.GetServiceById(serviceId);
+			var actionTask = _srvAction.GetActionByBackendNameAsync(serviceId, actionBackendKey);
+			var statusIdTask = requestId is null
+				? _srvStatus.GetInitialStatusIdByServiceId(serviceId)
+				: Task.FromResult<Guid?>(null);
+			var requestObjTask = requestId is not null
+				? _srvServiceRequest.GetRequestByIdAsync(requestId.Value)
+				: Task.FromResult<ServiceRequest?>(null);
+			var hasAccessTask = requestId is not null
+				? _srvServiceRequest.HasAccessToRequestAsync(requestId.Value, userId!.Value)
+				: Task.FromResult(true);
+
+			await Task.WhenAll(serviceTask, actionTask, statusIdTask, hasAccessTask);
+
+			var service = await serviceTask ?? throw new BusinessException(ExceptionMessage.InvalidRequest);
+			var action = await actionTask
+						 ?? throw new BusinessException($"Action with key {actionBackendKey} not found for service {service.NameEn}.");
+
+			if (requestId is not null && !(hasAccessTask?.Result ?? false))
+			{
+				throw new UnauthorizedAccessException("You do not have permission to view this request.");
+			}
+
+			if (!service.Initialservice && action.IsInitialAction && PlanId == null)
+				throw new BusinessException(ExceptionMessage.MissingPlan);
+
+			if (requestId is null && !action.IsInitialAction)
+				throw new BusinessException(ExceptionMessage.InvalidRequest);
+
+			var isValidActionConditionsTask =
+				_srvActionStatusConfiguration.ValidateActionConditions(action.Id, requestId, PlanId);
+
+			var requestObj = await requestObjTask;
+			PlanId = requestId is not null ? requestObj!.PlanId : PlanId;
+
+			var actionCustomTask = action.ActionType!.BackendName switch
+			{
+				ActionTypeKeys.RequestDataChange => GetApprovedAndMissingFields(requestObj!, action),
+				ActionTypeKeys.SubmitMissingData => GetMissingFields(requestObj!, action),
+				_ => GetActionSteps(action, service.Id, requestId, PlanId)
+			};
+
+			var statusId = requestId is not null
+				? requestObj?.StatusId ?? throw new BusinessException(ExceptionMessage.InvalidRequest)
+				: await statusIdTask ?? throw new BusinessException(ExceptionMessage.lblNoServiceStatusFound);
+
+			var OrgTreeId = requestId != null ? requestObj!.OrgTreeId : userId;
+
+			if (OrgTreeId == Guid.Empty)
+				throw new BusinessException(ExceptionMessage.UserNotFound);
+
+			var dropDownTask = _srvDropdown.GetDropDownValuesForAction(
+				PlanId ?? requestObj?.PlanId,
+				OrgTreeId,
+				action.Id,
+				null,
+				lang,
+				requestId);
+
+			var actionConfigTask =
+				_srvActionStatusConfiguration.GetActionConfigurationDetails(action.Id, statusId);
+
+			var isValidActionConditions = await isValidActionConditionsTask;
+			if (!isValidActionConditions)
+				throw new BusinessException(ExceptionMessage.lblActionConditionsNotMet);
+
+			var actionCustom = await actionCustomTask;
+
+			Task<List<AttachementDTO?>> schAttachmentsTask =
+				(actionCustom.SchAttachmentIds is { Count: > 0 })
+					? _srvAttachments.GetAttachmentsByIdsAsync(actionCustom.SchAttachmentIds)
+					: Task.FromResult<List<AttachementDTO?>>(null!);
+
+			var actionConfig = await actionConfigTask
+							   ?? throw new BusinessException(ExceptionMessage.lblNoActionStatusConfiguration);
+
+			var assignUsers = new List<AssignUserDTO>();
+			if (action.ActionType.BackendName is ActionTypeKeys.Assign or ActionTypeKeys.Approve_And_Assign)
+			{
+				assignUsers = await _srvAssignment.GetAssignedUsers(
+					requestObj!,
+					action.Id,
+					actionConfig.ShowIsDefaultAssigner);
+			}
+
+			actionCustom.IsRemark = actionConfig.IsRemark;
+			actionCustom.IsOtherAttachment = actionConfig.IsOtherAttachment;
+			actionCustom.IsRemarkRequired = actionConfig.IsRemarkRequired;
+			actionCustom.IsOtherAttachmentRequired = actionConfig.IsOtherAttachmentRequired;
+			actionCustom.RemarkLabel = lang == "ar" ? actionConfig.RemarkLabelAr : actionConfig.RemarkLabelEn;
+			actionCustom.AttachmentLabel = lang == "ar" ? actionConfig.AttachmentLabelAr : actionConfig.AttachmentLabelEn;
+			actionCustom.AssignUsers = assignUsers;
+
+			var requestDto = new ServiceRequestDTO
+			{
+				ActionCustom = actionCustom,
+				DropDownValues = await dropDownTask,
+				SchAttachments = schAttachmentsTask != null ? await schAttachmentsTask : null
+			};
+
+			return requestDto;
+		}
 	}
 }

@@ -79,7 +79,7 @@
                 });
             }
         };
-        const url = "/ServiceRequest/GetCssClasses";
+        const url = "/FormRender/GetCssClasses";
         jqClient(options).Get(url);
     };
 

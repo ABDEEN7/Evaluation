@@ -84,5 +84,11 @@ public class PlanRequestRepository(IServiceScopeFactory serviceScopeFactory,
             .GetAllActiveNonDeleted()
             .AnyAsync(x => (x.AcademicYear.DepartmentId == model.AcademicYear.DepartmentId) && x.HasOnePlan);
     }
-
+    public async Task<List<Plan>> GetPlans()
+    {
+        var model = await unitOfWork
+            .GetRepository<Plan>()
+                .GetAllActiveNonDeleted().ToListAsync();
+        return model;
+    }
 }
