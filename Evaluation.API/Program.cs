@@ -7,9 +7,12 @@ using Evaluation.SharedHelper.Helper;
 using Evaluation.Web.Middlewares;
 using Mapster;
 using MapsterMapper;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -37,11 +40,15 @@ internal class Program
             ClsAppSetting.AzureBlobConnectionString = config.GetSection("AzureBlobStorageConnectionString").Value ?? "";
             ClsAppSetting.BlobSasUrl = config.GetSection("ConnectionStrings:AzureBlobStorage").Value ?? "";
            
-            ClsAppSetting.AllowWebCorsOnly = config.GetSection("AppSettings:baseAppUrl").Value!.Replace("/{lang}", "") ?? "";
-            ClsAppSetting.BaseApiUrl = config.GetSection("AppSettings:baseApiUrl").Value!.Replace("/{lang}", "") ?? "";
+           
             ClsAppSetting.OracleDBConnection = config["OracleDBConnection"] ?? "";
 
-
+            // Form JWT
+            ClsAppSetting.FormJwtConfigKey = (isKeyVault ? config["NSISStudentInfoURL"] : config["FormJwtConfig:Key"]) ?? "";
+            ClsAppSetting.FormJwtExpirationTime = (isKeyVault ? config["FormJwtExpirationTime"] : config["FormJwtConfig:ExpirationTime"]) ?? "";
+            ClsAppSetting.BaseApiUrl = (isKeyVault ? config["BaseApiUrl"] : config["AppSettings:baseApiUrl"]) ?? "";
+            ClsAppSetting.AllowWebCorsOnly = (isKeyVault ? config["baseAppUrl"] : config["AppSettings:baseAppUrl"]) ?? "";
+            ClsAppSetting.AllowAdminCorsOnly = (isKeyVault ? config["baseAdminUrl"] : config["AppSettings:baseAdminUrl"]) ?? "";
             // -------------------------------------
             // 2️⃣ Add Core Services
             // -------------------------------------
@@ -71,7 +78,7 @@ internal class Program
             builder.Services.ConfigureMasterBL(config, builder.Environment.IsDevelopment());
             builder.Services.AddScoped<TokenValidationFilter>();
 
-            builder.Services.AddScoped<TokenValidationFilter>();
+
 
             // -------------------------------------
             // 3️⃣ Register DbContext
@@ -84,6 +91,55 @@ internal class Program
             // -------------------------------------
             var mapsterConfig = TypeAdapterConfig.GlobalSettings;
 
+            // Add services to the container
+            builder.Services.AddControllers().AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+            });
+
+
+            // Configure JWT authentication
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    //ValidIssuer = config.GetValue<string>("FormJwtConfig:Issuer"), // Replace with your issuer
+                    //ValidAudience = config.GetValue<string>("FormJwtConfig:Audience"), // Replace with your audience
+                    ValidIssuer = ClsAppSetting.BaseApiUrl,
+                    ValidAudiences = new[]
+                    {
+                    ClsAppSetting.AllowWebCorsOnly,
+                    ClsAppSetting.AllowAdminCorsOnly,
+                    ClsAppSetting.BaseApiUrl,
+                    },
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(ClsAppSetting.FormJwtConfigKey)), // Replace with your secret key
+
+                    // Use custom lifetime validation
+                    LifetimeValidator = (notBefore, expires, securityToken, validationParameters) =>
+                    {
+                        // Custom logic here. For example, allow tokens that are within 5 minutes of expiration.
+                        if (expires.HasValue)
+                        {
+                            var expirationDate = expires.Value.ToLocalTime();
+                            var currentDate = DateTime.Now;
+
+                            return expirationDate > currentDate;
+                        }
+                        return false;
+                    }
+                };
+
+            });
+            builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
@@ -98,7 +154,7 @@ internal class Program
                     Scheme = "Bearer"
                 });
                 c.AddSecurityRequirement(new OpenApiSecurityRequirement
-                    {
+                {
                     {
                         new OpenApiSecurityScheme
                         {
@@ -110,7 +166,9 @@ internal class Program
                         },
                         Array.Empty<string>()
                     }
-                    });
+                });
+
+                c.CustomSchemaIds(x => x.FullName);
             });
 
             //// -------------------------------------
@@ -118,18 +176,21 @@ internal class Program
             //// -------------------------------------
             builder.Services.AddCors(options =>
             {
-                options.AddPolicy("AllowWebAndAdmin", policy =>
-                {
-                    policy.WithOrigins(ClsAppSetting.AllowWebCorsOnly, ClsAppSetting.AllowAdminCorsOnly)
-                          .AllowAnyHeader()
-                          .AllowAnyMethod()
-                          .WithExposedHeaders("Content-Disposition", "newToken", "expiryDateTime", "expirationTime");
-                });
+                options.AddPolicy("AllowWebAndAdmin",
+                    policy =>
+                    {
+                        policy
+                        //.AllowAnyOrigin()  
+                        .WithOrigins(ClsAppSetting.AllowWebCorsOnly.Replace("/{lang}", ""), ClsAppSetting.AllowAdminCorsOnly.Replace("/{lang}", ""))
+                        .AllowAnyHeader()
+                        .AllowAnyMethod() // Allows any HTTP method (GET, POST, etc.)
+                        .WithExposedHeaders("Content-Disposition", "newToken", "expiryDateTime", "expirationTime"); // Exposes specific headers to the client
+                    });
             });
 
             builder.Services.AddAuthorization(options =>
             {
-                //options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
+                options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
             });
 
             // Register AutoMapper and scan all assemblies
