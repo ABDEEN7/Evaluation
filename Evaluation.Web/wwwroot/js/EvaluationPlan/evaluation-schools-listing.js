@@ -25,7 +25,7 @@
         rowClass: 'school-card',
         columns: [
             {
-                data: "name",
+                data: "nameAr",
                 title: uiControlsSetup().GetUiControlText("lblSchoolName"),
                 className: "td-left name",
                 render: function (data, type, row) {
@@ -38,32 +38,32 @@
                 title: uiControlsSetup().GetUiControlText("lblSchoolCode"),
                 className: "td-left code"
             },
-            {
-                data: "typeName",
-                title: uiControlsSetup().GetUiControlText("lblSchoolType"),
-                className: "td-left type"
-            },
-            {
-                data: "phaseName",
-                title: uiControlsSetup().GetUiControlText("lblSchoolPhase"),
-                className: "td-left phase"
-            },
-            {
-                data: "regionName",
-                title: uiControlsSetup().GetUiControlText("lblRegion"),
-                className: "td-left region"
-            },
-            {
-                data: "currentPlanStatus",
-                title: uiControlsSetup().GetUiControlText("lblCurrentEvaluationStatus"),
-                className: "td-right status",
-                render: function (data, type, row) {
-                    const color = row.currentPlanStatusColor || "#cccccc";
-                    const textColor = getContrastingTextColor(color);
-                    const safe = data || "";
-                    return `<span class="request-status m-0" style="background-color:${color};color:${textColor};">${safe}</span>`;
-                }
-            }
+            //{
+            //    data: "typeName",
+            //    title: uiControlsSetup().GetUiControlText("lblSchoolType"),
+            //    className: "td-left type"
+            //},
+            //{
+            //    data: "phaseName",
+            //    title: uiControlsSetup().GetUiControlText("lblSchoolPhase"),
+            //    className: "td-left phase"
+            //},
+            //{
+            //    data: "regionName",
+            //    title: uiControlsSetup().GetUiControlText("lblRegion"),
+            //    className: "td-left region"
+            //},
+            //{
+            //    data: "currentPlanStatus",
+            //    title: uiControlsSetup().GetUiControlText("lblCurrentEvaluationStatus"),
+            //    className: "td-right status",
+            //    render: function (data, type, row) {
+            //        const color = row.currentPlanStatusColor || "#cccccc";
+            //        const textColor = getContrastingTextColor(color);
+            //        const safe = data || "";
+            //        return `<span class="request-status m-0" style="background-color:${color};color:${textColor};">${safe}</span>`;
+            //    }
+            //}
         ],
         onRowClick: function (rowData, event) {
             if ($(event.target).closest('.school-details-link').length) return;

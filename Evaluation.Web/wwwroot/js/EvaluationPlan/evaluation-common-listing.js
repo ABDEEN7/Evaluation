@@ -17,22 +17,23 @@
         function applyViewMode() {
             if (!config.enableCardView) return;
 
-            const $wrapper = $(tableSelector + '_wrapper');
+            const wrapperSelector = '#' + config.tableId + '_wrapper';
 
             if (isCardView) {
                 $table.addClass('card');
                 $table.find('tr').addClass('card');
                 $cardBtn.addClass('active');
                 $tblBtn.removeClass('active');
-                $wrapper.removeClass('table-responsive');
+                $(wrapperSelector).removeClass('table-responsive');
             } else {
                 $table.removeClass('card');
                 $table.find('tr').removeClass('card');
                 $tblBtn.addClass('active');
                 $cardBtn.removeClass('active');
-                $wrapper.addClass('table-responsive');
+                $(wrapperSelector).addClass('table-responsive');
             }
         }
+
 
         function buildPayload(dt) {
             const baseFilter = typeof config.getFilterInput === 'function'
@@ -80,8 +81,8 @@
                     const payload = buildPayload(dt);
                     const options = {
                         success: function (resp) {
-                            const total = resp.totalDataCount || 0;
-                            const rows = Array.isArray(resp.data) ? resp.data : [];
+                            const total = resp.totalCount || 0;
+                            const rows = Array.isArray(resp.items) ? resp.items : [];
 
                             if (config.tabLabelSelector && config.tabLabelKey) {
                                 const lbl = uiControlsSetup().GetUiControlText(config.tabLabelKey);
@@ -100,7 +101,7 @@
                         }
                     };
 
-                    jqClient(options).Post(config.ajaxUrl, payload);
+                    jqClient(options).Get(config.ajaxUrl, payload);
                 },
                 columns: config.columns,
                 createdRow: function (row, data) {
