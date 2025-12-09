@@ -584,10 +584,31 @@ public static class ConstantKeys
 
 		public const string lblApplyFilter = "lblApplyFilter";
 		public const string lblClear = "lblClear";
+		public const string lblRequestNo = "lblRequestNo";
+		public const string lblRequestStatus = "lblRequestStatus";
+		public const string lblRequestService = "lblRequestService";
+		public const string lblScholarships = "lblScholarships";
+		public const string lblRequestCreatedDate = "lblRequestCreatedDate";
+		public const string lblRequestCreatedTime = "lblRequestCreatedTime";
+		
+
+		public const string lblRequestDetails = "lblRequestDetails";
+
+		public const string lblStatistics = "lblStatistics";
+		public const string lblSchoolData = "lblSchoolData";
+		public const string lblSupportingFiles = "lblSupportingFiles";
+		public const string lblInterviewsSchedule = "lblInterviewsSchedule";
+		public const string lblEvidenceCollection = "lblEvidenceCollection";
+		public const string lblClassroomObservations = "lblClassroomObservations";
+		public const string lblSchoolRounds = "lblSchoolRounds";
+		public const string lblLabsVisits = "lblLabsVisits";
+		public const string lblResultsAnalysis = "lblResultsAnalysis";
+		public const string lblRealtimeEvaluationSystem = "lblRealtimeEvaluationSystem";
+		public const string lblPeriodicReport = "lblPeriodicReport";
+
+		public const string lblCloseModal = "lblCloseModal";
 	}
-	public static class WebAppLoginPage
-        public static readonly string lblLoginMenu = "lblLoginMenu";
-    }
+
 
     public static class WebAppLoginPage
     {
@@ -600,7 +621,8 @@ public static class ConstantKeys
         public static readonly string lblForgotPasswordQuestion = "lblForgotPasswordQuestion";
         public static readonly string lblMobileResetPassword = "lblMobileResetPassword";
         public static readonly string lblRegisterNewAccount = "lblRegisterNewAccount";
-    }
+	public static readonly string lblLoginMenu = "lblLoginMenu";
+}
 
     public static class WebAppCacheTableName
     {

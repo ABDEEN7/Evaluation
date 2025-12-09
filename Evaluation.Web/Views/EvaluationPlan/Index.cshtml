@@ -1,0 +1,171 @@
+﻿@using Evaluation.SharedHelper.Enums
+
+<link href="~/css/temp.css" rel="stylesheet" />
+<link rel="stylesheet" href="~/lib/datatable/jquery.dataTables.min.css" />
+<link rel="stylesheet" href="~/lib/datatable/buttons.dataTables.min.css" />
+<!-- Page Title -->
+<div class="page-title light-background">
+    <div class="container">
+        @*         <h1>Welcome</h1>
+ *@        <nav class="breadcrumbs">
+            <ol>
+                <li><a href="index.html">Home</a></li>
+                <li class="current">evaluation Plan </li>
+            </ol>
+        </nav>
+    </div>
+</div><!-- End Page Title -->
+
+
+<section id="evaluation" class="features overflow-visible bg-white">
+    <div class="container-fluid container-xxxl">
+        <div class="row">
+            <div class="col-lg-12">
+                <ul class="nav nav-tabs main-tabs bg-grey">
+                    <li id="tabEvaluationPlans" class="nav-item">
+                        <a class="nav-link active fs-6" data-bs-toggle="tab" href="#tab-plans">
+                            <h4 class="mb-0">خطط التقييم</h4>
+                        </a>
+                    </li>
+
+                    <li id="tabEvaluationOperations" class="nav-item">
+                        <a class="nav-link fs-6" data-bs-toggle="tab" href="#tab-operations">
+                            <h4 class="mb-0">عمليات التقييم</h4>
+                        </a>
+                    </li>
+
+                    <li id="tabSchools" class="nav-item">
+                        <a class="nav-link fs-6" data-bs-toggle="tab" href="#tab-schools">
+                            <h4 class="mb-0">المدارس</h4>
+                        </a>
+                    </li>
+
+                </ul>
+            </div>
+
+            <div class="col-lg-12">
+                <div class="tab-content p-0">
+
+                    <!-- خطط التقييم -->
+                    <div id="tab-plans" class="tab-pane fade show active">
+                        <ul class="nav nav-tabs sub-tabs mt-3">
+                            <li class="nav-item">
+                                <a class="nav-link active fs-6" data-bs-toggle="tab" href="#tab-plan-requests">
+                                    طلبات خطة التقييم
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link fs-6" data-bs-toggle="tab" href="#tab-plan-details">
+                                    خطة التقييم
+                                </a>
+                            </li>
+                        </ul>
+
+                        <div class="tab-content mt-3">
+                            <div id="tab-plan-requests" class="tab-pane fade show active">
+                                <partial name="_PartialEvaluationPlanRequests" />
+                            </div>
+
+                            <div id="tab-plan-details" class="tab-pane fade">
+                                <partial name="_PartialEvaluationPlans" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- عمليات التقييم -->
+                    <div id="tab-operations" class="tab-pane fade">
+                        <partial name="_PartialEvaluationOperations" />
+                    </div>
+
+                    <!-- المدارس -->
+                    <div id="tab-schools" class="tab-pane fade">
+                        <partial name="_PartialSchools" />
+                    </div>
+
+                  
+
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<partial name="_PartialFileModal" />
+
+@section Scripts {
+
+
+    <script src="~/lib/jquery/jquery.min.js"></script>
+
+    <script src="~/lib/datatable/jquery.dataTables.min.js"></script>
+    <script src="~/js/shared/populate-ui-control.js"></script>
+    <script src="~/lib/datatable/dataTables.buttons.min.js"></script>
+    <script src="~/lib/datatable/buttons.html5.min.js"></script>
+    <script src="~/js/shared/jq-table-util.js"></script>
+    <script src="~/js/evaluationplan/evaluation-common-listing.js"></script>
+    <script src="~/js/evaluationplan/evaluation-schools-listing.js"></script>
+  
+
+    <script>
+        $(document).ready(async function () {
+            // await webAppConfigsSetup().Init({
+            //     pageNames: [
+            //         '@nameof(ConstantKeys.WebAppCommon)',
+                  
+            //     ],
+            //         additional_keys: []
+            // });
+
+            if (sharedUtility().ExistingToken()) {
+                            //uiControlsSetup().UpdatPageTitle('WebAppScholarship');
+                    $('body').show();
+
+                // await LoadUserDetails();
+                // InitNavbarSection();
+
+
+
+                // activateTabFromUrl();
+                // CheckAndResumeSessionTimer();
+                // GetServices();
+                // GetRequests();
+                // GetScholarships();
+                // CheckRequiredEmailOrMobileVerification();
+                //InitializeAdvancedSearch();
+
+            //     const searchParams = new URLSearchParams(window.location.search);
+            //     const reqId = searchParams.get('id');
+            //     const scholarshipId = searchParams.get('schId');
+            //     const serviceId = searchParams.get('serviceId');
+
+            //     if (reqId) {
+            //         OpenRequestDetails(reqId, '', '', serviceId);
+            //     }
+
+            //     if (scholarshipId) {
+            //         OpenscholarshipDetails(scholarshipId, '', '');
+            //     }
+
+            //     InitializeAdvancedSearch();
+            // } else {
+            //     sharedUtility().RedirectToUrl(ConstantUrls.LoginURL);
+            // }
+
+            // $(document).on('click', '.more-details-btn', ServiceCardBuilder.handleCardClick);
+            // $(document).on('click', 'a[data-role="trigger-card-click"]', function (e) {
+            //     e.preventDefault();
+            //     ServiceCardBuilder.handleCardClick.call(this, e);
+            // });
+
+        }
+
+         });
+    </script>
+
+
+
+
+}
+
