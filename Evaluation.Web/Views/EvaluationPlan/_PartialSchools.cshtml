@@ -1,0 +1,132 @@
+﻿
+<div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h4 class="mb-0" id="tabSchoolsAnchorTag">
+            @* هيتغير بالـ JS ويضيف عدد المدارس *@
+            المدارس
+        </h4>
+
+        <div class="btn-group" role="group" aria-label="View mode">
+            <button id="cardViewSchool" type="button" class="btn btn-outline-primary active">
+                <i class="la la-th-large"></i> عرض كبطاقات
+            </button>
+            <button id="tblViewSchool" type="button" class="btn btn-outline-secondary">
+                <i class="la la-list"></i> عرض كجدول
+            </button>
+        </div>
+    </div>
+
+    <div class="card-body">
+
+        <!-- Filter Section -->
+        <form id="school-filter-form-id" class="mb-3">
+            <div class="row g-3">
+
+                <div class="col-md-4">
+                    <label for="schoolNameFilter" class="form-label">اسم المدرسة</label>
+                    <input id="schoolNameFilter" class="form-control filter-enter" />
+                </div>
+
+                <div class="col-md-4">
+                    <label for="schoolCodeFilter" class="form-label">كود المدرسة</label>
+                    <input id="schoolCodeFilter" class="form-control filter-enter" />
+                </div>
+
+                <div class="col-md-4">
+                    <label for="schoolPhaseFilter" class="form-label">المرحلة</label>
+                    <select id="schoolPhaseFilter" class="form-select filter-enter">
+                        <option value="">الكل</option>
+                        <option value="1">ابتدائية</option>
+                        <option value="2">إعدادية</option>
+                        <option value="3">ثانوية</option>
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <label for="schoolTypeFilter" class="form-label">نوع المدرسة</label>
+                    <select id="schoolTypeFilter" class="form-select filter-enter">
+                        <option value="">الكل</option>
+                        <option value="1">حكومية</option>
+                        <option value="2">خاصة</option>
+                        <option value="3">دولية</option>
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <label for="schoolRegionFilter" class="form-label">المنطقة</label>
+                    <select id="schoolRegionFilter" class="form-select filter-enter">
+                        <option value="">الكل</option>
+                        <option value="1">الدوحة</option>
+                        <option value="2">الريان</option>
+                        <option value="3">الوكرة</option>
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <label for="schoolStatusFilter" class="form-label">حالة الخطة الحالية</label>
+                    <select id="schoolStatusFilter" class="form-select filter-enter">
+                        <option value="">الكل</option>
+                        <option value="1">لم تبدأ</option>
+                        <option value="2">جارية</option>
+                        <option value="3">مكتملة</option>
+                    </select>
+                </div>
+
+                <div class="col-md-12 d-flex justify-content-end gap-2 mt-2">
+                    <button id="filterSchoolBtnId" type="button" class="btn btn-primary">
+                        <i class="la la-search"></i> بحث
+                    </button>
+                    <button id="clearFilterSchoolBtnId" type="button" class="btn btn-outline-secondary">
+                        <i class="la la-undo"></i> مسح التصفية
+                    </button>
+                </div>
+            </div>
+        </form>
+
+        <!-- Schools Table -->
+        <div class="table-responsive" id="schoolsTableWrapper">
+            <table id="schoolTable" class="table table-hover w-100">
+                <thead>
+                    <tr>
+                        <th>اسم المدرسة</th>
+                        <th>الكود</th>
+                        <th>النوع</th>
+                        <th>المرحلة</th>
+                        <th>المنطقة</th>
+                        <th>حالة الخطة الحالية</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+
+
+<div class="modal fade" id="schoolDetailsModal" tabindex="-1" aria-labelledby="schoolModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header align-items-start border-0">
+                <div>
+                    <h4 class="modal-title fw-semibold mb-2" id="schoolModalLabel"></h4>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="#">الرئيسية</a></li>
+                            <li class="breadcrumb-item"><a href="#">المدارس</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">تفاصيل المدرسة</li>
+                        </ol>
+                    </nav>
+                </div>
+
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="la la-close mt-1"></i>
+                </button>
+            </div>
+            <div class="modal-body py-0" id="schoolModalBody">
+            </div>
+        </div>
+    </div>
+</div>
+
+

@@ -198,7 +198,7 @@ window.serviceRequestForm = window.serviceRequestForm || {};
     // ================================
    
     async function submitAction(actionDetails, formGroups, options = {}) {
-        const url = options.url || "/ServiceRequest/PerformAction";
+        const url = options.url || "/FormRender/PerformAction";
         const renderType = RENDER_TYPE.ACTION;
 
         const normalizedGroups = normalizeFormGroups(formGroups);

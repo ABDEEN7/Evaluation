@@ -55,4 +55,10 @@ public class PlanController(MasterBL masterBL) : ControllerBase
         var plan = await masterBL.GetApiService<PlanServiceRequestServices>().GetPlanByIdAsync(planId);
         return Ok(new { result = plan });
     }
+    [HttpGet]
+    public IActionResult GetPlans()
+    {
+        var evaluation = masterBL.GetApiService<PlanServiceRequestServices>();
+        return Ok(evaluation);
+    }
 }

@@ -28,6 +28,7 @@ public static class ConstantKeys
         public static readonly string ParentDoesNotExist = "ParentDoesNotExist";
         public static readonly string CannotDeleteItsParent = "CannotDeleteItsParent";
         public static readonly string InvalidRequest = "InvalidRequest";
+        public static readonly string MissingPlan = "MissingPlan";
         public static readonly string NoDataFound = "NoDataFound";
         public static readonly string ServiceActionUsed = "ServiceActionUsed";
         public static readonly string ActionExistsActionAssignPartyType = "ActionExistsActionAssignPartyType";
@@ -553,8 +554,62 @@ public static class ConstantKeys
 
     public static class WebAppCommon
     {
-        public static readonly string lblLoginMenu = "lblLoginMenu";
-    }
+		public const string lblOk = "lblOk";
+		public const string lblCancel = "lblCancel";
+		public const string lblShowingEntries = "lblShowingEntries";
+		public const string lblprevious = "lblprevious";
+		public const string lblnext = "lblnext";
+	}
+
+	public static class EvaluationPlanRequests
+	{
+		public const string lblPlansListTitle = "lblPlansListTitle";
+		public const string lblFilter = "lblFilter";
+		public const string lblSearchPlan = "lblSearchPlan";
+		public const string lblCreateNewPlan = "lblCreateNewPlan";
+
+		public const string lblPlanEndDate = "lblPlanEndDate";
+		public const string lblPlanStartDate = "lblPlanStartDate";
+		public const string lblPlanCreatedOn = "lblPlanCreatedOn";
+		public const string lblPlanSchoolsCount = "lblPlanSchoolsCount";
+		public const string lblPlanStatus = "lblPlanStatus";
+		public const string lblPlanName = "lblPlanName";
+
+		public const string lblActions = "lblActions";
+		public const string lblView = "lblView";
+		public const string lblEdit = "lblEdit";
+		public const string lblDelete = "lblDelete";
+
+		public const string lblConfirmDelete = "lblConfirmDelete";
+		public const string lblDeletePlanConfirm = "lblDeletePlanConfirm";
+
+		public const string lblApplyFilter = "lblApplyFilter";
+		public const string lblClear = "lblClear";
+		public const string lblRequestNo = "lblRequestNo";
+		public const string lblRequestStatus = "lblRequestStatus";
+		public const string lblRequestService = "lblRequestService";
+		public const string lblScholarships = "lblScholarships";
+		public const string lblRequestCreatedDate = "lblRequestCreatedDate";
+		public const string lblRequestCreatedTime = "lblRequestCreatedTime";
+		
+
+		public const string lblRequestDetails = "lblRequestDetails";
+
+		public const string lblStatistics = "lblStatistics";
+		public const string lblSchoolData = "lblSchoolData";
+		public const string lblSupportingFiles = "lblSupportingFiles";
+		public const string lblInterviewsSchedule = "lblInterviewsSchedule";
+		public const string lblEvidenceCollection = "lblEvidenceCollection";
+		public const string lblClassroomObservations = "lblClassroomObservations";
+		public const string lblSchoolRounds = "lblSchoolRounds";
+		public const string lblLabsVisits = "lblLabsVisits";
+		public const string lblResultsAnalysis = "lblResultsAnalysis";
+		public const string lblRealtimeEvaluationSystem = "lblRealtimeEvaluationSystem";
+		public const string lblPeriodicReport = "lblPeriodicReport";
+
+		public const string lblCloseModal = "lblCloseModal";
+	}
+
 
     public static class WebAppLoginPage
     {
@@ -567,7 +622,8 @@ public static class ConstantKeys
         public static readonly string lblForgotPasswordQuestion = "lblForgotPasswordQuestion";
         public static readonly string lblMobileResetPassword = "lblMobileResetPassword";
         public static readonly string lblRegisterNewAccount = "lblRegisterNewAccount";
-    }
+	public static readonly string lblLoginMenu = "lblLoginMenu";
+}
 
     public static class WebAppCacheTableName
     {

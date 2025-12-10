@@ -1,0 +1,171 @@
+﻿@using Evaluation.SharedHelper.Enums
+
+<link href="~/lib/tabulator/css/tabulator.min.css" rel="stylesheet" asp-append-version="true" />
+<link href="~/lib/flatpickr/flatpickr.min.css" rel="stylesheet" asp-append-version="true" />
+<link href="~/lib/flatpickr/flatpickr.css" rel="stylesheet" asp-append-version="true" />
+<link href="~/lib/bootstrap-datepicker/css/bootstrap-datepicker.css" rel="stylesheet" asp-append-version="true" />
+<link href="~/lib/dualselectlist/css/bala.dualselectlist.css" rel="stylesheet" asp-append-version="true" />
+<link href="~/lib/jqte_editor/css/jquery.jqte.min.css" rel="stylesheet" />
+
+<link href="~/assets/css/stepper.css" rel="stylesheet" asp-append-version="true" />
+<link href="~/assets/css/tabulator-styling.css.css" rel="stylesheet" asp-append-version="true" />
+
+<!-- Page Title -->
+<div class="page-title light-background">
+    <div class="container">
+@*         <h1>Welcome</h1>
+ *@        <nav class="breadcrumbs">
+            <ol>
+                <li><a href="index.html">Home</a></li>
+                <li class="current">Evaluation Plan Request</li>
+            </ol>
+        </nav>
+    </div>
+</div><!-- End Page Title -->
+<section>
+    <div class="container mt-4">
+        <!-- Page Title -->
+        
+       
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-12">
+                    <div class="card app-card">
+                        <div class="card-header justify-content-between d-flex align-items-center bg-light" id="divForCreatedRequestButtons">
+                            <div class="d-flex"><h5 class="lblCreateRequest m-0">Create Request </h5> <h5 id="serviceName"></h5></div>
+                            <a id="Requestbtns1" class="closeit"><i class="fa fa-close " id="CloseRequestup"></i></a>
+                        </div>
+                        <div class="card-body">
+                            <form>
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div id="progress-container"></div>
+                                        <div class="accordion mt-4" id="accordionExample" hidden>
+                                            <select id="partyTypeSelect"></select>
+                                            <div id="user-wrapper">
+                                                <div id="user-tables"></div>
+                                            </div>
+                                        </div>
+                                        <div id="content-container"></div>
+                                    </div>
+                                </div>
+                                <div class="row" id="divForCreatedRequestButtons">
+                                    <div class="col-12">
+                                        <div  id="Requestbtns"></div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Success Message Modal -->
+    <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable ">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="successModalLabel">Success!</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="successMessage">Request submitted successfully!</div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal" id="goBackBtn">Go Back</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Error Message Modal -->
+    <div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable ">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="errorModalLabel">Error</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="errorMessage">An error occurred while submitting your request.</div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+  
+
+    <partial name="_PartialFileModal" />
+</section>
+
+@section Scripts {
+
+<script src="~/js/shared/jq-table-util.js" asp-append-version="true"></script>
+    <script src="~/lib/dropzone/dist/dropzone.js" asp-append-version="true"></script>
+    <script src="~/lib/dropzone/dist/dropzone-amd-module.js" asp-append-version="true"></script>
+    <a href="~/lib/tabulator/js/tabulator.js.map"></a>
+    <a href="~/lib/tabulator/js/tabulator.min.js.map"></a>
+    <script src="~/lib/tabulator/js/tabulator.js" asp-append-version="true"></script>
+<script src="~/js/shared/form-generation-utility.js" asp-append-version="true"></script>
+    <link href="~/lib/select2/dist/css/select2.min.css" rel="stylesheet" asp-append-version="true" />
+    <script src="~/lib/select2/dist/js/select2.min.js" asp-append-version="true"></script>
+
+    <script src="~/lib/select2/dist/js/select2.js" asp-append-version="true"></script>
+
+    <script src="~/lib/flatpickr/flatpickr.min.js" asp-append-version="true"></script>
+    <script src="~/lib/bootstrap-datepicker/js/bootstrap-datepicker.js" asp-append-version="true"></script>
+    <script src="~/lib/tinymce/tinymce.js" asp-append-version="true"></script>
+    <script src="~/lib/tinymce/theme.min.js" asp-append-version="true"></script>
+    <script src="~/lib/tinymce/plugins/charmap/plugin.min.js" asp-append-version="true"></script>
+    <script src="~/lib/tinymce/plugins/code/plugin.min.js" asp-append-version="true"></script>
+    <script src="~/lib/tinymce/plugins/contextmenu/plugin.min.js" asp-append-version="true"></script>
+    <script src="~/lib/tinymce/plugins/image/plugin.min.js" asp-append-version="true"></script>
+    <script src="~/lib/tinymce/plugins/insertdatetime/plugin.min.js" asp-append-version="true"></script>
+    <script src="~/lib/tinymce/plugins/link/plugin.min.js" asp-append-version="true"></script>
+    <script src="~/lib/tinymce/plugins/lists/plugin.min.js" asp-append-version="true"></script>
+    <script src="~/lib/tinymce/plugins/media/plugin.min.js" asp-append-version="true"></script>
+    <script src="~/lib/tinymce/plugins/table/plugin.min.js" asp-append-version="true"></script>
+    <script src="~/lib/tinymce/plugins/textcolor/plugin.min.js" asp-append-version="true"></script>
+    <script src="~/lib/tinymce/plugins/visualblocks/plugin.min.js" asp-append-version="true"></script>
+    <script src="~/lib/dualselectlist/js/dualselectlist.js" asp-append-version="true"></script>
+    <script src="~/js/EvaluationPlan/createrequest.js" asp-append-version="true"></script>
+    <script src="~/lib/uuid/uuid.min.js" asp-append-version="true"></script>
+    <script type="text/javascript">
+      
+
+        $(document).ready(async function () {
+
+
+            webAppConfigsSetup().Init({
+                pageNames: [
+                    '@typeof(ConstantKeys.WebAppCommon).Name',
+                    '@typeof(ConstantKeys.EvaluationPlanRequests).Name',
+                ],
+                additional_keys: []
+            }).then(() => {
+                //uiControlsSetup().UpdatPageTitle('WebAppCreateRequest');
+                $('body').show();
+                //InitNavbarSection();
+                const formUtility = FormGeneratorsUtility();
+                formUtility.LoadAllCssClasses();
+                InitializeCreateRequest();
+
+            });
+
+        });
+
+        $(document).on('click', '.view-attachment', async function () {
+            const id = $(this).data('id');
+            const name = $(this).data('name');
+
+            await formUtility.ViewAttac(id, name);
+        });
+
+     
+    </script>
+
+}
+      

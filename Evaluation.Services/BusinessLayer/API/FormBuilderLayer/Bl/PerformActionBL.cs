@@ -29,7 +29,7 @@ using static Evaluation.SharedHelper.Enums.ConstantKeys;
 namespace Evaluation.Services.Models.API
 {
 
-    public class RequestsBL(
+    public class PerformActionBL(
         IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow, SrvNotification SrvNotification, SrvUser SrvUser, 
         LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, SrvField SrvField, SrvAction SrvAction, 
         SrvStatus SrvStatus, SrvAssignment SrvAssignment, SrvDropdown SrvDropdown, SrvActionTransactionsLog SrvActionTransactionsLog, 
@@ -37,261 +37,6 @@ namespace Evaluation.Services.Models.API
             : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, _requestInfo)
     {
 
-		public async Task<ServiceRequestDTO> HandleServiceRequestAsync(ActionFormDTO? actionFormDTO, Guid? planId,
-			Guid serviceId, string actionName, string fieldValuesJson, List<AssignUserDTO?> assignUsers,
-			IFormFileCollection files, string remarks, bool saveAsDraft = false)
-		{
-			string lang = _requestInfo.Lang;
-			var requestId = actionFormDTO?.RequestId;
-
-			var serviceObj = await SrvService.GetActiveAndOpenServiceById(serviceId);
-
-			if (serviceObj == null)
-			{
-				throw new BusinessException(ExceptionMessage.IncompleteRequest);
-			}
-
-			var action = await SrvAction.GetActionByBackendNameAsync(serviceObj.Id, actionName) ??
-						 await SrvAction.GetInitialActionAsync(serviceId, actionName);
-
-			if (action == null || action.ActionType == null)
-			{
-				throw new BusinessException(ExceptionMessage.IncompleteRequest);
-			}
-
-			var (filesWithFieldId, othersAttachement) = SrvAttachments.SeparateFilesByFieldId(files);
-
-			var fileFields = filesWithFieldId.Select(file =>
-			{
-				var (fieldId, childFieldId, index) = GetFieldDetailsFromFile(file.ContentDisposition);
-
-				return new FileFieldDTO
-				{
-					File = file,
-					FieldId = fieldId,
-					childFieldId = childFieldId,
-					Index = index
-				};
-			}).ToList();
-
-			// Step 3: Create or update the request
-			ServiceRequestDTO resultRequest = new ServiceRequestDTO();
-			if (requestId == null || requestId == Guid.Empty)
-			{
-				var status = await SrvStatus.GetInitialStatusByServiceId(serviceId);
-				if (status == null)
-				{
-					throw new BusinessException(ExceptionMessage.IncompleteRequest);
-				}
-				Guid studentId;
-				Guid? CountryId;
-				Guid? UniversityId;
-				Guid? InitialHistoryId = null;
-
-				
-
-				var request = new ServiceRequest
-				{
-					Id = Guid.NewGuid(),
-					StatusId = status.Id,
-					ServiceId = serviceId,
-					//OrgTreeId = OrgTreeId,
-					//ScholarshipId = scholarshipId,
-					//InitialHistoryId = InitialHistoryId,
-					
-
-				};
-
-				var validateRequestTask = ValidateCanCreateRequest(planId, serviceObj);
-				if (actionFormDTO?.FieldValues != null)
-				{
-					var validateActionTask = SrvAction.ValidateActionAndActionFieldAsync(null,  actionFormDTO?.FieldValues!, remarks, othersAttachement, serviceObj, status.Id, action, fileFields, saveAsDraft);
-					await Task.WhenAll(validateRequestTask, validateActionTask);
-
-					var validatedFields = await validateActionTask;
-
-					actionFormDTO!.FieldValues = (await SrvAttachments.UploadAndInsertAttachments(validatedFields.ToList(), request.Id, request.PlanId, fileFields, filesWithFieldId)).Cast<FieldValueDTO?>().ToList();
-				}
-
-
-
-
-				resultRequest!.Id = request.Id;
-
-				var actionResult = await PerformAction(request, serviceObj, actionFormDTO!.FieldValues!, action.BackendName, assignUsers.Where(c => c!.IsSelected).ToList()!, remarks, saveAsDraft);
-
-				var otherAttachmentsTask = SrvAttachments.UploadAndInsertOtherAttachments(othersAttachement, actionResult.actionlog, planId);
-				var sequence = request.Sequence;
-				var requestNumber = DateTime.Now.ToString(serviceObj.ReqNumberDef ?? "", new CultureInfo("en-US")) + sequence;
-
-				request.RequestNumber = requestNumber;
-				resultRequest.RequestNumber = requestNumber;
-
-				SrvServiceRequest.InsertRequest(request);
-
-				await otherAttachmentsTask;
-
-				await uow.CommitAsync();
-
-
-				if (!saveAsDraft)
-				{
-					// Handle main action notifications
-					await SrvNotification.HandleNotification(actionResult.notifications, request, actionResult.actiondb.Id, lang, remarks, otherAttachmentsTask.Result);
-
-					// Check if auto-assign logic is applicable
-					bool shouldAutoAssign = request != null &&
-											serviceObj.IsAutoAssignEnabled == true &&
-											status.IsInitial &&
-											actionResult.actiondb.ActionType!.BackendName == ActionTypeKeys.Info;
-
-					if (shouldAutoAssign)
-					{
-						var assignAction = await serviceScopeFactory.CreateScopedUow()
-							.GetRepository<ActionStatusConfiguration>()
-							.GetAllQueryFiltered()
-							.Include(x => x.Notifications)
-							.Include(c => c.ServiceAction)
-								.ThenInclude(c => c!.ActionType)
-								.AsSplitQuery()
-							.FirstOrDefaultAsync(c =>
-								(c.ServiceAction!.ActionType!.BackendName == ActionTypeKeys.Assign || c.ServiceAction!.ActionType!.BackendName == ActionTypeKeys.Info)
-								&& c.CurrentStatusId == request!.StatusId
-							   && c.ServiceAction.IsAutoAssign);
-
-						if (assignAction != null)
-						{
-							await SrvNotification.HandleNotification(assignAction.Notifications, request!, assignAction.Id, lang, string.Empty);
-						}
-					}
-				}
-
-
-			}
-			else
-			{
-				// Handle  action for existing request
-				var application = await SrvServiceRequest.GetSrvServiceRequestByIdAsync(requestId!.Value, true);
-
-
-				var allFields = JsonConvert.DeserializeObject<List<FieldValueDTO?>>(fieldValuesJson);
-				var validatedFields = await SrvAction.ValidateActionAndActionFieldAsync(application, allFields!, remarks, othersAttachement, serviceObj, application.StatusId, action, fileFields, saveAsDraft);
-
-
-				actionFormDTO!.FieldValues = (await SrvAttachments.UploadAndInsertAttachments(validatedFields.ToList(), requestId, application.PlanId, fileFields, filesWithFieldId)).Cast<FieldValueDTO?>().ToList();
-
-				var actionResult = await PerformAction(application, serviceObj, actionFormDTO.FieldValues!, actionName, assignUsers.Where(c => c!.IsSelected).ToList()!, remarks, saveAsDraft);
-
-				var otherAttachments = await SrvAttachments.UploadAndInsertOtherAttachments(othersAttachement, actionResult.actionlog, application.PlanId);
-
-
-				await uow.CommitAsync();
-
-				if (actionResult.notifications != null && !saveAsDraft)
-				{
-					await SrvNotification.HandleNotification(actionResult.notifications, application, actionResult.actiondb.Id, lang, remarks, otherAttachments);
-				}
-				resultRequest = new ServiceRequestDTO { Id = requestId, RequestNumber = application.RequestNumber };
-			}
-
-			return resultRequest;
-		}
-		public (Guid? fieldId, Guid? childFieldId, Guid? index) GetFieldDetailsFromFile(string contentDisposition)
-		{
-			Match fieldIdMatch = Regex.Match(contentDisposition, @"Files\[(.*?)\]");
-			Match filenameMatch = Regex.Match(contentDisposition, @"filename=""(.*?)""");
-
-			if (fieldIdMatch.Success && filenameMatch.Success)
-			{
-				if (!Guid.TryParse(fieldIdMatch.Groups[1].Value, out Guid parsedFieldId))
-					return (null, null, null);
-
-				string filename = filenameMatch.Groups[1].Value;
-				string[] filenameParts = filename.Split('_');
-
-				if (filenameParts.Length >= 3)
-				{
-					Guid? childFieldId = Guid.TryParse(filenameParts[0], out Guid parsedChildFieldId) ? parsedChildFieldId : null;
-					Guid? index = Guid.TryParse(filenameParts[1], out Guid parsedIndex) ? parsedIndex : null;
-
-					return (parsedFieldId, childFieldId, index);
-				}
-
-				return (parsedFieldId, null, null);
-			}
-
-			return (null, null, null);
-		}
-	
-		public async Task<bool> ValidateCanCreateRequest(Guid? planId, Service serviceObj)
-		{
-			if (serviceObj == null)
-			{
-				throw new BusinessException(ExceptionMessage.IncompleteRequest);
-			}
-
-			#region maxCountOpen
-
-			int defaultMaxCountOpen = int.Parse(ServiceSettings.MaxCountOpen);
-			int maxCountOpen = defaultMaxCountOpen;
-
-			var serviceSettingsJson = serviceObj.ServiceSettings ?? "{}";
-			var serviceSettings = JsonConvert.DeserializeObject<Dictionary<string, object>>(serviceSettingsJson);
-
-			if (!TryGetSettingValue(serviceSettings!, ServiceSettings.MaxCountOpen, out maxCountOpen))
-			{
-				var systemSettingsJson = await cacheDataProvider.GetSystemSettingValue(SystemSettings.ServiceSettings);
-				if (!string.IsNullOrEmpty(systemSettingsJson))
-				{
-					var systemSettings = JsonConvert.DeserializeObject<Dictionary<string, object>>(systemSettingsJson);
-					if (systemSettings == null || !TryGetSettingValue(systemSettings, ServiceSettings.MaxCountOpen, out maxCountOpen))
-					{
-						SrvService.UpdateServiceSettingsAsync(serviceObj, ServiceSettings.MaxCountOpen, maxCountOpen);
-					}
-				}
-			}
-
-			await ValidateIfThereIsOpenedRequestForServiceAsync(planId, serviceObj, maxCountOpen);
-
-			#endregion
-
-			return true;
-		}
-
-		private bool TryGetSettingValue(Dictionary<string, object> settings, string settingKey, out int result)
-		{
-			result = 0;
-
-			if (settings != null && settings.TryGetValue(settingKey, out var settingValue))
-			{
-				return int.TryParse(settingValue?.ToString(), out result);
-			}
-			return false;
-		}
-		private async Task ValidateIfThereIsOpenedRequestForServiceAsync(Guid? PlanId, Service serviceObj, int maxCountOpen)
-		{
-
-			var user = await SrvUser.GetByIDActiveNonDeleted(userInfo!.UserId!.Value);
-
-
-			var isMinistry = user is MinistryUser;
-
-
-			var openRequests = await serviceScopeFactory.CreateScopedUow()
-									.GetRepository<ServiceRequest>()
-										.GetAllQueryFiltered()
-										.Include(c => c.Status)
-										.Where(c => c.PlanId == PlanId || serviceObj.Initialservice)
-										.Where(c => c.ServiceId == serviceObj.Id && c.Status!.IsOpen && !c.IsDeleted!.Value)
-										//.Where(c => c.OrgTreeId == userInfo!.UserId || isMinistry)
-										.CountAsync();
-
-
-			if (openRequests >= maxCountOpen)
-			{
-				throw new BusinessException(ExceptionMessage.lblRequestAlreadyOpened);
-			}
-		}
 		public async Task<PerforActionResponseDTO> PerformAction(ServiceRequest application, Service serviceObj, IList<FieldValueDTO> Fields, string actionname, List<AssignUserDTO> users, string Remarks, bool saveAsDraft = false)
 		{
 			string lang = _requestInfo.Lang;
@@ -451,7 +196,7 @@ namespace Evaluation.Services.Models.API
 
 			if (serviceObj.IsAutoAssignEnabled == true && !saveAsDraft)
 			{
-				
+
 				var Assignaction = await serviceScopeFactory.CreateScopedUow()
 					.GetRepository<ActionStatusConfiguration>()
 					.GetAllQueryFiltered()
@@ -813,7 +558,7 @@ namespace Evaluation.Services.Models.API
 			return newDBFields;
 
 		}
-	
+
 		private string SoftMerge(string oldJson, string newJson)
 		{
 
