@@ -1,22 +1,23 @@
+using AutoMapper;
 using Evaluation.DAL.Helper;
+using Evaluation.DAL.Models.Authentication;
+using Evaluation.DAL.Models.PermissionEntity;
+using Evaluation.DAL.Models.UserEntiy;
+using Evaluation.DAL.Repositories;
 using Evaluation.Services.BusinessLayer.API;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper;
 using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Exceptions;
+using Evaluation.SharedHelper.Extensions;
 using Evaluation.SharedHelper.Helper;
 using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Api.Authentication;
-using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using UserType = Evaluation.SharedHelper.Enums.UserType;
-using Evaluation.DAL.Models.Authentication;
-using Evaluation.DAL.Models.PermissionEntity;
-using Evaluation.DAL.Models.UserEntiy;
-using Evaluation.DAL.Repositories;
 
 public class AuthenticationBL : ApiBase
 {
@@ -111,7 +112,60 @@ public class AuthenticationBL : ApiBase
 
         return (User.Id, token);
     }
+    public async Task<(Guid userId, string token)> LoginMinistry(AuthorizationCodeRequest model)
+    {
+        if (string.IsNullOrEmpty(model.code))
+            throw new BusinessException(ConstantKeys.ExceptionMessage.InvalidRequestEmptyCode);
 
+
+        if (!string.IsNullOrEmpty(model.json) && !model.json.IsValidJson())
+            throw new BusinessException(ConstantKeys.ExceptionMessage.InvalidJsonParam);
+
+        var result = await _msJsonWT.GenerateMSAccessToken(model.code);
+
+        var claimsPrincipal = await _msJsonWT.ValidateMSIdToken(result.id_token);
+
+        var msId = claimsPrincipal?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var email = claimsPrincipal?.FindFirst(ClaimTypes.Email)?.Value;
+
+        var ministryUser = await serviceScopeFactory.CreateScopedUow()
+                .GetRepository<MinistryUser>()
+                .GetAllActiveNonDeleted(x => x.Email == email)
+                .FirstOrDefaultAsync();
+
+        if (ministryUser == null)
+        {
+            throw new BusinessException(ConstantKeys.ExceptionMessage.NoMinistryUserFound);
+        }
+
+
+        await RegisterLoginLog(ministryUser.Id);
+
+        ministryUser = await serviceScopeFactory.CreateScopedUow()
+             .GetRepository<MinistryUser>()
+             .GetAllActiveNonDeleted(x => x.Email == ministryUser.Email)
+             .FirstOrDefaultAsync();
+
+
+        var dictionary = GenerateClaimsForUserProfile(ministryUser, UserType.Ministry);
+
+        if (!string.IsNullOrEmpty(model.json))
+        {
+            var jsonDictionary = model.json.JsonToDictionary();
+            if (jsonDictionary != null)
+            {
+                foreach (var item in jsonDictionary)
+                {
+                    dictionary.Add(item.Key, item.Value);
+                }
+            }
+
+        }
+
+        var token = _msJsonWT.GenerateToken(dictionary);
+
+        return (ministryUser.Id, token);
+    }
     #endregion
 
     #region ?? Token Management

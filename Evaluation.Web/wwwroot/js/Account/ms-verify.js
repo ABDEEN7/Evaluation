@@ -1,4 +1,6 @@
-﻿async function VerifyMSToken() {
+﻿
+
+async function VerifyMSToken() {
     let authorizationCode = $("#code").val();
 
     if (authorizationCode) {
@@ -8,36 +10,37 @@
         const options = {
             success: function (result) {
 
-                //debugger
+                debugger
                 if (result.data) {
                     SetLocalStorageValue(LocalStorageKeys.Token, result.data);
                     let tokenExpirationTime = sharedUtility().ParseJwt(GetLocalStorageValue(LocalStorageKeys.Token))['TokenExpirationTime'];
 
-                    //let redirectUrl = GetLocalStorageValue(LocalStorageKeys.RedirectUrl);
-                    //if (redirectUrl) {
-                    //    SetLocalStorageValue(LocalStorageKeys.RedirectUrl, '');
-                    //    sharedUtility().RedirectToUrl(redirectUrl);
-                    //} else {
-                    //    sharedUtility().RedirectToUrl(ConstantUrls.Home);
+                    let redirectUrl = GetLocalStorageValue(LocalStorageKeys.RedirectUrl);
+                    if (redirectUrl) {
+                        SetLocalStorageValue(LocalStorageKeys.RedirectUrl, '');
+                        sharedUtility().RedirectToUrl(redirectUrl);
+                    } else {
+                        sharedUtility().RedirectToUrl(ConstantUrls.Home);
 
-                    //}
-                    sharedUtility().RedirectToUrl(ConstantUrls.Home);
+                    }
                 }
                 else {
                     sharedUtility().RedirectUnauthorized();
                 }
             },
             error: function (jqXHR, textStatus, errorThrown) {
-
+                debugger
                 SetLocalStorageValue(LocalStorageKeys.ErrorTempMessage, jqXHR.responseJSON.Message)
                 sharedUtility().RedirectUnauthorized();
             }
         };
 
-        jqClient(options).Post(ConstantUrls.LoginURL, data);
+        jqClient(options).Post(ConstantUrls.LoginMinistry, data);
 
     } else {
         sharedUtility().RedirectUnauthorized();
     }
 
 }
+
+

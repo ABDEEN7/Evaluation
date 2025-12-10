@@ -128,6 +128,7 @@ public static class ConstantKeys
         public static readonly string BackendNameAlreadyExists = "BackendNameAlreadyExists";
         public static readonly string EmailAlreadyExists = "EmailAlreadyExists";
         public static readonly string EmailProfileExistsEmailTemplate = "EmailProfileExistsEmailTemplate";
+        public static readonly string InvalidJsonParam = "InvalidJsonParam";
     }
 
     public static class AdminSettings
