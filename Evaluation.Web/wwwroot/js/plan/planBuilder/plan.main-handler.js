@@ -12,7 +12,10 @@
     const ns = window.planUtility;
 
     // ================== INITIALIZATION ==================
-
+    jsPlan(ns);
+    function jsPlan(ns) {
+        return ns;
+    }
     const initializePage = (options = {}) => {
         const {
             renderType = RENDER_TYPE.ACTION,
@@ -187,8 +190,8 @@
         // Load schools
         loadSchoolsData(1);
 
-        // Initialize date picker
-        ns.initParentPicker('custom');
+        // Initialize date picker in custom mode by default
+        initCustomMode();
     };
 
     const renderPlanWithData = (planData, renderType, actionType) => {
@@ -292,13 +295,13 @@
 
         if (!selectedOption) {
             $('#semesterContainer').hide();
-            ns.initParentPicker('custom');
+            initCustomMode();
             return;
         }
 
-        const backendName = selectedOption.backendName || selectedOption.element?.dataset?.backendname;
-        //const backendName = selectedOption.text || selectedOption.element?.dataset?.backendname;
+        const backendName = selectedOption.element?.dataset?.backendname || selectedOption.backendName;
 
+        // Hide semester by default
         $('#semesterContainer').hide();
         ns.destroyChildPicker();
 
@@ -313,7 +316,7 @@
                 initSemesterMode();
                 break;
             default:
-                ns.initParentPicker('custom');
+                initCustomMode();
                 break;
         }
     };
@@ -327,17 +330,22 @@
             return;
         }
 
-        const startDate = selectedOption.startDate || selectedOption.element?.dataset?.startdate;
-        const endDate = selectedOption.endDate || selectedOption.element?.dataset?.enddate;
+        const startDate = selectedOption.element?.dataset?.startdate || selectedOption.startDate;
+        const endDate = selectedOption.element?.dataset?.enddate || selectedOption.endDate;
 
         if (startDate && endDate) {
             const start = new Date(startDate);
             const end = new Date(endDate);
 
-            const startStr = formatDateISO(start);
-            const endStr = formatDateISO(end);
+            const startStr = ns.formatDateISO(start);
+            const endStr = ns.formatDateISO(end);
 
             $('#parentDate').val(`${startStr} to ${endStr}`).prop('disabled', true);
+
+            // Store dates in data attributes
+            $('#parentDate').data('startDate', startStr);
+            $('#parentDate').data('endDate', endStr);
+
             ns.initChildPicker(start, end);
         }
     };
@@ -426,13 +434,6 @@
 
     // ================== HELPER FUNCTIONS ==================
 
-    const formatDateISO = (date) => {
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
-    };
-
     const initYearMode = () => {
         const currentYear = new Date().getFullYear();
         const startDate = `${currentYear}-01-01`;
@@ -440,36 +441,46 @@
 
         $('#parentDate').val(`${startDate} to ${endDate}`).prop('disabled', true);
 
+        // Store dates in data attributes
+        $('#parentDate').data('startDate', startDate);
+        $('#parentDate').data('endDate', endDate);
+
         const minDate = new Date(currentYear, 0, 1);
         const maxDate = new Date(currentYear, 11, 31);
         ns.initChildPicker(minDate, maxDate);
     };
 
     const initMonthMode = () => {
-        const now = new Date();
-        const currentYear = now.getFullYear();
-        const currentMonth = now.getMonth();
-
-        const startDate = new Date(currentYear, currentMonth, 1);
-        const endDate = new Date(currentYear, currentMonth + 1, 0);
-
-        const startStr = formatDateISO(startDate);
-        const endStr = formatDateISO(endDate);
-
-        $('#parentDate').val(`${startStr} to ${endStr}`).prop('disabled', true);
-        ns.initChildPicker(startDate, endDate);
+        // Enable parent date picker in month selection mode
+        $('#parentDate').val('').prop('disabled', false).attr('placeholder', 'اختر الشهر');
+        ns.initParentPicker('month');
+        ns.destroyChildPicker();
     };
 
     const initSemesterMode = () => {
         $('#semesterContainer').show();
         $('#parentDate').val('').prop('disabled', true);
+        ns.destroyChildPicker();
+    };
+
+    const initCustomMode = () => {
+        $('#parentDate').val('').prop('disabled', false).attr('placeholder', 'اختر تاريخ بداية ونهاية الخطة');
+        ns.initParentPicker('custom');
+        ns.destroyChildPicker();
     };
 
     const initializeDatePickersForPlanType = (planData) => {
         const planType = ns.planTypes.find(t => t.id === planData.planTypeId);
 
         if (!planType) {
-            ns.initParentPicker('custom');
+            initCustomMode();
+            if (planData.dateRange) {
+                $('#parentDate').val(planData.dateRange);
+                const range = getDateRangeFromInput();
+                if (range) {
+                    ns.initChildPicker(range.startDateObj, range.endDateObj);
+                }
+            }
             return;
         }
 
@@ -477,27 +488,47 @@
             case PLAN_TYPE_BACKEND.YEAR:
                 initYearMode();
                 break;
+
             case PLAN_TYPE_BACKEND.MONTH:
-                initMonthMode();
+                // For existing month plan, show the selected month
+                if (planData.dateRange) {
+                    $('#parentDate').val(planData.dateRange).prop('disabled', false);
+                    const range = getDateRangeFromInput();
+                    if (range) {
+                        // Store in data attributes
+                        $('#parentDate').data('startDate', range.startDate);
+                        $('#parentDate').data('endDate', range.endDate);
+                        ns.initParentPicker('month');
+                        ns.initChildPicker(range.startDateObj, range.endDateObj);
+                    }
+                } else {
+                    initMonthMode();
+                }
                 break;
+
             case PLAN_TYPE_BACKEND.SEMESTER:
                 $('#semesterContainer').show();
                 if (planData.dateRange) {
-                    const [startStr, endStr] = planData.dateRange.split(' to ');
-                    const start = new Date(startStr);
-                    const end = new Date(endStr);
-                    ns.initChildPicker(start, end);
+                    $('#parentDate').val(planData.dateRange).prop('disabled', true);
+                    const range = getDateRangeFromInput();
+                    if (range) {
+                        $('#parentDate').data('startDate', range.startDate);
+                        $('#parentDate').data('endDate', range.endDate);
+                        ns.initChildPicker(range.startDateObj, range.endDateObj);
+                    }
                 }
                 break;
+
             default:
                 if (planData.dateRange) {
-                    const [startStr, endStr] = planData.dateRange.split(' to ');
-                    const start = new Date(startStr);
-                    const end = new Date(endStr);
-                    ns.initParentPicker('custom', start, end);
-                    ns.initChildPicker(start, end);
+                    $('#parentDate').val(planData.dateRange);
+                    const range = getDateRangeFromInput();
+                    if (range) {
+                        ns.initParentPicker('custom');
+                        ns.initChildPicker(range.startDateObj, range.endDateObj);
+                    }
                 } else {
-                    ns.initParentPicker('custom');
+                    initCustomMode();
                 }
                 break;
         }
@@ -505,12 +536,44 @@
 
     const reinitializeDatePickers = () => {
         const parentDate = $('#parentDate').val();
-        if (parentDate && parentDate.includes(' to ')) {
-            const [startStr, endStr] = parentDate.split(' to ');
-            const start = new Date(startStr);
-            const end = new Date(endStr);
-            ns.initChildPicker(start, end);
+        if (parentDate) {
+            const range = getDateRangeFromInput();
+            if (range) {
+                ns.initChildPicker(range.startDateObj, range.endDateObj);
+            }
         }
+    };
+
+    const getDateRangeFromInput = () => {
+        const dateRangeStr = $('#parentDate').val();
+
+        if (!dateRangeStr || dateRangeStr.trim() === '') {
+            return null;
+        }
+
+        // Try different separators
+        let parts = dateRangeStr.split(' إلى ');
+        if (parts.length !== 2) {
+            parts = dateRangeStr.split(' to ');
+        }
+
+        if (parts.length === 2) {
+            const startStr = parts[0].trim();
+            const endStr = parts[1].trim();
+
+            // Check if we have data attributes (from month selection)
+            const storedStart = $('#parentDate').data('startDate');
+            const storedEnd = $('#parentDate').data('endDate');
+
+            return {
+                startDate: storedStart || startStr,
+                endDate: storedEnd || endStr,
+                startDateObj: new Date(storedStart || startStr),
+                endDateObj: new Date(storedEnd || endStr)
+            };
+        }
+
+        return null;
     };
 
     const updateSelectedSchools = () => {
@@ -575,6 +638,7 @@
 
     const validatePlan = () => {
         let isValid = true;
+        clearErrors();
 
         // Validate title
         const title = $('#planTitle').val().trim();
@@ -592,9 +656,26 @@
 
         // Validate date range
         const dateRange = $('#parentDate').val();
-        if (!dateRange) {
+        if (!dateRange || dateRange.trim() === '') {
             showError('parentDate', 'يرجى اختيار الفترة الزمنية');
             isValid = false;
+        } else {
+            // Validate date range format
+            const range = getDateRangeFromInput();
+            if (!range || !range.startDateObj || !range.endDateObj ||
+                isNaN(range.startDateObj.getTime()) || isNaN(range.endDateObj.getTime())) {
+                showError('parentDate', 'تاريخ غير صحيح');
+                isValid = false;
+            }
+        }
+
+        // Validate semester if visible
+        if ($('#semesterContainer').is(':visible')) {
+            const semesterId = $('#ddlSemester').val();
+            if (!semesterId) {
+                showError('ddlSemester', 'يرجى اختيار الفصل الدراسي');
+                isValid = false;
+            }
         }
 
         // Validate schools
@@ -634,12 +715,16 @@
     // ================== DATA COLLECTION & SAVE ==================
 
     const collectPlanData = () => {
+        const dateRange = getDateRangeFromInput();
+
         return {
             id: ns.currentPlanId,
             title: $('#planTitle').val().trim(),
             planTypeId: $('#ddlPlanType').val(),
             semesterId: $('#ddlSemester').val() || null,
-            dateRange: $('#parentDate').val(),
+            startDate: dateRange ? dateRange.startDate : null,
+            endDate: dateRange ? dateRange.endDate : null,
+            dateRange: $('#parentDate').val(), // Keep the display format
             schools: ns.selectedSchools.map(school => ({
                 schoolId: school.id,
                 visitDate: school.visitDate,

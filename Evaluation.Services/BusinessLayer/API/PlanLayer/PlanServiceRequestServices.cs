@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using Evaluation.DAL.Dtos;
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.Calendars;
@@ -95,7 +94,7 @@ public class PlanServiceRequestServices(
             return result;
         });
     }
-    public async Task<Result<CreateEvaluationPlanDto>> ApprovePlan(CreateEvaluationPlanDto? modelDto)
+    public async Task<Result<CreateEvaluationPlanDto>> InsertOrUpdatePlan(CreateEvaluationPlanDto? modelDto)
     {
         //await ValidateApprovePlan(modelDto);
 
@@ -109,8 +108,8 @@ public class PlanServiceRequestServices(
             Guid statusId = await
             unitOfWork
             .GetRepository<PlanStatus>()
-            .GetAllActiveNonDeleted(x => x.NameEN == "Approved")
-            .Select(x=>x.Id)
+            .GetAllActiveNonDeleted(x => x.BackendName == "Approved")
+            .Select(x => x.Id)
             .FirstOrDefaultAsync();
 
             // Assign system-generated values
@@ -120,19 +119,22 @@ public class PlanServiceRequestServices(
             // Convert DTO to entity
             Plan plan = modelDto.ToPlan();
             plan.PlanJsonValue = JsonConvert.SerializeObject(modelDto);
-
-            var result = await planRepository.ApprovePlansAsync(plan);
+            if (plan.Id != null)
+            {
+                var result = await planRepository.InsertPlan(plan);
+            }
         });
     }
 
     //Plan Type Module
     public async Task<List<PlanTypeDto>> GetPlanTypes()
     {
-        return await planRepository.GetPlanType().Select(s => new PlanTypeDto
+        var departmentId = await departmentService.GetDepartmentIdAsync();
+        return await planRepository.GetPlanType().Where(x => x.DepartmentId == departmentId).Select(s => new PlanTypeDto
         {
             Id = s.Id,
             Name = requestInfo.Lang == LanguageConst.Ar ? s.NameAr : s.NameEn,
-            BackendName = s.BackendName,
+            BackendName = s.PlanType.BackendName,
         }).ToListAsync();
     }
     public async Task<PlanDto> GetPlanByIdAsyncAutoMapper(Guid planId)
@@ -177,8 +179,5 @@ public class PlanServiceRequestServices(
         plan.SemesterId = dto.SemesterId;
         plan.PlanJsonValue = dto.PlanJsonValue;
     }
-    public async Task<List<Plan>> GetPlans()
-    {
-        return await planRepository.GetPlans();
-    } 
+
 }

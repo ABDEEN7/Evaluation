@@ -116,7 +116,7 @@
 
     // API Endpoints
     const API_ENDPOINTS = {
-        GET_SCHOOLS: '/School/GetSchools',
+        GET_SCHOOLS: '/School/GetSchoolsPlan',
         GET_PLAN_TYPES: '/PlanType/GetPlanTypes',
         GET_SEMESTERS: '/Plan/GetSemesters',
         GET_VISITS: '/School/GetVisits',
