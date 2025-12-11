@@ -1,6 +1,6 @@
-﻿using System.Linq.Expressions;
-using AutoMapper;
+﻿using AutoMapper;
 using Evaluation.DAL.Helper;
+using Evaluation.DAL.Models.DepartementEntites;
 using Evaluation.DAL.Models.Org;
 using Evaluation.DAL.Models.Planing;
 using Evaluation.DAL.Repositories;
@@ -10,7 +10,9 @@ using Evaluation.SharedHelper.Dtos.SchoolDto;
 using Evaluation.SharedHelper.Extensions;
 using Evaluation.SharedHelper.Helper;
 using Evaluation.SharedHelper.Models;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using System.Linq.Expressions;
 
 namespace Evaluation.Services.BusinessLayer.API.SchooLayer;
 
@@ -33,8 +35,48 @@ public class SchoolRepository(IServiceScopeFactory serviceScopeFactory,
              .CreateScopedUow()
              .GetRepository<School>()
              .GetAllNonDeleted(filter);
+             //.Where(x => x.OrgParentId == depIt);
         return await query.GetPaginatedResult(request.PageNumber, request.PageSize = 10);
     }
+
+    public async Task<PaginatedResult<School>> GetSchoolsByDepartmentId(SchoolRequest request)
+    {
+        var filter = BuildFilterExpression(request);
+
+        var query = serviceScopeFactory
+             .CreateScopedUow()
+             .GetRepository<School>()
+             .GetAllNonDeleted(filter);
+        return await query.GetPaginatedResult(request.PageNumber, request.PageSize = 10);
+    }
+
+    public async Task<List<School>> GetSchoolsByDepartmentId(Guid depId)
+    {
+        var department = await serviceProvider.CreateScopedUow().GetRepository<Department>()
+             .GetAllQueryFiltered()
+             .AsNoTracking()
+             .Where(c => c.Id == depId)
+             .FirstOrDefaultAsync();
+
+
+        var schools = serviceProvider
+           .CreateScopedUow()
+           .GetRepository<School>()
+           .GetAllNonDeleted()
+           .Where(c => c.OrgParentId == department.TargetOrgTreeId)
+           .ToList();
+
+        return schools;
+    }
+    public async Task<School> GetSchoolDetails(Guid SchoolID)
+    {
+        var school = await serviceProvider
+           .CreateScopedUow()
+           .GetRepository<School>().GetByIDActiveNonDeleted(SchoolID);
+        
+        return school;
+    }
+
     public IQueryable<VisitType> GetVisitTypes()
         => unitOfWork
             .GetRepository<VisitType>()
