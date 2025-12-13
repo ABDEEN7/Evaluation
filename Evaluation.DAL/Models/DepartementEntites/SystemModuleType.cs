@@ -10,7 +10,6 @@ namespace Evaluation.DAL.Models.DepartementEntites
         public string NameAr { get; set; } = null!;
         public string NameEn { get; set; } = null!;
         public string BackendName { get; set; } = null!;
-
         public Guid? ParentModuleTypeId { get; set; }
         public SystemModuleType? ParentModuleType { get; set; }
 

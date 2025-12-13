@@ -1,4 +1,5 @@
-﻿using Evaluation.DAL.Models.Template;
+﻿using Evaluation.DAL.Models.DepartementEntites;
+using Evaluation.DAL.Models.Template;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -17,4 +18,5 @@ namespace Evaluation.DAL.EFConfiguration
 
         }
     }
+       
 }

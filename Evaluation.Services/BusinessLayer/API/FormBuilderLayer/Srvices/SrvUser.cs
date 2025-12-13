@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Evaluation.DAL.Helper;
+using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
 using Evaluation.DAL.Models.ServiceRequestEntities;
 using Evaluation.DAL.Models.UserEntiy;
 using Evaluation.DAL.Repositories;
@@ -154,51 +155,51 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
 		//	return result;
 		//}
-		public async Task<List<SelectListItemDTO>> GetMinistryUsersByDepartmentForRequestsAsync(Guid moduleId, List<Guid> partyTypesIdsList, string? StatusTypeId)
-		{
-			string lang = requestInfo.Lang;
-			var result = new List<SelectListItemDTO>();
+		//public async Task<List<SelectListItemDTO>> GetMinistryUsersByDepartmentForRequestsAsync(Guid moduleId, List<Guid> partyTypesIdsList, string? StatusTypeId)
+		//{
+		//	string lang = requestInfo.Lang;
+		//	var result = new List<SelectListItemDTO>();
 
-			if (moduleId != Guid.Empty && partyTypesIdsList != null && partyTypesIdsList.Any())
-			{
-				var ministryUserIdsList = await serviceScopeFactory.CreateScopedUow().GetRepository<UserPartyType>()
-					.GetAllQueryFiltered(x => x.IsActive == true && partyTypesIdsList.Contains(x.PartyTypeId))
-					.Select(x => x.UserId)
-					.ToListAsync();
+		//	if (moduleId != Guid.Empty && partyTypesIdsList != null && partyTypesIdsList.Any())
+		//	{
+		//		var ministryUserIdsList = await serviceScopeFactory.CreateScopedUow().GetRepository<UserPartyType>()
+		//			.GetAllQueryFiltered(x => x.IsActive == true && partyTypesIdsList.Contains(x.PartyTypeId))
+		//			.Select(x => x.UserId)
+		//			.ToListAsync();
 
-				var query = serviceScopeFactory.CreateScopedUow().GetRepository<RequestAssignment>()
-					.GetAll(x => x.IsActive == true)
-					.Include(x => x.PartyType)
-					.Include(x => x.MinistryUser)
-					.Include(x => x.ServiceRequest)
-					.Include(x => x.ServiceRequest.Status)
-					.Where(x => x.ServiceRequest.IsActive == true && x.ServiceRequest.IsDeleted == false)
-					.Where(x => x.PartyType.SystemModuleId == moduleId)
-					.Where(x => ministryUserIdsList.Contains(x.MinistryUserId));
+		//		var query = serviceScopeFactory.CreateScopedUow().GetRepository<EvaluationRequestAssignment>()
+		//			.GetAll(x => x.IsActive == true)
+		//			.Include(x => x.PartyType)
+		//			.Include(x => x.MinistryUser)
+		//			.Include(x => x.ServiceRequest)
+		//			.Include(x => x.ServiceRequest.Status)
+		//			.Where(x => x.ServiceRequest.IsActive == true && x.ServiceRequest.IsDeleted == false)
+		//			.Where(x => x.PartyType.SystemModuleId == moduleId)
+		//			.Where(x => ministryUserIdsList.Contains(x.MinistryUserId));
 
-				if (!string.IsNullOrEmpty(StatusTypeId))
-				{
-					query = query.Where(x => StatusTypeId == "0" ? x.ServiceRequest.Status.IsOpen == false : x.ServiceRequest.Status.IsOpen == true);
-				}
+		//		if (!string.IsNullOrEmpty(StatusTypeId))
+		//		{
+		//			query = query.Where(x => StatusTypeId == "0" ? x.ServiceRequest.Status.IsOpen == false : x.ServiceRequest.Status.IsOpen == true);
+		//		}
 
-				result = (await query.Select(x => new { x.MinistryUser, x.ServiceRequest }).ToListAsync())
-					.GroupBy(x => x.MinistryUser)
-					.Select(x => new
-					{
-						Value = x.Key.Id,
-						Text = lang == "ar" ? x.Key.NameAr : x.Key.NameEn,
-						Count = x.Select(y => y.ServiceRequest).Distinct().Count(),
-					})
-					.Select(x => new SelectListItemDTO
-					{
-						Value = x.Value.ToString(),
-						Text = $"{SplitAssignedUserName(x.Text)} ({x.Count})"
-					})
-					.ToList();
-			}
+		//		result = (await query.Select(x => new { x.MinistryUser, x.ServiceRequest }).ToListAsync())
+		//			.GroupBy(x => x.MinistryUser)
+		//			.Select(x => new
+		//			{
+		//				Value = x.Key.Id,
+		//				Text = lang == "ar" ? x.Key.NameAr : x.Key.NameEn,
+		//				Count = x.Select(y => y.ServiceRequest).Distinct().Count(),
+		//			})
+		//			.Select(x => new SelectListItemDTO
+		//			{
+		//				Value = x.Value.ToString(),
+		//				Text = $"{SplitAssignedUserName(x.Text)} ({x.Count})"
+		//			})
+		//			.ToList();
+		//	}
 
-			return result;
-		}
+		//	return result;
+		//}
 
 		private string SplitAssignedUserName(string assignedTo)
 		{
