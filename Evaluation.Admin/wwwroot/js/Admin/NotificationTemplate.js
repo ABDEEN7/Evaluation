@@ -139,7 +139,7 @@ $(document).ready(function () {
 
 
 
-    document.getElementById(btnAddContentId).addEventListener('click', event => {
+    $(`#${btnAddContentId}`).click(function (e) {
         sharedFn().ClearForm();
         sharedFn().EditMode();
         sharedFn().SetDefaultValueFromConfig();

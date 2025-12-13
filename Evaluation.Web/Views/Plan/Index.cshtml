@@ -1,0 +1,168 @@
+﻿@using Evaluation.SharedHelper.Enums
+@{
+    ViewData["Title"] = "Evaluation Plans";
+}
+
+<link href="~/lib/datatable/jquery.datatables.min.css" rel="stylesheet" />
+<link href="~/lib/select2/dist/css/select2.min.css" rel="stylesheet" asp-append-version="true" />
+<link href="~/css/evaluation/plans-listing.css" rel="stylesheet" asp-append-version="true" />
+
+<!-- Page Title / Breadcrumb -->
+<div class="page-title light-background">
+    <div class="container">
+        <nav class="breadcrumbs">
+            <ol>
+                <li><a href="/">Home</a></li>
+                <li class="current @ConstantKeys.EvaluationPlanRequests.lblPlansListTitle"></li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<section id="plans-list" class="features overflow-visible bg-white">
+    <div class="container-fluid container-xxxl">
+        <div class="row">
+            <div class="col-lg-12">
+
+                <!-- Header: Title + Filter + Search + New Plan -->
+                <div class="d-flex justify-content-between align-items-center flex-wrap mb-3 gap-3">
+                    <h3 class="m-0 @ConstantKeys.EvaluationPlanRequests.lblPlansListTitle"></h3>
+
+                    <div class="d-flex align-items-center gap-3 flex-wrap">
+
+                        <!-- Filter button (opens offcanvas) -->
+                        <button type="button"
+                                id="plansFilterToggleBtn"
+                                class="btn btn-outline-primary d-flex align-items-center gap-2 @ConstantKeys.EvaluationPlanRequests.lblFilter">
+                            <i class="fa-solid fa-filter"></i>
+                        </button>
+
+                        <!-- Search input -->
+                        <div class="flex-grow-1" style="min-width: 260px; max-width: 360px;">
+                            <div class="input-group">
+                                <input type="text"
+                                       id="planSearchInput"
+                                       class="form-control text-center @ConstantKeys.EvaluationPlanRequests.lblSearchPlan"
+                                       placeholder="" />
+                                <span class="input-group-text">
+                                    <i class="fa-solid fa-magnifying-glass"></i>
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Create new plan -->
+                        <a asp-controller="EvaluationPlan"
+                           asp-action="Create"
+                           class="btn btn-primary d-flex align-items-center gap-2 @ConstantKeys.EvaluationPlanRequests.lblCreateNewPlan">
+                            <i class="fa-solid fa-plus"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Offcanvas Filter -->
+                <div class="offcanvas offcanvas-start" tabindex="-1" id="plansFilterOffcanvas">
+                    <div class="offcanvas-header">
+                        <h5 class="offcanvas-title @ConstantKeys.EvaluationPlanRequests.lblFilter"></h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+                    </div>
+                    <div class="offcanvas-body">
+
+                        <!-- Plan Status -->
+                        <div class="mb-3">
+                            <label class="@ConstantKeys.EvaluationPlanRequests.lblPlanStatus"></label>
+                            <select id="statusIdForPlansFilter" class="form-select select2"></select>
+                        </div>
+
+                        <!-- Start Date From -->
+                        <div class="mb-3">
+                            <label class="@ConstantKeys.EvaluationPlanRequests.lblPlanStartDate"></label>
+                            <input type="date" id="startDateFromForPlansFilter" class="form-control" />
+                        </div>
+
+                        <!-- Start Date To (أو نهاية الفترة) -->
+                        <div class="mb-3">
+                            <label class="@ConstantKeys.EvaluationPlanRequests.lblPlanEndDate"></label>
+                            <input type="date" id="startDateToForPlansFilter" class="form-control" />
+                        </div>
+
+                        <!-- Filter buttons -->
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <button type="button"
+                                    class="btn btn-secondary @ConstantKeys.EvaluationPlanRequests.lblClear"
+                                    id="plansFilterClearBtn"></button>
+
+                            <button type="button"
+                                    class="btn btn-primary @ConstantKeys.EvaluationPlanRequests.lblApplyFilter"
+                                    id="plansFilterApplyBtn"
+                                    data-bs-dismiss="offcanvas"></button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Plans table -->
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <table id="plansTable" class="table table-striped plans-table" width="100%">
+                            <thead>
+                                <tr>
+                                    <th class="@ConstantKeys.EvaluationPlanRequests.lblActions"></th>
+                                    <th class="@ConstantKeys.EvaluationPlanRequests.lblPlanEndDate"></th>
+                                    <th class="@ConstantKeys.EvaluationPlanRequests.lblPlanStartDate"></th>
+                                    <th class="@ConstantKeys.EvaluationPlanRequests.lblPlanCreatedOn"></th>
+                                    <th class="@ConstantKeys.EvaluationPlanRequests.lblPlanSchoolsCount"></th>
+                                    <th class="@ConstantKeys.EvaluationPlanRequests.lblPlanStatus"></th>
+                                    <th class="@ConstantKeys.EvaluationPlanRequests.lblPlanName"></th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    @* <script src="~/plan-assets/vendor/datatables/js/jquery.datatables.min.js"></script>
+    <script src="~/lib/select2/dist/js/select2.min.js" asp-append-version="true"></script> *@
+    <script src="~/js/evaluation/plans-listing.js" asp-append-version="true"></script>
+    <script>
+        $(document).ready(async function () {
+            await webAppConfigsSetup().Init({
+                pageNames: [
+                    '@nameof(ConstantKeys.WebAppCommon)',
+                    '@nameof(ConstantKeys.EvaluationPlanRequests)'
+                ]
+            });
+
+            if (sharedUtility().ExistingToken()) {
+                uiControlsSetup().UpdatPageTitle('EvaluationPlanRequests');
+                $('body').show();
+
+                if (typeof LoadUserDetails === "function") {
+                    await LoadUserDetails();
+                }
+                if (typeof InitNavbarSection === "function") {
+                    InitNavbarSection();
+                }
+                if (typeof CheckAndResumeSessionTimer === "function") {
+                    CheckAndResumeSessionTimer();
+                }
+
+                if (typeof initPlansTable === "function") {
+                    initPlansTable();
+                }
+
+                $('#plansFilterToggleBtn').on('click', function () {
+                    const offcanvas = new bootstrap.Offcanvas('#plansFilterOffcanvas');
+                    offcanvas.show();
+                });
+
+            } else {
+                sharedUtility().RedirectToUrl(ConstantUrls.LoginURL);
+            }
+        });
+    </script>
+}

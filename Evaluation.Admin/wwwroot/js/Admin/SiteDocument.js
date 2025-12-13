@@ -289,7 +289,7 @@ function copyTextToClipboard(elementId) {
 
            
           
-            document.getElementById(btnAddContentId).addEventListener('click', event => {
+            $(`#${btnAddContentId}`).click(function (e) {
                 $thumbnail.empty();
                     sharedFn().ClearForm();
                 sharedFn().EditMode();

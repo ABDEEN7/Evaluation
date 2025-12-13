@@ -24,9 +24,12 @@
     <!-- Vendor JS Files -->
     <script src='~/assets/js/jquery.min.js'></script>
     <script src="~/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>-->
     <script src="~/assets/vendor/swiper/swiper-bundle.min.js"></script>
-
+    <script src="~/lib/toastr/toastr.min.js" asp-append-version="true"></script>
+    <script src="~/js/shared/jq-message-util.js" asp-append-version="true"></script>
+    <script src="~/lib/sweetalert2/js/sweetalert2.min.js" asp-append-version="true"></script>
+    <script src="~/js/shared/session-timer.js"></script>
     <script src="~/js/shared/ajax-setup.js" asp-append-version="true"></script>
     <script src="~/js/shared/general-params.js"></script>
     <script src="~/js/shared/shared-utility.js" asp-append-version="true"></script>
@@ -52,6 +55,9 @@
     <!-- Scroll Top -->
     <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i class="fa-solid fa-arrow-up"></i></a>
     <script src="~/js/layout.js" asp-append-version="true"></script>
+    <script src="~/js/shared/populate-ui-control.js" asp-append-version="true"></script>
+    <script src="~/js/shared/populate-system-setting.js" asp-append-version="true"></script>
+    <script src="~/js/shared/populate-web-app-configs.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 
 

@@ -1,0 +1,108 @@
+﻿@using Evaluation.SharedHelper.Enums
+
+
+<div class="tab-pane active show" id="plans-tab">
+
+    <!-- 🔍 Filter + Search + Create -->
+    <div class="filter-section mb-3">
+        <div class="row">
+            <div class="col-12 d-flex justify-content-between align-items-center flex-wrap">
+
+                <!-- Filter Button -->
+                <button type="button"
+                        id="plansFilterToggleBtn"
+                        class="btn btn-outline-primary d-flex align-items-center gap-2 @ConstantKeys.EvaluationPlanRequests.lblFilter">
+                    <i class="fa-solid fa-filter"></i>
+                </button>
+
+                <!-- Search -->
+                <div class="flex-grow-1 mx-3" style="max-width: 350px;">
+                    <div class="input-group">
+                        <input type="text"
+                               id="planSearchInput"
+                               class="form-control text-center @ConstantKeys.EvaluationPlanRequests.lblSearchPlan"
+                               placeholder="" />
+                        <span class="input-group-text"><i class="fa-solid fa-magnifying-glass"></i></span>
+                    </div>
+                </div>
+
+                <!-- Create New Plan -->
+                <a asp-controller="EvaluationPlan"
+                   asp-action="Create"
+                   class="btn btn-primary @ConstantKeys.EvaluationPlanRequests.lblCreateNewPlan">
+                    <i class="fa-solid fa-plus"></i>
+                </a>
+
+            </div>
+        </div>
+    </div>
+
+
+    <!-- 🧾 Filter Offcanvas -->
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="plansFilterOffcanvas">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title @ConstantKeys.EvaluationPlanRequests.lblFilter"></h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+        </div>
+
+        <div class="offcanvas-body">
+
+            <!-- Status Filter -->
+            <div class="mb-3">
+                <label class="@ConstantKeys.EvaluationPlanRequests.lblPlanStatus"></label>
+                <select id="statusIdForPlansFilter" class="form-select select2"></select>
+            </div>
+
+            <!-- Dates -->
+            <div class="mb-3">
+                <label class="@ConstantKeys.EvaluationPlanRequests.lblPlanStartDate"></label>
+                <input type="date" id="startDateFromForPlansFilter" class="form-control" />
+            </div>
+
+            <div class="mb-3">
+                <label class="@ConstantKeys.EvaluationPlanRequests.lblPlanEndDate"></label>
+                <input type="date" id="startDateToForPlansFilter" class="form-control" />
+            </div>
+
+            <!-- Buttons -->
+            <div class="d-flex justify-content-end gap-2 mt-4">
+                <button class="btn btn-secondary @ConstantKeys.EvaluationPlanRequests.lblClear"
+                        id="plansFilterClearBtn"></button>
+
+                <button class="btn btn-primary @ConstantKeys.EvaluationPlanRequests.lblApplyFilter"
+                        id="plansFilterApplyBtn"
+                        data-bs-dismiss="offcanvas"></button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- 📋 Plans Table -->
+    <div class="row mt-3">
+        <div class="col-12">
+            <table id="plansTable" class="table table-striped plans-table">
+                <thead>
+                    <tr>
+                        <th class="@ConstantKeys.EvaluationPlanRequests.lblActions"></th>
+                        <th class="@ConstantKeys.EvaluationPlanRequests.lblPlanEndDate"></th>
+                        <th class="@ConstantKeys.EvaluationPlanRequests.lblPlanStartDate"></th>
+                        <th class="@ConstantKeys.EvaluationPlanRequests.lblPlanCreatedOn"></th>
+                        <th class="@ConstantKeys.EvaluationPlanRequests.lblPlanSchoolsCount"></th>
+                        <th class="@ConstantKeys.EvaluationPlanRequests.lblPlanStatus"></th>
+                        <th class="@ConstantKeys.EvaluationPlanRequests.lblPlanName"></th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // فتح الفلتر
+    $('#plansFilterToggleBtn').on('click', function () {
+        const offcanvas = new bootstrap.Offcanvas('#plansFilterOffcanvas');
+        offcanvas.show();
+    });
+</script>

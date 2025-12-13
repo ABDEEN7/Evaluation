@@ -28,6 +28,7 @@ public static class ConstantKeys
         public static readonly string ParentDoesNotExist = "ParentDoesNotExist";
         public static readonly string CannotDeleteItsParent = "CannotDeleteItsParent";
         public static readonly string InvalidRequest = "InvalidRequest";
+        public static readonly string MissingPlan = "MissingPlan";
         public static readonly string NoDataFound = "NoDataFound";
         public static readonly string ServiceActionUsed = "ServiceActionUsed";
         public static readonly string ActionExistsActionAssignPartyType = "ActionExistsActionAssignPartyType";
@@ -125,6 +126,9 @@ public static class ConstantKeys
         public static readonly string EmailTemplateExistsActionStatusConfigNotification = "EmailTemplateExistsActionStatusConfigNotification";
         public static readonly string TemplateDocExistsEmailTemplateDocument = "TemplateDocExistsEmailTemplateDocument";
         public static readonly string TemplateDocExistsActionTemplateDoc = "TemplateDocExistsActionTemplateDoc";
+        public static readonly string BackendNameAlreadyExists = "BackendNameAlreadyExists";
+        public static readonly string EmailAlreadyExists = "EmailAlreadyExists";
+        public static readonly string EmailProfileExistsEmailTemplate = "EmailProfileExistsEmailTemplate";
     }
 
     public static class AdminSettings
@@ -203,6 +207,9 @@ public static class ConstantKeys
         public static readonly string lblSearchTable = "lblSearchTable";
         public static readonly string lblSearchForNames = "lblSearchForNames";
         public static readonly string lblSearchTree = "lblSearchTree";
+        public static readonly string SELECTALL = "SELECTALL";
+        public static readonly string EXPANDALL = "EXPANDALL";
+        public static readonly string COLLAPSEALL = "COLLAPSEALL";
     }
 
     public static class AdminPages
@@ -237,6 +244,10 @@ public static class ConstantKeys
         public static readonly string AdminSMSTemplate = "AdminSMSTemplate";
         public static readonly string AdminEmailTemplate = "AdminEmailTemplate";
         public static readonly string AdminTemplateDocument = "AdminTemplateDocument";
+        public static readonly string AdminEmailProfile = "AdminEmailProfile";
+        public static readonly string AdminUserPermission = "AdminUserPermission";
+        public static readonly string AdminPermission = "AdminPermission";
+        public static readonly string AdminRole = "AdminRole";
     }
 
     public static class AdminPermission
@@ -499,6 +510,30 @@ public static class ConstantKeys
 
         #endregion
 
+        #region EMAILPROFILE
+        public const string VIEW_ADMIN_EMAILPROFILE = "VIEW_ADMIN_EMAILPROFILE";
+        public const string ADD_ADMIN_EMAILPROFILE = "ADD_ADMIN_EMAILPROFILE";
+        public const string EDIT_ADMIN_EMAILPROFILE = "EDIT_ADMIN_EMAILPROFILE";
+        public const string DELETE_ADMIN_EMAILPROFILE = "DELETE_ADMIN_EMAILPROFILE";
+        #endregion
+        #region USER_PERMISSION
+        public const string VIEW_ADMIN_USER_PERMISSION = "VIEW_ADMIN_USER_PERMISSION";
+        public const string ADD_ADMIN_USER_PERMISSION = "ADD_ADMIN_USER_PERMISSION";
+        public const string EDIT_ADMIN_USER_PERMISSION = "EDIT_ADMIN_USER_PERMISSION";
+        #endregion
+
+        #region ROLE_PERMISSION
+        public const string VIEW_ADMIN_ROLE_PERMISSION = "VIEW_ADMIN_ROLE_PERMISSION";
+        public const string ADD_ADMIN_ROLE_PERMISSION = "ADD_ADMIN_ROLE_PERMISSION";
+        #endregion
+
+        #region ROLE
+        public const string VIEW_ADMIN_ROLE = "VIEW_ADMIN_ROLE";
+        public const string ADD_ADMIN_ROLE = "ADD_ADMIN_ROLE";
+        public const string EDIT_ADMIN_ROLE = "EDIT_ADMIN_ROLE";
+        public const string DELETE_ADMIN_ROLE = "DELETE_ADMIN_ROLE";
+        #endregion
+
     }
 
     public static class CustomDataSource
@@ -518,8 +553,62 @@ public static class ConstantKeys
 
     public static class WebAppCommon
     {
-        public static readonly string lblLoginMenu = "lblLoginMenu";
-    }
+		public const string lblOk = "lblOk";
+		public const string lblCancel = "lblCancel";
+		public const string lblShowingEntries = "lblShowingEntries";
+		public const string lblprevious = "lblprevious";
+		public const string lblnext = "lblnext";
+	}
+
+	public static class EvaluationPlanRequests
+	{
+		public const string lblPlansListTitle = "lblPlansListTitle";
+		public const string lblFilter = "lblFilter";
+		public const string lblSearchPlan = "lblSearchPlan";
+		public const string lblCreateNewPlan = "lblCreateNewPlan";
+
+		public const string lblPlanEndDate = "lblPlanEndDate";
+		public const string lblPlanStartDate = "lblPlanStartDate";
+		public const string lblPlanCreatedOn = "lblPlanCreatedOn";
+		public const string lblPlanSchoolsCount = "lblPlanSchoolsCount";
+		public const string lblPlanStatus = "lblPlanStatus";
+		public const string lblPlanName = "lblPlanName";
+
+		public const string lblActions = "lblActions";
+		public const string lblView = "lblView";
+		public const string lblEdit = "lblEdit";
+		public const string lblDelete = "lblDelete";
+
+		public const string lblConfirmDelete = "lblConfirmDelete";
+		public const string lblDeletePlanConfirm = "lblDeletePlanConfirm";
+
+		public const string lblApplyFilter = "lblApplyFilter";
+		public const string lblClear = "lblClear";
+		public const string lblRequestNo = "lblRequestNo";
+		public const string lblRequestStatus = "lblRequestStatus";
+		public const string lblRequestService = "lblRequestService";
+		public const string lblScholarships = "lblScholarships";
+		public const string lblRequestCreatedDate = "lblRequestCreatedDate";
+		public const string lblRequestCreatedTime = "lblRequestCreatedTime";
+		
+
+		public const string lblRequestDetails = "lblRequestDetails";
+
+		public const string lblStatistics = "lblStatistics";
+		public const string lblSchoolData = "lblSchoolData";
+		public const string lblSupportingFiles = "lblSupportingFiles";
+		public const string lblInterviewsSchedule = "lblInterviewsSchedule";
+		public const string lblEvidenceCollection = "lblEvidenceCollection";
+		public const string lblClassroomObservations = "lblClassroomObservations";
+		public const string lblSchoolRounds = "lblSchoolRounds";
+		public const string lblLabsVisits = "lblLabsVisits";
+		public const string lblResultsAnalysis = "lblResultsAnalysis";
+		public const string lblRealtimeEvaluationSystem = "lblRealtimeEvaluationSystem";
+		public const string lblPeriodicReport = "lblPeriodicReport";
+
+		public const string lblCloseModal = "lblCloseModal";
+	}
+
 
     public static class WebAppLoginPage
     {
@@ -532,7 +621,8 @@ public static class ConstantKeys
         public static readonly string lblForgotPasswordQuestion = "lblForgotPasswordQuestion";
         public static readonly string lblMobileResetPassword = "lblMobileResetPassword";
         public static readonly string lblRegisterNewAccount = "lblRegisterNewAccount";
-    }
+	public static readonly string lblLoginMenu = "lblLoginMenu";
+}
 
     public static class WebAppCacheTableName
     {

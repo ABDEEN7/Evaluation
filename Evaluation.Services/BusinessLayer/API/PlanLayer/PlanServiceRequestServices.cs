@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Threading.Tasks;
+using AutoMapper;
 using Evaluation.DAL.Dtos;
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.Calendars;
@@ -176,5 +177,8 @@ public class PlanServiceRequestServices(
         plan.SemesterId = dto.SemesterId;
         plan.PlanJsonValue = dto.PlanJsonValue;
     }
-
+    public async Task<List<Plan>> GetPlans()
+    {
+        return await planRepository.GetPlans();
+    } 
 }

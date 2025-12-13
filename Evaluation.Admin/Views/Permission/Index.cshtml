@@ -1,0 +1,88 @@
+﻿@using Evaluation.Admin.Extensions
+@using static Evaluation.SharedHelper.Enums.ConstantKeys
+
+
+@model PermissionVM
+@{
+
+    string Lang = Model.CurrentLanguage;
+    var uiControlItems = Model.UiControlItems.Where(x => x.RowOrder > 0).ToList();
+    var textDir = Lang == "ar" ? "RTL" : "LTR";
+    var permissionsList = Model.PermissionsList;
+    var controlsList = Model.ControlsList;
+    var settingList = Model.SettingList;
+    var containsOrderNo = Model.containsOrderNo;
+    var columnList = Model.Constraints.Where(x => x.ShowInGrid == true).ToList();
+}
+@section Styles {
+   
+           }
+<div class="sub-page-container">
+    <section id="tbl-template-container" class="section-container">
+        <div class="card app-card">
+            <div class="card-header d-flex align-items-center justify-content-between gap-2 flex-wrap">
+                <div class="d-flex align-items-center gap-2">
+                    @controlsList.GetUiControlText(AdminBackendUI.SELECTALL)
+                    <label class="switch-small mb-0">
+                        <input class="form-check-input" type="checkbox" id="checkall" name="checkall">
+                        <span class="slider-small round"></span>
+                    </label>
+                    <button id="treeexpand" class="data-expand-all btn btn-primary btn-sm">
+                        <i class="fa fa-plus"></i> @controlsList.GetUiControlText(AdminBackendUI.EXPANDALL)
+                    </button>
+                    <button id="treecollapse" class="data-collapse-all btn btn-primary btn-sm">
+                        <i class="fa fa-minus"></i> @controlsList.GetUiControlText(AdminBackendUI.COLLAPSEALL)
+                    </button>
+                </div>
+
+                <div class="d-flex align-items-center gap-2">
+                   
+
+                    @if (permissionsList.IsPermissionAvailabe(AdminPermission.ADD_ADMIN_ROLE_PERMISSION))
+                    {
+                        <button id="btn-submit" type="button" class="btn btn-primary">
+                            <i class="fa fa-plus-circle"></i> &nbsp;@controlsList.GetUiControlText(AdminBackendUI.SAVE_BUTTON)
+                        </button>
+                    }
+                </div>
+            </div>
+
+       
+        <div class="card-body">
+                
+                <div class="row">
+                    @if (uiControlItems != null)
+                    {
+                        <div class="row">
+                            @{
+                                @await Component.InvokeAsync("UiControlList", uiControlItems)
+                            }
+                        </div>
+                    }
+                </div>
+           
+        </div>
+    </div>
+</section>
+
+
+</div>
+@section Scripts {
+   
+    <script src="~/js/admin/Permission.js" asp-append-version="true"></script>
+    <script>
+         var controlsList = JSON.parse(`@Html.Raw(Json.Serialize(controlsList))`);
+         var columnList = @Html.Raw(Json.Serialize(columnList));
+        const settingList = JSON.parse(`@Html.Raw(Json.Serialize(settingList))`);
+         sharedFn().PopulateUiControl(controlsList);
+         var lang='@Lang';
+        let txtDir = '@textDir';
+        let containsOrderNo='@containsOrderNo';
+          const controlvalidationlist = @Html.Raw(Json.Serialize(uiControlItems));
+         let TableColumns=  sharedFn().PopulateColumn(columnList);
+        sharedFn().InitializeControl(controlvalidationlist, settingList);
+       
+   </script>
+    
+    
+}

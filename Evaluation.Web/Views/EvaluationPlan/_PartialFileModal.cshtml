@@ -1,0 +1,29 @@
+﻿<!-- Bootstrap 5 Modal -->
+<div class="modal fade" id="FileModal" tabindex="-1" aria-labelledby="FileModalLabel" aria-hidden="true" style="z-index: 1055;">
+    <div class="modal-dialog modal-dialog-scrollable  modal-lg" id="FileModalDialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="FileModalLabel">File Preview</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="d-flex justify-content-center align-items-center" id="FileModalContent">
+                            <!-- Dynamic Content -->
+                            <iframe id="file_frame" hidden class="w-100" style="height: 500px;" allow="fullscreen"></iframe>
+                            <img src="" hidden id="FileModalImg" class="img-fluid" alt="File Preview" />
+                            <video hidden controls id="FileModalVideo" class="w-100" style="max-height: 500px;">
+                                <source src="" type="video/mp4" />
+                                Your browser does not support the video tag.
+                            </video>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>

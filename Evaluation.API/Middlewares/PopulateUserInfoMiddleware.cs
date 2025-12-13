@@ -1,8 +1,9 @@
-﻿using Evaluation.SharedHelper.Enums;
-using Evaluation.SharedHelper;
-using Microsoft.EntityFrameworkCore;
-using Evaluation.DAL.Helper;
+﻿using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.PermissionEntity;
+using Evaluation.DAL.Models.UserEntiy;
+using Evaluation.SharedHelper;
+using Evaluation.SharedHelper.Enums;
+using Microsoft.EntityFrameworkCore;
 
 
 namespace Evaluation.API.Middlewares
@@ -21,33 +22,84 @@ namespace Evaluation.API.Middlewares
 
 		public async Task InvokeAsync(HttpContext context, UserInfo userInfo)
 		{
+            using (var scope = serviceProvider.CreateScopedUow())
+            {
+                if (context.User.Identity!.IsAuthenticated)
+                {
+                    userInfo.UserId = Guid.Parse(context.User.FindFirst(UserProfileClaim.UserId.ToString())?.Value ?? "");
+                    userInfo.Email = context.User.FindFirst(UserProfileClaim.Email.ToString())?.Value ?? ""; // Change if necessary
+                                                                                                             //userInfo.Roles = context.User.FindAll(ClaimTypes.Role).Select(r => r.Value).ToList();
+                    userInfo.Name = context.User.FindFirst(UserProfileClaim.FullNameEn.ToString())?.Value ?? "";
+                    userInfo.UserType = context.User.FindFirst(UserProfileClaim.UserType.ToString())?.Value ?? "";
+                    if (!string.IsNullOrEmpty(userInfo.Email))
+                    {
 
-            userInfo.UserId = Guid.Parse("11111111-1111-1111-1111-111111111111");
-            userInfo.Email = "test.user@moehe.gov.qa";
-			userInfo.Name = "Test User";
-			userInfo.UserType = "MinistryUser";
-			userInfo.DBName = "EvaluationDB";
-			userInfo.PartyTypes = new List<Guid>
-			{
-				Guid.Parse("22222222-2222-2222-2222-222222222222"),
-				Guid.Parse("33333333-3333-3333-3333-333333333333")
-			};
+                        var _UserObj = await scope.GetRepository<UserRole>()
+                                                  .GetAllQueryFiltered()
+                                                  .Include(x => x.User)
+                                                  .Include(x => x.Role)
+                                                  .Where(c => c.User!.Email == userInfo.Email && c.IsActive==true && c.IsDeleted==false && c.User.IsActive==true &&c.User.IsDeleted==false && c.Role!.IsActive==true &&c.Role.IsDeleted==false).FirstOrDefaultAsync();
+                        if (_UserObj != null)
+                        {
+                            userInfo.PermissionList = GetPermissions(_UserObj.RoleId);
+                            userInfo.UserId = _UserObj.UserId;
+                            userInfo.DBName = _UserObj.User!.NameEn;
+
+                        }
+                    }
+
+                    if (userInfo.UserId != null)
+                    {
+                        var isMinistry = scope.GetRepository<MinistryUser>().GetAll(x => x.Id == userInfo.UserId).Any();
+                        if (isMinistry)
+                        {
+                            var userPArtytypes = scope.GetRepository<UserPartyType>().GetAllQueryFiltered().Where(c => c.UserId == userInfo.UserId).Select(c => c.PartyTypeId).ToList();
+                            userInfo.PartyTypes = userPArtytypes;
+                        }
+                        else
+                        {
+                            var userPArtytypes = scope.GetRepository<PartyType>().GetAllQueryFiltered()
+                                .Where(c => !c.IsEmployeePartyType).Select(c => c.Id).ToList();
+
+                            userInfo.PartyTypes = userPArtytypes;
+                        }
 
 
-			userInfo.PermissionList = new List<string>
-			{
-				"ViewEvaluationPlans",
-				"CreateEvaluationPlan",
-				"EditEvaluationPlan",
-				"DeleteEvaluationPlan",
-				"ApproveEvaluation",
-                "GET_FORM_ITEMS",
-                "SAVE_EVALUATION",
-                "UPDATE_EVALUATION"
-			};
+                    }
 
-			await _next(context);
-		}
+                }
+            }
+
+            await _next(context);
+
+         
+
+            //         userInfo.UserId = Guid.Parse("11111111-1111-1111-1111-111111111111");
+            //         userInfo.Email = "test.user@moehe.gov.qa";
+            //userInfo.Name = "Test User";
+            //userInfo.UserType = "MinistryUser";
+            //userInfo.DBName = "EvaluationDB";
+            //userInfo.PartyTypes = new List<Guid>
+            //{
+            //	Guid.Parse("22222222-2222-2222-2222-222222222222"),
+            //	Guid.Parse("33333333-3333-3333-3333-333333333333")
+            //};
+
+
+            //userInfo.PermissionList = new List<string>
+            //{
+            //	"ViewEvaluationPlans",
+            //	"CreateEvaluationPlan",
+            //	"EditEvaluationPlan",
+            //	"DeleteEvaluationPlan",
+            //	"ApproveEvaluation",
+            //             "GET_FORM_ITEMS",
+            //             "SAVE_EVALUATION",
+            //             "UPDATE_EVALUATION"
+            //};
+
+            //await _next(context);
+        }
 	
 
 

@@ -59,7 +59,7 @@ public static class ServiceExtensions
         services.AddScoped<ISmsServices, SmsServices>();
         services.AddScoped<IEmailServices, EmailServices>();
         services.AddScoped<ResponseInfo>();
-        services.AddScoped<RequestsBL>();
+        services.AddScoped<ServiceRequestBL>();
         services.AddScoped<SrvNotification>();
         services.AddScoped<EmailTemplateProvider>();
 

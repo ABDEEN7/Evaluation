@@ -105,7 +105,7 @@ const formUtility = window.formUtility;
                         const scholarshipId = new URLSearchParams(window.location.search)
                             .get("schId")?.replace("#", "");
 
-                        const url = `/ServiceRequest/GetDropDownValuesByTypeId` +
+                        const url = `/FormRender/GetDropDownValuesByTypeId` +
                             `?dropDownTypeId=${encodeURIComponent(child.dropDownTypeId)}` +
                             `&requestId=${encodeURIComponent(requestId || '')}` +
                             `&schId=${encodeURIComponent(scholarshipId || '')}` +

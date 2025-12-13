@@ -52,38 +52,109 @@ namespace Evaluation.Admin.Controllers
             var response = await masterBL.GetAdminService<SrvDepartmentBL>().GetDepartmentList(Page, PageSize);
             return Ok(response);
         }
-       
-        
+        [HttpGet]
+        [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.AdminPermission.VIEW_ADMIN_DEPARTMENT })]
+        public async Task<IActionResult> GetAttachmentById(Guid Id)
+        {
+
+            var result = await masterBL.GetAdminService<SrvTemplateDocumentBL>().GetAttachment(Id);
+            return Ok(result);
+
+        }
+
         [HttpPost]
         [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.AdminPermission.ADD_ADMIN_DEPARTMENT })]
         public async Task<IActionResult> SaveDepartment()
         {
-           
-                var request = Request.Form["request"][0]?.StringToObject<DepartmentDTO>();
-                var result = new DepartmentDTO();
-                bool validateObject = await masterBL.GetAdminService<SrvBaseBL>().ValidateObject(request!, ConstantKeys.AdminPermission.ADD_ADMIN_DEPARTMENT);
-                if (validateObject)
+
+            var files = Request.Form.Files;
+            var result = new DepartmentDTO();
+            var model = Request.Form["request"][0]?.StringToObject<DepartmentDTO>();
+            List<WebsiteAttachmentDTO> filemodel = new  List<WebsiteAttachmentDTO>();
+            if (null != files)
+            {
+                var FinalFiles = files.Where(c => c.Length > 0).ToList();
+                if (FinalFiles.Count > 0)
                 {
-                     result = await masterBL.GetAdminService<SrvDepartmentBL>().SaveDepartment(request!);
-                    
+                    var constraintList = await masterBL.GetAdminService<SrvSystemSettingBL>().GetAppConstraints(ConstantKeys.AdminPermission.ADD_ADMIN_DEPARTMENT );
+
+                    var response = await masterBL.GetAdminService<SrvBaseBL>().ValidateWebsiteAttachment(constraintList, FinalFiles);
+                    if (response != null)
+                    {
+                        if (response.ResponseStatus == true)
+                        {
+                            filemodel = response.Data!;
+
+                        }
+                        else
+                        {
+                            model.ResponseMessage = response.ResponseMessage;
+
+                            model.ResponseState = response.ResponseStatus;
+
+                            return Json(new ResponseEntity(model));
+                        }
+                    }
+
                 }
-                return Ok(new ResponseEntity(result));
-           
+
+
+            }
+
+            bool validateObject = await masterBL.GetAdminService<SrvBaseBL>().ValidateObject(model!, ConstantKeys.AdminPermission.ADD_ADMIN_DEPARTMENT);
+            if (validateObject)
+            {
+                result = await masterBL.GetAdminService<SrvDepartmentBL>().SaveDepartment(model!, filemodel);
+            }
+            return Ok(new ResponseEntity(result));
+
         }
         [HttpPost]
         [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.AdminPermission.EDIT_ADMIN_DEPARTMENT })]
         public async Task<IActionResult> UpdateDepartment()
         {
-           
-                var request = Request.Form["request"][0]?.StringToObject<DepartmentDTO>();
-                var result = new DepartmentDTO();
-                bool validateObject = await masterBL.GetAdminService<SrvBaseBL>().ValidateObject(request!, ConstantKeys.AdminPermission.ADD_ADMIN_DEPARTMENT);
-                if (validateObject)
+
+            var files = Request.Form.Files;
+            var result = new DepartmentDTO();
+            var model = Request.Form["request"][0]?.StringToObject<DepartmentDTO>();
+            List<WebsiteAttachmentDTO> filemodel = new  List<WebsiteAttachmentDTO>();
+            if (null != files)
+            {
+                var FinalFiles = files.Where(c => c.Length > 0).ToList();
+                if (FinalFiles.Count > 0)
                 {
-                     result = await masterBL.GetAdminService<SrvDepartmentBL>().UpdateDepartment(request!);
+                    var constraintList = await masterBL.GetAdminService<SrvSystemSettingBL>().GetAppConstraints(ConstantKeys.AdminPermission.ADD_ADMIN_DEPARTMENT );
+
+                    var response = await masterBL.GetAdminService<SrvBaseBL>().ValidateWebsiteAttachment(constraintList, FinalFiles);
+                    if (response != null)
+                    {
+                        if (response.ResponseStatus == true)
+                        {
+                            filemodel = response.Data!;
+
+                        }
+                        else
+                        {
+                            model.ResponseMessage = response.ResponseMessage;
+
+                            model.ResponseState = response.ResponseStatus;
+
+                            return Json(new ResponseEntity(model));
+                        }
+                    }
+
                 }
-                return Ok(new ResponseEntity(result));
-            
+
+
+            }
+
+            bool validateObject = await masterBL.GetAdminService<SrvBaseBL>().ValidateObject(model!, ConstantKeys.AdminPermission.ADD_ADMIN_DEPARTMENT);
+            if (validateObject)
+            {
+                result = await masterBL.GetAdminService<SrvDepartmentBL>().UpdateDepartment(model!, filemodel);
+            }
+            return Ok(new ResponseEntity(result));
+
         }
 
         [HttpPost]
