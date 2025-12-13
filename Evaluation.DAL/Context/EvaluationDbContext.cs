@@ -84,7 +84,6 @@ public partial class EvaluationDbContext : DbContext
     public virtual DbSet<ServiceRequest> ServiceRequests { get; set; }
     public virtual DbSet<Service> Services { get; set; }
     public virtual DbSet<SystemModule> SystemModules { get; set; }
-    public virtual DbSet<ModuleType> ModuleTypes { get; set; }
     public virtual DbSet<UiControl> UiControls { get; set; }
     public virtual DbSet<OrgClass> OrgClass { get; set; }
     public virtual DbSet<ServiceRequestFieldsValue> ServiceRequestFieldsValue { get; set; }
