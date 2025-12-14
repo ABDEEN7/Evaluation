@@ -52,4 +52,6 @@ public  class Banner : EntityBase, IAuditLogEntity
     public string? Target { get; set; }
 
     public int? OrderNo { get; set; }
+    public Guid? WebGroupId { get; set; }
+    public WebGroup? WebGroup { get; set; }
 }
