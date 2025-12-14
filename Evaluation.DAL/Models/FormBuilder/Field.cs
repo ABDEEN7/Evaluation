@@ -47,7 +47,7 @@ namespace Evaluation.DAL.Models.FormBuilder
 		public Guid? FormGroupCustomListId { get; set; }
 		public FormGroupCustomList? FormGroupCustomList { get; set; }
 
-		public virtual ICollection<ActionField> ActionsStepsField { get; set; } = new List<ActionField>();
+		public virtual ICollection<ActionField>? ActionsStepsField { get; set; } = new List<ActionField>();
         public virtual ICollection<FieldAttributeValue>? FieldAttributeValues { get; set; }
         public virtual ICollection<FieldPartyType>? FieldPartyTypes { get; set; }
         public virtual ICollection<FieldViewCondition>? FieldViewConditions { get; set; }

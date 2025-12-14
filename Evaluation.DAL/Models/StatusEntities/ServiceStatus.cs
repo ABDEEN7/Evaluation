@@ -13,9 +13,9 @@ namespace Evaluation.DAL.Models.StatusEntities
 {
     public class ServiceStatus : EntityBase, IAuditLogEntity
     {
-        public string NameAr { get; set; }
-        public string NameEn { get; set; }
-        public string BackendName { get; set; }
+        public string NameAr { get; set; } = null!;
+        public string NameEn { get; set; } = null!;
+        public string BackendName { get; set; } = null!;
         public bool IsInitial { get; set; }
         public bool IsOpen { get; set; }
         public string? ColorCode { get; set; }
@@ -25,10 +25,10 @@ namespace Evaluation.DAL.Models.StatusEntities
         public Service Service { get; set; } = null!;
         public Guid StatusGroupId { get; set; }
 
-        public ICollection<ActionStatusConfiguration> NextStatusConfigurations { get; } = new List<ActionStatusConfiguration>();
-        public ICollection<ActionStatusConfiguration> CurrentStatusConfigurations { get; } = new List<ActionStatusConfiguration>();
-        public ICollection<ServiceStatusPartyTypeDisplayName> StatusPartyTypeDisplayNames { get; } = new List<ServiceStatusPartyTypeDisplayName>();
-        public ICollection<ServiceStatusPreventPartyType> StatusPreventPartyTypes { get; } = new List<ServiceStatusPreventPartyType>();
+        public virtual ICollection<ActionStatusConfiguration>? NextStatusConfigurations { get; } = new List<ActionStatusConfiguration>();
+        public virtual ICollection<ActionStatusConfiguration>? CurrentStatusConfigurations { get; } = new List<ActionStatusConfiguration>();
+        public virtual ICollection<ServiceStatusPartyTypeDisplayName>? StatusPartyTypeDisplayNames { get; } = new List<ServiceStatusPartyTypeDisplayName>();
+        public virtual ICollection<ServiceStatusPreventPartyType>? StatusPreventPartyTypes { get; } = new List<ServiceStatusPreventPartyType>();
 
     }
 }
