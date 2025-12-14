@@ -221,5 +221,21 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 		}
 
 
+		public async Task<List<Guid>> GetEmployeeUserPartyTypeIdsAsync(Guid userProfileId, Guid departementId)
+		{
+			var employeeUserPartyTypes = await serviceScopeFactory
+				.CreateScopedUow()
+				.GetRepository<UserPartyType>()
+				.GetAllQueryFiltered(x => x.UserId == userProfileId)
+				.Include(x => x.PartyType!.SystemModule)
+				.Where(x => x.PartyType!.SystemModule!.DepartmentId == departementId
+							&& x.PartyType.IsEmployeePartyType)
+				.Select(x => x.PartyType!.Id)
+				.Distinct()
+				.ToListAsync();
+
+			return employeeUserPartyTypes;
+		}
+
 	}
 }

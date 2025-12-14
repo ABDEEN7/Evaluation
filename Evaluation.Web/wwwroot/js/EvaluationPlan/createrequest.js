@@ -20,59 +20,31 @@ function redirectToDefault() {
     }
 }
 
-async function InitializeCreateRequest() {
-    PlanId = GetUrlParam("planId");
-    SchoolId = GetUrlParam("schoolId");
-    initialAction = GetUrlParam("initialAction");
+async function InitializeCreatePlanRequest() {
+   
 
-    if (!PlanId) {
-        const message = uiControlsSetup().GetUiControlText("lblErrorWhilePreparingTheNewRequest") || "Error while preparing the request.";
-        notificationUtil.confirmation(
-            {
-                title: message,
-                body: "",
-                okText: uiControlsSetup().GetUiControlText("lblBackToServicesPage") || "Back",
-                showCancelButton: false
-            },
-            function () { redirectToDefault(); },
-            function () { }
-        );
-        return;
-    }
-
-    const planMeta = await formUtility.fetchJSON(`/EvaluationPlanRequest/GetPlan?planId=${PlanId}`);
-    if (!planMeta) {
+    const createPlanService = await formUtility.fetchJSON(`/FormRender/GetCreatePlanService`);
+    if (!createPlanService) {
         redirectToDefault();
         return;
     }
-
-    const planName = (window.currentLang === "ar" ? planMeta.nameAr : planMeta.nameEn) || "";
+    const serviceName = (window.currentLang === "ar" ? createPlanService.nameAr : createPlanService.nameEn) || "";
     const headerEl = document.getElementById("serviceName");
-    if (headerEl) headerEl.textContent = planName ? " - " + planName : "";
+    if (headerEl) headerEl.textContent = serviceName ? " - " + serviceName : "";
 
-    const actions = planMeta.actions || [];
+    const actions = createPlanService.actions || [];
 
     if (actions && actions.filter(a => a.isInitialAction === true).length === 1) {
         const firstAction = actions.find(a => a.actionTypeBackEndKey !== ActionTypes.SaveAsDraft);
         initialAction = firstAction ? firstAction.bakendName : initialAction;
         $("#ActionsDropDown").hide();
         $("label[for='ActionsDropDown']").hide();
+        RenderActionFields(service.serviceRequestDTO)
     } else {
         fillActionDropDown(actions);
     }
+    
 
-    if (planMeta.eligibleSchools && planMeta.eligibleSchools.length) {
-        fillSchoolsDropDown(planMeta.eligibleSchools);
-    }
-
-    if (
-        actions.filter(a => a.actionTypeBackEndKey !== ActionTypes.SaveAsDraft).length === 1 &&
-        (!planMeta.eligibleSchools || SchoolId)
-    ) {
-        await GetActionFields();
-    } else {
-        configureSchoolModal();
-    }
 }
 
 const fillActionDropDown = (actions) => {
@@ -180,7 +152,7 @@ async function RenderActionFields(request) {
         if (!request || !request.actionCustom) return;
 
         const actionDetails = request.actionCustom;
-        const stepsData = actionDetails.steps || [];
+        const formGroups = actionDetails.formGroups || [];
         const dropdownsData = request.dropDownValues || [];
 
         if (dropdownsData && Array.isArray(dropdownsData)) {
@@ -197,7 +169,7 @@ async function RenderActionFields(request) {
             formUtility.attachments.push(...attachments);
         }
 
-        formUtility.renderActionView("content-container", stepsData, actionDetails);
+        formUtility.renderActionView("content-container", formGroups, actionDetails);
 
         if (typeof InitializeTooltip === "function") InitializeTooltip();
     } catch (e) {

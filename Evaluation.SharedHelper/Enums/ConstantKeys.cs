@@ -607,6 +607,8 @@ public static class ConstantKeys
 		public const string lblPeriodicReport = "lblPeriodicReport";
 
 		public const string lblCloseModal = "lblCloseModal";
+		public const string lblAddPlan = "lblAddPlan";
+		public const string lblPlanRequests = "lblPlanRequests";
 	}
 
 
@@ -743,4 +745,13 @@ public static class ConstantKeys
     {
         public static readonly string TestEmail = "TestEmail";
     }
+
+	public static class ModuleType
+	{
+		public static readonly string EvaluationPlan = "EvaluationPlan";
+		public static readonly string EvaluationPlanRequest = "EvaluationPlanRequest";
+		public static readonly string EvaluationParty = "EvaluationParty";
+		public static readonly string Forms = "Forms";
+		public static readonly string Complain = "Complain";
+	}
 }

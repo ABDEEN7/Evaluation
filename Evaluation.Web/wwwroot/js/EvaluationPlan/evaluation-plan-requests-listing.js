@@ -87,8 +87,9 @@
         jqClient(options).Get(`/EvaluationPlanRequest/GetDetails?requestId=${requestId}`);
     }
 
-    $('#addPlanRequestBtn').on('click', function () {
-        window.location.href = '/EvaluationPlanRequest/Create';
+    $('#btnAddEvaluationPlanRequest').on('click', function () {
+        $("#CreatePlanModal").modal("show");
+        InitializeCreatePlanRequest();
     });
 
     planRequestsListing.reload();

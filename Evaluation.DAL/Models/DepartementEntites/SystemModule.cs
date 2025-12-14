@@ -9,7 +9,9 @@ namespace Evaluation.DAL.Models.DepartementEntites
     {
         public Guid DepartmentId { get; set; }
         public Department? Department { get; set; }
-        public string NameAr { get; set; } = null!;
+	    public Guid SystemModuleTypeId { get; set; }
+		public Department? SystemModuleType { get; set; }
+		public string NameAr { get; set; } = null!;
         public string NameEn { get; set; } = null!;
         public string BackendName { get; set; } = null!;
         public string DescriptionAr { get; set; } = null!;
