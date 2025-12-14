@@ -130,6 +130,7 @@ public static class ConstantKeys
         public static readonly string EmailAlreadyExists = "EmailAlreadyExists";
         public static readonly string EmailProfileExistsEmailTemplate = "EmailProfileExistsEmailTemplate";
         public static readonly string InvalidJsonParam = "InvalidJsonParam";
+        public static readonly string WebGroupExistsDepWebGroup = "WebGroupExistsDepWebGroup";
     }
 
     public static class AdminSettings
@@ -249,6 +250,7 @@ public static class ConstantKeys
         public static readonly string AdminUserPermission = "AdminUserPermission";
         public static readonly string AdminPermission = "AdminPermission";
         public static readonly string AdminRole = "AdminRole";
+        public static readonly string AdminWebGroups = "AdminWebGroups";
     }
 
     public static class AdminPermission
@@ -533,6 +535,13 @@ public static class ConstantKeys
         public const string ADD_ADMIN_ROLE = "ADD_ADMIN_ROLE";
         public const string EDIT_ADMIN_ROLE = "EDIT_ADMIN_ROLE";
         public const string DELETE_ADMIN_ROLE = "DELETE_ADMIN_ROLE";
+        #endregion
+
+        #region WEBGROUPS
+        public const string VIEW_ADMIN_WEBGROUPS = "VIEW_ADMIN_WEBGROUPS";
+        public const string ADD_ADMIN_WEBGROUPS = "ADD_ADMIN_WEBGROUPS";
+        public const string EDIT_ADMIN_WEBGROUPS = "EDIT_ADMIN_WEBGROUPS";
+        public const string DELETE_ADMIN_WEBGROUPS = "DELETE_ADMIN_WEBGROUPS";
         #endregion
 
     }
