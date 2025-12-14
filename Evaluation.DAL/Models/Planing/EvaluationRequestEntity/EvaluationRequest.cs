@@ -4,6 +4,7 @@ using Evaluation.DAL.Models.Master;
 using Evaluation.DAL.Models.Org;
 using Evaluation.DAL.Models.Planing;
 using Evaluation.DAL.Models.ServiceEnities;
+using Evaluation.DAL.Models.StatusEntities;
 using Evaluation.DAL.Models.Template;
 
 namespace Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
@@ -20,6 +21,6 @@ public class EvaluationRequest : EntityBase
 	public DateTime ToDate { get; set; }
 	public Guid ServiceId { get; set; }
 	public Service? Service { get; set; }
-	public Guid StatusServiceId { get; set; }
-	public StatusService? StatusService { get; set; }
+	public Guid ServiceStatusId { get; set; }
+	public ServiceStatus? ServiceStatus { get; set; }
 }
