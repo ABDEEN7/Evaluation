@@ -133,6 +133,8 @@ public static class ConstantKeys
         public static readonly string WebGroupExistsDepWebGroup = "WebGroupExistsDepWebGroup";
         public static readonly string ScopeExistsScopeAcademicYear = "ScopeExistsScopeAcademicYear";
         public static readonly string ScopeExistsAcademicYearScope = "ScopeExistsAcademicYearScope";
+        public static readonly string SchoolTypesExistsOrganization = "SchoolTypesExistsOrganization";
+        public static readonly string SchoolTypesExistsSchool = "SchoolTypesExistsSchool";
     }
 
     public static class AdminSettings
@@ -254,6 +256,7 @@ public static class ConstantKeys
         public static readonly string AdminRole = "AdminRole";
         public static readonly string AdminWebGroups = "AdminWebGroups";
         public static readonly string AdminScopes = "AdminScopes";
+        public static readonly string AdminSchoolTypes = "AdminSchoolTypes";
     }
 
     public static class AdminPermission
@@ -552,6 +555,13 @@ public static class ConstantKeys
         public const string ADD_ADMIN_SCOPES = "ADD_ADMIN_SCOPES";
         public const string EDIT_ADMIN_SCOPES = "EDIT_ADMIN_SCOPES";
         public const string DELETE_ADMIN_SCOPES = "DELETE_ADMIN_SCOPES";
+        #endregion
+
+        #region SCHOOL_TYPES
+        public const string VIEW_ADMIN_SCHOOL_TYPES = "VIEW_ADMIN_SCHOOL_TYPES";
+        public const string ADD_ADMIN_SCHOOL_TYPES = "ADD_ADMIN_SCHOOL_TYPES";
+        public const string EDIT_ADMIN_SCHOOL_TYPES = "EDIT_ADMIN_SCHOOL_TYPES";
+        public const string DELETE_ADMIN_SCHOOL_TYPES = "DELETE_ADMIN_SCHOOL_TYPES";
         #endregion
 
     }
