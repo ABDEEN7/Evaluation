@@ -1,4 +1,5 @@
 ﻿using Evaluation.DAL.Models.BaseModule;
+using Evaluation.DAL.Models.DepartementEntites;
 using Evaluation.DAL.Models.Master;
 using Evaluation.DAL.Models.Org;
 using Evaluation.DAL.Models.Planing;
@@ -13,8 +14,8 @@ public class EvaluationRequest : EntityBase
     public Plan? Plan { get; set; }
     public Guid OrgTreeId { get; set; }
     public OrgTree? OrgTree { get; set; }
-    public Guid EvaluationTypeId { get; set; }
-    public EvaluationType? EvaluationType { get; set; }
+    public Guid DepEvaluationTypeId { get; set; }
+    public DepEvaluationType? DepEvaluationType { get; set; }
 	public DateTime FromDate { get; set; }
 	public DateTime ToDate { get; set; }
 	public Guid ServiceId { get; set; }

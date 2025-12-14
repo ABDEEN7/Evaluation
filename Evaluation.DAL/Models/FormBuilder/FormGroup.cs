@@ -22,7 +22,7 @@ namespace Evaluation.DAL.Models.FormBuilder
 
         public Guid? FormGroupCustomListId { get; set; }
         public FormGroupCustomList? FormGroupCustomList { get; set; }
-        public ICollection<Field> Fields { get; set; } =new List<Field>();
+        public virtual ICollection<Field>? Fields { get; set; } =new List<Field>();
 
     }
 }

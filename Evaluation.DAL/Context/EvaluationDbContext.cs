@@ -18,6 +18,7 @@ using Evaluation.DAL.Models.ServiceRequestEntities;
 using Evaluation.DAL.Models.SystemSetting;
 using Evaluation.DAL.Models.Template;
 using Evaluation.DAL.Models.UserEntiy;
+using Evaluation.DAL.Models.Website;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 
@@ -83,11 +84,10 @@ public partial class EvaluationDbContext : DbContext
     public virtual DbSet<ServiceRequest> ServiceRequests { get; set; }
     public virtual DbSet<Service> Services { get; set; }
     public virtual DbSet<SystemModule> SystemModules { get; set; }
-    public virtual DbSet<ModuleType> ModuleTypes { get; set; }
     public virtual DbSet<UiControl> UiControls { get; set; }
     public virtual DbSet<OrgClass> OrgClass { get; set; }
     public virtual DbSet<ServiceRequestFieldsValue> ServiceRequestFieldsValue { get; set; }
-    public virtual DbSet<RequestAssignment> RequestAssignment { get; set; }
+    public virtual DbSet<EvaluationRequestAssignment> RequestAssignment { get; set; }
     public virtual DbSet<EvaluationRequest> EvaluationRequest { get; set; }
     public virtual DbSet<EvaluationRequestFieldsValue> EvaluationRequestFieldsValue { get; set; }
     public virtual DbSet<EvaluationRequestHistory> EvaluationRequestHistory { get; set; }
@@ -106,6 +106,12 @@ public partial class EvaluationDbContext : DbContext
     public virtual DbSet<RequestAssignmentScope> RequestAssignmentScopes { get; set; }
     public virtual DbSet<EvalAttachment> EvalAttachments { get; set; }
     public virtual DbSet<PlanTypeDep> PlanTypeDep { get; set; }
+    public virtual DbSet<WebGroup> WebGroups{ get; set; }
+    public virtual DbSet<DepWebGroup> DepWebGroup { get; set; }
+    public virtual DbSet<DepEvaluationType> DepEvaluationType { get; set; }
+    public virtual DbSet<EvaluationRequestAssignment> EvaluationRequestAssignment { get; set; }
+    public virtual DbSet<EvalRequestAssignmentScope> EvalRequestAssignmentScope { get; set; }
+    public virtual DbSet<SystemModuleType> SystemModuleTypes { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -136,6 +142,7 @@ public partial class EvaluationDbContext : DbContext
 
     private void ApplyGeneralConfigurations(ModelBuilder modelBuilder)
     {
+
         modelBuilder.Entity<OrgTree>()
            .HasOne(x => x.OrgType)
                    .WithMany()
