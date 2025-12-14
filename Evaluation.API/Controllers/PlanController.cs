@@ -12,13 +12,6 @@ namespace Evaluation.API.Controllers;
 [Route("api/[controller]/[action]")]
 public class PlanController(MasterBL masterBL) : ControllerBase
 {
-    [HttpPost]
-    [CheckRolePermisionFilter(true, ConstantKeys.WebPermission.ADD_WEB_PLAN_REQUEST)]
-    public async Task<IActionResult> Create([FromBody] CreateEvaluationPlanDto planRequest)
-    {
-        var jsonPlan = await masterBL.GetApiService<PlanServiceRequestServices>().AddEvaulationPlan(planRequest);
-        return jsonPlan.ToActionResult();
-    }
 
     [HttpPost]
     [CheckRolePermisionFilter(true, ConstantKeys.WebPermission.APPROVE_WEB_PLAN_REQUEST)]
@@ -54,5 +47,12 @@ public class PlanController(MasterBL masterBL) : ControllerBase
     {
         var plan = await masterBL.GetApiService<PlanServiceRequestServices>().GetPlanByIdAsync(planId);
         return Ok(new { result = plan });
+    }
+    [HttpGet]
+    public async Task<IActionResult> GetPlans()
+    {
+        return Ok(await masterBL
+            .GetApiService<PlanServiceRequestServices>()
+            .GetPlansAsync());
     }
 }

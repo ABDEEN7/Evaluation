@@ -3,6 +3,7 @@ using Evaluation.DAL.Models.Org;
 using Evaluation.DAL.Models.Planing;
 using Evaluation.DAL.Repositories;
 using Evaluation.SharedHelper;
+using Evaluation.SharedHelper.Consts;
 using Evaluation.SharedHelper.Dtos.PlanDto;
 using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Exceptions;
@@ -11,6 +12,7 @@ using Mapster;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using static Evaluation.SharedHelper.Enums.ConstantKeys;
 namespace Evaluation.Services.BusinessLayer.API.PlanLayer;
 
@@ -96,6 +98,15 @@ public class PlanRequestRepository(IServiceScopeFactory serviceScopeFactory,
         return serviceScopeFactory.CreateScopedUow()
             .GetRepository<PlanTypeDep>()
             .GetAllActiveNonDeleted();
+    }
+    public async Task<List<Plan>> GetPlans()
+    {
+        List<Plan> plans = await unitOfWork.GetRepository<Plan>()
+            .GetAllActiveNonDeleted()
+            .Include(x => x.PlanStatus)
+            .Where(x => x.PlanStatus.BackendName == StatusBackEnds.ApprovedPlans)
+            .ToListAsync();
+        return plans;
     }
     private async Task<bool> IsThereExistingDraftPlanForSameAcadmicYear(PlanServiceRequest model)
     {

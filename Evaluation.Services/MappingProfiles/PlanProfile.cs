@@ -11,5 +11,10 @@ public class PlanProfile : Profile
         CreateMap<Plan, PlanDto>()
             .ForMember(d => d.Name, opt => opt.MapFrom(src => src.PlanName))
             .ReverseMap();
+
+        CreateMap<PlanDto, Plan>()
+            .ForMember(d => d.PlanName, opt => opt.MapFrom(src => src.Name))
+            .ReverseMap();
+
     }
 }
