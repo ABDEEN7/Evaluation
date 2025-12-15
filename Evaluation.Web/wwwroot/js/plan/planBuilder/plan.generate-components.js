@@ -4,9 +4,9 @@ const planUtility = window.planUtility;
 (function (ns) {
 
     // ================== CONSTANTS ==================
-    const { 
-        RENDER_TYPE, 
-        ACTION_TYPE, 
+    const {
+        RENDER_TYPE,
+        ACTION_TYPE,
         ReadOnly_ACTION_TYPES,
         PLAN_FIELD_TYPE,
         SCHOOL_FIELD_TYPE,
@@ -30,7 +30,7 @@ const planUtility = window.planUtility;
     ns.parentPickerInstance = null;
 
     // ================== HELPER FUNCTIONS ==================
-    
+
     const formatDateISO = (date) => {
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -44,8 +44,8 @@ const planUtility = window.planUtility;
     };
 
     const isReadOnly = (renderType, actionType) => {
-        return renderType === RENDER_TYPE.PREVIEW || 
-               ReadOnly_ACTION_TYPES.includes(actionType);
+        return renderType === RENDER_TYPE.PREVIEW ||
+            ReadOnly_ACTION_TYPES.includes(actionType);
     };
 
     // ================== PLAN FORM FIELD GENERATORS ==================
@@ -90,13 +90,13 @@ const planUtility = window.planUtility;
             const option = $('<option>')
                 .val(type.id)
                 .text(type.name)
-                .attr('data-backendname', type.backendName); 
-                //.data('backendName', type.backendName);
-            
+                .attr('data-backendname', type.backendName);
+            //.data('backendName', type.backendName);
+
             if (field?.value === type.id) {
                 option.prop('selected', true);
             }
-            
+
             selectElement.append(option);
         });
 
@@ -126,11 +126,11 @@ const planUtility = window.planUtility;
                 .text(semester.name)
                 .data('startDate', semester.startDate)
                 .data('endDate', semester.endDate);
-            
+
             if (field?.value === semester.id) {
                 option.prop('selected', true);
             }
-            
+
             selectElement.append(option);
         });
 
@@ -141,7 +141,7 @@ const planUtility = window.planUtility;
 
         const formGroup = $('<div>').addClass('mb-4');
         formGroup.append(label, selectElement);
-        
+
         if (!readonly) {
             formGroup.append($('<div>').addClass('invalid-feedback').text('يرجى اختيار الفصل الدراسي'));
         }
@@ -178,7 +178,7 @@ const planUtility = window.planUtility;
 
     const generateSelectCheckbox = (school, readonly, isComparison = false) => {
         const label = $('<label>').addClass('custom-checkbox');
-        
+
         const checkbox = $('<input>')
             .attr('type', 'checkbox')
             .addClass('selectRow')
@@ -194,27 +194,30 @@ const planUtility = window.planUtility;
         }
 
         const checkmark = $('<span>').addClass('checkmark');
-        
+
         label.append(checkbox, checkmark);
         return label;
     };
 
     const generateSchoolNameCell = (school) => {
         const ratingClass = RATING_CLASSES[school.rating] || 'bg-light';
-        
+
         const container = $('<div>').addClass('d-flex align-items-center justify-content-between');
-        
+
         const infoDiv = $('<div>');
         infoDiv.append($('<h6>').text(school.name || '-'));
-        
+
         const levelBadge = $('<div>').addClass('square-bullet');
-        levelBadge.append($('<div>').text(school.level || 'ابتدائية'));
+        const levelText = (school.schoolLevel && school.schoolLevel.length > 0)
+            ? school.schoolLevel.map(l => l.name).join(', ')
+            : '-';
+        levelBadge.append($('<div>').text(levelText));
         infoDiv.append(levelBadge);
-        
+
         const ratingBadge = $('<span>')
             .addClass(`badge ${ratingClass}`)
             .text(school.rating || '');
-        
+
         container.append(infoDiv, ratingBadge);
         return container;
     };
@@ -245,11 +248,11 @@ const planUtility = window.planUtility;
             const option = $('<option>')
                 .val(type.id)
                 .text(type.name);
-            
+
             if (school.visitType === type.name || school.visitTypeId === type.id) {
                 option.prop('selected', true);
             }
-            
+
             selectElement.append(option);
         });
 
@@ -262,7 +265,7 @@ const planUtility = window.planUtility;
 
     const generateActionsCell = (school, readonly) => {
         const container = $('<p>').addClass('m-0');
-        
+
         const link = $('<a>')
             .attr('href', '#')
             .addClass('text-dark')
@@ -354,14 +357,14 @@ const planUtility = window.planUtility;
             .addClass('form-label')
             .attr('for', 'planTitle')
             .html('عنوان <span class="text-danger">*</span>');
-        
-        const titleField = generateTitleField({value: planData?.title}, readonly);
+
+        const titleField = generateTitleField({ value: planData?.title }, readonly);
         titleGroup.append(titleLabel, titleField);
-        
+
         if (!readonly) {
             titleGroup.append($('<div>').addClass('invalid-feedback').text('يرجى إدخال عنوان الخطة'));
         }
-        
+
         titleCol.append(titleGroup);
         form.append(titleCol);
 
@@ -372,14 +375,14 @@ const planUtility = window.planUtility;
             .addClass('form-label')
             .attr('for', 'ddlPlanType')
             .html('نوع الخطة <span class="text-danger">*</span>');
-        
-        const planTypeField = generatePlanTypeField({value: planData?.planTypeId}, readonly);
+
+        const planTypeField = generatePlanTypeField({ value: planData?.planTypeId }, readonly);
         planTypeGroup.append(planTypeLabel, planTypeField);
-        
+
         if (!readonly) {
             planTypeGroup.append($('<div>').addClass('invalid-feedback').text('يرجى اختيار نوع الخطة'));
         }
-        
+
         planTypeCol.append(planTypeGroup);
         form.append(planTypeCol);
 
@@ -397,14 +400,14 @@ const planUtility = window.planUtility;
             .addClass('form-label')
             .attr('for', 'parentDate')
             .html('الفترة الزمنية <span class="text-danger">*</span>');
-        
-        const dateRangeField = generateDateRangeField({value: planData?.dateRange}, readonly);
+
+        const dateRangeField = generateDateRangeField({ value: planData?.dateRange }, readonly);
         dateRangeGroup.append(dateRangeLabel, dateRangeField);
-        
+
         if (!readonly) {
             dateRangeGroup.append($('<div>').addClass('invalid-feedback').text('يرجى اختيار الفترة الزمنية'));
         }
-        
+
         dateRangeCol.append(dateRangeGroup);
         form.append(dateRangeCol);
 
@@ -458,13 +461,13 @@ const planUtility = window.planUtility;
             if (i === ns.currentPage) {
                 pageItem.addClass('active');
             }
-            
+
             const pageLink = $('<a>')
                 .addClass('page-link')
                 .attr('href', '#')
                 .attr('data-page', i)
                 .text(i);
-            
+
             pageItem.append(pageLink);
             pagination.append(pageItem);
         }
@@ -493,9 +496,7 @@ const planUtility = window.planUtility;
         }
 
         const config = {
-            mode: "range",
-            locale: "ar",
-            dateFormat: "Y-m-d",
+            locale: "en",
             allowInput: true,
             onDayCreate: function (dObj, dStr, fp, dayElem) {
                 if (isHoliday(dayElem.dateObj)) {
@@ -504,22 +505,69 @@ const planUtility = window.planUtility;
             }
         };
 
+        // Handle disabled mode
         if (mode === 'disabled') {
             $('#parentDate').prop('disabled', true);
             return;
         }
 
-        if (minDate) config.minDate = minDate;
-        if (maxDate) config.maxDate = maxDate;
+        // Enable the input
+        $('#parentDate').prop('disabled', false);
 
-        config.onClose = function (selectedDates, dateStr, instance) {
-            if (selectedDates.length === 2) {
-                const [min, max] = selectedDates;
-                initChildPicker(min, max);
-            } else if (selectedDates.length === 0) {
-                destroyChildPicker();
-            }
-        };
+        // Configure based on mode
+        if (mode === 'month') {
+            // Month picker mode using monthSelectPlugin
+            config.plugins = [
+                new monthSelectPlugin({
+                    shorthand: true,
+                    dateFormat: "m.y",
+                    altFormat: "F Y",
+                    theme: "light" // or "dark" based on your theme
+                })
+            ];
+
+            config.onChange = function (selectedDates, dateStr, instance) {
+                if (selectedDates.length > 0) {
+                    const selectedDate = selectedDates[0];
+                    const year = selectedDate.getFullYear();
+                    const month = selectedDate.getMonth();
+
+                    // Get first and last day of selected month
+                    const firstDay = new Date(year, month, 1);
+                    const lastDay = new Date(year, month + 1, 0);
+
+                    // Format the date range display
+                    const rangeStr = `${formatDateISO(firstDay)} to ${formatDateISO(lastDay)}`;
+                    $('#parentDate').val(rangeStr);
+
+                    // Store the actual dates for form submission
+                    $('#parentDate').data('startDate', formatDateISO(firstDay));
+                    $('#parentDate').data('endDate', formatDateISO(lastDay));
+
+                    // Initialize child pickers with month range
+                    initChildPicker(firstDay, lastDay);
+                } else {
+                    destroyChildPicker();
+                }
+            };
+
+        } else if (mode === 'custom') {
+            // Custom date range picker mode
+            config.mode = "range";
+            config.dateFormat = "Y-m-d";
+
+            if (minDate) config.minDate = minDate;
+            if (maxDate) config.maxDate = maxDate;
+
+            config.onClose = function (selectedDates, dateStr, instance) {
+                if (selectedDates.length === 2) {
+                    const [min, max] = selectedDates;
+                    initChildPicker(min, max);
+                } else if (selectedDates.length === 0) {
+                    destroyChildPicker();
+                }
+            };
+        }
 
         ns.parentPickerInstance = flatpickr("#parentDate", config);
     };
@@ -532,7 +580,7 @@ const planUtility = window.planUtility;
 
         ns.childPicker = flatpickr(".childDate", {
             mode: "range",
-            locale: "ar",
+            locale: "en",
             dateFormat: "Y-m-d",
             allowInput: true,
             minDate: minDate,
@@ -594,6 +642,16 @@ const planUtility = window.planUtility;
         }
     };
 
+    // Helper function to get month range from selected date
+    const getMonthRange = (date) => {
+        const year = date.getFullYear();
+        const month = date.getMonth();
+        return {
+            start: new Date(year, month, 1),
+            end: new Date(year, month + 1, 0)
+        };
+    };
+
     // ================== EXPORTS ==================
 
     ns.generateTitleField = generateTitleField;
@@ -614,5 +672,7 @@ const planUtility = window.planUtility;
     ns.initChildPicker = initChildPicker;
     ns.destroyChildPicker = destroyChildPicker;
     ns.isReadOnly = isReadOnly;
+    ns.formatDateISO = formatDateISO;
+    ns.getMonthRange = getMonthRange;
 
 })(planUtility);

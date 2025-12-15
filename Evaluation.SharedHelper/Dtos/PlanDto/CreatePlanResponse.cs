@@ -7,7 +7,7 @@ public class CreatePlanResponse : BaseDto
     public string Name { get; set; }
     public DateOnly StartDate { get; set; }
     public DateOnly EndDate { get; set; }
-    public Guid PlanTypeId { get; set; }
+    public Guid PlanTypeDepId { get; set; }
     public List<SelectedSchool>? Schools { get; set; }
     public Guid? AcademicYearId { get; set; }
     public Guid PlanStatusId { get; set; }

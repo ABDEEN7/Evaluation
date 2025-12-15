@@ -186,8 +186,7 @@
                             <div class="row mt-3">
                                 <div class="col-md-6 mt-3">
                                     <div class="d-flex gap-2 align-items-center flex-wrap">
-                                        <a href="#" class="btn btn-primary mw-200" type="button"
-                                           data-bs-toggle="modal" data-bs-target="#confirmation-modal">
+                                        <a href="#" id="openSaveModal" class="btn btn-primary mw-200" type="button">
                                             <i class="la la-bookmark"></i> حفظ
                                         </a>
                                         <a href="@Url.Action("Index", "Plan")" class="btn btn-outline-primary">
@@ -431,20 +430,34 @@
 </div>
 
 @section Styles {
-	<link href="~/plan-assets/css/style.css" rel="stylesheet">
+    <!-- Flatpickr CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <!-- Month Select Plugin CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/style.css">
+    <!-- Custom CSS -->
+    <link href="~/plan-assets/css/style.css" rel="stylesheet">
 }
 
 
 @section Scripts {
-	<!-- Core Libraries -->
-	<script src="~/plan-assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
-	<script src="~/plan-assets/vendor/select2/js/select2.min.js"></script>
-	<script src="~/plan-assets/vendor/flatpickr/js/flatpickr.js"></script>
-<script src="~/js/shared/populate-ui-control.js"></script>
-	<!-- NEW: Plan System Files (in this order) -->
-	<script src="~/js/plan/planBuilder/plan.constants.js"></script>
-	<script src="~/js/plan/planBuilder/plan.generate-components.js"></script>
-	<script src="~/js/plan/planBuilder/plan.main-handler.js"></script>
+    <!-- Core Libraries -->
+    <script src="~/plan-assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
+    <script src="~/plan-assets/vendor/select2/js/select2.min.js"></script>
+
+    <!-- Flatpickr JS -->
+    <script src="~/plan-assets/vendor/flatpickr/js/flatpickr.js"></script>
+    <!-- Flatpickr Arabic Locale -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ar.js"></script>
+    <!-- Month Select Plugin JS -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/index.js"></script>
+
+    <!-- Shared JS -->
+    <script src="~/js/shared/populate-ui-control.js"></script>
+
+    <!-- Plan System Files (in order) -->
+    <script src="~/js/plan/planBuilder/plan.constants.js"></script>
+    <script src="~/js/plan/planBuilder/plan.generate-components.js"></script>
+    <script src="~/js/plan/planBuilder/plan.main-handler.js"></script>
     <script src="~/js/plan/submit-evaluation-plan.js"></script>
 }
 
