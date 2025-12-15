@@ -1,7 +1,6 @@
 ﻿// form.submit.js
 
 window.formUtility = window.formUtility || {};
-const formUtility = window.formUtility;
 
 window.serviceRequestForm = window.serviceRequestForm || {};
 
@@ -268,4 +267,4 @@ window.serviceRequestForm = window.serviceRequestForm || {};
     // ================================
     ns.submitAction = submitAction;
 
-})(window.serviceRequestForm, formUtility);
+})(window.serviceRequestForm, window.formUtility);

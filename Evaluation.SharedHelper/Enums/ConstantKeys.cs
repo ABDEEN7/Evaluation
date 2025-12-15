@@ -129,6 +129,17 @@ public static class ConstantKeys
         public static readonly string BackendNameAlreadyExists = "BackendNameAlreadyExists";
         public static readonly string EmailAlreadyExists = "EmailAlreadyExists";
         public static readonly string EmailProfileExistsEmailTemplate = "EmailProfileExistsEmailTemplate";
+        public static readonly string InvalidJsonParam = "InvalidJsonParam";
+        public static readonly string WebGroupExistsDepWebGroup = "WebGroupExistsDepWebGroup";
+        public static readonly string ScopeExistsScopeAcademicYear = "ScopeExistsScopeAcademicYear";
+        public static readonly string ScopeExistsAcademicYearScope = "ScopeExistsAcademicYearScope";
+        public static readonly string SchoolTypesExistsOrganization = "SchoolTypesExistsOrganization";
+        public static readonly string SchoolTypesExistsSchool = "SchoolTypesExistsSchool";
+        public static readonly string PlanTypeDepExistsPlan = "PlanTypeDepExistsPlan";
+        public static readonly string PlanStatusExistsPlanHistory = "PlanStatusExistsPlanHistory";
+        public static readonly string PlanStatusExistsPlan = "PlanStatusExistsPlan";
+        public static readonly string OrgTypeExistsOrgTree = "OrgTypeExistsOrgTree";
+        public static readonly string OrgTypeExistsOrganization = "OrgTypeExistsOrganization";
     }
 
     public static class AdminSettings
@@ -248,6 +259,12 @@ public static class ConstantKeys
         public static readonly string AdminUserPermission = "AdminUserPermission";
         public static readonly string AdminPermission = "AdminPermission";
         public static readonly string AdminRole = "AdminRole";
+        public static readonly string AdminWebGroups = "AdminWebGroups";
+        public static readonly string AdminScopes = "AdminScopes";
+        public static readonly string AdminSchoolTypes = "AdminSchoolTypes";
+        public static readonly string AdminPlanTypeDep = "AdminPlanTypeDep";
+        public static readonly string AdminPlanStatuses = "AdminPlanStatuses";
+        public static readonly string AdminOrgTypes = "AdminOrgTypes";
     }
 
     public static class AdminPermission
@@ -534,6 +551,48 @@ public static class ConstantKeys
         public const string DELETE_ADMIN_ROLE = "DELETE_ADMIN_ROLE";
         #endregion
 
+        #region WEBGROUPS
+        public const string VIEW_ADMIN_WEBGROUPS = "VIEW_ADMIN_WEBGROUPS";
+        public const string ADD_ADMIN_WEBGROUPS = "ADD_ADMIN_WEBGROUPS";
+        public const string EDIT_ADMIN_WEBGROUPS = "EDIT_ADMIN_WEBGROUPS";
+        public const string DELETE_ADMIN_WEBGROUPS = "DELETE_ADMIN_WEBGROUPS";
+        #endregion
+
+        #region SCOPES
+        public const string VIEW_ADMIN_SCOPES = "VIEW_ADMIN_SCOPES";
+        public const string ADD_ADMIN_SCOPES = "ADD_ADMIN_SCOPES";
+        public const string EDIT_ADMIN_SCOPES = "EDIT_ADMIN_SCOPES";
+        public const string DELETE_ADMIN_SCOPES = "DELETE_ADMIN_SCOPES";
+        #endregion
+
+        #region SCHOOL_TYPES
+        public const string VIEW_ADMIN_SCHOOL_TYPES = "VIEW_ADMIN_SCHOOL_TYPES";
+        public const string ADD_ADMIN_SCHOOL_TYPES = "ADD_ADMIN_SCHOOL_TYPES";
+        public const string EDIT_ADMIN_SCHOOL_TYPES = "EDIT_ADMIN_SCHOOL_TYPES";
+        public const string DELETE_ADMIN_SCHOOL_TYPES = "DELETE_ADMIN_SCHOOL_TYPES";
+        #endregion
+
+        #region PLANTYPEDEP
+        public const string VIEW_ADMIN_PLANTYPEDEP = "VIEW_ADMIN_PLANTYPEDEP";
+        public const string ADD_ADMIN_PLANTYPEDEP = "ADD_ADMIN_PLANTYPEDEP";
+        public const string EDIT_ADMIN_PLANTYPEDEP = "EDIT_ADMIN_PLANTYPEDEP";
+        public const string DELETE_ADMIN_PLANTYPEDEP = "DELETE_ADMIN_PLANTYPEDEP";
+        #endregion
+
+        #region PLANSTATUS
+        public const string VIEW_ADMIN_PLANSTATUS = "VIEW_ADMIN_PLANSTATUS";
+        public const string ADD_ADMIN_PLANSTATUS = "ADD_ADMIN_PLANSTATUS";
+        public const string EDIT_ADMIN_PLANSTATUS = "EDIT_ADMIN_PLANSTATUS";
+        public const string DELETE_ADMIN_PLANSTATUS = "DELETE_ADMIN_PLANSTATUS";
+        #endregion
+
+        #region ORGTYPES
+        public const string VIEW_ADMIN_ORGTYPES = "VIEW_ADMIN_ORGTYPES";
+        public const string ADD_ADMIN_ORGTYPES = "ADD_ADMIN_ORGTYPES";
+        public const string EDIT_ADMIN_ORGTYPES = "EDIT_ADMIN_ORGTYPES";
+        public const string DELETE_ADMIN_ORGTYPES = "DELETE_ADMIN_ORGTYPES";
+        #endregion
+
     }
 
     public static class CustomDataSource
@@ -607,6 +666,8 @@ public static class ConstantKeys
 		public const string lblPeriodicReport = "lblPeriodicReport";
 
 		public const string lblCloseModal = "lblCloseModal";
+		public const string lblAddPlan = "lblAddPlan";
+		public const string lblPlanRequests = "lblPlanRequests";
 	}
 
 
@@ -743,4 +804,13 @@ public static class ConstantKeys
     {
         public static readonly string TestEmail = "TestEmail";
     }
+
+	public static class ModuleType
+	{
+		public static readonly string EvaluationPlan = "EvaluationPlan";
+		public static readonly string EvaluationPlanRequest = "EvaluationPlanRequest";
+		public static readonly string EvaluationParty = "EvaluationParty";
+		public static readonly string Forms = "Forms";
+		public static readonly string Complain = "Complain";
+	}
 }

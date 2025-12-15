@@ -4,7 +4,6 @@
 
 //-----------------------------------------------------------------------
 let pageActiveRequests = 0;
-
 const systemSetting = {
     values: [],
 }
@@ -45,6 +44,7 @@ const ConstantUrls = {
     LoginURL: '/Account/Login',
     AccessDenied: '/AccessDenied',
     LogoutUrl: '/Account/Logout',
+    LoginMinistry: '/Account/LoginMinistry',
     RefreshTokenURL: '/Account/RefreshToken',
     GetMSAuthorizationURL: '/Account/GetMSAuthorizationURL',
     GetUserAuthType: '/Account/GetUserAuthType/{username}',

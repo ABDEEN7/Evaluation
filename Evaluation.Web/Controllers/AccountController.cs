@@ -10,7 +10,7 @@ namespace Evaluation.Web.Controllers
     {
 
         [HttpGet()]
-        public IActionResult Login(string redirectUrl = null)
+        public IActionResult Login(string? redirectUrl = null)
         {
             var model = new LoginViewModel { RedirectUrl = redirectUrl };
             return View(model);

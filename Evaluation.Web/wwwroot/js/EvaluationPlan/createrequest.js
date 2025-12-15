@@ -1,208 +1,200 @@
-﻿const formUtility = FormGeneratorsUtility();
-const ActionTypes = formUtility.ACTION_TYPE;
-window.dropdowns = window.dropdowns || [];
-let PlanId;
-let SchoolId;
-let initialAction;
+﻿(function (w, $) {
 
-const GetUrlParam = (param) => {
-    const params = new URLSearchParams(window.location.search);
-    return params.get(param);
-};
+    const fu = w.formUtility || {};
+    const ActionTypes = (w.FormConstants && w.FormConstants.ACTION_TYPE) || {};
+    w.dropdowns = w.dropdowns || [];
 
-function redirectToDefault() {
-    if (typeof sharedUtility === "function") {
-        sharedUtility().RedirectToModuleOrDefault();
-    } else if (window.locationReferrer) {
-        window.location.href = document.referrer;
-    } else {
-        window.location.href = "/";
-    }
-}
+    let PlanId;
+    let SchoolId;
+    let initialAction;
 
-async function InitializeCreateRequest() {
-    PlanId = GetUrlParam("planId");
-    SchoolId = GetUrlParam("schoolId");
-    initialAction = GetUrlParam("initialAction");
+    const GetUrlParam = (param) => {
+        const params = new URLSearchParams(w.location.search);
+        return params.get(param);
+    };
 
-    if (!PlanId) {
-        const message = uiControlsSetup().GetUiControlText("lblErrorWhilePreparingTheNewRequest") || "Error while preparing the request.";
-        notificationUtil.confirmation(
-            {
-                title: message,
-                body: "",
-                okText: uiControlsSetup().GetUiControlText("lblBackToServicesPage") || "Back",
-                showCancelButton: false
-            },
-            function () { redirectToDefault(); },
-            function () { }
-        );
-        return;
+    function redirectToDefault() {
+        //if (typeof w.sharedUtility === "function") {
+        //    w.sharedUtility().RedirectToModuleOrDefault();
+        //} else if (w.locationReferrer) {
+        //    w.location.href = document.referrer;
+        //} else {
+        //    w.location.href = "/";
+        //}
     }
 
-    const planMeta = await formUtility.fetchJSON(`/EvaluationPlanRequest/GetPlan?planId=${PlanId}`);
-    if (!planMeta) {
-        redirectToDefault();
-        return;
+    async function InitializeCreatePlanRequest() {
+        const createPlanService =  await fu.fetchJSON(`/FormRender/GetCreatePlanService`);
+        if (!createPlanService) {
+            redirectToDefault();
+            return;
+        }
+
+        const serviceName = (w.currentLang === "ar" ? createPlanService.nameAr : createPlanService.nameEn) || "";
+        const headerEl = document.getElementById("serviceName");
+        if (headerEl) headerEl.textContent = serviceName ? " - " + serviceName : "";
+
+        const actions = createPlanService.actions || [];
+
+        if (actions && actions.filter(a => a.isInitialAction === true).length === 1) {
+            const firstAction = actions.find(a => a.actionTypeBackEndKey !== ActionTypes.SaveAsDraft);
+            initialAction = firstAction ? firstAction.bakendName : initialAction;
+            $("#ActionsDropDown").hide();
+            $("label[for='ActionsDropDown']").hide();
+            await GetActionFields();
+        } else {
+            fillActionDropDown(actions);
+        }
     }
 
-    const planName = (window.currentLang === "ar" ? planMeta.nameAr : planMeta.nameEn) || "";
-    const headerEl = document.getElementById("serviceName");
-    if (headerEl) headerEl.textContent = planName ? " - " + planName : "";
+    const fillActionDropDown = (actions) => {
+        if (!actions || actions.length < 2) {
+            $("#ActionsDropDown").hide();
+            $("label[for='ActionsDropDown']").hide();
+            return;
+        }
 
-    const actions = planMeta.actions || [];
-
-    if (actions && actions.filter(a => a.isInitialAction === true).length === 1) {
-        const firstAction = actions.find(a => a.actionTypeBackEndKey !== ActionTypes.SaveAsDraft);
-        initialAction = firstAction ? firstAction.bakendName : initialAction;
-        $("#ActionsDropDown").hide();
-        $("label[for='ActionsDropDown']").hide();
-    } else {
-        fillActionDropDown(actions);
-    }
-
-    if (planMeta.eligibleSchools && planMeta.eligibleSchools.length) {
-        fillSchoolsDropDown(planMeta.eligibleSchools);
-    }
-
-    if (
-        actions.filter(a => a.actionTypeBackEndKey !== ActionTypes.SaveAsDraft).length === 1 &&
-        (!planMeta.eligibleSchools || SchoolId)
-    ) {
-        await GetActionFields();
-    } else {
-        configureSchoolModal();
-    }
-}
-
-const fillActionDropDown = (actions) => {
-    if (!actions || actions.length < 2) {
-        $("#ActionsDropDown").hide();
-        $("label[for='ActionsDropDown']").hide();
-        return;
-    }
-
-    actions.forEach(action => {
-        const text = action.title || (window.currentLang === "ar" ? action.nameAr : action.nameEn);
-        const option = new Option(text, action.bakendName);
-        $("#ActionsDropDown").append($(option));
-    });
-
-    initialAction = $("#ActionsDropDown").val();
-
-    $("#ActionsDropDown").on("change", function () {
-        initialAction = $(this).val();
-    });
-};
-
-const fillSchoolsDropDown = (schools) => {
-    schools.forEach(s => {
-        const text = `${s.schoolName || ""} - ${s.code || ""} - ${s.typeName || ""} - ${s.stageName || ""}`;
-        const option = new Option(text, s.id);
-        $("#School").append($(option));
-    });
-
-    $("#School").select2({
-        width: "100%",
-        dropdownCssClass: "manageselect2zindex",
-        dropdownParent: $("#SchoolModal"),
-        allowClear: true,
-        placeholder: uiControlsSetup().GetUiControlText("lblSelect") || "Select…",
-        minimumResultsForSearch: 0
-    });
-
-    if (SchoolId) $("#School").val(SchoolId).trigger("change");
-
-    $("#School")
-        .removeAttr("hidden")
-        .on("change", function () {
-            SchoolId = $(this).val();
+        actions.forEach(action => {
+            const text = action.title || (w.currentLang === "ar" ? action.nameAr : action.nameEn);
+            const option = new Option(text, action.bakendName);
+            $("#ActionsDropDown").append($(option));
         });
 
-    $("label[for='School']").removeAttr("hidden");
-};
+        initialAction = $("#ActionsDropDown").val();
 
-const configureSchoolModal = () => {
-    $("#SchoolModal").modal({ backdrop: "static", keyboard: false });
-    $("#SchoolModal").modal("show");
+        $("#ActionsDropDown").on("change", function () {
+            initialAction = $(this).val();
+        });
+    };
 
-    $("#submitButtonModal").off("click").on("click", async function () {
-        if ($("#School").val()) {
-            $("#School").closest(".mb-3").find(".messages").removeClass("text-danger").text("");
-            await GetActionFields();
-            $("#SchoolModal").modal("hide");
-        } else {
-            $("#School").closest(".mb-3").find(".messages")
-                .addClass("text-danger")
-                .text(uiControlsSetup().GetUiControlText("lblIsRequired"));
-        }
-    });
+    const fillSchoolsDropDown = (schools) => {
+        (schools || []).forEach(s => {
+            const text = `${s.schoolName || ""} - ${s.code || ""} - ${s.typeName || ""} - ${s.stageName || ""}`;
+            const option = new Option(text, s.id);
+            $("#School").append($(option));
+        });
 
-    $("#cancelButtonModal, .btn-close").off("click").on("click", function () {
+        $("#School").select2({
+            width: "100%",
+            dropdownCssClass: "manageselect2zindex",
+            dropdownParent: $("#SchoolModal"),
+            allowClear: true,
+            placeholder: (w.uiControlsSetup && uiControlsSetup().GetUiControlText("lblSelect")) || "Select…",
+            minimumResultsForSearch: 0
+        });
+
+        if (SchoolId) $("#School").val(SchoolId).trigger("change");
+
+        $("#School")
+            .removeAttr("hidden")
+            .off("change")
+            .on("change", function () {
+                SchoolId = $(this).val();
+            });
+
+        $("label[for='School']").removeAttr("hidden");
+    };
+
+    const configureSchoolModal = () => {
+        $("#SchoolModal").modal({ backdrop: "static", keyboard: false });
+        $("#SchoolModal").modal("show");
+
+        $("#submitButtonModal").off("click").on("click", async function () {
+            if ($("#School").val()) {
+                $("#School").closest(".mb-3").find(".messages").removeClass("text-danger").text("");
+                await GetActionFields();
+                $("#SchoolModal").modal("hide");
+            } else {
+                $("#School").closest(".mb-3").find(".messages")
+                    .addClass("text-danger")
+                    .text((w.uiControlsSetup && uiControlsSetup().GetUiControlText("lblIsRequired")) || "Required");
+            }
+        });
+
+        $("#cancelButtonModal, .btn-close").off("click").on("click", function () {
+            redirectToDefault();
+        });
+    };
+
+    $("#Requestbtns1, #CloseRequestup").off("click").on("click", function () {
         redirectToDefault();
     });
-};
 
-$("#Requestbtns1, #CloseRequestup").off("click").on("click", function () {
-    redirectToDefault();
-});
+    $("#goBackBtn").off("click").on("click", function () {
+        redirectToDefault();
+    });
 
-$("#goBackBtn").off("click").on("click", function () {
-    redirectToDefault();
-});
-
-async function CheckCanCreateingDraft() {
-    try {
-        const url = `/EvaluationPlanRequest/CheckCanCreateingDraft?planId=${PlanId}`;
-        const response = await jqClient().SyncGet(url);
-        return response;
-    } catch (e) {
-        return false;
-    }
-}
-
-async function GetActionFields() {
-    try {
-        let url = `/EvaluationPlanRequest/GetActionField?planId=${PlanId}`;
-        if (initialAction) url += `&actionBackendKey=${encodeURIComponent(initialAction)}`;
-        if (SchoolId) url += `&schoolId=${encodeURIComponent(SchoolId)}`;
-        url += `&dropDownTypeIds=${encodeURIComponent(formUtility.dropDownTypeIds || [])}`;
-
-        const request = await formUtility.fetchJSON(url);
-        await RenderActionFields(request);
-    } catch (e) {
-        console.error("Error loading action fields:", e);
-    }
-}
-
-async function RenderActionFields(request) {
-    try {
-        if (!request || !request.actionCustom) return;
-
-        const actionDetails = request.actionCustom;
-        const stepsData = actionDetails.steps || [];
-        const dropdownsData = request.dropDownValues || [];
-
-        if (dropdownsData && Array.isArray(dropdownsData)) {
-            dropdownsData.forEach(item => {
-                if (!dropdowns.some(x => x.id === item.id && x.dropDownTypeId === item.dropDownTypeId)) {
-                    dropdowns.push(item);
-                    formUtility.dropDownTypeIds.push(item.dropDownTypeId);
-                }
-            });
+    async function CheckCanCreateingDraft() {
+        try {
+            const url = `/EvaluationPlanRequest/CheckCanCreateingDraft?planId=${PlanId}`;
+            const response = await jqClient().SyncGet(url);
+            return response;
+        } catch (e) {
+            return false;
         }
-
-        const attachments = request.planAttachments || request.attachments;
-        if (attachments && attachments.length > 0) {
-            formUtility.attachments.push(...attachments);
-        }
-
-        formUtility.renderActionView("content-container", stepsData, actionDetails);
-
-        if (typeof InitializeTooltip === "function") InitializeTooltip();
-    } catch (e) {
-        console.error("Error rendering action fields:", e);
     }
-}
 
+    async function GetActionFields() {
+        try {
+            let url = `/EvaluationPlanRequest/GetActionField?planId=${PlanId}`;
+            if (initialAction) url += `&actionBackendKey=${encodeURIComponent(initialAction)}`;
+            if (SchoolId) url += `&schoolId=${encodeURIComponent(SchoolId)}`;
 
+            const ddIds = Array.isArray(fu.dropDownTypeIds) ? fu.dropDownTypeIds : [];
+            url += `&dropDownTypeIds=${encodeURIComponent(ddIds.join(","))}`;
+
+            const request = null;// await fu.fetchJSON(url);
+            await RenderActionFields(request);
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    async function RenderActionFields(request) {
+        try {
+            if (!request || !request.actionCustom) return;
+
+            const actionDetails = request.actionCustom;
+            const formGroups = actionDetails.formGroups || [];
+            const dropdownsData = request.dropDownValues || [];
+
+            if (dropdownsData && Array.isArray(dropdownsData)) {
+                dropdownsData.forEach(item => {
+                    if (!w.dropdowns.some(x => x.id === item.id && x.dropDownTypeId === item.dropDownTypeId)) {
+                        w.dropdowns.push(item);
+                        fu.dropDownTypeIds = fu.dropDownTypeIds || [];
+                        if (!fu.dropDownTypeIds.includes(item.dropDownTypeId)) {
+                            fu.dropDownTypeIds.push(item.dropDownTypeId);
+                        }
+                    }
+                });
+            }
+
+            const attachments = request.planAttachments || request.attachments;
+            if (attachments && attachments.length > 0) {
+                fu.attachments = fu.attachments || [];
+                fu.attachments.push(...attachments);
+            }
+
+            fu.renderActionView("content-container", formGroups, actionDetails);
+
+            if (typeof w.InitializeTooltip === "function") w.InitializeTooltip();
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    w.InitializeCreatePlanRequest = InitializeCreatePlanRequest;
+    w.GetActionFields = GetActionFields;
+    w.RenderActionFields = RenderActionFields;
+    w.configureSchoolModal = configureSchoolModal;
+    w.fillSchoolsDropDown = fillSchoolsDropDown;
+    w.CheckCanCreateingDraft = CheckCanCreateingDraft;
+
+    $(function () {
+        PlanId = GetUrlParam("planId") || GetUrlParam("PlanId") || PlanId;
+        SchoolId = GetUrlParam("schoolId") || GetUrlParam("SchoolId") || SchoolId;
+        InitializeCreatePlanRequest();
+    });
+
+})(window, jQuery);
