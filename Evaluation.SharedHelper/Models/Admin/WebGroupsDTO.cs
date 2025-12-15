@@ -1,14 +1,15 @@
-﻿using Evaluation.DAL.Models.Audit;
-using Evaluation.DAL.Models.BaseModule;
+﻿
 
-
-namespace Evaluation.DAL.Models.Website
+namespace Evaluation.SharedHelper.Models.Admin
 {
-    public class WebGroup : EntityBase, IAuditLogEntity
+    public class WebGroupsDTO : EntityBaseDTO
     {
         public string NameAr { get; set; } = null!;
         public string NameEn { get; set; } = null!;
         public string RoutingPath { get; set; } = null!;
         public string BackendName { get; set; } = null!;
+
+        public Guid[]? DepWebGroup { get; set; }
+
     }
 }

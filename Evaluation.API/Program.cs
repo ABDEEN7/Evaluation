@@ -7,6 +7,7 @@ using Evaluation.SharedHelper.Helper;
 using Evaluation.Web.Middlewares;
 using Mapster;
 using MapsterMapper;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
@@ -96,8 +97,6 @@ internal class Program
             {
                 options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
             });
-
-
             // Configure JWT authentication
             builder.Services.AddAuthentication(options =>
             {
@@ -117,8 +116,8 @@ internal class Program
                     ValidIssuer = ClsAppSetting.BaseApiUrl,
                     ValidAudiences = new[]
                     {
-                    ClsAppSetting.AllowWebCorsOnly,
-                    ClsAppSetting.AllowAdminCorsOnly,
+                    //ClsAppSetting.AllowWebCorsOnly,
+                    //ClsAppSetting.AllowAdminCorsOnly,
                     ClsAppSetting.BaseApiUrl,
                     },
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(ClsAppSetting.FormJwtConfigKey)), // Replace with your secret key
@@ -139,6 +138,7 @@ internal class Program
                 };
 
             });
+
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(c =>
             {

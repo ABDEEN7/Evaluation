@@ -75,6 +75,7 @@
     <script type="text/javascript">
 
         $(document).ready(async function () {
+             
             webAppConfigsSetup().Init({
                 pageNames: [
                      'Exceptions',
@@ -83,8 +84,10 @@
                 ],
                 additional_keys: []
             }).then(() => {
+              
                 uiControlsSetup().UpdatPageTitle("WebAppLoginPage");
                 if (sharedUtility().ExistingToken()) {
+                 
                     let TempMessage = GetLocalStorageValue(LocalStorageKeys.TempMessage);
                     if (TempMessage) {
                         notificationUtil.success(TempMessage);
@@ -96,7 +99,7 @@
                         SetLocalStorageValue(LocalStorageKeys.ErrorTempMessage, '');
                     }
 
-                    sharedUtility().RedirectToUrl(ConstantUrls.Home);
+                    //sharedUtility().RedirectToUrl(ConstantUrls.Home);
                 }
             });
 
