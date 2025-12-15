@@ -12,7 +12,7 @@
 
     const planRequestsListing = evaluationListing.createListing({
         tableId: 'planRequestTable',
-        ajaxUrl: '/EvaluationPlanRequest/GetUserRequests',
+        ajaxUrl: '/ServiceRequest/GetPlanRequests',
         getFilterInput: getPlanRequestFilter,
         filterFormId: 'plan-request-filter-form-id',
         filterBtnId: 'filterPlanRequestBtnId',
@@ -24,36 +24,38 @@
         tableViewBtnId: 'tblViewPlanRequest',
         rowClass: 'plan-request-card',
         columns: [
+           
             {
-                data: "planName",
-                title: uiControlsSetup().GetUiControlText("lblEvaluationPlan"),
+                data: "service",
+                title: uiControlsSetup().GetUiControlText("lblRequestService"),
                 className: "header-left status",
                 render: function (data) {
                     return `<strong class="text-truncate-2">${data || ""}</strong>`;
                 }
             },
+            //{
+            //    data: "planName",
+            //    title: uiControlsSetup().GetUiControlText("lblEvaluationPlan"),
+            //    className: "header-left status",
+            //    render: function (data) {
+            //        return `<strong class="text-truncate-2">${data || ""}</strong>`;
+            //    }
+            //},
             {
                 data: "status",
                 title: uiControlsSetup().GetUiControlText("lblRequestStatus"),
                 className: "header-right",
                 render: function (data, type, row) {
                     const statusColor = row.statusColor || "#cccccc";
-                    const textColor = getContrastingTextColor(statusColor);
+                    const textColor = "#000";// getContrastingTextColor(statusColor);
                     return `<span class="request-status m-0" style="background-color:${statusColor};color:${textColor};">${data || ""}</span>`;
                 }
             },
-            {
-                data: "schoolName",
-                title: uiControlsSetup().GetUiControlText("lblSchoolName"),
-                className: "td-left name",
-                render: function (data) {
-                    return `<strong class="text-truncate-2">${data || ""}</strong>`;
-                }
-            },
+           
             {
                 data: "requestNumber",
                 title: uiControlsSetup().GetUiControlText("lblRequestNo"),
-                className: "td-right"
+                className: "td-full"
             },
             {
                 data: "createOn",
@@ -87,8 +89,9 @@
         jqClient(options).Get(`/EvaluationPlanRequest/GetDetails?requestId=${requestId}`);
     }
 
-    $('#addPlanRequestBtn').on('click', function () {
-        window.location.href = '/EvaluationPlanRequest/Create';
+    $('#btnAddEvaluationPlanRequest').on('click', function () {
+        $("#CreatePlanModal").modal("show");
+        InitializeCreatePlanRequest();
     });
 
     planRequestsListing.reload();

@@ -34,6 +34,11 @@ namespace Evaluation.API.Controllers
 		{
 			return await _formRenderBL.GetServiceAsync(serviceId);
 		}
+		[HttpGet]
+		public async Task<ServiceDTO> GetCreatePlanService(Guid serviceId)
+		{
+			return await _formRenderBL.GetCreatePlanService(serviceId);
+		}
 
 		[HttpGet]
 		public async Task<List<ServiceDTO>> GetServicesWebApp(string? moduelName)

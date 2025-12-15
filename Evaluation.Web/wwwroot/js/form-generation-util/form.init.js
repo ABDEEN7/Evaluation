@@ -1,7 +1,7 @@
 ﻿// form.init.js
 
 window.formUtility = window.formUtility || {};
-const formUtility = window.formUtility;
+
 
 (function (ns) {
 
@@ -442,12 +442,8 @@ const formUtility = window.formUtility;
         initializeDropzoneFields(dropzoneElements);
         initializeTinyMceFields(tinyMceElements);
         initializeDualSelectFields(DualSelectFieldFields);
-
-        if (renderType === RENDER_TYPE.MAJOR) {
-            initializeMajorTabulatorTables(tabulatorTables);
-        } else {
-            initializeTabulatorTables(tabulatorTables);
-        }
+        initializeTabulatorTables(tabulatorTables);
+        
 
         initializeTelInputFields(telInputElements);
 
@@ -1100,7 +1096,6 @@ const formUtility = window.formUtility;
     ns.initializeFormFieldsAndConditions = initializeFormFieldsAndConditions;
     ns.initializeCheckboxFields = initializeCheckboxFields;
     ns.initializeTelInputFields = initializeTelInputFields;
-    ns.initializeMajorTabulatorTables = initializeMajorTabulatorTables;
     ns.initializeTabulatorTables = initializeTabulatorTables;
     ns.initializeDualSelectFields = initializeDualSelectFields;
     ns.initializeSelect2Fields = initializeSelect2Fields;
@@ -1115,4 +1110,4 @@ const formUtility = window.formUtility;
 
     // #endregion
 
-})(formUtility);
+})(window.formUtility);
