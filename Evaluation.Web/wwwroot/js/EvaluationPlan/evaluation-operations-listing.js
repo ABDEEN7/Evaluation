@@ -23,39 +23,50 @@
         enableCardView: true,
         cardViewBtnId: 'cardViewEvaluationRequest',
         tableViewBtnId: 'tblViewEvaluationRequest',
-        rowClass: 'evaluation-request-card',
+        rowClass: 'plan-request-card',
 
         columns: [
+           
             {
-                data: "planName",
-                title: uiControlsSetup().GetUiControlText("lblEvaluationPlan"),
+                data: "Status",
+                title: uiControlsSetup().GetUiControlText("lblRequestStatus"),
                 className: "header-left status",
+                render: function (data, type, row) {
+
+                    if (row.StatusISOPen === false) {
+                        return ` <span class="badge bg-success-light fw-semibold br-0">
+                                    <i class="la la-check fs-14"></i>
+                                    مكتمل
+                                </span>`;
+                    }
+                    else
+                    return `<span class="badge bg-danger-light fw-semibold br-0">
+                            <i class="las la-times fs-14"></i>
+                            غير مكتمل
+                        </span>`;
+                }
+            }
+            ,
+            {
+                data: "evaluationType",
+                title: uiControlsSetup().GetUiControlText("lblEvaluationPlan"),
+                className: "header-right",
+                render: function (data) {
+                    return `<strong class="text-truncate-2">${data || ""}</strong>`;
+                }
+            },
+            {
+                data: "orgTreeName",
+                title: uiControlsSetup().GetUiControlText("lblSchoolName"),
+                className: "td-full",
                 render: function (data) {
                     return `<strong class="text-truncate-2">${data || ""}</strong>`;
                 }
             },
             {
                 data: "status",
-                title: uiControlsSetup().GetUiControlText("lblRequestStatus"),
-                className: "header-right",
-                render: function (data, type, row) {
-                    const statusColor = row.StatusColor || "#cccccc";
-                    const textColor = "#000";// getContrastingTextColor(statusColor);
-                    return `<span class="request-status m-0" style="background-color:${statusColor};color:${textColor};">${data || ""}</span>`;
-                }
-            },
-            {
-                data: "orgTreeName",
-                title: uiControlsSetup().GetUiControlText("lblSchoolName"),
-                className: "td-left name",
-                render: function (data) {
-                    return `<strong class="text-truncate-2">${data || ""}</strong>`;
-                }
-            },
-            {
-                data: "requestNumber",
                 title: uiControlsSetup().GetUiControlText("lblRequestNo"),
-                className: "td-right"
+                className: "td-full"
             },
             {
                 data: "createOn",
@@ -66,6 +77,28 @@
                 data: "createOnTime",
                 title: uiControlsSetup().GetUiControlText("lblRequestCreatedTime"),
                 className: "td-right bg-grey justify-content-end"
+            },
+
+            {
+                data: null,
+                title: uiControlsSetup().GetUiControlText("lblActions") || "",
+                orderable: false,
+                searchable: false,
+                className: "td-full",
+                render: function (data, type, row) {
+
+                    return `
+            <div class="d-flex justify-content-center gap-1">
+
+                <button class="btn btn-outline-primary btn-sm"
+                        title="تصفح عملية التقييم"
+                        onclick="openEvaluation('${row.Id}')">
+                    <i class="la la-arrow-left"></i>
+                </button>
+
+            </div>
+        `;
+                }
             }
         ],
 

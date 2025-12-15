@@ -24,22 +24,23 @@
         tableViewBtnId: 'tblViewPlanRequest',
         rowClass: 'plan-request-card',
         columns: [
+           
             {
-                data: "planName",
-                title: uiControlsSetup().GetUiControlText("lblEvaluationPlan"),
+                data: "service",
+                title: uiControlsSetup().GetUiControlText("lblRequestService"),
                 className: "header-left status",
                 render: function (data) {
                     return `<strong class="text-truncate-2">${data || ""}</strong>`;
                 }
             },
-            {
-                data: "service",
-                title: uiControlsSetup().GetUiControlText("lblRequestService"),
-                className: "td-left name",
-                render: function (data) {
-                    return `<strong class="text-truncate-2">${data || ""}</strong>`;
-                }
-            },
+            //{
+            //    data: "planName",
+            //    title: uiControlsSetup().GetUiControlText("lblEvaluationPlan"),
+            //    className: "header-left status",
+            //    render: function (data) {
+            //        return `<strong class="text-truncate-2">${data || ""}</strong>`;
+            //    }
+            //},
             {
                 data: "status",
                 title: uiControlsSetup().GetUiControlText("lblRequestStatus"),
@@ -54,7 +55,7 @@
             {
                 data: "requestNumber",
                 title: uiControlsSetup().GetUiControlText("lblRequestNo"),
-                className: "td-right"
+                className: "td-full"
             },
             {
                 data: "createOn",

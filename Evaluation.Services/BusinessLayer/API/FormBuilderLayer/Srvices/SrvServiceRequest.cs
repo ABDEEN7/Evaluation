@@ -244,6 +244,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 				.Include(x => x.Service)
 				.Include(x => x.ServiceStatus)
 				.Include(x => x.OrgTree)
+				.Include(x => x.DepEvaluationType)
 				.Include(x => x.Plan)
 					.ThenInclude(p => p!.PlanStatus);
 
@@ -285,6 +286,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
 				planId = x.PlanId,
 				PlanName = x.Plan != null ? x.Plan.PlanName : "",
+				EvaluationType = x.DepEvaluationType != null ? (lang == "ar" ? x.DepEvaluationType.NameAr : x.DepEvaluationType.NameAr) : "",
 				OrgTreeId = x.OrgTreeId,
 				OrgTreeName = x.OrgTree != null ? (lang == "ar" ? x.OrgTree.NameAr : x.OrgTree.NameEn) : ""
 			});

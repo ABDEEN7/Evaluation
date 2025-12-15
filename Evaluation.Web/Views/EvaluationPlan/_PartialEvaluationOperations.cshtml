@@ -19,6 +19,7 @@
         </div>
     </div>
 
+   
     <div class="card-body">
         <form id="evaluation-request-filter-form-id">
             <div class="row g-3">
@@ -43,7 +44,7 @@
 
                 <div class="col-md-4">
                     <label class="form-label">الحالة</label>
-                    <select id="evaluationRequestStatusFilter" class="form-select filter-enter" multiple>
+                    <select id="evaluationRequestStatusFilter" class="form-select filter-enter" >
                     </select>
                 </div>
 
@@ -62,7 +63,7 @@
 </div>
 
 <div class="table-responsive">
-    <table class="table table-striped table-bordered w-100" id="evaluationRequestTable">
+    <table class="table table-striped table-bordered w-100 application-request card" id="evaluationRequestTable">
         <thead>
             <tr>
                 <th>الخطة</th>
@@ -73,7 +74,7 @@
                 <th>وقت الإنشاء</th>
             </tr>
         </thead>
-        <tbody></tbody>
+        <tbody class="requeststableBody"></tbody>
     </table>
 </div>
 

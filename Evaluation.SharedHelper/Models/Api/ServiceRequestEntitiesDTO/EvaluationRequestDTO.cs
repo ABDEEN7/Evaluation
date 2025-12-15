@@ -23,6 +23,7 @@ namespace Evaluation.SharedHelper.Models.Api.ServiceRequestEntitiesDTO
 		public string? StatusColor { get; set; }
 		public Guid? StatusId { get; set; }
 		public bool? StatusISOPen { get; set; }
+		
 		public string? Service { get; set; }
 		public Guid? ServiceId { get; set; }
 		public string? CreateOn { get; set; }
@@ -67,6 +68,7 @@ namespace Evaluation.SharedHelper.Models.Api.ServiceRequestEntitiesDTO
 		public List<string>? AssignedToIdsList { get; set; }
 
 		public string? PlanName { get; set; }
+		public string? EvaluationType { get; set; }
 
 		public Guid OrgTreeId { get; set; }
 		public string? OrgTreeName { get; set; }

@@ -1,7 +1,7 @@
 ﻿// form.assign.js
 
 window.formUtility = window.formUtility || {};
-const formUtility = window.formUtility;
+var formUtility = window.formUtility;
 
 (function (ns) {
 
