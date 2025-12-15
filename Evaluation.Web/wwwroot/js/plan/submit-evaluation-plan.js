@@ -207,7 +207,7 @@
         try {
             submitBtn.prop('disabled', true).text('Saving...');
 
-            let endpoint = API_ENDPOINTS.APPROVE_PLAN;
+            let endpoint = API_ENDPOINTS.INSERTORUPDATEPLAN;
             // let endpoint = API_ENDPOINTS.CREATE_PLAN;
 
             if (ns.currentActionType === ACTION_TYPE.EDIT ||
@@ -215,7 +215,7 @@
                 endpoint = API_ENDPOINTS.UPDATE_PLAN;
             } else if (ns.currentActionType === ACTION_TYPE.APPROVE ||
                 ns.currentActionType === ACTION_TYPE.APPROVE_WITH_CHANGES) {
-                endpoint = API_ENDPOINTS.APPROVE_PLAN;
+                endpoint = API_ENDPOINTS.INSERTORUPUDATEPLAN;
             }
 
             const result = await jqClient().Post(endpoint, data);

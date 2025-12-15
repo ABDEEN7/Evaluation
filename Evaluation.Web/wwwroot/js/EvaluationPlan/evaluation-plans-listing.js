@@ -9,7 +9,7 @@
 
     const plansListing = evaluationListing.createListing({
         tableId: 'planTable',
-        ajaxUrl: '/EvaluationPlan/GetPlans',
+        ajaxUrl: '/Plan/GetPlans',
         getFilterInput: getPlansFilter,
         filterFormId: 'plan-filter-form-id',
         filterBtnId: 'filterPlanBtnId',

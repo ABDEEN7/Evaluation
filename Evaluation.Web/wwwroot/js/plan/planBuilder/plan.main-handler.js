@@ -734,7 +734,7 @@
     };
 
     const savePlan = (planData) => {
-        const endpoint = planData.id ? API_ENDPOINTS.UPDATE_PLAN : API_ENDPOINTS.APPROVE_PLAN;
+        const endpoint = planData.id ? API_ENDPOINTS.UPDATE_PLAN : API_ENDPOINTS.INSERTORUPUDATEPLAN;
 
         jqClient().Post(endpoint, planData)
             .done(result => {

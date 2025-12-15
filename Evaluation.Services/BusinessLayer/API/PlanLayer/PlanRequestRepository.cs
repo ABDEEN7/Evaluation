@@ -13,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Spire.Doc.AI.Model;
 using static Evaluation.SharedHelper.Enums.ConstantKeys;
 namespace Evaluation.Services.BusinessLayer.API.PlanLayer;
 
@@ -41,20 +42,15 @@ public class PlanRequestRepository(IServiceScopeFactory serviceScopeFactory,
         await unitOfWork.CommitAsync();
         return true;
     }
-    public async Task<Plan> InsertPlan(Plan model)
+
+    public async Task InsertAsync(Plan plan)
     {
-        if (model == null)
-            throw new ArgumentNullException(nameof(model));
+        if (plan == null)
+            throw new ArgumentNullException(nameof(plan));
 
-        //Insert Plan
-        await unitOfWork.GetRepository<Plan>().InsertAsync(model);
-        // Link EvaluationRequest to the new Plan
-
-        //await unitOfWork.SaveChangesAsync()
-        await unitOfWork.CommitAsync();
-
-        return model;
+        await unitOfWork.GetRepository<Plan>().InsertAsync(plan);
     }
+
     public async Task<Plan> UpdatePlan(Plan model)
     {
         if (model == null)
@@ -99,14 +95,24 @@ public class PlanRequestRepository(IServiceScopeFactory serviceScopeFactory,
             .GetRepository<PlanTypeDep>()
             .GetAllActiveNonDeleted();
     }
-    public async Task<List<Plan>> GetPlans()
+    public async Task<List<Plan>> GetPlans(PlanRequestDto request)
     {
-        List<Plan> plans = await unitOfWork.GetRepository<Plan>()
+        IQueryable<Plan> plans = unitOfWork.GetRepository<Plan>()
             .GetAllActiveNonDeleted()
             .Include(x => x.PlanStatus)
-            .Where(x => x.PlanStatus.BackendName == StatusBackEnds.ApprovedPlans)
-            .ToListAsync();
-        return plans;
+            .Include(x => x.AcademicYear)
+            .Include(x => x.EvaluationRequests)
+            .Where(x => x.PlanStatus.BackendName == StatusBackEnds.ApprovedPlans);
+        if (request.StatusId != null)
+        {
+            plans = plans.Where(x => x.PlanStatusId == request.StatusId);
+        }
+
+        if (!string.IsNullOrEmpty(request.PlanName))
+        {
+            plans = plans.Where(x => x.PlanName.Contains(request.PlanName));
+        }
+        return await plans.ToListAsync();
     }
     private async Task<bool> IsThereExistingDraftPlanForSameAcadmicYear(PlanServiceRequest model)
     {

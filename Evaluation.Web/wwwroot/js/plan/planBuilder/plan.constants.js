@@ -122,8 +122,8 @@
         GET_VISITS: '/School/GetVisits',
         GET_VACATION_DATES: '/AcademicYear/GetVcationDate',
         CREATE_PLAN: '/Plan/CreatePlan',
-        //APPROVE_PLAN: '/Plan/ApprovePlan',
-        APPROVE_PLAN: '/Plan/Approve',
+        //INSERTORUPUDATEPLAN: '/Plan/ApprovePlan',
+        INSERTORUPDATEPLAN: '/Plan/InsertOrUpdatePlan',
         UPDATE_PLAN: '/Plan/UpdatePlan',
         GET_PLAN_DETAILS: '/Plan/GetPlanDetails'
     };
