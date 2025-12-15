@@ -69,4 +69,10 @@ public class SchoolController : ControllerBase
         var result = await _masterBl.GetApiService<SchoolBL>().GetSchoolsByDepartmentId(depId);
         return Ok(result);
     }
+    [HttpGet]
+    public async Task<IActionResult> GetSchoolsPlan([FromQuery] SchoolRequest request)
+    {
+        var result = await _masterBl.GetApiService<SchoolBL>().GetSchoolsPlan(request);
+        return Ok(result);
+    }
 }

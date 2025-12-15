@@ -4,21 +4,22 @@
 <link rel="stylesheet" href="~/lib/datatable/jquery.dataTables.min.css" />
 <link rel="stylesheet" href="~/lib/datatable/buttons.dataTables.min.css" />
 <link href="~/lib/datatable/jquery.datatables.min.css" rel="stylesheet" />
-<!-- Page Title -->
+<link href="~/assets/css/application-requests.css" rel="stylesheet" />
+
+<!-- Page Title
 <div class="page-title light-background">
     <div class="container">
-        @*         <h1>Welcome</h1>
- *@        <nav class="breadcrumbs">
+           <nav class="breadcrumbs">
             <ol>
                 <li><a href="index.html">Home</a></li>
                 <li class="current">evaluation Plan </li>
             </ol>
         </nav>
     </div>
-</div><!-- End Page Title -->
+</div>End Page Title -->
 
 
-<section id="evaluation" class="features overflow-visible bg-white">
+<section id="evaluation" class="banner px-0 ">
     <div class="container-fluid container-xxxl">
         <div class="row">
             <div class="col-lg-12">
@@ -97,17 +98,25 @@
 
 @section Scripts {
 
-    <script src="~/js/shared/session-timer.js"></script>
     <script src="~/lib/jquery/jquery.min.js"></script>
     <script src="~/lib/datatable/jquery.dataTables.min.js"></script>
-    <script src="~/js/shared/populate-ui-control.js"></script>
     <script src="~/lib/datatable/dataTables.buttons.min.js"></script>
     <script src="~/lib/datatable/buttons.html5.min.js"></script>
     <script src="~/js/shared/jq-table-util.js"></script>
     <script src="~/js/evaluationplan/evaluation-common-listing.js"></script>
     <script src="~/js/evaluationplan/evaluation-schools-listing.js"></script>
-  
+    <script src="~/js/evaluationplan/evaluation-operations-listing.js"></script>
+    <script src="~/js/evaluationplan/evaluation-plan-requests-listing.js"></script>
 
+
+    <script src="/js/form-generation-util/form.constants.js"></script>
+    <script src="/js/form-generation-util/form.api.js"></script>
+    <script src="/js/form-generation-util/form.generate-field.js"></script>
+    <script src="/js/form-generation-util/form.render.js"></script>
+    <script src="/js/form-generation-util/form.submit.js"></script>
+    <script src="/js/form-generation-util/form.init.js"></script>
+    <script src="/js/form-generation-util/form.namespace.js"></script>
+    <script src="~/js/evaluationplan/createrequest.js"></script>
     <script>
         $(document).ready(async function () {
             // await webAppConfigsSetup().Init({
@@ -117,7 +126,7 @@
             //     ],
             //         additional_keys: []
             // });
-
+             let departmentName = await sharedUtility().extractDepartmentName();
             if (sharedUtility().ExistingToken()) {
                             //uiControlsSetup().UpdatPageTitle('WebAppScholarship');
                     $('body').show();

@@ -1,7 +1,7 @@
 ﻿// form.templates.js
 
 window.formUtility = window.formUtility || {};
-const formUtility = window.formUtility;
+
 
 (function (ns) {
 
@@ -194,4 +194,4 @@ const formUtility = window.formUtility;
     ns.ViewTemplate = ViewTemplate;
     ns.renderTemplateFirst = renderTemplateFirst;
 
-})(formUtility);
+})(window.formUtility);

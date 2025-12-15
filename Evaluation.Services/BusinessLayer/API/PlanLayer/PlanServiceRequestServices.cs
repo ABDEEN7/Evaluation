@@ -1,21 +1,24 @@
-﻿using System.Threading.Tasks;
+﻿using Aspose.Words.Drawing;
 using AutoMapper;
 using Evaluation.DAL.Dtos;
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.Calendars;
 using Evaluation.DAL.Models.DepartementEntites;
 using Evaluation.DAL.Models.Planing;
+using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
+using Evaluation.DAL.Models.StatusEntities;
+using Evaluation.DAL.Models.Template;
 using Evaluation.DAL.Repositories;
 using Evaluation.Services.BusinessLayer.API.AcademicYearLayer;
 using Evaluation.Services.BusinessLayer.API.DepartmentLayer;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper;
+using Evaluation.SharedHelper.Consts;
 using Evaluation.SharedHelper.Dtos.PlanDto;
 using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Models;
 using FluentResults;
-using Mapster;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
@@ -38,29 +41,6 @@ public class PlanServiceRequestServices(
     ) : ApiBase(serviceScopeFactory, cacheDataProvider, unitOfWork, loggingServices, mapper, userInfo,
         serviceProvider, requestInfo)
 {
-    public async Task<Result<CreatePlanResponse>> AddEvaulationPlan(CreateEvaluationPlanDto evaluationPlanDto)
-    {
-        //await ValidateDraftPlan(evaluationPlanDto);
-        return await ExecuteWithResult(async () =>
-        {
-            //PlanServiceRequest planDraft = evaluationPlanDto.Adapt<PlanServiceRequest>();
-            //var result = await f.CreateServicPlan(evaluationPlanDto);
-            var academicYearIdForCurrentUser = unitOfWork
-                 .GetRepository<Department>()
-                 .GetAllActiveNonDeleted(d => d.TargetOrgTreeId == userInfo.UserId)
-                 .SelectMany(d => d.AcademicYears)
-                 .OrderByDescending(a => a.CreateDate)
-                 .Select(a => a.Id)
-                 .FirstOrDefault();
-
-            var result = evaluationPlanDto.ConvertFromRequestToResponse(evaluationPlanDto);
-            result.CreateDate = DateTime.Now;
-            result.AcademicYearId = new Guid("00066600-9999-0000-7777-000000000001");
-            result.IsActive = true;
-            result.CreateById = new Guid("11111111-1111-1111-1111-000000000069");
-            return result;
-        });
-    }
     public async Task<bool> UpdatePlanAsync(Guid id, UpdatePlanDto planDto)
     {
         // 1. Fetch existing plan
@@ -95,7 +75,7 @@ public class PlanServiceRequestServices(
             return result;
         });
     }
-    public async Task<Result<CreateEvaluationPlanDto>> ApprovePlan(CreateEvaluationPlanDto? modelDto)
+    public async Task<Result<CreateEvaluationPlanDto>> InsertOrUpdatePlan(CreateEvaluationPlanDto? modelDto)
     {
         //await ValidateApprovePlan(modelDto);
 
@@ -109,8 +89,14 @@ public class PlanServiceRequestServices(
             Guid statusId = await
             unitOfWork
             .GetRepository<PlanStatus>()
-            .GetAllActiveNonDeleted(x => x.NameEN == "Approved")
-            .Select(x=>x.Id)
+            .GetAllActiveNonDeleted(x => x.BackendName == StatusBackEnds.ApprovedPlans)
+            .Select(x => x.Id)
+            .FirstOrDefaultAsync();
+
+            Guid statusServiceId = await unitOfWork
+            .GetRepository<ServiceStatus>()
+            .GetAllActiveNonDeleted(x => x.BackendName == StatusBackEnds.ReadyEvaluation)
+            .Select(x => x.Id)
             .FirstOrDefaultAsync();
 
             // Assign system-generated values
@@ -120,25 +106,53 @@ public class PlanServiceRequestServices(
             // Convert DTO to entity
             Plan plan = modelDto.ToPlan();
             plan.PlanJsonValue = JsonConvert.SerializeObject(modelDto);
-
-            var result = await planRepository.ApprovePlansAsync(plan);
+            //if (plan.Id != null)
+            //{
+            var result = await planRepository.InsertPlan(plan);
+            //}
+            if (modelDto.Schools != null && modelDto.Schools.Any())
+            {
+                List<EvaluationRequest> evaluationRequests = modelDto
+                .Schools.Select(school => new EvaluationRequest
+                {
+                    Id = Guid.NewGuid(),
+                    PlanId = result.Id,
+                    OrgTreeId = school.Id,
+                    DepEvaluationTypeId = modelDto.PlanTypeDepId,
+                    //Service = 
+                    ServiceStatusId = statusServiceId,
+                    FromDate = school.StartEvaluationDate,
+                    ToDate = school.EndEvaluationDate,
+                    CreateDate = DateTime.Now,
+                    IsDeleted = false,
+                }).ToList();
+                await unitOfWork.GetRepository<EvaluationRequest>()
+                  .InsertRange(evaluationRequests);
+                await unitOfWork.CommitAsync();
+            }
         });
     }
 
     //Plan Type Module
     public async Task<List<PlanTypeDto>> GetPlanTypes()
     {
-        return await planRepository.GetPlanType().Select(s => new PlanTypeDto
+        var departmentId = await departmentService.GetDepartmentIdAsync();
+        return await planRepository.GetPlanType().Where(x => x.DepartmentId == departmentId).Select(s => new PlanTypeDto
         {
             Id = s.Id,
             Name = requestInfo.Lang == LanguageConst.Ar ? s.NameAr : s.NameEn,
-            BackendName = s.BackendName,
+            BackendName = s.PlanType.BackendName,
         }).ToListAsync();
     }
     public async Task<PlanDto> GetPlanByIdAsyncAutoMapper(Guid planId)
     {
         Plan? plan = await planRepository.GetPlanAsync(planId);
-        return plan.Adapt<PlanDto>();
+        return mapper.Map<PlanDto>(plan);
+    }
+    public async Task<List<PlanDto>> GetPlansAsync()
+    {
+        List<Plan> plans = await planRepository.GetPlans();
+        return mapper.Map<List<PlanDto>>(plans);
     }
     //Validation Plans
     private async Task ValidateUpdatePlan(UpdatePlanDto model)
@@ -153,19 +167,7 @@ public class PlanServiceRequestServices(
         if (selectedYear?.Year < DateTime.Now.Year)
             throw new BusinessException(ConstantKeys.ExceptionMessage.PlanInThePastIsNotAllowed);
     }
-    //private Plan ConvertFromPlanToDto(CreateEvaluationPlanDto model)
-    //{
-    //    return new Plan
-    //    {
-    //        Id = model.Id,
-    //        AcademicYearId = model.AcademicYearId,
-    //        PlanName = model.Name,
-    //        PlanJsonValue = JsonConvert.SerializeObject(model),
-    //        PlanStatusId = model.PlanStatusId,
-    //        //PlanTypeDepartmentId = 
 
-    //    };
-    //}
     private void UpdatePlanEntity(Plan plan, UpdatePlanDto dto)
     {
         plan.PlanName = dto.Name;
@@ -177,8 +179,5 @@ public class PlanServiceRequestServices(
         plan.SemesterId = dto.SemesterId;
         plan.PlanJsonValue = dto.PlanJsonValue;
     }
-    public async Task<List<Plan>> GetPlans()
-    {
-        return await planRepository.GetPlans();
-    } 
+
 }

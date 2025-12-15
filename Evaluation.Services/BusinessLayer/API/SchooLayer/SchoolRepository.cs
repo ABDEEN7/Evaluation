@@ -34,19 +34,9 @@ public class SchoolRepository(IServiceScopeFactory serviceScopeFactory,
         var query = serviceScopeFactory
              .CreateScopedUow()
              .GetRepository<School>()
-             .GetAllNonDeleted(filter);
-             //.Where(x => x.OrgParentId == depIt);
-        return await query.GetPaginatedResult(request.PageNumber, request.PageSize = 10);
-    }
-
-    public async Task<PaginatedResult<School>> GetSchoolsByDepartmentId(SchoolRequest request)
-    {
-        var filter = BuildFilterExpression(request);
-
-        var query = serviceScopeFactory
-             .CreateScopedUow()
-             .GetRepository<School>()
-             .GetAllNonDeleted(filter);
+             .GetAllNonDeleted(filter)
+             .Include(x => x.SchoolLevel)
+             .ThenInclude(x => x.EducationLevel);
         return await query.GetPaginatedResult(request.PageNumber, request.PageSize = 10);
     }
 
