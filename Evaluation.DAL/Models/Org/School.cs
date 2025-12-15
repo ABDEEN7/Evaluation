@@ -15,6 +15,10 @@ public class School : OrgTree , IAuditLogEntity
     public string? Mobile { get; set; }
     public string Code { get; set; } = null!;
     public string? Region { get; set; }
+    public bool IsAccredited { get; set; }
+    public DateOnly? AcceditedDate { get; set; }
+    public bool SupportIdentity { get; set; }
+    public DateOnly? SupportIdentityDate { get; set; }
 
     public virtual ICollection<SchoolLevel>? SchoolLevel { get; set; }
     
