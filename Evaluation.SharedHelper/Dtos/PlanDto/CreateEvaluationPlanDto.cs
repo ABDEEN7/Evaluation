@@ -9,9 +9,9 @@ public class CreateEvaluationPlanDto
     public string Name { get; set; } = null!;
     public DateOnly StartDate { get; set; }
     public DateOnly EndDate { get; set; }
-    public Guid PlanTypeId { get; set; }
+    public Guid PlanTypeDepId { get; set; }
     public List<SelectedSchool>? Schools { get; set; }
-    public Guid? AcademicYearId { get; set; } 
+    public Guid? AcademicYearId { get; set; }
     public Guid? PlanStatusId { get; set; }
     public Guid? SemesterId { get; set; }
 
@@ -24,7 +24,7 @@ public class CreateEvaluationPlanDto
             StartDate = StartDate,
             EndDate = EndDate,
             //PlanTypeDepartmentId = PlanTypeId,
-            //PlanTypeId = PlanTypeId,
+            PlanTypeDepId = PlanTypeDepId,
             AcademicYearId = AcademicYearId,
             PlanStatusId = PlanStatusId.Value,
             SemesterId = SemesterId,
@@ -41,7 +41,7 @@ public class CreateEvaluationPlanDto
             Name = request.Name,
             StartDate = request.StartDate,
             EndDate = request.EndDate,
-            PlanTypeId = request.PlanTypeId,
+            PlanTypeDepId = request.PlanTypeDepId,
             Schools = request.Schools,
             AcademicYearId = request.AcademicYearId,
             PlanStatusId = request.PlanStatusId.Value,

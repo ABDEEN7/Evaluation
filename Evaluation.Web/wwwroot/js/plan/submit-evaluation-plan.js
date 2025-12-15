@@ -11,7 +11,7 @@
      * Collects and validates evaluation plan data from the form
      * @returns {Object|null} Evaluation data object or null if validation fails
      */
-    function getEvaluationData() {
+    function generatePlan() {
         try {
             // Get plan name from the title input
             const name = $('#planTitle').val()?.trim() || '';
@@ -19,7 +19,7 @@
             // Get plan type from the select dropdown
             const planTypeSelect = $('#ddlPlanType');
             const selectedPlanType = planTypeSelect.select2('data')[0];
-            const planTypeId = selectedPlanType?.id || '';
+            const PlanTypeDepId = selectedPlanType?.id || '';
             const planTypeBackendName = selectedPlanType?.backendName ||
                 selectedPlanType?.element?.dataset?.backendname || '';
 
@@ -47,7 +47,7 @@
             // Return structured data object
             const evaluationData = {
                 name,
-                planTypeId,
+                PlanTypeDepId,
                 startDate,
                 endDate,
                 schools: selectedSchools
@@ -57,7 +57,7 @@
                 evaluationData.semesterId = semesterId;
             }
 
-            // Add plan ID if editing existing plan
+            // Add plan ID if editing an existing plan
             if (ns.currentPlanId) {
                 evaluationData.id = ns.currentPlanId;
             }
@@ -96,7 +96,7 @@
             const dateObj1 = new Date(date1);
             const dateObj2 = new Date(date2);
 
-            // Ensure startDate is the earlier date and endDate is the later date
+            // Ensure startDate is earlier and endDate is later
             if (dateObj1 <= dateObj2) {
                 return {
                     startDate: date1,
@@ -127,38 +127,38 @@
      * @param {Object} data - Evaluation data object
      * @returns {Object} Validation result with isValid flag and errors array
      */
-    function validateEvaluationData(data) {
+    function validatePlan(data) {
         const errors = [];
 
         if (!data) {
-            errors.push('›‘· ›Ì Ã„⁄ »Ì«‰«  «·‰„Ê–Ã');
+            errors.push('Failed to collect form data');
             return { isValid: false, errors };
         }
 
         if (!data.name || data.name.length < 3) {
-            errors.push('⁄‰Ê«‰ «·Œÿ… „ÿ·Ê» ÊÌÃ» √‰ ÌﬂÊ‰ 3 √Õ—› ⁄·Ï «·√ﬁ·');
+            errors.push('Plan title is required and must be at least 3 characters');
         }
 
-        if (!data.planTypeId) {
-            errors.push('‰Ê⁄ «·Œÿ… „ÿ·Ê»');
+        if (!data.PlanTypeDepId) {
+            errors.push('Plan type is required');
         }
 
         if (!data.startDate || !data.endDate) {
-            errors.push('«·› —… «·“„‰Ì… „ÿ·Ê»…');
+            errors.push('Date range is required');
         }
 
         if (!data.schools || data.schools.length === 0) {
-            errors.push('ÌÃ»  ÕœÌœ „œ—”… Ê«Õœ… ⁄·Ï «·√ﬁ·');
+            errors.push('At least one school must be selected');
         }
 
         // Validate each school has required fields
         if (data.schools && data.schools.length > 0) {
             data.schools.forEach((school, index) => {
                 if (!school.startEvaluationDate || !school.endEvaluationDate) {
-                    errors.push(`«·„œ—”… ${index + 1}:  «—ÌŒ «·“Ì«—… „ÿ·Ê»`);
+                    errors.push(`School ${index + 1}: Visit date is required`);
                 }
                 if (!school.visitTypeId) {
-                    errors.push(`«·„œ—”… ${index + 1}: ‰Ê⁄ «·“Ì«—… „ÿ·Ê»`);
+                    errors.push(`School ${index + 1}: Visit type is required`);
                 }
             });
         }
@@ -174,20 +174,16 @@
      * @param {Array} errors - Array of error messages
      */
     function displayErrors(errors) {
-        // Display errors as alert
-        alert('Ì—ÃÏ ≈’·«Õ «·√Œÿ«¡ «· «·Ì…:\n\n' + errors.join('\n'));
-
-        // Log to console for debugging
+        alert('Please fix the following errors:\n\n' + errors.join('\n'));
         console.error('Validation errors:', errors);
 
-        // Add invalid class to form fields
-        if (errors.some(e => e.includes('⁄‰Ê«‰'))) {
+        if (errors.some(e => e.includes('title'))) {
             $('#planTitle').addClass('is-invalid');
         }
-        if (errors.some(e => e.includes('‰Ê⁄ «·Œÿ…'))) {
+        if (errors.some(e => e.includes('Plan type'))) {
             $('#ddlPlanType').next('.select2-container').addClass('is-invalid');
         }
-        if (errors.some(e => e.includes('«·› —… «·“„‰Ì…'))) {
+        if (errors.some(e => e.includes('Date range'))) {
             $('#parentDate').addClass('is-invalid');
         }
     }
@@ -209,12 +205,10 @@
         const originalText = submitBtn.text();
 
         try {
-            // Show loading state
-            submitBtn.prop('disabled', true).text('Ã«—Ì «·Õ›Ÿ...');
+            submitBtn.prop('disabled', true).text('Saving...');
 
-            // Determine endpoint based on action type
             let endpoint = API_ENDPOINTS.APPROVE_PLAN;
-            //let endpoint = API_ENDPOINTS.CREATE_PLAN;
+            // let endpoint = API_ENDPOINTS.CREATE_PLAN;
 
             if (ns.currentActionType === ACTION_TYPE.EDIT ||
                 ns.currentActionType === ACTION_TYPE.EDIT_DRAFT) {
@@ -224,28 +218,22 @@
                 endpoint = API_ENDPOINTS.APPROVE_PLAN;
             }
 
-            // Submit data
             const result = await jqClient().Post(endpoint, data);
 
             if (result.success) {
-                // Close confirmation modal if open
                 const modal = bootstrap.Modal.getInstance(document.getElementById('confirmation-modal'));
                 if (modal) modal.hide();
 
-                // Show success message
-                alert(' „ Õ›Ÿ «·Œÿ… »‰Ã«Õ');
-
-                // Redirect to plans list
+                alert('Plan saved successfully');
                 window.location.href = '/Plan/Index';
             } else {
-                throw new Error(result.message || '›‘· ›Ì Õ›Ÿ «·Œÿ…');
+                throw new Error(result.message || 'Failed to save the plan');
             }
 
         } catch (error) {
             console.error('Submission error:', error);
-            alert('ÕœÀ Œÿ√ √À‰«¡ Õ›Ÿ «·Œÿ…. Ì—ÃÏ «·„Õ«Ê·… „—… √Œ—Ï.');
+            alert('An error occurred while saving the plan. Please try again.');
         } finally {
-            // Restore button state
             submitBtn.prop('disabled', false).text(originalText);
         }
     }
@@ -262,16 +250,13 @@
             const schoolId = checkbox.data('id');
             const row = checkbox.closest('tr');
 
-            // Get visit date range
             const dateRangeInput = row.find('.childDate');
             const dateRangeValue = dateRangeInput.val() || '';
             const parsedDates = parseDateRange(dateRangeValue);
 
-            // Get visit type
             const visitTypeSelect = row.find('.visitTypeSelect');
             const visitTypeId = visitTypeSelect.val() || '';
 
-            // Create school data object
             const schoolData = {
                 id: schoolId,
                 startEvaluationDate: parsedDates.startDate,
@@ -291,39 +276,52 @@
     async function handleSubmit(event) {
         event.preventDefault();
 
-        // Clear previous errors
         clearErrors();
 
-        // Step 1: Collect data
-        const evaluationData = getEvaluationData();
-
-        // Step 2: Validate data
-        const validation = validateEvaluationData(evaluationData);
+        const evaluationData = generatePlan();
+        const validation = validatePlan(evaluationData);
 
         if (!validation.isValid) {
             displayErrors(validation.errors);
             return;
         }
 
-        // Step 3: Submit data
         await submitEvaluationData(evaluationData);
     }
 
+    /**
+     * NEW: Validation BEFORE opening modal (when clicking "Save")
+     */
+    $(document).on('click', '#openSaveModal', function (e) {
+        e.preventDefault();
+
+        clearErrors();
+
+        const evaluationData = generatePlan();
+        const validation = validatePlan(evaluationData);
+
+        if (!validation.isValid) {
+            displayErrors(validation.errors);
+            return;
+        }
+
+        const selectedCount = evaluationData.schools.length;
+        $('#confirmationMessage').text(`(${selectedCount}) school(s) selected for adding to the plan`);
+
+        const modal = new bootstrap.Modal(document.getElementById('confirmation-modal'));
+        modal.show();
+    });
+
     // ================== EVENT BINDING ==================
 
-    $(document).ready(function () {
-        // Bind submit button click event
-        $(document).on('click', '#btn-submit', handleSubmit);
-
-        // Alternative: Bind to confirmation modal's confirm button
-        $(document).on('click', '#confirmSubmitBtn', handleSubmit);
-    });
+    $(document).on('click', '#btn-submit', handleSubmit);
+    $(document).on('click', '#confirmSubmitBtn', handleSubmit);
 
     // ================== EXPORTS ==================
 
     window.SubmitPlanHandler = {
-        getEvaluationData,
-        validateEvaluationData,
+        generatePlan,
+        validatePlan,
         submitEvaluationData,
         getSelectedSchools
     };

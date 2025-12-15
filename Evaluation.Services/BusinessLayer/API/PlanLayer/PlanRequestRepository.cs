@@ -3,13 +3,16 @@ using Evaluation.DAL.Models.Org;
 using Evaluation.DAL.Models.Planing;
 using Evaluation.DAL.Repositories;
 using Evaluation.SharedHelper;
+using Evaluation.SharedHelper.Consts;
 using Evaluation.SharedHelper.Dtos.PlanDto;
 using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Models;
+using Mapster;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using static Evaluation.SharedHelper.Enums.ConstantKeys;
 namespace Evaluation.Services.BusinessLayer.API.PlanLayer;
 
@@ -32,18 +35,38 @@ public class PlanRequestRepository(IServiceScopeFactory serviceScopeFactory,
         //return (await unitOfWork.GetRepository<PlanServiceRequest>().GetByIdAsync(model.Id));
     }
     public async Task<bool> UpdatePlanAsync(Plan plan)
-{
-    var repo = unitOfWork.GetRepository<Plan>();
-    repo.Update(plan);
+    {
+        var repo = unitOfWork.GetRepository<Plan>();
+        repo.Update(plan);
         await unitOfWork.CommitAsync();
-    return  true;
-}
-    public async Task<Plan> ApprovePlansAsync(Plan model)
+        return true;
+    }
+    public async Task<Plan> InsertPlan(Plan model)
     {
         if (model == null)
             throw new ArgumentNullException(nameof(model));
 
+        //Insert Plan
         await unitOfWork.GetRepository<Plan>().InsertAsync(model);
+        // Link EvaluationRequest to the new Plan
+
+        //await unitOfWork.SaveChangesAsync()
+        await unitOfWork.CommitAsync();
+
+        return model;
+    }
+    public async Task<Plan> UpdatePlan(Plan model)
+    {
+        if (model == null)
+            throw new ArgumentNullException(nameof(model));
+        //Get old Plan
+        var oldPlan = unitOfWork.GetRepository<Plan>().GetAllActiveNonDeleted(x => x.Id == model.Id);
+        oldPlan.Adapt(model);
+        //Insert Plan
+        unitOfWork.GetRepository<Plan>().Update(model);
+        // Link EvaluationRequest to the new Plan
+
+        //await unitOfWork.SaveChangesAsync()
         await unitOfWork.CommitAsync();
 
         return model;
@@ -70,10 +93,20 @@ public class PlanRequestRepository(IServiceScopeFactory serviceScopeFactory,
     //    await unitOfWork.CommitAsync();
     //    return true;
     //}
-    public IQueryable<PlanType> GetPlanType()
+    public IQueryable<PlanTypeDep> GetPlanType()
     {
-        return  serviceScopeFactory.CreateScopedUow().GetRepository<PlanType>()
-            .GetAllActiveNonDeleted();            
+        return serviceScopeFactory.CreateScopedUow()
+            .GetRepository<PlanTypeDep>()
+            .GetAllActiveNonDeleted();
+    }
+    public async Task<List<Plan>> GetPlans()
+    {
+        List<Plan> plans = await unitOfWork.GetRepository<Plan>()
+            .GetAllActiveNonDeleted()
+            .Include(x => x.PlanStatus)
+            .Where(x => x.PlanStatus.BackendName == StatusBackEnds.ApprovedPlans)
+            .ToListAsync();
+        return plans;
     }
     private async Task<bool> IsThereExistingDraftPlanForSameAcadmicYear(PlanServiceRequest model)
     {
@@ -84,11 +117,5 @@ public class PlanRequestRepository(IServiceScopeFactory serviceScopeFactory,
             .GetAllActiveNonDeleted()
             .AnyAsync(x => (x.AcademicYear.DepartmentId == model.AcademicYear.DepartmentId) && x.HasOnePlan);
     }
-    public async Task<List<Plan>> GetPlans()
-    {
-        var model = await unitOfWork
-            .GetRepository<Plan>()
-                .GetAllActiveNonDeleted().ToListAsync();
-        return model;
-    }
+
 }

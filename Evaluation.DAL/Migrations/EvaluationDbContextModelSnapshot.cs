@@ -5891,10 +5891,13 @@ namespace Evaluation.DAL.Migrations
                     b.Property<Guid>("PlanId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("PlanId1")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid>("ServiceId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("StatusServiceId")
+                    b.Property<Guid>("ServiceStatusId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("ToDate")
@@ -5918,9 +5921,11 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("PlanId");
 
+                    b.HasIndex("PlanId1");
+
                     b.HasIndex("ServiceId");
 
-                    b.HasIndex("StatusServiceId");
+                    b.HasIndex("ServiceStatusId");
 
                     b.HasIndex("UpdateById");
 
@@ -6123,7 +6128,7 @@ namespace Evaluation.DAL.Migrations
                     b.Property<Guid>("ServiceId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("StatusServiceId")
+                    b.Property<Guid>("ServiceStatusId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("ToDate")
@@ -6151,7 +6156,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("ServiceId");
 
-                    b.HasIndex("StatusServiceId");
+                    b.HasIndex("ServiceStatusId");
 
                     b.HasIndex("UpdateById");
 
@@ -8554,61 +8559,6 @@ namespace Evaluation.DAL.Migrations
                     b.HasIndex("UpdateById");
 
                     b.ToTable("SMSTemplates");
-                });
-
-            modelBuilder.Entity("Evaluation.DAL.Models.Template.StatusService", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("CreateById")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreateDate")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("getdate()");
-
-                    b.Property<Guid?>("DeleteById")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("DeleteDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool?>("IsActive")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValueSql("1");
-
-                    b.Property<bool?>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValueSql("0");
-
-                    b.Property<string>("NameAr")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NameEn")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid?>("UpdateById")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("UpdateDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreateById");
-
-                    b.HasIndex("DeleteById");
-
-                    b.HasIndex("UpdateById");
-
-                    b.ToTable("StatusService");
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.Template.TemplateDocument", b =>
@@ -12883,15 +12833,20 @@ namespace Evaluation.DAL.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("Evaluation.DAL.Models.Planing.Plan", null)
+                        .WithMany("EvaluationRequests")
+                        .HasForeignKey("PlanId1")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("Evaluation.DAL.Models.ServiceEnities.Service", "Service")
                         .WithMany()
                         .HasForeignKey("ServiceId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Evaluation.DAL.Models.Template.StatusService", "StatusService")
+                    b.HasOne("Evaluation.DAL.Models.StatusEntities.ServiceStatus", "ServiceStatus")
                         .WithMany()
-                        .HasForeignKey("StatusServiceId")
+                        .HasForeignKey("ServiceStatusId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -12912,7 +12867,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.Navigation("Service");
 
-                    b.Navigation("StatusService");
+                    b.Navigation("ServiceStatus");
 
                     b.Navigation("UpdateBy");
                 });
@@ -13052,9 +13007,9 @@ namespace Evaluation.DAL.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Evaluation.DAL.Models.Template.StatusService", "StatusService")
+                    b.HasOne("Evaluation.DAL.Models.StatusEntities.ServiceStatus", "ServiceStatus")
                         .WithMany()
-                        .HasForeignKey("StatusServiceId")
+                        .HasForeignKey("ServiceStatusId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -13077,7 +13032,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.Navigation("Service");
 
-                    b.Navigation("StatusService");
+                    b.Navigation("ServiceStatus");
 
                     b.Navigation("UpdateBy");
                 });
@@ -14337,30 +14292,6 @@ namespace Evaluation.DAL.Migrations
                     b.Navigation("UpdateBy");
                 });
 
-            modelBuilder.Entity("Evaluation.DAL.Models.Template.StatusService", b =>
-                {
-                    b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "CreateBy")
-                        .WithMany()
-                        .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "DeleteBy")
-                        .WithMany()
-                        .HasForeignKey("DeleteById")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "UpdateBy")
-                        .WithMany()
-                        .HasForeignKey("UpdateById")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("CreateBy");
-
-                    b.Navigation("DeleteBy");
-
-                    b.Navigation("UpdateBy");
-                });
-
             modelBuilder.Entity("Evaluation.DAL.Models.Template.TemplateDocument", b =>
                 {
                     b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "CreateBy")
@@ -14952,6 +14883,11 @@ namespace Evaluation.DAL.Migrations
             modelBuilder.Entity("Evaluation.DAL.Models.Planing.OrgType", b =>
                 {
                     b.Navigation("Organizations");
+                });
+
+            modelBuilder.Entity("Evaluation.DAL.Models.Planing.Plan", b =>
+                {
+                    b.Navigation("EvaluationRequests");
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.ServiceEnities.Service", b =>

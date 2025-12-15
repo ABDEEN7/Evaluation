@@ -62,7 +62,21 @@ namespace Evaluation.API.Controllers
                 return StatusCode(500, "An unexpected error occurred.");
             }
         }
+        [HttpPost("LoginMinistry")]
+        public async Task<ApiResponse<string>> LoginMinistry(AuthorizationCodeRequest model)
+        {
+            var data = await masterBL.GetApiService<AuthenticationBL>().LoginMinistry(model);
 
+            await masterBL.GetApiService<AuthenticationBL>()
+               .RegisterUserToken(data.userId, data.token)
+               .ConfigureAwait(false);
+
+            var response = new ApiResponse<string>
+            {
+                Data = data.token,//token
+            };
+            return response;
+        }
         [Authorize]
         [ServiceFilter(typeof(TokenValidationFilter))]
         [HttpGet("RefreshToken")]
@@ -101,7 +115,7 @@ namespace Evaluation.API.Controllers
             return response;
         }
 
-        [Authorize]
+        
         [ServiceFilter(typeof(TokenValidationFilter))]
         [HttpPost("GetUserPagePermissions")]
         public async Task<ApiResponse<List<PermissionDTO>>> GetUserPagePermissions([FromBody] GetUserPagePermissionsDTO model)
