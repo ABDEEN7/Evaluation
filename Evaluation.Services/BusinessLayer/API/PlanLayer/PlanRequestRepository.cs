@@ -1,4 +1,5 @@
-﻿using Evaluation.DAL.Models.Calendars;
+﻿using Evaluation.DAL.Dtos;
+using Evaluation.DAL.Models.Calendars;
 using Evaluation.DAL.Models.Org;
 using Evaluation.DAL.Models.Planing;
 using Evaluation.DAL.Repositories;
@@ -7,6 +8,7 @@ using Evaluation.SharedHelper.Consts;
 using Evaluation.SharedHelper.Dtos.PlanDto;
 using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Exceptions;
+using Evaluation.SharedHelper.Extensions;
 using Evaluation.SharedHelper.Models;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
@@ -24,6 +26,11 @@ public class PlanRequestRepository(IServiceScopeFactory serviceScopeFactory,
 {
     public async Task<Plan?> GetPlanAsync(Guid id)
         => await unitOfWork.GetRepository<Plan>().GetByIDActiveNonDeleted(id);
+    public async Task<Plan?> GetPlanDetailsAsync(Guid id)
+        => await unitOfWork.GetRepository<Plan>().GetAllActiveNonDeleted()
+        .Include(x => x.EvaluationRequests)
+        .FirstOrDefaultAsync(x => x.Id == id);
+
 
     public async Task<string> CreateServicPlan(PlanServiceRequest model)
     {
@@ -95,14 +102,10 @@ public class PlanRequestRepository(IServiceScopeFactory serviceScopeFactory,
             .GetRepository<PlanTypeDep>()
             .GetAllActiveNonDeleted();
     }
-    public async Task<List<Plan>> GetPlans(PlanRequestDto request)
+    public async Task<PaginatedResult<PlanListDto>> GetPlans(PlanRequestDto request)
     {
         IQueryable<Plan> plans = unitOfWork.GetRepository<Plan>()
-            .GetAllActiveNonDeleted()
-            .Include(x => x.PlanStatus)
-            .Include(x => x.AcademicYear)
-            .Include(x => x.EvaluationRequests)
-            .Where(x => x.PlanStatus.BackendName == StatusBackEnds.ApprovedPlans);
+            .GetAllActiveNonDeleted(x => x.PlanStatus.BackendName == StatusBackEnds.ApprovedPlans);
         if (request.StatusId != null)
         {
             plans = plans.Where(x => x.PlanStatusId == request.StatusId);
@@ -112,7 +115,20 @@ public class PlanRequestRepository(IServiceScopeFactory serviceScopeFactory,
         {
             plans = plans.Where(x => x.PlanName.Contains(request.PlanName));
         }
-        return await plans.ToListAsync();
+        var query = plans
+            .Select(x => new PlanListDto
+            {
+                Id = x.Id,
+                Name = x.PlanName,
+                StartDate = x.StartDate,
+                EndDate = x.EndDate,
+                StatusCode = x.PlanStatus.BackendName,
+                CountSchools = x.EvaluationRequests
+                .Select(er => er.OrgTreeId)
+                .Distinct()
+                .Count()
+            });
+        return await query.GetPaginatedResult(request.PageNumber, request.PageSize = 10);
     }
     private async Task<bool> IsThereExistingDraftPlanForSameAcadmicYear(PlanServiceRequest model)
     {

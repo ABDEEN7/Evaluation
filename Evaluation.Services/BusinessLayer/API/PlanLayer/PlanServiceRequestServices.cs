@@ -15,10 +15,13 @@ using Evaluation.Services.Special;
 using Evaluation.SharedHelper;
 using Evaluation.SharedHelper.Consts;
 using Evaluation.SharedHelper.Dtos.PlanDto;
+using Evaluation.SharedHelper.Dtos.SchoolDto;
 using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Models;
 using FluentResults;
+using Mapster;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
@@ -60,10 +63,10 @@ public class PlanServiceRequestServices(
         // 5. Save to DB
         return await planRepository.UpdatePlanAsync(plan);
     }
-    public async Task<PlanDto> GetPlanByIdAsync(Guid id)
+    public async Task<PlanDetailsDto> GetPlanByIdAsync(Guid id)
     {
         var result = await planRepository.GetPlanAsync(id);
-        var planDto = PlanDto.FromEntity(result);
+        var planDto = mapper.Map<PlanDetailsDto>(result);
         return planDto;
     }
 
@@ -95,7 +98,7 @@ public class PlanServiceRequestServices(
                     .FirstAsync();
 
             Guid serviceStatusId =
-                await unitOfWork.GetRepository<StatusService>()
+                await unitOfWork.GetRepository<ServiceStatus>()
                     .GetAllActiveNonDeleted(x =>
                         x.BackendName == StatusBackEnds.ReadyEvaluation)
                     .Select(x => x.Id)
@@ -124,7 +127,7 @@ public class PlanServiceRequestServices(
                         DepEvaluationTypeId = modelDto.PlanTypeDepId,
                         FromDate = school.StartEvaluationDate,
                         ToDate = school.EndEvaluationDate,
-                        StatusServiceId = serviceStatusId,
+                        ServiceStatusId = serviceStatusId,
                         CreateDate = DateTime.UtcNow,
                         IsDeleted = false
                     }).ToList();
@@ -155,10 +158,10 @@ public class PlanServiceRequestServices(
         Plan? plan = await planRepository.GetPlanAsync(planId);
         return mapper.Map<PlanDto>(plan);
     }
-    public async Task<List<PlanDto>> GetPlansAsync(PlanRequestDto requestDto)
+    public async Task<PaginatedResult<PlanListDto>> GetPlansAsync(PlanRequestDto requestDto)
     {
-        List<Plan> plans = await planRepository.GetPlans(requestDto);
-        return mapper.Map<List<PlanDto>>(plans);
+        PaginatedResult<PlanListDto> result = await planRepository.GetPlans(requestDto);
+        return mapper.Map<PaginatedResult<PlanListDto>>(result);
     }
     //Validation Plans
     private async Task ValidateUpdatePlan(UpdatePlanDto model)
