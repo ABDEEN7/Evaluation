@@ -22,6 +22,7 @@
         public Guid? ParentId { get; set; }
         public Guid? AcademicYearId { get; set; }
         public Guid? CountryId { get; set; }
+        public Guid? OrgClassId { get; set; }
 
     }
 }

@@ -140,6 +140,7 @@ public static class ConstantKeys
         public static readonly string PlanStatusExistsPlan = "PlanStatusExistsPlan";
         public static readonly string OrgTypeExistsOrgTree = "OrgTypeExistsOrgTree";
         public static readonly string OrgTypeExistsOrganization = "OrgTypeExistsOrganization";
+        public static readonly string SchoolsExistsSchoolLevel = "OrgTypeExistsOrganization";
     }
 
     public static class AdminSettings
@@ -172,6 +173,8 @@ public static class ConstantKeys
         public static readonly string RoutingValue = "RoutingValue";
         public static readonly string WebAppSitePath = "WebAppSitePath";
         public static readonly string SubSiteContentMaxCount = "SubSiteContentMaxCount";
+        public static readonly string SchoolOrgType = "SchoolOrgType";
+        public static readonly string OrgClassList = "OrgClassList";
         
 
     }
@@ -265,6 +268,7 @@ public static class ConstantKeys
         public static readonly string AdminPlanTypeDep = "AdminPlanTypeDep";
         public static readonly string AdminPlanStatuses = "AdminPlanStatuses";
         public static readonly string AdminOrgTypes = "AdminOrgTypes";
+        public static readonly string AdminSchools = "AdminSchools";
     }
 
     public static class AdminPermission
@@ -591,6 +595,15 @@ public static class ConstantKeys
         public const string ADD_ADMIN_ORGTYPES = "ADD_ADMIN_ORGTYPES";
         public const string EDIT_ADMIN_ORGTYPES = "EDIT_ADMIN_ORGTYPES";
         public const string DELETE_ADMIN_ORGTYPES = "DELETE_ADMIN_ORGTYPES";
+        #endregion
+
+        #region SCHOOL
+
+        public const string VIEW_ADMIN_SCHOOL = "VIEW_ADMIN_SCHOOL";
+        public const string ADD_ADMIN_SCHOOL = "ADD_ADMIN_SCHOOL";
+        public const string EDIT_ADMIN_SCHOOL = "EDIT_ADMIN_SCHOOL";
+        public const string DELETE_ADMIN_SCHOOL = "DELETE_ADMIN_SCHOOL";
+
         #endregion
 
     }
