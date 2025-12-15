@@ -10,4 +10,8 @@
     <ProjectReference Include="..\Evaluation.SharedHelper\Evaluation.SharedHelper.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\assets\vendor\fullcalendar\" />
+  </ItemGroup>
+
 </Project>
