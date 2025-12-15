@@ -1,7 +1,7 @@
 ﻿// form.validation.js
 
 window.formUtility = window.formUtility || {};
-const formUtility = window.formUtility;
+
 
 (function (ns) {
 
@@ -728,4 +728,4 @@ const formUtility = window.formUtility;
     ns.validateDateFields = validateDateFields; // dategroup + dategroupindex
     ns.validateDateGroups = validateDateGroups; // from/to style
 
-})(formUtility);
+})(window.formUtility);

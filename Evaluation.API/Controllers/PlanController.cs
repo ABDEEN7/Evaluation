@@ -12,23 +12,16 @@ namespace Evaluation.API.Controllers;
 [Route("api/[controller]/[action]")]
 public class PlanController(MasterBL masterBL) : ControllerBase
 {
-    [HttpPost]
-    [CheckRolePermisionFilter(true, ConstantKeys.WebPermission.ADD_WEB_PLAN_REQUEST)]
-    public async Task<IActionResult> Create([FromBody] CreateEvaluationPlanDto planRequest)
-    {
-        var jsonPlan = await masterBL.GetApiService<PlanServiceRequestServices>().AddEvaulationPlan(planRequest);
-        return jsonPlan.ToActionResult();
-    }
 
     [HttpPost]
     [CheckRolePermisionFilter(true, ConstantKeys.WebPermission.APPROVE_WEB_PLAN_REQUEST)]
-    public async Task<IActionResult> Approve([FromBody] CreateEvaluationPlanDto approveDto)
+    public async Task<IActionResult> InsertOrUpdatePlan([FromBody] CreateEvaluationPlanDto approveDto)
     {
-        await masterBL.GetApiService<PlanServiceRequestServices>().ApprovePlan(approveDto);
+        await masterBL.GetApiService<PlanServiceRequestServices>().InsertOrUpdatePlan(approveDto);
         return Ok();
     }
 
-  
+
     [HttpPut("{id:guid}")]
     [CheckRolePermisionFilter(true, ConstantKeys.WebPermission.UPDATE_WEB_PLAN_REQUEST)]
     public async Task<IActionResult> UpdatePlan(Guid id, [FromBody] UpdatePlanDto planDto)
@@ -49,16 +42,17 @@ public class PlanController(MasterBL masterBL) : ControllerBase
         //return semester.ToActionResult();
     }
     [HttpGet("{planId:guid}")]
-    [CheckRolePermisionFilter(true,ConstantKeys.WebPermission.GET_WEB_PLAN_DETAILS_REQUEST)]
+    [CheckRolePermisionFilter(true, ConstantKeys.WebPermission.GET_WEB_PLAN_DETAILS_REQUEST)]
     public async Task<IActionResult> GetPlanDetails(Guid planId)
     {
         var plan = await masterBL.GetApiService<PlanServiceRequestServices>().GetPlanByIdAsync(planId);
         return Ok(new { result = plan });
     }
     [HttpGet]
-    public IActionResult GetPlans()
+    public async Task<IActionResult> GetPlans()
     {
-        var evaluation = masterBL.GetApiService<PlanServiceRequestServices>();
-        return Ok(evaluation);
+        return Ok(await masterBL
+            .GetApiService<PlanServiceRequestServices>()
+            .GetPlansAsync());
     }
 }

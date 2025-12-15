@@ -85,7 +85,7 @@ namespace Evaluation.Services.Special
 							SettingValue = x.SettingValue
 						}).ToListAsync();
 
-                   
+					result = list;
                 }
 
 				return result;

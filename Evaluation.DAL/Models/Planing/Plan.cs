@@ -21,6 +21,6 @@ public class Plan : EntityBase
     public Semester? Semester { get; set; }
     public string? PlanJsonValue { get; set; }
 
-    public virtual ICollection<EvaluationRequest>? EvaluationRequests { get; set; }
+   // public virtual ICollection<EvaluationRequest>? EvaluationRequests { get; set; }
 
 }

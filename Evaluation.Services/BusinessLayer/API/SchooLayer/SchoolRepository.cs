@@ -10,6 +10,7 @@ using Evaluation.SharedHelper.Dtos.SchoolDto;
 using Evaluation.SharedHelper.Extensions;
 using Evaluation.SharedHelper.Helper;
 using Evaluation.SharedHelper.Models;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Evaluation.Services.BusinessLayer.API.SchooLayer;
@@ -32,7 +33,9 @@ public class SchoolRepository(IServiceScopeFactory serviceScopeFactory,
         var query = serviceScopeFactory
              .CreateScopedUow()
              .GetRepository<School>()
-             .GetAllNonDeleted(filter);
+             .GetAllNonDeleted(filter)
+             .Include(x => x.SchoolLevel)
+             .ThenInclude(x => x.EducationLevel);
         return await query.GetPaginatedResult(request.PageNumber, request.PageSize = 10);
     }
     public IQueryable<VisitType> GetVisitTypes()

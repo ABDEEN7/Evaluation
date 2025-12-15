@@ -38,6 +38,11 @@ public class SchoolBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvide
         var result = await schoolRepository.GetSchoolsAsync(request);
         return mapper.Map<PaginatedResult<ResponseSchools>>(result);
     }
+    public async Task<PaginatedResult<ResponseSchoolsPlans>> GetSchoolsPlan(SchoolRequest request)
+    {
+        var result = await schoolRepository.GetSchoolsAsync(request);
+        return mapper.Map<PaginatedResult<ResponseSchoolsPlans>>(result);
+    }
     public async Task<List<SchoolVisits>> GetVisitsAsync()
     {
         var responses = schoolRepository.GetVisitTypes();

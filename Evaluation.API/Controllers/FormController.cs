@@ -22,24 +22,18 @@ public class FormController : ControllerBase
 
 
     [HttpGet]
-    [CheckRolePermisionFilter(true, PermisionNames: [ConstantKeys.WebPermissions.GET_FORM_ITEMS])]
-
     public async Task<Result<List<FormItemDto>>> GetItems([FromQuery] Guid formId)
     {
         return await _masterBl.GetApiService<FormBL>().GetFormItems(formId);
     }
 
     [HttpPost]
-    [CheckRolePermisionFilter(true, PermisionNames: [ConstantKeys.WebPermissions.SAVE_EVALUATION_FORM])]
-
     public async Task<Result<FormEvaluationDto>> SaveEvaluationForm([FromBody] FormEvaluationDto formEvaluation)
     {
         return await _masterBl.GetApiService<FormBL>().SaveEvaluationForm(formEvaluation);
     }
 
     [HttpPost]
-    [CheckRolePermisionFilter(true, PermisionNames: [ConstantKeys.WebPermissions.UPDATE_EVALUATION_FORM])]
-
     public async Task<Result<FormEvaluationDto>> UpdateEvaluationForm([FromBody] FormEvaluationDto formEvaluation)
     {
         return await _masterBl.GetApiService<FormBL>().UpdateEvaluationForm(formEvaluation);

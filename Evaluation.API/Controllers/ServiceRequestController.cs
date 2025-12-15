@@ -28,11 +28,15 @@ namespace Evaluation.API.Controllers
 		}
 
 		[HttpPost]
-		public async Task<WebAppRequestsDTO> GetUserRequests([FromBody] FilterRequestsDTO data)
+		public async Task<WebAppPlanRequestsDTO> GetPlanRequests([FromBody] FilterRequestsDTO data)
 		{
-			return await _serviceRequestBL.GetUserRequestsAsync(data);
+			return await _serviceRequestBL.GetPlanRequestsAsync(data);
 		}
-
+		[HttpPost]
+		public async Task<WebAppEvaluationRequestsDTO> GetEvaluationRequests([FromBody] FilterRequestsDTO data)
+		{
+			return await _serviceRequestBL.GetEvaluationRequestsAsync(data);
+		}
 		[HttpGet]
 		public async Task<ServiceRequestDTO> GetApplicationDetails(Guid requestId)
 		{

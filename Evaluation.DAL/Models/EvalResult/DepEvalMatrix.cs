@@ -17,6 +17,7 @@ namespace Evaluation.DAL.Models.EvalResult
         public string BackendName { get; set; } = null!;
         public string NameAr { get; set; } = null!;
         public string NameEn { get; set; } = null!;
+        public decimal? ItemValue { get; set; }
         public decimal MinValue { get; set; }
         public decimal MaxValue { get; set; }
         public bool RequiredFollowUp { get; set; }

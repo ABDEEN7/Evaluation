@@ -1,6 +1,6 @@
 ﻿
 window.formUtility = window.formUtility || {};
-const formUtility = window.formUtility;
+var formGenerateFieldUtility = window.formUtility;
 
 (function (ns) {
 
@@ -1366,9 +1366,8 @@ const formUtility = window.formUtility;
     ns.evaluateConditionsAfterLoad = evaluateConditionsAfterLoad;
     ns.handleListFieldConditionalFields = handleListFieldConditionalFields;
     ns.evaluateConditionsAfterLoadForList = evaluateConditionsAfterLoadForList;
-    ns.rendermajordetails = rendermajordetails;
     ns.renderFormGroups = renderFormGroups;
     ns.applyAttributes = applyAttributes;
     ns.applyCssClasses = applyCssClasses;
 
-})(formUtility);
+})(window.formUtility);

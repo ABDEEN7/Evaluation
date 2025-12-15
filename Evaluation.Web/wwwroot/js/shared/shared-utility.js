@@ -277,7 +277,20 @@ const sharedUtility = () => {
 
     }
     //--------------------------------------------------------------------
+    function extractDepartmentName() {
+        let pathArray = window.location.pathname.split('/');
 
+        if (pathArray[2] == '') { return null; }
+        // Check if the URL is "/home/index"
+        if (pathArray[1].toLowerCase() === "home" && pathArray[2].toLowerCase() === "index") {
+            return null;
+        }
+        if (!pathArray[2]) return null;
+
+        let departmentName = '/' + pathArray[2];
+
+        return departmentName;
+    }
 
     //--------------------------------------------------------------------------------------
     let result = {};
@@ -317,6 +330,7 @@ const sharedUtility = () => {
     result.RemoveAllLocalStorageDataByUserId = RemoveAllLocalStorageDataByUserId;
     result.TooltipSpan = tooltipSpan;
     result.CopyToClipboard = copyToClipboard;
+    result.extractDepartmentName = extractDepartmentName;
 
 
 

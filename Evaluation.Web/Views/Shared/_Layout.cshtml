@@ -46,8 +46,10 @@
     <div id="topbar"></div>
     <!-- ======= Header ======= -->
     @await Component.InvokeAsync("Navbar")
-    @RenderBody()
-
+    <div class="layout">
+        <main class="main-content"> @RenderBody()</main>
+   
+    </div>
     <footer id="footer" class="footer">
         <div class="container copyright text-center"><p>جميع حقوق الملكية محفوظة © 2025 وزارة التربية والتعليم والتعليم العالي .</p></div>
     </footer>

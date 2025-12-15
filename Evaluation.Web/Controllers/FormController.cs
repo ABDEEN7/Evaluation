@@ -4,8 +4,8 @@ namespace Evaluation.Web.Controllers;
 
 public class FormController : Controller
 {
-    public IActionResult Create()
+    public ActionResult CreatePartial()
     {
-        return View();
+        return PartialView("_Create");
     }
 }
