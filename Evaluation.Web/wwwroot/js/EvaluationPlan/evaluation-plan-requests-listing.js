@@ -12,7 +12,7 @@
 
     const planRequestsListing = evaluationListing.createListing({
         tableId: 'planRequestTable',
-        ajaxUrl: '/EvaluationPlanRequest/GetUserRequests',
+        ajaxUrl: '/ServiceRequest/GetPlanRequests',
         getFilterInput: getPlanRequestFilter,
         filterFormId: 'plan-request-filter-form-id',
         filterBtnId: 'filterPlanRequestBtnId',
@@ -33,23 +33,24 @@
                 }
             },
             {
-                data: "status",
-                title: uiControlsSetup().GetUiControlText("lblRequestStatus"),
-                className: "header-right",
-                render: function (data, type, row) {
-                    const statusColor = row.statusColor || "#cccccc";
-                    const textColor = getContrastingTextColor(statusColor);
-                    return `<span class="request-status m-0" style="background-color:${statusColor};color:${textColor};">${data || ""}</span>`;
-                }
-            },
-            {
-                data: "schoolName",
-                title: uiControlsSetup().GetUiControlText("lblSchoolName"),
+                data: "service",
+                title: uiControlsSetup().GetUiControlText("lblRequestService"),
                 className: "td-left name",
                 render: function (data) {
                     return `<strong class="text-truncate-2">${data || ""}</strong>`;
                 }
             },
+            {
+                data: "status",
+                title: uiControlsSetup().GetUiControlText("lblRequestStatus"),
+                className: "header-right",
+                render: function (data, type, row) {
+                    const statusColor = row.statusColor || "#cccccc";
+                    const textColor = "#000";// getContrastingTextColor(statusColor);
+                    return `<span class="request-status m-0" style="background-color:${statusColor};color:${textColor};">${data || ""}</span>`;
+                }
+            },
+           
             {
                 data: "requestNumber",
                 title: uiControlsSetup().GetUiControlText("lblRequestNo"),

@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace Evaluation.SharedHelper.Models.Api.ServiceRequestEntitiesDTO
 {
-    public class WebAppRequestsDTO
+    public class WebAppEvaluationRequestsDTO
     {
-        public WebAppRequestsDTO()
+        public WebAppEvaluationRequestsDTO()
         {
-            Data = new List<ServiceRequestDTO>();
+            Data = new List<EvaluationRequestDTO>();
         }
-        public List<ServiceRequestDTO> Data { get; set; }
+        public List<EvaluationRequestDTO> Data { get; set; }
 
         public int PageNumber { get; set; }
         public int PageSize { get; set; }

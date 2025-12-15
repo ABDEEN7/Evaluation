@@ -1,5 +1,12 @@
 ﻿using AutoMapper;
 using Evaluation.DAL.Helper;
+using Evaluation.DAL.Models.Attachments;
+using Evaluation.DAL.Models.DepartementEntites;
+using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
+using Evaluation.DAL.Models.ServiceRequestEntities;
+using Evaluation.DAL.Models.SystemLog;
+using Evaluation.DAL.Models.UserEntiy;
+using Evaluation.DAL.Repositories;
 using Evaluation.Services.Extensions;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Exceptions;
@@ -8,19 +15,13 @@ using Evaluation.SharedHelper.Models.Api.AttachmentsDTOs;
 using Evaluation.SharedHelper.Models.Api.FormBuilderDTO;
 using Evaluation.SharedHelper.Models.Api.PartyTypeDTOs;
 using Evaluation.SharedHelper.Models.Api.ServiceRequestEntitiesDTO;
+using Evaluation.SharedHelper.Models.Api.ServiceRequestEntitiesDTO;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
-using Evaluation.SharedHelper.Models.Api.ServiceRequestEntitiesDTO;
 using System.Diagnostics.Metrics;
 using System.Globalization;
 using static Evaluation.SharedHelper.Enums.ConstantKeys;
-using Evaluation.DAL.Models.Attachments;
-using Evaluation.DAL.Models.DepartementEntites;
-using Evaluation.DAL.Models.ServiceRequestEntities;
-using Evaluation.DAL.Models.UserEntiy;
-using Evaluation.DAL.Repositories;
-using Evaluation.DAL.Models.SystemLog;
 
 
 namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
@@ -96,10 +97,10 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 		{
 			return uow.GetRepository<ServiceRequest>().Insert(request, false);
 		}
-		public async Task<WebAppRequestsDTO> GetRequestsAsync(Guid userId, FilterRequestsDTO model)
+		public async Task<WebAppPlanRequestsDTO> GetPlanRequestsAsync(Guid userId, FilterRequestsDTO model)
 		{
 			string lang = _requestInfo!.Lang;
-			model.ModuleName = "/EvaluationPlan";
+			model.ModuleName = "/evaluation-plan";
 
 			using var uow = serviceScopeFactory.CreateScopedUow();
 			using var uow2 = serviceScopeFactory.CreateScopedUow();
@@ -115,7 +116,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 			var user = userTask.Result;
 			var time_Format = timeFormatTask.Result;
 			var date_Format = dateFormatTask.Result;
-			WebAppRequestsDTO filteredResult;
+			WebAppPlanRequestsDTO filteredResult;
 			if (user == null || module == null)
 				throw new BusinessException(ExceptionMessage.UserInfoNotFound);
 
@@ -129,10 +130,10 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 			else
 			{
 				var RequestsTask = await GetRequestsForMinistryUserAsync(uow, userId, module, lang, time_Format, date_Format);
-				filteredResult = await FilteredRequestsAsync(uow, isMinistry, RequestsTask, model);
+				filteredResult = await FilteredPlanRequestsAsync(uow, isMinistry, RequestsTask, model);
 			}
 
-			await UpdateRequestStatusesAsync(filteredResult.Data, module?.Id);
+			//await UpdateRequestStatusesAsync(filteredResult.Data, module?.Id);
 
 
 			return filteredResult;
@@ -189,6 +190,123 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
 		//	return requestObj;
 		//}
+
+		public async Task<WebAppEvaluationRequestsDTO> GetEvaluationRequestsAsync(Guid userId, FilterRequestsDTO model)
+		{
+			string lang = _requestInfo!.Lang;
+			model.ModuleName = "/evaluation-plan-request";
+
+			using var uow = serviceScopeFactory.CreateScopedUow();
+
+			var moduleTask = SrvSystemModule.GetSystemModuleByRoutingAsync(model.ModuleName);
+			var userTask = srvUser.GetByIDActiveNonDeleted(userId);
+			var timeFormatTask = cacheDataProvider.GetSystemSettingValue(SystemSettings.ShortTimeFormat);
+			var dateFormatTask = cacheDataProvider.GetSystemSettingValue(SystemSettings.DateFormat);
+
+			await Task.WhenAll(moduleTask, userTask, timeFormatTask, dateFormatTask);
+
+			var module = moduleTask.Result;
+			var user = userTask.Result;
+			var timeFormat = timeFormatTask.Result;
+			var dateFormat = dateFormatTask.Result;
+
+			if (user == null || module == null)
+				throw new BusinessException(ExceptionMessage.UserInfoNotFound);
+
+			var isMinistry = user is MinistryUser;
+
+			var query = await GetDepEvaluationRequestsAsync(
+				uow, userId, module, lang, timeFormat, dateFormat);
+
+			var result = await FilteredEvaluationRequestsAsync(uow, isMinistry, query, model);
+
+			//await UpdateRequestStatusesAsync(result.Data, module.Id);
+
+			return result;
+		}
+		private async Task<IQueryable<EvaluationRequestDTO>> GetDepEvaluationRequestsAsync(UnitOfWork uow,Guid userId,SystemModule module,string lang,string timeFormat,string dateFormat)
+		{
+			var permissionTasks = new
+			{
+				IsAllowedToViewAllRequests =
+					IsAllowedToViewAllRequestsAsync(userId, module.Id),
+
+				IsAllowedToViewAllRequestsWithoutFiltration =
+					SrvPartyType.IsAllowedToViewAllRequestsWitoutFilterationAsync(userId, module.Id),
+
+				UserPartyTypeData =
+					SrvPartyType.GetUserPartyTypeData(userInfo.UserId!, module.Id)
+			};
+
+			IQueryable<EvaluationRequest> baseQuery = uow
+				.GetRepository<EvaluationRequest>()
+				.GetAllActiveNonDeleted()
+				.Include(x => x.Service)
+				.Include(x => x.ServiceStatus)
+				.Include(x => x.OrgTree)
+				.Include(x => x.Plan)
+					.ThenInclude(p => p!.PlanStatus);
+
+			baseQuery = baseQuery.AsSplitQuery()
+				.Where(x =>x.Service!.SystemModuleId == module.Id);
+
+			var permissions = new
+			{
+				IsAllowedToViewAllRequests = await permissionTasks.IsAllowedToViewAllRequests,
+				IsAllowedToViewAllRequestsWithoutFiltration = await permissionTasks.IsAllowedToViewAllRequestsWithoutFiltration,
+				UserPartyTypeData = await permissionTasks.UserPartyTypeData
+			};
+
+			//if (!permissions.IsAllowedToViewAllRequestsWithoutFiltration)
+			//{
+			//	baseQuery = ApplyUserAccessFiltersForEvaluationRequests(
+			//		baseQuery,
+			//		permissions.UserPartyTypeData,
+			//		userId,
+			//		permissions.IsAllowedToViewAllRequests
+			//	);
+			//}
+
+			return baseQuery.Select(x => new EvaluationRequestDTO
+			{
+				Id = x.Id, 
+				ServiceId = x.ServiceId,
+				Service = lang == "ar" ? x.Service!.NameAr : x.Service!.NameEn,
+				icon = x.Service!.Icon,
+				RequestNumber="1234",
+				StatusId = x.ServiceStatusId,
+				Status = lang == "ar" ? x.ServiceStatus!.NameAr : x.ServiceStatus!.NameEn,
+				StatusColor = x.ServiceStatus!.ColorCode,
+				StatusISOPen = x.ServiceStatus!.IsOpen,
+
+				CreateDate = x.CreateDate,
+				CreateOn = x.CreateDate.ToString(dateFormat),
+				CreateOnTime = x.CreateDate.ToString(timeFormat),
+
+				planId = x.PlanId,
+				PlanName = x.Plan != null ? x.Plan.PlanName : "",
+				OrgTreeId = x.OrgTreeId,
+				OrgTreeName = x.OrgTree != null ? (lang == "ar" ? x.OrgTree.NameAr : x.OrgTree.NameEn) : ""
+			});
+		}
+		//private IQueryable<EvaluationRequest> ApplyUserAccessFiltersForEvaluationRequests(IQueryable<EvaluationRequest> query,UserPartyTypeDataDTO userPartyTypeData,Guid userId,bool isAllowedToViewAllRequests)
+		//{
+		//	if (isAllowedToViewAllRequests)
+		//		return query;
+
+		//	if (userPartyTypeData.AllowedOrgTreeIds?.Any() == true)
+		//	{
+		//		query = query.Where(e => userPartyTypeData.AllowedOrgTreeIds.Contains(e.OrgTreeId));
+		//	}
+
+		//	if (userPartyTypeData.AllowedPlanIds?.Any() == true)
+		//	{
+		//		query = query.Where(e => userPartyTypeData.AllowedPlanIds.Contains(e.PlanId));
+		//	}
+
+		//	return query;
+		//}
+
 		public async Task<ServiceRequestDTO> GetRequestDetailsAsync(Guid id)
 		{
 			string lang = _requestInfo.Lang;
@@ -308,8 +426,16 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 				item.Status = SrvStatus.GetStatusDisplayName(item.StatusId, moduleId);
 			}
 		}
+		private async Task UpdateRequestStatusesAsync(List<EvaluationRequestDTO> requests, Guid? moduleId)
+		{
+			string lang = _requestInfo.Lang;
 
-	
+			foreach (var item in requests)
+			{
+				item.Status = SrvStatus.GetStatusDisplayName(item.StatusId, moduleId);
+			}
+		}
+
 		//private IQueryable<ServiceRequestDTO> GetRequestsForStudentUser(UnitOfWork uow, Guid userId, SystemModule module, string lang, string timeFormat, string dateFormat)
 		//{
 		//	var query =
@@ -778,9 +904,9 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
 			return result;
 		}
-		private async Task<WebAppRequestsDTO> FilteredRequestsAsync(UnitOfWork uow, bool isMinistry, IQueryable<ServiceRequestDTO> requests, FilterRequestsDTO model)
+		private async Task<WebAppEvaluationRequestsDTO> FilteredEvaluationRequestsAsync(UnitOfWork uow, bool isMinistry, IQueryable<EvaluationRequestDTO> requests, FilterRequestsDTO model)
 		{
-			var result = new WebAppRequestsDTO();
+			var result = new WebAppEvaluationRequestsDTO();
 
 			if (model != null)
 			{
@@ -868,7 +994,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
 				if (model.PageNumber != null)
 				{
-					var pageSize = Int32.Parse(await cacheDataProvider.GetSystemSettingValue(SystemSettings.ServiceRequestPageSize));
+					var pageSize = 10;//Int32.Parse(await cacheDataProvider.GetSystemSettingValue(SystemSettings.ServiceRequestPageSize));
 					//if (isMinistry)
 					//    pageSize= (pageSize + 1) / 2;
 					result.PageNumber = model.PageNumber.Value;
@@ -885,8 +1011,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 						}
 
 						result.Data = requestList
-							.OrderByDescending(x => x.StudentIsSpecial)
-							.ThenByDescending(x => x.StatusISOPen)
+							.OrderByDescending(x => x.StatusISOPen)
 							.ThenByDescending(x => x.ActionCount)
 							.ThenByDescending(x => x.CreateDate!.Value)
 							.Skip(skip)
@@ -898,8 +1023,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 					else
 					{
 						result.Data = await requests
-							.OrderByDescending(x => x.StudentIsSpecial)
-							.ThenByDescending(x => x.CreateDate!.Value)
+							.OrderByDescending(x => x.CreateDate!.Value)
 							.Skip(skip)
 							.Take(pageSize)
 							.ToListAsync();
@@ -912,6 +1036,144 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 					result.Data = await requests
 						.OrderByDescending(x => x.StudentIsSpecial)
 						.ThenByDescending(x => x.CreateDate!.Value)
+						.ToListAsync();
+				}
+			}
+
+			return result;
+		}
+
+		private async Task<WebAppPlanRequestsDTO> FilteredPlanRequestsAsync(UnitOfWork uow, bool isMinistry, IQueryable<ServiceRequestDTO> requests, FilterRequestsDTO model)
+		{
+			var result = new WebAppPlanRequestsDTO();
+
+			if (model != null)
+			{
+				if (isMinistry)
+				{
+					if (!string.IsNullOrEmpty(model.Qid))
+					{
+						requests = requests.Where(x => !string.IsNullOrEmpty(x.QID) && x.QID == model.Qid);
+					}
+
+					if (model.StudentUserId.HasValue)
+					{
+						requests = requests.Where(x => x.StudentUserId == model.StudentUserId);
+					}
+
+					if (!string.IsNullOrEmpty(model.Mobile))
+					{
+						requests = requests.Where(x => !string.IsNullOrEmpty(x.Mobile) && x.Mobile == model.Mobile);
+					}
+
+					if (model.StudentNationalityId != null && model.StudentNationalityId.Any())
+					{
+						requests = requests.Where(x => model.StudentNationalityId.Contains(x.StudentNationalityId!));
+					}
+
+					if (model.CountryId != null && model.CountryId.Any())
+					{
+						requests = requests.Where(x => model.CountryId.Contains(x.CountryId));
+					}
+
+					if (model.UniversityId != null && model.UniversityId.Any())
+					{
+						requests = requests.Where(x => model.UniversityId.Contains(x.UniversityId));
+					}
+
+					var date_Format = await cacheDataProvider.GetSystemSettingValue(SystemSettings.DateFormat);
+
+					if (!string.IsNullOrEmpty(model.RequestDateFrom))
+					{
+						if (DateTime.TryParseExact(model.RequestDateFrom, date_Format, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime requestDateFromDate))
+						{
+							requests = requests.Where(x => x.CreateDate != null && x.CreateDate.Value.Date >= requestDateFromDate.Date);
+						}
+					}
+
+					if (!string.IsNullOrEmpty(model.RequestDateTo))
+					{
+						if (DateTime.TryParseExact(model.RequestDateTo, date_Format, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime requestDateToDate))
+						{
+							requests = requests.Where(x => x.CreateDate != null && x.CreateDate.Value.Date <= requestDateToDate.Date);
+						}
+					}
+
+					if (model.StatusesList != null && model.StatusesList.Any())
+					{
+						model.StatusesList = model.StatusesList.Where(x => x != null).ToList();
+						if (model.StatusesList.Count > 0)
+						{
+							requests = requests.Where(x => model.StatusesList.Contains(x.StatusId));
+						}
+					}
+				}
+
+				if (!string.IsNullOrEmpty(model.planNo))
+				{
+					requests = requests.Where(x => !string.IsNullOrEmpty(x.planNo) && x.planNo.ToLower().Contains(model.planNo.ToLower()));
+				}
+
+				if (!string.IsNullOrEmpty(model.RequestNo))
+				{
+					requests = requests.Where(x => !string.IsNullOrEmpty(x.RequestNumber) && x.RequestNumber.ToLower().Contains(model.RequestNo.ToLower()));
+				}
+
+				if (model.ServiceId != null && model.ServiceId.Any())
+				{
+					requests = requests.Where(x => model.ServiceId.Contains(x.ServiceId!.Value));
+				}
+
+				if (!string.IsNullOrEmpty(model.StatusTypeId))
+				{
+					requests = requests.Where(c => model.StatusTypeId == "0" ? c.StatusISOPen == false : c.StatusISOPen == true);
+				}
+
+				result.TotalDataCount = await requests.CountAsync();
+
+				if (model.PageNumber != null)
+				{
+					var pageSize = 10;//Int32.Parse(await cacheDataProvider.GetSystemSettingValue(SystemSettings.ServiceRequestPageSize));
+					//if (isMinistry)
+					//    pageSize= (pageSize + 1) / 2;
+					result.PageNumber = model.PageNumber.Value;
+					result.PageSize = pageSize;
+					var skip = (result.PageNumber - 1) * pageSize;
+
+					if (model.OderByAction == true)
+					{
+						var requestList = await requests.ToListAsync();
+
+						foreach (var item in requestList)
+						{
+							item.ActionCount = await GetActionCountByStatusAsync(item.StatusId);
+						}
+
+						result.Data = requestList
+							.OrderByDescending(x => x.StatusISOPen)
+							.ThenByDescending(x => x.ActionCount)
+							.ThenByDescending(x => x.CreateDate!.Value)
+							.Skip(skip)
+							.Take(pageSize)
+							.ToList();
+
+						result.IsRemainingData = result.Data.Count >= result.PageSize;
+					}
+					else
+					{
+						result.Data = await requests
+							.OrderByDescending(x => x.CreateDate!.Value)
+							.Skip(skip)
+							.Take(pageSize)
+							.ToListAsync();
+
+						result.IsRemainingData = result.Data.Count >= result.PageSize;
+					}
+				}
+				else
+				{
+					result.Data = await requests
+						.OrderByDescending(x => x.CreateDate!.Value)
 						.ToListAsync();
 				}
 			}

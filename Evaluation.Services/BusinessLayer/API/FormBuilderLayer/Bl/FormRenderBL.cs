@@ -590,7 +590,7 @@ namespace Evaluation.Services.BusinessLayer.API
 			if (service.Actions != null &&service.Actions.Any() &&service.Actions.Count == 1)
 			{
 				var action = service.Actions.First();
-				service.ServiceRequestDTO = await GetActionFieldAsync(service.Id, action.BakendName, null, null);
+				service.ServiceRequestDTO = await GetActionFieldAsync(service.Id!.Value, action.BakendName, null, null);
 			}
 
 			return service;

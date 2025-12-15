@@ -1,41 +1,51 @@
 ﻿$(document).ready(function () {
-    function getOperationsFilter() {
+
+    function getEvaluationRequestFilter() {
         return {
-            OperationNo: $('#operationNoFilter').val(),
-            PlanId: $('#operationPlanFilter').val(),
-            SchoolId: $('#operationSchoolFilter').val(),
-            StatusId: $('#operationStatusFilter').val(),
-            OperationDateFrom: $('#operationDateFrom').val(),
-            OperationDateTo: $('#operationDateTo').val()
+            RequestNo: $('#evaluationRequestNoFilter').val(),
+            PlanId: $('#evaluationPlanIdFilter').val(),
+            OrgTreeId: $('#evaluationOrgTreeFilter').val(),
+            StatusesList: $('#evaluationRequestStatusFilter').val(),
+            RequestDateFrom: $('#evaluationRequestDateFrom').val(),
+            RequestDateTo: $('#evaluationRequestDateTo').val()
         };
     }
 
-    const operationsListing = evaluationListing.createListing({
-        tableId: 'operationTable',
-        ajaxUrl: '/EvaluationOperation/GetOperations',
-        getFilterInput: getOperationsFilter,
-        filterFormId: 'operation-filter-form-id',
-        filterBtnId: 'filterOperationBtnId',
-        clearFilterBtnId: 'clearFilterOperationBtnId',
-        tabLabelSelector: '#tabOperationsAnchorTag',
-        tabLabelKey: 'lblEvaluationOperations',
-        enableCardView: false,
-        cardViewBtnId: 'cardViewOperation',
-        tableViewBtnId: 'tblViewOperation',
-        rowClass: 'operation-row',
+    const evaluationRequestsListing = evaluationListing.createListing({
+        tableId: 'evaluationRequestTable',
+        ajaxUrl: '/ServiceRequest/GetEvaluationRequests',
+        getFilterInput: getEvaluationRequestFilter,
+
+        filterFormId: 'evaluation-request-filter-form-id',
+        filterBtnId: 'filterEvaluationRequestBtnId',
+        clearFilterBtnId: 'clearFilterEvaluationRequestBtnId',
+
+        enableCardView: true,
+        cardViewBtnId: 'cardViewEvaluationRequest',
+        tableViewBtnId: 'tblViewEvaluationRequest',
+        rowClass: 'evaluation-request-card',
+
         columns: [
-            {
-                data: "operationNo",
-                title: uiControlsSetup().GetUiControlText("lblOperationNo"),
-                className: "td-left"
-            },
             {
                 data: "planName",
                 title: uiControlsSetup().GetUiControlText("lblEvaluationPlan"),
-                className: "td-left"
+                className: "header-left status",
+                render: function (data) {
+                    return `<strong class="text-truncate-2">${data || ""}</strong>`;
+                }
             },
             {
-                data: "schoolName",
+                data: "status",
+                title: uiControlsSetup().GetUiControlText("lblRequestStatus"),
+                className: "header-right",
+                render: function (data, type, row) {
+                    const statusColor = row.StatusColor || "#cccccc";
+                    const textColor = "#000";// getContrastingTextColor(statusColor);
+                    return `<span class="request-status m-0" style="background-color:${statusColor};color:${textColor};">${data || ""}</span>`;
+                }
+            },
+            {
+                data: "orgTreeName",
                 title: uiControlsSetup().GetUiControlText("lblSchoolName"),
                 className: "td-left name",
                 render: function (data) {
@@ -43,36 +53,48 @@
                 }
             },
             {
-                data: "operationDate",
-                title: uiControlsSetup().GetUiControlText("lblOperationDate"),
+                data: "requestNumber",
+                title: uiControlsSetup().GetUiControlText("lblRequestNo"),
+                className: "td-right"
+            },
+            {
+                data: "createOn",
+                title: uiControlsSetup().GetUiControlText("lblRequestCreatedDate"),
                 className: "td-left bg-grey"
             },
             {
-                data: "status",
-                title: uiControlsSetup().GetUiControlText("lblOperationStatus"),
-                className: "td-right",
-                render: function (data, type, row) {
-                    const color = row.statusColor || "#cccccc";
-                    const textColor = getContrastingTextColor(color);
-                    return `<span class="request-status m-0" style="background-color:${color};color:${textColor};">${data || ""}</span>`;
-                }
+                data: "createOnTime",
+                title: uiControlsSetup().GetUiControlText("lblRequestCreatedTime"),
+                className: "td-right bg-grey justify-content-end"
             }
         ],
+
         onRowClick: function (rowData) {
-            openOperationDetails(rowData.id);
+            openEvaluationRequestDetails(rowData.Id); 
         }
     });
 
-    function openOperationDetails(operationId) {
+    function openEvaluationRequestDetails(requestId) {
         const options = {
             success: function (response) {
-                $('#operationDetailsModalLabel').text(response.operationNo);
-                $('#operationDetailsModalBody').html(response.htmlContent || '');
-                $('#operationDetailsModal').modal('show');
+                formUtility.attachments = response.attachments || [];
+                formUtility.renderPreviewView(
+                    'evaluation-request-details-container',
+                    response.statusGroup,
+                    response.formGroups,
+                    response.actions,
+                    response.actionTransactions,
+                    response.attachments
+                );
+
+                $('#evaluationRequestModalLabel').text(response.status || '');
+                $('#evaluationRequestNoText').text(response.requestNumber || '');
+                $('#evaluationRequestModal').modal('show');
             }
         };
-        jqClient(options).Get(`/EvaluationOperation/Details?operationId=${operationId}`);
+
+        jqClient(options).Get(`/EvaluationPlanRequest/GetEvaluationDetails?requestId=${requestId}`);
     }
 
-    operationsListing.reload();
+    evaluationRequestsListing.reload();
 });

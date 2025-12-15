@@ -4,7 +4,6 @@
 
 //-----------------------------------------------------------------------
 let pageActiveRequests = 0;
-let departmentName = "";
 const systemSetting = {
     values: [],
 }

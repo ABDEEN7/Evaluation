@@ -81,8 +81,8 @@
                     const payload = buildPayload(dt);
                     const options = {
                         success: function (resp) {
-                            const total = resp.totalCount || 0;
-                            const rows = Array.isArray(resp.items) ? resp.items : [];
+                            const total = resp.totalDataCount || resp.TotalDataCount || 0;
+                            const rows = resp.data || resp.Data || [];
 
                             if (config.tabLabelSelector && config.tabLabelKey) {
                                 const lbl = uiControlsSetup().GetUiControlText(config.tabLabelKey);
@@ -101,7 +101,7 @@
                         }
                     };
 
-                    jqClient(options).Get(config.ajaxUrl, payload);
+                    jqClient(options).Post(config.ajaxUrl, payload);
                 },
                 columns: config.columns,
                 createdRow: function (row, data) {
