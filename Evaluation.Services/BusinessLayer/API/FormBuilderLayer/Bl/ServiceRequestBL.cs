@@ -38,10 +38,15 @@ namespace Evaluation.Services.Models.API
             : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, _requestInfo)
     {
 
-		public async Task<WebAppRequestsDTO> GetUserRequestsAsync(FilterRequestsDTO filter)
+		public async Task<WebAppPlanRequestsDTO> GetPlanRequestsAsync(FilterRequestsDTO filter)
 		{
-			var userId = userInfo.UserId;
-			return await _srvServiceRequest.GetRequestsAsync(userId!.Value, filter);
+			var userId = userInfo.UserId ?? Guid.Parse("C2536611-576B-4EB8-84F4-747F4ECE9A23") ;
+			return await _srvServiceRequest.GetPlanRequestsAsync(userId, filter);
+		}
+		public async Task<WebAppEvaluationRequestsDTO> GetEvaluationRequestsAsync(FilterRequestsDTO filter)
+		{
+			var userId = userInfo.UserId ?? Guid.Parse("C2536611-576B-4EB8-84F4-747F4ECE9A23");
+			return await _srvServiceRequest.GetEvaluationRequestsAsync(userId, filter);
 		}
 
 		public async Task<ServiceRequestDTO> GetApplicationDetailsAsync(Guid requestId)

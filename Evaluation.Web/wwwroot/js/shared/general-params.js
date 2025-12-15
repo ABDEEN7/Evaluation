@@ -4,7 +4,6 @@
 
 //-----------------------------------------------------------------------
 let pageActiveRequests = 0;
-
 const systemSetting = {
     values: [],
 }

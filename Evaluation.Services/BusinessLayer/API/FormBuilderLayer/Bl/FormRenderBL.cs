@@ -580,7 +580,21 @@ namespace Evaluation.Services.BusinessLayer.API
 
 			return service;
 		}
+		public async Task<ServiceDTO> GetCreatePlanService(Guid DepartementId)
+		{
+			var lang = _requestInfo.Lang;
+			var userId = userInfo.UserId ?? Guid.Parse("C2536611-576B-4EB8-84F4-747F4ECE9A23");
+			DepartementId = Guid.Parse("1B8F5ADE-37D0-4D77-A780-CA3FF3EC0F43");
+			var service = await _srvService.GetCreatePlanServiceDetailsAsync(DepartementId, lang);
 
+			if (service.Actions != null &&service.Actions.Any() &&service.Actions.Count == 1)
+			{
+				var action = service.Actions.First();
+				service.ServiceRequestDTO = await GetActionFieldAsync(service.Id!.Value, action.BakendName, null, null);
+			}
+
+			return service;
+		}
 		public async Task<List<ServiceDTO>> GetServicesWebAppAsync(string? moduleName)
 		{
 			var userId = userInfo.UserId;
