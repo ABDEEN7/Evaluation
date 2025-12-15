@@ -1,0 +1,171 @@
+.custom-checkbox {
+      position: relative;
+      display: inline-block;
+      cursor: pointer;
+      font-size: 18px;
+      user-select: none;
+      padding-left: 30px;
+    }
+
+    .custom-checkbox input {
+      position: absolute;
+      opacity: 0;
+      cursor: pointer;
+      height: 0;
+      width: 0;
+    }
+
+    .checkmark {
+     position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 20px;
+    width: 20px;
+    background-color: white;
+    border-radius: 5px;
+    transition: 0.3s;
+    border: 1px solid rgba(153, 153, 153, 1);
+    right: auto;
+    }
+
+    .custom-checkbox:hover input ~ .checkmark {
+      background-color: #ccc;
+    }
+
+    .custom-checkbox input:checked ~ .checkmark {
+      background-color: #8a1538;
+    }
+
+    .checkmark:after {
+      content: "";
+      position: absolute;
+      display: none;
+    }
+
+    .custom-checkbox input:checked ~ .checkmark:after {
+      display: block;
+    }
+
+    .custom-checkbox .checkmark:after {
+      left: 6px;
+      top: 2px;
+      width: 6px;
+      height: 12px;
+      border: solid white;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+    }
+
+
+
+
+    .custom-checkbox1 {
+   position: relative;
+      display: inline-block;
+      cursor: pointer;
+      font-size: 18px;
+      user-select: none;
+      padding-left: 30px;
+}
+
+/* Hide the native checkbox */
+.custom-checkbox1 input {
+  display: none;
+}
+
+
+
+
+
+
+   .custom-checkbox1 .checkmark {
+     position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 20px;
+    width: 20px;
+    background-color: white;
+    border-radius: 5px;
+    transition: 0.3s;
+    border: 1px solid rgba(153, 153, 153, 1);
+    right: auto;
+    }
+
+    .custom-checkbox1:hover input ~ .checkmark {
+      background-color: #ccc;
+    }
+
+    .custom-checkbox1 input:checked ~ .checkmark {
+      background-color: #8a1538;
+    }
+
+    .custom-checkbox1 .checkmark:after {
+          content: "+";
+    position: absolute;
+    display: none;
+        left: 4px;
+    top: -1px;
+    line-height: 1;
+    color: white;
+    }
+   .custom-checkbox1.minus .checkmark:after {
+          content: "-";
+    position: absolute;
+    display: none;
+        left:5px;
+    top: -1px;
+    line-height: 1;
+    color: white;
+    }
+    .custom-checkbox1 input:checked ~ .checkmark:after {
+      display: block;
+    }
+
+    .custom-checkbox1 .custom-checkbox .checkmark:after {
+      left: 6px;
+      top: 2px;
+      width: 6px;
+      height: 12px;
+      border: solid white;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+    }
+
+    /* Hide original radio circle */
+.custom-radio .form-check-input {
+  position: relative;
+  width: 22px;
+  height: 22px;
+  appearance: none;
+      border: 2px solid var(--color-primary);
+    border-radius: 50%;
+    outline: none;
+    cursor: pointer;
+    transition: all 0.2s 
+ease;
+    background-color: white;
+}
+/* ON FOCUS */
+
+
+/* CHECKED STATE */
+.custom-radio .form-check-input:checked {
+  border-color: var(--color-primary);
+}
+
+/* Fill circle when checked */
+.custom-radio .form-check-input:checked::before {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 10px;
+  height: 10px;
+  background-color: var(--primary-color);
+  border-radius: 50%;
+  transition: 0.2s ease;
+}
+.form-check-input:checked[type=radio] {
+   
+    --bs-form-check-bg-image: url(data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='2' fill='%238a1538'/%3e%3c/svg%3e);
+}
