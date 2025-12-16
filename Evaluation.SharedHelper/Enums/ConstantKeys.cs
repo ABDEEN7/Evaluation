@@ -141,6 +141,7 @@ public static class ConstantKeys
         public static readonly string OrgTypeExistsOrgTree = "OrgTypeExistsOrgTree";
         public static readonly string OrgTypeExistsOrganization = "OrgTypeExistsOrganization";
         public static readonly string SchoolsExistsSchoolLevel = "OrgTypeExistsOrganization";
+        public static readonly string OrgTypeDoesNotExists = "OrgTypeDoesNotExists";
     }
 
     public static class AdminSettings

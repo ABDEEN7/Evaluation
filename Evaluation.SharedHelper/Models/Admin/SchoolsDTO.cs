@@ -6,7 +6,7 @@ public class SchoolsDTO : EntityBaseDTO
     public string NameAr { get; set; } = null!;
     public string NameEn { get; set; } = null!;
     public Guid TypeId { get; set; }
-    public string SchoolType { get; set; } = null!;
+    public string Type { get; set; } = null!;
 
     public Guid OrgClassId { get; set; }
     public string OrgClass { get; set; } = null!;
@@ -22,5 +22,5 @@ public class SchoolsDTO : EntityBaseDTO
     public bool IsAccredited { get; set; }
     public DateOnly? AcceditedDate { get; set; }
     public bool SupportIdentity { get; set; }
-    public DateOnly SupportIdentityDate { get; set; }
+    public DateOnly? SupportIdentityDate { get; set; }
 }

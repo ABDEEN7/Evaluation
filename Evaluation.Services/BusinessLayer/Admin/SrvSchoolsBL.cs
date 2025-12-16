@@ -93,6 +93,10 @@ namespace Evaluation.Services.Models.Admin
                                      .Where(x => x.SettingKey == AdminSettings.SchoolOrgType.ToString())
                                      .Select(x => x.SettingValue)
                                      .FirstOrDefaultAsync();
+            if(OrgTypeBackend==null)
+            {
+                throw new BusinessException(ConstantKeys.ExceptionMessage.OrgTypeDoesNotExists);
+            }
 
             var orgtypeid=await uow.GetRepository<OrgType>()
                                      .GetAllNonDeleted()
@@ -104,6 +108,7 @@ namespace Evaluation.Services.Models.Admin
             obj.NameEn = message.NameEn;
             obj.OrgTypeId = orgtypeid;
             obj.OrgClassId = message.OrgClassId;
+            obj.EstablishmentDate = message.EstablishmentDate;
             obj.TypeId = message.TypeId;
             obj.ManagerQID = message.ManagerQID;
             obj.ManageEmail = message.ManageEmail;
@@ -151,6 +156,7 @@ namespace Evaluation.Services.Models.Admin
                 obj.NameEn = message.NameEn;
                 obj.OrgTypeId = obj.OrgTypeId;
                 obj.OrgClassId = message.OrgClassId;
+                obj.EstablishmentDate = message.EstablishmentDate;
                 obj.TypeId = message.TypeId;
                 obj.ManagerQID = message.ManagerQID;
                 obj.ManageEmail = message.ManageEmail;

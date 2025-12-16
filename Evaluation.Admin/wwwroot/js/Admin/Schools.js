@@ -191,6 +191,15 @@ const gettreedata = () => {
                         })
                         $(dropdown).val('').trigger('change');
 
+                        $('#SchoolsOrgClassId').select2({
+                            width: 'resolve',
+                            allowClear: true,
+                            data: ddlData,
+                            placeholder: sharedFn().GetUiControlText('SchoolsOrgClassId'),
+                            dropdownCssClass: "manageselect2zindex"
+                        })
+                        $('#SchoolsOrgClassId').val('').trigger('change');
+
                     }
 
 
