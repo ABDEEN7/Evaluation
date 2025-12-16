@@ -2,7 +2,7 @@
 @using static Evaluation.SharedHelper.Enums.ConstantKeys
 
 
-@model SchoolsVM
+@model OrgTreeVM
 @{
 
     string Lang = Model.CurrentLanguage;
@@ -16,13 +16,13 @@
     var columnList = Model.Constraints.Where(x => x.ShowInGrid == true).ToList();
 }
 @section Styles {
-   
+  
            }
 <div class="sub-page-container">
     <section id="tbl-template-container" class="section-container">
         <div class="card app-card">
         <div class="card-header justify-content-end d-flex align-items-center bg-light">
-            @if (permissionsList.IsPermissionAvailabe(AdminPermission.ADD_ADMIN_SCHOOL))
+            @if (permissionsList.IsPermissionAvailabe(AdminPermission.ADD_ADMIN_ORGTREE))
             {
                 <button id="btn-add-content" type="button" class="btn btn-primary">
                     <i class="fa fa-plus-circle"></i> &nbsp;@controlsList.GetUiControlText(AdminBackendUI.ADD_RECORD)
@@ -32,13 +32,7 @@
         </div>
         <div class="card-body">
                 
-                @*<div class="row">*@
-                <div id="search-panel-section" class="mb-3"></div>
-                <div class="center-header">
-                    <div id="view-container"></div>
-                </div>
-                <div id="scroll-progress-bar"></div>
-                @*</div>*@
+                <div id="view-container"></div>
         </div>
     </div>
 </section>
@@ -70,7 +64,7 @@
 </div>
 @section Scripts {
 
-    <script src="~/js/admin/Schools.js" asp-append-version="true"></script>
+    <script src="~/js/admin/OrgTree.js" asp-append-version="true"></script>
     <script>
          var controlsList = JSON.parse(`@Html.Raw(Json.Serialize(controlsList))`);
          var columnList = @Html.Raw(Json.Serialize(columnList));
@@ -81,9 +75,9 @@
         let containsOrderNo='@containsOrderNo';
           const controlvalidationlist = @Html.Raw(Json.Serialize(uiControlItems));
           const searchcontrolvalidationlist = @Html.Raw(Json.Serialize(SearchuiControlItems));
-        let IsEdit='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.EDIT_ADMIN_SCHOOL))';
-        let IsDelete='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.DELETE_ADMIN_SCHOOL))';
-        let IsView='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.VIEW_ADMIN_SCHOOL))';
+        let IsEdit='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.EDIT_ADMIN_ORGTREE))';
+        let IsDelete='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.DELETE_ADMIN_ORGTREE))';
+        let IsView='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.VIEW_ADMIN_ORGTREE))';
          let TableColumns=  sharedFn().PopulateColumn(columnList);
         sharedFn().InitializeControl(controlvalidationlist, settingList);
        

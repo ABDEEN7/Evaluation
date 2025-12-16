@@ -142,6 +142,18 @@ public static class ConstantKeys
         public static readonly string OrgTypeExistsOrganization = "OrgTypeExistsOrganization";
         public static readonly string SchoolsExistsSchoolLevel = "OrgTypeExistsOrganization";
         public static readonly string OrgTypeDoesNotExists = "OrgTypeDoesNotExists";
+        public static readonly string OrgTreeExistsDepartmentOrgTree = "OrgTreeExistsDepartmentOrgTree";
+        public static readonly string OrgTreeExistsOrgEvalResult = "OrgTreeExistsOrgEvalResult";
+        public static readonly string OrgTreeExistsEvalAttachment = "OrgTreeExistsEvalAttachment";
+        public static readonly string OrgTreeExistsServiceRequest = "OrgTreeExistsServiceRequest";
+        public static readonly string OrgTreeExistsEvaluationRequestHistory = "OrgTreeExistsEvaluationRequestHistory";
+        public static readonly string OrgTreeExistsParentOrgTree = "OrgTreeExistsParentOrgTree";
+        public static readonly string OrgTreeExistsEmployee = "OrgTreeExistsEmployee";
+        public static readonly string OrgTreeExistsOrganization = "OrgTreeExistsOrganization";
+        public static readonly string OrgTreeExistsSchool = "OrgTreeExistsSchool";
+        public static readonly string OrgTreeExistsDepartment = "OrgTreeExistsDepartment";
+        public static readonly string OrgTreeExistsEvaluationRequest = "OrgTreeExistsEvaluationRequest";
+        public static readonly string OrgTreeExistsOrgAcademicYear = "OrgTreeExistsOrgAcademicYear";
     }
 
     public static class AdminSettings
@@ -270,6 +282,7 @@ public static class ConstantKeys
         public static readonly string AdminPlanStatuses = "AdminPlanStatuses";
         public static readonly string AdminOrgTypes = "AdminOrgTypes";
         public static readonly string AdminSchools = "AdminSchools";
+        public static readonly string AdminOrgTree = "AdminOrgTree";
     }
 
     public static class AdminPermission
@@ -604,6 +617,15 @@ public static class ConstantKeys
         public const string ADD_ADMIN_SCHOOL = "ADD_ADMIN_SCHOOL";
         public const string EDIT_ADMIN_SCHOOL = "EDIT_ADMIN_SCHOOL";
         public const string DELETE_ADMIN_SCHOOL = "DELETE_ADMIN_SCHOOL";
+
+        #endregion
+
+        #region ORGTREE
+
+        public const string VIEW_ADMIN_ORGTREE = "VIEW_ADMIN_ORGTREE";
+        public const string ADD_ADMIN_ORGTREE = "ADD_ADMIN_ORGTREE";
+        public const string EDIT_ADMIN_ORGTREE = "EDIT_ADMIN_ORGTREE";
+        public const string DELETE_ADMIN_ORGTREE = "DELETE_ADMIN_ORGTREE";
 
         #endregion
 
