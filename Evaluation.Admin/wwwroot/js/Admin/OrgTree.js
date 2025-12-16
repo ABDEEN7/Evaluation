@@ -38,7 +38,9 @@ const loadData = (isSearch) => {
 
     jqClientAdvanced(options).Get("OrgTree/GetAllOrgTree".concat('?page=', currentPage));
 };
-
+function DisableParentDropdownOptions() {
+    sharedFn().DisableDropdownOptions("OrgTreeOrgParentId", $('#Id').val());
+}
 const deleteData = (id) => {
     if (!id) return;
 
@@ -86,7 +88,7 @@ const deleteData = (id) => {
 
 
     dialogElem = commonUtil.createDailog({ dailogId: dailogId });    loadData();        $(`#${btnAddContentId}`).click(function (e) {        sharedFn().ClearForm();        sharedFn().EditMode();
-        
+        sharedFn().EnableDropdownOptions("OrgTreeOrgParentId");
     });
         $("#btn-submit").click(function (e) {
         if (sharedFn().NewvalidateForm("form-control", sharedFn().GetUiControlText('ADMIN_CNTRL_REQUIRED'), sharedFn().GetUiControlText('ADMIN_MSG_MAX_CHAR_LENGTH'), sharedFn().GetUiControlText('ADMIN_MSG_MIN_CHAR_LENGTH'))) {
