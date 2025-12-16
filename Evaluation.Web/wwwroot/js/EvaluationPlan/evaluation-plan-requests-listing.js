@@ -28,7 +28,7 @@
             {
                 data: "service",
                 title: uiControlsSetup().GetUiControlText("lblRequestService"),
-                className: "header-left status",
+                className: "header-left ",
                 render: function (data) {
                     return `<strong class="text-truncate-2">${data || ""}</strong>`;
                 }
@@ -89,9 +89,30 @@
         jqClient(options).Get(`/EvaluationPlanRequest/GetDetails?requestId=${requestId}`);
     }
 
+    //$('#btnAddEvaluationPlanRequest').on('click', function () {
+    //    //const el = document.getElementById("CreatePlanModal");
+    //    //const modal = bootstrap.Modal.getOrCreateInstance(el);
+    //    //modal.show();
+    //    //InitializeCreatePlanRequest();
+    //});
     $('#btnAddEvaluationPlanRequest').on('click', function () {
-        $("#CreatePlanModal").modal("show");
-        InitializeCreatePlanRequest();
+
+        const el = document.getElementById("CreatePlanModal");
+        const modal = bootstrap.Modal.getOrCreateInstance(el);
+        modal.show();
+
+        $("#CreatePlanModalBody").load("/Plan/CreatePartial", function (response, status) {
+            if (status !== "success") {
+                console.error("Failed to load Create partial:", response);
+                return;
+            }
+
+            if (typeof window.InitializeCreatePlanRequest === "function") {
+                window.InitializeCreatePlanRequest();
+            } else if (typeof window.CreatePlan?.InitializeCreatePlanRequest === "function") {
+                window.CreatePlan.InitializeCreatePlanRequest();
+            }
+        });
     });
 
     planRequestsListing.reload();
