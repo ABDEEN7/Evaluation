@@ -108,7 +108,8 @@
     <script src="~/js/evaluationplan/evaluation-operations-listing.js"></script>
     <script src="~/js/evaluationplan/evaluation-plan-requests-listing.js"></script>
 
-
+    <script src="/lib/jquery/jquery.min.js"></script>
+    <script src="~/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="/js/form-generation-util/form.constants.js"></script>
     <script src="/js/form-generation-util/form.api.js"></script>
     <script src="/js/form-generation-util/form.generate-field.js"></script>
@@ -117,6 +118,8 @@
     <script src="/js/form-generation-util/form.init.js"></script>
     <script src="/js/form-generation-util/form.namespace.js"></script>
     <script src="~/js/evaluationplan/createrequest.js"></script>
+
+   
     <script>
         $(document).ready(async function () {
             // await webAppConfigsSetup().Init({
@@ -173,6 +176,23 @@
          });
     </script>
 
+    <div class="modal fade" id="CreatePlanModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">إضافة طلب خطة تقييم</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div id="CreatePlanModalBody">
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
 
 
 

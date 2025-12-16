@@ -41,7 +41,7 @@
             initialAction = firstAction ? firstAction.bakendName : initialAction;
             $("#ActionsDropDown").hide();
             $("label[for='ActionsDropDown']").hide();
-            await GetActionFields();
+            await RenderActionFields(createPlanService.serviceRequestDTO);
         } else {
             fillActionDropDown(actions);
         }

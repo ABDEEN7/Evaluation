@@ -63,9 +63,9 @@ namespace Evaluation.Services.BusinessLayer.API
 			var stepFieldsList = await ActionFieldListsTask;
 			var requestFieldValues = await requestFieldValuesTask ?? new List<ServiceRequestFieldsValue>();
 
-			var visibleFieldsForAction = stepFields
-				.Where(f => action.ActionFields!.Any(x => x.FieldId == f.Id) && !hiddenFieldIds.Contains(f.Id))
-				.ToList();
+			var visibleFieldsForAction = stepFields;
+				//.Where(f => action.ActionFields!.Any(x => x.FieldId == f.Id) && !hiddenFieldIds.Contains(f.Id))
+				//.ToList();
 
 			// Group by form group
 			var grouped = visibleFieldsForAction
@@ -773,8 +773,8 @@ namespace Evaluation.Services.BusinessLayer.API
 			var requestDto = new ServiceRequestDTO
 			{
 				ActionCustom = actionCustom,
-				DropDownValues = await dropDownTask,
-				SchAttachments = schAttachmentsTask != null ? await schAttachmentsTask : null
+				//DropDownValues = await dropDownTask,
+				//SchAttachments = schAttachmentsTask != null ? await schAttachmentsTask : null
 			};
 
 			return requestDto;
