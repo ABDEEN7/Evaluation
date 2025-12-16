@@ -44,9 +44,6 @@ public class FormController : ControllerBase
     [HttpGet]
     public async Task<Result<List<FormEvalMarixValueDto>>> GetFormEvalMarixValues([FromQuery] Guid formId)
     {
-        List<FormEvalMarixValueDto> FormEvalMarixValues = new List<FormEvalMarixValueDto>();
-        FormEvalMarixValues.Add(new FormEvalMarixValueDto() { Id = new Guid(), Name = "Agree", MaxValue = 100 });
-        FormEvalMarixValues.Add(new FormEvalMarixValueDto() { Id = new Guid(), Name = "Disagree", MaxValue = 49 });
-        return FormEvalMarixValues;
+        return await _masterBl.GetApiService<FormBL>().GetFormEvalMarixValues(formId);
     }
 }
