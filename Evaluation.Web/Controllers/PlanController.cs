@@ -5,11 +5,11 @@ namespace Evaluation.Web.Controllers
 {
     public class PlanController : Controller
     {
-		public IActionResult Index()
-		{
-			return View();
-		}
-		public IActionResult Create()
+        public IActionResult Index()
+        {
+            return View();
+        }
+        public IActionResult Create()
         {
             var viewModel = new PlanViewModel
             {
@@ -25,6 +25,18 @@ namespace Evaluation.Web.Controllers
         {
             return View(planId);
         }
-		
+
+		[HttpGet]
+		public IActionResult CreatePartial()
+		{
+			var model = new PlanViewModel
+			{
+				ActionType = "CREATE",
+				RenderType = "action"
+			};
+
+			return PartialView("_Create", model);
+		}
+
 	}
 }
