@@ -125,16 +125,20 @@
     $('#planYearFilter').on('change', function () {
         plansListing.reload();
     });
-
+    $('#searchPlansBtn').on('click', function (e) {
+        e.preventDefault();
+        plansListing.reload();
+    });
     // View plan details
     function openPlanDetails(planId) {
-        jqClient({
-            success: function (response) {
-                $('#planDetailsModalLabel').text(response.name);
-                $('#planDetailsModalBody').html(response.htmlContent || '');
-                $('#planDetailsModal').modal('show');
-            }
-        }).Get(`/Plan/Details?planId=${planId}`);
+        //jqClient({
+        //    success: function (response) {
+        //        $('#planDetailsModalLabel').text(response.name);
+        //        $('#planDetailsModalBody').html(response.htmlContent || '');
+        //        $('#planDetailsModal').modal('show');
+        //    }
+        //}).Get(`/Plan/Details?planId=${planId}`);
+        window.location.href = `/Plan/Details?planId=${planId}`;
     }
 
     $('#addPlanBtn').on('click', function () {

@@ -129,14 +129,14 @@ public class PlanServiceRequestServices(
                     {
                         Id = Guid.NewGuid(),
                         PlanId = plan.Id,
-                        ServiceId = new Guid("3CD9D8D9-8C8F-4BCC-AB37-9C2F87C8615D"),
+                        ServiceId = new Guid("370026F8-07DD-4E70-8F9B-756696C89181"),
                         OrgTreeId = school.Id,
                         DepEvaluationTypeId = depEvaluationType,
                         FromDate = school.StartEvaluationDate,
                         ToDate = school.EndEvaluationDate,
                         ServiceStatusId = serviceStatusId,
                         CreateDate = DateTime.UtcNow,
-                        IsDeleted = false
+                        IsDeleted = false,
                     }).ToList();
 
                 await unitOfWork.GetRepository<EvaluationRequest>()

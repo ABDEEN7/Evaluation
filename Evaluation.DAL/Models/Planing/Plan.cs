@@ -1,4 +1,5 @@
-﻿using Evaluation.DAL.Models.BaseModule;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using Evaluation.DAL.Models.BaseModule;
 using Evaluation.DAL.Models.Calendars;
 using Evaluation.DAL.Models.DepartementEntites;
 using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;

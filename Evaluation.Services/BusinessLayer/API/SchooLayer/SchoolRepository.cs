@@ -4,6 +4,8 @@ using Evaluation.DAL.Models.DepartementEntites;
 using Evaluation.DAL.Models.Org;
 using Evaluation.DAL.Models.Planing;
 using Evaluation.DAL.Repositories;
+using Evaluation.Services.BusinessLayer.API.AcademicYearLayer;
+using Evaluation.Services.BusinessLayer.API.DepartmentLayer;
 using Evaluation.Services.Extensions;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Dtos.SchoolDto;
@@ -13,6 +15,7 @@ using Evaluation.SharedHelper.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace Evaluation.Services.BusinessLayer.API.SchooLayer;
 
@@ -63,14 +66,19 @@ public class SchoolRepository(IServiceScopeFactory serviceScopeFactory,
         var school = await serviceProvider
            .CreateScopedUow()
            .GetRepository<School>().GetByIDActiveNonDeleted(SchoolID);
-        
+
         return school;
     }
 
-    public IQueryable<VisitType> GetVisitTypes()
-        => unitOfWork
-            .GetRepository<VisitType>()
-            .GetAllActiveNonDeleted();
+    public async Task<IQueryable<DepEvaluationType>> GetVisitTypes()
+    {
+        Guid? departmentId = await serviceProvider.GetRequiredService<DepartmentService>().GetDepartmentIdAsync();
+        var visitTypes =
+        unitOfWork
+        .GetRepository<DepEvaluationType>()
+        .GetAllActiveNonDeleted(x => x.DepartmentId == departmentId);
+        return visitTypes;
+    }
 
 
     private Expression<Func<School, bool>> BuildFilterExpression(SchoolRequest request)

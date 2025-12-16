@@ -29,6 +29,7 @@ public class PlanRequestRepository(IServiceScopeFactory serviceScopeFactory,
     public async Task<Plan?> GetPlanDetailsAsync(Guid id)
         => await unitOfWork.GetRepository<Plan>().GetAllActiveNonDeleted()
         .Include(x => x.EvaluationRequests)
+        .ThenInclude(x=>x.OrgTree)
         .FirstOrDefaultAsync(x => x.Id == id);
 
 
@@ -130,7 +131,7 @@ public class PlanRequestRepository(IServiceScopeFactory serviceScopeFactory,
                 .Select(er => er.OrgTreeId)
                 .Distinct()
                 .Count()
-            });
+            }).OrderByDescending(x=>x.Id);
         return await query.GetPaginatedResult(request.PageNumber, request.PageSize = 10);
     }
     private async Task<bool> IsThereExistingDraftPlanForSameAcadmicYear(PlanServiceRequest model)

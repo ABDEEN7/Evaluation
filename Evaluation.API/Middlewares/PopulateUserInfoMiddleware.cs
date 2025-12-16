@@ -22,7 +22,7 @@ namespace Evaluation.API.Middlewares
         public async Task InvokeAsync(HttpContext context, UserInfo userInfo)
         {
 
-            userInfo.UserId = Guid.Parse("98786faf-b41c-489a-af3f-3b61fb5b079b");
+            userInfo.UserId = Guid.Parse("98786FAF-B41C-489A-AF3F-3B61FB5B079B");
             userInfo.Email = "test.user@moehe.gov.qa";
             userInfo.Name = "Test User";
             userInfo.UserType = "MinistryUser";

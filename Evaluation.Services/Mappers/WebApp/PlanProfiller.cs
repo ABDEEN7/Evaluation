@@ -28,6 +28,9 @@ internal class PlanProfiller : Profile
               opt => opt.MapFrom(src => src.FromDate))
 
           .ForMember(dest => dest.EndEvaluationDate,
-              opt => opt.MapFrom(src => src.ToDate));
+              opt => opt.MapFrom(src => src.ToDate))
+
+          .ForMember(dest => dest.Name,
+            opt => opt.MapFrom(src => src.OrgTree.NameEn));
     }
 }

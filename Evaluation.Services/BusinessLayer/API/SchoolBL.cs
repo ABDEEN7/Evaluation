@@ -48,7 +48,7 @@ public class SchoolBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvide
     public async Task<PaginatedResult<ResponseSchools>> GetSchools(SchoolRequest request)
     {
         //TODO: Get Department Id by Department Routing Path
-        
+
         var result = await schoolRepository.GetSchoolsAsync(request);
         return mapper.Map<PaginatedResult<ResponseSchools>>(result);
     }
@@ -59,7 +59,7 @@ public class SchoolBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvide
     }
     public async Task<List<SchoolVisits>> GetVisitsAsync()
     {
-        var responses = schoolRepository.GetVisitTypes();
+        var responses = await schoolRepository.GetVisitTypes();
         return await responses.Select(x => new SchoolVisits
         {
             Id = x.Id,

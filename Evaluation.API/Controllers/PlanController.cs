@@ -19,7 +19,7 @@ public class PlanController(MasterBL masterBL) : ControllerBase
     public async Task<IActionResult> InsertOrUpdatePlan([FromBody] CreateEvaluationPlanDto approveDto)
     {
         await masterBL.GetApiService<PlanServiceRequestServices>().InsertOrUpdatePlan(approveDto);
-        return Ok();
+        return Ok(new {success= true});
     }
 
 
