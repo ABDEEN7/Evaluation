@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Evaluation.DAL.Helper;
+using Evaluation.DAL.Models.FormsModules;
 using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
 using Evaluation.DAL.Repositories;
 using Evaluation.Services.Special;
@@ -28,4 +29,19 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
                     .Include(d => d.DepEvaluationType)
                     .ToList();
     }
+
+    public async Task<EvaluationRequest> GetEvaluationRequestById(Guid Id)
+    {
+        return await unitOfWork.GetRepository<EvaluationRequest>()
+                    .GetByIDActiveNonDeleted(Id);
+    }
+
+    public async Task<EvaluationRequest> UpdateEvaluationRequest(EvaluationRequest evaluationRequest)
+    {
+        unitOfWork.GetRepository<EvaluationRequest>().Update(evaluationRequest);
+        await uow.CommitAsync();
+
+        return evaluationRequest;
+    }
+
 }

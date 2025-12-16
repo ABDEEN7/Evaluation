@@ -18,8 +18,8 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
     public async Task<Result<List<FormItemDto>>> GetFormItems(Guid FormId)
     {
         var formItems = await formService.GetFormItems();
-
-        return mapper.Map<List<FormItemDto>>(formItems.Where(s => s.EvalFormId == FormId).ToList());
+       var y=  mapper.Map<List<FormItemDto>>(formItems.Where(s => s.EvalFormId == FormId).ToList());
+        return y;
     }
 
     public async Task<Result<FormEvaluationDto>> SaveEvaluationForm(FormEvaluationDto formEvaluationDto)

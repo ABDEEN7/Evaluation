@@ -1,5 +1,7 @@
 ﻿// Constants
-const FORM_ID = 'C251A99A-A7A3-41B5-955E-1EBDD4B2B5FC';
+const params = new URLSearchParams(window.location.search);
+const FORM_ID = params.get('formId');  
+let matrixValues;
 const SELECTORS = {
     noteHeader: 'thead th:contains("الشواهد وأثرها")',
     tableBody: '#tbodyRows',
@@ -18,6 +20,8 @@ document.addEventListener('DOMContentLoaded', () => {
 const loadFormItems = async (formId) => {
     try {
         const result = await jqClient().Get(`/Form/GetItems?formId=${formId}`);
+        matrixValues = await jqClient().Get(`/Form/GetFormEvalMarixValues?formId=${formId}`);
+
         //const items = Array.isArray(result.result.value) ? result : [result];
         const items = result.value ? result.value : [result];
 
@@ -29,7 +33,7 @@ const loadFormItems = async (formId) => {
 
         togglenoteColumn(hasAnyNote);
         toggleCollapseColumn(hasAnyChildren);
-        renderFormItems(items, hasAnyNote, hasAnyChildren);
+        await renderFormItems(items, hasAnyNote, hasAnyChildren);
     } catch (error) {
         console.error('Error loading form items:', error);
         // Consider adding user-friendly error handling here
@@ -60,7 +64,7 @@ const toggleCollapseColumn = (show) => {
  * @param {boolean} hasAnyNote - Whether any item has note
  * @param {boolean} hasAnyChildren - Whether any item has children
  */
-const renderFormItems = (items, hasAnyNote, hasAnyChildren) => {
+const renderFormItems = async (items, hasAnyNote, hasAnyChildren) => {
     const $tbody = $(SELECTORS.tableBody);
     $tbody.empty();
 
@@ -70,7 +74,12 @@ const renderFormItems = (items, hasAnyNote, hasAnyChildren) => {
         const hasChildren = item.subFormItems?.length > 0;
 
         // Render main row
-        $tbody.append(createMainRow(item, orderItem, collapseId, hasChildren, hasAnyNote, hasAnyChildren));
+
+        createMainRow(item, orderItem, collapseId, hasChildren, hasAnyNote, hasAnyChildren)
+            .then(html => {
+            console.log(html);
+            $tbody.append(html);
+        });
 
         // Render child rows only if there are any children in the dataset
         if (hasChildren && hasAnyChildren) {
@@ -92,7 +101,7 @@ const renderFormItems = (items, hasAnyNote, hasAnyChildren) => {
  * @param {boolean} hasAnyChildren - Whether any item has children
  * @returns {string} HTML string for the row
  */
-const createMainRow = (item, orderItem, collapseId, hasChildren, hasAnyNote, hasAnyChildren) => {
+const createMainRow = async (item, orderItem, collapseId, hasChildren, hasAnyNote, hasAnyChildren) => {
     return `
     <tr class="main-row align-middle">
       ${hasAnyChildren ? `
@@ -107,7 +116,7 @@ const createMainRow = (item, orderItem, collapseId, hasChildren, hasAnyNote, has
           ${escapeHtml(item.name)}
         </div>
       </td>
-      <td>${buildSelection(item)}</td>
+      <td>${await buildSelectionNew(item)}</td>
       ${hasAnyNote ? `<td>${item.hasnote ? buildnote(item) : ''}</td>` : ''}
     </tr>
   `;
@@ -132,7 +141,7 @@ const createChildRow = (child, parentId, collapseId, subOrder, hasAnyNote, hasAn
       ${hasAnyChildren ? '<td></td>' : ''}
       <td class="serial">${subOrder}</td>
       <td class="text-start">${escapeHtml(child.name)}</td>
-      <td>${buildSelection(child)}</td>
+      <td>${buildSelection2(child)}</td>
       ${hasAnyNote ? `<td>${child.hasnote ? buildnote(child) : ''}</td>` : ''}
     </tr>
   `;
@@ -176,8 +185,45 @@ const buildSelection = (item) => {
     return `
     <select ${baseAttrs}>
       <option value="">اختر</option>
-      <option value="approve">موافق</option>
-      <option value="not-approve">غير موافق</option>
+      <option value="1">موافق</option>
+      <option value="0">غير موافق</option>
+    </select>
+  `;
+};
+
+const buildSelectionNew = async (item) => {
+    const baseAttrs = `class="form-select eval-select" data-id="${item.id}"`;
+
+    let options = `<option value="">اختر</option>`;
+
+    matrixValues.value.forEach(item => {
+        options += `<option value="${item.id}">${item.name}</option>`;
+    });
+
+    return `
+        <select ${baseAttrs}>
+            ${options}
+        </select>
+    `;
+};
+
+const buildSelection2 = (item) => {
+    const baseAttrs = `class="form-select eval-select" data-id="${item.id}"`;
+
+    if (item.selectionCode === 'multiSelect') {
+        return `
+      <select ${baseAttrs}>
+        <option value="">اختر من 1 إلى 5</option>
+        ${[1, 2, 3, 4, 5].map(num => `<option value="${num}">${num}</option>`).join('')}
+      </select>
+    `;
+    }
+
+    return `
+    <select ${baseAttrs}>
+      <option value="">اختر</option>
+      <option value="6b03c651-763c-4193-8c26-d810ff703fb4">موافق</option>
+      <option value="2ca355ce-ce36-4f71-a16b-8f73a723ea9b">غير موافق</option>
     </select>
   `;
 };

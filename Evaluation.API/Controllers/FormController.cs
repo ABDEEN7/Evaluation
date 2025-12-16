@@ -4,6 +4,7 @@ using Evaluation.DAL.Dtos.Form;
 using Evaluation.DAL.Models.FormsModules;
 using Evaluation.Services.BusinessLayer;
 using Evaluation.Services.BusinessLayer.API.FormLayer;
+using Evaluation.SharedHelper.Dtos.Form;
 using Evaluation.SharedHelper.Enums;
 using FluentResults;
 using Microsoft.AspNetCore.Mvc;
@@ -37,5 +38,15 @@ public class FormController : ControllerBase
     public async Task<Result<FormEvaluationDto>> UpdateEvaluationForm([FromBody] FormEvaluationDto formEvaluation)
     {
         return await _masterBl.GetApiService<FormBL>().UpdateEvaluationForm(formEvaluation);
+    }
+
+
+    [HttpGet]
+    public async Task<Result<List<FormEvalMarixValueDto>>> GetFormEvalMarixValues([FromQuery] Guid formId)
+    {
+        List<FormEvalMarixValueDto> FormEvalMarixValues = new List<FormEvalMarixValueDto>();
+        FormEvalMarixValues.Add(new FormEvalMarixValueDto() { Id = new Guid(), Name = "Agree", MaxValue = 100 });
+        FormEvalMarixValues.Add(new FormEvalMarixValueDto() { Id = new Guid(), Name = "Disagree", MaxValue = 49 });
+        return FormEvalMarixValues;
     }
 }
