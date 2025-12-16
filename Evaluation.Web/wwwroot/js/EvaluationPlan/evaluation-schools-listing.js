@@ -22,7 +22,7 @@
         enableCardView: true,
         cardViewBtnId: 'cardViewSchool',
         tableViewBtnId: 'tblViewSchool',
-        rowClass: 'school-card',
+        rowClass: 'plan-request-card',
         columns: [
             {
                 data: "nameAr",
