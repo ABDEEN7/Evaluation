@@ -6,4 +6,5 @@ public static class StatusBackEnds
 {
     public static string ApprovedPlans = "Approved";
     public static string ReadyEvaluation = "ReadyEvaluation";
+    public static string New = "New";
 }

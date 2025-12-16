@@ -1,125 +1,167 @@
 ﻿$(document).ready(function () {
-    let plansListing = null;
 
+    /* =========================
+     * API ENDPOINTS
+     * ========================= */
+    const API_ENDPOINTS = {
+        GET_ACADEMIC_YEARS: '/AcademicYear/GetAcademicYearByDepartment'
+    };
+
+    /* =========================
+     * LOAD ACADEMIC YEARS
+     * ========================= */
+    function loadAcademicYears() {
+        const $ddl = $('#planYearFilter');
+
+        $ddl
+            .empty()
+            .append('<option value="">الكل</option>')
+            .prop('disabled', true);
+
+        jqClient()
+            .Get(API_ENDPOINTS.GET_ACADEMIC_YEARS)
+            .done(function (response) {
+                $ddl.prop('disabled', false);
+
+                //if (response && response.result && response.result.length > 0) {
+                if (response) {
+                    response.forEach(function (year) {
+                        $ddl.append(`
+                            <option value="${year.id}">
+                                ${year.nameAr}
+                            </option>
+                        `);
+                    });
+                }
+            })
+            .fail(function (jqXHR, textStatus) {
+                console.error('Failed to load academic years:', textStatus);
+                $ddl.prop('disabled', false);
+            });
+    }
+
+    /* =========================
+     * FILTER OBJECT
+     * ========================= */
     function getPlansFilter() {
         return {
             YearId: $('#planYearFilter').val(),
-            StatusId: $('#planStatusFilter').val()
+            schoolName: $('#schoolName').val()
         };
     }
 
-    function initPlansListing() {
-        if (plansListing) {
-            console.log('[PLANS] Already initialized, reloading...');
-            plansListing.reload();
-            return;
-        }
+    /* =========================
+     * INITIALIZE LISTING
+     * ========================= */
+    const plansListing = evaluationListing.createListing({
+        tableId: 'evaluationPlansTable',
+        ajaxUrl: '/Plan/GetPlans',
+        getFilterInput: getPlansFilter,
+        filterFormId: 'plan-filter-form-id',
+        filterBtnId: 'filterPlanBtnId',
+        clearFilterBtnId: 'clearFilterPlanBtnId',
+        tabLabelSelector: '#tabPlansAnchorTag',
+        tabLabelKey: 'lblEvaluationPlans',
+        enableCardView: false,
+        cardViewBtnId: 'cardViewPlan',
+        tableViewBtnId: 'tblViewPlan',
+        rowClass: 'plan-row',
 
-        console.log('[PLANS] Creating new listing...');
-        plansListing = evaluationListing.createListing({
-            tableId: 'evaluationPlansTable',
-            ajaxUrl: '/Plan/GetPlans',
-            getFilterInput: getPlansFilter,
-            filterFormId: 'plan-filter-form-id',
-            filterBtnId: 'filterPlanBtnId',
-            clearFilterBtnId: 'clearFilterPlanBtnId',
-            tabLabelSelector: '#tabPlansAnchorTag',
-            tabLabelKey: 'lblEvaluationPlans',
-            enableCardView: false,
-            cardViewBtnId: 'cardViewPlan',
-            tableViewBtnId: 'tblViewPlan',
-            rowClass: 'plan-row',
-            columns: [
-                //{
-                //    data: "planNumber",
-                //    className: "td-left"
-                //},
-                {
-                    data: "name",
-                    className: "td-left"
-                },
-                {
-                    data: "countSchools",
-                    className: "td-left"
-                },
-                {
-                    data: null,
-                    className: "td-left",
-                    render: function (data, type, row) {
-                        return `${row.startDate} - ${row.endDate}`
-                    }
+        onAjaxSuccess: function (response) {
+            return {
+                data: response.items || response.data || [],
+                totalDataCount: response.totalCount || response.totalDataCount || 0,
+                TotalDataCount: response.totalCount || response.TotalDataCount || 0
+            };
+        },
+
+        columns: [
+            {
+                data: "name",
+                className: "td-left"
+            },
+            {
+                data: "countSchools",
+                className: "td-left"
+            },
+            {
+                data: null,
+                className: "td-left",
+                render: function (data, type, row) {
+                    return `${row.startDate} - ${row.endDate}`;
                 }
-                ,
-                {
-                    data: "statusCode",
-                    className: "td-right",
-                    render: function (data, type, row) {
-                        //const color = row.statusColor || "#cccccc";
-                        //const textColor = getContrastingTextColor(color);
-                        //return `<span class="request-status" style="background:${color};color:${textColor}">${data || ""}</span>`;
-                        return `<span class="request-status">${data || ""}</span>`;
-                    }
-                },
-                {
-                    data: null,
-                    orderable: false,
-                    className: "td-center",
-                    render: function (data, type, row) {
-                        return `
-                            <button class="btn btn-sm btn-primary view-plan" data-id="${row.id}">
-                                عرض
-                            </button>
-                        `;
-                    }
+            },
+            {
+                data: "statusCode",
+                className: "td-right",
+                render: function (data) {
+                    return `<span class="request-status">${data || ""}</span>`;
                 }
-            ],
-            onRowClick: function (rowData) {
-                openPlanDetails(rowData.id);
+            },
+            {
+                data: null,
+                orderable: false,
+                className: "td-center",
+                render: function (data, type, row) {
+                    return `
+                        <button class="btn btn-sm btn-primary view-plan" data-id="${row.id}">
+                            عرض
+                        </button>
+                    `;
+                }
             }
-        });
+        ],
 
-        // **FORCE RELOAD IMMEDIATELY - Don't wait for visibility**
-        console.log('[PLANS] Force reload immediately');
-        setTimeout(function () {
-            plansListing.reload();
-        }, 50);
-    }
+        onRowClick: function (rowData) {
+            openPlanDetails(rowData.id);
+        }
+    });
 
+    /* =========================
+     * EVENTS
+     * ========================= */
+
+    // Reload plans when year changes
+    $('#planYearFilter').on('change', function () {
+        plansListing.reload();
+    });
+
+    // View plan details
     function openPlanDetails(planId) {
-        const options = {
+        jqClient({
             success: function (response) {
                 $('#planDetailsModalLabel').text(response.name);
                 $('#planDetailsModalBody').html(response.htmlContent || '');
                 $('#planDetailsModal').modal('show');
             }
-        };
-        jqClient(options).Get(`/Plan/Details?planId=${planId}`);
+        }).Get(`/Plan/Details?planId=${planId}`);
     }
 
     $('#addPlanBtn').on('click', function () {
         window.location.href = '/Plan/Create';
     });
 
+    /* =========================
+     * TAB HANDLING
+     * ========================= */
     $('a[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
-        const href = $(e.target).attr('href');
-        console.log('[TAB] Tab shown:', href);
+        if ($(e.target).attr('href') === '#tab-plan-details') {
+            plansListing.reload();
+            loadAcademicYears();
 
-        if (href === '#tab-plan-details') {
-            console.log('[TAB] Plan details tab activated');
-            initPlansListing();
         }
     });
 
+    // Initial load if tab already active
     setTimeout(function () {
-        const parentActive = $('#tab-plans').hasClass('active') || $('#tab-plans').hasClass('show');
-        const childActive = $('#tab-plan-details').hasClass('active') || $('#tab-plan-details').hasClass('show');
-
-        console.log('[INIT] Parent tab active:', parentActive);
-        console.log('[INIT] Child tab active:', childActive);
-
-        if (parentActive && childActive) {
-            console.log('[INIT] Both tabs active, initializing');
-            initPlansListing();
+        const $tab = $('#tab-plan-details');
+        if ($tab.is(':visible') && ($tab.hasClass('active') || $tab.hasClass('show'))) {
+            plansListing.reload();
         }
-    }, 300);
+    }, 500);
+
+    /* =========================
+     * INITIAL PAGE LOAD
+     * ========================= */
+
 });

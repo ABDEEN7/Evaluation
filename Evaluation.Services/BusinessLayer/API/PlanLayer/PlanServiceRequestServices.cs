@@ -65,7 +65,7 @@ public class PlanServiceRequestServices(
     }
     public async Task<PlanDetailsDto> GetPlanByIdAsync(Guid id)
     {
-        var result = await planRepository.GetPlanAsync(id);
+        var result = await planRepository.GetPlanDetailsAsync(id);
         var planDto = mapper.Map<PlanDetailsDto>(result);
         return planDto;
     }
@@ -96,11 +96,17 @@ public class PlanServiceRequestServices(
                         x.BackendName == StatusBackEnds.ApprovedPlans)
                     .Select(x => x.Id)
                     .FirstAsync();
+            Guid depEvaluationType =
+                await unitOfWork.GetRepository<DepEvaluationType>()
+                    .GetAllActiveNonDeleted(x =>
+                        x.DepartmentId == departmentId)
+                    .Select(x => x.Id)
+                    .FirstAsync();
 
             Guid serviceStatusId =
                 await unitOfWork.GetRepository<ServiceStatus>()
                     .GetAllActiveNonDeleted(x =>
-                        x.BackendName == StatusBackEnds.ReadyEvaluation)
+                        x.BackendName == StatusBackEnds.New)
                     .Select(x => x.Id)
                     .FirstAsync();
 
@@ -123,8 +129,9 @@ public class PlanServiceRequestServices(
                     {
                         Id = Guid.NewGuid(),
                         PlanId = plan.Id,
+                        ServiceId = new Guid("3CD9D8D9-8C8F-4BCC-AB37-9C2F87C8615D"),
                         OrgTreeId = school.Id,
-                        DepEvaluationTypeId = modelDto.PlanTypeDepId,
+                        DepEvaluationTypeId = depEvaluationType,
                         FromDate = school.StartEvaluationDate,
                         ToDate = school.EndEvaluationDate,
                         ServiceStatusId = serviceStatusId,
@@ -158,9 +165,9 @@ public class PlanServiceRequestServices(
         Plan? plan = await planRepository.GetPlanAsync(planId);
         return mapper.Map<PlanDto>(plan);
     }
-    public async Task<PaginatedResult<PlanListDto>> GetPlansAsync(PlanRequestDto requestDto)
+    public async Task<PaginatedResult<PlanListDto>> GetPlansAsync(PlanDetailsRequestDto request)
     {
-        PaginatedResult<PlanListDto> result = await planRepository.GetPlans(requestDto);
+        PaginatedResult<PlanListDto> result = await planRepository.GetPlans(request);
         return mapper.Map<PaginatedResult<PlanListDto>>(result);
     }
     //Validation Plans

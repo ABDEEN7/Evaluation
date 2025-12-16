@@ -1,7 +1,13 @@
 ﻿/**
  * View Plan Handler - Loads and displays plan data in read-only mode
  */
-
+const RATING_CLASSES = {
+    'Perfect': 'bg-success',
+    'VeryGood': 'bg-info',
+    'Good': 'bg-primary',
+    'Acceptable': 'bg-secondary',
+    'Week': 'bg-danger'
+};
 $(document).ready(function () {
     // Get plan ID from URL or other source
     const urlParams = new URLSearchParams(window.location.search);
@@ -72,6 +78,7 @@ function populatePlanData(planData) {
     // Populate schools table
     if (planData.schools && planData.schools.length > 0) {
         populateSchoolsTable(planData.schools, planData.startDate, planData.endDate);
+        loadSchoolDetails(planData.schools);
     } else {
         showEmptyTable();
     }
@@ -112,6 +119,39 @@ function populateSchoolsTable(schools, planStartDate, planEndDate) {
  * Create table row for school
  */
 function createSchoolRow(school, index, planStartDate, planEndDate) {
+    const generateSchoolNameCell = (school) => {
+        const ratingClass = RATING_CLASSES?.[school.rating] || 'bg-light';
+
+        const container = $('<div>')
+            .addClass('d-flex align-items-center justify-content-between');
+
+        const infoDiv = $('<div>');
+
+        infoDiv.append(
+            $('<h6>').text(school.name || '-')
+        );
+
+        const levelBadge = $('<div>').addClass('square-bullet');
+
+        const levelText = (school.schoolLevel && school.schoolLevel.length > 0)
+            ? school.schoolLevel.map(l => l.name).join(', ')
+            : '-';
+
+        levelBadge.append(
+            $('<div>').text(levelText)
+        );
+
+        infoDiv.append(levelBadge);
+
+        const ratingBadge = $('<span>')
+            .addClass(`badge ${ratingClass}`)
+            .text(school.rating || '');
+
+        container.append(infoDiv, ratingBadge);
+
+        return container;
+    };
+
     const startDate = formatDate(school.startEvaluationDate);
     const endDate = formatDate(school.endEvaluationDate);
     const dateRange = `${startDate} - ${endDate}`;
@@ -119,48 +159,51 @@ function createSchoolRow(school, index, planStartDate, planEndDate) {
     // Generate unique ID for date picker
     const datePickerId = `schoolDate_${index}`;
 
-    return `
-        <tr data-school-id="${school.id}">
-            <td>
-                <label class="custom-checkbox">
-                    <input type="checkbox" class="school-checkbox" checked disabled>
-                    <span class="checkmark"></span>
-                </label>
-            </td>
-            <td class="school-name" data-school-id="${school.name}">
-                <div class="spinner-border spinner-border-sm" role="status">
-                    <span class="visually-hidden">جاري التحميل...</span>
-                </div>
-            </td>
-            <td>
-                <div class="input-group">
-                    <input type="text" 
-                           class="form-control school-date-picker" 
-                           id="${datePickerId}"
-                           value="${dateRange}"
-                           readonly
-                           data-school-id="${school.id}"
-                           data-start="${school.startEvaluationDate}"
-                           data-end="${school.endEvaluationDate}">
-                    <span class="input-group-text">
-                        <i class="la la-calendar"></i>
-                    </span>
-                </div>
-            </td>
-            <td class="last-eval-date">-</td>
-            <td class="visit-type" data-visit-type-id="${school.visitTypeId}">
-                <span class="spinner-border spinner-border-sm" role="status"></span>
-            </td>
-            <td class="academic-year">-</td>
-            <td>
-                <button class="btn btn-sm btn-outline-primary" 
-                        onclick="viewSchoolDetails('${school.id}')"
-                        disabled>
-                    <i class="la la-eye"></i>
-                </button>
-            </td>
-        </tr>
-    `;
+    const $row = $(`
+    <tr data-school-id="${school.id}">
+        <td>
+            <label class="custom-checkbox">
+                <input type="checkbox" class="school-checkbox" checked disabled>
+                <span class="checkmark"></span>
+            </label>
+        </td>
+
+        <td class="school-name-cell"></td>
+
+        <td>
+            <div class="input-group">
+                <input type="text"
+                       class="form-control school-date-picker"
+                       id="${datePickerId}"
+                       value="${dateRange}"
+                       readonly
+                       data-school-id="${school.id}"
+                       data-start="${school.startEvaluationDate}"
+                       data-end="${school.endEvaluationDate}">
+                <span class="input-group-text">
+                    <i class="la la-calendar"></i>
+                </span>
+            </div>
+        </td>
+
+        <td class="last-eval-date">-</td>
+        <td class="visit-type" data-visit-type-id="${school.visitTypeId}">
+            <span class="spinner-border spinner-border-sm" role="status"></span>
+        </td>
+        <td class="academic-year">-</td>
+        <td>
+            <button class="btn btn-sm btn-outline-primary"
+                    onclick="viewSchoolDetails('${school.id}')"
+                    disabled>
+                <i class="la la-eye"></i>
+            </button>
+        </td>
+    </tr>
+`);
+    $row.find('.school-name-cell')
+        .append(generateSchoolNameCell(school));
+    return $row;
+
 }
 
 /**

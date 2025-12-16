@@ -102,18 +102,21 @@ public class PlanRequestRepository(IServiceScopeFactory serviceScopeFactory,
             .GetRepository<PlanTypeDep>()
             .GetAllActiveNonDeleted();
     }
-    public async Task<PaginatedResult<PlanListDto>> GetPlans(PlanRequestDto request)
+    public async Task<PaginatedResult<PlanListDto>> GetPlans(PlanDetailsRequestDto request)
     {
         IQueryable<Plan> plans = unitOfWork.GetRepository<Plan>()
             .GetAllActiveNonDeleted(x => x.PlanStatus.BackendName == StatusBackEnds.ApprovedPlans);
-        if (request.StatusId != null)
+        //if (request.StatusId != null)
+        //{
+        //    plans = plans.Where(x => x.PlanStatusId == request.StatusId);
+        //}
+        if (request.YearId != null)
         {
-            plans = plans.Where(x => x.PlanStatusId == request.StatusId);
+            plans = plans.Where(x => x.AcademicYearId == request.YearId);
         }
-
-        if (!string.IsNullOrEmpty(request.PlanName))
+        if (!string.IsNullOrEmpty(request.SchoolName))
         {
-            plans = plans.Where(x => x.PlanName.Contains(request.PlanName));
+            plans = plans.Where(x => x.EvaluationRequests.Any(er => er.OrgTree.NameAr.Contains(request.SchoolName)));
         }
         var query = plans
             .Select(x => new PlanListDto
