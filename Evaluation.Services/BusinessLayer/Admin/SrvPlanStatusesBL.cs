@@ -89,23 +89,25 @@ namespace Evaluation.Services.Models.Admin
 
             var result = new PlanStatusesDTO();
 
-
-            PlanStatus obj = await uow.GetRepository<PlanStatus>()
+            if (message.Id is not null)
+            {
+                PlanStatus obj = await uow.GetRepository<PlanStatus>()
                                       .GetAllNonDeleted()
                                       .Include(x => x.CreateBy)
                                       .Where(x => x.Id == message.Id)
                                       .FirstAsync();
 
-            obj.NameAr = message.NameAr;
-            obj.NameEN = message.NameEN;
-            obj.BackendName = obj.BackendName;
+                obj.NameAr = message.NameAr;
+                obj.NameEN = message.NameEN;
+                obj.BackendName = obj.BackendName;
                 obj.IsActive = message.IsActive;
 
                 uow.GetRepository<PlanStatus>().Update(obj);
-           
-            await uow.CommitAsync();
-             result = mapper.Map<PlanStatusesDTO>(obj);
-            result.ResponseStatus = DBResult.Updated;
+
+                await uow.CommitAsync();
+                result = mapper.Map<PlanStatusesDTO>(obj);
+                result.ResponseStatus = DBResult.Updated;
+            }
                 return result;
            
         }
