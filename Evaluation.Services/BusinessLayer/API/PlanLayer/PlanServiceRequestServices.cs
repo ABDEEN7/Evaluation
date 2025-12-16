@@ -94,7 +94,7 @@ public class PlanServiceRequestServices(
             .FirstOrDefaultAsync();
 
             Guid statusServiceId = await unitOfWork
-            .GetRepository<ServiceStatus >()
+            .GetRepository<ServiceStatus>()
             .GetAllActiveNonDeleted(x => x.BackendName == StatusBackEnds.ReadyEvaluation)
             .Select(x => x.Id)
             .FirstOrDefaultAsync();
@@ -120,7 +120,7 @@ public class PlanServiceRequestServices(
                     OrgTreeId = school.Id,
                     DepEvaluationTypeId = modelDto.PlanTypeDepId,
                     //Service = 
-                    ServiceId = statusServiceId,
+                    ServiceStatusId = statusServiceId,
                     FromDate = school.StartEvaluationDate,
                     ToDate = school.EndEvaluationDate,
                     CreateDate = DateTime.Now,

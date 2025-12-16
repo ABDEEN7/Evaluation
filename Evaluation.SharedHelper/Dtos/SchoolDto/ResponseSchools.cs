@@ -2,7 +2,8 @@
 
 public class ResponseSchools
 {
-	public string NameAr { get; set; } = null!;
+    public Guid? Id { get; set; }
+    public string NameAr { get; set; } = null!;
 	public string NameEn { get; set; } = null!;
 	public Guid? OrgParentId { get; set; }
 	public string? HrCode { get; set; }

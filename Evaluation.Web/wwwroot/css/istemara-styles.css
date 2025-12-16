@@ -1,0 +1,102 @@
+.card-table .table tbody tr.main-row { border-bottom: 1px solid #eef0f2;}
+.table-header{background-color: var(--color-primary); color: var(--color-white); text-align: center; padding:9px;}
+
+.table>thead.table-grey tr th {background-color: #f6f6f3;padding-top: 16px;padding-bottom: 16px;font-weight: normal;}
+.table>thead.table-primary tr th {background-color: var(--color-primary);padding-top: 8px;padding-bottom: 8px;font-weight: normal; color: var(--color-white);}
+
+.row-icon {
+  width: 48px;
+  text-align: center;
+  font-size: 18px;
+}
+
+.row-icon .icon-box {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: linear-gradient(
+    180deg,
+    rgba(122, 30, 30, 0.08),
+    rgba(122, 30, 30, 0.02)
+  );
+  color: var(--color-primary);
+}
+
+/* Toggle button style */
+.toggle-btn {
+  width: 18px;
+    height: 18px;
+    border-radius: 0;
+    border: 1px solid var(--color-primary);
+    background: white;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+.toggle-btn i{
+  font-size: 14px;
+   color: var(--color-primary);
+}
+
+.toggle-btn[aria-expanded="true"] i:before {
+    content: '\f068';
+}
+
+
+/* Mobile card-like rows */
+@media (max-width: 900px) {
+  table.table tbody tr.main-row {
+    margin: 12px;
+    padding: 12px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.03);
+  }
+
+  table.table tbody tr.main-row td {
+    padding: 6px 8px;
+  }
+}
+.serial{
+  width: 60px;
+}
+
+/* Rotate animation for chevron icon */
+.toggle-icon {
+  transition: transform 0.3s ease;
+}
+
+.accordion-button.collapsed .toggle-icon {
+  transform: rotate(180deg);
+}
+.heading i{
+   transform: rotate(180deg);
+}
+
+
+/* Remove Bootstrap default arrow */
+.accordion-button::after {
+  display: none !important;
+}
+
+/* Smooth content animation */
+.accordion-collapse {
+  transition: all 0.35s ease;
+}
+.accordion-item:not(:first-of-type) {
+    border-top:1px solid rgba(203, 203, 203, 1);
+}
+
+.accordion-button:not(.collapsed){
+  background-color: transparent;
+  box-shadow: none;
+  color: var(--color-primary);
+}
+.accordion-item>.accordion-header .accordion-button{
+    border-radius: 0.375rem;}
+
+  
