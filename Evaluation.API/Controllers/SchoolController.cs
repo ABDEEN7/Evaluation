@@ -22,7 +22,7 @@ public class SchoolController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<School> GetSchoolDetails(Guid SchoolID)
+    public async Task<ResponseSchools> GetSchoolDetails(Guid SchoolID)
     {
         var schooldetails = await _masterBl.GetApiService<SchoolBL>().GetSchoolDetails(SchoolID);
         return schooldetails;
@@ -56,10 +56,17 @@ public class SchoolController : ControllerBase
     public async Task<IActionResult> GetVisits()
         => Ok(new { result = await _masterBl.GetApiService<SchoolBL>().GetVisitsAsync() });
 
-    [HttpGet]
+    [HttpPost]
     public async Task<IActionResult> GetSchools([FromQuery] SchoolRequest request)
     {
         var result = await _masterBl.GetApiService<SchoolBL>().GetSchools(request);
+        return Ok(result);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GetSchoolsByDepartment([FromQuery] Guid depId)
+    {
+        var result = await _masterBl.GetApiService<SchoolBL>().GetSchoolsByDepartmentId(depId);
         return Ok(result);
     }
     [HttpGet]

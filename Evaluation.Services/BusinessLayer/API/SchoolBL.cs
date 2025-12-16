@@ -1,6 +1,6 @@
-﻿using System.Linq.Expressions;
-using AutoMapper;
+﻿using AutoMapper;
 using Evaluation.DAL.Helper;
+using Evaluation.DAL.Models.DepartementEntites;
 using Evaluation.DAL.Models.Org;
 using Evaluation.DAL.Repositories;
 using Evaluation.Services.BusinessLayer.API.SchooLayer;
@@ -8,12 +8,15 @@ using Evaluation.Services.Special;
 using Evaluation.SharedHelper;
 using Evaluation.SharedHelper.Consts;
 using Evaluation.SharedHelper.Dtos.SchoolDto;
+using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Extensions;
 using Evaluation.SharedHelper.Helper;
 using Evaluation.SharedHelper.Models;
 using FluentResults;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using System.Linq.Expressions;
 
 namespace Evaluation.Services.BusinessLayer.API;
 
@@ -24,17 +27,28 @@ public class SchoolBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvide
         : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, requestInfo)
 {
 
-    public async Task<School> GetSchoolDetails(Guid SchoolID)
+    public async Task<ResponseSchools> GetSchoolDetails(Guid SchoolID)
     {
-        var schoolData = await serviceProvider.CreateScopedUow().GetRepository<School>()
-            .GetAllQueryFiltered()
-            .AsNoTracking()
-            .Where(c => c.Id == SchoolID)
-               .FirstOrDefaultAsync();
-        return schoolData;
+        var result = await schoolRepository.GetSchoolDetails(SchoolID);
+
+        var schoolsResponse = mapper.Map<ResponseSchools>(result);
+
+        return schoolsResponse;
     }
+
+    public async Task<List<ResponseSchools>> GetSchoolsByDepartmentId(Guid depId)
+    {
+        var result = await schoolRepository.GetSchoolsByDepartmentId(depId);
+
+        var schoolsResponse = mapper.Map<List<ResponseSchools>>(result);
+
+        return schoolsResponse;
+    }
+
     public async Task<PaginatedResult<ResponseSchools>> GetSchools(SchoolRequest request)
     {
+        //TODO: Get Department Id by Department Routing Path
+        
         var result = await schoolRepository.GetSchoolsAsync(request);
         return mapper.Map<PaginatedResult<ResponseSchools>>(result);
     }
@@ -52,4 +66,5 @@ public class SchoolBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvide
             Name = LanguageStatic.SelectLang(requestInfo.Lang, x.NameAr, x.NameEn)
         }).ToListAsync();
     }
+
 }

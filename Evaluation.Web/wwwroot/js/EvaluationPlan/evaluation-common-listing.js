@@ -82,7 +82,7 @@
                     const options = {
                         success: function (resp) {
                             const total = resp.totalDataCount || resp.TotalDataCount || 0;
-                            const rows = resp.data || resp.Data || [];
+                            const rows = resp.data || resp.Data || resp.items || [];
 
                             if (config.tabLabelSelector && config.tabLabelKey) {
                                 const lbl = uiControlsSetup().GetUiControlText(config.tabLabelKey);

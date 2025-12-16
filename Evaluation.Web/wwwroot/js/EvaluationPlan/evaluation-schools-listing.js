@@ -6,7 +6,8 @@
             PhaseId: $('#schoolPhaseFilter').val(),
             TypeId: $('#schoolTypeFilter').val(),
             RegionId: $('#schoolRegionFilter').val(),
-            StatusId: $('#schoolStatusFilter').val()
+            StatusId: $('#schoolStatusFilter').val(),
+            //DepartmentRoutingPath: departmentName
         };
     }
 
@@ -22,15 +23,16 @@
         enableCardView: true,
         cardViewBtnId: 'cardViewSchool',
         tableViewBtnId: 'tblViewSchool',
-        rowClass: 'school-card',
+        rowClass: 'plan-request-card',
         columns: [
             {
                 data: "nameAr",
                 title: uiControlsSetup().GetUiControlText("lblSchoolName"),
                 className: "td-left name",
+               
                 render: function (data, type, row) {
                     const safe = data || "";
-                    return `<a href="javascript:void(0)" class="text-decoration-none text-primary fw-bold school-details-link" data-id="${row.id}">${safe}</a>`;
+                    return `<a href="javascript:void(0)" data-bs-toggle= 'modal' data-bs-target= '#schoolDetailsModal' class="text-decoration-none text-primary fw-bold school-details-link" data-id="${row.id}">${safe}</a>`;
                 }
             },
             {
@@ -86,7 +88,7 @@
                 $('#schoolDetailsModal').modal('show');
             }
         };
-        jqClient(options).Get(`/EvaluationSchool/Details?schoolId=${schoolId}`);
+        //jqClient(options).Get(`/School/GetSchoolDetails?schoolID=${schoolId}`);
     }
 
     schoolsListing.reload();
