@@ -35,7 +35,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                                                  .Select((id, index) => new { ActionId = id, Order = index });
 
             var actionPartType = (await cacheDataProvider.GetActionPartyTypes())
-                                  .Where(c => userInfo.PartyTypes.Contains(c.PartyTypeId))
+                                  //.Where(c => userInfo.PartyTypes.Contains(c.PartyTypeId))
                                   .Select(c => c.ServiceActionId)
                                   .ToList();
 

@@ -27,12 +27,12 @@ public class FormService(IServiceScopeFactory serviceScopeFactory,
 
     public async Task<List<FormItem>> GetFormItems()
     {
-        var formItems = await unitOfWork.GetRepository<FormItem>()
-            .GetAllActiveNonDeleted().Include(d => d.SubFormItems).ToListAsync();
+            var formItems = await unitOfWork.GetRepository<FormItem>()
+                      .GetAllActiveNonDeleted().Include(d => d.SubFormItems).ToListAsync();
 
-        return formItems;
+            return formItems;
     }
-
+      
     public async Task<FormItemValue> UpdateFormItemValue(FormItemValue formItemValue)
     {
         unitOfWork.GetRepository<FormItemValue>().Update(formItemValue);

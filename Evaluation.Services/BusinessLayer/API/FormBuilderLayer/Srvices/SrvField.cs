@@ -76,11 +76,13 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 		}
 		public async Task<List<Guid>> GetHiddenFields(Guid serviceId)
 		{
+			userInfo.UserId = Guid.Parse("C2536611-576B-4EB8-84F4-747F4ECE9A23");
 			if (userInfo.UserId == null)
 			{
 				throw new BusinessException(SharedHelper.Enums.ConstantKeys.ExceptionMessage.UserInfoNotFound);
 			}
-
+			if(userInfo.PartyTypes != null)
+			{ 
 			var userPartyTypeIds = new List<Guid>(userInfo.PartyTypes);
 
 			var hiddenFieldsIds = await serviceScopeFactory.CreateScopedUow()
@@ -94,8 +96,10 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 							  .Any())
 				.Select(f => f.Id)
 				.ToListAsync();
-
+			
 			return hiddenFieldsIds;
+			}
+			return new List<Guid>();
 
 		}
 		public async Task<List<Field>> GetFieldsByActionId(Guid actionId, Guid ServiceId)
@@ -126,9 +130,10 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 				await cacheDataProvider.SetToCache(WebAppCacheTableName.CACHE_FIELDS, data);
 			}
 
-			return data
-				.Where(f => f.ActionsStepsField.Any(x => x.ServiceActionId == actionId) && f.FormGroup!.FormGroupTypeId != FormGroupTypeKeyIds.List)
-				.ToList();
+			return data;
+
+				//.Where(f => f.ActionsStepsField.Any(x => x.ServiceActionId == actionId) && f.FormGroup!.FormGroupTypeId != FormGroupTypeKeyIds.List)
+				//.ToList();
 		}
 		public async Task<List<Field>> GetFieldsListByActionIdAsync(Guid? serviceId, Guid? SystemModuleId = null)
 		{

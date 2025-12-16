@@ -1,0 +1,27 @@
+﻿@model PlanViewModel
+@{
+    Layout = null;
+}
+
+<form id="create-plan-form">
+    <div class="row">
+        <div class="col-12">
+            <div id="progress-container"></div>
+
+            <div class="accordion mt-4" id="accordionExample" hidden>
+                <select id="partyTypeSelect" class="form-select"></select>
+                <div id="user-wrapper">
+                    <div id="user-tables"></div>
+                </div>
+            </div>
+
+            <div id="content-container"></div>
+        </div>
+    </div>
+
+    <div class="row" id="divForCreatedRequestButtons">
+        <div class="col-12">
+            <div id="Requestbtns"></div>
+        </div>
+    </div>
+</form>

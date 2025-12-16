@@ -12,7 +12,7 @@ public class SchoolRequest : PaginatedQuery
     public DateTime? LastEvaluationDateTo { get; set; }
     public Guid? VisitType { get; set; }
     public int? AcademicYear { get; set; }
-
+    public string? DepartmentRoutingPath { get; set; }
     public Guid StatusId { get; set; }
 
 }
