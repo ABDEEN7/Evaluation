@@ -1,4 +1,7 @@
-﻿using Evaluation.SharedHelper.Models.Api.ActionEntitiesDTOs;
+﻿using Azure;
+using Evaluation.DAL.Models.Org;
+using Evaluation.SharedHelper.Dtos.SchoolDto;
+using Evaluation.SharedHelper.Models.Api.ActionEntitiesDTOs;
 using Evaluation.SharedHelper.Models.Api.AttachmentsDTOs;
 using Evaluation.SharedHelper.Models.Api.FormBuilderDTO;
 using Evaluation.SharedHelper.Models.Api.LogsDTO;
@@ -17,6 +20,7 @@ namespace Evaluation.SharedHelper.Models.Api.ServiceRequestEntitiesDTO
 	{
 
 		public UserProfileCustomDTO? Applicant { get; set; }
+		public ResponseSchools? School { get; set; }
 
 		public string? RequestNumber { get; set; }
 		public string? Status { get; set; }

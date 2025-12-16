@@ -90,6 +90,234 @@
     </div>
 </section>
 
+<div class="modal fade" id="evaluationRequestModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen">
+        <div class="modal-content">
+
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <div>
+                    <h5 class="modal-title" id="evaluationRequestModalLabel">
+                        منصة تقييم المنشآت التعليمية
+                    </h5>
+                    <small class="text-muted">
+                        رقم الطلب: <strong id="evaluationRequestNoText"></strong>
+                    </small>
+                </div>
+
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+
+                <div class="accordion" id="evaluationAccordion">
+
+                    <!-- الإحصائيات -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#statisticsSection">
+                                <i class="la la-bar-chart me-2"></i>
+                                الإحصائيات
+                            </button>
+                        </h2>
+                        <div id="statisticsSection" class="accordion-collapse collapse"
+                             data-bs-parent="#evaluationAccordion">
+                            <div class="accordion-body">
+                                <!-- محتوى الإحصائيات -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- بيانات المدرسة -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#schoolInfoSection">
+                                <i class="la la-school me-2"></i>
+                                بيانات المدرسة
+                            </button>
+                        </h2>
+                        <div id="schoolInfoSection" class="accordion-collapse collapse"
+                             data-bs-parent="#evaluationAccordion">
+                            <div class="accordion-body">
+                                <!-- بيانات المدرسة -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- الملفات الداعمة -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#attachmentsSection">
+                                <i class="la la-file me-2"></i>
+                                الملفات الداعمة
+                            </button>
+                        </h2>
+                        <div id="attachmentsSection" class="accordion-collapse collapse"
+                             data-bs-parent="#evaluationAccordion">
+                            <div class="accordion-body">
+                                <!-- ملفات -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- جدولة المقابلات -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#interviewsSection">
+                                <i class="la la-calendar me-2"></i>
+                                جدولة المقابلات / المشاهدات
+                            </button>
+                        </h2>
+                        <div id="interviewsSection" class="accordion-collapse collapse"
+                             data-bs-parent="#evaluationAccordion">
+                            <div class="accordion-body">
+                                <!-- الجدولة -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- جمع الأدلة -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#evidenceSection">
+                                <i class="la la-link me-2"></i>
+                                جمع الأدلة
+                            </button>
+                        </h2>
+                        <div id="evidenceSection" class="accordion-collapse collapse"
+                             data-bs-parent="#evaluationAccordion">
+                            <div class="accordion-body">
+                                <!-- الأدلة -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- المشاهدات الصفية -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#classObservationsSection">
+                                <i class="la la-eye me-2"></i>
+                                المشاهدات الصفية
+                            </button>
+                        </h2>
+                        <div id="classObservationsSection" class="accordion-collapse collapse"
+                             data-bs-parent="#evaluationAccordion">
+                            <div class="accordion-body">
+                                <!-- المشاهدات -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- الجولات المدرسية -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#schoolToursSection">
+                                <i class="la la-users me-2"></i>
+                                الجولات المدرسية
+                            </button>
+                        </h2>
+                        <div id="schoolToursSection" class="accordion-collapse collapse"
+                             data-bs-parent="#evaluationAccordion">
+                            <div class="accordion-body">
+                                <!-- الجولات -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- جولات المختبرات -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#labsSection">
+                                <i class="la la-flask me-2"></i>
+                                جولات المختبرات
+                            </button>
+                        </h2>
+                        <div id="labsSection" class="accordion-collapse collapse"
+                             data-bs-parent="#evaluationAccordion">
+                            <div class="accordion-body">
+                                <!-- المختبرات -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- تحليل المخرجات -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#outputsSection">
+                                <i class="la la-list me-2"></i>
+                                تحليل المخرجات
+                            </button>
+                        </h2>
+                        <div id="outputsSection" class="accordion-collapse collapse"
+                             data-bs-parent="#evaluationAccordion">
+                            <div class="accordion-body">
+                                <!-- التحليل -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- سلم التقدير اللفظي -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#verbalScaleSection">
+                                <i class="la la-align-right me-2"></i>
+                                سلم التقدير اللفظي
+                            </button>
+                        </h2>
+                        <div id="verbalScaleSection" class="accordion-collapse collapse"
+                             data-bs-parent="#evaluationAccordion">
+                            <div class="accordion-body">
+                                <!-- السلم -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- التقرير الدوري -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#reportSection">
+                                <i class="la la-file-text me-2"></i>
+                                التقرير الدوري
+                            </button>
+                        </h2>
+                        <div id="reportSection" class="accordion-collapse collapse"
+                             data-bs-parent="#evaluationAccordion">
+                            <div class="accordion-body">
+                                <!-- التقرير -->
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
 
 <partial name="_PartialFileModal" />
 

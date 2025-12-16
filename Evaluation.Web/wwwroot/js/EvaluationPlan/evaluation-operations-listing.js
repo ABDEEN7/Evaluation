@@ -131,3 +131,23 @@
 
     evaluationRequestsListing.reload();
 });
+
+    //function openEvaluationRequestDetails(requestId) {
+
+    //    $('#evaluation-request-details-container').html('<div class="p-3">Loading...</div>');
+
+    //    $.get(`/ServiceRequest/GetEvaluationDetailsModal?requestId=${requestId}`)
+    //        .done(function (html) {
+
+    //            $('#evaluation-request-details-container').html(html);
+
+    //            $('#evaluationRequestModalLabel').text('تفاصيل طلب التقييم');
+    //            $('#evaluationRequestNoText').text('');
+
+    //            $('#evaluationRequestModal').modal('show');
+    //        })
+    //        .fail(function () {
+    //            $('#evaluation-request-details-container').html('<div class="alert alert-danger m-3">Failed to load details.</div>');
+    //        });
+    //}
+

@@ -53,6 +53,10 @@ namespace Evaluation.Services.Models.API
 		{
 			return await _srvServiceRequest.GetRequestDetailsAsync(requestId);
 		}
+		public async Task<EvaluationRequestDTO> GetEvaluationDetailsAsync(Guid requestId)
+		{
+			return await _srvServiceRequest.GetEvaluationDetailsAsync(requestId);
+		}
 		public async Task<ServiceRequestDTO> HandleServiceRequestAsync(ActionFormDTO? actionFormDTO, Guid? planId,
 			Guid serviceId, string actionName, string fieldValuesJson, List<AssignUserDTO?> assignUsers,
 			IFormFileCollection files, string remarks, bool saveAsDraft = false)

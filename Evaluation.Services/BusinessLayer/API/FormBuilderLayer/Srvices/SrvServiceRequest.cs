@@ -7,8 +7,10 @@ using Evaluation.DAL.Models.ServiceRequestEntities;
 using Evaluation.DAL.Models.SystemLog;
 using Evaluation.DAL.Models.UserEntiy;
 using Evaluation.DAL.Repositories;
+using Evaluation.Services.BusinessLayer.API.SchooLayer;
 using Evaluation.Services.Extensions;
 using Evaluation.Services.Special;
+using Evaluation.SharedHelper.Dtos.SchoolDto;
 using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Api.AttachmentsDTOs;
@@ -16,6 +18,7 @@ using Evaluation.SharedHelper.Models.Api.FormBuilderDTO;
 using Evaluation.SharedHelper.Models.Api.PartyTypeDTOs;
 using Evaluation.SharedHelper.Models.Api.ServiceRequestEntitiesDTO;
 using Evaluation.SharedHelper.Models.Api.ServiceRequestEntitiesDTO;
+using FluentResults;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
@@ -26,7 +29,7 @@ using static Evaluation.SharedHelper.Enums.ConstantKeys;
 
 namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 {
-    public class SrvServiceRequest(SystemModuleSrv SrvSystemModule,SrvAction SrvAction, SrvActionTransactionsLog SrvActionTransactionsLog, SrvField SrvField, SrvAttachments SrvAttachments, SrvPartyType SrvPartyType, SrvDropdown SrvDropdown, SrvActionStatusConfiguration SrvActionStatusConfiguration, SrvStatus SrvStatus, SrvUser srvUser, IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow, LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, IServiceProvider serviceProvider, RequestInfo _requestInfo)
+    public class SrvServiceRequest(SystemModuleSrv SrvSystemModule,SrvAction SrvAction, SchoolRepository schoolRepository, SrvActionTransactionsLog SrvActionTransactionsLog, SrvField SrvField, SrvAttachments SrvAttachments, SrvPartyType SrvPartyType, SrvDropdown SrvDropdown, SrvActionStatusConfiguration SrvActionStatusConfiguration, SrvStatus SrvStatus, SrvUser srvUser, IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow, LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, IServiceProvider serviceProvider, RequestInfo _requestInfo)
              : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, _requestInfo)
 
     {
@@ -68,6 +71,33 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 										.Include(c => c.Plan)
 										.Include(c => c.EvaluationRequest)
 										.Include(x => x.Status)
+										.ThenInclude(x => x!.StatusPreventPartyTypes)
+										.Include(c => c.Service)
+										.Include(c => c.OrgTree)
+										.AsSplitQuery()
+										.AsNoTracking()
+										.FirstOrDefaultAsync(x => x.IsActive == true && x.IsDeleted == false);
+
+			return Request;
+
+		}
+
+		public async Task<EvaluationRequest?> GetEvaluationRequestByIdAsync(Guid RequestId, bool UseMainUow = false)
+		{
+			UnitOfWork Scope;
+			if (UseMainUow)
+			{
+				Scope = uow;
+			}
+			else
+			{
+				Scope = serviceScopeFactory.CreateScopedUow();
+
+			}
+			var Request = await Scope.GetRepository<EvaluationRequest>()
+										.GetAllActiveNonDeleted(x => x.Id == RequestId)
+										.Include(c => c.Plan)
+										.Include(x => x.ServiceStatus)
 										.ThenInclude(x => x!.StatusPreventPartyTypes)
 										.Include(c => c.Service)
 										.Include(c => c.OrgTree)
@@ -373,6 +403,79 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 				Service = lang == "ar" ? request.Service.NameAr : request.Service.NameEn,
 				CanViewFieldHistory = hasFieldHistoryPermission,
 				CanViewAllFieldHistory = hasAllFieldHistoryPermission
+			};
+
+			return dto;
+
+		}
+
+		public async Task<EvaluationRequestDTO> GetEvaluationDetailsAsync(Guid id)
+		{
+			string lang = _requestInfo.Lang;
+			var userId = userInfo.UserId;
+
+			bool hasFieldHistoryPermission = false;
+			bool hasAllFieldHistoryPermission = false;
+
+			var request = await GetEvaluationRequestByIdAsync(id);
+			if (request == null) throw new BusinessException(ExceptionMessage.lblRequestNotValid);
+
+			var userTask = srvUser.GetByIDActiveNonDeleted(userId!.Value);
+			//var RequestFieldsValueTask = GetRequestFieldsValueAsync(request);
+
+			var ModuleTask = SrvSystemModule.GetSystemModuleByIdAsync(request.Service!.SystemModuleId);
+
+			var user = await userTask;
+
+			if (user == null)
+			{
+				throw new BusinessException(ExceptionMessage.UserNotFound);
+			}
+
+			//if (request.Status!.StatusPreventPartyTypes.Any(x => user.UserPartTypes!.Any(c => c.PartyTypeId == x.PartyTypeId)))
+			//{
+			//	throw new BusinessException(ExceptionMessage.lblNoPermissionForRequestStatus);
+			//}
+			var Module = await ModuleTask;
+
+			var isMinistry = user is MinistryUser;
+
+
+			if (isMinistry)
+			{
+
+				if (user.Id != request.CreateById && !await ValidateMinistryUserAccessAsync(userId!.Value, Module?.Id, request.Id))
+				{
+					throw new UnauthorizedAccessException(ExceptionMessage.lblNoPermissionForViewRequest);
+				}
+
+			}
+
+
+			//var attachmentsTask = GetAllRequestAttachmentsAsync(request.Id, lang);
+			//var actionTransactionsTask = SrvActionTransactionsLog.GetActionLog(request.Id, request.ServiceId, Module?.Id, user);
+			var applicantTask = schoolRepository.GetSchoolDetails(request.OrgTreeId);
+			//var actionsTask = SrvActionStatusConfiguration.GetActionsByStatus(request.ServiceId, request.StatusId, request.Id, request.PlanId, lang);
+
+			//await Task.WhenAll( actionTransactionsTask, applicantTask, actionsTask);//RequestFieldsValueTask,attachmentsTask
+																					//var RequestFieldsValue = await RequestFieldsValueTask;
+
+			var schoolsResponse = mapper.Map<ResponseSchools>(applicantTask.Result);
+
+			var dto = new EvaluationRequestDTO
+			{
+				//formGroups = RequestFieldsValue,
+				//Attachments = attachmentsTask.Result,
+				//ActionTransactions = actionTransactionsTask.Result,
+				School = schoolsResponse,
+				//Actions = actionsTask.Result,
+				//planNo = request.EvaluationRequest?.,
+				//planId = request.Plan?.Id,
+				//RequestNumber = request.RequestNumber,
+				//Status = SrvStatus.GetStatusDisplayName(request.StatusId, Module?.Id),
+				Service = lang == "ar" ? request.Service.NameAr : request.Service.NameEn,
+				//CanViewFieldHistory = hasFieldHistoryPermission,
+				//CanViewAllFieldHistory = hasAllFieldHistoryPermission
 			};
 
 			return dto;
