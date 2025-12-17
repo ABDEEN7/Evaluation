@@ -245,8 +245,14 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             return action;
 
         }
-
-    }
+		public async Task<int> GetActionCountByStatusAsync(Guid? statusId)
+		{
+			var ActionStatusConfiguration = (await cacheDataProvider.GetActionStatusConfiguration()).Where(c => c.CurrentStatusId == statusId).OrderBy(c => c.OrderNo).Select(c => c.ServiceActionId).ToList();
+			var actionPartType = (await cacheDataProvider.GetActionPartyTypes()).Where(c => userInfo.PartyTypes.Contains(c.PartyTypeId)).Select(c => c.ServiceActionId).ToList();
+			var actionsId = ActionStatusConfiguration.Intersect(actionPartType).ToList();
+			return actionsId.Count();
+		}
+	}
 
 
 }

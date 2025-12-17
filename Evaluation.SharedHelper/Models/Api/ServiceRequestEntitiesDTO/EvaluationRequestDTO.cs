@@ -3,6 +3,7 @@ using Evaluation.DAL.Models.Org;
 using Evaluation.SharedHelper.Dtos.SchoolDto;
 using Evaluation.SharedHelper.Models.Api.ActionEntitiesDTOs;
 using Evaluation.SharedHelper.Models.Api.AttachmentsDTOs;
+using Evaluation.SharedHelper.Models.Api.EvaluationRequestEntities;
 using Evaluation.SharedHelper.Models.Api.FormBuilderDTO;
 using Evaluation.SharedHelper.Models.Api.LogsDTO;
 using Evaluation.SharedHelper.Models.Api.PartyTypeDTOs;
@@ -76,5 +77,7 @@ namespace Evaluation.SharedHelper.Models.Api.ServiceRequestEntitiesDTO
 
 		public Guid OrgTreeId { get; set; }
 		public string? OrgTreeName { get; set; }
+
+		public List<EvaluationPartyDTO> EvaluationParties { get; set; }
 	}
 }
