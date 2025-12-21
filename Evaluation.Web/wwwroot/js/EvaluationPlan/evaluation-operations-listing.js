@@ -103,51 +103,66 @@
         ],
 
         onRowClick: function (rowData) {
-            openEvaluationRequestDetails(rowData.Id); 
+            openEvaluationRequestDetails(rowData.id); 
         }
     });
 
     function openEvaluationRequestDetails(requestId) {
         const options = {
             success: function (response) {
+
                 formUtility.attachments = response.attachments || [];
+                $('#evaluationRequestModalLabel').text(response.status || '');
+                $('#evaluationRequestNoText').text(response.requestNumber || '');
+
                 formUtility.renderPreviewView(
-                    'evaluation-request-details-container',
-                    response.statusGroup,
+                    'formGroupsAccordion',
                     response.formGroups,
                     response.actions,
                     response.actionTransactions,
                     response.attachments
                 );
 
-                $('#evaluationRequestModalLabel').text(response.status || '');
-                $('#evaluationRequestNoText').text(response.requestNumber || '');
-                $('#evaluationRequestModal').modal('show');
+                renderSchoolDetails(response);
+
+                renderEvaluationPartiesSection(response);
+
+                $('#evaluationRequestDetailsModal').modal('show');
             }
         };
 
-        jqClient(options).Get(`/EvaluationPlanRequest/GetEvaluationDetails?requestId=${requestId}`);
+        jqClient(options).Get(`/ServiceRequest/GetEvaluationDetails?requestId=${requestId}`);
+    }
+
+    function renderSchoolDetails(response) {
+        const schoolId = response.school?.id || response.orgTreeId;
+
+        if (!schoolId) {
+            $('#school-details-container')
+                .html('<div class="text-muted">لا توجد بيانات مدرسة</div>');
+            return;
+        }
+
+        $('#school-details-container')
+            .load(`/EvaluationPlan/RenderSchoolDetails?orgTreeId=${schoolId}`);
+    }
+    function renderEvaluationPartiesSection(response) {
+        const parties = response?.evaluationParties || [];
+
+        if (!window.formUtility || typeof formUtility.renderEvaluationParties !== "function") {
+            console.error("formUtility.renderEvaluationParties is not loaded.");
+            return;
+        }
+
+        formUtility.renderEvaluationParties(parties, {
+            containerId: "evaluationPartiesContainer",
+            parentAccordionId: "evaluationRootAccordion",
+            expandFirst: true
+        });
     }
 
     evaluationRequestsListing.reload();
 });
 
-    //function openEvaluationRequestDetails(requestId) {
 
-    //    $('#evaluation-request-details-container').html('<div class="p-3">Loading...</div>');
-
-    //    $.get(`/ServiceRequest/GetEvaluationDetailsModal?requestId=${requestId}`)
-    //        .done(function (html) {
-
-    //            $('#evaluation-request-details-container').html(html);
-
-    //            $('#evaluationRequestModalLabel').text('تفاصيل طلب التقييم');
-    //            $('#evaluationRequestNoText').text('');
-
-    //            $('#evaluationRequestModal').modal('show');
-    //        })
-    //        .fail(function () {
-    //            $('#evaluation-request-details-container').html('<div class="alert alert-danger m-3">Failed to load details.</div>');
-    //        });
-    //}
 

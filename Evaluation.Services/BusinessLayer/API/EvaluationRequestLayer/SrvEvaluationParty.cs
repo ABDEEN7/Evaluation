@@ -26,8 +26,7 @@ namespace Evaluation.Services.BusinessLayer.API.EvaluationRequestLayer
 		IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow, SrvNotification SrvNotification, SrvUser SrvUser,
 		LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, SrvAction SrvAction,
 		SrvStatus SrvStatus, SrvAssignment SrvAssignment, SrvActionTransactionsLog SrvActionTransactionsLog, PerformActionBL _performActionBL,
-
-		SrvService SrvService, SrvServiceRequest _srvServiceRequest, EvaluationRequestService _evaluationRequestService, SrvAttachments _srvAttachments, IServiceProvider serviceProvider, RequestInfo _requestInfo)
+		SrvService SrvService,   SrvAttachments _srvAttachments, IServiceProvider serviceProvider, RequestInfo _requestInfo)
 			: ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, _requestInfo)
 	
 	{
