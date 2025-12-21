@@ -46,7 +46,6 @@ const sharedUtility = () => {
         let url = decodeURIComponent(baseAppUrl());
         //if (userProfileDetailsInfo) {
 
-
         //    if (userProfileDetailsInfo.RoutingList && userProfileDetailsInfo.RoutingList.length > 0) {
         //        if (userProfileDetailsInfo.RoutingList.length == 1) {
         //            url = CombineWithBaseWebAppUrlOrDefault(['/home', userProfileDetailsInfo.RoutingList[0]]);

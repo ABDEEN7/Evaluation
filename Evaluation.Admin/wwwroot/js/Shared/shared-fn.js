@@ -122,6 +122,7 @@ const sharedFn = (options) => {
                 });
                 dropdownInitializer.InitParents();
                 dropdownInitializer.InitChildren();
+                
             }
             //initiazing DualList
             var dualist = controlvalidationlist.filter(c => c.constraint.controlType == 'DUAL_LIST');

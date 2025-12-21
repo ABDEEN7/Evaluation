@@ -105,66 +105,67 @@ namespace Evaluation.Services.Models.Admin
                
                 var result = new WebGroupsDTO();
 
-               
+            if (message.Id is not null)
+            {
                 WebGroup obj = await uow.GetRepository<WebGroup>()
                                       .GetAllNonDeleted()
                                       .Include(x => x.CreateBy)
                                       .Where(x => x.Id == message.Id)
                                       .FirstAsync();
 
-            obj.NameAr = message.NameAr;
-            obj.NameEn = message.NameEn;
-            obj.RoutingPath = message.RoutingPath;
-            obj.BackendName = obj.BackendName;
+                obj.NameAr = message.NameAr;
+                obj.NameEn = message.NameEn;
+                obj.RoutingPath = message.RoutingPath;
+                obj.BackendName = obj.BackendName;
                 obj.IsActive = message.IsActive;
 
                 uow.GetRepository<WebGroup>().Update(obj);
-            //update values to DepWebGroup
-            List<DepWebGroup>  objDepWebGroupdelete = await uow.GetRepository<DepWebGroup>()
+                //update values to DepWebGroup
+                List<DepWebGroup>  objDepWebGroupdelete = await uow.GetRepository<DepWebGroup>()
                                       .GetAllNonDeleted()
                                       .Where(x => x.WebGroupId == obj.Id)
                                       .ToListAsync();
 
-            var DepWebGroupexistids =new List<Guid>();
-            if (objDepWebGroupdelete.Count > 0)
-            {
-                foreach (var item in objDepWebGroupdelete)
+                var DepWebGroupexistids =new List<Guid>();
+                if (objDepWebGroupdelete.Count > 0)
                 {
-                    if (message.DepWebGroup != null && message.DepWebGroup.Contains(item.DepartmentId))
+                    foreach (var item in objDepWebGroupdelete)
                     {
-                        DepWebGroupexistids.Add(item.DepartmentId);
+                        if (message.DepWebGroup != null && message.DepWebGroup.Contains(item.DepartmentId))
+                        {
+                            DepWebGroupexistids.Add(item.DepartmentId);
+                        }
+                        else
+                        {
+                            uow.GetRepository<DepWebGroup>().Delete(item);
+                        }
+
                     }
-                    else
+                }
+                if (message.DepWebGroup != null)
+                {
+                    var notInSelected = message.DepWebGroup.Except(DepWebGroupexistids).ToList();
+                    List<DepWebGroup> objentitylist=new List<DepWebGroup>();
+                    foreach (var item in notInSelected)
                     {
-                        uow.GetRepository<DepWebGroup>().Delete(item);
+                        DepWebGroup objentity = new DepWebGroup();
+                        objentity.WebGroupId = obj.Id;
+                        objentity.DepartmentId = item;
+                        objentity.IsActive = true;
+                        objentitylist.Add(objentity);
+                    }
+                    if (objentitylist.Count > 0)
+                    {
+                        await uow.GetRepository<DepWebGroup>().InsertRange(objentitylist);
                     }
 
-                }
-            }
-            if (message.DepWebGroup != null)
-            {
-                var notInSelected = message.DepWebGroup.Except(DepWebGroupexistids).ToList();
-                List<DepWebGroup> objentitylist=new List<DepWebGroup>();
-                foreach (var item in notInSelected)
-                {
-                    DepWebGroup objentity = new DepWebGroup();
-                    objentity.WebGroupId = obj.Id;
-                    objentity.DepartmentId = item;
-                    objentity.IsActive = true;
-                    objentitylist.Add(objentity);
-                }
-                if (objentitylist.Count > 0)
-                {
-                    await uow.GetRepository<DepWebGroup>().InsertRange(objentitylist);
-                }
 
-
-            }
-            await uow.CommitAsync();
+                }
+                await uow.CommitAsync();
                 result = mapper.Map<WebGroupsDTO>(obj, opts => opts.Items["Language"] = _requestInfo.Lang);
                 result.ResponseStatus = DBResult.Updated;
                 result.DepWebGroup = message.DepWebGroup;
-           
+            }
 
                 return result;
            

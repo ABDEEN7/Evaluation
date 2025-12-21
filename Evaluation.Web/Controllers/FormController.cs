@@ -8,4 +8,10 @@ public class FormController : Controller
     {
         return PartialView("_Create");
     }
+
+    public IActionResult Create()
+    {
+        return View();
+    }
+
 }

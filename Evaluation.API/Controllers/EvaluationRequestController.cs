@@ -1,5 +1,9 @@
-﻿using Evaluation.Services.BusinessLayer;
+﻿using Evaluation.DAL.Dtos.Form;
+using Evaluation.Services.BusinessLayer;
 using Evaluation.Services.BusinessLayer.API;
+using Evaluation.Services.BusinessLayer.API.FormLayer;
+using Evaluation.SharedHelper.Dtos.PlanDto;
+using FluentResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Evaluation.API.Controllers;
@@ -17,8 +21,13 @@ public class EvaluationRequestController : ControllerBase
 
     [HttpGet]
     public async Task<IActionResult> GetEvaluationRequests()
-
     {
         return Ok(await _masterBl.GetApiService<EvaluationRequestBL>().GetEvaluationRequestsForCalender());
+    }
+
+    [HttpPost]
+    public async Task<Result<EvaluationRequestCalenderDto>> UpdateEvaluationRequest([FromBody] EvaluationRequestCalenderDto evaluationRequestCalender)
+    {
+        return await _masterBl.GetApiService<EvaluationRequestBL>().UpdateEvaluationRequest(evaluationRequestCalender);
     }
 }
