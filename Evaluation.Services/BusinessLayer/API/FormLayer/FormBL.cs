@@ -4,9 +4,11 @@ using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.FormsModules;
 using Evaluation.DAL.Repositories;
 using Evaluation.Services.Special;
+using Evaluation.SharedHelper.Dtos.Form;
 using Evaluation.SharedHelper.Models;
 using FluentResults;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json.Linq;
 
 namespace Evaluation.Services.BusinessLayer.API.FormLayer;
 
@@ -18,7 +20,6 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
     public async Task<Result<List<FormItemDto>>> GetFormItems(Guid FormId)
     {
         var formItems = await formService.GetFormItems();
-
         return mapper.Map<List<FormItemDto>>(formItems.Where(s => s.EvalFormId == FormId).ToList());
     }
 
@@ -124,5 +125,14 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
         var formItems = await formService.GetFormItems();
 
         return mapper.Map<List<FormItemDto>>(formItems.Where(s => s.EvalFormId == FormId).ToList());
+    }
+
+    public async Task<Result<List<FormEvalMarixValueDto>>> GetFormEvalMarixValues(Guid FormId)
+    {
+
+        var evalForm = await formService.GetEvalForm(FormId);
+        var formEvalMatrixValues = await formService.GetFormEvalMatrixValues(evalForm.FormEvalMatrixId.Value);
+
+        return mapper.Map<List<FormEvalMarixValueDto>>(formEvalMatrixValues);
     }
 }
