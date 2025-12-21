@@ -1,4 +1,5 @@
 ﻿(function (global) {
+    'use strict'; 
     const uniqueIndexId = 'IndexForPlanTable';
 
     // Render types for different viewing modes
@@ -125,7 +126,7 @@
         //INSERTORUPUDATEPLAN: '/Plan/ApprovePlan',
         INSERTORUPDATEPLAN: '/Plan/InsertOrUpdatePlan',
         UPDATE_PLAN: '/Plan/UpdatePlan',
-        GET_PLAN_DETAILS: '/Plan/GetPlanDetails'
+        GET_PLAN_DETAILS: '/Plan/GetPlansWithunSelectedSchoolsDetails'
     };
 
     // Export all constants

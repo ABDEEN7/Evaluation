@@ -49,6 +49,14 @@ public class PlanController(MasterBL masterBL) : ControllerBase
         var plan = await masterBL.GetApiService<PlanServiceRequestServices>().GetPlanByIdAsync(planId);
         return Ok(new { result = plan });
     }
+
+    [HttpGet("{planId:guid}")]
+    //[CheckRolePermisionFilter(true, ConstantKeys.WebPermission.GET_WEB_PLAN_DETAILS_REQUEST)]
+    public async Task<IActionResult> GetPlansWithunSelectedSchoolsDetails(Guid planId)
+    {
+        var plan = await masterBL.GetApiService<PlanServiceRequestServices>().GetPlanWithSchoolsByIdAsync(planId);
+        return Ok(new { result = plan });
+    }
  
     [HttpPost]
     public async Task<IActionResult> GetPlans(PlanDetailsRequestDto request)

@@ -189,7 +189,7 @@ const planUtility = window.planUtility;
         }
 
         // Check if this school is in selected schools
-        if (ns.selectedSchools.some(s => s.id === school.id)) {
+        if (ns.selectedSchools.some(s => s.id === school.id && s.visitTypeId === school.visitTypeId)) {
             checkbox.prop('checked', true);
         }
 
@@ -223,12 +223,19 @@ const planUtility = window.planUtility;
     };
 
     const generateVisitDateField = (school, readonly, renderType) => {
+        let visitDateValue = '';
+
+        if (school.fromDate || school.toDate) {
+            visitDateValue = formatDateRange(school.fromDate, school.toDate);
+        } else if (school.visitDate) {
+            visitDateValue = school.visitDate;
+        }
         const inputElement = $('<input>')
             .attr('type', 'text')
             .addClass('form-control form-control-sm childDate')
             .attr('placeholder', 'اختر تاريخ بداية ونهاية الزيارة')
             .attr('data-school-id', school.id)
-            .val(school.visitDate || '')
+            .val(visitDateValue || '')
             .prop('readonly', true); // Always readonly for flatpickr
 
         if (readonly) {
@@ -489,7 +496,7 @@ const planUtility = window.planUtility;
 
     // ================== FLATPICKR INITIALIZATION ==================
 
-    const initParentPicker = (mode, minDate, maxDate) => {
+    const initParentPicker = (mode, minDate, maxDate, existingValue = null) => {
         if (ns.parentPickerInstance) {
             ns.parentPickerInstance.destroy();
             ns.parentPickerInstance = null;
@@ -525,6 +532,13 @@ const planUtility = window.planUtility;
                     theme: "light" // or "dark" based on your theme
                 })
             ];
+            if (existingValue && existingValue.includes(' to ')) {
+                const parts = existingValue.split(' to ');
+                if (parts.length === 2) {
+                    const startDate = new Date(parts[0].trim());
+                    config.defaultDate = startDate;
+                }
+            }
 
             config.onChange = function (selectedDates, dateStr, instance) {
                 if (selectedDates.length > 0) {
@@ -550,7 +564,6 @@ const planUtility = window.planUtility;
                     destroyChildPicker();
                 }
             };
-
         } else if (mode === 'custom') {
             // Custom date range picker mode
             config.mode = "range";
@@ -559,6 +572,13 @@ const planUtility = window.planUtility;
             if (minDate) config.minDate = minDate;
             if (maxDate) config.maxDate = maxDate;
 
+            // If we have an existing value, set it as default
+            if (existingValue && existingValue.includes(' to ')) {
+                const parts = existingValue.split(' to ');
+                if (parts.length === 2) {
+                    config.defaultDate = [parts[0].trim(), parts[1].trim()];
+                }
+            }
             config.onClose = function (selectedDates, dateStr, instance) {
                 if (selectedDates.length === 2) {
                     const [min, max] = selectedDates;
@@ -567,9 +587,9 @@ const planUtility = window.planUtility;
                     destroyChildPicker();
                 }
             };
-        }
 
-        ns.parentPickerInstance = flatpickr("#parentDate", config);
+            ns.parentPickerInstance = flatpickr("#parentDate", config);
+        };
     };
 
     const initChildPicker = (minDate, maxDate) => {
@@ -650,6 +670,19 @@ const planUtility = window.planUtility;
             start: new Date(year, month, 1),
             end: new Date(year, month + 1, 0)
         };
+    };
+    const formatDateRange = (startDate, endDate) => {
+        if (!startDate || !endDate) return '';
+
+        // Handle different date formats
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+
+        if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+            return '';
+        }
+
+        return `${formatDateISO(start)} to ${formatDateISO(end)}`;
     };
 
     // ================== EXPORTS ==================

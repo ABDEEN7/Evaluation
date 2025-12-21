@@ -12,10 +12,6 @@
     const ns = window.planUtility;
 
     // ================== INITIALIZATION ==================
-    jsPlan(ns);
-    function jsPlan(ns) {
-        return ns;
-    }
     const initializePage = (options = {}) => {
         const {
             renderType = RENDER_TYPE.ACTION,
@@ -58,6 +54,7 @@
         return jqClient().Get(API_ENDPOINTS.GET_PLAN_TYPES)
             .done(result => {
                 ns.planTypes = result?.result || [];
+                console.log('Plan types loaded:', ns.planTypes);
             })
             .fail((jqXHR, textStatus, err) => {
                 console.error('Load plan types failed', textStatus, err);
@@ -68,6 +65,7 @@
         return jqClient().Get(API_ENDPOINTS.GET_SEMESTERS)
             .done(result => {
                 ns.semesters = result?.result || [];
+                console.log('Semesters loaded:', ns.semesters);
             })
             .fail((jqXHR, textStatus, err) => {
                 console.error('Load semesters failed', textStatus, err);
@@ -78,6 +76,7 @@
         return jqClient().Get(API_ENDPOINTS.GET_VISITS)
             .done(result => {
                 ns.visitTypes = result?.result || [];
+                console.log('Visit types loaded:', ns.visitTypes);
             })
             .fail((jqXHR, textStatus, err) => {
                 console.error('Load visit types failed', textStatus, err);
@@ -89,6 +88,7 @@
             .done(result => {
                 const data = result?.result || [];
                 ns.holidays = data.map(item => ({ date: item.date }));
+                console.log('Holidays loaded:', ns.holidays.length);
             })
             .fail((jqXHR, textStatus, err) => {
                 console.error('Load vacation days failed', textStatus, err);
@@ -142,13 +142,21 @@
     };
 
     const loadPlanData = (planId, renderType, actionType) => {
-        return jqClient().Get(`${API_ENDPOINTS.GET_PLAN_DETAILS}?planId=${planId}`)
+        console.log('Loading plan data for ID:', planId);
+        return jqClient().Get(`${API_ENDPOINTS.GET_PLAN_DETAILS}/${planId}`)
             .done(result => {
+                console.log('Plan data received:', result);
                 const planData = result?.result;
-                renderPlanWithData(planData, renderType, actionType);
+                if (planData) {
+                    renderPlanWithData(planData, renderType, actionType);
+                } else {
+                    console.error('No plan data in response');
+                    alert('فشل تحميل بيانات الخطة');
+                }
             })
             .fail((jqXHR, textStatus, err) => {
                 console.error('Load plan data failed', textStatus, err);
+                alert('حدث خطأ أثناء تحميل بيانات الخطة');
             });
     };
 
@@ -172,7 +180,7 @@
     const renderNewPlan = (renderType, actionType) => {
         // Render empty plan form
         const planForm = ns.renderPlanForm(null, renderType, actionType);
-        $('#planFormContainer').html(planForm);
+        $('#planFormContainer .form-container').html(planForm);
 
         // Initialize Select2 for dropdowns
         $('#ddlPlanType').select2({
@@ -194,17 +202,61 @@
         initCustomMode();
     };
 
-    const renderPlanWithData = (planData, renderType, actionType) => {
-        // Render plan form with data
-        const planForm = ns.renderPlanForm(planData, renderType, actionType);
-        $('#planFormContainer').html(planForm);
+    // Helper function to format date range
+    const formatDateRange = (startDate, endDate) => {
+        if (!startDate || !endDate) return '';
 
-        // Initialize Select2
+        // Handle different date formats
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+
+        if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+            return '';
+        }
+
+        return `${ns.formatDateISO(start)} to ${ns.formatDateISO(end)}`;
+    };
+
+    // Helper function to determine if semester should be shown
+    const shouldShowSemester = (planTypeId) => {
+        if (!planTypeId) return false;
+
+        const planType = ns.planTypes.find(t => t.id === planTypeId);
+        if (!planType) return false;
+
+        return planType.backendName === PLAN_TYPE_BACKEND.SEMESTER;
+    };
+
+    const renderPlanWithData = (planData, renderType, actionType) => {
+        console.log('Rendering plan with data:', planData);
+
+        // Transform the API response to match the expected structure
+        const transformedData = {
+            title: planData.name || planData.name || '',
+            planTypeId: planData.planTypeId || '',
+            semesterId: planData.semesterId || '',
+            dateRange: formatDateRange(planData.startDate, planData.endDate),
+            showSemester: shouldShowSemester(planData.planTypeId),
+            schools: planData.schools || planData.planSchools || []
+        };
+
+        console.log('Transformed data:', transformedData);
+
+        // Render plan form with transformed data
+        const planForm = ns.renderPlanForm(transformedData, renderType, actionType);
+        $('#planFormContainer .form-container').html(planForm);
+
+        // Initialize Select2 for dropdowns
         $('#ddlPlanType').select2({
             placeholder: "اختر نوع الخطة",
             allowClear: true,
             width: '100%'
         });
+
+        // Set the selected value AFTER Select2 is initialized
+        if (transformedData.planTypeId) {
+            $('#ddlPlanType').val(transformedData.planTypeId).trigger('change');
+        }
 
         $('#ddlSemester').select2({
             placeholder: "اختر الفصل الدراسي",
@@ -212,19 +264,31 @@
             width: '100%'
         });
 
+        // Set semester value if exists
+        if (transformedData.semesterId) {
+            $('#ddlSemester').val(transformedData.semesterId).trigger('change');
+        }
+
         // Set selected schools
-        ns.selectedSchools = planData.schools || [];
+        ns.selectedSchools = transformedData.schools.map(school => ({
+            ...school,
+            visitDate: school.visitDate || '',
+            visitTypeId: school.visitTypeId || school.visitType || ''
+        }));
 
         // Render schools table with data
         const tbody = ns.renderSchoolTable(
-            planData.schools || [],
+            transformedData.schools,
             renderType,
             actionType
         );
         $('#planTable tbody').replaceWith(tbody);
 
         // Initialize date pickers based on plan type
-        initializeDatePickersForPlanType(planData);
+        // Wait a bit for Select2 to finish initializing
+        setTimeout(() => {
+            initializeDatePickersForPlanType(transformedData);
+        }, 100);
 
         // Attach event handlers
         attachRowEventHandlers();
@@ -284,10 +348,10 @@
         $(document).on('click', '#dtPagination .page-link', handlePaginationClick);
 
         // Save button
-        //$(document).on('click', '#btn-submit', handleSavePlan);
+        $(document).on('click', '#btn-submit', handleSavePlan);
 
         // Open confirmation modal
-        $(document).on('click', '[data-bs-target="#confirmation-modal"]', handleOpenConfirmation);
+        $(document).on('click', '#openSaveModal', handleOpenConfirmation);
     };
 
     const handlePlanTypeChange = function () {
@@ -399,9 +463,18 @@
 
     const handleOpenConfirmation = function (e) {
         e.preventDefault();
+
+        // Validate before opening modal
+        if (!validatePlan()) {
+            return;
+        }
+
         updateSelectedSchools();
         const count = ns.selectedSchools.length;
         $('#confirmationMessage').html(`تم تحديد (${count.toString().padStart(2, '0')}) مدرسة للإضافة للخطة`);
+
+        // Show the modal
+        $('#confirmation-modal').modal('show');
     };
 
     const handleSavePlan = function () {
@@ -450,13 +523,28 @@
         ns.initChildPicker(minDate, maxDate);
     };
 
-    const initMonthMode = () => {
+    const initMonthMode = (existingValue = null) => {
         // Enable parent date picker in month selection mode
         $('#parentDate').val('').prop('disabled', false).attr('placeholder', 'اختر الشهر');
-        ns.initParentPicker('month');
-        ns.destroyChildPicker();
-    };
+        ns.initParentPicker('month', null, null, existingValue);
 
+        // If we have an existing value, parse and initialize child picker
+        if (existingValue && existingValue.includes(' to ')) {
+            const parts = existingValue.split(' to ');
+            if (parts.length === 2) {
+                const startDate = new Date(parts[0].trim());
+                const endDate = new Date(parts[1].trim());
+
+                // Store dates
+                $('#parentDate').data('startDate', formatDateISO(startDate));
+                $('#parentDate').data('endDate', formatDateISO(endDate));
+                $('#parentDate').val(existingValue);
+
+                ns.initChildPicker(startDate, endDate);
+            }
+        }
+    };
+    
     const initSemesterMode = () => {
         $('#semesterContainer').show();
         $('#parentDate').val('').prop('disabled', true);
@@ -483,6 +571,8 @@
             }
             return;
         }
+
+        console.log('Initializing date picker for plan type:', planType.backendName);
 
         switch (planType.backendName) {
             case PLAN_TYPE_BACKEND.YEAR:
@@ -736,14 +826,18 @@
     const savePlan = (planData) => {
         const endpoint = planData.id ? API_ENDPOINTS.UPDATE_PLAN : API_ENDPOINTS.INSERTORUPUDATEPLAN;
 
+        console.log('Saving plan:', planData);
+        console.log('Using endpoint:', endpoint);
+
         jqClient().Post(endpoint, planData)
             .done(result => {
+                console.log('Save result:', result);
                 if (result.success) {
                     alert('تم حفظ الخطة بنجاح');
                     // Redirect or refresh
                     window.location.href = '/Plan/Index';
                 } else {
-                    alert('حدث خطأ أثناء حفظ الخطة');
+                    alert('حدث خطأ أثناء حفظ الخطة: ' + (result.message || ''));
                 }
             })
             .fail((jqXHR, textStatus, err) => {
@@ -771,37 +865,56 @@
 // ================== DOCUMENT READY ==================
 
 $(document).ready(function () {
-    // Initialize with default mode (CREATE)
-    // For edit mode, pass planId
-    // For comparison mode, pass oldPlanId and planId with renderType: RENDER_TYPE.COMPARISON
+    // Priority 1: Server-side configuration from view model
+    const serverConfig = window.PLAN_PAGE_CONFIG || {};
 
+    // Priority 2: URL parameters (for backwards compatibility)
     const urlParams = new URLSearchParams(window.location.search);
-    const planId = urlParams.get('planId');
-    const oldPlanId = urlParams.get('oldPlanId');
-    const mode = urlParams.get('mode'); // 'edit', 'view', 'approve', 'comparison'
+    const urlPlanId = urlParams.get('planId');
+    const urlOldPlanId = urlParams.get('oldPlanId');
+    const urlMode = urlParams.get('mode');
 
-    let renderType, actionType;
+    // Determine values (server config takes priority)
+    let planId = serverConfig.planId || urlPlanId;
+    let oldPlanId = serverConfig.oldPlanId || urlOldPlanId;
+    let actionType = serverConfig.actionType || null;
+    let renderType = serverConfig.renderType || null;
 
-    if (mode === 'comparison' && oldPlanId && planId) {
-        renderType = window.PlanConstants.RENDER_TYPE.COMPARISON;
-        actionType = window.PlanConstants.ACTION_TYPE.APPROVE_WITH_CHANGES;
-    } else if (mode === 'view' || mode === 'approve') {
-        renderType = window.PlanConstants.RENDER_TYPE.PREVIEW;
-        actionType = mode === 'approve'
-            ? window.PlanConstants.ACTION_TYPE.APPROVE
-            : window.PlanConstants.ACTION_TYPE.VIEW;
-    } else if (planId) {
-        renderType = window.PlanConstants.RENDER_TYPE.ACTION;
-        actionType = window.PlanConstants.ACTION_TYPE.EDIT;
-    } else {
-        renderType = window.PlanConstants.RENDER_TYPE.ACTION;
-        actionType = window.PlanConstants.ACTION_TYPE.CREATE;
-    }
+    // If no server config, determine from URL mode
+    if (!actionType || !renderType) {
+        if (urlMode === 'comparison' && urlOldPlanId && urlPlanId) {
+                    renderType = window.PlanConstants.RENDER_TYPE.COMPARISON;
+                    actionType = window.PlanConstants.ACTION_TYPE.APPROVE_WITH_CHANGES;
+                } else if (urlMode === 'view' || urlMode === 'approve') {
+                    renderType = window.PlanConstants.RENDER_TYPE.PREVIEW;
+                    actionType = urlMode === 'approve'
+                        ? window.PlanConstants.ACTION_TYPE.APPROVE
+                        : window.PlanConstants.ACTION_TYPE.VIEW;
+                } else if (planId) {
+                    renderType = window.PlanConstants.RENDER_TYPE.ACTION;
+                    actionType = window.PlanConstants.ACTION_TYPE.EDIT;
+                } else {
+                    renderType = window.PlanConstants.RENDER_TYPE.ACTION;
+                    actionType = window.PlanConstants.ACTION_TYPE.CREATE;
+                }
+            }
 
-    window.PlanHandler.initialize({
-        renderType: renderType,
-        actionType: actionType,
-        planId: planId,
-        oldPlanId: oldPlanId
-    });
-});
+            // Normalize action type (handle UPDATE as EDIT)
+            if (actionType === "UPDATE") {
+                actionType = window.PlanConstants.ACTION_TYPE.EDIT;
+            }
+
+            console.log('Initializing Plan Handler:', {
+                renderType,
+                actionType,
+                planId,
+                oldPlanId
+            });
+
+            window.PlanHandler.initialize({
+                renderType: renderType,
+                actionType: actionType,
+                planId: planId,
+                oldPlanId: oldPlanId
+            });
+        });

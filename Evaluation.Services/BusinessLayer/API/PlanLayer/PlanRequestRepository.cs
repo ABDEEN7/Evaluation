@@ -6,6 +6,7 @@ using Evaluation.DAL.Repositories;
 using Evaluation.SharedHelper;
 using Evaluation.SharedHelper.Consts;
 using Evaluation.SharedHelper.Dtos.PlanDto;
+using Evaluation.SharedHelper.Dtos.PlanDto.EditDto;
 using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Extensions;
@@ -29,9 +30,104 @@ public class PlanRequestRepository(IServiceScopeFactory serviceScopeFactory,
     public async Task<Plan?> GetPlanDetailsAsync(Guid id)
         => await unitOfWork.GetRepository<Plan>().GetAllActiveNonDeleted()
         .Include(x => x.EvaluationRequests)
-        .ThenInclude(x=>x.OrgTree)
+        .ThenInclude(x => x.OrgTree)
         .FirstOrDefaultAsync(x => x.Id == id);
 
+    public async Task GetPlanEvaluationWithSchools(Guid planId)
+    {
+        var planQuery =
+            unitOfWork
+            .GetRepository<Plan>()
+            .GetAllActiveNonDeleted(
+                filter: p => p.Id == planId,
+                includeProperties:
+                        p => p.EvaluationRequests!
+                );
+        var schoolsQuery = unitOfWork
+            .GetRepository<School>()
+            .GetAllActiveNonDeleted();
+
+        var plan = await planQuery
+            .Select(p=> new PlanEditDto
+            {
+                Id = p.Id,
+                PlanName = p.PlanName,
+                PlanTypeDepId = p.PlanTypeDepId,
+                StartDate = p.StartDate,
+                EndDate = p.EndDate,
+
+                Schools = schoolsQuery.Select(s => new SchoolEvaluationEditDto
+                {
+                    SchoolId = s.Id,
+                    SchoolName = s.NameEn, // or NameAr by culture
+
+                    IsSelected = p.EvaluationRequests!
+                        .Any(er => er.OrgTreeId == s.Id),
+
+                    DepEvaluationTypeId = p.EvaluationRequests!
+                        .Where(er => er.OrgTreeId == s.Id)
+                        .Select(er => (Guid?)er.DepEvaluationTypeId)
+                        .FirstOrDefault(),
+
+                    FromDate = p.EvaluationRequests!
+                        .Where(er => er.OrgTreeId == s.Id)
+                        .Select(er => (DateTime?)er.FromDate)
+                        .FirstOrDefault(),
+
+                    ToDate = p.EvaluationRequests!
+                        .Where(er => er.OrgTreeId == s.Id)
+                        .Select(er => (DateTime?)er.ToDate)
+                        .FirstOrDefault()
+                }).ToList()
+            })
+    .FirstOrDefaultAsync();
+
+    }
+    public async Task<PlanWithSchoolsDto> GetPlanWithSchoolsDetailsAsync(Guid id)
+    {
+        var planRepo = unitOfWork.GetRepository<Plan>();
+        var schoolRepo = unitOfWork.GetRepository<School>();
+
+        // Query 1: Get the plan with evaluation requests
+        var plan = await planRepo
+            .GetAllActiveNonDeleted(p => p.Id == id && p.EvaluationRequests.Any())
+            .Include(p => p.EvaluationRequests)
+            .FirstOrDefaultAsync();
+
+        if (plan == null)
+            return null;
+
+        // Query 2: Get all schools
+        var schools = await schoolRepo
+            .GetAllActiveNonDeleted()
+            .ToListAsync();
+
+        // Map in memory (fast)
+        return new PlanWithSchoolsDto
+        {
+            Id = plan.Id,
+            Name = plan.PlanName,
+            startDate = plan.StartDate,
+            endDate = plan.EndDate,
+            PlanTypeId = plan.PlanTypeDepId,
+            Schools = schools.Select(s =>
+            {
+                var evalRequest = plan.EvaluationRequests
+                    .FirstOrDefault(er => er.OrgTreeId == s.Id);
+
+                return new SchoolEvaluationDto
+                {
+                    Id = s.Id,
+                    Name = s.NameEn,
+                    HasEvaluationRequest = evalRequest != null,
+                    EvaluationRequestId = evalRequest?.Id,
+                    VisitTypeId = evalRequest?.DepEvaluationTypeId,
+                    FromDate = evalRequest?.ToDate,
+                    ToDate = evalRequest?.ToDate
+                };
+            }).ToList()
+        };
+    }
 
     public async Task<string> CreateServicPlan(PlanServiceRequest model)
     {
@@ -131,7 +227,7 @@ public class PlanRequestRepository(IServiceScopeFactory serviceScopeFactory,
                 .Select(er => er.OrgTreeId)
                 .Distinct()
                 .Count()
-            }).OrderByDescending(x=>x.Id);
+            }).OrderByDescending(x => x.Id);
         return await query.GetPaginatedResult(request.PageNumber, request.PageSize = 10);
     }
     private async Task<bool> IsThereExistingDraftPlanForSameAcadmicYear(PlanServiceRequest model)

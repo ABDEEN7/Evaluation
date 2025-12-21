@@ -15,6 +15,7 @@ using Evaluation.Services.Special;
 using Evaluation.SharedHelper;
 using Evaluation.SharedHelper.Consts;
 using Evaluation.SharedHelper.Dtos.PlanDto;
+using Evaluation.SharedHelper.Dtos.PlanDto.EditDto;
 using Evaluation.SharedHelper.Dtos.SchoolDto;
 using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Exceptions;
@@ -68,6 +69,11 @@ public class PlanServiceRequestServices(
         var result = await planRepository.GetPlanDetailsAsync(id);
         var planDto = mapper.Map<PlanDetailsDto>(result);
         return planDto;
+    }
+
+    public async Task<PlanWithSchoolsDto> GetPlanWithSchoolsByIdAsync(Guid id)
+    {
+        return await planRepository.GetPlanWithSchoolsDetailsAsync(id);
     }
 
     public async Task<Result<bool>> DeletePlanDraft(Guid id)

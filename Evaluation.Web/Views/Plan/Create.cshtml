@@ -12,7 +12,7 @@
     window.PLAN_PAGE_CONFIG = {
         renderType: '@Model.RenderType',
         actionType: '@Model.ActionType',
-        planId: @(Model.PlanId?.ToString() ?? "null"),
+        planId: @Html.Raw(Json.Serialize(Model.PlanId)),
         oldPlanId: @(Model.OldPlanId?.ToString() ?? "null"),
         showApprovalButtons: @(Model.ShowApprovalButtons.ToString().ToLower())
     };
