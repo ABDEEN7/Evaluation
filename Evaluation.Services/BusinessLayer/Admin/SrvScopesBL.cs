@@ -77,25 +77,26 @@ namespace Evaluation.Services.Models.Admin
                
                 var result = new ScopesDTO();
 
-
-            Scope obj = await uow.GetRepository<Scope>()
+            if (message.Id is not null)
+            {
+                Scope obj = await uow.GetRepository<Scope>()
                                       .GetAllNonDeleted()
                                       .Include(x => x.CreateBy)
                                       .Where(x => x.Id == message.Id)
                                       .FirstAsync();
 
-            obj.NameAr = message.NameAr;
-            obj.NameEn = message.NameEn;
-            obj.DepartmentId = message.DepartmentId;
-            obj.ScopeTypeId = message.ScopeTypeId;
-            obj.IsActive = message.IsActive;
+                obj.NameAr = message.NameAr;
+                obj.NameEn = message.NameEn;
+                obj.DepartmentId = message.DepartmentId;
+                obj.ScopeTypeId = message.ScopeTypeId;
+                obj.IsActive = message.IsActive;
 
-            uow.GetRepository<Scope>().Update(obj);
-           
-            await uow.CommitAsync();
+                uow.GetRepository<Scope>().Update(obj);
+
+                await uow.CommitAsync();
                 result = mapper.Map<ScopesDTO>(obj, opts => opts.Items["Language"] = _requestInfo.Lang);
                 result.ResponseStatus = DBResult.Updated;
-           
+            }
 
                 return result;
            

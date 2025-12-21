@@ -79,25 +79,26 @@ namespace Evaluation.Services.Models.Admin
                
                 var result = new PlanTypeDepDTO();
 
-
-            PlanTypeDep obj = await uow.GetRepository<PlanTypeDep>()
+            if (message.Id is not null)
+            {
+                PlanTypeDep obj = await uow.GetRepository<PlanTypeDep>()
                                       .GetAllNonDeleted()
                                       .Include(x => x.CreateBy)
                                       .Where(x => x.Id == message.Id)
                                       .FirstAsync();
 
-            obj.NameAr = message.NameAr;
-            obj.NameEn = message.NameEn;
-            obj.DepartmentId = message.DepartmentId;
-            obj.PlanTypeId = message.PlanTypeId;
-            obj.IsActive = message.IsActive;
+                obj.NameAr = message.NameAr;
+                obj.NameEn = message.NameEn;
+                obj.DepartmentId = message.DepartmentId;
+                obj.PlanTypeId = message.PlanTypeId;
+                obj.IsActive = message.IsActive;
 
-            uow.GetRepository<PlanTypeDep>().Update(obj);
-           
-            await uow.CommitAsync();
+                uow.GetRepository<PlanTypeDep>().Update(obj);
+
+                await uow.CommitAsync();
                 result = mapper.Map<PlanTypeDepDTO>(obj, opts => opts.Items["Language"] = _requestInfo.Lang);
                 result.ResponseStatus = DBResult.Updated;
-           
+            }
 
                 return result;
            
