@@ -265,6 +265,7 @@ public static class ConstantKeys
         public static readonly string AdminPlanTypeDep = "AdminPlanTypeDep";
         public static readonly string AdminPlanStatuses = "AdminPlanStatuses";
         public static readonly string AdminOrgTypes = "AdminOrgTypes";
+        public static readonly string AdminJobTitle = "AdminJobTitle";
     }
 
     public static class AdminPermission
@@ -591,6 +592,12 @@ public static class ConstantKeys
         public const string ADD_ADMIN_ORGTYPES = "ADD_ADMIN_ORGTYPES";
         public const string EDIT_ADMIN_ORGTYPES = "EDIT_ADMIN_ORGTYPES";
         public const string DELETE_ADMIN_ORGTYPES = "DELETE_ADMIN_ORGTYPES";
+        #endregion
+        #region JOBTITLE
+        public const string VIEW_ADMIN_JOBTITLE = "VIEW_ADMIN_JOBTITLE";
+        public const string ADD_ADMIN_JOBTITLE = "ADD_ADMIN_JOBTITLE";
+        public const string EDIT_ADMIN_JOBTITLE = "EDIT_ADMIN_JOBTITLE";
+        public const string DELETE_ADMIN_JOBTITLE = "DELETE_ADMIN_JOBTITLE";
         #endregion
 
     }

@@ -1,0 +1,55 @@
+﻿using Evaluation.Admin.Extensions;
+using Evaluation.Admin.Models;
+using Evaluation.DAL.Models.Master;
+using Evaluation.Services.BusinessLayer;
+using Evaluation.Services.BusinessLayer.Admin;
+using Evaluation.Services.Models.Admin;
+using Evaluation.SharedHelper.Enums;
+using Evaluation.SharedHelper.Models.Admin;
+using Microsoft.AspNetCore.Mvc;
+
+namespace Evaluation.Admin.Controllers;
+
+public class JobTitleController : Controller
+{
+    private readonly MasterBL masterBL;
+    private readonly IHttpContextAccessor httpContextAccessor;
+
+    public JobTitleController(MasterBL masterBL, IHttpContextAccessor httpContextAccessor)
+    {
+        this.masterBL = masterBL;
+        this.httpContextAccessor = httpContextAccessor;
+    }
+    public async Task<IActionResult> Index()
+    {
+        var model = new JobTitleVM(httpContextAccessor);
+        await model.LoadAllAData(new string[] { ConstantKeys.AdminPages.AdminJobTitle },
+                new string[] { ConstantKeys.AdminPermission.ADD_ADMIN_JOBTITLE });
+        var property = typeof(JobTitle).GetProperty("OrderNo");
+        model.containsOrderNo = property != null ? true : false;
+        return View(model);
+    }
+    [HttpGet]
+    public async Task<IActionResult> GetAllJobTitle(int page = 1)
+    {
+        var pageSize = Convert.ToInt32(masterBL.GetAdminService<SrvSystemSettingBL>
+            ().GetSetting(ConstantKeys.AdminSettings.ADMIN_PAGE_SIZE));
+        var response = await masterBL.GetAdminService<SrvJobTitleBL>().GetJobTitleList(page, pageSize);
+        return Ok(response);
+    }
+    [HttpPost]
+    public async Task<IActionResult> SaveJobTitle()
+    {
+
+        var request = Request.Form["request"][0]?.StringToObject<JobTitleDto>();
+
+        var result = new JobTitleDto();
+        bool validateObject = await masterBL.GetAdminService<SrvBaseBL>().ValidateObject(request!, ConstantKeys.AdminPermission.ADD_ADMIN_JOBTITLE);
+        if (validateObject)
+        {
+            result = await masterBL.GetAdminService<SrvJobTitleBL>().SaveJobTitle(request!);
+        }
+        return Ok(new ResponseEntity(result));
+
+    }
+}
