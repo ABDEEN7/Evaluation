@@ -6,6 +6,7 @@ using Evaluation.DAL.Models.Calendars;
 using Evaluation.DAL.Models.DepartementEntites;
 using Evaluation.DAL.Models.Planing;
 using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
+using Evaluation.DAL.Models.ServiceEnities;
 using Evaluation.DAL.Models.StatusEntities;
 using Evaluation.DAL.Models.Template;
 using Evaluation.DAL.Repositories;
@@ -87,6 +88,7 @@ public class PlanServiceRequestServices(
     public async Task<Result<CreateEvaluationPlanDto>> InsertOrUpdatePlan(
     CreateEvaluationPlanDto modelDto)
     {
+        ValidatedPlan(modelDto);
         return await ExecuteWithResult(async () =>
         {
             // 1️⃣ Get system values
@@ -127,6 +129,10 @@ public class PlanServiceRequestServices(
             // 4️⃣ Insert Plan
             await unitOfWork.GetRepository<Plan>().InsertAsync(plan);
 
+            //4.1 Services
+            Guid serviceId = await uow.GetRepository<Service>()
+            .GetAllActiveNonDeleted(x => x.BackendName == BackendServices.EvaluationPlan_P_CreatePlan)
+            .Select(x => x.Id).FirstOrDefaultAsync();
             // 5️⃣ Insert Evaluation Requests
             if (modelDto.Schools?.Any() == true)
             {
@@ -135,7 +141,7 @@ public class PlanServiceRequestServices(
                     {
                         Id = Guid.NewGuid(),
                         PlanId = plan.Id,
-                        ServiceId = new Guid("370026F8-07DD-4E70-8F9B-756696C89181"),
+                        ServiceId = serviceId,
                         OrgTreeId = school.Id,
                         DepEvaluationTypeId = depEvaluationType,
                         FromDate = school.StartEvaluationDate,
@@ -190,6 +196,13 @@ public class PlanServiceRequestServices(
             throw new BusinessException(ConstantKeys.ExceptionMessage.PlanInThePastIsNotAllowed);
     }
 
+    private void ValidatedPlan(CreateEvaluationPlanDto model)
+    {
+        if (model is null || string.IsNullOrEmpty(model.Name))
+            throw new BusinessException(ConstantKeys.ExceptionMessage.InvalidApprovePlan);
+        if (model.StartDate <= model.EndDate)
+            throw new BusinessException(ConstantKeys.ExceptionMessage.InvalidEvaluationDate);
+    }
     private void UpdatePlanEntity(Plan plan, UpdatePlanDto dto)
     {
         plan.PlanName = dto.Name;

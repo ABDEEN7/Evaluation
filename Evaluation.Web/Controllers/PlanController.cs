@@ -15,10 +15,10 @@ namespace Evaluation.Web.Controllers
             {
                 RenderType = "action",
                 ActionType = "EDIT",
-                PlanId = new Guid("1FB93348-FF57-47B7-889E-F7C5D9449FFF"),
-                OldPlanId = null
+                PlanId = new Guid("E5F7D1E5-3A7E-4DE7-939C-FCC2298FB7CB"),
+                //RenderType = "action",
+                //ActionType = "CREATE"
             };
-
             return View(viewModel);
         }
         [HttpGet]
