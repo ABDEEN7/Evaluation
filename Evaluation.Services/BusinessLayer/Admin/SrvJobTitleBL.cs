@@ -1,8 +1,7 @@
 ﻿using AutoMapper;
 using Evaluation.DAL.Helper;
-using Evaluation.DAL.Models.Calendars;
 using Evaluation.DAL.Models.Master;
-using Evaluation.DAL.Models.UserEntiy;
+using Evaluation.DAL.Models.PermissionEntity;
 using Evaluation.DAL.Repositories;
 using Evaluation.Services.Models.Admin;
 using Evaluation.Services.Special;
@@ -48,9 +47,65 @@ public class SrvJobTitleBL : AdminBase
         jobTitle.NameEn = message.NameEn;
         jobTitle.NameAr = message.NameAr;
         jobTitle.IsActive = message.IsActive;
-        jobTitle.BackendName =  bacendName;
-         uow.GetRepository<JobTitle>().Insert(jobTitle);
+        jobTitle.BackendName = bacendName;
+        uow.GetRepository<JobTitle>().Insert(jobTitle);
         await uow.CommitAsync();
+        message.ResponseStatus = DBResult.Updated;
         return message;
     }
+    public async Task<JobTitleDto> DeleteJobTitleAsync(Guid? id)
+    {
+        var repository = uow.GetRepository<JobTitle>();
+        var jobTitle = await repository
+            .GetAllActiveNonDeleted(x => x.Id == id)
+            .FirstOrDefaultAsync()
+            .ConfigureAwait(false);
+        if (jobTitle == null)
+        {
+            return new JobTitleDto
+            {
+                ResponseStatus = DBResult.NotFound
+            };
+        }
+        repository.Delete(jobTitle);
+        await uow.CommitAsync();
+        var result = mapper.Map<JobTitleDto>(jobTitle, opts =>
+        opts.Items["Language"] = _requestInfo.Lang);
+        result.ResponseStatus = DBResult.Deleted;
+        return result;
+    }
+    public async Task<JobTitleDto> UpdateJobTitle(JobTitleDto jobTitle)
+    {
+        if (jobTitle == null)
+        {
+            return new JobTitleDto
+            {
+                ResponseStatus = DBResult.Error
+            };
+        }
+        if (jobTitle.Id == null)
+        {
+            return new JobTitleDto
+            {
+                ResponseStatus = DBResult.Error
+            };
+        }
+        var repository = uow.GetRepository<JobTitle>();
+        var job = await uow
+            .GetRepository<JobTitle>()
+            .GetAllActiveNonDeleted()
+            .FirstOrDefaultAsync(x => x.Id == jobTitle.Id);
+        job.NameAr = jobTitle.NameAr;
+        job.NameEn = jobTitle.NameEn;
+        job.IsActive = jobTitle.IsActive;
+        job.UpdateById = userInfo.UserId;
+        job.UpdateDate = DateTime.UtcNow;
+
+        repository.Update(job);
+        await uow.CommitAsync().ConfigureAwait(false);
+        var result = mapper.Map<JobTitleDto>(job);
+        result.ResponseStatus = DBResult.Updated;
+        return result;
+    }
 }
+

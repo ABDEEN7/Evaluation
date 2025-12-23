@@ -66,7 +66,7 @@ const deleteData = (id) => {
                 }
             }
         };
-        jqClientAdvanced(options).Post("JobTitle/DeletePlanTypeDep".concat('?Id=', id));
+        jqClientAdvanced(options).Post("JobTitle/DeleteJobTitle".concat('?Id=', id));
 
     });
 };
@@ -123,7 +123,7 @@ $(document).ready(function () {
                     notificationUtil.success(sharedFn().GetUiControlText('ADMIN_MSG_UPDATE'));
                 }
             };
-            jqClientAdvanced(options).PostFormData("JobTitle/UpdatePlanTypeDepOrder", formData);
+            jqClientAdvanced(options).PostFormData("JobTitle/UpdateJobTitle", formData);
 
         }
 
@@ -147,47 +147,58 @@ $(document).ready(function () {
             commonUtil.btnProgress(btnSubmitId);
             var requestdata = sharedFn().GetSaveObject(controlvalidationlist, $('#Id').val());
 
+            const RESPONSE_STATUS = {
+                CREATE: 1,
+                UPDATE: 2
+            };
 
             const options = {
                 success: function (data) {
-                    if (data) {
-                        commonUtil.btnProgress(btnSubmitId, true);
 
-                        var { responseStatus } = data;
-                        //debugger
-                        switch (responseStatus) {
-                            case 1:
-
-                                table.addData([data], true);
-                                table.deselectRow();
-                                table.getRows()[0].select();
-                                notificationUtil.success(sharedFn().GetUiControlText('ADMIN_MSG_SAVE'));
-                                sharedFn().ViewMode();
-                                break;
-
-                            case 2:
-                                table.updateData([data]);
-                                notificationUtil.success(sharedFn().GetUiControlText('ADMIN_MSG_UPDATE'));
-                                sharedFn().ViewMode();
-                                break;
-
-                            default:
-                                notificationUtil.error(data.message);
-                                $('#btn-submit').removeAttr("disabled");
-                                break;
-                        }
-
-                        $('#btn-submit').removeAttr("disabled");
-
+                    // Fail fast
+                    if (!data) {
+                        notificationUtil.error('Invalid server response');
+                        $('#btn-submit').removeAttr('disabled');
+                        return;
                     }
 
+                    commonUtil.btnProgress(btnSubmitId, true);
 
+                    const responseStatus = data?.responseStatus;
 
+                    switch (responseStatus) {
 
+                        case RESPONSE_STATUS.CREATE:
+                            table.addData([data], true);
+                            table.deselectRow();
+                            table.getRows()[0]?.select();
+                            notificationUtil.success(
+                                sharedFn().GetUiControlText('ADMIN_MSG_SAVE')
+                            );
+                            sharedFn().ViewMode();
+                            break;
+
+                        case RESPONSE_STATUS.UPDATE:
+                            table.updateData([data]);
+                            notificationUtil.success(
+                                sharedFn().GetUiControlText('ADMIN_MSG_UPDATE')
+                            );
+                            sharedFn().ViewMode();
+                            break;
+
+                        default:
+                            notificationUtil.error(
+                                data.responseMessage || 'Unexpected response status'
+                            );
+                            break;
+                    }
+
+                    $('#btn-submit').removeAttr('disabled');
                 },
-                error: function (xhr) {
-                    notificationUtil.error(xhr.responseJSON.Message);
-                    $('#btn-submit').removeAttr("disabled");
+
+                error: function () {
+                    notificationUtil.error('Request failed. Please try again.');
+                    $('#btn-submit').removeAttr('disabled');
                 }
             };
 
@@ -195,7 +206,7 @@ $(document).ready(function () {
             let id = $('#Id').val();
 
             if (id) {
-                url = "JobTitle/UpdateJobTITLE";
+                url = "JobTitle/UpdateJobTitle";
             } else {
                 url = "JobTitle/SaveJobTitle";
 

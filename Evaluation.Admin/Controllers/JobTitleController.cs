@@ -49,7 +49,27 @@ public class JobTitleController : Controller
         {
             result = await masterBL.GetAdminService<SrvJobTitleBL>().SaveJobTitle(request!);
         }
-        return Ok(new ResponseEntity(result));
+        return Ok(result);
 
+    }
+    [HttpPost]
+    public async Task<IActionResult> DeleteJobTitle(Guid id)
+    {
+        var result = await masterBL
+            .GetAdminService<SrvJobTitleBL>()
+            .DeleteJobTitleAsync(id);
+        return Ok(result);
+    }
+    [HttpPost]
+    public async Task<IActionResult> UpdateJobTitle()
+    {
+        var request = Request.Form["request"][0]?.StringToObject<JobTitleDto>();
+        var result = new JobTitleDto();
+        bool validateObject = await masterBL.GetAdminService<SrvBaseBL>().ValidateObject(request!, ConstantKeys.AdminPermission.EDIT_ADMIN_JOBTITLE);
+        if (validateObject)
+        {
+            result = await masterBL.GetAdminService<SrvJobTitleBL>().UpdateJobTitle(request!);
+        }
+        return Ok(result);
     }
 }
