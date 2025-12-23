@@ -284,6 +284,7 @@ public static class ConstantKeys
         public static readonly string AdminPlanStatuses = "AdminPlanStatuses";
         public static readonly string AdminOrgTypes = "AdminOrgTypes";
         public static readonly string AdminJobTitle = "AdminJobTitle";
+        public static readonly string AdminDepEvaluationType = "AdminDepEvaluationType";
         public static readonly string AdminSchools = "AdminSchools";
         public static readonly string AdminOrgTree = "AdminOrgTree";
     }
@@ -628,6 +629,13 @@ public static class ConstantKeys
         public const string ADD_ADMIN_JOBTITLE = "ADD_ADMIN_JOBTITLE";
         public const string EDIT_ADMIN_JOBTITLE = "EDIT_ADMIN_JOBTITLE";
         public const string DELETE_ADMIN_JOBTITLE = "DELETE_ADMIN_JOBTITLE";
+        #endregion
+
+        #region DepEvaluationType
+        public const string VIEW_ADMIN_DepEvaluationType = "VIEW_ADMIN_DepEvaluationType";
+        public const string ADD_ADMIN_DepEvaluationType = "ADD_ADMIN_DepEvaluationType";
+        public const string EDIT_ADMIN_DepEvaluationType = "EDIT_ADMIN_DepEvaluationType";
+        public const string DELETE_ADMIN_DepEvaluationType = "DELETE_ADMIN_DepEvaluationType";
         #endregion
 
         #region SCHOOL
