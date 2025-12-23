@@ -132,6 +132,7 @@ public static class ConstantKeys
         public static readonly string InvalidJsonParam = "InvalidJsonParam";
         public static readonly string WebGroupExistsDepWebGroup = "WebGroupExistsDepWebGroup";
         public static readonly string ScopeExistsScopeAcademicYear = "ScopeExistsScopeAcademicYear";
+        public static readonly string FormEvalMatrixExistsFormEval = "FormEvalMatrixExistsFormEval";
         public static readonly string ScopeExistsAcademicYearScope = "ScopeExistsAcademicYearScope";
         public static readonly string SchoolTypesExistsOrganization = "SchoolTypesExistsOrganization";
         public static readonly string SchoolTypesExistsSchool = "SchoolTypesExistsSchool";
@@ -140,6 +141,20 @@ public static class ConstantKeys
         public static readonly string PlanStatusExistsPlan = "PlanStatusExistsPlan";
         public static readonly string OrgTypeExistsOrgTree = "OrgTypeExistsOrgTree";
         public static readonly string OrgTypeExistsOrganization = "OrgTypeExistsOrganization";
+        public static readonly string SchoolsExistsSchoolLevel = "OrgTypeExistsOrganization";
+        public static readonly string OrgTypeDoesNotExists = "OrgTypeDoesNotExists";
+        public static readonly string OrgTreeExistsDepartmentOrgTree = "OrgTreeExistsDepartmentOrgTree";
+        public static readonly string OrgTreeExistsOrgEvalResult = "OrgTreeExistsOrgEvalResult";
+        public static readonly string OrgTreeExistsEvalAttachment = "OrgTreeExistsEvalAttachment";
+        public static readonly string OrgTreeExistsServiceRequest = "OrgTreeExistsServiceRequest";
+        public static readonly string OrgTreeExistsEvaluationRequestHistory = "OrgTreeExistsEvaluationRequestHistory";
+        public static readonly string OrgTreeExistsParentOrgTree = "OrgTreeExistsParentOrgTree";
+        public static readonly string OrgTreeExistsEmployee = "OrgTreeExistsEmployee";
+        public static readonly string OrgTreeExistsOrganization = "OrgTreeExistsOrganization";
+        public static readonly string OrgTreeExistsSchool = "OrgTreeExistsSchool";
+        public static readonly string OrgTreeExistsDepartment = "OrgTreeExistsDepartment";
+        public static readonly string OrgTreeExistsEvaluationRequest = "OrgTreeExistsEvaluationRequest";
+        public static readonly string OrgTreeExistsOrgAcademicYear = "OrgTreeExistsOrgAcademicYear";
     }
 
     public static class AdminSettings
@@ -172,6 +187,8 @@ public static class ConstantKeys
         public static readonly string RoutingValue = "RoutingValue";
         public static readonly string WebAppSitePath = "WebAppSitePath";
         public static readonly string SubSiteContentMaxCount = "SubSiteContentMaxCount";
+        public static readonly string SchoolOrgType = "SchoolOrgType";
+        public static readonly string OrgClassList = "OrgClassList";
         
 
     }
@@ -242,6 +259,7 @@ public static class ConstantKeys
         public static readonly string AdminActionFieldAttribute = "AdminActionFieldAttribute";
         public static readonly string AdminActionCondition = "AdminActionCondition";
         public static readonly string AdminAcademicYear = "AdminAcademicYear";
+        public static readonly string AdminFormEvalMatrix = "AdminFormEvalMatrix";
         public static readonly string AdminAcademicYearScope = "AdminAcademicYearScope";
         public static readonly string AdminScopeAcademicYear = "AdminScopeAcademicYear";
         public static readonly string AdminUserPartyType = "AdminUserPartyType";
@@ -266,6 +284,8 @@ public static class ConstantKeys
         public static readonly string AdminPlanStatuses = "AdminPlanStatuses";
         public static readonly string AdminOrgTypes = "AdminOrgTypes";
         public static readonly string AdminJobTitle = "AdminJobTitle";
+        public static readonly string AdminSchools = "AdminSchools";
+        public static readonly string AdminOrgTree = "AdminOrgTree";
     }
 
     public static class AdminPermission
@@ -414,6 +434,16 @@ public static class ConstantKeys
         public const string ADD_ADMIN_ACADEMIC_YEAR = "ADD_ADMIN_ACADEMIC_YEAR";
         public const string EDIT_ADMIN_ACADEMIC_YEAR = "EDIT_ADMIN_ACADEMIC_YEAR";
         public const string VIEW_ADMIN_ACADEMIC_YEAR = "VIEW_ADMIN_ACADEMIC_YEAR";
+
+        #endregion
+
+
+        #region FORM_EVAL_MATRIX
+
+        public const string DELETE_ADMIN_FORM_EVAL_MATRIX = "DELETE_ADMIN_FORM_EVAL_MATRIX";
+        public const string ADD_ADMIN_FORM_EVAL_MATRIX = "ADD_ADMIN_FORM_EVAL_MATRIX";
+        public const string EDIT_ADMIN_FORM_EVAL_MATRIX = "EDIT_ADMIN_FORM_EVAL_MATRIX";
+        public const string VIEW_ADMIN_FORM_EVAL_MATRIX = "VIEW_ADMIN_FORM_EVAL_MATRIX";
 
         #endregion
 
@@ -598,6 +628,24 @@ public static class ConstantKeys
         public const string ADD_ADMIN_JOBTITLE = "ADD_ADMIN_JOBTITLE";
         public const string EDIT_ADMIN_JOBTITLE = "EDIT_ADMIN_JOBTITLE";
         public const string DELETE_ADMIN_JOBTITLE = "DELETE_ADMIN_JOBTITLE";
+        #endregion
+
+        #region SCHOOL
+
+        public const string VIEW_ADMIN_SCHOOL = "VIEW_ADMIN_SCHOOL";
+        public const string ADD_ADMIN_SCHOOL = "ADD_ADMIN_SCHOOL";
+        public const string EDIT_ADMIN_SCHOOL = "EDIT_ADMIN_SCHOOL";
+        public const string DELETE_ADMIN_SCHOOL = "DELETE_ADMIN_SCHOOL";
+
+        #endregion
+
+        #region ORGTREE
+
+        public const string VIEW_ADMIN_ORGTREE = "VIEW_ADMIN_ORGTREE";
+        public const string ADD_ADMIN_ORGTREE = "ADD_ADMIN_ORGTREE";
+        public const string EDIT_ADMIN_ORGTREE = "EDIT_ADMIN_ORGTREE";
+        public const string DELETE_ADMIN_ORGTREE = "DELETE_ADMIN_ORGTREE";
+
         #endregion
 
     }

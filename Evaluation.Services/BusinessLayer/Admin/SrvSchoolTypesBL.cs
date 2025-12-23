@@ -76,24 +76,25 @@ namespace Evaluation.Services.Models.Admin
 
             var result = new SchoolTypesDTO();
 
-
-            SchoolType obj = await uow.GetRepository<SchoolType>()
+            if (message.Id is not null)
+            {
+                SchoolType obj = await uow.GetRepository<SchoolType>()
                                       .GetAllNonDeleted()
                                       .Include(x => x.CreateBy)
                                       .Where(x => x.Id == message.Id)
                                       .FirstAsync();
 
-            obj.NameAr = message.NameAr;
-            obj.NameEn = message.NameEn;
-            obj.IsActive = message.IsActive;
+                obj.NameAr = message.NameAr;
+                obj.NameEn = message.NameEn;
+                obj.IsActive = message.IsActive;
 
-            uow.GetRepository<SchoolType>().Update(obj);
-           
-            await uow.CommitAsync();
-            result = mapper.Map<SchoolTypesDTO>(obj);
-            result.UpdateBy = userInfo.DBName;
-            result.ResponseStatus = DBResult.Updated;
-           
+                uow.GetRepository<SchoolType>().Update(obj);
+
+                await uow.CommitAsync();
+                result = mapper.Map<SchoolTypesDTO>(obj);
+                result.UpdateBy = userInfo.DBName;
+                result.ResponseStatus = DBResult.Updated;
+            }
 
                 return result;
            

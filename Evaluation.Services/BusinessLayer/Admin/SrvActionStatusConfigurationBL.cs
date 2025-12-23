@@ -227,44 +227,48 @@ namespace Evaluation.Services.Models.Admin
                 .Include(x => x.CreateBy)
                 .Where(x => x.Id == message.Id)
                 .FirstAsync();
-
-            if (message.ShowIsDefaultAssigner)
+            if(obj!=null)
             {
-                var actiontype = await uow.GetRepository<ServiceAction>().GetAllNonDeleted()
-                    .Include(x => x.ActionType).Where(x => x.Id == message.ServiceActionId).FirstOrDefaultAsync();
-                if (actiontype != null)
+                if (message.ShowIsDefaultAssigner)
                 {
-                    if (actiontype.ActionType!.BackendName != "ASSIGN" && actiontype.ActionType.BackendName != "APPROVE_AND_ASSIGN")
+                    var actiontype = await uow.GetRepository<ServiceAction>().GetAllNonDeleted()
+                    .Include(x => x.ActionType).Where(x => x.Id == message.ServiceActionId).FirstOrDefaultAsync();
+                    if (actiontype != null)
                     {
-                        message.ShowIsDefaultAssigner = false;
+                        if (actiontype.ActionType!.BackendName != "ASSIGN" && actiontype.ActionType.BackendName != "APPROVE_AND_ASSIGN")
+                        {
+                            message.ShowIsDefaultAssigner = false;
+                        }
+
                     }
-
                 }
-            }
 
-            obj.ServiceActionId = message.ServiceActionId;
-            obj.CurrentStatusId = message.CurrentStatusId;
-            obj.NextStatusId = message.NextStatusId;
-            obj.IsRemark = message.IsRemark;
-            obj.RemarkLabelAr = message.RemarkLabelAr;
-            obj.RemarkLabelEn = message.RemarkLabelEn;
-            obj.IsRemarkRequired = message.IsRemarkRequired;
-            obj.IsOtherAttachment = message.IsOtherAttachment;
-            obj.AttachmentLabelAr = message.AttachmentLabelAr;
-            obj.AttachmentLabelEn = message.AttachmentLabelEn;
-            obj.IsOtherAttachmentRequired = message.IsOtherAttachmentRequired;
-            obj.ShowIsDefaultAssigner = message.ShowIsDefaultAssigner;
-            obj.IsAuto = message.IsAuto;
-            obj.IsActive = message.IsActive;
-            uow.GetRepository<ActionStatusConfiguration>().Update(obj);
-            await uow.CommitAsync();
-             result = mapper.Map<ActionStatusConfigurationDTO>(obj, opts => opts.Items["Language"] = _requestInfo.Lang);
-            result.ResponseStatus = DBResult.Updated;
-            result.ServiceId = await uow.GetRepository<ServiceAction>()
-                .GetAllNonDeleted()
-                .Where(x => x.Id == obj.ServiceActionId)
-                .Select(x => x.ServiceId)
-                .FirstAsync();
+                obj.ServiceActionId = message.ServiceActionId;
+                obj.CurrentStatusId = message.CurrentStatusId;
+                obj.NextStatusId = message.NextStatusId;
+                obj.IsRemark = message.IsRemark;
+                obj.RemarkLabelAr = message.RemarkLabelAr;
+                obj.RemarkLabelEn = message.RemarkLabelEn;
+                obj.IsRemarkRequired = message.IsRemarkRequired;
+                obj.IsOtherAttachment = message.IsOtherAttachment;
+                obj.AttachmentLabelAr = message.AttachmentLabelAr;
+                obj.AttachmentLabelEn = message.AttachmentLabelEn;
+                obj.IsOtherAttachmentRequired = message.IsOtherAttachmentRequired;
+                obj.ShowIsDefaultAssigner = message.ShowIsDefaultAssigner;
+                obj.IsAuto = message.IsAuto;
+                obj.IsActive = message.IsActive;
+                uow.GetRepository<ActionStatusConfiguration>().Update(obj);
+                await uow.CommitAsync();
+                result = mapper.Map<ActionStatusConfigurationDTO>(obj, opts => opts.Items["Language"] = _requestInfo.Lang);
+                result.ResponseStatus = DBResult.Updated;
+                result.ServiceId = await uow.GetRepository<ServiceAction>()
+                    .GetAllNonDeleted()
+                    .Where(x => x.Id == obj.ServiceActionId)
+                    .Select(x => x.ServiceId)
+                    .FirstAsync();
+
+            }
+          
            // await _CacheDataProvider.ClearCacheByKey(ConstantKeys.WebAppCacheTableName.CACHE_ACTIONSTATUSCONFIG);
 
             return result;
@@ -377,20 +381,23 @@ namespace Evaluation.Services.Models.Admin
                 .Include(x => x.CreateBy)
                 .Where(x => x.Id == message.Id)
                 .FirstAsync();
-
-            obj.ActionStatusConfigurationId = message.ActionStatusConfigurationId;
-            obj.PartyTypeId = message.PartyTypeId;
-            obj.IsEmailSend = message.IsEmailSend;
-            obj.EmailTemplateId = message.EmailTemplateId.HasValue ? message.EmailTemplateId : null;
-            obj.IsMessageSend = message.IsMessageSend;
-            obj.SMSTemplateId = message.SMSTemplateId.HasValue ? message.SMSTemplateId : null;
-            obj.IsNotificationSend = message.IsNotificationSend;
-            obj.NotificationTemplateId = message.NotificationTemplateId.HasValue ? message.NotificationTemplateId : null;
-            obj.IsActive = message.IsActive;
-            uow.GetRepository<ActionStatusConfigNotification>().Update(obj);
-            await uow.CommitAsync();
-             result = mapper.Map<ActionStatusConfigNotificationDTO>(obj, opts => opts.Items["Language"] = _requestInfo.Lang);
-            result.ResponseStatus = DBResult.Updated;
+            if(obj!=null)
+            {
+                obj.ActionStatusConfigurationId = message.ActionStatusConfigurationId;
+                obj.PartyTypeId = message.PartyTypeId;
+                obj.IsEmailSend = message.IsEmailSend;
+                obj.EmailTemplateId = message.EmailTemplateId.HasValue ? message.EmailTemplateId : null;
+                obj.IsMessageSend = message.IsMessageSend;
+                obj.SMSTemplateId = message.SMSTemplateId.HasValue ? message.SMSTemplateId : null;
+                obj.IsNotificationSend = message.IsNotificationSend;
+                obj.NotificationTemplateId = message.NotificationTemplateId.HasValue ? message.NotificationTemplateId : null;
+                obj.IsActive = message.IsActive;
+                uow.GetRepository<ActionStatusConfigNotification>().Update(obj);
+                await uow.CommitAsync();
+                result = mapper.Map<ActionStatusConfigNotificationDTO>(obj, opts => opts.Items["Language"] = _requestInfo.Lang);
+                result.ResponseStatus = DBResult.Updated;
+            }
+           
 
 
             return result;

@@ -24,7 +24,7 @@
             headerToolbar: {
               left: 'prev,next',
               center: 'title',
-              right: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth'
+              right: 'dayGridMonth,timeGridWeek,timeGridDay'
             },
             initialDate: '@today',
             navLinks: true, // can click day/week names to navigate views
@@ -38,6 +38,30 @@
                 } catch (err) {
                     failureCallback(err);
                 }
+            },
+            eventDrop: function (info) {
+            // alert(
+            // `Event "${info.event.title}" was moved
+            // OldFrom: ${info.oldEvent.start.toDateString()}
+            // NewFrom: ${info.event.start.toDateString()}
+            // OldTo: ${info.oldEvent.end.toDateString()}
+            // NewTo: ${info.event.end.toDateString()}`
+            //   );
+                  const payload = {
+                id: info.event.id,
+                Title: info.event.title,
+                Start: info.event.start,
+                End: info.event.end,
+               };
+
+               jqClient().Post("/EvaluationRequest/UpdateEvaluationRequest", payload)
+                .done((res) => {
+                    Swal.fire({
+                        icon: "success",
+                        title: "تم التعديل",
+                        text: "تم تعديل تاريخ الطلب"
+                    });
+                });
             },
             loading: function(isLoading) {
               if (isLoading) {

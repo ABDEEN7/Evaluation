@@ -1,11 +1,15 @@
-﻿using Evaluation.DAL.Models.Audit;
+﻿
 
-namespace Evaluation.DAL.Models.Org;
-
-public class School : OrgTree , IAuditLogEntity
+namespace Evaluation.SharedHelper.Models.Admin;
+public class SchoolsDTO : EntityBaseDTO
 {
-    public Guid TypeId { get; set; }//بنين وبنات
-    public SchoolType SchoolType { get; set; } 
+    public string NameAr { get; set; } = null!;
+    public string NameEn { get; set; } = null!;
+    public Guid TypeId { get; set; }
+    public string Type { get; set; } = null!;
+
+    public Guid OrgClassId { get; set; }
+    public string OrgClass { get; set; } = null!;
     public DateOnly EstablishmentDate { get; set; }
     public string? ManagerQID { get; set; }
     public string? ManageEmail { get; set; }
@@ -19,7 +23,4 @@ public class School : OrgTree , IAuditLogEntity
     public DateOnly? AcceditedDate { get; set; }
     public bool SupportIdentity { get; set; }
     public DateOnly? SupportIdentityDate { get; set; }
-
-    public virtual ICollection<SchoolLevel>? SchoolLevel { get; set; }
-    
 }
