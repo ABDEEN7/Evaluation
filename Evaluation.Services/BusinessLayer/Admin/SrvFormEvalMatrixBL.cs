@@ -133,7 +133,22 @@ public class SrvFormEvalMatrixBL : AdminBase
                               .GetAllNonDeleted()
                               .Where(x => x.Id == Id)
                               .FirstAsync();
-            //TODO:Need to check if used in item before delete 
+            if (obj == null)
+            {
+                result.ResponseStatus = DBResult.NotFound;
+                return result;
+            }
+
+            var evalForm = await uow.GetRepository<EvalForm>()
+                  .GetAllNonDeleted()
+                  .Where(x => x.FormEvalMatrixId == obj.Id)
+                  .ToListAsync();
+
+            if (evalForm.Count > 0)
+            {
+                throw new BusinessException(ConstantKeys.ExceptionMessage.FormEvalMatrixExistsFormEval);
+            }
+
             uow.GetRepository<FormEvalMatrix>().Delete(obj);
             await uow.CommitAsync();
             result = mapper.Map<FormEvalMatrixDTO>(obj, opts => opts.Items["Language"] = _requestInfo.Lang);

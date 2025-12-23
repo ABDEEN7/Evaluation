@@ -132,6 +132,7 @@ public static class ConstantKeys
         public static readonly string InvalidJsonParam = "InvalidJsonParam";
         public static readonly string WebGroupExistsDepWebGroup = "WebGroupExistsDepWebGroup";
         public static readonly string ScopeExistsScopeAcademicYear = "ScopeExistsScopeAcademicYear";
+        public static readonly string FormEvalMatrixExistsFormEval = "FormEvalMatrixExistsFormEval";
         public static readonly string ScopeExistsAcademicYearScope = "ScopeExistsAcademicYearScope";
         public static readonly string SchoolTypesExistsOrganization = "SchoolTypesExistsOrganization";
         public static readonly string SchoolTypesExistsSchool = "SchoolTypesExistsSchool";
