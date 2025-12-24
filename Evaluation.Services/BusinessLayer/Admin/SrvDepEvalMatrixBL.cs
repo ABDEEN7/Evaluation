@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.EvalResult;
+using Evaluation.DAL.Models.FormsModules;
 using Evaluation.DAL.Repositories;
 using Evaluation.Services.Models.Admin;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Enums;
+using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Admin;
 using Microsoft.EntityFrameworkCore;
@@ -61,6 +63,7 @@ public class SrvDepEvalMatrixBL : AdminBase
         obj.NextFollowUpDays= message.NextFollowUpDays;
         obj.AcademicYearId = message.AcademicYearId;
         obj.IsActive = message.IsActive;
+        obj.RequiredFollowUp = message.RequiredFollowUp;
 
         uow.GetRepository<DepEvalMatrix>().Insert(obj);
         await uow.CommitAsync();
@@ -92,6 +95,7 @@ public class SrvDepEvalMatrixBL : AdminBase
             obj.NextFollowUpDays = message.NextFollowUpDays;
             obj.AcademicYearId = message.AcademicYearId;
             obj.IsActive = message.IsActive;
+            obj.RequiredFollowUp = message.RequiredFollowUp;
 
             uow.GetRepository<DepEvalMatrix>().Update(obj);
             await uow.CommitAsync();
@@ -119,6 +123,28 @@ public class SrvDepEvalMatrixBL : AdminBase
                 result.ResponseStatus = DBResult.NotFound;
                 return result;
             }
+
+            var evalForm = await uow.GetRepository<FormItemValue>()
+                 .GetAllNonDeleted()
+                 .Where(x => x.DepEvalMatrixId == obj.Id)
+                 .ToListAsync();
+
+            if (evalForm.Count > 0)
+            {
+                throw new BusinessException(ConstantKeys.ExceptionMessage.DepEvalMatrixExistsFormItemValue);
+            }
+
+
+            var orgEvalResult = await uow.GetRepository<OrgEvalResult>()
+              .GetAllNonDeleted()
+              .Where(x => x.DepEvalMatrixId == obj.Id)
+              .ToListAsync();
+
+            if (evalForm.Count > 0)
+            {
+                throw new BusinessException(ConstantKeys.ExceptionMessage.DepEvalMatrixExistsOrgEvalResults);
+            }
+
 
             uow.GetRepository<DepEvalMatrix>().Delete(obj);
             await uow.CommitAsync();

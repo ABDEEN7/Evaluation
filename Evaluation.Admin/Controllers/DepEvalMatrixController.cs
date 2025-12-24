@@ -61,8 +61,6 @@ namespace Evaluation.Admin.Controllers
         [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.AdminPermission.ADD_ADMIN_DEP_EVAL_MATRIX })]
         public async Task<IActionResult> SaveDepEvalMatrix()
         {
-
-            var files = Request.Form.Files;
             var result = new DepEvalMatrixDTO();
             var model = Request.Form["request"][0]?.StringToObject<DepEvalMatrixDTO>();
 
@@ -78,8 +76,6 @@ namespace Evaluation.Admin.Controllers
         [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.AdminPermission.EDIT_ADMIN_DEP_EVAL_MATRIX })]
         public async Task<IActionResult> UpdateDepEvalMatrix()
         {
-
-            var files = Request.Form.Files;
             var result = new DepEvalMatrixDTO();
             var model = Request.Form["request"][0]?.StringToObject<DepEvalMatrixDTO>();
 
