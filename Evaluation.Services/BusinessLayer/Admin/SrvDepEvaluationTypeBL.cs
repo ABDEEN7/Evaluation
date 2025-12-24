@@ -45,6 +45,7 @@ public class SrvDepEvaluationTypeBL : AdminBase
         DepEvaluationType DepEvaluationType = new DepEvaluationType();
         DepEvaluationType.NameEn = message.NameEn;
         DepEvaluationType.NameAr = message.NameAr;
+        DepEvaluationType.DepartmentId = message.DepartmentId;
         DepEvaluationType.IsActive = message.IsActive;
         DepEvaluationType.BackendName = bacendName;
         uow.GetRepository<DepEvaluationType>().Insert(DepEvaluationType);
@@ -97,6 +98,7 @@ public class SrvDepEvaluationTypeBL : AdminBase
         job.NameAr = DepEvaluationType.NameAr;
         job.NameEn = DepEvaluationType.NameEn;
         job.IsActive = DepEvaluationType.IsActive;
+        job.DepartmentId = DepEvaluationType.DepartmentId;
         job.UpdateById = userInfo.UserId;
         job.UpdateDate = DateTime.UtcNow;
 
@@ -105,6 +107,19 @@ public class SrvDepEvaluationTypeBL : AdminBase
         var result = mapper.Map<DepEvaluationTypeDto>(job);
         result.ResponseStatus = DBResult.Updated;
         return result;
+    }
+    public async Task<bool> UpdateDepEvaluationTypeOrderAsync(List<OrderingDTO> message)
+    {
+        var depEvaluationTypes = await uow.GetRepository<DepEvaluationType>()
+            .GetAllActiveNonDeleted()
+            .Where(n => message.Select(m => m.Id).Contains(n.Id))
+            .ToListAsync();
+        foreach (var depEvaluationType in depEvaluationTypes)
+        {
+            depEvaluationType.OrderNo = message.First(m => m.Id == depEvaluationType.Id).OrderNo;
+        }
+        await uow.CommitAsync();
+        return true;
     }
 }
 

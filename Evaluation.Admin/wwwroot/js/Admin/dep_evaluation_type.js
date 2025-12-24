@@ -123,7 +123,7 @@ $(document).ready(function () {
                     notificationUtil.success(sharedFn().GetUiControlText('ADMIN_MSG_UPDATE'));
                 }
             };
-            jqClientAdvanced(options).PostFormData("DepEvaluationType/UpdateDepEvaluationType", formData);
+            jqClientAdvanced(options).PostFormData("DepEvaluationType/UpdateDepEvaluationTypeOrder", formData);
 
         }
 

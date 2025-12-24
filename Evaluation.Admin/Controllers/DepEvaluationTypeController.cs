@@ -73,4 +73,11 @@ public class DepEvaluationTypeController : Controller
         }
         return Ok(result);
     }
+    [HttpPost]
+    public async Task<IActionResult> UpdateDepEvaluationTypeOrder()
+    {
+        var model = Request.Form["OrderObj"][0]?.StringToObject<List<OrderingDTO>>();
+        var result = await masterBL.GetAdminService<SrvJobTitleBL>().UpdateJobTitleOrderAsync(model!);
+        return Ok(result);
+    }
 }
