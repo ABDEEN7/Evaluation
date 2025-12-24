@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Runtime.InteropServices;
+using AutoMapper;
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.Master;
 using Evaluation.DAL.Models.PermissionEntity;
@@ -106,6 +107,19 @@ public class SrvJobTitleBL : AdminBase
         var result = mapper.Map<JobTitleDto>(job);
         result.ResponseStatus = DBResult.Updated;
         return result;
+    }
+    public async Task<bool> UpdateJobTitleOrderAsync(List<OrderingDTO> message)
+    {
+        var jobTitles = await uow.GetRepository<JobTitle>()
+            .GetAllActiveNonDeleted()
+            .Where(n=>message.Select(m=>m.Id).Contains(n.Id))
+            .ToListAsync();
+        foreach(var jobTitle in jobTitles)
+        {
+            jobTitle.OrderNo = message.First(m=>m.Id == jobTitle.Id).OrderNo;
+        }
+        await uow.CommitAsync();
+        return true;
     }
 }
 

@@ -123,7 +123,7 @@ $(document).ready(function () {
                     notificationUtil.success(sharedFn().GetUiControlText('ADMIN_MSG_UPDATE'));
                 }
             };
-            jqClientAdvanced(options).PostFormData("JobTitle/UpdateJobTitle", formData);
+            jqClientAdvanced(options).PostFormData("JobTitle/UpdateJobTitleOrder", formData);
 
         }
 

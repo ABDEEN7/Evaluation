@@ -72,4 +72,11 @@ public class JobTitleController : Controller
         }
         return Ok(result);
     }
+    [HttpPost]
+    public async Task<IActionResult> UpdateJobTitleOrder()
+    {
+        var model = Request.Form["OrderObj"][0]?.StringToObject<List<OrderingDTO>>();
+        var result = await masterBL.GetAdminService<SrvJobTitleBL>().UpdateJobTitleOrderAsync(model!);
+        return Ok(result);
+    }
 }
