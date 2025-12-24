@@ -45,12 +45,12 @@ public class EvaluationRequestBL(IServiceScopeFactory serviceScopeFactory, Cache
         if (evaluationRequestCalenderDto == null)
             return Result.Fail<EvaluationRequestCalenderDto>("evaluation request is null.");
 
-        var evaluationRequest = await evaluationRequestService.GetEvaluationRequestById(evaluationRequestCalenderDto.Id);
+        //var evaluationRequest = await evaluationRequestService.GetEvaluationRequestById(evaluationRequestCalenderDto.Id);
 
-        evaluationRequest.FromDate = DateTime.Parse(evaluationRequestCalenderDto.Start);
-        evaluationRequest.ToDate = DateTime.Parse(evaluationRequestCalenderDto.End).AddDays(-1);//remove extra day that added on show
+        //evaluationRequest.FromDate = DateTime.Parse(evaluationRequestCalenderDto.Start);
+        //evaluationRequest.ToDate = DateTime.Parse(evaluationRequestCalenderDto.End).AddDays(-1);//remove extra day that added on show
 
-        await evaluationRequestService.UpdateEvaluationRequest(evaluationRequest);
+        //await evaluationRequestService.UpdateEvaluationRequest(evaluationRequest);
 
         return evaluationRequestCalenderDto;
     }

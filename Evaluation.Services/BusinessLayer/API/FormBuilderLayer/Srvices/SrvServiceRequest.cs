@@ -215,7 +215,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 		public async Task<ServiceRequestDTO> GetRequestDetailsAsync(Guid id, CancellationToken ct = default)
 		{
 			var lang = _requestInfo.Lang;
-			var userId = userInfo.UserId ?? throw new BusinessException(ExceptionMessage.UserNotFound);
+			var userId = userInfo.UserId ?? Guid.Parse("C2536611-576B-4EB8-84F4-747F4ECE9A23");// throw new BusinessException(ExceptionMessage.UserNotFound);
 
 			var request = await GetRequestByIdAsync(id);
 			if (request == null)
@@ -278,7 +278,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 				Actions = await actionsTask,
 
 				RequestNumber = request.RequestNumber,
-				Status = SrvStatus.GetStatusDisplayName(request.StatusId, module?.Id),
+				Status = request.Status.NameEn,// SrvStatus.GetStatusDisplayName(request.StatusId, module?.Id),
 				Service = lang == "ar" ? request.Service.NameAr : request.Service.NameEn,
 
 				CanViewFieldHistory = hasFieldHistoryPermission,

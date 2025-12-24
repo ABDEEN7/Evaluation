@@ -114,38 +114,84 @@
                 formUtility.attachments = response.attachments || [];
                 $('#evaluationRequestModalLabel').text(response.status || '');
                 $('#evaluationRequestNoText').text(response.requestNumber || '');
+                $('#evaluationRequestDetailsModal').modal('show');
 
                 formUtility.renderPreviewView(
                     'formGroupsAccordion',
                     response.formGroups,
                     response.actions,
                     response.actionTransactions,
-                    response.attachments
+                    response.attachments,
+                    {
+                        requestId: requestId,                
+                        serviceId: response.serviceId, 
+                        actionsContainerId: 'actions-container',
+                        templateContainerId: 'divTemplates',
+                        modalContainerId: 'Action-container-fields',
+                        ctx: { root: '#evaluationRequestDetailsModal' }
+                    }
                 );
 
-                renderSchoolDetails(response);
 
                 renderEvaluationPartiesSection(response);
 
-                $('#evaluationRequestDetailsModal').modal('show');
+                bindSchoolDetails(response);
             }
         };
 
         jqClient(options).Get(`/ServiceRequest/GetEvaluationDetails?requestId=${requestId}`);
     }
 
-    function renderSchoolDetails(response) {
-        const schoolId = response.school?.id || response.orgTreeId;
+    function bindSchoolDetails(response) {
+        const s = response && response.school ? response.school : null;
+        if (!s) return;
 
-        if (!schoolId) {
-            $('#school-details-container')
-                .html('<div class="text-muted">لا توجد بيانات مدرسة</div>');
-            return;
-        }
+        const $root = $("#school-details-container");
 
-        $('#school-details-container')
-            .load(`/EvaluationPlan/RenderSchoolDetails?orgTreeId=${schoolId}`);
+        const formatDate = (val) => {
+            if (!val) return "";
+            const d = new Date(val);
+            if (isNaN(d.getTime())) return val;
+            const dd = String(d.getDate()).padStart(2, "0");
+            const mm = String(d.getMonth() + 1).padStart(2, "0");
+            const yyyy = d.getFullYear();
+            return `${dd}-${mm}-${yyyy}`;
+        };
+
+        const schoolName =
+            (window.currentLang === "ar" ? s.nameAr : s.nameEn) ||
+            s.nameAr ||
+            s.nameEn ||
+            "";
+
+        $root.find("#schoolName").text(schoolName);
+
+        $root.find("#managerName").text(s.managerQID || "");
+        $root.find("#establishmentDate").text(formatDate(s.establishmentDate));
+        $root.find("#teachers").text(s.teachersCount ?? s.teachers ?? "-");
+        $root.find("#students").text(s.studentsCount ?? s.students ?? "-");
+
+        const phone = s.phone || s.mobile || "";
+        $root.find("#phone").text(phone).attr("href", phone ? `tel:${phone}` : "#");
+
+        const email = s.orgEmail || s.manageEmail || "";
+        $root.find("#email").text(email).attr("href", email ? `mailto:${email}` : "#");
+
+        $root.find("#address").text(s.address || "");
+
+        $root.find("#currentRating").text(s.rating ?? "-");
+        $root.find("#currentRatingDate").text(
+            s.lastEvaluationDate ? formatDate(s.lastEvaluationDate) : ""
+        );
+
+        $root.find("#previousRating").text(response.previousRating ?? "-");
+        $root.find("#previousRatingDate").text(
+            response.previousRatingDate ? formatDate(response.previousRatingDate) : ""
+        );
     }
+
+
+
     function renderEvaluationPartiesSection(response) {
         const parties = response?.evaluationParties || [];
 

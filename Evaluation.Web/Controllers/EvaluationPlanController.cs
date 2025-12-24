@@ -2,6 +2,7 @@
 
 namespace Evaluation.Web.Controllers
 {
+
 	public class EvaluationPlanController : Controller
 	{
 		public IActionResult Index()
@@ -13,24 +14,6 @@ namespace Evaluation.Web.Controllers
             return View();
         }
 
-		[HttpGet]
-		public IActionResult RenderSchoolDetails(Guid orgTreeId)
-		{
-			var schoolHtml = $@"
-					<div class='row'>
-						<div class='col-md-6'><strong>School ID:</strong> {orgTreeId}</div>
-					</div> ";
-
-			return ViewComponent(
-				"SchoolDetailsModal",
-				new
-				{
-					modalId = "schoolDetailsContent",
-					title = "بيانات المدرسة",
-					body = schoolHtml
-				}
-			);
-		}
 
 	}
 }

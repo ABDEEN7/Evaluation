@@ -96,6 +96,9 @@
 
             <div class="modal-header">
                 <h5 class="modal-title" id="evaluationRequestModalLabel"></h5>
+
+                <div class="dropdown" id="actions-container">
+                </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
 
@@ -125,7 +128,101 @@
                              aria-labelledby="schoolHeader"
                              data-bs-parent="#evaluationRootAccordion">
                             <div class="accordion-body">
-                                <div id="school-details-container"></div>
+                                <div id="school-details-container">
+                                    <div class="mb-3">
+                                        <h4 class="fw-bold text-primary" id="schoolName"></h4>
+                                    </div>
+
+                                    <div class="py-0">
+                                        <div class="row">
+
+                                            <div class="col-md-6">
+                                                <div class="card card-table mb-4">
+                                                    <div class="card-body">
+                                                        <h5 class="fw-bold text-primary mb-3">
+                                                            <i class="la la-building"></i> معلومات أساسية
+                                                        </h5>
+
+                                                        <div class="row">
+                                                            <div class="col-md-6 mb-3">
+                                                                <p class="text-light">المدير</p>
+                                                                <h5 class="fw-bold" id="managerName"></h5>
+                                                            </div>
+
+                                                            <div class="col-md-6 mb-3">
+                                                                <p class="text-light">تاريخ الإنشاء</p>
+                                                                <h5 class="fw-bold" id="establishmentDate"></h5>
+                                                            </div>
+
+                                                            <div class="col-md-6 mb-3">
+                                                                <p class="text-light">المدرسون</p>
+                                                                <h5 class="fw-bold" id="teachers"></h5>
+                                                            </div>
+
+                                                            <div class="col-md-6 mb-3">
+                                                                <p class="text-light">الطلاب</p>
+                                                                <h5 class="fw-bold" id="students"></h5>
+                                                            </div>
+                                                        </div>
+
+                                                        <hr class="mt-0">
+
+                                                        <div class="row">
+                                                            <div class="col-md-12">
+                                                                <div class="d-flex gap-2 align-items-center mb-3">
+                                                                    <div class="social-icon"><i class="la la-phone-volume"></i></div>
+                                                                    <div><a id="phone" href="#" class="text-dark"></a></div>
+                                                                </div>
+
+                                                                <div class="d-flex gap-2 align-items-center mb-3">
+                                                                    <div class="social-icon"><i class="la la-envelope"></i></div>
+                                                                    <div><a id="email" href="#" class="text-dark"></a></div>
+                                                                </div>
+
+                                                                <div class="d-flex gap-2 align-items-center mb-3">
+                                                                    <div class="social-icon"><i class="la la-location-arrow"></i></div>
+                                                                    <div><p id="address" class="text-dark m-0"></p></div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <div class="card card-table mb-4">
+                                                    <div class="card-body">
+                                                        <h5 class="fw-bold text-primary mb-3">
+                                                            <i class="la la-chart-bar"></i> الوضع الحالي
+                                                        </h5>
+
+                                                        <div class="row">
+                                                            <div class="col-md-12 mb-3">
+                                                                <div class="bg-success-light p-3 text-center br-8">
+                                                                    <p>التقييم الحالي</p>
+                                                                    <h3 id="currentRating"></h3>
+                                                                    <p id="currentRatingDate"></p>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-md-12 mb-3">
+                                                                <div class="bg-danger-light p-3 text-center br-8">
+                                                                    <p>التقييم السابق</p>
+                                                                    <h3 id="previousRating"></h3>
+                                                                    <p id="previousRatingDate"></p>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+
                             </div>
                         </div>
                     </div>
@@ -162,6 +259,91 @@
     </div>
 </div>
 
+<div class="modal fade" id="planRequestModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-fullscreen">
+        <div class="modal-content">
+
+            <div class="modal-header justify-content-between flex-wrap flex-column">
+                <div class="d-flex justify-content-between flex-wrap w-100 align-items-center">
+                    <h5 class="modal-title">
+                        <span id="planRequestModalLabel"></span> -
+                        <span class="text-primary">
+                            <i class="fas fa-file-alt me-1"></i>
+                            <span id="planRequestNoText"></span>
+                        </span>
+                    </h5>
+
+                    <h5 class="modal-title" id="planRequestModalSubTitle"></h5>
+
+                    <div class="d-flex gap-3 align-items-center">
+                        <div class="dropdown" id="plan-actions-container"></div>
+                        <button type="button" class="btn-close m-0" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                </div>
+
+                <h5 class="modal-title align-items-start" id="planRequestModalDetailsLabel"></h5>
+            </div>
+
+            <div class="modal-body">
+
+               
+                <div class="accordion mt-4" id="planRequestViewAccordion">
+
+                    <div class="divNotes" id="divNotes"></div>
+                    <div class="divTemplates" id="plan-divTemplates"></div>
+
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="planRequestHeadingDetails">
+                            <button class="accordion-button"
+                                    type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#planRequestCollapseDetails"
+                                    aria-expanded="true"
+                                    aria-controls="planRequestCollapseDetails">
+                                تفاصيل الطلب
+                            </button>
+                        </h2>
+
+                        <div id="planRequestCollapseDetails"
+                             class="accordion-collapse collapse show"
+                             aria-labelledby="planRequestHeadingDetails"
+                             data-bs-parent="#planRequestViewAccordion">
+                            <div class="accordion-body">
+                                <div id="plan-request-details-container"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="planRequestHeadingLogs">
+                            <button class="accordion-button"
+                                    type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#planRequestCollapseLogs"
+                                    aria-expanded="true"
+                                    aria-controls="planRequestCollapseLogs">
+                                سجل الإجراءات
+                            </button>
+                        </h2>
+
+                        <div id="planRequestCollapseLogs"
+                             class="accordion-collapse collapse show"
+                             aria-labelledby="planRequestHeadingLogs"
+                             data-bs-parent="#planRequestViewAccordion">
+                            <div class="accordion-body">
+                                <div id="logTableContainer" class="table-responsive"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer"></div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <partial name="_PartialFileModal" />
 
 @section Scripts {
@@ -180,6 +362,7 @@
     <script src="~/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="/js/form-generation-util/form.constants.js"></script>
     <script src="/js/form-generation-util/form.api.js"></script>
+    <script src="~/js/form-generation-util/form.evaluationplanfield.js"></script>
     <script src="/js/form-generation-util/form.generate-field.js"></script>
     <script src="/js/form-generation-util/form.render.js"></script>
     <script src="/js/form-generation-util/form.submit.js"></script>

@@ -764,6 +764,7 @@ var formGenerateFieldUtility = window.formUtility;
         'dropdown': generateDropdownField,
         'list': generateListTable,
         'phone': generatePhoneField,
+        'evaluationPlan': generateEvaluationPlanField,
     };
 
     const generateField = (field, renderType, actionType = null, options = {}) => {

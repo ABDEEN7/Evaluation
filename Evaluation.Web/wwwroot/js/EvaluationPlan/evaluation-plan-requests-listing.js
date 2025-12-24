@@ -76,44 +76,54 @@
     function openPlanRequestDetails(requestId) {
         const options = {
             success: function (response) {
+
+                window.formUtility = window.formUtility || {};
                 formUtility.attachments = response.attachments || [];
-                formUtility.renderPreviewView('plan-request-details-container', response.statusGroup, response.formGroups, response.actions, response.actionTransactions, response.attachments);
-                $('#planRequestModalLabel').text(response.status);
-                $('#planRequestNoText').text(response.requestNumber);
+
+                formUtility.renderPreviewView(
+                    'plan-request-details-container',
+                    response.formGroups,
+                    response.actions,
+                    response.actionTransactions,
+                    response.attachments,
+                    {
+                        actionsContainerId: 'plan-actions-container',
+                        templateContainerId: 'plan-divTemplates',
+                        modalContainerId: 'plan-Action-container-fields',
+                        requestId: requestId,
+                        serviceId: response.serviceId,
+                        ctx: { root: '#planRequestModal' }
+                    }
+                );
+
+                $('#planRequestModalLabel').text(response.status || '');
+                $('#planRequestNoText').text(response.requestNumber || '');
+
                 $('#planRequestModal').modal('show');
-                $('#planRequestModal').off('shown.bs.modal.redraw').on('shown.bs.modal.redraw', function () {
-                    Tabulator.findTable("#planRequestModal .tabulator").forEach(t => t.redraw(true));
-                });
+
+                $('#planRequestModal')
+                    .off('shown.bs.modal.redraw')
+                    .on('shown.bs.modal.redraw', function () {
+                        if (window.Tabulator?.findTable) {
+                            Tabulator.findTable("#planRequestModal .tabulator")
+                                .forEach(t => t.redraw(true));
+                        }
+                    });
             }
         };
-        jqClient(options).Get(`/EvaluationPlanRequest/GetDetails?requestId=${requestId}`);
+
+        jqClient(options).Get(`/ServiceRequest/GetApplicationDetails?requestId=${requestId}`);
     }
 
-    //$('#btnAddEvaluationPlanRequest').on('click', function () {
-    //    //const el = document.getElementById("CreatePlanModal");
-    //    //const modal = bootstrap.Modal.getOrCreateInstance(el);
-    //    //modal.show();
-    //    //InitializeCreatePlanRequest();
-    //});
+
     $('#btnAddEvaluationPlanRequest').on('click', function () {
 
         const el = document.getElementById("CreatePlanModal");
         const modal = bootstrap.Modal.getOrCreateInstance(el);
         modal.show();
 
-        $("#CreatePlanModalBody").load("/Plan/CreatePartial", function (response, status) {
-            if (status !== "success") {
-                console.error("Failed to load Create partial:", response);
-                return;
-            }
-
-            if (typeof window.InitializeCreatePlanRequest === "function") {
                 window.InitializeCreatePlanRequest();
-            } else if (typeof window.CreatePlan?.InitializeCreatePlanRequest === "function") {
-                window.CreatePlan.InitializeCreatePlanRequest();
-            }
-        });
+           
     });
-
     planRequestsListing.reload();
 });
