@@ -133,6 +133,8 @@ public static class ConstantKeys
         public static readonly string WebGroupExistsDepWebGroup = "WebGroupExistsDepWebGroup";
         public static readonly string ScopeExistsScopeAcademicYear = "ScopeExistsScopeAcademicYear";
         public static readonly string FormEvalMatrixExistsFormEval = "FormEvalMatrixExistsFormEval";
+        public static readonly string DepEvalMatrixExistsFormItemValue = "DepEvalMatrixExistsFormItemValue";
+        public static readonly string DepEvalMatrixExistsOrgEvalResults = "DepEvalMatrixExistsOrgEvalResults";
         public static readonly string ScopeExistsAcademicYearScope = "ScopeExistsAcademicYearScope";
         public static readonly string SchoolTypesExistsOrganization = "SchoolTypesExistsOrganization";
         public static readonly string SchoolTypesExistsSchool = "SchoolTypesExistsSchool";
@@ -260,6 +262,7 @@ public static class ConstantKeys
         public static readonly string AdminActionCondition = "AdminActionCondition";
         public static readonly string AdminAcademicYear = "AdminAcademicYear";
         public static readonly string AdminFormEvalMatrix = "AdminFormEvalMatrix";
+        public static readonly string AdminDepEvalMatrix = "AdminDepEvalMatrix";
         public static readonly string AdminAcademicYearScope = "AdminAcademicYearScope";
         public static readonly string AdminScopeAcademicYear = "AdminScopeAcademicYear";
         public static readonly string AdminUserPartyType = "AdminUserPartyType";
@@ -443,6 +446,15 @@ public static class ConstantKeys
         public const string ADD_ADMIN_FORM_EVAL_MATRIX = "ADD_ADMIN_FORM_EVAL_MATRIX";
         public const string EDIT_ADMIN_FORM_EVAL_MATRIX = "EDIT_ADMIN_FORM_EVAL_MATRIX";
         public const string VIEW_ADMIN_FORM_EVAL_MATRIX = "VIEW_ADMIN_FORM_EVAL_MATRIX";
+
+        #endregion
+
+        #region DEP_EVAL_MATRIX
+
+        public const string DELETE_ADMIN_DEP_EVAL_MATRIX = "DELETE_ADMIN_DEP_EVAL_MATRIX";
+        public const string ADD_ADMIN_DEP_EVAL_MATRIX = "ADD_ADMIN_DEP_EVAL_MATRIX";
+        public const string EDIT_ADMIN_DEP_EVAL_MATRIX = "EDIT_ADMIN_DEP_EVAL_MATRIX";
+        public const string VIEW_ADMIN_DEP_EVAL_MATRIX = "VIEW_ADMIN_DEP_EVAL_MATRIX";
 
         #endregion
 
