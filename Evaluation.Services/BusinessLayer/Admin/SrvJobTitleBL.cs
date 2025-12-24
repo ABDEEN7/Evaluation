@@ -49,6 +49,8 @@ public class SrvJobTitleBL : AdminBase
         jobTitle.NameAr = message.NameAr;
         jobTitle.IsActive = message.IsActive;
         jobTitle.BackendName = bacendName;
+        jobTitle.IsOrgManager = message.IsOrgManager;
+        jobTitle.HRCode = message.HrCode;
         uow.GetRepository<JobTitle>().Insert(jobTitle);
         await uow.CommitAsync();
         message.ResponseStatus = DBResult.Updated;
@@ -101,6 +103,8 @@ public class SrvJobTitleBL : AdminBase
         job.IsActive = jobTitle.IsActive;
         job.UpdateById = userInfo.UserId;
         job.UpdateDate = DateTime.UtcNow;
+        job.HRCode = jobTitle.HrCode;
+        job.IsOrgManager = jobTitle.IsOrgManager;
 
         repository.Update(job);
         await uow.CommitAsync().ConfigureAwait(false);
