@@ -1,4 +1,5 @@
-﻿using Evaluation.Admin.Extensions;
+﻿using Evaluation.Admin.ActionFilter;
+using Evaluation.Admin.Extensions;
 using Evaluation.Admin.Models;
 using Evaluation.DAL.Models.Master;
 using Evaluation.Services.BusinessLayer;
@@ -20,6 +21,7 @@ public class JobTitleController : Controller
         this.masterBL = masterBL;
         this.httpContextAccessor = httpContextAccessor;
     }
+    [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.AdminPermission.VIEW_ADMIN_JOBTITLE })]
     public async Task<IActionResult> Index()
     {
         var model = new JobTitleVM(httpContextAccessor);
@@ -30,6 +32,7 @@ public class JobTitleController : Controller
         return View(model);
     }
     [HttpGet]
+    [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.AdminPermission.VIEW_ADMIN_JOBTITLE })]
     public async Task<IActionResult> GetAllJobTitle(int page = 1)
     {
         var pageSize = Convert.ToInt32(masterBL.GetAdminService<SrvSystemSettingBL>
@@ -38,6 +41,7 @@ public class JobTitleController : Controller
         return Ok(response);
     }
     [HttpPost]
+    [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.AdminPermission.ADD_ADMIN_JOBTITLE })]
     public async Task<IActionResult> SaveJobTitle()
     {
 
@@ -53,6 +57,7 @@ public class JobTitleController : Controller
 
     }
     [HttpPost]
+    [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.AdminPermission.DELETE_ADMIN_JOBTITLE })]
     public async Task<IActionResult> DeleteJobTitle(Guid id)
     {
         var result = await masterBL
@@ -61,6 +66,7 @@ public class JobTitleController : Controller
         return Ok(result);
     }
     [HttpPost]
+    [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.AdminPermission.EDIT_ADMIN_JOBTITLE })]
     public async Task<IActionResult> UpdateJobTitle()
     {
         var request = Request.Form["request"][0]?.StringToObject<JobTitleDto>();
