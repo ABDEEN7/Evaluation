@@ -2,11 +2,13 @@
 using AutoMapper;
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.Master;
+using Evaluation.DAL.Models.Org;
 using Evaluation.DAL.Models.PermissionEntity;
 using Evaluation.DAL.Repositories;
 using Evaluation.Services.Models.Admin;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Enums;
+using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Admin;
 using Microsoft.EntityFrameworkCore;
@@ -63,6 +65,10 @@ public class SrvJobTitleBL : AdminBase
             .GetAllActiveNonDeleted(x => x.Id == id)
             .FirstOrDefaultAsync()
             .ConfigureAwait(false);
+        var hasEmployee = await uow.GetRepository<Employee>().GetAllActiveNonDeleted().AnyAsync(x => x.JobTitleId == id);
+        if (hasEmployee)
+            throw new BusinessException(ConstantKeys.ExceptionMessage.JobTitleCannotDelete);
+        
         if (jobTitle == null)
         {
             return new JobTitleDto
@@ -116,11 +122,11 @@ public class SrvJobTitleBL : AdminBase
     {
         var jobTitles = await uow.GetRepository<JobTitle>()
             .GetAllActiveNonDeleted()
-            .Where(n=>message.Select(m=>m.Id).Contains(n.Id))
+            .Where(n => message.Select(m => m.Id).Contains(n.Id))
             .ToListAsync();
-        foreach(var jobTitle in jobTitles)
+        foreach (var jobTitle in jobTitles)
         {
-            jobTitle.OrderNo = message.First(m=>m.Id == jobTitle.Id).OrderNo;
+            jobTitle.OrderNo = message.First(m => m.Id == jobTitle.Id).OrderNo;
         }
         await uow.CommitAsync();
         return true;
