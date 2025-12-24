@@ -33,7 +33,7 @@ public class PlanController(MasterBL masterBL) : ControllerBase
     }
 
     [HttpGet]
-    [CheckRolePermisionFilter(true, ConstantKeys.WebPermission.GET_SEMESTERS_REQUEST)]
+    //[CheckRolePermisionFilter(true, ConstantKeys.WebPermission.GET_SEMESTERS_REQUEST)]
     public async Task<IActionResult> GetSemesters()
     {
         //var semester = await masterBL.GetApiService<SemesterRequestServices>().GetSemestersAsync(new Guid("37689d34-4928-4bb9-92b4-8a11abc0dbaf"));
