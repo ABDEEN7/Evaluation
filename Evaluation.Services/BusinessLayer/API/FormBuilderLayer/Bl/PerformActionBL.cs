@@ -114,9 +114,7 @@ namespace Evaluation.Services.Models.API
 			Fields = allFields;
 
 
-			var FieldsToUpdates1 = Fields
-								  .Where(c => editableFields.Contains(c.FieldId!.Value))
-								  .ToList();
+			
 			var FieldsToUpdates = Fields
 								  .Where(c => editableFields.Contains(c.FieldId!.Value) || c.BackendName == "EntityContractId" || c.BackendName == "SectorId")
 								  .ToList();

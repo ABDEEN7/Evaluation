@@ -22,7 +22,7 @@ namespace Evaluation.DAL.Models.ServiceRequestEntities
 		public ServiceStatus? Status { get; set; }
 		public Guid ServiceId { get; set; }
 		public Service? Service { get; set; }
-		public Guid OrgTreeId { get; set; }
+		public Guid? OrgTreeId { get; set; }
 		public OrgTree? OrgTree { get; set; }
 		public long Sequence { get; set; }
 		public Guid? PlanId { get; set; }

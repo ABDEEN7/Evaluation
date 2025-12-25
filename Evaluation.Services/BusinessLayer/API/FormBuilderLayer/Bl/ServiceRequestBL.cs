@@ -123,15 +123,15 @@ namespace Evaluation.Services.Models.API
 				};
 
 				var validateRequestTask = ValidateCanCreateRequest(planId, serviceObj);
-				if (actionFormDTO?.FieldValues != null)
-				{
-					var validateActionTask = SrvAction.ValidateActionAndActionFieldAsync(null,  actionFormDTO?.FieldValues!, remarks, othersAttachement, serviceObj, status.Id, action, fileFields, saveAsDraft);
-					await Task.WhenAll(validateRequestTask, validateActionTask);
+				//if (actionFormDTO?.FieldValues != null)
+				//{
+				//	var validateActionTask = SrvAction.ValidateActionAndActionFieldAsync(null,  actionFormDTO?.FieldValues!, remarks, othersAttachement, serviceObj, status.Id, action, fileFields, saveAsDraft);
+				//	await Task.WhenAll(validateRequestTask, validateActionTask);
 
-					var validatedFields = await validateActionTask;
+				//	var validatedFields = await validateActionTask;
 
-					actionFormDTO!.FieldValues = (await _srvAttachments.UploadAndInsertAttachments(validatedFields.ToList(), request.Id, request.PlanId, fileFields, filesWithFieldId)).Cast<FieldValueDTO?>().ToList();
-				}
+				//	actionFormDTO!.FieldValues = (await _srvAttachments.UploadAndInsertAttachments(validatedFields.ToList(), request.Id, request.PlanId, fileFields, filesWithFieldId)).Cast<FieldValueDTO?>().ToList();
+				//}
 
 
 

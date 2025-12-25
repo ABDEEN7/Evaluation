@@ -33,34 +33,26 @@ window.serviceRequestForm = window.serviceRequestForm || {};
 
     const generateSubmitButton = (requestId, formGroups, actionDetails, wrapInContainer = true) => {
         const lang = window.currentLang || "en";
-        const actionName = lang === "ar" ? actionDetails.nameAr : actionDetails.nameEn;
+        const btnText = lang === "ar" ? actionDetails.nameAr : actionDetails.nameEn;
 
         const $btn = $('<button>')
             .addClass('btn btn-success ms-2 btn-sm min-w-auto')
             .attr('type', 'button')
             .attr('id', 'submitButton')
-            .text(actionName)
+            .text(btnText)
             .on('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
 
                 const doSubmit = () => {
-                    if (typeof window.handleSubmit === "function") {
-                        window.handleSubmit(requestId, formGroups, actionDetails, /*isDraft*/ false);
-                    } else if (typeof ns.submitAction === "function") {
-                        ns.submitAction(actionDetails, formGroups);
-                    }
+                    ns.submitAction(actionDetails, formGroups,  saveAsDraft= false );
                 };
 
                 if (actionDetails.isConfirmationAction && window.notificationUtil?.confirmation) {
                     notificationUtil.confirmation(
                         {
-                            title: lang === "ar"
-                                ? actionDetails.confirmationTitleAr
-                                : actionDetails.confirmationTitleEn,
-                            body: lang === "ar"
-                                ? actionDetails.confirmationBodyAr
-                                : actionDetails.confirmationBodyEn,
+                            title: lang === "ar" ? actionDetails.confirmationTitleAr : actionDetails.confirmationTitleEn,
+                            body: lang === "ar" ? actionDetails.confirmationBodyAr : actionDetails.confirmationBodyEn,
                             okText: getText('lblOk'),
                             cancelText: getText('lblCancel'),
                         },
@@ -410,11 +402,8 @@ window.serviceRequestForm = window.serviceRequestForm || {};
                     e.preventDefault();
                     e.stopPropagation();
 
-                    if (typeof window.handleSubmit === "function") {
-                        window.handleSubmit(requestId, groups, actionDetails, /*isDraft*/ true);
-                    } else if (typeof ns.submitAction === "function") {
-                        ns.submitAction(actionDetails, groups, { isDraft: true });
-                    }
+                    ns.submitAction(actionDetails, groups,  saveAsDraft= true );
+                    
                 });
 
             $buttonsWrapper.append($draftBtn);

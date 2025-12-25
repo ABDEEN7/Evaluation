@@ -762,6 +762,7 @@ namespace Evaluation.Services.BusinessLayer.API
 					actionConfig.ShowIsDefaultAssigner);
 			}
 
+			actionCustom.BakendName = action.BackendName;
 			actionCustom.IsRemark = actionConfig.IsRemark;
 			actionCustom.IsOtherAttachment = actionConfig.IsOtherAttachment;
 			actionCustom.IsRemarkRequired = actionConfig.IsRemarkRequired;
