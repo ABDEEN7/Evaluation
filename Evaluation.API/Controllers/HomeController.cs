@@ -2,6 +2,7 @@
 using Evaluation.API.Filters;
 using Evaluation.Services.BusinessLayer;
 using Evaluation.Services.Models.API;
+using Evaluation.Services.Shared;
 using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Models.Api;
 using Microsoft.AspNetCore.Authorization;
@@ -28,17 +29,17 @@ namespace Evaluation.API.Controllers
         }
 
 
-        //[HttpPost]
-        //public async Task<IActionResult> GetPageControls()
-        //{
-        //    var pages = Request.Form["pages"].ElementAtOrDefault(0)?.StringToObject<List<string>>()?.ToArray() ?? [];
-        //    var permissions = Request.Form["permissions"].ElementAtOrDefault(0)?.StringToObject<List<string>>()?.ToArray() ?? [];
-        //    var systemSettings = Request.Form["systemSettings"].ElementAtOrDefault(0)?.StringToObject<List<string>>()?.ToArray() ?? [];
+        [HttpPost]
+        public async Task<IActionResult> GetPageControls()
+        {
+            var pages = Request.Form["pages"].ElementAtOrDefault(0)?.StringToObject<List<string>>()?.ToArray() ?? [];
+            var permissions = Request.Form["permissions"].ElementAtOrDefault(0)?.StringToObject<List<string>>()?.ToArray() ?? [];
+            var systemSettings = Request.Form["systemSettings"].ElementAtOrDefault(0)?.StringToObject<List<string>>()?.ToArray() ?? [];
 
-        //    var model = new BaseVM(httpContextAccessor);
-        //    await model.LoadAllAData(pages, permissions, systemSettings);
-        //    return Ok(model);
-        //}
+            var model = new BaseVM(httpContextAccessor);
+            await model.LoadAllAData(pages, permissions, systemSettings);
+            return Ok(model);
+        }
 
         //[HttpGet]
         //public async Task<IActionResult> GetSearchResult(int page, string? query)
