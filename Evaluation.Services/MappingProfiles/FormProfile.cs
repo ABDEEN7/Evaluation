@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Evaluation.DAL.Dtos.Form;
 using Evaluation.DAL.Models.FormsModules;
+using Evaluation.SharedHelper.Dtos.Form;
 
 namespace Evaluation.Services.MappingProfiles;
 
@@ -11,7 +12,7 @@ public class FormProfile : Profile
         CreateMap<FormItem, FormItemDto>()
             .ForMember(d => d.Id, opt => opt.MapFrom(src => src.Id))
             .ForMember(d => d.Name, opt => opt.MapFrom(src => src.NameEn))
-            .ForMember(d => d.OrderNo, opt => opt.MapFrom(src => src.OrderNo))
+            //.ForMember(d => d.OrderNo, opt => opt.MapFrom(src => src.OrderNo))
             .ForMember(d => d.HasNote, opt => opt.MapFrom(src => src.HasNote))
             .ForMember(d => d.SubFormItems, opt => opt.MapFrom(src => src.SubFormItems))
             .ReverseMap();
@@ -58,6 +59,13 @@ public class FormProfile : Profile
                       }
                   }
               });
+
+
+        CreateMap<FormEvalMarixValue, FormEvalMarixValueDto>()
+         .ForMember(d => d.Id, opt => opt.MapFrom(src => src.Id))
+         .ForMember(d => d.Name, opt => opt.MapFrom(src => src.NameEn))
+         .ForMember(d => d.MaxValue, opt => opt.MapFrom(src => src.MaxValue))
+         .ReverseMap();
 
     }
 }
