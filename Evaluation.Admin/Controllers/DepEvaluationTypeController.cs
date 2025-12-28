@@ -1,4 +1,5 @@
-﻿using Evaluation.Admin.Extensions;
+﻿using Evaluation.Admin.ActionFilter;
+using Evaluation.Admin.Extensions;
 using Evaluation.Admin.Models;
 using Evaluation.DAL.Models.DepartementEntites;
 using Evaluation.Services.BusinessLayer;
@@ -20,17 +21,19 @@ public class DepEvaluationTypeController : Controller
         this.masterBL = masterBL;
         this.httpContextAccessor = httpContextAccessor;
     }
+    [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.AdminPermission.VIEW_ADMIN_DEPEVALUATIONTYPE })]
     public async Task<IActionResult> Index()
     {
         var model = new DepEvaluationTypeVM(httpContextAccessor);
         await model.LoadAllAData(new string[] { ConstantKeys.AdminPages.AdminDepEvaluationType },
-                new string[] { ConstantKeys.AdminPermission.ADD_ADMIN_DepEvaluationType });
+                new string[] { ConstantKeys.AdminPermission.ADD_ADMIN_DEPEVALUATIONTYPE });
         var property = typeof(DepEvaluationType).GetProperty("OrderNo");
         model.containsOrderNo = property != null ? true : false;
         return View(model);
     }
 
     [HttpGet]
+    [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.AdminPermission.VIEW_ADMIN_DEPEVALUATIONTYPE })]
     public async Task<IActionResult> GetAllDepEvaluationType(int page = 1)
     {
         var pageSize = Convert.ToInt32(masterBL.GetAdminService<SrvSystemSettingBL>
@@ -39,6 +42,7 @@ public class DepEvaluationTypeController : Controller
         return Ok(response);
     }
     [HttpPost]
+    [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.AdminPermission.ADD_ADMIN_DEPEVALUATIONTYPE })]
     public async Task<IActionResult> SaveDepEvaluationType()
     {
 
@@ -54,6 +58,7 @@ public class DepEvaluationTypeController : Controller
 
     }
     [HttpPost]
+    [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.AdminPermission.DELETE_ADMIN_DEPEVALUATIONTYPE })]
     public async Task<IActionResult> DeleteDepEvaluationType(Guid id)
     {
         var result = await masterBL
@@ -62,11 +67,12 @@ public class DepEvaluationTypeController : Controller
         return Ok(result);
     }
     [HttpPost]
+    [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.AdminPermission.EDIT_ADMIN_DEPEVALUATIONTYPE })]
     public async Task<IActionResult> UpdateDepEvaluationType()
     {
         var request = Request.Form["request"][0]?.StringToObject<DepEvaluationTypeDto>();
         var result = new DepEvaluationTypeDto();
-        bool validateObject = await masterBL.GetAdminService<SrvBaseBL>().ValidateObject(request!, ConstantKeys.AdminPermission.EDIT_ADMIN_DepEvaluationType);
+        bool validateObject = await masterBL.GetAdminService<SrvBaseBL>().ValidateObject(request!, ConstantKeys.AdminPermission.ADD_ADMIN_DEPEVALUATIONTYPE);
         if (validateObject)
         {
             result = await masterBL.GetAdminService<SrvDepEvaluationTypeBL>().UpdateDepEvaluationType(request!);
@@ -74,10 +80,11 @@ public class DepEvaluationTypeController : Controller
         return Ok(result);
     }
     [HttpPost]
+    [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.AdminPermission.EDIT_ADMIN_DEPEVALUATIONTYPE })]
     public async Task<IActionResult> UpdateDepEvaluationTypeOrder()
     {
         var model = Request.Form["OrderObj"][0]?.StringToObject<List<OrderingDTO>>();
-        var result = await masterBL.GetAdminService<SrvJobTitleBL>().UpdateJobTitleOrderAsync(model!);
+        var result = await masterBL.GetAdminService<SrvDepEvaluationTypeBL>().UpdateDepEvaluationTypeOrderAsync(model!);
         return Ok(result);
     }
 }

@@ -632,10 +632,11 @@ public static class ConstantKeys
         #endregion
 
         #region DepEvaluationType
-        public const string VIEW_ADMIN_DepEvaluationType = "VIEW_ADMIN_DepEvaluationType";
-        public const string ADD_ADMIN_DepEvaluationType = "ADD_ADMIN_DepEvaluationType";
-        public const string EDIT_ADMIN_DepEvaluationType = "EDIT_ADMIN_DepEvaluationType";
-        public const string DELETE_ADMIN_DepEvaluationType = "DELETE_ADMIN_DepEvaluationType";
+        public const string VIEW_ADMIN_DEPEVALUATIONTYPE = "VIEW_ADMIN_DEPEVALUATIONTYPE";
+        public const string ADD_ADMIN_DEPEVALUATIONTYPE = "ADD_ADMIN_DEPEVALUATIONTYPE";
+        public const string EDIT_ADMIN_DEPEVALUATIONTYPE = "EDIT_ADMIN_DEPEVALUATIONTYPE";
+        public const string DELETE_ADMIN_DEPEVALUATIONTYPE = "DELETE_ADMIN_DEPEVALUATIONTYPE";
+        public const string EDIT_ORDER_ADMIN_DEPEVALUATIONTYPE = "EDIT_ORDER_ADMIN_DEPEVALUATIONTYPE";
         #endregion
 
         #region SCHOOL
