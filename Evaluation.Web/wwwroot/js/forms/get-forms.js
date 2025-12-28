@@ -2,7 +2,7 @@
 // Globals & Constants
 // ==============================
 const params = new URLSearchParams(window.location.search);
-const FORM_ID = params.get('formId');
+//const FORM_ID = params.get('formId');
 
 let matrixValues = [];
 let itemsResult = [];
@@ -164,8 +164,8 @@ const generateTableBodyHtml = async (items, hasAnyNote, hasAnyChildren, fieldId,
 // ==============================
 // Page Generator
 // ==============================
-const generateFullFormPageHtml = async ({ fieldId, readOnly }) => {
-    itemsResult = await jqClient().Get(`/Form/GetItems?formId=${FORM_ID}`);
+const generateFullFormPageHtml = async ({ formId, fieldId, readOnly }) => {
+    itemsResult = await jqClient().Get(`/Form/GetItems?formId=${formId}`);
     const items = itemsResult?.value ?? [];
 
     const hasAnyNote = items.some(i => i.hasNote);
@@ -185,9 +185,9 @@ const generateFullFormPageHtml = async ({ fieldId, readOnly }) => {
 // ==============================
 // Initialize Controls
 // ==============================
-async function initializeControls(fieldId, controlValues) {
+async function initializeControls(formId, fieldId, controlValues) {
 
-    const matrixResponse = await jqClient().Get(`/Form/GetFormEvalMarixValues?formId=${FORM_ID}`);
+    const matrixResponse = await jqClient().Get(`/Form/GetFormEvalMarixValues?formId=${formId}`);
 
     const items = itemsResult?.value ?? [];
     const matrixValues = matrixResponse?.value ?? matrixResponse ?? [];
@@ -251,6 +251,7 @@ async function initializeControls(fieldId, controlValues) {
 //document.addEventListener('DOMContentLoaded', async () => {
 //    try {
 //        const html = await generateFullFormPageHtml({
+//            formId: 'b8fb67a9-b09a-4e0c-a466-d0625d92521d',
 //            fieldId: 'ADD_YOUR_FIELD_ID_HERE',
 //            readOnly: false
 //        });
