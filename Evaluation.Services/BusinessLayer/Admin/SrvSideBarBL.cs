@@ -26,7 +26,7 @@ namespace Evaluation.Services.Models.Admin
             var allData = await uow.GetRepository<SideBar>()
                 .GetAllNonDeleted()
                 .Include(x => x.Permission)
-                .Where(x => (x.Permission != null && permissionids.Contains(x.Permission.BackendName)) || (x.ParentId == null && x.PermissionId == null))
+                //.Where(x => (x.Permission != null && permissionids.Contains(x.Permission.BackendName)) || (x.ParentId == null && x.PermissionId == null))
                 .OrderBy(x => x.OrderNo).ThenByDescending(x => x.CreateDate)
                 .Select(c => new SideBarDTO
                 {
