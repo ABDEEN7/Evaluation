@@ -49,7 +49,7 @@ public class DepEvaluationTypeController : Controller
         var request = Request.Form["request"][0]?.StringToObject<DepEvaluationTypeDto>();
 
         var result = new DepEvaluationTypeDto();
-        bool validateObject = await masterBL.GetAdminService<SrvBaseBL>().ValidateObject(request!, ConstantKeys.AdminPermission.ADD_ADMIN_DepEvaluationType);
+        bool validateObject = await masterBL.GetAdminService<SrvBaseBL>().ValidateObject(request!, ConstantKeys.AdminPermission.ADD_ADMIN_DEPEVALUATIONTYPE);
         if (validateObject)
         {
             result = await masterBL.GetAdminService<SrvDepEvaluationTypeBL>().SaveDepEvaluationType(request!);
