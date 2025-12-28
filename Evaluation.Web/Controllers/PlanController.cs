@@ -13,11 +13,11 @@ namespace Evaluation.Web.Controllers
         {
             var viewModel = new PlanViewModel
             {
-                RenderType = "action",
-                ActionType = "EDIT",
-                PlanId = new Guid("E5F7D1E5-3A7E-4DE7-939C-FCC2298FB7CB"),
                 //RenderType = "action",
-                //ActionType = "CREATE"
+                //ActionType = "EDIT",
+                //PlanId = new Guid("E5F7D1E5-3A7E-4DE7-939C-FCC2298FB7CB"),
+                RenderType = "action",
+                ActionType = "CREATE"
             };
             return View(viewModel);
         }

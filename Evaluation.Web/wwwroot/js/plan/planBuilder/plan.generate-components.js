@@ -1,11 +1,10 @@
 ﻿window.planUtility = window.planUtility || {};
-const planUtility = window.planUtility;
+//const planUtility = window.planUtility;
 
 (function (ns) {
 
     // ================== CONSTANTS ==================
     const {
-        RENDER_TYPE,
         ACTION_TYPE,
         ReadOnly_ACTION_TYPES,
         PLAN_FIELD_TYPE,
@@ -31,6 +30,35 @@ const planUtility = window.planUtility;
 
     // ================== HELPER FUNCTIONS ==================
 
+    const initSelect2 = (selector, placeholder, disabled) =>{
+        const $el = $(selector);
+        if (!$el.length) return;
+        //Destroy if already initialized
+        if ($el.hasClass("select2-hidden-accessible")) {
+            $el.select2('destroy');
+        }
+        $el.select2({
+            placeholder: placeholder,
+            width: '100%',
+            allowClear: true
+        });
+        if (disabled) {
+            $el.prop('disabled', true);
+        }
+    };
+    const formatDateRange = (startDate, endDate) => {
+        if (!startDate || !endDate) return '';
+
+        // Handle different date formats
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+
+        if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+            return '';
+        }
+
+        return `${formatDateISO(start)} to ${formatDateISO(end)}`;
+    };
     const formatDateISO = (date) => {
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -43,17 +71,14 @@ const planUtility = window.planUtility;
         return ns.holidays.some(h => h.date === dateStr);
     };
 
-    const isReadOnly = (renderType, actionType) => {
-        return renderType === RENDER_TYPE.PREVIEW ||
-            ReadOnly_ACTION_TYPES.includes(actionType);
-    };
+  
 
     // ================== PLAN FORM FIELD GENERATORS ==================
 
     const generateTitleField = (field, readonly) => {
         const inputElement = $('<input>')
             .attr('type', 'text')
-            .attr('id', 'planTitle')
+            .attr('id',  'planTitle')
             .attr('name', 'PlanTitle')
             .addClass('form-control')
             .attr('placeholder', 'أدخل عنوان الخطة')
@@ -176,7 +201,7 @@ const planUtility = window.planUtility;
 
     // ================== SCHOOL TABLE FIELD GENERATORS ==================
 
-    const generateSelectCheckbox = (school, readonly, isComparison = false) => {
+    const generateSelectCheckbox = (school, readonly) => {
         const label = $('<label>').addClass('custom-checkbox');
 
         const checkbox = $('<input>')
@@ -222,7 +247,7 @@ const planUtility = window.planUtility;
         return container;
     };
 
-    const generateVisitDateField = (school, readonly, renderType) => {
+    const generateVisitDateField = (school, readonly) => {
         let visitDateValue = '';
 
         if (school.fromDate || school.toDate) {
@@ -288,8 +313,8 @@ const planUtility = window.planUtility;
 
     // ================== TABLE ROW GENERATOR ==================
 
-    const generateSchoolRow = (school, renderType, actionType) => {
-        const readonly = isReadOnly(renderType, actionType);
+    const generateSchoolRow = (school, isReadOnly, actionType) => {
+        const readonly = isReadOnly;
         const row = $('<tr>');
 
         // Checkbox cell
@@ -304,7 +329,7 @@ const planUtility = window.planUtility;
 
         // Visit date cell
         const visitDateCell = $('<td>');
-        visitDateCell.append(generateVisitDateField(school, readonly, renderType));
+        visitDateCell.append(generateVisitDateField(school, readonly));
         row.append(visitDateCell);
 
         // Last evaluation date cell
@@ -330,31 +355,10 @@ const planUtility = window.planUtility;
         return row;
     };
 
-    // ================== COMPARISON VIEW GENERATOR ==================
-
-    const generateComparisonView = (oldPlan, newPlan) => {
-        const container = $('<div>').addClass('comparison-container row');
-
-        // Old Plan Column
-        const oldColumn = $('<div>').addClass('col-md-6 border-end');
-        oldColumn.append($('<h4>').addClass('text-muted mb-3').text('الخطة القديمة'));
-        oldColumn.append(renderPlanForm(oldPlan, RENDER_TYPE.PREVIEW, ACTION_TYPE.VIEW));
-        oldColumn.append(renderSchoolTable(oldPlan.schools || [], RENDER_TYPE.PREVIEW, ACTION_TYPE.VIEW));
-
-        // New Plan Column
-        const newColumn = $('<div>').addClass('col-md-6');
-        newColumn.append($('<h4>').addClass('text-primary mb-3').text('الخطة الجديدة'));
-        newColumn.append(renderPlanForm(newPlan, RENDER_TYPE.PREVIEW, ACTION_TYPE.VIEW));
-        newColumn.append(renderSchoolTable(newPlan.schools || [], RENDER_TYPE.PREVIEW, ACTION_TYPE.VIEW));
-
-        container.append(oldColumn, newColumn);
-        return container;
-    };
-
     // ================== RENDER FUNCTIONS ==================
 
-    const renderPlanForm = (planData, renderType, actionType) => {
-        const readonly = isReadOnly(renderType, actionType);
+    const renderPlanForm = (planData, isReadOnly, actionType) => {
+        const readonly = isReadOnly;
         const form = $('<form>').addClass('row').attr('id', 'planForm');
 
         // Title Field
@@ -421,8 +425,7 @@ const planUtility = window.planUtility;
         return form;
     };
 
-    const renderSchoolTable = (schools, renderType, actionType) => {
-        const readonly = isReadOnly(renderType, actionType);
+    const renderSchoolTable = (schools, isReadOnly, actionType) => {
         const tbody = $('<tbody>');
 
         if (!schools || schools.length === 0) {
@@ -436,7 +439,7 @@ const planUtility = window.planUtility;
             tbody.append(emptyRow);
         } else {
             schools.forEach(school => {
-                const row = generateSchoolRow(school, renderType, actionType);
+                const row = generateSchoolRow(school, isReadOnly, actionType);
                 tbody.append(row);
             });
         }
@@ -662,7 +665,6 @@ const planUtility = window.planUtility;
         }
     };
 
-    // Helper function to get month range from selected date
     const getMonthRange = (date) => {
         const year = date.getFullYear();
         const month = date.getMonth();
@@ -671,19 +673,7 @@ const planUtility = window.planUtility;
             end: new Date(year, month + 1, 0)
         };
     };
-    const formatDateRange = (startDate, endDate) => {
-        if (!startDate || !endDate) return '';
-
-        // Handle different date formats
-        const start = new Date(startDate);
-        const end = new Date(endDate);
-
-        if (isNaN(start.getTime()) || isNaN(end.getTime())) {
-            return '';
-        }
-
-        return `${formatDateISO(start)} to ${formatDateISO(end)}`;
-    };
+ 
 
     // ================== EXPORTS ==================
 
@@ -697,14 +687,12 @@ const planUtility = window.planUtility;
     ns.generateVisitTypeField = generateVisitTypeField;
     ns.generateActionsCell = generateActionsCell;
     ns.generateSchoolRow = generateSchoolRow;
-    ns.generateComparisonView = generateComparisonView;
     ns.renderPlanForm = renderPlanForm;
     ns.renderSchoolTable = renderSchoolTable;
     ns.renderPagination = renderPagination;
     ns.initParentPicker = initParentPicker;
     ns.initChildPicker = initChildPicker;
     ns.destroyChildPicker = destroyChildPicker;
-    ns.isReadOnly = isReadOnly;
     ns.formatDateISO = formatDateISO;
     ns.getMonthRange = getMonthRange;
 

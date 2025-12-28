@@ -2,13 +2,6 @@
     'use strict'; 
     const uniqueIndexId = 'IndexForPlanTable';
 
-    // Render types for different viewing modes
-    const RENDER_TYPE = {
-        PREVIEW: 'preview',      // View-only mode
-        ACTION: 'action',        // Edit/Create mode
-        COMPARISON: 'comparison' // Side-by-side comparison (old vs new)
-    };
-
     // Action types for workflow
     const ACTION_TYPE = {
         CREATE: "CREATE",                    // Creating new plan
@@ -132,7 +125,6 @@
     // Export all constants
     global.PlanConstants = {
         uniqueIndexId,
-        RENDER_TYPE,
         ACTION_TYPE,
         ReadOnly_ACTION_TYPES,
         PLAN_FIELD_TYPE,
