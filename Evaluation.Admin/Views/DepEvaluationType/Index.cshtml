@@ -15,7 +15,7 @@
 <section id="tbl-template-container" class="section-container">
 	<div class="card app-card">
 		<div class="card-header justify-content-end d-flex align-items-center bg-light">
-			@if (permissionsList.IsPermissionAvailabe(AdminPermission.ADD_ADMIN_DepEvaluationType))
+			@if (permissionsList.IsPermissionAvailabe(AdminPermission.ADD_ADMIN_DEPEVALUATIONTYPE))
 			{
 				<button id="btn-add-content" type="button" class="btn btn-primary">
 					<i class="fa fa-plus-circle"></i> &nbsp;@controlsList.GetUiControlText(AdminBackendUI.ADD_RECORD)
@@ -61,9 +61,9 @@
 		let txtDir = '@textDir';
 		let containsOrderNo='@containsOrderNo';
 		  const controlvalidationlist = @Html.Raw(Json.Serialize(uiControlItems));
-		let IsEdit='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.EDIT_ADMIN_DepEvaluationType))';
-		let IsDelete='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.DELETE_ADMIN_DepEvaluationType))';
-		let IsView='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.VIEW_ADMIN_DepEvaluationType))';
+		let IsEdit='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.EDIT_ADMIN_DEPEVALUATIONTYPE))';
+		let IsDelete='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.DELETE_ADMIN_DEPEVALUATIONTYPE))';
+		let IsView='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.VIEW_ADMIN_DEPEVALUATIONTYPE))';
 		let TableColumns = sharedFn().PopulateColumn(columnList);
 		sharedFn
 		().InitializeControl(controlvalidationlist, settingList);
