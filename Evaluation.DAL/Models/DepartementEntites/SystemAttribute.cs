@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Evaluation.DAL.Models.DepartementEntites
 {
-    public class DepartmentRoleAttribute : EntityBase , IAuditLogEntity
+    public class SystemAttribute : EntityBase , IAuditLogEntity
     {
         public string BackendName { get; set; } = null!;
         public string NameAr { get; set; } = null!;

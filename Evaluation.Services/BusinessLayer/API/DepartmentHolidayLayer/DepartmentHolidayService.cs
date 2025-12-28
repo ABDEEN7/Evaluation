@@ -34,7 +34,7 @@ public class DepartmentHolidayService(IServiceScopeFactory serviceScopeFactory,
                 Name = x.NameEn,
                 IsCronExpression = x.IsCronExpression,
                 CronExpression = x.CronExpression,
-                EndDate = x.EndDate,
+                EndDate = x.EndDate.HasValue ? x.EndDate.Value : null,
             }).ToList();
             return result;
         });
