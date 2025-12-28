@@ -164,7 +164,7 @@ const generateTableBodyHtml = async (items, hasAnyNote, hasAnyChildren, fieldId,
 // ==============================
 // Page Generator
 // ==============================
-const generateFullFormPageHtml = async ({ title, fieldId, readOnly }) => {
+const generateFullFormPageHtml = async ({ fieldId, readOnly }) => {
     itemsResult = await jqClient().Get(`/Form/GetItems?formId=${FORM_ID}`);
     const items = itemsResult?.value ?? [];
 
@@ -187,93 +187,77 @@ const generateFullFormPageHtml = async ({ title, fieldId, readOnly }) => {
 // ==============================
 async function initializeControls(fieldId, controlValues) {
 
-    const { value: items = [] } =
-        await jqClient().Get(`/Form/GetItems?formId=${FORM_ID}`);
+    const matrixResponse = await jqClient().Get(`/Form/GetFormEvalMarixValues?formId=${FORM_ID}`);
 
-    const matrixResponse =
-        await jqClient().Get(`/Form/GetFormEvalMarixValues?formId=${FORM_ID}`);
+    const items = itemsResult?.value ?? [];
+    const matrixValues = matrixResponse?.value ?? matrixResponse ?? [];
 
-    matrixValues = matrixResponse?.value ?? matrixResponse ?? [];
+    // Build lookup maps for faster access
+    const itemValueMap = new Map();
+    const subItemValueMap = new Map();
 
-    const populateSelect = (itemId, parentId) => {
+    if (controlValues?.items?.length) {
+        controlValues.items.forEach(item => {
+            itemValueMap.set(item.id, item);
+            (item.subItems || []).forEach(subItem => {
+                subItemValueMap.set(subItem.id, subItem);
+            });
+        });
+    }
+
+    // Pre-create matrix options (cloned later)
+    const matrixOptions = matrixValues.map(
+        ({ id, name }) => new Option(name, id)
+    );
+
+    function populateForm(itemId, isSubItem = false) {
         const select = document.getElementById(`${fieldId}_${itemId}_Select`);
+        const note = document.getElementById(`${fieldId}_${itemId}_Note`);
+
         if (!select) return;
 
+        // Reset select
+        select.length = 0;
         select.add(createPlaceholderOption());
 
-        matrixValues.forEach(({ id, name }) => {
-            select.add(new Option(name, id));
-        });
+        // Add matrix options
+        matrixOptions.forEach(option =>
+            select.add(option.cloneNode(true))
+        );
 
-        if (controlValues != null) {
-            if (parentId != null) {
-                const result = controlValues.items
-                    .flatMap(item => item.subItems)
-                    .find(subItem => subItem.id === itemId);
-                select.value = result.value;
-            }
-            else {
-                const result = controlValues.items
-                    .find(item => item.id === itemId)
-                select.value = result.value;
-            }
+        // Apply saved values
+        const valueSource = isSubItem
+            ? subItemValueMap.get(itemId)
+            : itemValueMap.get(itemId);
+
+        if (valueSource) {
+            select.value = valueSource.value ?? "";
+            if (note) note.value = valueSource.note ?? "";
         }
-    };
+    }
 
+    // Populate main items and sub-items
     items.forEach(item => {
-        populateSelect(item.id);
-        (item.subFormItems || []).forEach(child => populateSelect(child.id, item.id));
+        populateForm(item.id, false);
+        (item.subFormItems || []).forEach(subItem =>
+            populateForm(subItem.id, true)
+        );
     });
-
-    /*
-    {
-    "id": "b8fb67a9-b09a-4e0c-a466-d0625d92521d",
-    "items": [
-        {
-            "id": "9115be55-4872-485f-9738-05dbdb77ffbe",
-            "value": "8ae5207d-324b-4d20-ad29-036de6accb1c",
-            "note": null,
-            "subItems": [
-                {
-                    "id": "346b0ff1-bb12-4f34-be79-3dec77b2b93a",
-                    "value": "8356b853-3526-4d57-991d-6f654aea11d9",
-                    "note": null
-                },
-                {
-                    "id": "7b3ded9e-6e78-41cf-9875-9c22430993d5",
-                    "value": "8ae5207d-324b-4d20-ad29-036de6accb1c",
-                    "note": null
-                }
-            ]
-        },
-        {
-            "id": "1ab1a3f0-6e8f-43ab-b91d-b7803e7fa2d3",
-            "value": "8356b853-3526-4d57-991d-6f654aea11d9",
-            "note": null,
-            "subItems": []
-        }
-    ],
-    "strengths": null,
-    "improvements": null
-}
-    */
- 
 }
 
 // ==============================
 // Init
 // ==============================
-document.addEventListener('DOMContentLoaded', async () => {
-    try {
-        const html = await generateFullFormPageHtml({
-            title: 'استمارة المشاهدات الصفية',
-            fieldId: 'ADD_YOUR_FIELD_ID_HERE',
-            readOnly: false
-        });
+//document.addEventListener('DOMContentLoaded', async () => {
+//    try {
+//        const html = await generateFullFormPageHtml({
+//            fieldId: 'ADD_YOUR_FIELD_ID_HERE',
+//            readOnly: false
+//        });
 
-        document.getElementById('app').innerHTML = html;
+//        document.getElementById('app').innerHTML = html;
 
-    } catch (error) {
-        console.error('Form builder error:', error);
-    }
-});
+//    } catch (error) {
+//        console.error('Form builder error:', error);
+//    }
+//});
