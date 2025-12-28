@@ -71,7 +71,7 @@ public class JobTitleController : Controller
     {
         var request = Request.Form["request"][0]?.StringToObject<JobTitleDto>();
         var result = new JobTitleDto();
-        bool validateObject = await masterBL.GetAdminService<SrvBaseBL>().ValidateObject(request!, ConstantKeys.AdminPermission.EDIT_ADMIN_JOBTITLE);
+        bool validateObject = await masterBL.GetAdminService<SrvBaseBL>().ValidateObject(request!, ConstantKeys.AdminPermission.ADD_ADMIN_JOBTITLE);
         if (validateObject)
         {
             result = await masterBL.GetAdminService<SrvJobTitleBL>().UpdateJobTitle(request!);
@@ -79,6 +79,7 @@ public class JobTitleController : Controller
         return Ok(result);
     }
     [HttpPost]
+    [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.AdminPermission.UPDATE_ORDER_ADMIN_JOBTITLE })]
     public async Task<IActionResult> UpdateJobTitleOrder()
     {
         var model = Request.Form["OrderObj"][0]?.StringToObject<List<OrderingDTO>>();

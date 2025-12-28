@@ -629,6 +629,7 @@ public static class ConstantKeys
         public const string ADD_ADMIN_JOBTITLE = "ADD_ADMIN_JOBTITLE";
         public const string EDIT_ADMIN_JOBTITLE = "EDIT_ADMIN_JOBTITLE";
         public const string DELETE_ADMIN_JOBTITLE = "DELETE_ADMIN_JOBTITLE";
+        public const string UPDATE_ORDER_ADMIN_JOBTITLE = "UPDATE_ORDER_ADMIN_JOBTITLE";
         #endregion
 
         #region SCHOOL
