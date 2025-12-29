@@ -6,11 +6,16 @@ using Evaluation.DAL.Repositories;
 using Evaluation.Services.BusinessLayer.API;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper;
+using Evaluation.SharedHelper.Enums;
+using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Api;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System.Reflection;
 using static Evaluation.SharedHelper.Enums.ConstantKeys;
 
 namespace Evaluation.Services.Models.API
@@ -47,7 +52,163 @@ namespace Evaluation.Services.Models.API
         //        return result ?? "";
         //    }
         //}
+        public async Task<List<DropdownItem>> GetDropDownValues(DropDownValuesRequestDTO model)
+        {
+            var result = new List<DropdownItem>();
+            try
+            {
 
+
+                var controlValidationItem = await uow.GetRepository<ControlValidation>()
+                .GetAllNonDeleted()
+                .Where(x => x.UibackendName == model.controlUibackendName)
+                .FirstOrDefaultAsync();
+
+                if (controlValidationItem == null)
+                {
+                    throw new BusinessException(ConstantKeys.ExceptionMessage.NoDataFound);
+                }
+
+                if (!string.IsNullOrEmpty(controlValidationItem.ControlJsonConfig))
+                {
+                    var dropdownJsonConfig = JsonConvert.DeserializeObject<DropdownJsonConfig>(controlValidationItem.ControlJsonConfig);
+
+                    if (dropdownJsonConfig != null)
+                    {
+                        // Dynamically find the dropdown data from settings
+                        Type objType = typeof(ConstantKeys.AdminSettings);
+                        bool exists = objType.GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly)
+                             .Any(f => f.Name == dropdownJsonConfig.TableNameSource);
+
+                        // Dynamically find the dropdown data from custom datasource
+                        Type CustomDataSourceType = typeof(ConstantKeys.CustomDataSource);
+                        bool CustomDataSourceexists = CustomDataSourceType.GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly)
+                             .Any(f => f.Name == dropdownJsonConfig.TableNameSource);
+
+
+                        if (exists)
+                        {
+                            var Settintaskvalue = await uow.GetRepository<SystemSetting>().GetAllNonDeleted()
+                                .Where(x => x.SettingKey == dropdownJsonConfig.TableNameSource)
+                                .Select(x => x.SettingValue).FirstOrDefaultAsync();
+                            if (Settintaskvalue != null)
+                            {
+                                var jsonArray = JArray.Parse(Settintaskvalue);
+                                foreach (var data in jsonArray)
+                                {
+                                    DropdownItem rslt = new DropdownItem();
+                                    rslt.Id = (data["Id"]?.ToString() ?? "");
+                                    rslt.NameAr = (data["TitleAr"]?.ToString() ?? "");
+                                    rslt.NameEn = (data["TitleEn"]?.ToString() ?? "");
+                                    result.Add(rslt);
+                                }
+                            }
+
+
+
+                        }
+                        else if (CustomDataSourceexists)
+                        {
+
+                            switch (dropdownJsonConfig.TableNameSource)
+                            {
+
+                                default:
+                                    // Fallback if none match
+                                    break;
+                            }
+
+
+                        }
+                        else
+                        {
+                            // Dynamically find the entity type
+                            Type? entityType = AppDomain.CurrentDomain
+                        .GetAssemblies()
+                        .Where(a => !a.IsDynamic&& a.GetName().Name=="Evaluation.DAL")
+                        .SelectMany(a => a.GetTypes())
+                        .FirstOrDefault(t => t.Name.Equals(dropdownJsonConfig.TableNameSource, StringComparison.OrdinalIgnoreCase));
+
+                            if (entityType != null)
+                            {
+                                // Get the generic repository method
+                                MethodInfo? getRepositoryMethod = typeof(UnitOfWork).GetMethod("GetRepository");
+                                if (getRepositoryMethod != null)
+                                {
+                                    // Make the method generic with the dynamically found entity type
+                                    MethodInfo genericMethod = getRepositoryMethod.MakeGenericMethod(entityType);
+                                    object? repository = genericMethod.Invoke(uow, null);
+
+                                    if (repository != null)
+                                    {
+                                        // Ensure the repository implements IGenericRepository<T>
+                                        Type repoType = typeof(Repository<>).MakeGenericType(entityType);
+                                        if (repoType.IsInstanceOfType(repository))
+                                        {
+                                            var getAllNonDeletedMethod = repoType.GetMethod("GetAllNonDeleted");
+
+                                            if (getAllNonDeletedMethod != null)
+                                            {
+                                                // Invoke GetAllNonDeleted and pass the necessary parameters (using null for optional params)
+                                                var queryableResult = (IQueryable<object>)getAllNonDeletedMethod.Invoke(repository, new object[] { null, null, null, null, null });
+
+                                                if (queryableResult != null)
+                                                {
+                                                    // ToListAsync can be used to execute the query and get the result as a List
+                                                    var items = await queryableResult
+                                                .ToListAsync();
+
+                                                    // Apply filtering based on ParentReferenceId if provided
+                                                    if (!string.IsNullOrEmpty(dropdownJsonConfig.ParentReferenceId) && model.parentReferenceValue != null && model.parentReferenceValue.Any())
+                                                    {
+                                                        items = items
+    .Where(item =>
+    {
+        var property = item.GetType().GetProperty(dropdownJsonConfig.ParentReferenceId);
+        if (property == null) return false;
+
+        var value = property.GetValue(item);
+        if (value == null) return false;
+
+        var stringValue = value.ToString();
+        return model.parentReferenceValue != null && stringValue != null && model.parentReferenceValue.Contains(stringValue);
+    })
+    .ToList();
+                                                    }
+
+                                                    if (!string.IsNullOrEmpty(dropdownJsonConfig.IsActive))
+                                                    {
+                                                        items = items.Where(item => item.GetType().GetProperty("IsActive")?.GetValue(item)?.ToString()?.ToLower() == dropdownJsonConfig.IsActive.ToLower()).ToList();
+                                                    }
+
+                                                    // Map the items to DropdownItem
+                                                    result = items.Select(item => new DropdownItem
+                                                    {
+                                                        Id = item.GetType().GetProperty(dropdownJsonConfig.IdName)?.GetValue(item)?.ToString() ?? string.Empty,
+                                                        NameAr = item.GetType().GetProperty(dropdownJsonConfig.DisplayNameAr)?.GetValue(item)?.ToString() ?? string.Empty,
+                                                        NameEn = item.GetType().GetProperty(dropdownJsonConfig.DisplayNameEn)?.GetValue(item)?.ToString() ?? string.Empty,
+                                                        Type = dropdownJsonConfig.TableNameSource,
+                                                        OrderNo = Convert.ToInt32(item.GetType().GetProperty("OrderNo")?.GetValue(item) ?? 0)
+                                                    }).OrderBy(x => x.OrderNo).ToList();
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                        }
+
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            var finalresult=requestInfo.Lang=="ar"?result.OrderBy(x=>x.NameAr).ToList():result.OrderBy(x=>x.NameEn).ToList();
+            return finalresult;
+        }
         public async Task<List<UiControlDTO>> GetUiControlsByBackendKeys(params string[] backendKeys)
         {
             var result = new List<UiControlDTO>();

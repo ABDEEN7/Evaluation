@@ -1,6 +1,11 @@
 ﻿
-let EvalFormtable = null, currentPage = 0, isLoading = true;
-const gridContainerId = "view-container";
+let table = null, currentPage = 0, isLoading = true;
+const gridContainerId = "view-container",
+    $tblContentContainer = $('#tbltemplatecontainer'),
+    $formSection = $('#formsection'),
+    $formContent = $('#formcontent'),
+    $btnAddbutton = $('#btnaddcontent'),
+    btnSubmitId = "btn-submit";
 let lang = sharedUtility().GetCookie('lang');
 let txtDir = lang === "ar" ? "RTL" : "LTR";
 const loadData = () => {
@@ -11,7 +16,7 @@ const loadData = () => {
             if (data) {
                 if (data && data.length > 0) {
 
-                    EvalFormtable.addData(data);
+                    table.addData(data);
                     currentPage = currentPage + 1;
                     isLoading = false;
                 }
@@ -22,175 +27,127 @@ const loadData = () => {
 
     jqClient(options).Get("/EvaluationForm/GetAllEvalForm".concat('?page=', currentPage));
 };
-//===========================================================
-const getActionTemplate = (pkId, dynamicaction) => {
 
-    var deleteTmpl = '';
-    if (typeof IsDelete != 'undefined') {
-        deleteTmpl = IsDelete == "True" ?
-            `<span class="delete pointer" title="${uiControlsSetup().GetUiControlText('ADMIN_TOOLTIP_DELETE')}"><i class="delete fa fa-trash-can"></i></span>`
-            : '';
-    }
-    var editTmpl = '';
-    if (typeof IsEdit != 'undefined') {
-        editTmpl = IsEdit == "True" ?
-            `<span class="edit pointer" title="${uiControlsSetup().GetUiControlText('ADMIN_TOOLTIP_EDIT')}"><i class="edit fa fa-edit"></i></span>`
-            : '';
-    }
-    return `
-    <section class="sec-center" id="action__section__${pkId}" data-key="${pkId}">
-        <div class="action-items">
+$btnAddbutton.click(function () {
+    sharedFn().InitialPageControls(uiControlItems);
 
-            ${editTmpl}
-            ${deleteTmpl} 
+});
 
-        </div>
-    </section>
-    `;
-};
+const deleteData = (id) => {
+    if (!id) return;
 
-//===========================================================
-const actionCellClick = (event, cell) => {
+    const obj = table.getData().find(f => f.id == id);
+    if (!obj) return;
 
-    let tableId = cell.getTable().element.id;
-    table = Tabulator.prototype.findTable("#" + tableId)[0];
 
-    let pkId = '';
-    const cellElem = event.target.closest('section');
-    if (cellElem) {
-        pkId = cellElem.getAttribute('data-key');
-        loaderId = cellElem.getAttribute('id');
-    }
-    const clazzList = event.target.classList;
-   
-     if (clazzList.contains('edit')) {
-        edit(pkId);
-
-    }
-    else if (clazzList.contains('delete')) {
-        deleteData(pkId);
-    }
+    notificationUtil.confirmation({ title: sharedFn().GetUiControlText('WEB_WARNING_DELETE'), okText: sharedFn().GetUiControlText('WEB_DELETE_BUTTON'), cancelText: sharedFn().GetUiControlText('WEB_CANCEL') }, result => {
+        if (!id) return;
 
 
 
-};
-const columns = () => {
-    return [
-        {
+        const options = {
+            success: function (data) {
+                if (data) {
 
-            title: uiControlsSetup().GetUiControlText('ACTION'), field: "", cssClass: 'tbl-cell-actions',
-            frozen: false, width: 120,
-            formatter: function (cell, formatterParams, onRendered) {
-                const { id, isActive } = cell.getRow().getData();
-                return getActionTemplate(id, isActive);
-            },
-            cellClick: function (event, cell) {
-                actionCellClick(event, cell);
-            }
 
-        },
+                    if (data.responseStatus == '3') {
+                        table.deleteRow(id);
+                        notificationUtil.success(sharedFn().GetUiControlText('WEB_MSG_DELETE'));
+                    }
 
-        { title: uiControlsSetup().GetUiControlText('EvalFormsNameAr'), headerTooltip: uiControlsSetup().GetUiControlText('EvalFormsNameAr'), field: "nameAr", hozAlign: "center", headerFilter: "input" },
-        { title: uiControlsSetup().GetUiControlText('EvalFormsNameEn'), headerTooltip: uiControlsSetup().GetUiControlText('EvalFormsNameEn'), field: "nameEn", hozAlign: "center", headerFilter: "input" },
-        { title: uiControlsSetup().GetUiControlText('EvalFormsEvalFormType'), headerTooltip: uiControlsSetup().GetUiControlText('EvalFormsEvalFormType'), field: "EvalFormType", hozAlign: "center", headerFilter: "input" },
-        { title: uiControlsSetup().GetUiControlText('EvalFormsFormEvalMatrix'), headerTooltip: uiControlsSetup().GetUiControlText('EvalFormsFormEvalMatrix'), field: "FormEvalMatrix", hozAlign: "center", headerFilter: "input" },
-
-        { title: uiControlsSetup().GetUiControlText('EvalFormsIsActive'), headerTooltip: uiControlsSetup().GetUiControlText('EvalFormsIsActive'), field: "isActive", hozAlign: "center", formatter: "tickCross", sorter: "boolean", editor: false, width: 80 },
-
-        {
-            title: uiControlsSetup().GetUiControlText('LASTUPDATEDBY'), headerTooltip: uiControlsSetup().GetUiControlText('LASTUPDATEDBY'), field: 'updateBy', hozAlign: "center", headerFilter: "input",
-        },
-        {
-            title: uiControlsSetup().GetUiControlText('LASTUPDATEDDATE'), headerTooltip: uiControlsSetup().GetUiControlText('LASTUPDATEDDATE'), field: "updateDate", width: 130, sorter: "datetime",
-            tooltip: function (cell) {
-                const { updateDate } = cell.getRow().getData();
-                return getActionDate(updateDate, commonUtil.DATE_FORMAT.lll);
-            },
-            formatter: function (cell) {
-                const { updateDate } = cell.getRow().getData();
-                return getActionDate(updateDate, commonUtil.DATE_FORMAT.lll);
-            }
-        },
-
-    ]
-};
-const InitialPopup =  (ControlItems) => {
-    let popupdivcontent = '<div class="row">';
-    if (ControlItems) {
-        var formData = new FormData();
-        formData.append('request', JSON.stringify(ControlItems));
-        $.ajax({
-            url: "/Home/UiControlList",
-            type: "POST",
-            dataType: "html",
-            processData: false,
-            contentType: false,
-            data: formData,
-            Mode: 'APP',
-            success: function (response) {
-                if (response) {
-                    popupdivcontent += response + "</div>";
-                    $('#formcontent').empty();
-                    $('#formcontent').append(popupdivcontent);
-                    $("#formsection").show();
-                    $("#tbltemplatecontainer").hide();
+                    else {
+                        notificationUtil.error(data.message);
+                    }
                 }
-            },
-            error: function (xhr, status, error) {
-                console.error("UI Control load failed:", error);
             }
-        });
+        };
+        jqClient(options).Post("/EvaluationForm/DeleteEvaluationForm".concat('?Id=', id));
 
-        
-        }
-  
-    return popupdivcontent;
-};
-
-$("#btnaddcontent").click(function () {
-    InitialPopup(uiControlItems);
-
-});
-
-$("#btn-back").click(function () {
-    $("#app-form").trigger("reset");
-    $("#app-form select").each(function () {
-        $(this).val('').trigger('change');
-        $(this).removeAttr("data-value");
     });
-    $("#formsection").hide();
-    $("#tbltemplatecontainer").show();
-});
-//===========================================================
-const getActionDate = (val, format) => {
-    format = format ?? commonUtil.DATE_FORMAT.lll;
-    return commonUtil.getLocalUtcDateStringEn(val, format);
 };
+$("#btn-submit").click(function (e) {
+
+
+    if (sharedFn().NewvalidateForm("form-control", sharedFn().GetUiControlText('WEB_CNTRL_REQUIRED'), sharedFn().GetUiControlText('WEB_MSG_MAX_CHAR_LENGTH'), sharedFn().GetUiControlText('WEB_MSG_MIN_CHAR_LENGTH'))) {
+
+
+        commonUtil.btnProgress(btnSubmitId);
+        var requestdata = sharedFn().GetSaveObject(controlvalidationlist, $('#Id').val());
+        const options = {
+            success: function (response) {
+                commonUtil.btnProgress(btnSubmitId, true);
+
+                
+                if (response.responseStatus == '1') {
+                    table.addData([response], true);
+                    table.deselectRow();
+                    table.getRows()[0].select();
+                    if (response) {
+                        notificationUtil.success(sharedFn().GetUiControlText('WEB_MSG_SAVE'));
+
+                    }
+                }
+                else if (response.responseStatus == '2') {
+                    table.updateData([response]);
+                    if (response) {
+                        notificationUtil.success(sharedFn().GetUiControlText('WEB_MSG_UPDATE'));
+
+                    }
+
+                }
+                else {
+                    notificationUtil.error(response.message);
+
+                }
+                sharedFn().ViewMode();
+            }
+        };
+
+        let url = '';
+        let id = $('#Id').val();
+
+        if (id) {
+            url = "/EvaluationForm/UpdateEvaluationForm";
+        } else {
+            url = "/EvaluationForm/SaveEvaluationForm";
+
+        }
+        jqClient(options).PostFormData(url, requestdata);
+
+
+
+    }
+});
+
 initTables = () => {
-    uiControlsSetup().PopulateUiControl(controlsList);
-    $("#formsection").hide();
+    sharedFn().PopulateUiControl(controlsList);
+    
+    var TableColumns = sharedFn().PopulateColumn(columnList);
+    
+    $formSection.hide();
     if (IsAdd == true) {
-        $("#btnaddcontent").show();
+        $btnAddbutton.show();
     }
     else {
-        $("#btnaddcontent").hide();
+        $btnAddbutton.hide();
     }
-    loadData();
+   
     table = tableUtil.createTabulator({
         id: gridContainerId,
         config: {
             textDirection: txtDir,
             paginationSize: 10,
-            placeholder: uiControlsSetup().GetUiControlText('NO_DATA_FOUND'),
-            headerFilterPlaceholder: uiControlsSetup().GetUiControlText('FILTER_COLUMN'),
+            placeholder: sharedFn().GetUiControlText('NO_DATA_FOUND'),
+            headerFilterPlaceholder: sharedFn().GetUiControlText('FILTER_COLUMN'),
             movableRows: true,
         },
         uniqueRowId: 'id',
         sortColumn: "updateDate",
         sortDir: "desc",
-        columns: columns(),
+        columns: TableColumns,
 
     });
+    loadData();
 };
 
 

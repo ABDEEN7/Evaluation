@@ -1,9 +1,11 @@
 ﻿using Evaluation.Api.Extensions;
 using Evaluation.API.Filters;
 using Evaluation.Services.BusinessLayer;
+using Evaluation.Services.Models.Admin;
 using Evaluation.Services.Models.API;
 using Evaluation.Services.Shared;
 using Evaluation.SharedHelper.Enums;
+using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Api;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
@@ -39,6 +41,14 @@ namespace Evaluation.API.Controllers
             var model = new BaseVM(httpContextAccessor);
             await model.LoadAllAData(pages, permissions, systemSettings);
             return Ok(model);
+        }
+        [HttpPost]
+        public async Task<List<DropdownItem>> GetDropDownValues([FromBody] DropDownValuesRequestDTO model)
+        {
+            var result = new List<DropdownItem>();
+
+            result = await masterBl.GetApiService<UiControlBL>().GetDropDownValues(model);
+            return result;
         }
 
         //[HttpGet]

@@ -1,10 +1,14 @@
 ﻿using AutoMapper;
+using Azure.Core;
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.Repositories;
+using Evaluation.Services.Models.Admin;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Dtos.EvalFormDto;
-using Evaluation.SharedHelper.Dtos.PlanDto;
+using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Models;
+using Evaluation.SharedHelper.Models.Admin;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Evaluation.Services.BusinessLayer.API.EvaluationForm;
@@ -17,6 +21,35 @@ public class EvaluationFormBL(IServiceScopeFactory serviceScopeFactory, CacheDat
     public async Task<List<EvaluationFormDto>> GetEvaluationForm(int Page)
     {
         var result = await evaluationFormService.GetEvaluationFormList(Page);
-        return mapper.Map<List<EvaluationFormDto>>(result);
+        return result;
     }
+
+    public async Task<EvaluationFormDto> SaveEvaluationForm(EvaluationFormDto model)
+    {
+        var result = new EvaluationFormDto();
+        bool validateObject = await ValidateObject(model!, ConstantKeys.WebPermissions.ADD_WEB_EVALFORMS);
+        if (validateObject)
+        {
+            result = await evaluationFormService.SaveEvaluationForm(model!);
+
+        }
+        return result;
+    }
+    public async Task<EvaluationFormDto> UpdateEvaluationForm(EvaluationFormDto model)
+    {
+        var result = new EvaluationFormDto();
+        bool validateObject = await ValidateObject(model!, ConstantKeys.WebPermissions.ADD_WEB_EVALFORMS);
+        if (validateObject)
+        {
+            result = await evaluationFormService.UpdateEvaluationForm(model!);
+
+        }
+        return result;
+    }
+    public async Task<EvaluationFormDto> DeleteEvaluationForm(Guid Id)
+    {
+        var result = await evaluationFormService.DeleteEvaluationForm(Id!);
+        return result;
+    }
+
 }

@@ -1,8 +1,10 @@
 ﻿
 
+using Evaluation.SharedHelper.Models;
+
 namespace Evaluation.SharedHelper.Dtos.EvalFormDto;
 
-public class EvaluationFormDto
+public class EvaluationFormDto : EntityBaseDTO
 {
     public Guid EvalFormTypeId { get; set; }
     public string? EvalFormType { get; set; }
@@ -13,7 +15,7 @@ public class EvaluationFormDto
     public bool IsRopric { get; set; }
     public bool HasOneValue { get; set; }
     public Guid EvaluationPartyId { get; set; }
-    public string? EvaluationParties { get; set; }
+    public string? EvaluationParty { get; set; }
     public bool HasEvaluation { get; set; }
     public Guid CalcMethodId { get; set; }
     public string? CalcMethod { get; set; }
