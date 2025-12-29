@@ -290,6 +290,7 @@ public static class ConstantKeys
         public static readonly string AdminJobTitle = "AdminJobTitle";
         public static readonly string AdminSchools = "AdminSchools";
         public static readonly string AdminOrgTree = "AdminOrgTree";
+        public static readonly string AdminDepartmentEvaluationParty = "AdminDepartmentEvaluationParty";
     }
 
     public static class AdminPermission
@@ -662,6 +663,12 @@ public static class ConstantKeys
 
         #endregion
 
+        #region DepartmentEvaluationPartyVM
+        public const string VIEW_ADMIN_DEPARTMENTEVALUATIONPARTY = "VIEW_ADMIN_DEPARTMENTEVALUATIONPARTY";
+        public const string ADD_ADMIN_DEPARTMENTEVALUATIONPARTY = "ADD_ADMIN_DEPARTMENTEVALUATIONPARTY";
+        public const string EDIT_ADMIN_DEPARTMENTEVALUATIONPARTY = "EDIT_ADMIN_DEPARTMENTEVALUATIONPARTY";
+        public const string DELETE_ADMIN_DEPARTMENTEVALUATIONPARTY = "DELETE_ADMIN_DEPARTMENTEVALUATIONPARTY";
+        #endregion
     }
 
     public static class CustomDataSource
