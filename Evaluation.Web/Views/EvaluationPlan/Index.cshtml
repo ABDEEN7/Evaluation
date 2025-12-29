@@ -2,6 +2,7 @@
 
 
 <link href="~/assets/css/application-requests.css" rel="stylesheet" />
+<link href="~/form-assets/css/istemara-styles.css" rel="stylesheet">
 
 <!-- Page Title
 <div class="page-title light-background">
@@ -362,8 +363,12 @@
     <script src="~/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="/js/form-generation-util/form.constants.js"></script>
     <script src="/js/form-generation-util/form.api.js"></script>
-    <script src="~/js/form-generation-util/form.evaluationplanfield.js"></script>
-    <script src="/js/form-generation-util/form.generate-field.js"></script>
+@*     <script src="~/js/form-generation-util/form.evaluationplanfield.js"></script>
+
+ *@   
+       <script src="~/js/forms/get-forms.js"></script>
+    <script src="~/js/forms/submit-form.js"></script>
+ <script src="/js/form-generation-util/form.generate-field.js"></script>
     <script src="/js/form-generation-util/form.render.js"></script>
     <script src="/js/form-generation-util/form.submit.js"></script>
     <script src="/js/form-generation-util/form.init.js"></script>
@@ -427,7 +432,7 @@
          });
     </script>
 
-    <div class="modal fade" id="CreatePlanModal" tabindex="-1" aria-hidden="true">
+ @*    <div class="modal fade" id="CreatePlanModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-xl modal-dialog-scrollable">
             <div class="modal-content">
 
@@ -443,8 +448,59 @@
 
             </div>
         </div>
-    </div>
+    </div> *@
 
+    <div class="modal fade" id="CreateRequestModal" tabindex="-1" aria-labelledby="CreateRequestModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="CreateRequestModalLabel">
+                        إنشاء طلب خطة تقييم
+                    </h5>
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+
+                    <form id="create-plan-form" autocomplete="off">
+
+                        <div class="row">
+                            <div class="col-12">
+
+                               
+                                <div class="accordion mt-4" id="accordionExample" hidden>
+                                    <select id="partyTypeSelect" class="form-select mb-3"></select>
+
+                                    <div id="user-wrapper">
+                                        <div id="user-tables"></div>
+                                    </div>
+                                </div>
+
+                                <div id="content-container"></div>
+
+                            </div>
+                        </div>
+
+                        <div class="row mt-3" id="divForCreatedRequestButtons">
+                            <div class="col-12">
+                                <div id="Requestbtns"
+                                     class="d-flex justify-content-end gap-2">
+                                </div>
+                            </div>
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
 
 
 }

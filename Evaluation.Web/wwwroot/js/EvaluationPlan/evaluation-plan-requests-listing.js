@@ -118,7 +118,7 @@
 
     $('#btnAddEvaluationPlanRequest').on('click', function () {
 
-        const el = document.getElementById("CreatePlanModal");
+        const el = document.getElementById("CreateRequestModal");
         const modal = bootstrap.Modal.getOrCreateInstance(el);
         modal.show();
 

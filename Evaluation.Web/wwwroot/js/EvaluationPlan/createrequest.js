@@ -46,6 +46,46 @@
             fillActionDropDown(actions);
         }
     }
+    async function InitializeCreateEvaluationPartRequest(serviceId) {
+        if (!serviceId) {
+            console.error("ServiceId is required");
+            redirectToDefault();
+            return;
+        }
+        const CreateEvaluationPartyService = await fu.fetchJSON(
+            `/FormRender/GetCreateEvaluationPartyService?serviceId=${encodeURIComponent(serviceId)}`
+        );
+
+        if (!CreateEvaluationPartyService) {
+            redirectToDefault();
+            return;
+        }
+
+        const serviceName =
+            (w.currentLang === "ar"
+                ? CreateEvaluationPartyService.nameAr
+                : CreateEvaluationPartyService.nameEn) || "";
+
+        const headerEl = document.getElementById("serviceName");
+        if (headerEl) headerEl.textContent = serviceName ? " - " + serviceName : "";
+
+        const actions = CreateEvaluationPartyService.actions || [];
+
+        if (actions.filter(a => a.isInitialAction === true).length === 1) {
+            const firstAction = actions.find(
+                a => a.actionTypeBackEndKey !== ActionTypes.SaveAsDraft
+            );
+
+            initialAction = firstAction ? firstAction.bakendName : initialAction;
+
+            $("#ActionsDropDown").hide();
+            $("label[for='ActionsDropDown']").hide();
+
+            await RenderActionFields(CreateEvaluationPartyService.serviceRequestDTO);
+        } else {
+            fillActionDropDown(actions);
+        }
+    }
 
     const fillActionDropDown = (actions) => {
         if (!actions || actions.length < 2) {
@@ -185,6 +225,7 @@
     }
 
     w.InitializeCreatePlanRequest = InitializeCreatePlanRequest;
+    w.InitializeCreateEvaluationPartRequest = InitializeCreateEvaluationPartRequest;
     w.GetActionFields = GetActionFields;
     w.RenderActionFields = RenderActionFields;
     w.configureSchoolModal = configureSchoolModal;
@@ -194,7 +235,7 @@
     $(function () {
         PlanId = GetUrlParam("planId") || GetUrlParam("PlanId") || PlanId;
         SchoolId = GetUrlParam("schoolId") || GetUrlParam("SchoolId") || SchoolId;
-        InitializeCreatePlanRequest();
+        //InitializeCreatePlanRequest();
     });
 
 })(window, jQuery);
