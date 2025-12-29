@@ -347,36 +347,7 @@ const planUtility = window.planUtility;
     /**
      * Initialize plugins after rendering HTML
      */
-    function initializePlugins() {
-        // Initialize Select2
-        if (typeof $.fn.select2 !== 'undefined') {
-            $('#ddlPlanType').select2({
-                placeholder: 'اختر نوع الخطة',
-                width: '100%',
-                allowClear: true
-            });
-
-            $('#ddlSemester').select2({
-                placeholder: 'اختر الفصل الدراسي',
-                width: '100%',
-                allowClear: true
-            });
-        }
-
-        // Initialize filter date pickers
-        if (typeof flatpickr !== 'undefined') {
-            flatpickr('.datepicker-single', {
-                locale: 'ar',
-                dateFormat: 'Y-m-d'
-            });
-
-            flatpickr('.datepicker-any', {
-                locale: 'ar',
-                dateFormat: 'Y-m-d'
-            });
-        }
-    }
-
+  
     /**
      * Render the complete plan page
      */
@@ -394,12 +365,10 @@ const planUtility = window.planUtility;
         mainContent.innerHTML = html;
 
         // Initialize plugins
-        initializePlugins();
 
         console.log('[PlanFields] Page rendered successfully');
     };
 
     // Export for direct use
-    ns.initializePlugins = initializePlugins;
 
 })(planUtility);

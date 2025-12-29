@@ -46,25 +46,6 @@ public class PlanServiceRequestServices(
     ) : ApiBase(serviceScopeFactory, cacheDataProvider, unitOfWork, loggingServices, mapper, userInfo,
         serviceProvider, requestInfo)
 {
-    public async Task<bool> UpdatePlanAsync(Guid id, UpdatePlanDto planDto)
-    {
-        // 1. Fetch existing plan
-        var plan = await planRepository.GetPlanAsync(id);
-
-        if (plan is null)
-            throw new BusinessException(ConstantKeys.ExceptionMessage.PlanIsNotFound);
-
-        // 2. Save old version as JSON (audit or history)
-        planDto.PlanJsonValue = JsonConvert.SerializeObject(plan);
-
-        // 3. Validate input
-        await ValidateUpdatePlan(planDto);
-
-        // 4. Update the existing entity instead of replacing it
-        UpdatePlanEntity(plan, planDto);
-        // 5. Save to DB
-        return await planRepository.UpdatePlanAsync(plan);
-    }
     public async Task<PlanDetailsDto> GetPlanByIdAsync(Guid id)
     {
         var result = await planRepository.GetPlanDetailsAsync(id);
@@ -89,77 +70,9 @@ public class PlanServiceRequestServices(
     CreateEvaluationPlanDto modelDto)
     {
         ValidatedPlan(modelDto);
-        return await ExecuteWithResult(async () =>
-        {
-            // 1️⃣ Get system values
-            Guid? departmentId =
-                await departmentService.GetDepartmentIdAsync();
-
-            Guid academicYearId =
-                await academicYearRepository.GetAcademicYearId(departmentId);
-
-            Guid planStatusId =
-                await unitOfWork.GetRepository<PlanStatus>()
-                    .GetAllActiveNonDeleted(x =>
-                        x.BackendName == StatusBackEnds.ApprovedPlans)
-                    .Select(x => x.Id)
-                    .FirstAsync();
-            Guid depEvaluationType =
-                await unitOfWork.GetRepository<DepEvaluationType>()
-                    .GetAllActiveNonDeleted(x =>
-                        x.DepartmentId == departmentId)
-                    .Select(x => x.Id)
-                    .FirstAsync();
-
-            Guid serviceStatusId =
-                await unitOfWork.GetRepository<ServiceStatus>()
-                    .GetAllActiveNonDeleted(x =>
-                        x.BackendName == StatusBackEnds.New)
-                    .Select(x => x.Id)
-                    .FirstAsync();
-
-            // 2️⃣ Assign system fields
-            modelDto.AcademicYearId = academicYearId;
-            modelDto.PlanStatusId = planStatusId;
-
-            // 3️⃣ Map DTO → Entity
-            Plan plan = modelDto.ToPlan();
-            plan.PlanJsonValue = JsonConvert.SerializeObject(modelDto);
-
-            // 4️⃣ Insert Plan
-            await unitOfWork.GetRepository<Plan>().InsertAsync(plan);
-
-            //4.1 Services
-            Guid serviceId = await uow.GetRepository<Service>()
-            .GetAllActiveNonDeleted(x => x.BackendName == BackendServices.EvaluationPlan_P_CreatePlan)
-            .Select(x => x.Id).FirstOrDefaultAsync();
-            // 5️⃣ Insert Evaluation Requests
-            if (modelDto.Schools?.Any() == true)
-            {
-                var evaluationRequests = modelDto.Schools.Select(school =>
-                    new EvaluationRequest
-                    {
-                        Id = Guid.NewGuid(),
-                        PlanId = plan.Id,
-                        ServiceId = serviceId,
-                        OrgTreeId = school.Id,
-                        DepEvaluationTypeId = depEvaluationType,
-                        FromDate = school.StartEvaluationDate,
-                        ToDate = school.EndEvaluationDate,
-                        ServiceStatusId = serviceStatusId,
-                        CreateDate = DateTime.UtcNow,
-                        IsDeleted = false,
-                    }).ToList();
-
-                await unitOfWork.GetRepository<EvaluationRequest>()
-                                .InsertRange(evaluationRequests);
-            }
-
-            // 6️⃣ ONE COMMIT ONLY
-            await unitOfWork.CommitAsync();
-
-            return modelDto;
-        });
+        return modelDto.Id == Guid.Empty
+     ? await InsertPlan(modelDto)
+     : await UpdatePlan(modelDto);
     }
     //Plan Type Module
     public async Task<List<PlanTypeDto>> GetPlanTypes()
@@ -200,19 +113,134 @@ public class PlanServiceRequestServices(
     {
         if (model is null || string.IsNullOrEmpty(model.Name))
             throw new BusinessException(ConstantKeys.ExceptionMessage.InvalidApprovePlan);
-        if (model.StartDate <= model.EndDate)
+        if (model.StartDate >= model.EndDate)
             throw new BusinessException(ConstantKeys.ExceptionMessage.InvalidEvaluationDate);
     }
-    private void UpdatePlanEntity(Plan plan, UpdatePlanDto dto)
+    private async Task<Result<CreateEvaluationPlanDto>> InsertPlan(CreateEvaluationPlanDto modelDto)
     {
-        plan.PlanName = dto.Name;
-        plan.StartDate = dto.StartDate;
-        plan.EndDate = dto.EndDate;
-        plan.AcademicYearId = dto.AcademicYearId;
-        plan.PlanStatusId = dto.PlanStatusId;
-        plan.PlanTypeDepId = dto.PlanTypeDepartmentId;
-        plan.SemesterId = dto.SemesterId;
-        plan.PlanJsonValue = dto.PlanJsonValue;
+        return await ExecuteWithResult(async () =>
+        {
+            await FillSystemFields(modelDto);
+
+            Plan plan = modelDto.ToPlan();
+            plan.PlanJsonValue = JsonConvert.SerializeObject(modelDto);
+
+            await unitOfWork.GetRepository<Plan>().InsertAsync(plan);
+
+            await InsertEvaluationRequests(plan.Id, modelDto);
+
+            await unitOfWork.CommitAsync();
+            return modelDto;
+        });
     }
+    private async Task<Result<CreateEvaluationPlanDto>> UpdatePlan(
+      CreateEvaluationPlanDto modelDto)
+    {
+        return await ExecuteWithResult(async () =>
+        {
+            Plan plan = await unitOfWork.GetRepository<Plan>()
+                .GetAllActiveNonDeleted(x => x.Id == modelDto.Id)
+                .FirstOrDefaultAsync();
+
+            if (plan == null)
+                throw new BusinessException("Plan not found");
+
+            modelDto.AcademicYearId = plan.AcademicYearId;
+            modelDto.PlanStatusId = plan.PlanStatusId;
+
+            mapper.Map(modelDto, plan);
+
+            plan.PlanJsonValue = JsonConvert.SerializeObject(modelDto);
+            plan.UpdateDate = DateTime.UtcNow;
+
+            unitOfWork.GetRepository<Plan>().Update(plan);
+
+            await ReplaceEvaluationRequests(plan.Id, modelDto);
+
+            await unitOfWork.CommitAsync();
+            return modelDto;
+        });
+    }
+
+
+    private async Task FillSystemFields(CreateEvaluationPlanDto modelDto)
+    {
+        Guid? departmentId = await departmentService.GetDepartmentIdAsync();
+
+        modelDto.AcademicYearId =
+            await academicYearRepository.GetAcademicYearId(departmentId);
+
+        modelDto.PlanStatusId =
+            await unitOfWork.GetRepository<PlanStatus>()
+                .GetAllActiveNonDeleted(x =>
+                    x.BackendName == StatusBackEnds.ApprovedPlans)
+                .Select(x => x.Id)
+                .FirstAsync();
+    }
+    private async Task InsertEvaluationRequests(
+    Guid planId,
+    CreateEvaluationPlanDto modelDto)
+    {
+        if (modelDto.Schools?.Any() != true)
+            return;
+
+        Guid serviceId = await uow.GetRepository<Service>()
+            .GetAllActiveNonDeleted(x =>
+                x.BackendName == BackendServices.EvaluationPlan_P_CreatePlan)
+            .Select(x => x.Id)
+            .FirstAsync();
+
+        Guid depEvaluationType = await GetDepEvaluationType(); // i dont see this
+        Guid serviceStatusId = await GetServiceStatus(); // also i don't see this
+
+        var requests = modelDto.Schools.Select(school => new EvaluationRequest
+        {
+            Id = Guid.NewGuid(),
+            PlanId = planId,
+            ServiceId = serviceId,
+            OrgTreeId = school.Id,
+            DepEvaluationTypeId = depEvaluationType,
+            FromDate = school.StartEvaluationDate,
+            ToDate = school.EndEvaluationDate,
+            ServiceStatusId = serviceStatusId,
+            CreateDate = DateTime.UtcNow,
+            IsDeleted = false
+        });
+
+        await unitOfWork.GetRepository<EvaluationRequest>()
+            .InsertRange(requests);
+    }
+    private async Task ReplaceEvaluationRequests(
+    Guid planId,
+    CreateEvaluationPlanDto modelDto)
+    {
+        var repo = unitOfWork.GetRepository<EvaluationRequest>();
+
+        var existing = await repo
+            .GetAllActiveNonDeleted(x => x.PlanId == planId)
+            .ToListAsync();
+
+        if (existing.Any())
+            repo.DeleteRange(existing);
+
+        await InsertEvaluationRequests(planId, modelDto);
+    }
+    private async Task<Guid> GetDepEvaluationType()
+    {
+        Guid? departmentId = await departmentService.GetDepartmentIdAsync();
+
+        return await unitOfWork.GetRepository<DepEvaluationType>()
+            .GetAllActiveNonDeleted(x => x.DepartmentId == departmentId)
+            .Select(x => x.Id)
+            .FirstAsync();
+    }
+    private async Task<Guid> GetServiceStatus()
+    {
+        return await unitOfWork.GetRepository<ServiceStatus>()
+            .GetAllActiveNonDeleted(x => x.BackendName == StatusBackEnds.New)
+            .Select(x => x.Id)
+            .FirstAsync();
+    }
+
 
 }

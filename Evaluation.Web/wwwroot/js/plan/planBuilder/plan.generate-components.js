@@ -3,6 +3,66 @@
 
 (function (ns) {
 
+
+    // ================== PREFIX CONFIGURATION ==================
+
+    ns.fieldIdPrefix = null;
+
+    ns.initializePrefix = function (fieldId) {
+        ns.fieldIdPrefix = fieldId;
+    }
+    /**
+    * Generate prefixed ID
+    * @param {string} id - Original ID
+    * @returns {string} Prefixed ID (fieldId_originalId)
+    */
+    ns.getPrefixedId = function (id) {
+        if (!ns.fieldIdPrefix || !id) return id;
+        return `${ns.fieldIdPrefix}_${id}`;
+    };
+    /**
+   * Apply prefix to all elements with ID attributes
+   * Call this after rendering any HTML
+   */
+    ns.applyPrefixToIds = function (container) {
+        if (!ns.fieldIdPrefix) return;
+        const $container = container ? $(container) : $(document);
+        $container.find('[id]').each(function () {
+            const $el = $(this);
+            const originalId = $el.attr('id');
+
+            // Skip if already prefixed
+            if (originalId.startsWith(ns.fieldIdPrefix + '_')) {
+                return;
+            }
+
+            const newId = ns.getPrefixedId(originalId);
+            $el.attr('id', newId);
+
+            // Update associated labels' for attribute
+            $(`label[for="${originalId}"]`).attr('for', newId);
+
+            // Update any data attributes pointing to this ID
+            $container.find(`[data-id="${originalId}"]`).attr('data-id', newId);
+            $container.find(`[data-school-id="${originalId}"]`).attr('data-school-id', newId);
+
+            console.log(`[PrefixSystem] Updated ID: ${originalId} → ${newId}`);
+        });
+
+        // Update name attributes as well for form submission
+        $container.find('[name]').each(function () {
+            const $el = $(this);
+            const originalName = $el.attr('name');
+
+            // Skip if already prefixed
+            if (originalName.startsWith(ns.fieldIdPrefix + '_')) {
+                return;
+            }
+
+            const newName = ns.getPrefixedId(originalName);
+            $el.attr('name', newName);
+        });
+    };
     // ================== CONSTANTS ==================
     const {
         ACTION_TYPE,
@@ -498,13 +558,23 @@
     };
 
     // ================== FLATPICKR INITIALIZATION ==================
-
-    const initParentPicker = (mode, minDate, maxDate, existingValue = null) => {
+    const initParentPicker = (mode, minDate, maxDate, existingValue = null, selector = null) => {
         if (ns.parentPickerInstance) {
-            ns.parentPickerInstance.destroy();
+            try {
+                if (typeof ns.parentPickerInstance.destroy === 'function') {
+                    ns.parentPickerInstance.destroy();
+                }
+            } catch (e) {
+                console.warn('[initParentPicker] Could not destroy previous instance:', e);
+            }
             ns.parentPickerInstance = null;
         }
-
+        const targetSelector = selector || '#parentDate';
+        const $input = $(targetSelector);
+        if (!$input.length) {
+            console.error('[initParentPicker] Element not found:', targetSelector);
+            return;
+        }
         const config = {
             locale: "en",
             allowInput: true,
@@ -566,7 +636,8 @@
                 } else {
                     destroyChildPicker();
                 }
-            };
+                ns.parentPickerInstance = flatpickr(targetSelector, config);
+            }
         } else if (mode === 'custom') {
             // Custom date range picker mode
             config.mode = "range";
@@ -590,8 +661,7 @@
                     destroyChildPicker();
                 }
             };
-
-            ns.parentPickerInstance = flatpickr("#parentDate", config);
+            ns.parentPickerInstance = flatpickr(targetSelector, config);
         };
     };
 

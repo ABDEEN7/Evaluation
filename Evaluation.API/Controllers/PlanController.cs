@@ -22,17 +22,6 @@ public class PlanController(MasterBL masterBL) : ControllerBase
         return Ok(new {success= true});
     }
 
-
-    [HttpPut("{id:guid}")]
-    //[CheckRolePermisionFilter(true, ConstantKeys.WebPermission.UPDATE_WEB_PLAN_REQUEST)]
-    public async Task<IActionResult> UpdatePlan(Guid id, [FromBody] UpdatePlanDto planDto)
-    {
-        var result = await masterBL
-              .GetApiService<PlanServiceRequestServices>()
-              .UpdatePlanAsync(id, planDto);
-        return Ok(result);
-    }
-
     [HttpGet]
     //[CheckRolePermisionFilter(true, ConstantKeys.WebPermission.GET_SEMESTERS_REQUEST)]
     public async Task<IActionResult> GetSemesters()

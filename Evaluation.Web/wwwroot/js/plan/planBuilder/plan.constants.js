@@ -116,7 +116,6 @@
         GET_VISITS: '/School/GetVisits',
         GET_VACATION_DATES: '/AcademicYear/GetVcationDate',
         CREATE_PLAN: '/Plan/CreatePlan',
-        //INSERTORUPUDATEPLAN: '/Plan/ApprovePlan',
         INSERTORUPDATEPLAN: '/Plan/InsertOrUpdatePlan',
         UPDATE_PLAN: '/Plan/UpdatePlan',
         GET_PLAN_DETAILS: '/Plan/GetPlansWithunSelectedSchoolsDetails'

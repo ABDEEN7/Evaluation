@@ -21,16 +21,17 @@
 
     <script src="~/js/plan/planBuilder/plan.generate-components.js"></script>
     <script src="~/js/plan/planBuilder/plan.main-handler.js"></script>
+    <script src="~/js/plan/submit-evaluation-plan.js"></script>
     <!-- ENTRY POINT -->
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-
+               document.addEventListener('DOMContentLoaded', function () {
             planUtility.generatePlanFields();
-                PlanHandler.init(
-            '@Model.ActionType',
-            false,
-            @Html.Raw(Json.Serialize(Model.PlanId))
-        );
+            PlanHandler.init(
+                '@Model.ActionType',
+                false,
+                @Html.Raw(Json.Serialize(Model.PlanId)),
+                'prefix'
+            );
         });
     </script>
 

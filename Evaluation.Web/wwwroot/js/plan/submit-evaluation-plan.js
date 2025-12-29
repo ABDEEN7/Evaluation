@@ -1,3 +1,19 @@
+﻿const ns = window.planUtility;
+
+/*  Helper selector with prefix support */
+function $p(selector) {
+    if (!ns?.fieldId) {
+        return window.jQuery(selector);
+    }
+
+    if (typeof selector === 'string' && selector.startsWith('#')) {
+        const id = selector.substring(1);
+        return window.jQuery(`#${ns.fieldId}_${id}`);
+    }
+
+    return window.jQuery(selector);
+}
+
 /**
  * Submit Evaluation Plan Handler
  * Updated to integrate with plan.constants.js, plan.generate-components.js, and plan.main-handler.js
@@ -11,20 +27,20 @@
      * Collects and validates evaluation plan data from the form
      * @returns {Object|null} Evaluation data object or null if validation fails
      */
-    function generatePlan() {
+    function getFormPlanJson() {
         try {
             // Get plan name from the title input
-            const name = $('#planTitle').val()?.trim() || '';
+            const name = $p('#planTitle').val()?.trim() || '';
 
             // Get plan type from the select dropdown
-            const planTypeSelect = $('#ddlPlanType');
+            const planTypeSelect = $p('#ddlPlanType');
             const selectedPlanType = planTypeSelect.select2('data')[0];
             const PlanTypeDepId = selectedPlanType?.id || '';
             const planTypeBackendName = selectedPlanType?.backendName ||
                 selectedPlanType?.element?.dataset?.backendname || '';
 
             // Get date range and parse start/end dates
-            const dateRangeInput = $('#parentDate');
+            const dateRangeInput = $p('#parentDate');
             let startDate = '';
             let endDate = '';
 
@@ -37,7 +53,7 @@
             // Get semester Id if plan type is semester
             let semesterId = null;
             if (planTypeBackendName === PLAN_TYPE_BACKEND.SEMESTER) {
-                const semesterSelect = $('#ddlSemester');
+                const semesterSelect = $p('#ddlSemester');
                 semesterId = semesterSelect.val() || null;
             }
 
@@ -178,13 +194,13 @@
         console.error('Validation errors:', errors);
 
         if (errors.some(e => e.includes('title'))) {
-            $('#planTitle').addClass('is-invalid');
+            $p('#planTitle').addClass('is-invalid');
         }
         if (errors.some(e => e.includes('Plan type'))) {
-            $('#ddlPlanType').next('.select2-container').addClass('is-invalid');
+            $p('#ddlPlanType').next('.select2-container').addClass('is-invalid');
         }
         if (errors.some(e => e.includes('Date range'))) {
-            $('#parentDate').addClass('is-invalid');
+            $p('#parentDate').addClass('is-invalid');
         }
     }
 
@@ -278,7 +294,7 @@
 
         clearErrors();
 
-        const evaluationData = generatePlan();
+        const evaluationData = getFormPlanJson();
         const validation = validatePlan(evaluationData);
 
         if (!validation.isValid) {
@@ -297,7 +313,7 @@
 
         clearErrors();
 
-        const evaluationData = generatePlan();
+        const evaluationData = getFormPlanJson();
         const validation = validatePlan(evaluationData);
 
         if (!validation.isValid) {
@@ -320,7 +336,7 @@
     // ================== EXPORTS ==================
 
     window.SubmitPlanHandler = {
-        generatePlan,
+        getFormPlanJson,
         validatePlan,
         submitEvaluationData,
         getSelectedSchools

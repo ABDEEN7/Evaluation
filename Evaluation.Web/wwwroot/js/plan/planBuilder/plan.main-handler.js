@@ -1,4 +1,9 @@
-﻿(function (global) {
+﻿/**
+ * ✅ COMPLETE SOLUTION: Prefix shows in DOM + All logic works
+ * Key: Use helper function for ALL jQuery selectors
+ */
+
+(function (global) {
     'use strict';
 
     const ns = global.planUtility;
@@ -43,20 +48,43 @@
         isReadOnly: false,
         pageSize: TABLE_CONFIG.pageSize || 10,
         currentPage: 1,
-        filters: {},  // تهيئة الفلاتر
-        searchTerm: '' // إضافة البحث
+        filters: {},
+        searchTerm: '',
+        fieldId: null
+    };
+
+    /* ⭐ HELPER: Get element by ID (handles prefix automatically) */
+    const $ = (selector) => {
+        if (!state.fieldId) return window.jQuery(selector);
+
+        // If selector has ID (#something), add prefix
+        if (typeof selector === 'string' && selector.startsWith('#')) {
+            const id = selector.substring(1);
+            const prefixedId = `${state.fieldId}_${id}`;
+            return window.jQuery(`#${prefixedId}`);
+        }
+
+        return window.jQuery(selector);
     };
 
     /* ===================== INIT ===================== */
 
-    const init = async (actionType, isReadOnly, planId = null) => {
+    const init = async (actionType, isReadOnly, planId = null, fieldId = null, planObject = null) => {
         state.actionType = actionType;
         state.planId = planId;
+        state.planObject = planObject;
         state.isReadOnly = isReadOnly;
+        state.fieldId = fieldId;
+        ns.fieldId = fieldId;
+
         console.log('[PlanHandler] Initializing...', state);
 
+        // ⭐ Initialize prefix system
+        if (fieldId) {
+            ns.initializePrefix(fieldId);
+        }
+
         try {
-            // Load all required data
             await Promise.all([
                 loadPlanTypes(),
                 loadSemesters(),
@@ -64,12 +92,12 @@
                 loadVacationDays()
             ]);
 
-            // Populate plan types dropdown
             populatePlanTypes();
-
-            // Populate semesters dropdown
             populateSemesters();
 
+            if (planObject) {
+                renderPlanWithData(planObject);
+            }
             if (state.planId) {
                 await loadPlanData(state.planId);
             } else {
@@ -128,11 +156,11 @@
 
     const populatePlanTypes = () => {
         const $select = $('#ddlPlanType');
-        $select.empty().append($('<option>').val('').text('اختر نوع الخطة'));
+        $select.empty().append(window.jQuery('<option>').val('').text('اختر نوع الخطة'));
 
         ns.planTypes.forEach(type => {
             $select.append(
-                $('<option>')
+                window.jQuery('<option>')
                     .val(type.id)
                     .text(type.name)
                     .attr('data-backendname', type.backendName)
@@ -151,11 +179,11 @@
 
     const populateSemesters = () => {
         const $select = $('#ddlSemester');
-        $select.empty().append($('<option>').val('').text('اختر الفصل الدراسي'));
+        $select.empty().append(window.jQuery('<option>').val('').text('اختر الفصل الدراسي'));
 
         ns.semesters.forEach(semester => {
             $select.append(
-                $('<option>')
+                window.jQuery('<option>')
                     .val(semester.id)
                     .text(semester.name)
                     .data('startDate', semester.startDate)
@@ -177,19 +205,17 @@
 
     const loadSchoolsData = (page = 1, filters = {}) => {
         state.currentPage = page;
-        state.filters = filters; // حفظ الفلاتر في الحالة
+        state.filters = filters;
 
         const params = new URLSearchParams({
             page,
             pageSize: state.pageSize
         });
 
-        // إضافة الفلاتر
         Object.keys(filters).forEach(k => {
             if (filters[k]) params.append(k, filters[k]);
         });
 
-        // إضافة البحث
         if (state.searchTerm) {
             params.append('search', state.searchTerm);
         }
@@ -210,12 +236,11 @@
                     state.actionType
                 );
 
-                $('#planTable tbody').replaceWith(tbody);
+                window.jQuery('#planTable tbody').replaceWith(tbody);
 
                 const total = result.totalCount || data.length;
-                $('#dtPagination').html(ns.renderPagination(total));
+                window.jQuery('#dtPagination').html(ns.renderPagination(total));
 
-                // تحديث عداد الفلاتر
                 updateFilterBadge();
 
                 reinitializeDatePickers();
@@ -234,9 +259,13 @@
     const renderNewPlan = () => {
         console.log('[PlanHandler] Rendering new plan form');
 
-        $('#planFormContainer .form-container').html(
-            ns.renderPlanForm(null, state.isReadOnly, state.actionType)
-        );
+        const form = ns.renderPlanForm(null, state.isReadOnly, state.actionType);
+        window.jQuery('#planFormContainer .form-container').html(form);
+
+        // ⭐ Apply prefix after render
+        if (state.fieldId) {
+            ns.applyPrefixToIds('#planFormContainer');
+        }
 
         initSelects();
         loadSchoolsData(1);
@@ -251,12 +280,17 @@
             planTypeId: plan.planTypeId,
             semesterId: plan.semesterId,
             dateRange: formatRange(plan.startDate, plan.endDate),
-            schools: plan.schools || []
+            schools: plan.schools || [],
+
         };
 
-        $('#planFormContainer .form-container').html(
-            ns.renderPlanForm(vm, state.actionType)
-        );
+        const form = ns.renderPlanForm(vm, state.actionType);
+        window.jQuery('#planFormContainer .form-container').html(form);
+
+        // ⭐ Apply prefix after render
+        if (state.fieldId) {
+            ns.applyPrefixToIds('#planFormContainer');
+        }
 
         initSelects(vm);
 
@@ -272,7 +306,7 @@
             state.actionType
         );
 
-        $('#planTable tbody').replaceWith(tbody);
+        window.jQuery('#planTable tbody').replaceWith(tbody);
 
         initializeDatePickersForPlan(vm);
         attachRowEvents();
@@ -303,32 +337,34 @@
     const bindEvents = () => {
         console.log('[PlanHandler] Binding events');
 
-        $(document)
-            .off('change', '#ddlPlanType').on('change', '#ddlPlanType', onPlanTypeChange)
-            .off('change', '#ddlSemester').on('change', '#ddlSemester', onSemesterChange)
+        const getSelector = (id) => {
+            return state.fieldId ? `#${state.fieldId}_${id}` : `#${id}`;
+        };
+
+        window.jQuery(document)
+            .off('change', getSelector('ddlPlanType')).on('change', getSelector('ddlPlanType'), onPlanTypeChange)
+            .off('change', getSelector('ddlSemester')).on('change', getSelector('ddlSemester'), onSemesterChange)
             .off('click', '#btn-save-plan').on('click', '#btn-save-plan', onSaveClick)
-            .off('click', '#btn-submit').on('click', '#btn-submit', onSubmit)
             .off('change', '.selectRow').on('change', '.selectRow', updateSelectedSchools)
             .off('change', '.childDate').on('change', '.childDate', onVisitDateChange)
             .off('change', '.visitTypeSelect').on('change', '.visitTypeSelect', onVisitTypeChange)
             .off('click', '#selectAll').on('click', '#selectAll', onSelectAll)
             .off('click', '.page-link').on('click', '.page-link', onPaginationClick)
-            // إضافة أحداث الفلاتر
             .off('submit', '#filterForm').on('submit', '#filterForm', handleFilterSubmit)
             .off('click', '#clearFiltersBtn').on('click', '#clearFiltersBtn', handleClearFilters)
             .off('input', '#customSearch').on('input', '#customSearch', handleSearch);
     };
 
     const attachRowEvents = () => {
-        $('.selectRow').off('change').on('change', updateSelectedSchools);
-        $('.childDate').off('change').on('change', onVisitDateChange);
-        $('.visitTypeSelect').off('change').on('change', onVisitTypeChange);
+        window.jQuery('.selectRow').off('change').on('change', updateSelectedSchools);
+        window.jQuery('.childDate').off('change').on('change', onVisitDateChange);
+        window.jQuery('.visitTypeSelect').off('change').on('change', onVisitTypeChange);
     };
 
     /* ===================== HANDLERS ===================== */
 
     const onPlanTypeChange = function () {
-        const backend = $(this).find(':selected').data('backendname');
+        const backend = window.jQuery(this).find(':selected').data('backendname');
         console.log('[PlanHandler] Plan type changed:', backend);
 
         $('#semesterContainer').hide();
@@ -343,7 +379,7 @@
     };
 
     const onSemesterChange = function () {
-        const opt = $(this).find(':selected');
+        const opt = window.jQuery(this).find(':selected');
         if (!opt.length) return;
 
         const start = new Date(opt.data('startdate'));
@@ -358,32 +394,32 @@
     };
 
     const onVisitDateChange = function () {
-        const id = $(this).data('school-id');
+        const id = window.jQuery(this).data('school-id');
         const school = ns.selectedSchools.find(s => s.id === id);
         if (school) {
-            school.visitDate = $(this).val();
+            school.visitDate = window.jQuery(this).val();
             console.log('[PlanHandler] Visit date updated for school:', id);
         }
     };
 
     const onVisitTypeChange = function () {
-        const id = $(this).data('school-id');
+        const id = window.jQuery(this).data('school-id');
         const school = ns.selectedSchools.find(s => s.id === id);
         if (school) {
-            school.visitTypeId = $(this).val();
+            school.visitTypeId = window.jQuery(this).val();
             console.log('[PlanHandler] Visit type updated for school:', id);
         }
     };
 
     const onSelectAll = function () {
-        const isChecked = $(this).prop('checked');
-        $('.selectRow').prop('checked', isChecked);
+        const isChecked = window.jQuery(this).prop('checked');
+        window.jQuery('.selectRow').prop('checked', isChecked);
         updateSelectedSchools();
     };
 
     const onPaginationClick = function (e) {
         e.preventDefault();
-        const page = parseInt($(this).data('page'));
+        const page = parseInt(window.jQuery(this).data('page'));
         if (page) {
             loadSchoolsData(page, state.filters);
         }
@@ -394,16 +430,13 @@
         if (!validate()) return;
 
         updateSelectedSchools();
-        $('#confirmationMessage').text(`تم تحديد (${ns.selectedSchools.length}) مدرسة للإضافة للخطة`);
+        window.jQuery('#confirmationMessage').text(`تم تحديد (${ns.selectedSchools.length}) مدرسة للإضافة للخطة`);
 
         const modal = new bootstrap.Modal(document.getElementById('confirmation-modal'));
         modal.show();
     };
 
-    const onSubmit = () => {
-        if (!validate()) return;
-        save(collect());
-    };
+
 
     /* ===================== FILTER HANDLERS ===================== */
 
@@ -411,27 +444,23 @@
         e.preventDefault();
         console.log('[PlanHandler] Applying filters');
 
-        // جمع قيم الفلاتر
         const filters = {
-            Name: $('#filterSchoolName').val()?.trim(),
-            lastEvalDate: $('#filterLastEvalDate').val(),
-            establishmentDate: $('#filterCreatedDate').val(),
-            nextEvalDate: $('#filterNextEvalDate').val(),
-            previousResult: $('#filterPreviousResult').val(),
-            visitType: $('#filterVisitType').val()
+            Name: window.jQuery('#filterSchoolName').val()?.trim(),
+            lastEvalDate: window.jQuery('#filterLastEvalDate').val(),
+            establishmentDate: window.jQuery('#filterCreatedDate').val(),
+            nextEvalDate: window.jQuery('#filterNextEvalDate').val(),
+            previousResult: window.jQuery('#filterPreviousResult').val(),
+            visitType: window.jQuery('#filterVisitType').val()
         };
 
-        // إزالة القيم الفارغة
         Object.keys(filters).forEach(key => {
             if (!filters[key]) delete filters[key];
         });
 
-        // تطبيق الفلاتر
         state.filters = filters;
         state.currentPage = 1;
         loadSchoolsData(1, filters);
 
-        // إغلاق القائمة الجانبية
         const offcanvas = bootstrap.Offcanvas.getInstance(document.getElementById('filterOffcanvas'));
         if (offcanvas) offcanvas.hide();
     };
@@ -440,25 +469,20 @@
         e.preventDefault();
         console.log('[PlanHandler] Clearing filters');
 
-        // مسح النموذج
-        $('#filterForm')[0].reset();
+        window.jQuery('#filterForm')[0].reset();
 
-        // مسح الفلاتر
         state.filters = {};
         state.currentPage = 1;
 
-        // تحديث عداد الفلاتر
         updateFilterBadge();
 
-        // إعادة تحميل البيانات
         loadSchoolsData(1, {});
     };
 
     const handleSearch = function () {
-        const term = $(this).val()?.trim() || '';
+        const term = window.jQuery(this).val()?.trim() || '';
         console.log('[PlanHandler] Searching:', term);
 
-        // تأخير البحث
         clearTimeout(state.searchTimeout);
         state.searchTimeout = setTimeout(() => {
             state.searchTerm = term;
@@ -469,7 +493,7 @@
 
     const updateFilterBadge = () => {
         const count = Object.keys(state.filters).length;
-        const $badge = $('.filterbtn .badge');
+        const $badge = window.jQuery('.filterbtn .badge');
 
         if (count > 0) {
             $badge.text(count).show();
@@ -494,7 +518,10 @@
 
     const initMonthMode = () => {
         $('#parentDate').val('').prop('disabled', false);
-        ns.initParentPicker('month');
+
+        // ⭐ Fix: Pass the actual prefixed selector to flatpickr
+        const parentDateSelector = state.fieldId ? `#${state.fieldId}_parentDate` : '#parentDate';
+        ns.initParentPicker('month', null, null, null, parentDateSelector);
         console.log('[PlanHandler] Month mode initialized');
     };
 
@@ -506,7 +533,10 @@
 
     const initCustomMode = () => {
         $('#parentDate').val('').prop('disabled', false);
-        ns.initParentPicker('custom');
+
+        // ⭐ Fix: Pass the actual prefixed selector to flatpickr
+        const parentDateSelector = state.fieldId ? `#${state.fieldId}_parentDate` : '#parentDate';
+        ns.initParentPicker('custom', null, null, null, parentDateSelector);
         console.log('[PlanHandler] Custom mode initialized');
     };
 
@@ -530,38 +560,31 @@
     const collect = () => {
         const range = getDateRangeFromInput();
 
-        return {
+        const title = $('#planTitle').val();
+        const planTypeId = $('#ddlPlanType').val();
+        const semesterId = $('#ddlSemester').val() || null;
+        const startDate = range?.startDate;
+        const endDate = range?.endDate;
+
+        const schools = ns.selectedSchools.map(s => ({
+            schoolId: s.id,
+            visitDate: s.visitDate,
+            visitTypeId: s.visitTypeId
+        }));
+
+        // ⭐ No prefix in payload - backend will see original field names
+        const payload = {
             id: state.planId,
-            title: $('#planTitle').val(),
-            planTypeId: $('#ddlPlanType').val(),
-            semesterId: $('#ddlSemester').val() || null,
-            startDate: range?.startDate,
-            endDate: range?.endDate,
-            schools: ns.selectedSchools.map(s => ({
-                schoolId: s.id,
-                visitDate: s.visitDate,
-                visitTypeId: s.visitTypeId
-            }))
+            title: title,
+            planTypeId: planTypeId,
+            semesterId: semesterId,
+            startDate: startDate,
+            endDate: endDate,
+            schools: schools
         };
-    };
 
-    const save = (payload) => {
-        console.log('[PlanHandler] Saving plan:', payload);
-
-        const url = payload.id
-            ? API_ENDPOINTS.UPDATE_PLAN
-            : API_ENDPOINTS.INSERTORUPUDATEPLAN;
-
-        jqClient().Post(url, payload)
-            .done(() => {
-                console.log('[PlanHandler] Plan saved successfully');
-                alert('تم حفظ الخطة بنجاح');
-                location.href = '/Plan/Index';
-            })
-            .fail(err => {
-                console.error('[PlanHandler] Save failed', err);
-                alert('حدث خطأ أثناء الحفظ');
-            });
+        console.log('[PlanHandler] Payload:', payload);
+        return payload;
     };
 
     /* ===================== VALIDATION ===================== */
@@ -620,8 +643,9 @@
             const startStr = parts[0].trim();
             const endStr = parts[1].trim();
 
-            const storedStart = $('#parentDate').data('startDate');
-            const storedEnd = $('#parentDate').data('endDate');
+            const $parentDate = $('#parentDate');
+            const storedStart = $parentDate.data('startDate');
+            const storedEnd = $parentDate.data('endDate');
 
             return {
                 startDate: storedStart || startStr,
@@ -637,15 +661,15 @@
     const updateSelectedSchools = () => {
         ns.selectedSchools = [];
 
-        $('.selectRow:checked').each(function () {
-            const id = $(this).data('id');
+        window.jQuery('.selectRow:checked').each(function () {
+            const id = window.jQuery(this).data('id');
             const school = ns.allSchools.find(s => s.id === id);
             if (!school) return;
 
             ns.selectedSchools.push({
                 ...school,
-                visitDate: $(`.childDate[data-school-id="${id}"]`).val(),
-                visitTypeId: $(`.visitTypeSelect[data-school-id="${id}"]`).val()
+                visitDate: window.jQuery(`.childDate[data-school-id="${id}"]`).val(),
+                visitTypeId: window.jQuery(`.visitTypeSelect[data-school-id="${id}"]`).val()
             });
         });
 
@@ -655,7 +679,7 @@
     /* ===================== UI STATES ===================== */
 
     const showLoadingState = () => {
-        $('#planTable tbody').html(`
+        window.jQuery('#planTable tbody').html(`
             <tr>
                 <td colspan="7" class="text-center py-5">
                     <div class="spinner-border text-primary"></div>
@@ -666,7 +690,7 @@
     };
 
     const showErrorState = () => {
-        $('#planTable tbody').html(`
+        window.jQuery('#planTable tbody').html(`
             <tr>
                 <td colspan="7" class="text-center text-danger py-5">
                     حدث خطأ أثناء تحميل البيانات
