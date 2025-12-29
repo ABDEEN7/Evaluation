@@ -26,6 +26,17 @@ namespace Evaluation.API.Controllers
             return Ok(new { result = GetDepartmentList() });
         }
 
+        [HttpGet]
+        public IActionResult GetDepartmentsForWebGroup([FromQuery] string webGroupPath)
+        {
+            return Ok(new { result = GetAllDepartmentsForWebGroupList(webGroupPath) });
+        }
+
+        private async Task<List<DepartmentDto>> GetAllDepartmentsForWebGroupList(string webGroupPath)
+        {
+           return await _masterBl.GetApiService<DepartmentBL>().GetAllDepartmentsForWebGroup(webGroupPath);
+        }
+
         private async Task<List<DepartmentDto>> GetDepartmentList()
         {
            return await _masterBl.GetApiService<DepartmentBL>().GetAllDepartments();
