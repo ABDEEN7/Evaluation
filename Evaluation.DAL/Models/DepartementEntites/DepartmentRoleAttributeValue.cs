@@ -6,7 +6,8 @@ namespace Evaluation.DAL.Models.DepartementEntites;
 public class DepartmentRoleAttributeValue : EntityBase,IAuditLogEntity
 {
     public Guid DepartmentId { get; set; }
-    public Guid DepartmentRoleAttributeId { get; set; }
-    public DepartmentRoleAttribute? DepartmentRoleAttribute { get; set; }
+    public Department? Department { get; set; }
+    public Guid SystemAttributeId { get; set; }
+    public SystemAttribute? SystemAttribute { get; set; }
     public string? Value { get; set; } 
 }

@@ -157,6 +157,7 @@ public static class ConstantKeys
         public static readonly string OrgTreeExistsDepartment = "OrgTreeExistsDepartment";
         public static readonly string OrgTreeExistsEvaluationRequest = "OrgTreeExistsEvaluationRequest";
         public static readonly string OrgTreeExistsOrgAcademicYear = "OrgTreeExistsOrgAcademicYear";
+        public static readonly string JobTitleCannotDelete = "JobTitleCannotDelete";
         public static readonly string EvalFormExistsFormItem = "EvalFormExistsFormItem";
         public static readonly string EvalFormExistsFormScope = "EvalFormExistsFormScope";
     }
@@ -288,6 +289,7 @@ public static class ConstantKeys
         public static readonly string AdminPlanTypeDep = "AdminPlanTypeDep";
         public static readonly string AdminPlanStatuses = "AdminPlanStatuses";
         public static readonly string AdminOrgTypes = "AdminOrgTypes";
+        public static readonly string AdminJobTitle = "AdminJobTitle";
         public static readonly string AdminSchools = "AdminSchools";
         public static readonly string AdminOrgTree = "AdminOrgTree";
     }
@@ -638,6 +640,13 @@ public static class ConstantKeys
         public const string ADD_ADMIN_ORGTYPES = "ADD_ADMIN_ORGTYPES";
         public const string EDIT_ADMIN_ORGTYPES = "EDIT_ADMIN_ORGTYPES";
         public const string DELETE_ADMIN_ORGTYPES = "DELETE_ADMIN_ORGTYPES";
+        #endregion
+        #region JOBTITLE
+        public const string VIEW_ADMIN_JOBTITLE = "VIEW_ADMIN_JOBTITLE";
+        public const string ADD_ADMIN_JOBTITLE = "ADD_ADMIN_JOBTITLE";
+        public const string EDIT_ADMIN_JOBTITLE = "EDIT_ADMIN_JOBTITLE";
+        public const string DELETE_ADMIN_JOBTITLE = "DELETE_ADMIN_JOBTITLE";
+        public const string UPDATE_ORDER_ADMIN_JOBTITLE = "UPDATE_ORDER_ADMIN_JOBTITLE";
         #endregion
 
         #region SCHOOL
