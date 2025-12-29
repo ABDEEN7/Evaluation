@@ -1,29 +1,31 @@
 ﻿using AutoMapper;
-using Evaluation.DAL.Dtos.Form;
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
 using Evaluation.DAL.Repositories;
-using Evaluation.Services.BusinessLayer.API.FormLayer;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Dtos.PlanDto;
-using Evaluation.SharedHelper.Extensions;
 using Evaluation.SharedHelper.Models;
 using FluentResults;
-using Microsoft.AspNetCore.Cors.Infrastructure;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Evaluation.Services.BusinessLayer.API;
 
 public class EvaluationRequestBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider,
         UnitOfWork uow, LoggingServices loggingServices, IMapper mapper, UserInfo userInfo,
-        IServiceProvider serviceProvider, RequestInfo requestInfo, EvaluationRequestService evaluationRequestService)
+        IServiceProvider serviceProvider, RequestInfo requestInfo, EvaluationRequestService evaluationRequestService, ServiceRequestService serviceRequestService)
         : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, requestInfo)
 {
     public async Task<List<EvaluationRequestCalenderDto>> GetEvaluationRequestsForCalender()
     {
-        var result = await evaluationRequestService.GetEvaluationRequests();
-        return mapper.Map<List<EvaluationRequestCalenderDto>>(result);
+        var evaluationRequestResult = await evaluationRequestService.GetEvaluationRequests();
+        var serviceRequestResult = await serviceRequestService.GetServiceRequestsByEvaluationRequestIds(evaluationRequestResult.Select(er => er.Id).ToList());
+        
+        List<EvaluationRequestCalenderDto>  evaluationRequestCalenderDtos = new List<EvaluationRequestCalenderDto>();
+
+        evaluationRequestCalenderDtos.AddRange(mapper.Map<List<EvaluationRequestCalenderDto>>(evaluationRequestResult));
+        evaluationRequestCalenderDtos.AddRange(mapper.Map<List<EvaluationRequestCalenderDto>>(serviceRequestResult));
+
+        return evaluationRequestCalenderDtos;
     }
     public async Task<Result<EvaluationRequestCalenderDto>> UpdateEvaluationRequest(EvaluationRequestCalenderDto evaluationRequestCalenderDto)
     {

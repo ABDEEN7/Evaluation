@@ -40,13 +40,6 @@
                 }
             },
             eventDrop: function (info) {
-            // alert(
-            // `Event "${info.event.title}" was moved
-            // OldFrom: ${info.oldEvent.start.toDateString()}
-            // NewFrom: ${info.event.start.toDateString()}
-            // OldTo: ${info.oldEvent.end.toDateString()}
-            // NewTo: ${info.event.end.toDateString()}`
-            //   );
                   const payload = {
                 id: info.event.id,
                 Title: info.event.title,
