@@ -2,7 +2,7 @@
 @using static Evaluation.SharedHelper.Enums.ConstantKeys
 
 
-@model FormEvalMatrixVM
+@model DepEvalMatrixVM
 @{
 
     string Lang = Model.CurrentLanguage;
@@ -23,7 +23,7 @@
     <section id="tbl-template-container" class="section-container">
         <div class="card app-card">
             <div class="card-header justify-content-end d-flex align-items-center bg-light">
-                @if (permissionsList.IsPermissionAvailabe(AdminPermission.ADD_ADMIN_FORM_EVAL_MATRIX))
+                @if (permissionsList.IsPermissionAvailabe(AdminPermission.ADD_ADMIN_DEP_EVAL_MATRIX))
                 {
                     <button id="btn-add-content" type="button" class="btn btn-primary">
                         <i class="fa fa-plus-circle"></i> &nbsp;@controlsList.GetUiControlText(AdminBackendUI.ADD_RECORD)
@@ -71,7 +71,7 @@
 @section Scripts {
 
 
-    <script src="~/js/admin/formevalmatrix.js" asp-append-version="true"></script>
+    <script src="~/js/admin/DepEvalMatrix.js" asp-append-version="true"></script>
     <script>
          var controlsList = JSON.parse(`@Html.Raw(Json.Serialize(controlsList))`);
          var columnList = @Html.Raw(Json.Serialize(columnList));
@@ -81,9 +81,9 @@
         let txtDir = '@textDir';
         let containsOrderNo = '@containsOrderNo';
          const controlvalidationlist = @Html.Raw(Json.Serialize(uiControlItems));
-        let IsEdit = '@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.EDIT_ADMIN_FORM_EVAL_MATRIX))';
-        let IsDelete = '@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.DELETE_ADMIN_FORM_EVAL_MATRIX))';
-        let IsView = '@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.VIEW_ADMIN_FORM_EVAL_MATRIX))';
+        let IsEdit = '@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.EDIT_ADMIN_DEP_EVAL_MATRIX))';
+        let IsDelete = '@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.DELETE_ADMIN_DEP_EVAL_MATRIX))';
+        let IsView = '@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.VIEW_ADMIN_DEP_EVAL_MATRIX))';
         let TableColumns = sharedFn().PopulateColumn(columnList);
         sharedFn().InitializeControl(controlvalidationlist, settingList);
         var SearchuiControlItems=@Html.Raw(Json.Serialize(SearchuiControlItems));
