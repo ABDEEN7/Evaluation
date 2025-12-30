@@ -640,8 +640,9 @@
                     destroyChildPicker();
                 }
             }
-                ns.parentPickerInstance = flatpickr(targetSelector, config);
-        } else if (mode === 'custom') {
+            ns.parentPickerInstance = flatpickr("#parentDate", config);
+        }
+        else if (mode === 'custom') {
             // Custom date range picker mode
             config.mode = "range";
             config.dateFormat = "Y-m-d";
