@@ -98,7 +98,7 @@
             if (planObject) {
                 renderPlanWithData(planObject);
             }
-            if (state.planId) {
+            else if (state.planId) {
                 await loadPlanData(state.planId);
             } else {
                 renderNewPlan();
@@ -277,14 +277,14 @@
 
         const vm = {
             title: plan.name || '',
-            planTypeId: plan.planTypeId,
+            planTypeId: plan.planTypeDepId,
             semesterId: plan.semesterId,
             dateRange: formatRange(plan.startDate, plan.endDate),
             schools: plan.schools || [],
 
         };
 
-        const form = ns.renderPlanForm(vm, state.actionType);
+        const form = ns.renderPlanForm(vm, state.isReadOnly, state.actionType);
         window.jQuery('#planFormContainer .form-container').html(form);
 
         // ⭐ Apply prefix after render

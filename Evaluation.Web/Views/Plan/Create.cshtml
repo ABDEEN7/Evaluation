@@ -18,12 +18,92 @@
     <!-- Plan System (ORDER IS CRITICAL) -->
     <script src="~/js/plan/planBuilder/plan.constants.js"></script>
     <script src="~/js/plan/planBuilder/plan.generate-plan-fields.js"></script>
-
     <script src="~/js/plan/planBuilder/plan.generate-components.js"></script>
     <script src="~/js/plan/planBuilder/plan.main-handler.js"></script>
     <script src="~/js/plan/submit-evaluation-plan.js"></script>
     <!-- ENTRY POINT -->
     <script>
+                const planObject = {  
+          "name": "sbc",
+          "PlanTypeDepId": "fe848400-3ef6-44cc-812f-0b9026748a26",
+          "startDate": "2025-01-01",
+          "endDate": "2025-12-31",
+          "schools": [
+            {
+              "id": "f01ca4c4-dc39-4558-8a6c-0719e07b20d4",
+              "isSelected": true,
+              "startEvaluationDate": "2025-12-16",
+              "endEvaluationDate": "2025-12-23",
+              "visitTypeId": "0c5d5b28-8894-4887-8454-7a605f9e0164",
+              "name": "Turkish School Qatar"
+            },
+            {
+              "id": "160c62a6-0556-4a33-b6c6-0ad687062492",
+              "isSelected": false,
+              "startEvaluationDate": null,
+              "endEvaluationDate": null,
+              "visitTypeId": null,
+              "name": "Doha Modern Indian School"
+            },
+            {
+              "id": "54f38bba-e522-4098-b90f-1b2906ba87bf",
+              "isSelected": false,
+              "startEvaluationDate": null,
+              "endEvaluationDate": null,
+              "visitTypeId": null,
+              "name": "Philippine School Doha"
+            },
+            {
+              "id": "a297a912-2e70-453c-befc-5dd502cd4894",
+              "isSelected": false,
+              "startEvaluationDate": null,
+              "endEvaluationDate": null,
+              "visitTypeId": null,
+              "name": "School X"
+            },
+            {
+              "id": "4ecb31d7-db11-4b46-8b0f-bca1d0497f96",
+              "isSelected": false,
+              "startEvaluationDate": null,
+              "endEvaluationDate": null,
+              "visitTypeId": null,
+              "name": "Al Bayan Primary School"
+            },
+            {
+              "id": "c84b7a16-904b-433e-95aa-bcd363b01714",
+              "isSelected": false,
+              "startEvaluationDate": null,
+              "endEvaluationDate": null,
+              "visitTypeId": null,
+              "name": "Park House English School"
+            },
+            {
+              "id": "eb888624-058e-409a-9788-d804e071f686",
+              "isSelected": false,
+              "startEvaluationDate": null,
+              "endEvaluationDate": null,
+              "visitTypeId": null,
+              "name": "Qatar Academy Doha"
+            },
+            {
+              "id": "9600165f-7de6-464c-a0f7-d9d933ca16fc",
+              "isSelected": false,
+              "startEvaluationDate": null,
+              "endEvaluationDate": null,
+              "visitTypeId": null,
+              "name": "Abdulrahman Bin Jassim Prep Boys School"
+            },
+            {
+              "id": "928082b0-9ad7-4bcb-ae5c-e7f95c48e8dc",
+              "isSelected": false,
+              "startEvaluationDate": null,
+              "endEvaluationDate": null,
+              "visitTypeId": null,
+              "name": "Qatar Academy Doha"
+            }
+          ]
+        };
+
                document.addEventListener('DOMContentLoaded', function () {
             planUtility.generatePlanFields();
             PlanHandler.init(

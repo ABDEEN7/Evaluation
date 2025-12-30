@@ -267,7 +267,8 @@
         const checkbox = $('<input>')
             .attr('type', 'checkbox')
             .addClass('selectRow')
-            .attr('data-id', school.id);
+            .attr('data-id', school.id)
+            .attr('data-name', school.name);
 
         if (readonly) {
             checkbox.prop('disabled', true);
@@ -599,9 +600,11 @@
             // Month picker mode using monthSelectPlugin
             config.plugins = [
                 new monthSelectPlugin({
-                    shorthand: true,
-                    dateFormat: "m.y",
+                    shorthand: false,
+                    //dateFormat: "m.y",
+                    dateFormat: "m-y",
                     altFormat: "F Y",
+                    altInput: true,          // show clean UI input
                     theme: "light" // or "dark" based on your theme
                 })
             ];
@@ -636,8 +639,8 @@
                 } else {
                     destroyChildPicker();
                 }
-                ns.parentPickerInstance = flatpickr(targetSelector, config);
             }
+                ns.parentPickerInstance = flatpickr(targetSelector, config);
         } else if (mode === 'custom') {
             // Custom date range picker mode
             config.mode = "range";

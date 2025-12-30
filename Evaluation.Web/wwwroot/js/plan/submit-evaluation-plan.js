@@ -58,7 +58,8 @@ function $p(selector) {
             }
 
             // Get selected schools from the utility namespace
-            const selectedSchools = getSelectedSchools();
+            //const selectedSchools = getSelectedSchools();
+            const allschools = getAllSchoolsWithSelectionFlag();
 
             // Return structured data object
             const evaluationData = {
@@ -66,7 +67,8 @@ function $p(selector) {
                 PlanTypeDepId,
                 startDate,
                 endDate,
-                schools: selectedSchools
+                //schools: selectedSchools
+                schools: allschools
             };
 
             if (planTypeBackendName === PLAN_TYPE_BACKEND.SEMESTER && semesterId) {
@@ -258,6 +260,43 @@ function $p(selector) {
      * Gets selected schools from the table with their visit details
      * @returns {Array} Array of selected school objects
      */
+    /**
+ * Gets ALL schools (selected & unselected) with selection flag
+ * @returns {Array} Array of school objects with isSelected flag
+ */
+    function getAllSchoolsWithSelectionFlag() {
+        const schools = [];
+
+        $('#planTable tbody tr').each(function () {
+            const row = $(this);
+
+            const checkbox = row.find('.selectRow');
+            const isSelected = checkbox.is(':checked');
+
+            const schoolId = checkbox.data('id');
+            const schoolName = checkbox.data('name');
+            const dateRangeInput = row.find('.childDate');
+            const dateRangeValue = dateRangeInput.val() || '';
+            const parsedDates = parseDateRange(dateRangeValue);
+
+            const visitTypeSelect = row.find('.visitTypeSelect');
+            const visitTypeId = visitTypeSelect.val() || null;
+
+            const schoolData = {
+                id: schoolId,
+                isSelected: isSelected,              // ⭐ FLAG
+                startEvaluationDate: parsedDates.startDate || null,
+                endEvaluationDate: parsedDates.endDate || null,
+                visitTypeId: visitTypeId,
+                name: schoolName
+            };
+
+            schools.push(schoolData);
+        });
+
+        return schools;
+    }
+
     function getSelectedSchools() {
         const selectedSchools = [];
 
@@ -295,12 +334,12 @@ function $p(selector) {
         clearErrors();
 
         const evaluationData = getFormPlanJson();
-        const validation = validatePlan(evaluationData);
+        //const validation = validatePlan(evaluationData);
 
-        if (!validation.isValid) {
-            displayErrors(validation.errors);
-            return;
-        }
+        //if (!validation.isValid) {
+        //    displayErrors(validation.errors);
+        //    return;
+        //}
 
         await submitEvaluationData(evaluationData);
     }
@@ -339,7 +378,8 @@ function $p(selector) {
         getFormPlanJson,
         validatePlan,
         submitEvaluationData,
-        getSelectedSchools
+        getAllSchoolsWithSelectionFlag
+        /*getSelectedSchools*/
     };
 
 })();
