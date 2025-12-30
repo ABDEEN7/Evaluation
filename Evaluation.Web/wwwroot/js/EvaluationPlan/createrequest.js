@@ -31,7 +31,7 @@
         }
 
         const serviceName = (w.currentLang === "ar" ? createPlanService.nameAr : createPlanService.nameEn) || "";
-        const headerEl = document.getElementById("serviceName");
+        const headerEl = document.getElementById("CreateRequestModalLabel");
         if (headerEl) headerEl.textContent = serviceName ? " - " + serviceName : "";
 
         const actions = createPlanService.actions || [];
@@ -66,7 +66,7 @@
                 ? CreateEvaluationPartyService.nameAr
                 : CreateEvaluationPartyService.nameEn) || "";
 
-        const headerEl = document.getElementById("serviceName");
+        const headerEl = document.getElementById("CreateRequestModalLabel");
         if (headerEl) headerEl.textContent = serviceName ? " - " + serviceName : "";
 
         const actions = CreateEvaluationPartyService.actions || [];

@@ -134,12 +134,13 @@ namespace Evaluation.Services.BusinessLayer.API.EvaluationRequestLayer
 
 			var requests = await uow
 				.GetRepository<ServiceRequest>()
-				.GetAllActiveNonDeleted(r => r.EvaluationRequestId == evaluationRequestId)
+				.GetAllActiveNonDeleted(r => r.EvaluationRequestId == evaluationRequestId).Include(x=>x.Status)
 				.Select(r => new
 				{
 					r.Id,
 					r.RequestNumber,
 					r.StatusId,
+					r.Status!.IsOpen,
 					StatusNameAr = r.Status!.NameAr,
 					StatusNameEn = r.Status!.NameEn,
 					r.ServiceId,
@@ -157,6 +158,7 @@ namespace Evaluation.Services.BusinessLayer.API.EvaluationRequestLayer
 						Id = r.Id,
 						RequestNumber = r.RequestNumber,
 						StatusId = r.StatusId,
+						StatusISOPen = r.IsOpen,
 						Status = Lang == "ar" ? r.StatusNameAr : r.StatusNameEn,
 						ServiceId = r.ServiceId,
 						EvaluationPartyId = r.EvaluationPartyId,
