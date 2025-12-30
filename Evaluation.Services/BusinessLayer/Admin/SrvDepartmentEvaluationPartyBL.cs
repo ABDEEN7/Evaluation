@@ -5,6 +5,7 @@ using Evaluation.DAL.Repositories;
 using Evaluation.Services.Models.Admin;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Enums;
+using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Admin;
 using Microsoft.EntityFrameworkCore;
@@ -46,14 +47,15 @@ public class SrvDepartmentEvaluationPartyBL : AdminBase
     public async Task<DepartmentEvaluationPartyDto> DeleteDepartmentEvaluationPartyAsync(Guid? id)
     {
         var repository = uow.GetRepository<DepartmentEvaluationParty>();
-        var DepartmentEvaluationParty = await repository
+        var departmentEvaluationParty = await repository
             .GetAllActiveNonDeleted(x => x.Id == id)
             .FirstOrDefaultAsync()
             .ConfigureAwait(false);
-        
-        repository.Delete(DepartmentEvaluationParty);
+        if (departmentEvaluationParty == null)
+            throw new BusinessException(ConstantKeys.ExceptionMessage.DepartmentEvaluationParty);
+        repository.Delete(departmentEvaluationParty);
         await uow.CommitAsync();
-        var result = mapper.Map<DepartmentEvaluationPartyDto>(DepartmentEvaluationParty, opts =>
+        var result = mapper.Map<DepartmentEvaluationPartyDto>(departmentEvaluationParty, opts =>
         opts.Items["Language"] = _requestInfo.Lang);
         result.ResponseStatus = DBResult.Deleted;
         return result;

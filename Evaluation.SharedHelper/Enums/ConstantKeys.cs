@@ -158,6 +158,7 @@ public static class ConstantKeys
         public static readonly string OrgTreeExistsEvaluationRequest = "OrgTreeExistsEvaluationRequest";
         public static readonly string OrgTreeExistsOrgAcademicYear = "OrgTreeExistsOrgAcademicYear";
         public static readonly string JobTitleCannotDelete = "JobTitleCannotDelete";
+        public static readonly string DepartmentEvaluationParty = "DepartmentEvaluationParty";
     }
 
     public static class AdminSettings
