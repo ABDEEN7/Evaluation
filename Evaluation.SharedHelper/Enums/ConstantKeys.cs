@@ -163,6 +163,7 @@ public static class ConstantKeys
         public static readonly string FormItemExistsFormItemValues = "FormItemExistsFormItemValues";
         public static readonly string FormItemExistsSubFormItem = "FormItemExistsSubFormItem";
         public static readonly string EvalFormTypeExistsEvalForms = "EvalFormTypeExistsEvalForms";
+        public static readonly string EducationLevelExistsSchoolLevel = "EducationLevelExistsSchoolLevel";
     }
 
     public static class AdminSettings
@@ -296,6 +297,7 @@ public static class ConstantKeys
         public static readonly string AdminSchools = "AdminSchools";
         public static readonly string AdminOrgTree = "AdminOrgTree";
         public static readonly string AdminEvalFormType = "AdminEvalFormType";
+        public static readonly string AdminEducationLevel = "AdminEducationLevel";
     }
     public static class WebAppPages
     {
@@ -679,6 +681,15 @@ public static class ConstantKeys
         public const string ADD_ADMIN_EVALFORMTYPE = "ADD_ADMIN_EVALFORMTYPE";
         public const string EDIT_ADMIN_EVALFORMTYPE = "EDIT_ADMIN_EVALFORMTYPE";
         public const string DELETE_ADMIN_EVALFORMTYPE = "DELETE_ADMIN_EVALFORMTYPE";
+
+        #endregion
+
+        #region EDUCATIONLEVEL
+
+        public const string VIEW_ADMIN_EDUCATIONLEVEL = "VIEW_ADMIN_EDUCATIONLEVEL";
+        public const string ADD_ADMIN_EDUCATIONLEVEL = "ADD_ADMIN_EDUCATIONLEVEL";
+        public const string EDIT_ADMIN_EDUCATIONLEVEL = "EDIT_ADMIN_EDUCATIONLEVEL";
+        public const string DELETE_ADMIN_EDUCATIONLEVEL = "DELETE_ADMIN_EDUCATIONLEVEL";
 
         #endregion
 
