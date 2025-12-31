@@ -6,7 +6,7 @@ namespace Evaluation.Admin.Extensions
 {
     public static class AppExtensions
     {
-       
+
         public static TSource StringToObject<TSource>(this string source)
         {
             var result = JsonConvert.DeserializeObject<TSource>(source);
@@ -17,7 +17,7 @@ namespace Evaluation.Admin.Extensions
         }
         public static bool IsPermissionAvailabe(this List<string> Permisions, string Key)
         {
-            var isAvl = Permisions.FirstOrDefault(c => c == Key);
+            var isAvl = Permisions.FirstOrDefault(c => c.ToLower() == Key.ToLower());
             if (null == isAvl) return false;
             else return true;
         }
@@ -31,11 +31,11 @@ namespace Evaluation.Admin.Extensions
                 var control = ControlsList.FirstOrDefault(c => c.BackEndName == BackendName);
                 if (control == null)
                 {
-                    result= $"Missing Text For : [{BackendName}]";
+                    result = $"Missing Text For : [{BackendName}]";
                 }
                 else
                 {
-                    if(lang == "ar")
+                    if (lang == "ar")
                     {
                         if (!string.IsNullOrEmpty(control.ArValue))
                         {
@@ -99,6 +99,6 @@ namespace Evaluation.Admin.Extensions
             return result;
         }
 
-       
+
     }
 }
