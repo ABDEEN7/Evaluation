@@ -1,0 +1,148 @@
+﻿@{
+    Layout = "_Layout";
+}
+
+@section Styles {
+    <link href="~/plan-assets/css/style.css" rel="stylesheet">
+    <link href="~/plan-assets/vendor/select2/css/select2.min.css" rel="stylesheet">
+    <style>
+        .marked-for-removal {
+            background-color: #ffebee !important;
+        }
+
+        .checkbox-item {
+            padding: 8px;
+            cursor: pointer;
+        }
+
+            .checkbox-item:hover {
+                background-color: #f5f5f5;
+            }
+
+            .checkbox-item input[type="checkbox"] {
+                margin-right: 8px;
+            }
+    </style>
+}
+
+<!-- Main Content -->
+<main class="main-content">
+    <!-- Members Card -->
+    <div class="card card-table mb-4">
+        <div class="card-body">
+            <div class="row align-items-center">
+                <div class="col-xl-4 col-lg-4"><h4 class="mb-3 mb-lg-0">الأعضاء</h4></div>
+                <div class="col-xl-8 col-lg-8">
+                    <div class="row">
+                        <!-- Team Filter Dropdown will be injected here by JS -->
+                        <div class="col-xl-8 col-lg-8 col-md-8 mb-3">
+                            <div class="d-flex justify-content-end custom-search">
+                                <div class="input-group">
+                                    <span class="input-group-text border-end-0 bg-transparent"><i class="las la-search"></i></span>
+                                    <input type="text" id="customSearch" class="form-control form-control-lg border-start-0 ps-0" placeholder="ابحث هنا...">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-4 col-lg-4 col-md-4 mb-3">
+                            <button class="btn filterbtn" data-bs-toggle="offcanvas" data-bs-target="#filterOffcanvas">
+                                <i class="la la-filter"></i> تصفية
+                                <span class="badge bg-primary rounded-pill mx-2">1</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="table-card rounded overflow-hidden">
+                <div class="table-responsive">
+                    <table id="userTable" class="table table-bordered table-hover align-middle w-100">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width: 50px;">
+                                    <label class="custom-checkbox1 plus">
+                                        <input type="checkbox" id="selectAll">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                </th>
+                                <th>اسم العضو</th>
+                                <th>المسمى الوظيفي</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="3" class="text-center text-muted py-4">جاري التحميل...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Selected Team Card -->
+    <div class="card card-table">
+        <div class="card-body">
+            <div class="row align-items-center">
+                <div class="col-xl-8 col-lg-5 mb-3 mb-lg-0">
+                    <h4>فريق الزيارة المحدد</h4>
+                </div>
+                <div class="col-xl-4 col-lg-7 mb-3">
+                    <div class="bg-success-light d-flex justify-content-between p-2 align-items-center br-6" role="alert" style="display: none;">
+                        <div class="d-flex justify-content-between align-items-center gap-2">
+                            <i class="las la-check-circle text-success fs-22"></i>
+                            <p class="m-0 text-dark">تم إضافة الأعضاء بنجاح</p>
+                        </div>
+                        <button type="button" class="btn-close fs-14" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                </div>
+            </div>
+            <div class="table-card rounded overflow-hidden">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover align-middle w-100">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width: 50px;">
+                                    <label class="custom-checkbox1 minus">
+                                        <input type="checkbox">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                </th>
+                                <th>اسم العضو</th>
+                                <th>NDA</th>
+                                <th>المجال</th>
+                                <th style="width: 100px;">قائد الفريق</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="5" class="text-center text-muted py-4">لا يوجد أعضاء محددين</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mt-3">
+                    <div class="d-flex gap-2 align-items-center flex-wrap">
+                        <button class="btn btn-primary mw-200" type="button">
+                            <i class="las la-save"></i> حفظ الفريق
+                        </button>
+                        <button class="btn btn-outline-danger mw-200" type="button">
+                            <i class="las la-trash"></i> حذف المحدد
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+@section Scripts {
+    <!-- JS Libraries -->
+    <script src="~/plan-assets/vendor/js/jquery.min.js"></script>
+    <script src="~/plan-assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="~/plan-assets/vendor/select2/js/select2.min.js"></script>
+
+    <!-- Team Management Script -->
+    <script src="~/js/teammemebers/team-member-const.js"></script>
+    <script src="~/js/teammemebers/get-team-members.js"></script>
+}
