@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Evaluation.Web.Controllers
 {
+    [Route("{language}")]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -13,11 +14,13 @@ namespace Evaluation.Web.Controllers
             _logger = logger;
         }
 
-        public IActionResult Index(string id)
+        [HttpGet("{id?}")]
+        public IActionResult Index(string? id)
         {
+            ViewBag.Webgroup = id;
+
             return View();
         }
-
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

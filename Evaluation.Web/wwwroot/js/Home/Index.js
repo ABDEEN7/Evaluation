@@ -77,7 +77,7 @@
 
 
 function loadDepartments() {
-    let webGroupPath = 'testwebgroup';
+    let webGroupPath = webgroup;
     jqClient().Get(`/Website/GetDepartmentsForWebGroup?webGroupPath=${webGroupPath}`)
         .done((result) => {
 

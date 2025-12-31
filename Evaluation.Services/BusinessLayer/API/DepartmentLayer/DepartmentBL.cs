@@ -20,9 +20,13 @@ public class DepartmentBL(IServiceScopeFactory serviceScopeFactory, CacheDataPro
         return mapper.Map<List<DepartmentDto>>(departments);
     }
 
-    public async Task<List<DepartmentDto>> GetAllDepartmentsForWebGroup(string webGroupPath)
+    public async Task<List<DepartmentDto>?> GetAllDepartmentsForWebGroup(string webGroupPath)
     {
         var webGroup = await webGroubService.GetWebGroubByPath(webGroupPath);
+
+        if (webGroup == null)
+            return null;
+
         var departments = await departmentService.GetDepartmentsByWebGroupId(webGroup.Id);
 
         return mapper.Map<List<DepartmentDto>>(departments);
