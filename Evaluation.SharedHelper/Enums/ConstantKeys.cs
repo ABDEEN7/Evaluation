@@ -160,6 +160,8 @@ public static class ConstantKeys
         public static readonly string JobTitleCannotDelete = "JobTitleCannotDelete";
         public static readonly string EvalFormExistsFormItem = "EvalFormExistsFormItem";
         public static readonly string EvalFormExistsFormScope = "EvalFormExistsFormScope";
+        public static readonly string FormItemExistsFormItemValues = "FormItemExistsFormItemValues";
+        public static readonly string FormItemExistsSubFormItem = "FormItemExistsSubFormItem";
     }
 
     public static class AdminSettings
@@ -296,6 +298,8 @@ public static class ConstantKeys
     public static class WebAppPages
     {
         public static readonly string WebEvaluationForm = "WebEvaluationForm";
+        public static readonly string WebEvaluationFormItem = "WebEvaluationFormItem";
+        public static readonly string WebEvaluationSubFormItem = "WebEvaluationSubFormItem";
     }
     public static class AdminPermission
     {
@@ -684,6 +688,24 @@ public static class ConstantKeys
         public const string ADD_WEB_EVALFORMS = "ADD_WEB_EVALFORMS";
         public const string EDIT_WEB_EVALFORMS = "EDIT_WEB_EVALFORMS";
         public const string DELETE_WEB_EVALFORMS = "DELETE_WEB_EVALFORMS";
+
+        #endregion
+
+        #region FORMITEMS
+
+        public const string VIEW_WEB_FORMITEMS = "VIEW_WEB_FORMITEMS";
+        public const string ADD_WEB_FORMITEMS = "ADD_WEB_FORMITEMS";
+        public const string EDIT_WEB_FORMITEMS = "EDIT_WEB_FORMITEMS";
+        public const string DELETE_WEB_FORMITEMS = "DELETE_WEB_FORMITEMS";
+
+        #endregion
+
+        #region SUBFORMITEMS
+
+        public const string VIEW_WEB_SUBFORMITEMS = "VIEW_WEB_SUBFORMITEMS";
+        public const string ADD_WEB_SUBFORMITEMS = "ADD_WEB_SUBFORMITEMS";
+        public const string EDIT_WEB_SUBFORMITEMS = "EDIT_WEB_SUBFORMITEMS";
+        public const string DELETE_WEB_SUBFORMITEMS = "DELETE_WEB_SUBFORMITEMS";
 
         #endregion
 

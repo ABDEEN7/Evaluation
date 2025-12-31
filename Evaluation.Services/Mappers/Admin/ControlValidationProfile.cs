@@ -13,7 +13,8 @@ namespace Evaluation.Services.Mappers
                  .ForMember(dest => dest.ControlName, opt => opt.MapFrom(src => src.Name))
                    .ForMember(dest => dest.TabulatorConfig, opt => opt.MapFrom(src => src.TabulatorConfigJson))
                    .ForMember(dest => dest.FileCount, opt => opt.MapFrom(src => src.MaxFileCount))
-                   .ForMember(dest => dest.FileSize, opt => opt.MapFrom(src => src.MaxFileSize));
+                   .ForMember(dest => dest.FileSize, opt => opt.MapFrom(src => src.MaxFileSize))
+                   .ForMember(dest => dest.PermissionName, opt => opt.MapFrom(src => src.Permission.BackendName));
         }
     }
 }

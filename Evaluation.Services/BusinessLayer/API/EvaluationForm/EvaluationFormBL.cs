@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Azure.Core;
 using Evaluation.DAL.Helper;
+using Evaluation.DAL.Models.FormsModules;
 using Evaluation.DAL.Repositories;
 using Evaluation.Services.Models.Admin;
 using Evaluation.Services.Special;
@@ -21,6 +22,12 @@ public class EvaluationFormBL(IServiceScopeFactory serviceScopeFactory, CacheDat
     public async Task<List<EvaluationFormDto>> GetEvaluationForm(int Page)
     {
         var result = await evaluationFormService.GetEvaluationFormList(Page);
+        return result;
+    }
+
+    public async Task<List<EvaluationFormItemDto> >GetAllEvalFormItems(Guid EvalformId)
+    {
+        var result = await evaluationFormService.GetEvaluationFormItemList(EvalformId);
         return result;
     }
 
@@ -49,6 +56,61 @@ public class EvaluationFormBL(IServiceScopeFactory serviceScopeFactory, CacheDat
     public async Task<EvaluationFormDto> DeleteEvaluationForm(Guid Id)
     {
         var result = await evaluationFormService.DeleteEvaluationForm(Id!);
+        return result;
+    }
+    public async Task<EvaluationFormItemDto> SaveEvaluationFormItem(EvaluationFormItemDto model)
+    {
+        var result = new EvaluationFormItemDto();
+        bool validateObject = await ValidateObject(model!, ConstantKeys.WebPermissions.ADD_WEB_FORMITEMS);
+        if (validateObject)
+        {
+            result = await evaluationFormService.SaveEvaluationFormItem(model!);
+
+        }
+        return result;
+    }
+    public async Task<EvaluationFormItemDto> UpdateEvaluationFormItem(EvaluationFormItemDto model)
+    {
+        var result = new EvaluationFormItemDto();
+        bool validateObject = await ValidateObject(model!, ConstantKeys.WebPermissions.ADD_WEB_FORMITEMS);
+        if (validateObject)
+        {
+            result = await evaluationFormService.UpdateEvaluationFormItem(model!);
+
+        }
+        return result;
+    }
+    public async Task<EvaluationFormItemDto> DeleteEvaluationFormItem(Guid Id)
+    {
+        var result = await evaluationFormService.DeleteEvaluationFormItem(Id!);
+        return result;
+    }
+
+    public async Task<EvaluationFormSubItemDto> SaveEvaluationSubFormItem(EvaluationFormSubItemDto model)
+    {
+        var result = new EvaluationFormSubItemDto();
+        bool validateObject = await ValidateObject(model!, ConstantKeys.WebPermissions.ADD_WEB_SUBFORMITEMS);
+        if (validateObject)
+        {
+            result = await evaluationFormService.SaveEvaluationSubFormItem(model!);
+
+        }
+        return result;
+    }
+    public async Task<EvaluationFormSubItemDto> UpdateEvaluationSubFormItem(EvaluationFormSubItemDto model)
+    {
+        var result = new EvaluationFormSubItemDto();
+        bool validateObject = await ValidateObject(model!, ConstantKeys.WebPermissions.ADD_WEB_SUBFORMITEMS);
+        if (validateObject)
+        {
+            result = await evaluationFormService.UpdateEvaluationSubFormItem(model!);
+
+        }
+        return result;
+    }
+    public async Task<EvaluationFormSubItemDto> DeleteEvaluationSubFormItem(Guid Id)
+    {
+        var result = await evaluationFormService.DeleteEvaluationSubFormItem(Id!);
         return result;
     }
 

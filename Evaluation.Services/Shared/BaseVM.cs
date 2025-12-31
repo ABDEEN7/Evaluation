@@ -38,6 +38,7 @@ namespace Evaluation.Services.Shared
         public async Task LoadAllAData(string[]? PageNamesList = null, string[]? ControlValidationPermissionBackendNameList = null, string[]? SettingKeyList = null)
         {
             //dotn't use Task.WhenAll this tasks depandent on each other
+            
             await LoadAllUiControls(PageNamesList!);
             await LoadAllControlValidations(ControlValidationPermissionBackendNameList!);
             await LoadASystemSettings(SettingKeyList!);
@@ -84,7 +85,7 @@ namespace Evaluation.Services.Shared
 
                             TabulatorConfig = constraint == null || string.IsNullOrEmpty(constraint.TabulatorConfig) ? null : constraint.TabulatorConfig,
                             ControlJsonConfig = constraint == null || string.IsNullOrEmpty(constraint.ControlJsonConfig) ? null : constraint.ControlJsonConfig,
-
+                            PermissionBackendName=constraint == null || string.IsNullOrEmpty(constraint.PermissionName) ? null : constraint.PermissionName,
 
                         };
 
