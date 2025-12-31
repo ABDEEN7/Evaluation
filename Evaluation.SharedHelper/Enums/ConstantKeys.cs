@@ -158,6 +158,8 @@ public static class ConstantKeys
         public static readonly string OrgTreeExistsEvaluationRequest = "OrgTreeExistsEvaluationRequest";
         public static readonly string OrgTreeExistsOrgAcademicYear = "OrgTreeExistsOrgAcademicYear";
         public static readonly string JobTitleCannotDelete = "JobTitleCannotDelete";
+        public static readonly string EvalFormExistsFormItem = "EvalFormExistsFormItem";
+        public static readonly string EvalFormExistsFormScope = "EvalFormExistsFormScope";
     }
 
     public static class AdminSettings
@@ -291,7 +293,10 @@ public static class ConstantKeys
         public static readonly string AdminSchools = "AdminSchools";
         public static readonly string AdminOrgTree = "AdminOrgTree";
     }
-
+    public static class WebAppPages
+    {
+        public static readonly string WebEvaluationForm = "WebEvaluationForm";
+    }
     public static class AdminPermission
     {
         public const string VIEW_ADMIN_HOME = "VIEW_ADMIN_HOME";
@@ -672,6 +677,16 @@ public static class ConstantKeys
         public const string GET_FORM_ITEMS = "GET_FORM_ITEMS";
         public const string SAVE_EVALUATION_FORM = "SAVE_EVALUATION_FORM";
         public const string UPDATE_EVALUATION_FORM = "UPDATE_EVALUATION_FORM";
+
+        #region EVALFORMS
+
+        public const string VIEW_WEB_EVALFORMS = "VIEW_WEB_EVALFORMS";
+        public const string ADD_WEB_EVALFORMS = "ADD_WEB_EVALFORMS";
+        public const string EDIT_WEB_EVALFORMS = "EDIT_WEB_EVALFORMS";
+        public const string DELETE_WEB_EVALFORMS = "DELETE_WEB_EVALFORMS";
+
+        #endregion
+
     }
     public static class WebAppSettings
     {
@@ -686,6 +701,9 @@ public static class ConstantKeys
 		public const string lblShowingEntries = "lblShowingEntries";
 		public const string lblprevious = "lblprevious";
 		public const string lblnext = "lblnext";
+		public const string ACTION = "ACTION";
+		public const string LASTUPDATEDBY = "LASTUPDATEDBY";
+		public const string LASTUPDATEDDATE = "LASTUPDATEDDATE";
 	}
 
 	public static class EvaluationPlanRequests

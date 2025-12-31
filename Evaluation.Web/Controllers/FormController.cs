@@ -14,4 +14,9 @@ public class FormController : Controller
         return View();
     }
 
+    public IActionResult Istemara()
+    {
+        return View();
+    }
+
 }
