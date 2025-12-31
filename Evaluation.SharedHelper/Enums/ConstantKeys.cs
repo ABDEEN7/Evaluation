@@ -197,7 +197,9 @@ public static class ConstantKeys
         public static readonly string WebAppSitePath = "WebAppSitePath";
         public static readonly string SubSiteContentMaxCount = "SubSiteContentMaxCount";
         public static readonly string SchoolOrgType = "SchoolOrgType";
+        public static readonly string EmployeeOrgType = "EmployeeOrgType";
         public static readonly string OrgClassList = "OrgClassList";
+        public static readonly string EmployeeOrgClassList = "EmployeeOrgClassList";
         
 
     }
@@ -298,6 +300,7 @@ public static class ConstantKeys
         public static readonly string AdminOrgTree = "AdminOrgTree";
         public static readonly string AdminEvalFormType = "AdminEvalFormType";
         public static readonly string AdminEducationLevel = "AdminEducationLevel";
+        public static readonly string AdminEmployees = "AdminEmployees";
     }
     public static class WebAppPages
     {
@@ -690,6 +693,15 @@ public static class ConstantKeys
         public const string ADD_ADMIN_EDUCATIONLEVEL = "ADD_ADMIN_EDUCATIONLEVEL";
         public const string EDIT_ADMIN_EDUCATIONLEVEL = "EDIT_ADMIN_EDUCATIONLEVEL";
         public const string DELETE_ADMIN_EDUCATIONLEVEL = "DELETE_ADMIN_EDUCATIONLEVEL";
+
+        #endregion
+
+        #region EMPLOYEE
+
+        public const string VIEW_ADMIN_EMPLOYEE = "VIEW_ADMIN_EMPLOYEE";
+        public const string ADD_ADMIN_EMPLOYEE = "ADD_ADMIN_EMPLOYEE";
+        public const string EDIT_ADMIN_EMPLOYEE = "EDIT_ADMIN_EMPLOYEE";
+        public const string DELETE_ADMIN_EMPLOYEE = "DELETE_ADMIN_EMPLOYEE";
 
         #endregion
 
