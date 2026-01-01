@@ -1,5 +1,6 @@
 ﻿using Evaluation.DAL.Models.ActionEntities;
 using Evaluation.DAL.Models.Attachments;
+using Evaluation.DAL.Models.Audit;
 using Evaluation.DAL.Models.BaseModule;
 using Evaluation.DAL.Models.DepartementEntites;
 using Evaluation.DAL.Models.ServiceRequestEntities;
@@ -11,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Evaluation.DAL.Models.SystemLog
 {
-    public class ActionTransactionsLog:EntityBase
+    public class ActionTransactionsLog:EntityBase, IAuditLogEntity
     {
         public Guid ServiceActionId { get; set; }
         public ServiceAction? ServiceAction { get; set; }

@@ -56,7 +56,7 @@ public class SchoolController : ControllerBase
     public async Task<IActionResult> GetVisits()
         => Ok(new { result = await _masterBl.GetApiService<SchoolBL>().GetVisitsAsync() });
 
-    [HttpGet]
+    [HttpPost]
     public async Task<IActionResult> GetSchools([FromQuery] SchoolRequest request)
     {
         var result = await _masterBl.GetApiService<SchoolBL>().GetSchools(request);

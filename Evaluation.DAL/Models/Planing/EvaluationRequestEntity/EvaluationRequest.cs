@@ -23,4 +23,7 @@ public class EvaluationRequest : EntityBase
 	public Service? Service { get; set; }
 	public Guid ServiceStatusId { get; set; }
 	public ServiceStatus? ServiceStatus { get; set; }
+    public string? RequestNumber  { get; set; }
+    public long Sequence { get; set; }
+
 }

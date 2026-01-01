@@ -22,7 +22,22 @@ public class FormService(IServiceScopeFactory serviceScopeFactory,
 {
     public async Task<EvalForm> GetEvalForm(Guid id)
     {
-        return await unitOfWork.GetRepository<EvalForm>().GetByIdAsync(id);
+        return await unitOfWork.GetRepository<EvalForm>()
+            .GetByIdAsync(id);
+    }
+
+    public async Task<FormEvalMatrix> GetFormEvalMatrix(Guid id)
+    {
+        return await unitOfWork.GetRepository<FormEvalMatrix>()
+            .GetByIdAsync(id);
+    }
+
+    public async Task<List<FormEvalMarixValue>> GetFormEvalMatrixValues(Guid id)
+    {
+        return await unitOfWork.GetRepository<FormEvalMarixValue>()
+            .GetAllActiveNonDeleted()
+            .Where(x=>x.FormEvalMatrixId == id)
+            .ToListAsync();
     }
 
     public async Task<List<FormItem>> GetFormItems()

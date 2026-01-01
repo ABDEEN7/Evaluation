@@ -111,10 +111,12 @@ public partial class EvaluationDbContext : DbContext
     public virtual DbSet<EvaluationRequestAssignment> EvaluationRequestAssignment { get; set; }
     public virtual DbSet<EvalRequestAssignmentScope> EvalRequestAssignmentScope { get; set; }
     public virtual DbSet<SystemModuleType> SystemModuleTypes { get; set; }
+    public virtual DbSet<SystemAttribute> SystemAttributes { get; set; }
+    public virtual DbSet<DepartmentRoleAttributeValue> DepartmentRoleAttributeValue { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        //optionsBuilder.UseSqlServer("Server=DCDCSQL2DNET01;Database=Evaluation;Trust Server Certificate=true;User id=t-m.fatouh-dev;Integrated Security=SSPI;");
+       // optionsBuilder.UseSqlServer("Server=DCDCSQL2DNET01;Database=Evaluation;Trust Server Certificate=true;User id=t-m.fatouh-dev;Integrated Security=SSPI;");
         //optionsBuilder.UseSqlServer("Server=DCDCSQL2DNET01;Database=Evaluation;Trust Server Certificate=true;User id=Eval_User; Password=Abc@1234;");
     }
 

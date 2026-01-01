@@ -253,6 +253,9 @@
                                     $(`#${uibackendName}`).trigger('change');
 
                                 }
+                                if (window.hasOwnProperty("DisableParentDropdownOptions")) {
+                                    DisableParentDropdownOptions();
+                                }
                             }
                         }
                     };
@@ -340,7 +343,9 @@
 
                     $(`#${uibackendName}`).val('')
                     $(`#${uibackendName}`).trigger('change');
-
+                    if (window.hasOwnProperty("DisableParentDropdownOptions")) {
+                        DisableParentDropdownOptions();
+                    }
 
                 }
 

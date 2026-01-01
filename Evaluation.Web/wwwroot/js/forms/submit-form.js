@@ -2,11 +2,19 @@
 $(document).ready(function () {
     $("#btnSubmitForm").on("click", function (e) {
         e.preventDefault();
-        submitEvaluationForm();
+        submitForm();
     });
 });
-function submitEvaluationForm() {
-    const formId = "e4530010-a302-41f5-935c-2599674db37a";
+
+$(document).ready(function () {
+    $("#btnSaveForm").on("click", function (e) {
+        e.preventDefault();
+        saveForm();
+    });
+});
+function evaluationFormResult() {
+    const params = new URLSearchParams(window.location.search);
+    const formId = params.get('formId');  
     const mainItems = [];
 
     // ========== LOOP MAIN ITEMS ONLY ==========
@@ -71,7 +79,12 @@ function submitEvaluationForm() {
 
     console.log("FINAL NESTED JSON:", payload);
 
-    jqClient().Post("/Form/SaveEvaluation", payload)
+    return payload;
+}
+
+function submitForm() {
+    var result = evaluationFormResult();
+    jqClient().Post("/Form/SaveEvaluationForm", result)
         .done((res) => {
             Swal.fire({
                 icon: "success",
@@ -79,4 +92,8 @@ function submitEvaluationForm() {
                 text: "تم إرسال الاستمارة للاعتماد بنجاح"
             });
         });
+}
+
+function saveForm() {
+  return evaluationFormResult();
 }
