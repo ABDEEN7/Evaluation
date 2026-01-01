@@ -6,6 +6,7 @@ using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Dtos.PlanDto;
 using Evaluation.SharedHelper.Models;
 using FluentResults;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Evaluation.Services.BusinessLayer.API;
@@ -15,12 +16,13 @@ public class EvaluationRequestBL(IServiceScopeFactory serviceScopeFactory, Cache
         IServiceProvider serviceProvider, RequestInfo requestInfo, EvaluationRequestService evaluationRequestService, ServiceRequestService serviceRequestService)
         : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, requestInfo)
 {
-    public async Task<List<EvaluationRequestCalenderDto>> GetEvaluationRequestsForCalender()
+
+    public async Task<List<EvaluationRequestCalenderDto>> GetEvaluationRequestsForCalender(string[] monthes)
     {
-        var evaluationRequestResult = await evaluationRequestService.GetEvaluationRequests();
+        var evaluationRequestResult = await evaluationRequestService.GetEvaluationRequests(monthes);
         var serviceRequestResult = await serviceRequestService.GetServiceRequestsByEvaluationRequestIds(evaluationRequestResult.Select(er => er.Id).ToList());
-        
-        List<EvaluationRequestCalenderDto>  evaluationRequestCalenderDtos = new List<EvaluationRequestCalenderDto>();
+
+        List<EvaluationRequestCalenderDto> evaluationRequestCalenderDtos = new List<EvaluationRequestCalenderDto>();
 
         evaluationRequestCalenderDtos.AddRange(mapper.Map<List<EvaluationRequestCalenderDto>>(evaluationRequestResult));
         evaluationRequestCalenderDtos.AddRange(mapper.Map<List<EvaluationRequestCalenderDto>>(serviceRequestResult));

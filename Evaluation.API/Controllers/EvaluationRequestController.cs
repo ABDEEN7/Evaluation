@@ -20,9 +20,9 @@ public class EvaluationRequestController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetEvaluationRequests()
+    public async Task<IActionResult> GetEvaluationRequests([FromQuery] string[] monthes)
     {
-        return Ok(await _masterBl.GetApiService<EvaluationRequestBL>().GetEvaluationRequestsForCalender());
+        return Ok(await _masterBl.GetApiService<EvaluationRequestBL>().GetEvaluationRequestsForCalender(monthes));
     }
 
     [HttpPost]

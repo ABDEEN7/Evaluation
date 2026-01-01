@@ -20,14 +20,20 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
     RequestInfo requestInfo
     ) : ApiBase(serviceScopeFactory, cacheDataProvider, unitOfWork, loggingServices, mapper, userInfo, serviceProvider, requestInfo)
 {
-    public async Task<List<EvaluationRequest>> GetEvaluationRequests()
+    public async Task<List<EvaluationRequest>> GetEvaluationRequests(string[] monthes)
     {
+        var monthInts = monthes.Select(int.Parse).ToList();
+
         return unitOfWork.GetRepository<EvaluationRequest>()
                     .GetAllActiveNonDeleted()
                     .Include(d => d.Plan)
                     .Include(d => d.OrgTree)
                     .Include(d => d.DepEvaluationType)
-                    .ToList();
+                    .Include(d => d.ServiceStatus)
+                     .Where(er =>
+            monthInts.Contains(er.FromDate.Year * 100 + er.FromDate.Month) ||
+            monthInts.Contains(er.ToDate.Year * 100 + er.ToDate.Month))
+        .ToList();
     }
 
     public async Task<EvaluationRequest> GetEvaluationRequestById(Guid Id)

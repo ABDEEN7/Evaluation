@@ -22,6 +22,10 @@ public class ServiceRequestService(IServiceScopeFactory serviceScopeFactory,
 {
     public async Task<List<ServiceRequest>> GetServiceRequestsByEvaluationRequestIds(List<Guid> Ids)
     {
-        return await unitOfWork.GetRepository<ServiceRequest>().GetAllActiveNonDeleted().Where(x => Ids.Contains(x.EvaluationRequestId.Value)).ToListAsync();
+        return await unitOfWork.GetRepository<ServiceRequest>()
+            .GetAllActiveNonDeleted()
+            .Where(x => Ids.Contains(x.EvaluationRequestId.Value))
+            .Include(d => d.Status)
+            .ToListAsync();
     }
 }
