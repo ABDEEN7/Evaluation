@@ -1,6 +1,5 @@
 ﻿/**
- * ✅ COMPLETE SOLUTION: Prefix shows in DOM + All logic works
- * Key: Use helper function for ALL jQuery selectors
+ * ✅ COMPLETE SOLUTION: fieldId على مستوى Form + School Records
  */
 
 (function (global) {
@@ -52,6 +51,8 @@
         searchTerm: '',
         fieldId: null
     };
+    const getTableSelector = () =>
+        state.fieldId ? `#${state.fieldId}_planTable` : '#planTable';
 
     /* ⭐ HELPER: Get element by ID (handles prefix automatically) */
     const $ = (selector) => {
@@ -96,12 +97,12 @@
             populateSemesters();
 
             if (planObject) {
-                renderPlanWithData(planObject);
+                renderPlanWithData(planObject, fieldId);
             }
             else if (state.planId) {
-                await loadPlanData(state.planId);
+                await loadPlanData(state.planId, fieldId);
             } else {
-                renderNewPlan();
+                renderNewPlan(fieldId);
             }
 
             bindEvents();
@@ -145,11 +146,11 @@
                 console.log('[PlanHandler] Holidays loaded:', ns.holidays);
             });
 
-    const loadPlanData = async (planId) => {
+    const loadPlanData = async (planId, fieldId) => {
         console.log('[PlanHandler] Loading plan data for ID:', planId);
         const res = await jqClient().Get(`${API_ENDPOINTS.GET_PLAN_DETAILS}/${planId}`);
         if (!res?.result) throw new Error('Invalid plan data');
-        renderPlanWithData(res.result);
+        renderPlanWithData(res.result, fieldId);
     };
 
     /* ===================== POPULATE DROPDOWNS ===================== */
@@ -202,6 +203,7 @@
     };
 
     /* ===================== SCHOOLS ===================== */
+    // ✅ تمرير fieldId إلى renderSchoolTable
 
     const loadSchoolsData = (page = 1, filters = {}) => {
         state.currentPage = page;
@@ -230,13 +232,15 @@
                 ns.allSchools = data;
                 ns.filteredSchools = data;
 
+                // ✅ تمرير fieldId
                 const tbody = ns.renderSchoolTable(
                     ns.filteredSchools,
                     state.isReadOnly,
-                    state.actionType
+                    state.actionType,
+                    state.fieldId
                 );
 
-                window.jQuery('#planTable tbody').replaceWith(tbody);
+                window.jQuery(`${getTableSelector()} tbody`).replaceWith(tbody);
 
                 const total = result.totalCount || data.length;
                 window.jQuery('#dtPagination').html(ns.renderPagination(total));
@@ -259,11 +263,12 @@
     const renderNewPlan = () => {
         console.log('[PlanHandler] Rendering new plan form');
 
-        const form = ns.renderPlanForm(null, state.isReadOnly, state.actionType);
+        const form = ns.renderPlanForm(state.fieldId, null, state.isReadOnly, state.actionType);
         window.jQuery('#planFormContainer .form-container').html(form);
-
         // ⭐ Apply prefix after render
         if (state.fieldId) {
+            const $table = window.jQuery('#planTable');
+            $table.attr('id', state.fieldId + '_' + 'planTable');
             ns.applyPrefixToIds('#planFormContainer');
         }
 
@@ -272,7 +277,7 @@
         initCustomMode();
     };
 
-    const renderPlanWithData = (plan) => {
+    const renderPlanWithData = (plan, fieldId) => {
         console.log('[PlanHandler] Rendering plan with data:', plan);
 
         const vm = {
@@ -281,12 +286,14 @@
             semesterId: plan.semesterId,
             dateRange: formatRange(plan.startDate, plan.endDate),
             schools: plan.schools || [],
-
         };
 
-        const form = ns.renderPlanForm(vm, state.isReadOnly, state.actionType);
+        const form = ns.renderPlanForm(state.fieldId,vm, state.isReadOnly, state.actionType);
         window.jQuery('#planFormContainer .form-container').html(form);
 
+        if (state.fieldId) {
+            const $table = window.jQuery('#planTable');
+            $table.attr('id', state.fieldId + '_' + 'planTable');        }
         // ⭐ Apply prefix after render
         if (state.fieldId) {
             ns.applyPrefixToIds('#planFormContainer');
@@ -300,13 +307,15 @@
             visitTypeId: s.visitTypeId || ''
         }));
 
+        // ✅ تمرير fieldId
         const tbody = ns.renderSchoolTable(
             vm.schools,
             state.isReadOnly,
-            state.actionType
+            state.actionType,
+            state.fieldId
         );
 
-        window.jQuery('#planTable tbody').replaceWith(tbody);
+        window.jQuery(`${getTableSelector()} tbody`).replaceWith(tbody);
 
         initializeDatePickersForPlan(vm);
         attachRowEvents();
@@ -349,17 +358,19 @@
             .off('change', '.childDate').on('change', '.childDate', onVisitDateChange)
             .off('change', '.visitTypeSelect').on('change', '.visitTypeSelect', onVisitTypeChange)
             .off('click', '#selectAll').on('click', '#selectAll', onSelectAll)
-            .off('click', '.page-link').on('click', '.page-link', onPaginationClick)
+            .off('click', `${getTableSelector()} .page-link`).on('click', `${getTableSelector()} .page-link`, onPaginationClick)
             .off('submit', '#filterForm').on('submit', '#filterForm', handleFilterSubmit)
             .off('click', '#clearFiltersBtn').on('click', '#clearFiltersBtn', handleClearFilters)
             .off('input', '#customSearch').on('input', '#customSearch', handleSearch);
     };
 
     const attachRowEvents = () => {
-        window.jQuery('.selectRow').off('change').on('change', updateSelectedSchools);
-        window.jQuery('.childDate').off('change').on('change', onVisitDateChange);
-        window.jQuery('.visitTypeSelect').off('change').on('change', onVisitTypeChange);
+        const scope = getTableSelector();
+        window.jQuery(scope).find('.selectRow').off('change').on('change', updateSelectedSchools);
+        window.jQuery(scope).find('.childDate').off('change').on('change', onVisitDateChange);
+        window.jQuery(scope).find('.visitTypeSelect').off('change').on('change', onVisitTypeChange);
     };
+
 
     /* ===================== HANDLERS ===================== */
 
@@ -394,20 +405,22 @@
     };
 
     const onVisitDateChange = function () {
-        const id = window.jQuery(this).data('school-id');
-        const school = ns.selectedSchools.find(s => s.id === id);
+        // ✅ الحصول على الـ school ID الأصلي
+        const schoolId = window.jQuery(this).data('school-id');
+        const school = ns.selectedSchools.find(s => s.id === schoolId);
         if (school) {
             school.visitDate = window.jQuery(this).val();
-            console.log('[PlanHandler] Visit date updated for school:', id);
+            console.log('[PlanHandler] Visit date updated for school:', schoolId);
         }
     };
 
     const onVisitTypeChange = function () {
-        const id = window.jQuery(this).data('school-id');
-        const school = ns.selectedSchools.find(s => s.id === id);
+        // ✅ الحصول على الـ school ID الأصلي
+        const schoolId = window.jQuery(this).data('school-id');
+        const school = ns.selectedSchools.find(s => s.id === schoolId);
         if (school) {
             school.visitTypeId = window.jQuery(this).val();
-            console.log('[PlanHandler] Visit type updated for school:', id);
+            console.log('[PlanHandler] Visit type updated for school:', schoolId);
         }
     };
 
@@ -435,8 +448,6 @@
         const modal = new bootstrap.Modal(document.getElementById('confirmation-modal'));
         modal.show();
     };
-
-
 
     /* ===================== FILTER HANDLERS ===================== */
 
@@ -572,7 +583,6 @@
             visitTypeId: s.visitTypeId
         }));
 
-        // ⭐ No prefix in payload - backend will see original field names
         const payload = {
             id: state.planId,
             title: title,
@@ -660,26 +670,26 @@
 
     const updateSelectedSchools = () => {
         ns.selectedSchools = [];
+        const scope = getTableSelector();
 
-        window.jQuery('.selectRow:checked').each(function () {
-            const id = window.jQuery(this).data('id');
-            const school = ns.allSchools.find(s => s.id === id);
+        window.jQuery(`${scope} .selectRow:checked`).each(function () {
+            const schoolId = window.jQuery(this).data('school-id');
+            const school = ns.allSchools.find(s => s.id === schoolId);
             if (!school) return;
 
             ns.selectedSchools.push({
                 ...school,
-                visitDate: window.jQuery(`.childDate[data-school-id="${id}"]`).val(),
-                visitTypeId: window.jQuery(`.visitTypeSelect[data-school-id="${id}"]`).val()
+                visitDate: window.jQuery(`${scope} .childDate[data-school-id="${schoolId}"]`).val(),
+                visitTypeId: window.jQuery(`${scope} .visitTypeSelect[data-school-id="${schoolId}"]`).val()
             });
         });
-
-        console.log('[PlanHandler] Selected schools updated:', ns.selectedSchools.length);
     };
+
 
     /* ===================== UI STATES ===================== */
 
     const showLoadingState = () => {
-        window.jQuery('#planTable tbody').html(`
+        window.jQuery(`${getTableSelector()} tbody`).html(`
             <tr>
                 <td colspan="7" class="text-center py-5">
                     <div class="spinner-border text-primary"></div>
@@ -690,13 +700,13 @@
     };
 
     const showErrorState = () => {
-        window.jQuery('#planTable tbody').html(`
-            <tr>
-                <td colspan="7" class="text-center text-danger py-5">
-                    حدث خطأ أثناء تحميل البيانات
-                </td>
-            </tr>
-        `);
+        window.jQuery(`${getTableSelector()} tbody`).html(`
+        <tr>
+            <td colspan="7" class="text-center text-danger py-5">
+                حدث خطأ أثناء تحميل البيانات
+            </td>
+        </tr>
+    `);
     };
 
     const formatRange = (s, e) =>
@@ -709,7 +719,8 @@
         loadSchools: loadSchoolsData,
         applyFilters: (filters) => loadSchoolsData(1, filters),
         clearFilters: handleClearFilters,
-        getState: () => ({ ...state })
+        getState: () => ({ ...state }),
+        collect: collect
     });
 
 })(window);

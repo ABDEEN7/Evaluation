@@ -1,29 +1,23 @@
 ﻿window.planUtility = window.planUtility || {};
-//const planUtility = window.planUtility;
 
 (function (ns) {
 
-
     // ================== PREFIX CONFIGURATION ==================
 
-    ns.fieldIdPrefix = null;
-
+    ns.fieldIdPrefixes = new Map()
     ns.initializePrefix = function (fieldId) {
-        ns.fieldIdPrefix = fieldId;
+        if (fieldId) {
+            ns.fieldIdPrefixes.set(fieldId, fieldId);
+            ns.fieldIdPrefix = fieldId;
+        }
     }
-    /**
-    * Generate prefixed ID
-    * @param {string} id - Original ID
-    * @returns {string} Prefixed ID (fieldId_originalId)
-    */
-    ns.getPrefixedId = function (id) {
-        if (!ns.fieldIdPrefix || !id) return id;
-        return `${ns.fieldIdPrefix}_${id}`;
+
+    ns.getPrefixedId = function (id, fieldId) {
+        const prefix = fieldId || ns.fieldIdPrefix;
+        if (!prefix || !id) return id;
+        return `${prefix}_${id}`;
     };
-    /**
-   * Apply prefix to all elements with ID attributes
-   * Call this after rendering any HTML
-   */
+
     ns.applyPrefixToIds = function (container) {
         if (!ns.fieldIdPrefix) return;
         const $container = container ? $(container) : $(document);
@@ -31,7 +25,6 @@
             const $el = $(this);
             const originalId = $el.attr('id');
 
-            // Skip if already prefixed
             if (originalId.startsWith(ns.fieldIdPrefix + '_')) {
                 return;
             }
@@ -39,22 +32,15 @@
             const newId = ns.getPrefixedId(originalId);
             $el.attr('id', newId);
 
-            // Update associated labels' for attribute
             $(`label[for="${originalId}"]`).attr('for', newId);
-
-            // Update any data attributes pointing to this ID
-            $container.find(`[data-id="${originalId}"]`).attr('data-id', newId);
-            $container.find(`[data-school-id="${originalId}"]`).attr('data-school-id', newId);
 
             console.log(`[PrefixSystem] Updated ID: ${originalId} → ${newId}`);
         });
 
-        // Update name attributes as well for form submission
         $container.find('[name]').each(function () {
             const $el = $(this);
             const originalName = $el.attr('name');
 
-            // Skip if already prefixed
             if (originalName.startsWith(ns.fieldIdPrefix + '_')) {
                 return;
             }
@@ -63,6 +49,7 @@
             $el.attr('name', newName);
         });
     };
+
     // ================== CONSTANTS ==================
     const {
         ACTION_TYPE,
@@ -90,10 +77,9 @@
 
     // ================== HELPER FUNCTIONS ==================
 
-    const initSelect2 = (selector, placeholder, disabled) =>{
+    const initSelect2 = (selector, placeholder, disabled) => {
         const $el = $(selector);
         if (!$el.length) return;
-        //Destroy if already initialized
         if ($el.hasClass("select2-hidden-accessible")) {
             $el.select2('destroy');
         }
@@ -106,19 +92,17 @@
             $el.prop('disabled', true);
         }
     };
+
     const formatDateRange = (startDate, endDate) => {
         if (!startDate || !endDate) return '';
-
-        // Handle different date formats
         const start = new Date(startDate);
         const end = new Date(endDate);
-
         if (isNaN(start.getTime()) || isNaN(end.getTime())) {
             return '';
         }
-
         return `${formatDateISO(start)} to ${formatDateISO(end)}`;
     };
+
     const formatDateISO = (date) => {
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -131,14 +115,12 @@
         return ns.holidays.some(h => h.date === dateStr);
     };
 
-  
-
     // ================== PLAN FORM FIELD GENERATORS ==================
 
-    const generateTitleField = (field, readonly) => {
+    const generateTitleField = (field, readonly, fieldId) => {
         const inputElement = $('<input>')
             .attr('type', 'text')
-            .attr('id',  'planTitle')
+            .attr('id', fieldId + '_' + 'planTitle')
             .attr('name', 'PlanTitle')
             .addClass('form-control')
             .attr('placeholder', 'أدخل عنوان الخطة')
@@ -155,9 +137,9 @@
         return inputElement;
     };
 
-    const generatePlanTypeField = (field, readonly) => {
+    const generatePlanTypeField = (field, readonly, fieldId) => {
         const selectElement = $('<select>')
-            .attr('id', 'ddlPlanType')
+            .attr('id', fieldId + '_' + 'ddlPlanType')
             .attr('name', 'PlanTypeId')
             .addClass('form-control')
             .append($('<option>').val('').text('اختر نوع الخطة'));
@@ -170,13 +152,11 @@
             selectElement.attr('required', true);
         }
 
-        // Populate with plan types
         ns.planTypes.forEach(type => {
             const option = $('<option>')
                 .val(type.id)
                 .text(type.name)
                 .attr('data-backendname', type.backendName);
-            //.data('backendName', type.backendName);
 
             if (field?.value === type.id) {
                 option.prop('selected', true);
@@ -188,14 +168,14 @@
         return selectElement;
     };
 
-    const generateSemesterField = (field, readonly) => {
+    const generateSemesterField = (field, readonly, fieldId) => {
         const container = $('<div>')
             .attr('id', 'semesterContainer')
             .addClass('col-md-4')
             .css('display', field?.visible !== false ? 'block' : 'none');
 
         const selectElement = $('<select>')
-            .attr('id', 'ddlSemester')
+            .attr('id', fieldId + '_' + 'ddlSemester')
             .attr('name', 'SemesterId')
             .addClass('form-control')
             .append($('<option>').val('').text('اختر الفصل الدراسي'));
@@ -204,7 +184,6 @@
             selectElement.prop('disabled', true);
         }
 
-        // Populate with semesters
         ns.semesters.forEach(semester => {
             const option = $('<option>')
                 .val(semester.id)
@@ -235,10 +214,10 @@
         return container;
     };
 
-    const generateDateRangeField = (field, readonly) => {
+    const generateDateRangeField = (field, readonly, fieldId) => {
         const inputElement = $('<input>')
             .attr('type', 'text')
-            .attr('id', 'parentDate')
+            .attr('id', fieldId + '_' + 'parentDate')
             .attr('name', 'dateRange')
             .addClass('form-control')
             .attr('placeholder', 'اختر تاريخ بداية ونهاية الخطة')
@@ -260,38 +239,40 @@
     };
 
     // ================== SCHOOL TABLE FIELD GENERATORS ==================
+    // ✅ كل دالة تستقبل fieldId وتطبقه على الـ school record
 
-    const generateSelectCheckbox = (school, readonly) => {
+    const generateSelectCheckbox = (fieldId, school, readonly) => {
         const label = $('<label>').addClass('custom-checkbox');
 
         const checkbox = $('<input>')
             .attr('type', 'checkbox')
             .addClass('selectRow')
-            .attr('data-id', school.id)
-            .attr('data-name', school.name);
+            .attr('data-id', `${fieldId}_${school.id}_chk`)
+            .attr('data-school-id', school.id)
+            .attr('data-name', `${fieldId}_${school.id}_${school.name}_name`);
 
         if (readonly) {
             checkbox.prop('disabled', true);
         }
 
-        // Check if this school is in selected schools
         if (ns.selectedSchools.some(s => s.id === school.id && s.visitTypeId === school.visitTypeId)) {
             checkbox.prop('checked', true);
         }
 
         const checkmark = $('<span>').addClass('checkmark');
-
         label.append(checkbox, checkmark);
         return label;
     };
 
-    const generateSchoolNameCell = (school) => {
+    const generateSchoolNameCell = (fieldId, school) => {
         const ratingClass = RATING_CLASSES[school.rating] || 'bg-light';
-
         const container = $('<div>').addClass('d-flex align-items-center justify-content-between');
 
         const infoDiv = $('<div>');
-        infoDiv.append($('<h6>').text(school.name || '-'));
+        const nameId = `${fieldId}_${school.id}_name`;
+
+        infoDiv.append($('<h6>').text(school.name || '-'))
+            .attr('data-name', nameId);
 
         const levelBadge = $('<div>').addClass('square-bullet');
         const levelText = (school.schoolLevel && school.schoolLevel.length > 0)
@@ -308,7 +289,7 @@
         return container;
     };
 
-    const generateVisitDateField = (school, readonly) => {
+    const generateVisitDateField = (fieldId, school, readonly) => {
         let visitDateValue = '';
 
         if (school.fromDate || school.toDate) {
@@ -316,13 +297,17 @@
         } else if (school.visitDate) {
             visitDateValue = school.visitDate;
         }
+
+        const dateId = `${fieldId}_${school.id}_ddlVisitDate`;
+
         const inputElement = $('<input>')
             .attr('type', 'text')
             .addClass('form-control form-control-sm childDate')
             .attr('placeholder', 'اختر تاريخ بداية ونهاية الزيارة')
             .attr('data-school-id', school.id)
+            .attr('data-field-id', dateId)
             .val(visitDateValue || '')
-            .prop('readonly', true); // Always readonly for flatpickr
+            .prop('readonly', true);
 
         if (readonly) {
             inputElement.prop('disabled', true);
@@ -331,10 +316,13 @@
         return inputElement;
     };
 
-    const generateVisitTypeField = (school, readonly) => {
+    const generateVisitTypeField = (fieldId, school, readonly) => {
+        const selectId = fieldId ? `${fieldId}_${school.id}_visitType` : `${school.id}_visitType`;
+
         const selectElement = $('<select>')
             .addClass('form-select visitTypeSelect')
-            .attr('data-school-id', school.id)
+            .attr('data-school-id', school.id) // ID الأصلي
+            .attr('data-field-id', selectId) // ID مع الـ prefix
             .append($('<option>').val('').text('اختر نوع الزيارة'));
 
         ns.visitTypes.forEach(type => {
@@ -372,25 +360,23 @@
         return container;
     };
 
-    // ================== TABLE ROW GENERATOR ==================
-
-    const generateSchoolRow = (school, isReadOnly, actionType) => {
+    const generateSchoolRow = (school, isReadOnly, actionType, fieldId) => {
         const readonly = isReadOnly;
         const row = $('<tr>');
 
         // Checkbox cell
         const checkboxCell = $('<td>');
-        checkboxCell.append(generateSelectCheckbox(school, readonly));
+        checkboxCell.append(generateSelectCheckbox(fieldId, school, readonly));
         row.append(checkboxCell);
 
         // School name cell
         const nameCell = $('<td>');
-        nameCell.append(generateSchoolNameCell(school));
+        nameCell.append(generateSchoolNameCell(fieldId, school));
         row.append(nameCell);
 
         // Visit date cell
         const visitDateCell = $('<td>');
-        visitDateCell.append(generateVisitDateField(school, readonly));
+        visitDateCell.append(generateVisitDateField(fieldId, school, readonly));
         row.append(visitDateCell);
 
         // Last evaluation date cell
@@ -400,7 +386,7 @@
 
         // Visit type cell
         const visitTypeCell = $('<td>');
-        visitTypeCell.append(generateVisitTypeField(school, readonly));
+        visitTypeCell.append(generateVisitTypeField(fieldId, school, readonly));
         row.append(visitTypeCell);
 
         // Academic year cell
@@ -418,7 +404,7 @@
 
     // ================== RENDER FUNCTIONS ==================
 
-    const renderPlanForm = (planData, isReadOnly, actionType) => {
+    const renderPlanForm = (fieldId, planData, isReadOnly, actionType) => {
         const readonly = isReadOnly;
         const form = $('<form>').addClass('row').attr('id', 'planForm');
 
@@ -430,7 +416,7 @@
             .attr('for', 'planTitle')
             .html('عنوان <span class="text-danger">*</span>');
 
-        const titleField = generateTitleField({ value: planData?.title }, readonly);
+        const titleField = generateTitleField({ value: planData?.title }, readonly, fieldId);
         titleGroup.append(titleLabel, titleField);
 
         if (!readonly) {
@@ -458,7 +444,7 @@
         planTypeCol.append(planTypeGroup);
         form.append(planTypeCol);
 
-        // Semester Field (conditionally visible)
+        // Semester Field
         const semesterField = generateSemesterField({
             value: planData?.semesterId,
             visible: planData?.showSemester
@@ -486,7 +472,8 @@
         return form;
     };
 
-    const renderSchoolTable = (schools, isReadOnly, actionType) => {
+    // ✅ يستقبل fieldId ويمرره لـ generateSchoolRow
+    const renderSchoolTable = (schools, isReadOnly, actionType, fieldId) => {
         const tbody = $('<tbody>');
 
         if (!schools || schools.length === 0) {
@@ -500,7 +487,7 @@
             tbody.append(emptyRow);
         } else {
             schools.forEach(school => {
-                const row = generateSchoolRow(school, isReadOnly, actionType);
+                const row = generateSchoolRow(school, isReadOnly, actionType, fieldId);
                 tbody.append(row);
             });
         }
@@ -514,7 +501,6 @@
 
         if (totalPages <= 1) return pagination;
 
-        // Previous button
         if (ns.currentPage > 1) {
             const prevItem = $('<li>').addClass('page-item');
             const prevLink = $('<a>')
@@ -526,7 +512,6 @@
             pagination.append(prevItem);
         }
 
-        // Page numbers
         for (let i = 1; i <= totalPages; i++) {
             const pageItem = $('<li>').addClass('page-item');
             if (i === ns.currentPage) {
@@ -543,7 +528,6 @@
             pagination.append(pageItem);
         }
 
-        // Next button
         if (ns.currentPage < totalPages) {
             const nextItem = $('<li>').addClass('page-item');
             const nextLink = $('<a>')
@@ -559,6 +543,7 @@
     };
 
     // ================== FLATPICKR INITIALIZATION ==================
+
     const initParentPicker = (mode, minDate, maxDate, existingValue = null, selector = null) => {
         if (ns.parentPickerInstance) {
             try {
@@ -570,12 +555,14 @@
             }
             ns.parentPickerInstance = null;
         }
+
         const targetSelector = selector || '#parentDate';
         const $input = $(targetSelector);
         if (!$input.length) {
             console.error('[initParentPicker] Element not found:', targetSelector);
             return;
         }
+
         const config = {
             locale: "en",
             allowInput: true,
@@ -586,28 +573,24 @@
             }
         };
 
-        // Handle disabled mode
         if (mode === 'disabled') {
-            $('#parentDate').prop('disabled', true);
+            $input.prop('disabled', true);
             return;
         }
 
-        // Enable the input
-        $('#parentDate').prop('disabled', false);
+        $input.prop('disabled', false);
 
-        // Configure based on mode
         if (mode === 'month') {
-            // Month picker mode using monthSelectPlugin
             config.plugins = [
                 new monthSelectPlugin({
                     shorthand: false,
-                    //dateFormat: "m.y",
                     dateFormat: "m-y",
                     altFormat: "F Y",
-                    altInput: true,          // show clean UI input
-                    theme: "light" // or "dark" based on your theme
+                    altInput: true,
+                    theme: "light"
                 })
             ];
+
             if (existingValue && existingValue.includes(' to ')) {
                 const parts = existingValue.split(' to ');
                 if (parts.length === 2) {
@@ -622,41 +605,37 @@
                     const year = selectedDate.getFullYear();
                     const month = selectedDate.getMonth();
 
-                    // Get first and last day of selected month
                     const firstDay = new Date(year, month, 1);
                     const lastDay = new Date(year, month + 1, 0);
 
-                    // Format the date range display
                     const rangeStr = `${formatDateISO(firstDay)} to ${formatDateISO(lastDay)}`;
-                    $('#parentDate').val(rangeStr);
+                    $input.val(rangeStr);
 
-                    // Store the actual dates for form submission
-                    $('#parentDate').data('startDate', formatDateISO(firstDay));
-                    $('#parentDate').data('endDate', formatDateISO(lastDay));
+                    $input.data('startDate', formatDateISO(firstDay));
+                    $input.data('endDate', formatDateISO(lastDay));
 
-                    // Initialize child pickers with month range
                     initChildPicker(firstDay, lastDay);
                 } else {
                     destroyChildPicker();
                 }
             }
-            ns.parentPickerInstance = flatpickr("#parentDate", config);
+
+            ns.parentPickerInstance = flatpickr(targetSelector, config);
         }
         else if (mode === 'custom') {
-            // Custom date range picker mode
             config.mode = "range";
             config.dateFormat = "Y-m-d";
 
             if (minDate) config.minDate = minDate;
             if (maxDate) config.maxDate = maxDate;
 
-            // If we have an existing value, set it as default
             if (existingValue && existingValue.includes(' to ')) {
                 const parts = existingValue.split(' to ');
                 if (parts.length === 2) {
                     config.defaultDate = [parts[0].trim(), parts[1].trim()];
                 }
             }
+
             config.onClose = function (selectedDates, dateStr, instance) {
                 if (selectedDates.length === 2) {
                     const [min, max] = selectedDates;
@@ -665,8 +644,9 @@
                     destroyChildPicker();
                 }
             };
+
             ns.parentPickerInstance = flatpickr(targetSelector, config);
-        };
+        }
     };
 
     const initChildPicker = (minDate, maxDate) => {
@@ -747,7 +727,6 @@
             end: new Date(year, month + 1, 0)
         };
     };
- 
 
     // ================== EXPORTS ==================
 

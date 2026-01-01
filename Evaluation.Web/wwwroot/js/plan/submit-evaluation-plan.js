@@ -27,20 +27,20 @@ function $p(selector) {
      * Collects and validates evaluation plan data from the form
      * @returns {Object|null} Evaluation data object or null if validation fails
      */
-    function getFormPlanJson() {
+    function getFormPlanJson(fieldId) {
         try {
             // Get plan name from the title input
-            const name = $p('#planTitle').val()?.trim() || '';
-
+            var fieldScore = `${fieldId}_`;
+            const name = $('#' + fieldScore + 'planTitle').val()?.trim() || '';
             // Get plan type from the select dropdown
-            const planTypeSelect = $p('#ddlPlanType');
+            const planTypeSelect = $('#' + fieldScore + 'ddlPlanType');
             const selectedPlanType = planTypeSelect.select2('data')[0];
             const PlanTypeDepId = selectedPlanType?.id || '';
             const planTypeBackendName = selectedPlanType?.backendName ||
                 selectedPlanType?.element?.dataset?.backendname || '';
 
             // Get date range and parse start/end dates
-            const dateRangeInput = $p('#parentDate');
+            const dateRangeInput = $('#' + fieldScore + 'parentDate');
             let startDate = '';
             let endDate = '';
 
@@ -53,13 +53,13 @@ function $p(selector) {
             // Get semester Id if plan type is semester
             let semesterId = null;
             if (planTypeBackendName === PLAN_TYPE_BACKEND.SEMESTER) {
-                const semesterSelect = $p('#ddlSemester');
+                const semesterSelect = $('#' + fieldScore + 'ddlSemester');
                 semesterId = semesterSelect.val() || null;
             }
 
             // Get selected schools from the utility namespace
             //const selectedSchools = getSelectedSchools();
-            const allschools = getAllSchoolsWithSelectionFlag();
+            const allschools = getAllSchoolsWithSelectionFlag(fieldScore);
 
             // Return structured data object
             const evaluationData = {
@@ -191,18 +191,18 @@ function $p(selector) {
      * Displays validation errors to the user
      * @param {Array} errors - Array of error messages
      */
-    function displayErrors(errors) {
+    function displayErrors(fieldId, errors) {
         alert('Please fix the following errors:\n\n' + errors.join('\n'));
         console.error('Validation errors:', errors);
-
+        var fieldScoure = `${fieldId}_`;
         if (errors.some(e => e.includes('title'))) {
-            $p('#planTitle').addClass('is-invalid');
+            $('#' + fieldScoure + 'planTitle').addClass('is - invalid');
         }
         if (errors.some(e => e.includes('Plan type'))) {
-            $p('#ddlPlanType').next('.select2-container').addClass('is-invalid');
+            $('#' + fieldScoure + 'ddlPlanType').next('.select2-container').addClass('is-invalid');
         }
         if (errors.some(e => e.includes('Date range'))) {
-            $p('#parentDate').addClass('is-invalid');
+            $('#' + fieldScoure + 'parentDate').addClass('is-invalid');
         }
     }
 
@@ -264,10 +264,10 @@ function $p(selector) {
  * Gets ALL schools (selected & unselected) with selection flag
  * @returns {Array} Array of school objects with isSelected flag
  */
-    function getAllSchoolsWithSelectionFlag() {
+    function getAllSchoolsWithSelectionFlag(fieldScore) {
         const schools = [];
 
-        $('#planTable tbody tr').each(function () {
+        $('#' + fieldScore + 'planTable tbody tr').each(function () {
             const row = $(this);
 
             const checkbox = row.find('.selectRow');
@@ -333,7 +333,7 @@ function $p(selector) {
 
         clearErrors();
 
-        const evaluationData = getFormPlanJson();
+        const evaluationData = getFormPlanJson(fieldId);
         //const validation = validatePlan(evaluationData);
 
         //if (!validation.isValid) {
@@ -356,7 +356,7 @@ function $p(selector) {
         const validation = validatePlan(evaluationData);
 
         if (!validation.isValid) {
-            displayErrors(validation.errors);
+            displayErrors(fieldId, validation.errors);
             return;
         }
 
@@ -373,6 +373,8 @@ function $p(selector) {
     $(document).on('click', '#confirmSubmitBtn', handleSubmit);
 
     // ================== EXPORTS ==================
+    window.getFormPlanJson = getFormPlanJson;
+    window.validatePlan = validatePlan;
 
     window.SubmitPlanHandler = {
         getFormPlanJson,

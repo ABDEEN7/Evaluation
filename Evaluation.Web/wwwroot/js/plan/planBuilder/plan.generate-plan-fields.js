@@ -16,30 +16,17 @@ const planUtility = window.planUtility;
         RATING_CLASSES,
         PLAN_TYPE_BACKEND,
         API_ENDPOINTS,
-        
+
     } = window.PlanConstants || {};
 
     ns.generatePlanFieldsHTML = function () {
         let html = '';
-        html += generateBreadcrumbs();
         html += generatePlanFormContainer();
         html += generateSchoolsTableSection();
         html += generateFilterOffcanvas();
         html += generateConfirmationModal();
         return html;
     };
-
-    function generateBreadcrumbs() {
-        return `
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="/Home/Index">الرئيسية</a></li>
-                    <li class="breadcrumb-item"><a href="/Plan/Index">الخطط</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">إنشاء خطة</li>
-                </ol>
-            </nav>
-        `;
-    }
 
     function generatePlanFormContainer() {
         let html = `
@@ -347,7 +334,7 @@ const planUtility = window.planUtility;
     /**
      * Initialize plugins after rendering HTML
      */
-  
+
     /**
      * Render the complete plan page
      */
@@ -361,8 +348,9 @@ const planUtility = window.planUtility;
             document.querySelector('.card-table') ||
             document.body;
 
-        // Clear and inject
-        mainContent.innerHTML = html;
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = html;
+        mainContent.appendChild(tempDiv);
 
         // Initialize plugins
 

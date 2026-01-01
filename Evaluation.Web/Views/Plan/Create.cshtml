@@ -33,7 +33,7 @@
     <script src="~/js/plan/submit-evaluation-plan.js"></script>
     <!-- ENTRY POINT -->
     <script>
-                const planObject = {  
+                const planObject = {
           "name": "sbc",
           "PlanTypeDepId": "fe848400-3ef6-44cc-812f-0b9026748a26",
           "startDate": "2025-01-01",
@@ -114,13 +114,22 @@
           ]
         };
 
-               document.addEventListener('DOMContentLoaded', function () {
+      document.addEventListener('DOMContentLoaded', function () {
             planUtility.generatePlanFields();
             PlanHandler.init(
                 '@Model.ActionType',
                 false,
                 @Html.Raw(Json.Serialize(Model.PlanId)),
-                'prefix'
+                'aaaa',
+                planObject
+            );
+
+            planUtility.generatePlanFields();
+            PlanHandler.init(
+                '@Model.ActionType',
+                false,
+                @Html.Raw(Json.Serialize(Model.PlanId)),
+                'second'
             );
         });
     </script>
