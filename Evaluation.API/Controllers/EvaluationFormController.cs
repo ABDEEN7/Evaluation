@@ -1,5 +1,7 @@
 ﻿using Azure.Core;
 using Evaluation.Api.Extensions;
+using Evaluation.API.ActionFilter;
+using Evaluation.DAL.Models.FormsModules;
 using Evaluation.Services.BusinessLayer;
 using Evaluation.Services.BusinessLayer.API.EvaluationForm;
 using Evaluation.Services.Models.Admin;
@@ -27,6 +29,13 @@ public class EvaluationFormController : ControllerBase
         return Ok(await _masterBl.GetApiService<EvaluationFormBL>().GetEvaluationForm(Page));
     }
 
+    [HttpGet]
+    //[CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.VIEW_WEB_FORMITEMS })]
+    public async Task<IActionResult> GetAllEvalFormItems(Guid EvalformId)
+    {
+        return Ok(await _masterBl.GetApiService<EvaluationFormBL>().GetAllEvalFormItems(EvalformId));
+    }
+
     [HttpPost]
     //[CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.ADD_WEB_EVALFORMS })]
     public async Task<IActionResult> SaveEvaluationForm()
@@ -48,6 +57,53 @@ public class EvaluationFormController : ControllerBase
     {
 
         return Ok(await _masterBl.GetApiService<EvaluationFormBL>().DeleteEvaluationForm(Id!));
+
+    }
+
+    [HttpPost]
+    //[CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.ADD_WEB_FORMITEMS })]
+    public async Task<IActionResult> SaveEvaluationFormItem()
+    {
+        var request = Request.Form["request"][0]?.StringToObject<EvaluationFormItemDto>();
+        return Ok(await _masterBl.GetApiService<EvaluationFormBL>().SaveEvaluationFormItem(request!));
+    }
+
+    [HttpPost]
+    //[CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.EDIT_WEB_FORMITEMS })]
+    public async Task<IActionResult> UpdateEvaluationFormItem()
+    {
+        var request = Request.Form["request"][0]?.StringToObject<EvaluationFormItemDto>();
+        return Ok(await _masterBl.GetApiService<EvaluationFormBL>().UpdateEvaluationFormItem(request!));
+    }
+    [HttpPost]
+     //[CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.DELETE_WEB_FORMITEMS })]
+    public async Task<IActionResult> DeleteEvaluationFormItem(Guid Id)
+    {
+
+        return Ok(await _masterBl.GetApiService<EvaluationFormBL>().DeleteEvaluationFormItem(Id!));
+
+    }
+    [HttpPost]
+    //[CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.ADD_WEB_SUBFORMITEMS })]
+    public async Task<IActionResult> SaveEvaluationSubFormItem()
+    {
+        var request = Request.Form["request"][0]?.StringToObject<EvaluationFormSubItemDto>();
+        return Ok(await _masterBl.GetApiService<EvaluationFormBL>().SaveEvaluationSubFormItem(request!));
+    }
+
+    [HttpPost]
+    //[CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.EDIT_WEB_SUBFORMITEMS })]
+    public async Task<IActionResult> UpdateEvaluationSubFormItem()
+    {
+        var request = Request.Form["request"][0]?.StringToObject<EvaluationFormSubItemDto>();
+        return Ok(await _masterBl.GetApiService<EvaluationFormBL>().UpdateEvaluationSubFormItem(request!));
+    }
+    [HttpPost]
+    //[CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.DELETE_WEB_SUBFORMITEMS })]
+    public async Task<IActionResult> DeleteEvaluationSubFormItem(Guid Id)
+    {
+
+        return Ok(await _masterBl.GetApiService<EvaluationFormBL>().DeleteEvaluationSubFormItem(Id!));
 
     }
 
