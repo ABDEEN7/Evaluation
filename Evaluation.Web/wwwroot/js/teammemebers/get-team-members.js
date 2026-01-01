@@ -1,179 +1,165 @@
-﻿// API Endpoints
+﻿window.teamMembersLogic = window.teamMembersLogic || {};
 
-$(document).ready(function () {
-    // Variables to store API data
-    let teams = [];
-    let members = [];
-    let allMembers = [];
-    let selectedTeamMembers = [];
+(function (ns, $) {
+    'use strict';
 
-    const TeamState = {
+    // ================== STATE ==================
+    const state = {
+        fieldId: null,
+        teams: [],
+        members: [],
+        allMembers: [],
+        selectedTeamMembers: [],
         scopes: []
+    };
+
+    // ================== ID HELPER ==================
+    function id(name) {
+        return `#${state.fieldId}_${name}`;
     }
 
-    // Load teams from API
+    // ================== API ==================
+    const TeamApi = {
+        getTeams() {
+            return jqClient().Get(API_ENDPOINTS.GET_TEAMS);
+        },
+        getMembersByTeam(teamId) {
+            return jqClient().Get(
+                `${API_ENDPOINTS.GET_MEMBERS_BY_TEAM}?teamId=${teamId ?? ''}`
+            );
+        },
+        getScopes() {
+            return jqClient().Get(API_ENDPOINTS.GET_SCOPES);
+        }
+    };
+
+    // ================== LOADERS ==================
+
     async function loadTeams() {
         try {
-            const response = await TeamApi.getTeams();
-
-            if (response && response.value) {
-                teams = response.value;
-                console.log('✅ Teams loaded:', teams.length, 'teams');
-                console.log('Teams:', teams);
-                initTeamDropdown();
-                return true;
-            } else {
-                console.error('❌ No teams data received');
-                showErrorAlert('لم يتم العثور على فرق');
-                return false;
-            }
-        } catch (error) {
-            console.error('❌ Error loading teams:', error);
-            showErrorAlert('حدث خطأ في تحميل الفرق');
+            const res = await TeamApi.getTeams();
+            state.teams = res?.value ?? [];
+            populateTeamDropdown();
+            console.log('✅ Teams loaded:', state.teams.length);
+            return state.teams.length > 0;
+        } catch {
+            showError('حدث خطأ في تحميل الفرق');
             return false;
         }
     }
 
-    // Load members by team ID from API
-    async function loadMembersByTeam(teamId) {
-
+    async function loadAllMembers() {
         showMembersLoading();
         try {
-            const response = await TeamApi.getMembersByTeam(teamId);
-
-            if (response && response.value) {
-                members = response.value;
-
-                // Add to allMembers if not exists
-                members.forEach(member => {
-                    if (!allMembers.find(m => m.id === member.id)) {
-                        allMembers.push(member);
-                    }
-                });
-
-                renderMembersTable();
-                return true;
-            } else {
-                $('#userTable tbody').html(`
-                    <tr>
-                        <td colspan="3" class="text-center text-muted py-4">لا يوجد أعضاء في هذا الفريق</td>
-                    </tr>
-                `);
-                return false;
-            }
-        } catch (error) {
-            showErrorAlert('حدث خطأ في تحميل الأعضاء');
-            $('#userTable tbody').html(`
-                <tr>
-                    <td colspan="3" class="text-center text-danger py-4">حدث خطأ في تحميل البيانات</td>
-                </tr>
-            `);
-            return false;
-        }
-    }
-    //Load Scope From API
-    async function LoadScopes() {
-        try {
-            const res = await TeamApi.getScopes();
-            TeamState.scopes = res?.value ?? [];
-
+            const res = await TeamApi.getMembersByTeam(null);
+            state.allMembers = res?.value ?? [];
+            state.members = state.allMembers;
+            console.log('✅ All members loaded:', state.members.length);
+            renderMembersTable();
         } catch {
-            showErrorAlert('خطأ في تحميل المجالات');
+            showError('خطأ في تحميل الأعضاء');
         }
     }
 
-    // Load all members (for "all teams" option)
-    async function loadAllMembers() {
+    async function loadMembersByTeam(teamId) {
+        showMembersLoading();
         try {
-            showMembersLoading();
-            if (teams.length === 0) {
-                $('#userTable tbody').html(`
-                    <tr>
-                        <td colspan="3" class="text-center text-muted py-4">لا توجد فرق متاحة</td>
-                    </tr>
-                `);
-                return false;
-            }
+            const res = await TeamApi.getMembersByTeam(teamId);
+            state.members = res?.value ?? [];
 
-            // Load members for each team
-            const promises = await TeamApi.getMembersByTeam(null);
-            const responses = promises.value;
-            allMembers = [];
-
-            responses.forEach(member => {
-                if (!allMembers.find(m => m.id === member.id)) {
-                    allMembers.push(member);
+            // Add to allMembers if not exists
+            state.members.forEach(member => {
+                if (!state.allMembers.find(m => m.id === member.id)) {
+                    state.allMembers.push(member);
                 }
             });
-            members = allMembers;
-            console.log('✅ All members loaded:', allMembers.length, 'total members');
+
+            console.log('✅ Team members loaded:', state.members.length);
             renderMembersTable();
-            return true;
-        } catch (error) {
-            console.error('❌ Error loading all members:', error);
-            showErrorAlert('حدث خطأ في تحميل الأعضاء');
-            $('#userTable tbody').html(`
-                <tr>
-                    <td colspan="3" class="text-center text-danger py-4">حدث خطأ في تحميل البيانات</td>
-                </tr>
-            `);
-            return false;
+        } catch {
+            showError('خطأ في تحميل أعضاء الفريق');
         }
     }
 
-    // Initialize team dropdown
-    function initTeamDropdown() {
-        if ($('#teamFilter').length > 0) {
-            console.log('ℹ️ Team dropdown already exists');
-            return;
-        }
-
-        if (teams.length === 0) {
-            console.warn('⚠️ No teams to display in dropdown');
-            return;
-        }
-
-        const dropdown = `
-            <div class="col-xl-4 col-lg-4 col-md-4 mb-3">
-                <select id="teamFilter" class="form-select form-select-lg">
-                    <option value="">جميع الفرق</option>
-                    ${teams.map(team => `<option value="${team.id}">${team.name}</option>`).join('')}
-                </select>
-            </div>
-        `;
-
-        const parentRow = $('.col-xl-8.col-lg-8.col-md-8.mb-3').first().parent();
-        if (parentRow.length) {
-            parentRow.prepend(dropdown);
-            console.log('✅ Team dropdown added successfully with', teams.length, 'teams');
-        } else {
-            console.error('❌ Parent row not found for team dropdown');
+    async function loadScopes() {
+        try {
+            const res = await TeamApi.getScopes();
+            state.scopes = res?.value ?? [];
+            console.log('✅ Scopes loaded:', state.scopes.length);
+        } catch {
+            showError('خطأ في تحميل المجالات');
         }
     }
 
-    // Render members table
+    // ================== UI POPULATION ==================
+
+    function populateTeamDropdown() {
+        const $select = $(id('teamFilter'));
+
+        if (!$select.length) {
+            console.error('❌ عنصر teamFilter غير موجود');
+            return;
+        }
+
+        if (!state.teams.length) {
+            console.warn('⚠️ لا توجد فرق لعرضها');
+            return;
+        }
+
+        const options = state.teams.map(t =>
+            `<option value="${t.id}">${t.name}</option>`
+        ).join('');
+
+        $select.append(options);
+
+        $select.off('change').on('change', function () {
+            const teamId = $(this).val();
+            if (teamId) {
+                const team = state.teams.find(t => t.id === teamId);
+                console.log('🔄 Team filter changed to:', team?.name);
+                loadMembersByTeam(teamId);
+            } else {
+                console.log('🔄 Team filter changed to: All Teams');
+                loadAllMembers();
+            }
+        });
+
+        console.log('✅ تم تعبئة قائمة الفرق:', state.teams.length);
+    }
+
+    // ================== RENDER ==================
+
     function renderMembersTable() {
-        const { scopes } = TeamState;
-        if (!members || members.length === 0) {
-            $('#userTable tbody').html(`
+        const $tbody = $(id('userTable')).find('tbody');
+
+        if (!$tbody.length) {
+            console.error('❌ جدول الأعضاء غير موجود');
+            return;
+        }
+
+        if (!state.members.length) {
+            $tbody.html(`
                 <tr>
-                    <td colspan="3" class="text-center text-muted py-4">لا يوجد أعضاء</td>
+                    <td colspan="3" class="text-center text-muted py-4">
+                        لا يوجد أعضاء
+                    </td>
                 </tr>
             `);
             updateSelectAllCheckbox();
             return;
         }
 
-        const tbody = members.map(member => {
-            const isSelected = selectedTeamMembers.find(m => m.id === member.id);
-            const memberName = member.name || member.fullName || member.memberName || 'غير محدد';
-            const memberPosition = member.position || member.jobTitle || member.title || 'غير محدد';
+        const rows = state.members.map(m => {
+            const checked = state.selectedTeamMembers.some(x => x.id === m.id);
+            const memberName = m.name || m.fullName || m.memberName || 'غير محدد';
+            const memberPosition = m.position || m.jobTitle || m.title || 'غير محدد';
 
             return `
-                <tr data-member-id="${member.id}">
+                <tr data-id="${m.id}">
                     <td>
                         <label class="custom-checkbox1 plus">
-                            <input type="checkbox" class="row-select" ${isSelected ? 'checked' : ''}>
+                            <input type="checkbox" class="row-select"
+                                   ${checked ? 'checked' : ''}>
                             <span class="checkmark"></span>
                         </label>
                     </td>
@@ -183,32 +169,33 @@ $(document).ready(function () {
             `;
         }).join('');
 
-        $('#userTable tbody').html(tbody);
+        $tbody.html(rows);
         updateSelectAllCheckbox();
-        console.log('✅ Members table rendered:', members.length, 'members');
+        console.log('✅ Members table rendered:', state.members.length, 'members');
     }
 
-    // Render selected team table
     function renderSelectedTeamTable() {
-        const selectedTable = $('.card-table').eq(1).find('tbody');
+        const $tbody = $(id('selectedTeamTable')).find('tbody');
 
-        if (!selectedTable.length) {
+        if (!$tbody.length) {
             console.error('❌ Selected team table not found!');
             return;
         }
 
-        if (selectedTeamMembers.length === 0) {
-            selectedTable.html(`
+        if (!state.selectedTeamMembers.length) {
+            $tbody.html(`
                 <tr>
-                    <td colspan="5" class="text-center text-muted py-4">لا يوجد أعضاء محددين</td>
+                    <td colspan="5" class="text-center text-muted py-4">
+                        لا يوجد أعضاء محددين
+                    </td>
                 </tr>
             `);
+            updateSelectedCheckboxHeader();
             console.log('ℹ️ Selected team table cleared');
             return;
         }
 
-        const tbody = selectedTeamMembers.map((member, index) => {
-            const { scopes } = TeamState;
+        const rows = state.selectedTeamMembers.map((member, index) => {
             const memberName = member.name || member.fullName || member.memberName || 'غير محدد';
             const memberPosition = member.position || member.jobTitle || member.title || 'غير محدد';
 
@@ -242,7 +229,7 @@ $(document).ready(function () {
                     <td>
                         <div class="mb-3 w-100">
                             <select multiple class="form-control multiCheckSelect-dynamic" data-member-id="${member.id}">
-                                ${scopes.map(scope => `
+                                ${state.scopes.map(scope => `
                                     <option value="${scope.id}">${scope.name}</option>
                                 `).join('')}
                             </select>
@@ -251,7 +238,7 @@ $(document).ready(function () {
                     <td>
                         <div class="form-check custom-radio">
                             <input class="form-check-input team-leader-radio" type="radio" 
-                                   name="example" value="${member.id}" 
+                                   name="teamLeader" value="${member.id}" 
                                    ${index === 0 ? 'checked' : ''}>
                         </div>
                     </td>
@@ -259,8 +246,8 @@ $(document).ready(function () {
             `;
         }).join('');
 
-        selectedTable.html(tbody);
-        console.log('✅ Selected team table rendered:', selectedTeamMembers.length, 'members');
+        $tbody.html(rows);
+        console.log('✅ Selected team table rendered:', state.selectedTeamMembers.length, 'members');
 
         setTimeout(() => {
             initializeSelect2();
@@ -269,7 +256,8 @@ $(document).ready(function () {
         updateSelectedCheckboxHeader();
     }
 
-    // Initialize Select2 for scopeselection
+    // ================== SELECT2 INITIALIZATION ==================
+
     function initializeSelect2() {
         if ($(".multiCheckSelect-dynamic").hasClass("select2-hidden-accessible")) {
             $(".multiCheckSelect-dynamic").select2('destroy');
@@ -297,7 +285,7 @@ $(document).ready(function () {
 
         $(".multiCheckSelect-dynamic").on("select2:open", function () {
             const memberId = $(this).data('member-id');
-            const member = selectedTeamMembers.find(m => m.id === memberId);
+            const member = state.selectedTeamMembers.find(m => m.id === memberId);
             const selected = member?.scopes || [];
 
             setTimeout(() => {
@@ -330,164 +318,152 @@ $(document).ready(function () {
         });
     }
 
-    // Update "Select All" checkbox state
+    // ================== UPDATE CHECKBOXES ==================
+
     function updateSelectAllCheckbox() {
-        const totalCheckboxes = $('#userTable .row-select').length;
-        const checkedCheckboxes = $('#userTable .row-select:checked').length;
+        const total = $(`${id('userTable')} .row-select`).length;
+        const checked = $(`${id('userTable')} .row-select:checked`).length;
 
-        const selectAllCheckbox = $('#selectAll');
-        if (selectAllCheckbox.length) {
-            selectAllCheckbox.prop('checked', totalCheckboxes > 0 && totalCheckboxes === checkedCheckboxes);
-        }
+        $(id('selectAllMembers')).prop('checked', total > 0 && total === checked);
     }
 
-    // Update selected team checkbox header
     function updateSelectedCheckboxHeader() {
-        const totalCheckboxes = $('.selected-row-checkbox').length;
-        const checkedCheckboxes = $('.selected-row-checkbox:checked').length;
+        const total = $('.selected-row-checkbox').length;
+        const checked = $('.selected-row-checkbox:checked').length;
 
-        $('.card-table').eq(1).find('thead .custom-checkbox1.minus input[type="checkbox"]')
-            .prop('checked', totalCheckboxes > 0 && totalCheckboxes === checkedCheckboxes);
+        $(id('selectAllSelected')).prop('checked', total > 0 && total === checked);
     }
 
-    // Handle member selection (add to team)
-    $(document).on('change', '#userTable .row-select', function () {
-        const row = $(this).closest('tr');
-        const memberId = row.data('member-id');
-        const member = members.find(m => m.id === memberId);
+    // ================== EVENT HANDLERS ==================
 
-        if (!member) {
-            console.error('❌ Member not found:', memberId);
-            return;
-        }
+    function initEventListeners() {
+        // Select All في جدول الأعضاء
+        $(document).off('change', id('selectAllMembers')).on('change', id('selectAllMembers'), function () {
+            const isChecked = this.checked;
+            console.log('🔄 Select All clicked:', isChecked);
 
-        const memberName = member.name || member.fullName || member.memberName || 'غير محدد';
+            $(`${id('userTable')} .row-select`).each(function () {
+                if ($(this).prop('checked') !== isChecked) {
+                    $(this).prop('checked', isChecked).trigger('change');
+                }
+            });
+        });
 
-        if (this.checked) {
-            if (!selectedTeamMembers.find(m => m.id === memberId)) {
-                selectedTeamMembers.push({
+        // إضافة عضو للفريق المحدد
+        $(document).off('change', `${id('userTable')} .row-select`).on('change', `${id('userTable')} .row-select`, function () {
+            // منع الإزالة من الجدول الأعلى - الأعلى إضافة فقط
+            if (!this.checked) {
+                this.checked = true;
+                return;
+            }
+
+            const row = $(this).closest('tr');
+            const memberId = row.data('id');
+            const member = state.members.find(m => m.id === memberId);
+
+            if (!member) return;
+
+            if (!state.selectedTeamMembers.find(m => m.id === memberId)) {
+                state.selectedTeamMembers.push({
                     ...member,
                     scopes: [],
                     nda: null
                 });
-                console.log('✅ Added member:', memberName);
-                showSuccessAlert('تم إضافة ' + memberName + ' بنجاح');
+
+                const memberName = member.name || member.fullName || member.memberName;
+                showSuccess('تم إضافة ' + memberName);
+                renderSelectedTeamTable();
             }
-        } else {
-            selectedTeamMembers = selectedTeamMembers.filter(m => m.id !== memberId);
-            console.log('❌ Removed member:', memberName);
-        }
 
-        console.log('📊 Total selected members:', selectedTeamMembers.length);
-        renderSelectedTeamTable();
-        updateSelectAllCheckbox();
-    });
-
-    // Handle "Select All" in members table
-    $(document).on('change', '#selectAll', function () {
-        const isChecked = this.checked;
-        console.log('🔄 Select All clicked:', isChecked);
-
-        $('#userTable .row-select').each(function () {
-            if ($(this).prop('checked') !== isChecked) {
-                $(this).prop('checked', isChecked).trigger('change');
-            }
-        });
-    });
-
-    // Handle removal from selected team
-    $(document).on('change', '.selected-row-checkbox', function () {
-        const row = $(this).closest('tr');
-
-        if (this.checked) {
-            row.addClass('marked-for-removal');
-            row.css('background-color', '#ffebee');
-        } else {
-            row.removeClass('marked-for-removal');
-            row.css('background-color', '');
-        }
-
-        updateSelectedCheckboxHeader();
-    });
-
-    // Handle "Select All" in selected team table
-    $(document).on('change', '.card-table:eq(1) thead .custom-checkbox1.minus input[type="checkbox"]', function () {
-        const isChecked = this.checked;
-        $('.selected-row-checkbox').prop('checked', isChecked).trigger('change');
-    });
-
-    // Remove selected members from team
-    $(document).on('click', '.btn-outline-danger', function (e) {
-        e.preventDefault();
-        const markedRows = $('.marked-for-removal');
-
-        if (markedRows.length === 0) {
-            alert('الرجاء تحديد الأعضاء المراد حذفهم');
-            return;
-        }
-
-        if (!confirm('هل أنت متأكد من حذف ' + markedRows.length + ' عضو؟')) {
-            return;
-        }
-
-        markedRows.each(function () {
-            const memberId = $(this).data('selected-id');
-            selectedTeamMembers = selectedTeamMembers.filter(m => m.id !== memberId);
+            updateSelectAllCheckbox();
         });
 
-        renderSelectedTeamTable();
-        renderMembersTable();
-        showSuccessAlert('تم حذف الأعضاء المحددين بنجاح');
-    });
+        // إزالة عضو من الفريق المحدد
+        $(document).off('change', '.selected-row-checkbox').on('change', '.selected-row-checkbox', function () {
+            // الأسفل إزالة فقط
+            if (!this.checked) return;
 
-    // Team filter change
-    $(document).on('change', '#teamFilter', async function () {
-        const teamId = $(this).val();
+            const row = $(this).closest('tr');
+            const memberId = row.data('selected-id');
 
-        if (teamId) {
-            const team = teams.find(t => t.id === teamId);
-            console.log('🔄 Team filter changed to:', team?.name);
-            await loadMembersByTeam(teamId);
-        } else {
-            console.log('🔄 Team filter changed to: All Teams');
-            await loadAllMembers();
-        }
-    });
+            // إزالة من الفريق
+            state.selectedTeamMembers = state.selectedTeamMembers.filter(m => m.id !== memberId);
 
-    // Search functionality
-    $(document).on('keyup', '#customSearch', function () {
-        const searchTerm = $(this).val().toLowerCase();
+            // تحديث الجدولين
+            renderSelectedTeamTable();
 
-        $('#userTable tbody tr').each(function () {
-            const name = $(this).find('td:eq(1)').text().toLowerCase();
-            const position = $(this).find('td:eq(2)').text().toLowerCase();
+            // إعادة تفعيل العضو في الأعلى
+            $(`${id('userTable')} tr[data-id="${memberId}"] .row-select`).prop('checked', false);
 
-            if (name.includes(searchTerm) || position.includes(searchTerm)) {
-                $(this).show();
-            } else {
-                $(this).hide();
-            }
+            updateSelectAllCheckbox();
         });
-    });
 
-    // Save team button
-    $(document).on('click', '.btn-primary', function (e) {
-        const buttonText = $(this).text().trim();
+        // Select All في جدول الفريق المحدد
+        $(document).off('change', id('selectAllSelected')).on('change', id('selectAllSelected'), function () {
+            const isChecked = this.checked;
+            $('.selected-row-checkbox').prop('checked', isChecked).trigger('change');
+        });
 
-        if (buttonText.includes('حفظ الفريق') || buttonText.includes('حفظ')) {
+        // البحث
+        $(document).off('keyup', id('customSearch')).on('keyup', id('customSearch'), function () {
+            const searchTerm = $(this).val().toLowerCase();
+
+            $(`${id('userTable')} tbody tr`).each(function () {
+                const name = $(this).find('td:eq(1)').text().toLowerCase();
+                const position = $(this).find('td:eq(2)').text().toLowerCase();
+
+                if (name.includes(searchTerm) || position.includes(searchTerm)) {
+                    $(this).show();
+                } else {
+                    $(this).hide();
+                }
+            });
+        });
+
+        // زر حذف المحدد
+        $(document).off('click', id('deleteSelectedBtn')).on('click', id('deleteSelectedBtn'), function (e) {
             e.preventDefault();
 
-            if (selectedTeamMembers.length === 0) {
+            const checkedBoxes = $('.selected-row-checkbox:checked');
+
+            if (checkedBoxes.length === 0) {
+                alert('الرجاء تحديد الأعضاء المراد حذفهم');
+                return;
+            }
+
+            if (!confirm(`هل أنت متأكد من حذف ${checkedBoxes.length} عضو؟`)) {
+                return;
+            }
+
+            checkedBoxes.each(function () {
+                const row = $(this).closest('tr');
+                const memberId = row.data('selected-id');
+                state.selectedTeamMembers = state.selectedTeamMembers.filter(m => m.id !== memberId);
+
+                // إعادة تفعيل العضو في الجدول الأعلى
+                $(`${id('userTable')} tr[data-id="${memberId}"] .row-select`).prop('checked', false);
+            });
+
+            renderSelectedTeamTable();
+            renderMembersTable();
+            showSuccess('تم حذف الأعضاء المحددين بنجاح');
+        });
+
+        // زر حفظ الفريق
+        $(document).off('click', id('saveTeamBtn')).on('click', id('saveTeamBtn'), function (e) {
+            e.preventDefault();
+
+            if (state.selectedTeamMembers.length === 0) {
                 alert('الرجاء تحديد أعضاء الفريق');
                 return;
             }
 
             const leaderId = $('.team-leader-radio:checked').val();
-            const leader = selectedTeamMembers.find(m => m.id === leaderId);
+            const leader = state.selectedTeamMembers.find(m => m.id === leaderId);
             const leaderName = leader?.name || leader?.fullName || leader?.memberName;
 
             const teamData = {
-                members: selectedTeamMembers.map(m => ({
+                members: state.selectedTeamMembers.map(m => ({
                     id: m.id,
                     name: m.name || m.fullName || m.memberName,
                     position: m.position || m.jobTitle || m.title,
@@ -496,94 +472,123 @@ $(document).ready(function () {
                 })),
                 leaderId: leaderId,
                 leaderName: leaderName,
-                totalMembers: selectedTeamMembers.length,
+                totalMembers: state.selectedTeamMembers.length,
                 timestamp: new Date().toISOString()
             };
 
             console.log('========== SAVING TEAM ==========');
             console.log('Team Leader:', leaderName);
-            console.log('Total Members:', selectedTeamMembers.length);
+            console.log('Total Members:', state.selectedTeamMembers.length);
             console.log('Team Data:', teamData);
             console.log('=================================');
 
             // TODO: Add your save API call here
             // Example:
-            // jqClient().Post(`${API_ENDPOINTS.SAVE_TEAM}`, teamData)
+            // TeamApi.saveTeam(teamData)
             //     .then(response => {
-            //         showSuccessAlert('تم حفظ الفريق بنجاح');
+            //         showSuccess('تم حفظ الفريق بنجاح');
             //     })
             //     .catch(error => {
-            //         showErrorAlert('حدث خطأ في حفظ الفريق');
+            //         showError('حدث خطأ في حفظ الفريق');
             //     });
 
-            showSuccessAlert('تم حفظ الفريق بنجاح (' + selectedTeamMembers.length + ' أعضاء)');
-        }
-    });
-
-    // Show success alert
-    function showSuccessAlert(message = 'تم العملية بنجاح') {
-        const alert = $('.bg-success-light');
-
-        if (alert.length) {
-            alert.find('p').text(message);
-            alert.show();
-
-            setTimeout(() => {
-                alert.fadeOut();
-            }, 3000);
-        }
+            showSuccess(`تم حفظ الفريق بنجاح (${state.selectedTeamMembers.length} أعضاء)`);
+        });
     }
 
-    // Show error alert
-    function showErrorAlert(message = 'حدث خطأ') {
-        alert(message);
-        console.error('❌', message);
+    // ================== HELPERS ==================
+
+    function showMembersLoading() {
+        const $tbody = $(id('userTable')).find('tbody');
+
+        if (!$tbody.length) {
+            console.error('❌ جدول الأعضاء غير موجود');
+            return;
+        }
+
+        $tbody.html(`
+            <tr>
+                <td colspan="3" class="text-center py-4">
+                    <i class="la la-spinner la-spin"></i> جاري التحميل...
+                </td>
+            </tr>
+        `);
     }
 
-    // Initialize system
-    async function initializeSystem() {
+    function showSuccess(msg) {
+        const $alert = $(id('successAlert'));
+        if (!$alert.length) {
+            // Try alternative success alert
+            const $bgSuccess = $('.bg-success-light');
+            if ($bgSuccess.length) {
+                $bgSuccess.find('p').text(msg);
+                $bgSuccess.show();
+                setTimeout(() => $bgSuccess.fadeOut(), 3000);
+            } else {
+                console.log('✅', msg);
+            }
+            return;
+        }
+
+        $alert.text(msg).removeClass('d-none');
+        setTimeout(() => $alert.addClass('d-none'), 3000);
+    }
+
+    function showError(msg) {
+        console.error('❌', msg);
+        alert(msg);
+    }
+
+    // ================== INIT ==================
+
+    ns.init = async function (fieldId) {
         console.log('========================================');
         console.log('🚀 Initializing Team Management System');
+        console.log('Field ID:', fieldId);
         console.log('========================================');
 
+        state.fieldId = fieldId;
+
+        // التحقق من وجود العناصر الأساسية
+        const $teamFilter = $(id('teamFilter'));
+        const $userTable = $(id('userTable'));
+        const $selectedTeamTable = $(id('selectedTeamTable'));
+
+        if (!$teamFilter.length) {
+            console.error('❌ عنصر teamFilter غير موجود');
+        }
+
+        if (!$userTable.length) {
+            console.error('❌ عنصر userTable غير موجود');
+        }
+
+        if (!$selectedTeamTable.length) {
+            console.error('❌ عنصر selectedTeamTable غير موجود');
+        }
+
+        // إخفاء تنبيه النجاح
         $('.bg-success-light').hide();
 
-        // Load teams first
+        // تحميل البيانات
+        console.log('📥 جاري تحميل الفرق...');
         const teamsLoaded = await loadTeams();
 
         if (teamsLoaded) {
-            // Load all members by default
+            console.log('📥 جاري تحميل الأعضاء...');
             await loadAllMembers();
         } else {
             console.error('❌ Failed to initialize: No teams loaded');
-            showErrorAlert('فشل تحميل البيانات الأساسية');
+            showError('فشل تحميل البيانات الأساسية');
         }
-        await LoadScopes();
+
+        console.log('📥 جاري تحميل المجالات...');
+        await loadScopes();
+
+        // تهيئة معالجات الأحداث
+        initEventListeners();
+
+        console.log('✅ اكتمل التهيئة بنجاح');
         console.log('========================================');
-    }
-    const TeamApi = {
-        getTeams() {
-            return jqClient().Get(API_ENDPOINTS.GET_TEAMS);
-        },
-
-        getMembersByTeam(teamId) {
-            return jqClient().Get(`${API_ENDPOINTS.GET_MEMBERS_BY_TEAM}?teamId=${teamId}`);
-        },
-
-        getScopes() {
-            return jqClient().Get(API_ENDPOINTS.GET_SCOPES);
-        }
     };
-    function showMembersLoading() {
-        $('#userTable tbody').html(`
-                <tr>
-                    <td colspan="3" class="text-center text-muted py-4">
-                        <i class="la la-spinner la-spin"></i> جاري التحميل...
-                    </td>
-                </tr>
-            `);
-    }
 
-    // Start initialization
-    initializeSystem();
-});
+})(window.teamMembersLogic, jQuery);
