@@ -3,8 +3,8 @@
 (function (ns) {
 
     // ================== PREFIX CONFIGURATION ==================
+    ns.fieldIdPrefixes = new Map();
 
-    ns.fieldIdPrefixes = new Map()
     ns.initializePrefix = function (fieldId) {
         if (fieldId) {
             ns.fieldIdPrefixes.set(fieldId, fieldId);
@@ -18,36 +18,10 @@
         return `${prefix}_${id}`;
     };
 
+    // ⚠️ هذه الدالة غير مستخدمة في النظام الجديد
     ns.applyPrefixToIds = function (container) {
-        if (!ns.fieldIdPrefix) return;
-        const $container = container ? $(container) : $(document);
-        $container.find('[id]').each(function () {
-            const $el = $(this);
-            const originalId = $el.attr('id');
-
-            if (originalId.startsWith(ns.fieldIdPrefix + '_')) {
-                return;
-            }
-
-            const newId = ns.getPrefixedId(originalId);
-            $el.attr('id', newId);
-
-            $(`label[for="${originalId}"]`).attr('for', newId);
-
-            console.log(`[PrefixSystem] Updated ID: ${originalId} → ${newId}`);
-        });
-
-        $container.find('[name]').each(function () {
-            const $el = $(this);
-            const originalName = $el.attr('name');
-
-            if (originalName.startsWith(ns.fieldIdPrefix + '_')) {
-                return;
-            }
-
-            const newName = ns.getPrefixedId(originalName);
-            $el.attr('name', newName);
-        });
+        // Not needed anymore since we apply prefix during generation
+        console.log('[PrefixSystem] applyPrefixToIds is deprecated');
     };
 
     // ================== CONSTANTS ==================
@@ -61,37 +35,16 @@
         PLAN_TYPE_BACKEND
     } = window.PlanConstants || {};
 
-    // ================== STATE MANAGEMENT ==================
-    ns.allSchools = [];
-    ns.filteredSchools = [];
-    ns.selectedSchools = [];
+    // ================== STATE MANAGEMENT (Per Instance) ==================
+    // ⚠️ تم نقل الـ state إلى main-handler ليكون منفصل لكل instance
     ns.visitTypes = [];
     ns.planTypes = [];
     ns.semesters = [];
     ns.holidays = [];
     ns.currentPage = 1;
     ns.pageSize = 10;
-    ns.currentFilters = {};
-    ns.childPicker = null;
-    ns.parentPickerInstance = null;
 
     // ================== HELPER FUNCTIONS ==================
-
-    const initSelect2 = (selector, placeholder, disabled) => {
-        const $el = $(selector);
-        if (!$el.length) return;
-        if ($el.hasClass("select2-hidden-accessible")) {
-            $el.select2('destroy');
-        }
-        $el.select2({
-            placeholder: placeholder,
-            width: '100%',
-            allowClear: true
-        });
-        if (disabled) {
-            $el.prop('disabled', true);
-        }
-    };
 
     const formatDateRange = (startDate, endDate) => {
         if (!startDate || !endDate) return '';
@@ -116,11 +69,12 @@
     };
 
     // ================== PLAN FORM FIELD GENERATORS ==================
+    // ✅ جميع الدوال تستقبل fieldId
 
-    const generateTitleField = (field, readonly, fieldId) => {
+    const generateTitleField = (fieldId, field, readonly) => {
         const inputElement = $('<input>')
             .attr('type', 'text')
-            .attr('id', fieldId + '_' + 'planTitle')
+            .attr('id', `${fieldId}_planTitle`)
             .attr('name', 'PlanTitle')
             .addClass('form-control')
             .attr('placeholder', 'أدخل عنوان الخطة')
@@ -137,9 +91,9 @@
         return inputElement;
     };
 
-    const generatePlanTypeField = (field, readonly, fieldId) => {
+    const generatePlanTypeField = (fieldId, field, readonly) => {
         const selectElement = $('<select>')
-            .attr('id', fieldId + '_' + 'ddlPlanType')
+            .attr('id', `${fieldId}_ddlPlanType`)
             .attr('name', 'PlanTypeId')
             .addClass('form-control')
             .append($('<option>').val('').text('اختر نوع الخطة'));
@@ -168,14 +122,14 @@
         return selectElement;
     };
 
-    const generateSemesterField = (field, readonly, fieldId) => {
+    const generateSemesterField = (fieldId, field, readonly) => {
         const container = $('<div>')
-            .attr('id', 'semesterContainer')
+            .attr('id', `${fieldId}_semesterContainer`)
             .addClass('col-md-4')
             .css('display', field?.visible !== false ? 'block' : 'none');
 
         const selectElement = $('<select>')
-            .attr('id', fieldId + '_' + 'ddlSemester')
+            .attr('id', `${fieldId}_ddlSemester`)
             .attr('name', 'SemesterId')
             .addClass('form-control')
             .append($('<option>').val('').text('اختر الفصل الدراسي'));
@@ -200,7 +154,7 @@
 
         const label = $('<label>')
             .addClass('form-label')
-            .attr('for', 'ddlSemester')
+            .attr('for', `${fieldId}_ddlSemester`)
             .html('الفصل الدراسي <span class="text-danger">*</span>');
 
         const formGroup = $('<div>').addClass('mb-4');
@@ -214,10 +168,10 @@
         return container;
     };
 
-    const generateDateRangeField = (field, readonly, fieldId) => {
+    const generateDateRangeField = (fieldId, field, readonly) => {
         const inputElement = $('<input>')
             .attr('type', 'text')
-            .attr('id', fieldId + '_' + 'parentDate')
+            .attr('id', `${fieldId}_parentDate`)
             .attr('name', 'dateRange')
             .addClass('form-control')
             .attr('placeholder', 'اختر تاريخ بداية ونهاية الخطة')
@@ -239,7 +193,6 @@
     };
 
     // ================== SCHOOL TABLE FIELD GENERATORS ==================
-    // ✅ كل دالة تستقبل fieldId وتطبقه على الـ school record
 
     const generateSelectCheckbox = (fieldId, school, readonly) => {
         const label = $('<label>').addClass('custom-checkbox');
@@ -249,14 +202,10 @@
             .addClass('selectRow')
             .attr('data-id', `${fieldId}_${school.id}_chk`)
             .attr('data-school-id', school.id)
-            .attr('data-name', `${fieldId}_${school.id}_${school.name}_name`);
+            .attr('data-name', school.name);
 
         if (readonly) {
             checkbox.prop('disabled', true);
-        }
-
-        if (ns.selectedSchools.some(s => s.id === school.id && s.visitTypeId === school.visitTypeId)) {
-            checkbox.prop('checked', true);
         }
 
         const checkmark = $('<span>').addClass('checkmark');
@@ -296,6 +245,8 @@
             visitDateValue = formatDateRange(school.fromDate, school.toDate);
         } else if (school.visitDate) {
             visitDateValue = school.visitDate;
+        } else if (school.startEvaluationDate && school.endEvaluationDate) {
+            visitDateValue = formatDateRange(school.startEvaluationDate, school.endEvaluationDate);
         }
 
         const dateId = `${fieldId}_${school.id}_ddlVisitDate`;
@@ -317,12 +268,12 @@
     };
 
     const generateVisitTypeField = (fieldId, school, readonly) => {
-        const selectId = fieldId ? `${fieldId}_${school.id}_visitType` : `${school.id}_visitType`;
+        const selectId = `${fieldId}_${school.id}_visitType`;
 
         const selectElement = $('<select>')
             .addClass('form-select visitTypeSelect')
-            .attr('data-school-id', school.id) // ID الأصلي
-            .attr('data-field-id', selectId) // ID مع الـ prefix
+            .attr('data-school-id', school.id)
+            .attr('data-field-id', selectId)
             .append($('<option>').val('').text('اختر نوع الزيارة'));
 
         ns.visitTypes.forEach(type => {
@@ -360,7 +311,9 @@
         return container;
     };
 
-    const generateSchoolRow = (school, isReadOnly, actionType, fieldId) => {
+    // ================== TABLE ROW GENERATOR ==================
+
+    const generateSchoolRow = (fieldId, school, isReadOnly, actionType) => {
         const readonly = isReadOnly;
         const row = $('<tr>');
 
@@ -403,20 +356,21 @@
     };
 
     // ================== RENDER FUNCTIONS ==================
+    // ✅ renderPlanForm: fieldId أول بارامتر
 
     const renderPlanForm = (fieldId, planData, isReadOnly, actionType) => {
         const readonly = isReadOnly;
-        const form = $('<form>').addClass('row').attr('id', 'planForm');
+        const form = $('<form>').addClass('row').attr('id', `${fieldId}_planForm`);
 
         // Title Field
-        const titleCol = $('<div>').addClass('col-md-4');
+        const titleCol = $('<div>').addClass('col-md-12');
         const titleGroup = $('<div>').addClass('mb-4');
         const titleLabel = $('<label>')
             .addClass('form-label')
-            .attr('for', 'planTitle')
+            .attr('for', `${fieldId}_planTitle`)
             .html('عنوان <span class="text-danger">*</span>');
 
-        const titleField = generateTitleField({ value: planData?.title }, readonly, fieldId);
+        const titleField = generateTitleField(fieldId, { value: planData?.title }, readonly);
         titleGroup.append(titleLabel, titleField);
 
         if (!readonly) {
@@ -431,10 +385,10 @@
         const planTypeGroup = $('<div>').addClass('mb-4');
         const planTypeLabel = $('<label>')
             .addClass('form-label')
-            .attr('for', 'ddlPlanType')
+            .attr('for', `${fieldId}_ddlPlanType`)
             .html('نوع الخطة <span class="text-danger">*</span>');
 
-        const planTypeField = generatePlanTypeField({ value: planData?.planTypeId }, readonly);
+        const planTypeField = generatePlanTypeField(fieldId, { value: planData?.planTypeId }, readonly);
         planTypeGroup.append(planTypeLabel, planTypeField);
 
         if (!readonly) {
@@ -445,7 +399,7 @@
         form.append(planTypeCol);
 
         // Semester Field
-        const semesterField = generateSemesterField({
+        const semesterField = generateSemesterField(fieldId, {
             value: planData?.semesterId,
             visible: planData?.showSemester
         }, readonly);
@@ -456,10 +410,10 @@
         const dateRangeGroup = $('<div>').addClass('mb-4');
         const dateRangeLabel = $('<label>')
             .addClass('form-label')
-            .attr('for', 'parentDate')
+            .attr('for', `${fieldId}_parentDate`)
             .html('الفترة الزمنية <span class="text-danger">*</span>');
 
-        const dateRangeField = generateDateRangeField({ value: planData?.dateRange }, readonly);
+        const dateRangeField = generateDateRangeField(fieldId, { value: planData?.dateRange }, readonly);
         dateRangeGroup.append(dateRangeLabel, dateRangeField);
 
         if (!readonly) {
@@ -472,8 +426,7 @@
         return form;
     };
 
-    // ✅ يستقبل fieldId ويمرره لـ generateSchoolRow
-    const renderSchoolTable = (schools, isReadOnly, actionType, fieldId) => {
+    const renderSchoolTable = (fieldId, schools, isReadOnly, actionType) => {
         const tbody = $('<tbody>');
 
         if (!schools || schools.length === 0) {
@@ -487,7 +440,7 @@
             tbody.append(emptyRow);
         } else {
             schools.forEach(school => {
-                const row = generateSchoolRow(school, isReadOnly, actionType, fieldId);
+                const row = generateSchoolRow(fieldId, school, isReadOnly, actionType);
                 tbody.append(row);
             });
         }
@@ -544,23 +497,18 @@
 
     // ================== FLATPICKR INITIALIZATION ==================
 
-    const initParentPicker = (mode, minDate, maxDate, existingValue = null, selector = null) => {
-        if (ns.parentPickerInstance) {
-            try {
-                if (typeof ns.parentPickerInstance.destroy === 'function') {
-                    ns.parentPickerInstance.destroy();
-                }
-            } catch (e) {
-                console.warn('[initParentPicker] Could not destroy previous instance:', e);
-            }
-            ns.parentPickerInstance = null;
-        }
-
-        const targetSelector = selector || '#parentDate';
+    const initParentPicker = (fieldId, mode, minDate, maxDate, existingValue = null) => {
+        const targetSelector = `#${fieldId}_parentDate`;
         const $input = $(targetSelector);
+
         if (!$input.length) {
             console.error('[initParentPicker] Element not found:', targetSelector);
             return;
+        }
+
+        // Destroy previous instance for this specific fieldId
+        if ($input.data('flatpickr')) {
+            $input.data('flatpickr').destroy();
         }
 
         const config = {
@@ -620,7 +568,8 @@
                 }
             }
 
-            ns.parentPickerInstance = flatpickr(targetSelector, config);
+            const fp = flatpickr(targetSelector, config);
+            $input.data('flatpickr', fp);
         }
         else if (mode === 'custom') {
             config.mode = "range";
@@ -645,17 +594,20 @@
                 }
             };
 
-            ns.parentPickerInstance = flatpickr(targetSelector, config);
+            const fp = flatpickr(targetSelector, config);
+            $input.data('flatpickr', fp);
         }
     };
 
     const initChildPicker = (minDate, maxDate) => {
-        if (ns.childPicker) {
-            ns.childPicker.destroy();
-            ns.childPicker = null;
-        }
+        // Destroy all existing child pickers
+        $('.childDate').each(function () {
+            if ($(this).data('flatpickr')) {
+                $(this).data('flatpickr').destroy();
+            }
+        });
 
-        ns.childPicker = flatpickr(".childDate", {
+        flatpickr(".childDate", {
             mode: "range",
             locale: "en",
             dateFormat: "Y-m-d",
@@ -706,17 +658,14 @@
                 }
             }
         });
-
-        if (Array.isArray(ns.childPicker)) {
-            ns.childPicker = ns.childPicker[0];
-        }
     };
 
     const destroyChildPicker = () => {
-        if (ns.childPicker) {
-            ns.childPicker.destroy();
-            ns.childPicker = null;
-        }
+        $('.childDate').each(function () {
+            if ($(this).data('flatpickr')) {
+                $(this).data('flatpickr').destroy();
+            }
+        });
     };
 
     const getMonthRange = (date) => {
