@@ -308,6 +308,7 @@ public static class ConstantKeys
         public static readonly string AdminEmployees = "AdminEmployees";
         public static readonly string AdminEvaluationParties = "AdminEvaluationParties";
         public static readonly string AdminEvaluationType = "AdminEvaluationType";
+        public static readonly string AdminFormEvalMarixValue = "AdminFormEvalMarixValue";
     }
     public static class WebAppPages
     {
@@ -735,6 +736,15 @@ public static class ConstantKeys
         public const string ADD_ADMIN_EVALUATIONTYPE = "ADD_ADMIN_EVALUATIONTYPE";
         public const string EDIT_ADMIN_EVALUATIONTYPE = "EDIT_ADMIN_EVALUATIONTYPE";
         public const string DELETE_ADMIN_EVALUATIONTYPE = "DELETE_ADMIN_EVALUATIONTYPE";
+
+        #endregion
+
+        #region FORMEVAL_MATRIX_VALUE
+
+        public const string VIEW_ADMIN_FORMEVAL_MATRIX_VALUE = "VIEW_ADMIN_FORMEVAL_MATRIX_VALUE";
+        public const string ADD_ADMIN_FORMEVAL_MATRIX_VALUE = "ADD_ADMIN_FORMEVAL_MATRIX_VALUE";
+        public const string EDIT_ADMIN_FORMEVAL_MATRIX_VALUE = "EDIT_ADMIN_FORMEVAL_MATRIX_VALUE";
+        public const string DELETE_ADMIN_FORMEVAL_MATRIX_VALUE = "DELETE_ADMIN_FORMEVAL_MATRIX_VALUE";
 
         #endregion
 
