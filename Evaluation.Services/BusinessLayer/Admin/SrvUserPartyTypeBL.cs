@@ -193,9 +193,6 @@ namespace Evaluation.Services.Models.Admin
         public async Task<UserPartyTypeDTO> UpdateUserPartyType(UserPartyTypeDTO message)
         {
 
-
-
-           
             var result = new UserPartyTypeDTO();
 
                 if (message.Id is not null)
