@@ -167,6 +167,7 @@ public static class ConstantKeys
         public static readonly string EvaluationPartiesExistsService = "EvaluationPartiesExistsService";
         public static readonly string EvaluationPartiesExistsServiceRequest = "EvaluationPartiesExistsServiceRequest";
         public static readonly string EvaluationPartiesExistsEvalForm = "EvaluationPartiesExistsEvalForm";
+        public static readonly string EvaluationTypeExistsEvaluationRequestHistory = "EvaluationTypeExistsEvaluationRequestHistory";
     }
 
     public static class AdminSettings
@@ -306,6 +307,7 @@ public static class ConstantKeys
         public static readonly string AdminEducationLevel = "AdminEducationLevel";
         public static readonly string AdminEmployees = "AdminEmployees";
         public static readonly string AdminEvaluationParties = "AdminEvaluationParties";
+        public static readonly string AdminEvaluationType = "AdminEvaluationType";
     }
     public static class WebAppPages
     {
@@ -724,6 +726,15 @@ public static class ConstantKeys
         public const string ADD_ADMIN_EVALUATIONPARTIES = "ADD_ADMIN_EVALUATIONPARTIES";
         public const string EDIT_ADMIN_EVALUATIONPARTIES = "EDIT_ADMIN_EVALUATIONPARTIES";
         public const string DELETE_ADMIN_EVALUATIONPARTIES = "DELETE_ADMIN_EVALUATIONPARTIES";
+
+        #endregion
+
+        #region EVALUATIONTYPE
+
+        public const string VIEW_ADMIN_EVALUATIONTYPE = "VIEW_ADMIN_EVALUATIONTYPE";
+        public const string ADD_ADMIN_EVALUATIONTYPE = "ADD_ADMIN_EVALUATIONTYPE";
+        public const string EDIT_ADMIN_EVALUATIONTYPE = "EDIT_ADMIN_EVALUATIONTYPE";
+        public const string DELETE_ADMIN_EVALUATIONTYPE = "DELETE_ADMIN_EVALUATIONTYPE";
 
         #endregion
 
