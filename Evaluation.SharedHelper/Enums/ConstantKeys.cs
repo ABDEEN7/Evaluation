@@ -160,6 +160,8 @@ public static class ConstantKeys
         public static readonly string JobTitleCannotDelete = "JobTitleCannotDelete";
         public static readonly string EvalFormExistsFormItem = "EvalFormExistsFormItem";
         public static readonly string EvalFormExistsFormScope = "EvalFormExistsFormScope";
+        public static readonly string EvaluationTeamRequestNotExist = "EvaluationTeamRequestNotExist";
+
     }
 
     public static class AdminSettings

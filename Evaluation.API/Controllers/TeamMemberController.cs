@@ -1,4 +1,5 @@
-﻿using Evaluation.Services.BusinessLayer;
+﻿using Azure.Core;
+using Evaluation.Services.BusinessLayer;
 using Evaluation.Services.BusinessLayer.API.TeamMemberBL;
 using Evaluation.SharedHelper.Dtos.TeamMemberDto;
 using Evaluation.SharedHelper.Models.Admin;
@@ -19,7 +20,7 @@ public class TeamMemberController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<Result<List<TeamDto>>> GetTeams()
+    public async Task<Result<TeamMembersResponse>> GetTeams()
         => await _masterBl.GetApiService<TeamMemberBL>().GetTeamsAsync();
 
     [HttpGet]
@@ -29,6 +30,10 @@ public class TeamMemberController : ControllerBase
     [HttpGet]
     public async Task<Result<List<ScopeDto>>> GetScopes()
          => await _masterBl.GetApiService<TeamMemberBL>().GetScopesAsync();
+    [HttpPost]
+    public async Task<Result<bool>> AddEvaluationRequestAssignment([FromBody] List<EvalTeamRequestDto> model)
+                 => await _masterBl.GetApiService<TeamMemberBL>().AddedRequestAssignment(model);
+
     //[HttpGet]
     //public IActionResult GetMebmer()
     //{

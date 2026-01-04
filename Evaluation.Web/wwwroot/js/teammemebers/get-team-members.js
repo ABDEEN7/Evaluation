@@ -12,6 +12,7 @@
         selectedTeamMembers: [],
         scopes: [],
         pendingRemoval: new Set(),
+        isNDA: false,
         teamLeaderId: null
     };
 
@@ -40,7 +41,9 @@
     async function loadTeams() {
         try {
             const res = await TeamApi.getTeams();
-            state.teams = res?.value ?? [];
+            state.teams = res?.value?.data ?? [];
+            state.isNDA = res?.value?.isNDA;
+
             populateTeamDropdown();
             return state.teams.length > 0;
         } catch {
@@ -118,6 +121,40 @@
         });
     }
 
+    // ================== UPDATE TABLE HEADERS ==================
+
+    function updateSelectedTeamTableHeader() {
+        const $thead = $(id('selectedTeamTable')).find('thead tr');
+
+        if (!$thead.length) {
+            return;
+        }
+
+        // بناء الـ header حسب isNDA
+        let headerHTML = `
+            <th style="width:50px;">
+                <label class="custom-checkbox1">
+                    <input type="checkbox" id="${state.fieldId}_selectAllSelected">
+                    <span class="checkmark"></span>
+                </label>
+            </th>
+            <th>اسم العضو</th>
+        `;
+
+        // إضافة عمود NDA فقط إذا كان مفعل
+        if (state.isNDA) {
+            headerHTML += `<th>NDA</th>`;
+        }
+
+        headerHTML += `
+            <th>المجال</th>
+            <th>نوع الطرف</th>
+            <th>قائد الفريق</th>
+        `;
+
+        $thead.html(headerHTML);
+    }
+
     // ================== RENDER ==================
 
     function renderMembersTable() {
@@ -171,9 +208,10 @@
         }
 
         if (!state.selectedTeamMembers.length) {
+            const colspan = state.isNDA ? 6 : 5; // حساب عدد الأعمدة حسب isNDA
             $tbody.html(`
                 <tr>
-                    <td colspan="5" class="text-center text-muted py-4">
+                    <td colspan="${colspan}" class="text-center text-muted py-4">
                         لا يوجد أعضاء محددين
                     </td>
                 </tr>
@@ -187,6 +225,14 @@
             const memberPosition = member.position || member.jobTitle || member.title || 'غير محدد';
             const isPending = state.pendingRemoval.has(member.id);
 
+            // الحصول على أنواع الأطراف الخاصة بهذا العضو
+            const userPartyTypes = member.userPartyTypes || [];
+
+            // إذا كان هناك نوع واحد فقط، اختره تلقائيًا
+            const defaultPartyTypeId = userPartyTypes.length === 1
+                ? userPartyTypes[0].partyType.id
+                : member.partyTypeId;
+
             return `
                 <tr data-selected-id="${member.id}">
                     <td>
@@ -196,24 +242,26 @@
                         </label>
                     </td>
                     <td><h6>${memberName}</h6></td>
-                    <td>
-                        ${member.nda ? `
-                            <div class="d-flex align-items-center justify-content-between">
-                                <div>
-                                    <h6>${member.nda.status}</h6>
-                                    <div class="square-bullet">
-                                        <div><i class="la la-calendar"></i> ${member.nda.date}</div>
-                                        <div><i class="la la-clock"></i> ${member.nda.time}</div>
+                    ${state.isNDA ? `
+                        <td>
+                            ${member.nda ? `
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div>
+                                        <h6>${member.nda.status}</h6>
+                                        <div class="square-bullet">
+                                            <div><i class="la la-calendar"></i> ${member.nda.date}</div>
+                                            <div><i class="la la-clock"></i> ${member.nda.time}</div>
+                                        </div>
                                     </div>
+                                    ${member.nda.hasConflict ? `
+                                        <span class="btn btn-outline-primary btn-sm d-flex gap-2">
+                                            <i class="la la-info-circle"></i>ضعيف
+                                        </span>
+                                    ` : ''}
                                 </div>
-                                ${member.nda.hasConflict ? `
-                                    <span class="btn btn-outline-primary btn-sm d-flex gap-2">
-                                        <i class="la la-info-circle"></i>ضعيف
-                                    </span>
-                                ` : ''}
-                            </div>
-                        ` : `<h6>${memberPosition}</h6>`}
-                    </td>
+                            ` : `<h6>${memberPosition}</h6>`}
+                        </td>
+                    ` : ''}
                     <td>
                         <div class="mb-3 w-100">
                             <select multiple class="form-control multiCheckSelect-dynamic" data-member-id="${member.id}">
@@ -224,15 +272,34 @@
                         </div>
                     </td>
                     <td>
-              <label class="custom-checkbox1 radio">
-                <input type="radio"
-                        class="team-leader-radio"
-                        name="teamLeader"
-                        value="${member.id}"
-                        ${state.teamLeaderId == member.id ? 'checked' : ''}>
-                <span class="checkmark"></span>
-            </label>
-
+                        <select class="form-select party-type-select" data-member-id="${member.id}" 
+                                ${userPartyTypes.length === 0 ? 'disabled' : ''}>
+                            ${userPartyTypes.length === 0 ? `
+                                <option value="">لا توجد أنواع أطراف متاحة</option>
+                            ` : userPartyTypes.length === 1 ? `
+                                <option value="${userPartyTypes[0].partyType.id}" selected>
+                                    ${userPartyTypes[0].partyType.name}
+                                </option>
+                            ` : `
+                                <option value="">اختر نوع الطرف</option>
+                                ${userPartyTypes.map(upt => `
+                                    <option value="${upt.partyType.id}" 
+                                            ${defaultPartyTypeId == upt.partyType.id ? 'selected' : ''}>
+                                        ${upt.partyType.name}
+                                    </option>
+                                `).join('')}
+                            `}
+                        </select>
+                    </td>
+                    <td>
+                        <label class="custom-checkbox1 radio">
+                            <input type="radio"
+                                    class="team-leader-radio"
+                                    name="teamLeader"
+                                    value="${member.id}"
+                                    ${state.teamLeaderId == member.id ? 'checked' : ''}>
+                            <span class="checkmark"></span>
+                        </label>
                     </td>
                 </tr>
             `;
@@ -335,6 +402,20 @@
 
                 console.log('👑 قائد الفريق:', leaderId);
             });
+
+        // Party Type Selection
+        $(document).off('change', '.party-type-select')
+            .on('change', '.party-type-select', function () {
+                const memberId = $(this).data('member-id');
+                const partyTypeId = $(this).val();
+
+                const member = state.selectedTeamMembers.find(m => m.id === memberId);
+                if (member) {
+                    member.partyTypeId = partyTypeId ? parseInt(partyTypeId) : null;
+                    console.log('🏢 نوع الطرف للعضو', memberId, ':', partyTypeId);
+                }
+            });
+
         // Select All في جدول الأعضاء
         $(document).off('change', id('selectAllMembers')).on('change', id('selectAllMembers'), function () {
             const isChecked = this.checked;
@@ -360,10 +441,19 @@
             if (!member) return;
 
             if (!state.selectedTeamMembers.find(m => m.id === memberId)) {
+                // الحصول على أنواع الأطراف الخاصة بالعضو
+                const userPartyTypes = member.userPartyTypes || [];
+
+                // تحديد partyTypeId التلقائي
+                const autoSelectedPartyTypeId = userPartyTypes.length === 1
+                    ? userPartyTypes[0].partyType.id
+                    : null;
+
                 state.selectedTeamMembers.push({
                     ...member,
                     scopes: [],
-                    nda: null
+                    nda: null,
+                    partyTypeId: autoSelectedPartyTypeId
                 });
                 if (!state.teamLeaderId) {
                     state.teamLeaderId = memberId;
@@ -497,7 +587,7 @@
             }
 
             console.log('📦 بيانات الفريق:', teamData);
-           
+
             showSuccess(`تم حفظ الفريق بنجاح (${teamData.totalMembers} أعضاء)`);
         });
     }
@@ -578,6 +668,9 @@
         console.log('📥 جاري تحميل الفرق...');
         const teamsLoaded = await loadTeams();
 
+        // تحديث رأس جدول الفريق المحدد بناءً على isNDA
+        updateSelectedTeamTableHeader();
+
         if (teamsLoaded) {
             console.log('📥 جاري تحميل الأعضاء...');
             await loadAllMembers();
@@ -593,6 +686,7 @@
         initEventListeners();
 
         console.log('✅ اكتمل التهيئة بنجاح');
+        console.log('NDA Mode:', state.isNDA ? 'مفعّل ✅' : 'معطّل ❌');
         console.log('========================================');
     };
 

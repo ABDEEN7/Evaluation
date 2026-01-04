@@ -23,6 +23,6 @@ namespace Evaluation.DAL.Models.Planing.EvaluationRequestEntity
         public bool NDAStatusId { get; set; }
         public bool NDAApproveDate { get; set; }
         public string? Note { get; set; }
-
+        public ICollection<EvalRequestAssignmentScope>? EvalRequestAssignmentScopies { get; set; }
     }
 }
