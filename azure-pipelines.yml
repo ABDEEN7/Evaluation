@@ -1,0 +1,66 @@
+# ASP.NET Core (.NET Framework)
+# Build and test ASP.NET Core projects targeting the full .NET Framework.
+# Add steps that publish symbols, save build artifacts, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
+
+
+trigger:
+- Development
+
+name: 'BuildEvaluationPipeline - Dev'
+
+pool:
+  #vmImage: 'windows-2022'
+  name: 'APPS CLOUD BUILD POOL'
+
+variables:
+  solution: '**/*.sln'
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release'
+
+steps:
+#- task: UseDotNet@2
+#  displayName: 'Install .NET 8 SDK'
+#  inputs:
+#    packageType: 'sdk'
+#    version: '8.0.x'
+    
+# Begin SonarQube analysis
+#- task: SonarQubePrepare@5
+#  displayName: 'Prepare SonarQube Analysis'
+#  inputs:
+#    SonarQube: 'SonarQubeConnection'  # Your service connection name
+#    scannerMode: 'MSBuild'
+#    projectKey: '$(SonarQubeProjectKey)'
+#    projectName: '$(SonarQubeProjectName)'
+#    projectVersion: '$(SonarQubeProjectVersion)'
+  
+#- task: NuGetToolInstaller@1
+#
+#- task: NuGetCommand@2
+#  inputs:
+#    restoreSolution: '$(solution)'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Build Solution'
+  inputs:
+    command: 'build'
+    projects: '**/*.sln'
+    arguments: '--configuration $(BuildConfiguration)'
+
+# (Optional) Run tests if you have test projects
+#- task: DotNetCoreCLI@2
+#  displayName: 'Run Tests'
+#  inputs:
+#    command: 'test'
+#    projects: '**/*Tests.csproj'
+#    arguments: '--configuration $(BuildConfiguration) --no-build --logger:trx'
+
+# End SonarQube analysis
+#- task: SonarQubeAnalyze@5
+#  displayName: 'Run SonarQube Analysis'
+
+#- task: SonarQubePublish@5
+#  displayName: 'Publish SonarQube Results'
+#  inputs:
+#    pollingTimeoutSec: '300'

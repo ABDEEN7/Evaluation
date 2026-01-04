@@ -225,6 +225,7 @@ const uiControlsSetup = (uiControlsSetupOptions) => {
     result.UpdatPageTitle = updatePageTitle;
     result.AnyUiBackendLabel = anyUiBackendLabel;
     result.UpdateUiControlText = replaceLabelText;
+    result.PopulateUiControl = populateUiControl;
 
     return result;
 

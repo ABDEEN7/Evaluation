@@ -1,10 +1,9 @@
-﻿
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Evaluation Dashboard</title>
-    <!-- Bootstrap Styles -->
+﻿@using Evaluation.SharedHelper.Enums
+@{
+    ViewData["Title"] = "Evaluation Form";
+}
+@section styles {
+   
     <link href="assets/vendor/bootstrap/css/bootstrap.rtl.min.css" rel="stylesheet">
 
     <!-- Custom Styles -->
@@ -12,440 +11,126 @@
     <link href="assets/css/style-ar.css" rel="stylesheet">
 
     <link href="assets/css/istemara-styles.css" rel="stylesheet">
-</head>
-<body>
-    <!-- Header -->
-    <header class="topbar">
-        <div class="container-fluid">
-            <div class="row align-items-center">
-                <div class="col-lg-4 col-md-4 col-12 mb-2 mb-md-0">
-                    <div class="d-flex align-items-center gap-3">
-                        <!-- Collapse button placed next to logo -->
-                        <!-- <button id="collapseBtn" class="btn btn-outline-secondary">
-                          <i class="la la-angle-left"></i>
-                        </button> -->
-                        <div class="d-flex align-items-center">
-                            <a href="#"><img alt="" src="assets/img/logo.png" class="img-fluid logo"></a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-4 col-6 mb-3 mb-md-0">
-                    <div class="d-flex justify-content-end custom-search">
-                        <div class="input-group">
-                            <span class="input-group-text border-end-0 bg-transparent"><i class="las la-search"></i></span>
-                            <input type="text" class="form-control form-control-lg border-start-0 ps-0" placeholder="البحث">
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-4 col-6 mb-3 mb-md-0">
-                    <div class="d-flex align-items-center gap-3 justify-content-end">
-                        <a href="identify-schools.html" class="language"> <i class="la la-globe"></i> <span>English</span></a>
-                        <div class="dropdown notification">
-                            <button class="btn position-relative" data-bs-toggle="dropdown">
-                                <i class="la la-bell"></i>
-                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill">3</span>
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end p-2">
-                                <li class="d-flex justify-content-between mb-3">
-                                    <h5 class="dropdown-header">الإشعارات</h5>
-                                    <a href="#">مشاهدة الكل</a>
-                                </li>
-                                <li class="mb-4">
-                                    <p class="mb-1"><span class="circle mx-1"></span> تذكير: موعد الزيارة القادمة في 10/10/2024 </p>
-                                    <div class="d-flex gap-2 date-time">
-                                        <div class="date d-flex"><i class="la la-calendar-check"></i>3-سبتمبر 2024</div>
-                                        <div class="time d-flex"> <i class="la la-clock"></i>الساعة 05:31 م</div>
-                                    </div>
-                                </li>
-                                <li class="mb-4">
-                                    <p class="mb-1"><span class="circle mx-1"></span> تذكير: موعد الزيارة القادمة في 10/10/2024 </p>
-                                    <div class="d-flex gap-2 date-time">
-                                        <div class="date d-flex"><i class="la la-calendar-check"></i>3-سبتمبر 2024</div>
-                                        <div class="time d-flex"> <i class="la la-clock"></i>الساعة 05:31 م</div>
-                                    </div>
-                                </li>
-                                <li>
-                                    <p class="mb-1"><span class="circle mx-1"></span> تذكير: موعد الزيارة القادمة في 10/10/2024 </p>
-                                    <div class="d-flex gap-2 date-time">
-                                        <div class="date d-flex"><i class="la la-calendar-check"></i>3-سبتمبر 2024</div>
-                                        <div class="time d-flex"> <i class="la la-clock"></i>الساعة 05:31 م</div>
-                                    </div>
-                                </li>
+    
+}
+<div class="sub-page-container">
+    <section id="tbltemplatecontainer" class="section-container">
+        <div class="card app-card">
+            <div class="card-header justify-content-end d-flex align-items-center bg-light">
 
-                            </ul>
-                        </div>
+                <button id="btnaddcontent" type="button" class="btn btn-primary ADDRECORD">
+                        <i class="fa fa-plus-circle"></i> 
+                    </button>
+               
 
-                        <div class="dropdown profile">
-                            <a href="#" class="d-flex align-items-start text-decoration-none dropdown-toggle" data-bs-toggle="dropdown">
-                                <img src="assets/img/profile-pic.png" alt="avatar" width="40" height="40" class="rounded-circle me-2">
-                                <div>
-                                    <h6>خالد المنصوري</h6>
-                                    <span>رئيس قسم المدارس الحكومية</span>
-                                </div>
-
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="#">الملف الشخصي</a></li>
-                                <li><a class="dropdown-item" href="#">الإعدادات</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="#">تسجيل الخروج</a></li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
             </div>
+            <div class="card-body">
 
+                <div id="view-container"></div>
+            </div>
         </div>
+    </section>
 
+    <section class="display-none" id="formsection">
+        <div class="card app-card">
+            <form enctype="multipart/form-data" id="app-form">
+                <input id="Id" hidden />
+                <input id="evalformidvalue" hidden />
+                <input id="evalformitemidvalue" hidden />
+                <div class="card-body" >
+                    <div id="formcontent"></div>
+                    <div id="itemcontent">
+                        <button type="button" id="btnAddParent" class="btn btn-danger mb-2 ADDPARENT"></button>
 
-
-    </header>
-    <!-- Layout (Sidebar + Content) -->
-    <div class="layout">
-        <!-- Main Content -->
-        <main class="main-content">
-            <div class="card card-table mb-4">
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-9">
-                            <div class="d-flex gap-3 align-items-center mb-2 heading">
-                                <i class="la la-angle-left fs-32"></i>
-                                <div>
-                                    <h3 class="fw-bold">استمارة المشاهدات الصفية 1</h3>
-                                    <!-- Breadcrumbs -->
-                                    <nav aria-label="breadcrumb">
-                                        <ol class="breadcrumb">
-                                            <li class="breadcrumb-item"><a href="#">مدرسة آمنة محمود الجيده للبنات</a></li>
-                                        </ol>
-                                    </nav>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="bg-success-light d-flex justify-content-between p-2 align-items-center br-6 mt-3" role="alert">
-                                <div class="d-flex justify-content-between align-items-center gap-2">
-                                    <i class="las la-check-circle text-success fs-22"></i>
-                                    <p class="m-0 text-dark">  تم إضافة دورة تدريبية بنجاح  </p>
-                                </div>
-                                <button type="button" class="btn-close fs-14" data-bs-dismiss="alert" aria-label="Close"></button>
-                            </div>
-                        </div>
+                        <table id="formitemTable" class="table table-bordered">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th style="width:40px"></th>
+                                    <th style="width:100px"></th>
+                                    <th class="EvalFormsNameAr"></th>
+                                    <th class="EvalFormsNameEn"></th>
+                                    <th style="display:none"></th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
                     </div>
 
-                    <div class="accordion" id="customAccordion">
-                        <!-- Accordion Item -->
-                        <div class="accordion-item mb-3 rounded">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button collapsed d-flex align-items-center  justify-content-between" type="button" data-bs-toggle="collapse" data-bs-target="#itemOne">
-                                    <!-- Left Icons + Title -->
-                                    <div class="d-flex align-items-center gap-2 fs-18"><i class="la la-key text-primary fs-25"></i><span class="fw-semibold">مستويات التقييم</span></div>
-                                    <!-- Status Badge -->
-                                    <span class="badge bg-success-light ms-auto me-2 fw-semibold br-0"> <i class="la la-check fs-14"></i> مكتمل</span>
-                                    <!-- Toggle Icon (Right) -->
-                                    <span class="toggle-icon"><i class="la la-angle-up fs-22"></i></span>
-                                </button>
-                            </h2>
-                            <div id="itemOne" class="accordion-collapse collapse" data-bs-parent="#customAccordion">
-                                <div class="accordion-body">
-                                    <div class="table-card rounded overflow-hidden table-responsive">
-                                        <table class="table table-bordered">
-                                            <thead class="table-primary">
-                                                <tr>
-                                                    <th>الحكم والدرجة</th>
-                                                    <th>ممتاز (5)</th>
-                                                    <th>جيد جداً (4)</th>
-                                                    <th>جيد (3)</th>
-                                                    <th>مقبول (2)</th>
-                                                    <th>ضعيف (1)</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td>التفسير والنسب</td>
-                                                    <td>جميع (%90 - %100)</td>
-                                                    <td>الغالبية العظمى (%80 - %89)</td>
-                                                    <td>معظم (%70 - %79)  </td>
-                                                    <td>بعض (%50 - %69)</td>
-                                                    <td>قلة (0 - %49)</td>
-                                                    x
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Item 2 -->
-                        <div class="accordion-item mb-3 rounded">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button collapsed d-flex align-items-center justify-content-between" type="button" data-bs-toggle="collapse" data-bs-target="#itemTwo">
-                                    <div class="d-flex align-items-center gap-2 fs-18"><i class="las la-clipboard  text-primary fs-25"></i><span class="fw-semibold">البيانات العامة</span></div>
-                                    <span class="toggle-icon"><i class="la la-angle-up fs-22"></i></span>
-                                </button>
-                            </h2>
-                            <div id="itemTwo" class="accordion-collapse collapse" data-bs-parent="#customAccordion">
-                                <div class="accordion-body">
-                                    <div class="row">
-                                        <div class="col-md-4">
-                                            <div class="mb-4">
-                                                <label class="form-label fw-semibold">اسم المدرسة</label>
-                                                <input type="text" class="form-control" placeholder="آمنة محمود الجيده للبنات" disabled>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-md-4">
-                                            <div class="mb-4">
-                                                <label class="form-label fw-semibold">اسم المقيم</label>
-                                                <input type="text" class="form-control" placeholder="مالك سالم العطية" disabled>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-md-4">
-                                            <div class="mb-4">
-                                                <label class="form-label fw-semibold">التاريخ</label>
-                                                <input type="datetime" class="form-control" placeholder="10/10/2024" disabled>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-md-3">
-                                            <div class="mb-4">
-                                                <label class="form-label fw-semibold"><span class="text-danger">*</span> المادة</label>
-                                                <select class="form-select userRole" style="width: 100%;">
-                                                    <option value="">اللغة العربية</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <div class="mb-4">
-                                                <label class="form-label fw-semibold"><span class="text-danger">*</span> الحصة</label>
-                                                <select class="form-select userRole" style="width: 100%;">
-                                                    <option value="">الأولي</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <div class="mb-4">
-                                                <label class="form-label fw-semibold"><span class="text-danger">*</span> الوقت</label>
-                                                <select class="form-select userRole" style="width: 100%;">
-                                                    <option value="">اللغة العربية</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <div class="mb-4">
-                                                <label class="form-label fw-semibold"><span class="text-danger">*</span> اسم المدرس</label>
-                                                <input type="text" class="form-control" placeholder="سامر العبدالله">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <div class="mb-4">
-                                                <label class="form-label fw-semibold"><span class="text-danger">*</span> الحضور</label>
-                                                <input type="number" class="form-control" placeholder="29">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <div class="mb-4">
-                                                <label class="form-label fw-semibold"><span class="text-danger">*</span> الغياب</label>
-                                                <input type="number" class="form-control" placeholder="3">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <div class="mb-4">
-                                                <label class="form-label fw-semibold"><span class="text-danger">*</span> الصف</label>
-                                                <select class="form-select userRole" style="width: 100%;">
-                                                    <option value="">الصف الثالث</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <div class="mb-4">
-                                                <label class="form-label fw-semibold"><span class="text-danger">*</span> الشعبة</label>
-                                                <select class="form-select userRole" style="width: 100%;">
-                                                    <option value="">الشعبة</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="mb-4">
-                                                <label class="form-label fw-bold d-block"><span class="text-danger">*</span> نوع الحصة</label>
-                                                <div class="grey-div">
-                                                    <div class="form-check form-check-inline">
-                                                        <input class="form-check-input" type="radio" name="gender" id="genderMale" checked>
-                                                        <label class="form-check-label" for="genderMale">حضور صفي</label>
-                                                    </div>
-                                                    <div class="form-check form-check-inline">
-                                                        <input class="form-check-input" type="radio" name="gender" id="genderFemale">
-                                                        <label class="form-check-label" for="genderFemale">عن بعد</label>
-                                                    </div>
-                                                    <div class="form-check form-check-inline">
-                                                        <input class="form-check-input" type="radio" name="gender" id="genderFemale">
-                                                        <label class="form-check-label" for="genderFemale">تعليم مدمج</label>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="mb-4">
-                                                <label class="form-label fw-bold d-block"><span class="text-danger">*</span> نوع الحضور</label>
-                                                <div class="grey-div">
-                                                    <div class="form-check form-check-inline">
-                                                        <input class="form-check-input" type="radio" name="gender" id="genderMale" checked>
-                                                        <label class="form-check-label" for="genderMale">كلي</label>
-                                                    </div>
-                                                    <div class="form-check form-check-inline">
-                                                        <input class="form-check-input" type="radio" name="gender" id="genderFemale">
-                                                        <label class="form-check-label" for="genderFemale">جزئي</label>
-                                                    </div>
-
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="mb-4">
-                                                <label class="form-label fw-semibold"><span class="text-danger">*</span> طلاب صعوبات التعلم - المستوى الأول</label>
-                                                <input type="number" class="form-control" placeholder="29">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="mb-4">
-                                                <label class="form-label fw-semibold"><span class="text-danger">*</span> طلاب صعوبات التعلم - المستوى الثاني</label>
-                                                <input type="number" class="form-control" placeholder="29">
-                                            </div>
-                                        </div>
-
-
-
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Item 3 -->
-                        <div class="accordion-item mb-3 rounded">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button collapsed d-flex align-items-center  justify-content-between" type="button" data-bs-toggle="collapse" data-bs-target="#item3">
-                                    <!-- Left Icons + Title -->
-                                    <div class="d-flex align-items-center gap-2 fs-18"><i class="la la-keyboard text-primary fs-25"></i><span class="fw-semibold">تعبئة الاستمارة</span></div>
-                                    <!-- Status Badge -->
-                                    <span class="badge bg-danger-light ms-auto me-2 fw-semibold br-0"> <i class="las la-times fs-14"></i> غير مكتمل</span>
-                                    <!-- Toggle Icon (Right) -->
-                                    <span class="toggle-icon"><i class="la la-angle-up fs-22"></i></span>
-                                </button>
-                            </h2>
-                            <div id="item3" class="accordion-collapse collapse" data-bs-parent="#customAccordion">
-                                <div class="accordion-body">
-                                    <div class="table-card rounded overflow-hidden">
-                                        <div class="table-responsive">
-                                            <div class="table-header">بنود الاستمارة</div>
-                                            <table class="table table-bordered text-center align-middle m-0">
-                                                <thead class="table-grey">
-                                                    <tr>
-                                                        <th></th>
-                                                        <th></th>
-                                                        <th>المعايير</th>
-                                                        <th>اختر التقييم</th>
-                                                        <th>الشواهد وأثرها</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody id="tbodyRows">
-                                                    <tr class="main-row align-middle">
-                                                        <!-- Rowspan column (covers 3 rows) -->
-                                                        <td rowspan="3" class="row-icon text-center">
-                                                            <button class="toggle-btn collapsed" data-bs-toggle="collapse" data-bs-target="#collapse-1" aria-expanded="false" aria-controls="collapse-1" title="توسيع/طي">
-                                                                <i class="la la-plus"></i>
-                                                            </button>
-                                                        </td>
-                                                        <td class="serial"> 1</td>
-                                                        <td class="text-start label">
-                                                            <div class="d-flex gap-2 align-items-center">
-                                                                <i class="la la-info-circle text-info"></i>
-                                                                تنفيذ الخطة اليومية للدرس وتحقيق أهداف  الدرس.
-                                                            </div>
-
-                                                        </td>
-                                                        <td class="text-start small">
-                                                            <div>
-                                                                <select class="form-select eval-select" data-row="1">
-                                                                    <option value="">أختر من 1 ل5</option>
-                                                                </select>
-                                                            </div>
-                                                        </td>
-                                                        <td class="small note-preview">
-                                                            <textarea class="form-control form-control-sm note-input" rows="2" data-row="1" placeholder="أضف ملاحظات..."></textarea>
-                                                        </td>
-                                                    </tr>
-                                                    <tr class="collapse" id="collapse-1">
-                                                        <td class="serial"> 1.1</td>
-                                                        <td class="text-start label">تنفيذ بنود الخطة</td>
-                                                        <td class="text-start small">
-                                                            <div>
-                                                                <select class="form-select eval-select" data-row="1">
-                                                                    <option value="">أختر من 1 ل5</option>
-                                                                </select>
-                                                            </div>
-                                                        </td>
-                                                        <td class="small note-preview">
-                                                            <textarea class="form-control form-control-sm note-input" rows="2" data-row="1" placeholder="أضف ملاحظات..."></textarea>
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                            <table class="table table-bordered text-center align-middle m-0">
-                                                <thead class="table-grey">
-                                                    <tr>
-                                                        <th>نقاط قوة</th>
-                                                        <th>نقاط تحتاج الى تحسين وتطوير </th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr>
-                                                        <td><textarea class="form-control form-control-sm note-input" rows="2" data-row="1" placeholder="أضف ملاحظات..."></textarea></td>
-                                                        <td><textarea class="form-control form-control-sm note-input" rows="2" data-row="1" placeholder="أضف ملاحظات..."></textarea></td>
-                                                    </tr>
-                                                </tbody>
-
-                                            </table>
-                                        </div>
-                                    </div>
-                                    <div class="row mt-4">
-                                        <div class="col-md-6">
-                                            <div class="d-flex gap-2 align-items-center flex-wrap">
-                                                <a href="#" class="btn btn-primary btn-lg mw-200"> <i class="la la-save"></i> حفظ الاستمارة</a>
-                                                <a href="#" class="btn mw-200 btn-lg text-primary"> <i class="la la-close"></i>&nbsp;إغلاق</a>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6 text-end">
-                                            <a href="#" class="btn btn-outline-primary btn-lg mw-200"> <i class="la la-send"></i>  إرسال للاعتماد</a>
-
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
+                    <div class="d-flex justify-content-end gap-2" id="action-container">
+                        <button type="button" id="btn-back" class="btn btn-secondary BACKBUTTON"></button>
+                        <button type="button" id="btn-submit" class="btn btn-primary SAVEBUTTON"></button>
                     </div>
-
-
                 </div>
-            </div>
-        </main>
-    </div>
-    <!-- JS -->
-    <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <script src="assets/js/jquery.min.js"></script>
-    <script src="assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
-    <script src="assets/vendor/datatables/js/dataTables.bootstrap5.min.js"></script>
+            </form>
+        </div>
+    </section>
+    
+</div>
 
-    <!-- Select2 JS -->
-    <script src="assets/vendor/select2/js/select2.min.js"></script>
-
-    <!-- Flatpickr JS -->
-    <script src="assets/vendor/flatpickr/js/flatpickr.js"></script>
-    <script src="assets/vendor/flatpickr/js/ar.js"></script>
-    <script src="assets/js/main.js"></script>
+@section Scripts {
+   
+    <script src="~/js/EvaluationForm/evaluation-form.js" asp-append-version="true"></script>
+   
     <script>
+        $(document).ready(async function () {
 
+             if (!sharedUtility().ExistingToken()) {
+                sharedUtility().RedirectUnauthorized();
+            }
+            await webAppConfigsSetup().Init({
+                pageNames: [
+                    '@nameof(ConstantKeys.WebAppCommon)',
+                    '@nameof(ConstantKeys.WebAppPages.WebEvaluationForm)',
+                    '@nameof(ConstantKeys.WebAppPages.WebEvaluationFormItem)',
+                    '@nameof(ConstantKeys.WebAppPages.WebEvaluationSubFormItem)'
+                ],
+                 pages: [
+                    '@nameof(ConstantKeys.WebAppCommon)',
+                    '@nameof(ConstantKeys.WebAppPages.WebEvaluationForm)',
+                    '@nameof(ConstantKeys.WebAppPages.WebEvaluationFormItem)',
+                    '@nameof(ConstantKeys.WebAppPages.WebEvaluationSubFormItem)'
+                ],
+                 permissions: [
+                    '@nameof(ConstantKeys.WebPermissions.ADD_WEB_EVALFORMS)',
+                    '@nameof(ConstantKeys.WebPermissions.ADD_WEB_FORMITEMS)',,
+                    '@nameof(ConstantKeys.WebPermissions.ADD_WEB_SUBFORMITEMS)',
+                ],
+            }).then((result) => {
+
+                 uiControlItems = result.uiControlItems.filter(x => x.rowOrder > 0 && x.permissionBackendName=='@ConstantKeys.WebPermissions.ADD_WEB_EVALFORMS');
+                 FormItemuiControlItems = result.uiControlItems.filter(x => x.rowOrder > 0 && x.permissionBackendName=='@ConstantKeys.WebPermissions.ADD_WEB_FORMITEMS');
+                  SubFormItemuiControlItems = result.uiControlItems.filter(x => x.rowOrder > 0 && x.permissionBackendName=='@ConstantKeys.WebPermissions.ADD_WEB_SUBFORMITEMS');
+                textDir = result.currentlanguage === "ar" ? "RTL" : "LTR";
+                permissionsList = result.permissionsList;
+                controlsList = result.controlsList;
+                columnList = uiControlItems.filter(x => x.constraint.showInGrid === true && x.control).map(c => ({
+                    ...c.constraint,
+                    pageName: c.control.pageName
+                }));
+                settingList = result.settingList;
+                targetSetting = result.targetSetting;
+                containsOrderNo = result.containsOrderNo;
+                controlvalidationlist = uiControlItems;
+                FormItemcontrolvalidationlist = FormItemuiControlItems;
+                SubFormItemcontrolvalidationlist = SubFormItemuiControlItems;
+
+                IsEdit = permissionsList?.some(p => p === '@ConstantKeys.WebPermissions.EDIT_WEB_EVALFORMS') ?? false;
+                IsDelete = permissionsList?.some(p => p === '@ConstantKeys.WebPermissions.DELETE_WEB_EVALFORMS') ?? false;
+                 IsAdd = permissionsList?.some(p => p === '@ConstantKeys.WebPermissions.ADD_WEB_EVALFORMS') ?? false;
+                 IsAddFormItem = permissionsList?.some(p => p === '@ConstantKeys.WebPermissions.ADD_WEB_FORMITEMS') ?? false;
+                 IsViewFormItem = permissionsList?.some(p => p === '@ConstantKeys.WebPermissions.VIEW_WEB_FORMITEMS') ?? false;
+                  IsEditFormItem = permissionsList?.some(p => p === '@ConstantKeys.WebPermissions.EDIT_WEB_FORMITEMS') ?? false;
+                   IsDeleteFormItem = permissionsList?.some(p => p === '@ConstantKeys.WebPermissions.DELETE_WEB_FORMITEMS') ?? false;
+                    IsAddSubFormItem = permissionsList?.some(p => p === '@ConstantKeys.WebPermissions.ADD_WEB_SUBFORMITEMS') ?? false;
+                 IsViewSubFormItem = permissionsList?.some(p => p === '@ConstantKeys.WebPermissions.VIEW_WEB_SUBFORMITEMS') ?? false;
+                  IsEditSubFormItem = permissionsList?.some(p => p === '@ConstantKeys.WebPermissions.EDIT_WEB_SUBFORMITEMS') ?? false;
+                   IsDeleteSubFormItem = permissionsList?.some(p => p === '@ConstantKeys.WebPermissions.DELETE_WEB_SUBFORMITEMS') ?? false;
+                 initTables();
+            });
+
+           
+        });
     </script>
-</body>
-</html>
+ 
+
+}

@@ -13,5 +13,6 @@ namespace Evaluation.SharedHelper.Models.Admin
         public string? TabulatorConfig { get; set; }
         public string? ControlJsonConfig { get; set; }
         public int? RowOrder { get; set; }
+        public string? PermissionBackendName { get; set; }
     }
 }
