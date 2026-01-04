@@ -4,6 +4,7 @@ using Evaluation.DAL.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Evaluation.DAL.Migrations
 {
     [DbContext(typeof(EvaluationDbContext))]
-    partial class EvaluationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260104063120_EnhnceNdaAndAddFormItemRelated")]
+    partial class EnhnceNdaAndAddFormItemRelated
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -6039,12 +6042,6 @@ namespace Evaluation.DAL.Migrations
                     b.Property<Guid>("MinistryUserId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime?>("NdaDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("NdaStatusId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("Note")
                         .HasColumnType("nvarchar(max)");
 
@@ -6066,8 +6063,6 @@ namespace Evaluation.DAL.Migrations
                     b.HasIndex("EvaluationRequestId");
 
                     b.HasIndex("MinistryUserId");
-
-                    b.HasIndex("NdaStatusId");
 
                     b.HasIndex("PartyTypeId");
 
@@ -13187,11 +13182,6 @@ namespace Evaluation.DAL.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Evaluation.DAL.Models.Planing.EvaluationRequestEntity.NdaStatus", "NdaStatus")
-                        .WithMany()
-                        .HasForeignKey("NdaStatusId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("Evaluation.DAL.Models.UserEntiy.PartyType", "PartyType")
                         .WithMany()
                         .HasForeignKey("PartyTypeId")
@@ -13210,8 +13200,6 @@ namespace Evaluation.DAL.Migrations
                     b.Navigation("EvaluationRequest");
 
                     b.Navigation("MinistryUser");
-
-                    b.Navigation("NdaStatus");
 
                     b.Navigation("PartyType");
 
