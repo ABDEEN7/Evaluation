@@ -10,7 +10,8 @@
         members: [],
         allMembers: [],
         selectedTeamMembers: [],
-        scopes: []
+        scopes: [],
+        pendingRemoval: new Set() // تتبع العناصر المحددة للحذف
     };
 
     // ================== ID HELPER ==================
@@ -40,7 +41,6 @@
             const res = await TeamApi.getTeams();
             state.teams = res?.value ?? [];
             populateTeamDropdown();
-            console.log('✅ Teams loaded:', state.teams.length);
             return state.teams.length > 0;
         } catch {
             showError('حدث خطأ في تحميل الفرق');
@@ -54,7 +54,6 @@
             const res = await TeamApi.getMembersByTeam(null);
             state.allMembers = res?.value ?? [];
             state.members = state.allMembers;
-            console.log('✅ All members loaded:', state.members.length);
             renderMembersTable();
         } catch {
             showError('خطأ في تحميل الأعضاء');
@@ -73,8 +72,6 @@
                     state.allMembers.push(member);
                 }
             });
-
-            console.log('✅ Team members loaded:', state.members.length);
             renderMembersTable();
         } catch {
             showError('خطأ في تحميل أعضاء الفريق');
@@ -85,7 +82,6 @@
         try {
             const res = await TeamApi.getScopes();
             state.scopes = res?.value ?? [];
-            console.log('✅ Scopes loaded:', state.scopes.length);
         } catch {
             showError('خطأ في تحميل المجالات');
         }
@@ -97,12 +93,10 @@
         const $select = $(id('teamFilter'));
 
         if (!$select.length) {
-            console.error('❌ عنصر teamFilter غير موجود');
             return;
         }
 
         if (!state.teams.length) {
-            console.warn('⚠️ لا توجد فرق لعرضها');
             return;
         }
 
@@ -116,15 +110,11 @@
             const teamId = $(this).val();
             if (teamId) {
                 const team = state.teams.find(t => t.id === teamId);
-                console.log('🔄 Team filter changed to:', team?.name);
                 loadMembersByTeam(teamId);
             } else {
-                console.log('🔄 Team filter changed to: All Teams');
                 loadAllMembers();
             }
         });
-
-        console.log('✅ تم تعبئة قائمة الفرق:', state.teams.length);
     }
 
     // ================== RENDER ==================
@@ -133,7 +123,6 @@
         const $tbody = $(id('userTable')).find('tbody');
 
         if (!$tbody.length) {
-            console.error('❌ جدول الأعضاء غير موجود');
             return;
         }
 
@@ -171,14 +160,12 @@
 
         $tbody.html(rows);
         updateSelectAllCheckbox();
-        console.log('✅ Members table rendered:', state.members.length, 'members');
     }
 
     function renderSelectedTeamTable() {
         const $tbody = $(id('selectedTeamTable')).find('tbody');
 
         if (!$tbody.length) {
-            console.error('❌ Selected team table not found!');
             return;
         }
 
@@ -191,19 +178,19 @@
                 </tr>
             `);
             updateSelectedCheckboxHeader();
-            console.log('ℹ️ Selected team table cleared');
             return;
         }
 
         const rows = state.selectedTeamMembers.map((member, index) => {
             const memberName = member.name || member.fullName || member.memberName || 'غير محدد';
             const memberPosition = member.position || member.jobTitle || member.title || 'غير محدد';
+            const isPending = state.pendingRemoval.has(member.id);
 
             return `
                 <tr data-selected-id="${member.id}">
                     <td>
-                        <label class="custom-checkbox1 minus">
-                            <input type="checkbox" class="selected-row-checkbox">
+                        <label class="custom-checkbox1 ${isPending ? 'minus' : 'plus'}">
+                            <input type="checkbox" class="selected-row-checkbox" ${isPending ? 'checked' : ''}>
                             <span class="checkmark"></span>
                         </label>
                     </td>
@@ -247,8 +234,6 @@
         }).join('');
 
         $tbody.html(rows);
-        console.log('✅ Selected team table rendered:', state.selectedTeamMembers.length, 'members');
-
         setTimeout(() => {
             initializeSelect2();
         }, 100);
@@ -340,8 +325,6 @@
         // Select All في جدول الأعضاء
         $(document).off('change', id('selectAllMembers')).on('change', id('selectAllMembers'), function () {
             const isChecked = this.checked;
-            console.log('🔄 Select All clicked:', isChecked);
-
             $(`${id('userTable')} .row-select`).each(function () {
                 if ($(this).prop('checked') !== isChecked) {
                     $(this).prop('checked', isChecked).trigger('change');
@@ -378,30 +361,62 @@
             updateSelectAllCheckbox();
         });
 
-        // إزالة عضو من الفريق المحدد
+        // التعامل مع checkbox في الجدول السفلي - الضغطة الأولى: minus، الثانية: حذف
         $(document).off('change', '.selected-row-checkbox').on('change', '.selected-row-checkbox', function () {
-            // الأسفل إزالة فقط
-            if (!this.checked) return;
+            const $checkbox = $(this);
+            const $row = $checkbox.closest('tr');
+            const $label = $checkbox.closest('.custom-checkbox1');
+            const memberId = $row.data('selected-id');
+            const isChecked = $checkbox.prop('checked');
 
-            const row = $(this).closest('tr');
-            const memberId = row.data('selected-id');
+            if (isChecked) {
+                // الضغطة الأولى: إضافة للحذف وتغيير إلى minus
+                state.pendingRemoval.add(memberId);
+                $label.removeClass('plus').addClass('minus');
+            } else {
+                // الضغطة الثانية: تنفيذ الحذف الفعلي
+                state.pendingRemoval.delete(memberId);
 
-            // إزالة من الفريق
-            state.selectedTeamMembers = state.selectedTeamMembers.filter(m => m.id !== memberId);
+                // إزالة من الفريق
+                const member = state.selectedTeamMembers.find(m => m.id === memberId);
+                state.selectedTeamMembers = state.selectedTeamMembers.filter(m => m.id !== memberId);
 
-            // تحديث الجدولين
-            renderSelectedTeamTable();
+                // إعادة تفعيل العضو في الجدول الأعلى
+                $(`${id('userTable')} tr[data-id="${memberId}"] .row-select`).prop('checked', false);
 
-            // إعادة تفعيل العضو في الأعلى
-            $(`${id('userTable')} tr[data-id="${memberId}"] .row-select`).prop('checked', false);
+                const memberName = member?.name || member?.fullName || member?.memberName;
+                showSuccess('تم حذف ' + memberName);
+
+                // إعادة رسم الجدول
+                renderSelectedTeamTable();
+            }
 
             updateSelectAllCheckbox();
+            updateSelectedCheckboxHeader();
         });
 
         // Select All في جدول الفريق المحدد
         $(document).off('change', id('selectAllSelected')).on('change', id('selectAllSelected'), function () {
             const isChecked = this.checked;
-            $('.selected-row-checkbox').prop('checked', isChecked).trigger('change');
+
+            $('.selected-row-checkbox').each(function () {
+                const $checkbox = $(this);
+                const $row = $checkbox.closest('tr');
+                const $label = $checkbox.closest('.custom-checkbox1');
+                const memberId = $row.data('selected-id');
+
+                if (isChecked) {
+                    // تحديد الكل: إضافة شعار minus
+                    $checkbox.prop('checked', true);
+                    state.pendingRemoval.add(memberId);
+                    $label.removeClass('plus').addClass('minus');
+                } else {
+                    // إلغاء التحديد: إزالة من pending
+                    $checkbox.prop('checked', false);
+                    state.pendingRemoval.delete(memberId);
+                    $label.removeClass('minus').addClass('plus');
+                }
+            });
         });
 
         // البحث
@@ -424,25 +439,25 @@
         $(document).off('click', id('deleteSelectedBtn')).on('click', id('deleteSelectedBtn'), function (e) {
             e.preventDefault();
 
-            const checkedBoxes = $('.selected-row-checkbox:checked');
-
-            if (checkedBoxes.length === 0) {
+            if (state.pendingRemoval.size === 0) {
                 alert('الرجاء تحديد الأعضاء المراد حذفهم');
                 return;
             }
 
-            if (!confirm(`هل أنت متأكد من حذف ${checkedBoxes.length} عضو؟`)) {
+            if (!confirm(`هل أنت متأكد من حذف ${state.pendingRemoval.size} عضو؟`)) {
                 return;
             }
 
-            checkedBoxes.each(function () {
-                const row = $(this).closest('tr');
-                const memberId = row.data('selected-id');
+            // حذف الأعضاء المحددين
+            state.pendingRemoval.forEach(memberId => {
                 state.selectedTeamMembers = state.selectedTeamMembers.filter(m => m.id !== memberId);
 
                 // إعادة تفعيل العضو في الجدول الأعلى
                 $(`${id('userTable')} tr[data-id="${memberId}"] .row-select`).prop('checked', false);
             });
+
+            // مسح قائمة الانتظار
+            state.pendingRemoval.clear();
 
             renderSelectedTeamTable();
             renderMembersTable();
@@ -458,29 +473,15 @@
                 return;
             }
 
-            const leaderId = $('.team-leader-radio:checked').val();
-            const leader = state.selectedTeamMembers.find(m => m.id === leaderId);
-            const leaderName = leader?.name || leader?.fullName || leader?.memberName;
+            // استخدام الدالة الخارجية للحصول على البيانات
+            const teamData = window.getSelectedTeamData(`${state.fieldId}_selectedTeamTable`);
 
-            const teamData = {
-                members: state.selectedTeamMembers.map(m => ({
-                    id: m.id,
-                    name: m.name || m.fullName || m.memberName,
-                    position: m.position || m.jobTitle || m.title,
-                    scopes: m.scopes || [],
-                    isLeader: m.id === leaderId
-                })),
-                leaderId: leaderId,
-                leaderName: leaderName,
-                totalMembers: state.selectedTeamMembers.length,
-                timestamp: new Date().toISOString()
-            };
+            if (!teamData) {
+                showError('خطأ في استخراج بيانات الفريق');
+                return;
+            }
 
-            console.log('========== SAVING TEAM ==========');
-            console.log('Team Leader:', leaderName);
-            console.log('Total Members:', state.selectedTeamMembers.length);
-            console.log('Team Data:', teamData);
-            console.log('=================================');
+            console.log('📦 بيانات الفريق:', teamData);
 
             // TODO: Add your save API call here
             // Example:
@@ -492,7 +493,7 @@
             //         showError('حدث خطأ في حفظ الفريق');
             //     });
 
-            showSuccess(`تم حفظ الفريق بنجاح (${state.selectedTeamMembers.length} أعضاء)`);
+            showSuccess(`تم حفظ الفريق بنجاح (${teamData.totalMembers} أعضاء)`);
         });
     }
 
@@ -502,7 +503,6 @@
         const $tbody = $(id('userTable')).find('tbody');
 
         if (!$tbody.length) {
-            console.error('❌ جدول الأعضاء غير موجود');
             return;
         }
 
