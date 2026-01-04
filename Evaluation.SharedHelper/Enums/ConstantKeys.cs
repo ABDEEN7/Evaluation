@@ -168,6 +168,7 @@ public static class ConstantKeys
         public static readonly string EvaluationPartiesExistsServiceRequest = "EvaluationPartiesExistsServiceRequest";
         public static readonly string EvaluationPartiesExistsEvalForm = "EvaluationPartiesExistsEvalForm";
         public static readonly string EvaluationTypeExistsEvaluationRequestHistory = "EvaluationTypeExistsEvaluationRequestHistory";
+        public static readonly string DropdownTypeExistsField = "DropdownTypeExistsField";
     }
 
     public static class AdminSettings
@@ -310,6 +311,7 @@ public static class ConstantKeys
         public static readonly string AdminEvaluationType = "AdminEvaluationType";
         public static readonly string AdminFormEvalMarixValue = "AdminFormEvalMarixValue";
         public static readonly string AdminCssClass = "AdminCssClass";
+        public static readonly string AdminDropDownType = "AdminDropDownType";
     }
     public static class WebAppPages
     {
@@ -755,6 +757,14 @@ public static class ConstantKeys
         public const string ADD_ADMIN_CSSCLASS = "ADD_ADMIN_CSSCLASS";
         public const string EDIT_ADMIN_CSSCLASS = "EDIT_ADMIN_CSSCLASS";
         public const string DELETE_ADMIN_CSSCLASS = "DELETE_ADMIN_CSSCLASS";
+
+        #endregion
+        #region DROPDOWNTYPE
+
+        public const string VIEW_ADMIN_DROPDOWNTYPE = "VIEW_ADMIN_DROPDOWNTYPE";
+        public const string ADD_ADMIN_DROPDOWNTYPE = "ADD_ADMIN_DROPDOWNTYPE";
+        public const string EDIT_ADMIN_DROPDOWNTYPE = "EDIT_ADMIN_DROPDOWNTYPE";
+        public const string DELETE_ADMIN_DROPDOWNTYPE = "DELETE_ADMIN_DROPDOWNTYPE";
 
         #endregion
 
