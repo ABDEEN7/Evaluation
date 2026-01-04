@@ -160,6 +160,13 @@ public static class ConstantKeys
         public static readonly string JobTitleCannotDelete = "JobTitleCannotDelete";
         public static readonly string EvalFormExistsFormItem = "EvalFormExistsFormItem";
         public static readonly string EvalFormExistsFormScope = "EvalFormExistsFormScope";
+        public static readonly string FormItemExistsFormItemValues = "FormItemExistsFormItemValues";
+        public static readonly string FormItemExistsSubFormItem = "FormItemExistsSubFormItem";
+        public static readonly string EvalFormTypeExistsEvalForms = "EvalFormTypeExistsEvalForms";
+        public static readonly string EducationLevelExistsSchoolLevel = "EducationLevelExistsSchoolLevel";
+        public static readonly string EvaluationPartiesExistsService = "EvaluationPartiesExistsService";
+        public static readonly string EvaluationPartiesExistsServiceRequest = "EvaluationPartiesExistsServiceRequest";
+        public static readonly string EvaluationPartiesExistsEvalForm = "EvaluationPartiesExistsEvalForm";
     }
 
     public static class AdminSettings
@@ -193,7 +200,9 @@ public static class ConstantKeys
         public static readonly string WebAppSitePath = "WebAppSitePath";
         public static readonly string SubSiteContentMaxCount = "SubSiteContentMaxCount";
         public static readonly string SchoolOrgType = "SchoolOrgType";
+        public static readonly string EmployeeOrgType = "EmployeeOrgType";
         public static readonly string OrgClassList = "OrgClassList";
+        public static readonly string EmployeeOrgClassList = "EmployeeOrgClassList";
         
 
     }
@@ -290,12 +299,19 @@ public static class ConstantKeys
         public static readonly string AdminPlanStatuses = "AdminPlanStatuses";
         public static readonly string AdminOrgTypes = "AdminOrgTypes";
         public static readonly string AdminJobTitle = "AdminJobTitle";
+        public static readonly string AdminDepEvaluationType = "AdminDepEvaluationType";
         public static readonly string AdminSchools = "AdminSchools";
         public static readonly string AdminOrgTree = "AdminOrgTree";
+        public static readonly string AdminEvalFormType = "AdminEvalFormType";
+        public static readonly string AdminEducationLevel = "AdminEducationLevel";
+        public static readonly string AdminEmployees = "AdminEmployees";
+        public static readonly string AdminEvaluationParties = "AdminEvaluationParties";
     }
     public static class WebAppPages
     {
         public static readonly string WebEvaluationForm = "WebEvaluationForm";
+        public static readonly string WebEvaluationFormItem = "WebEvaluationFormItem";
+        public static readonly string WebEvaluationSubFormItem = "WebEvaluationSubFormItem";
     }
     public static class AdminPermission
     {
@@ -649,6 +665,14 @@ public static class ConstantKeys
         public const string UPDATE_ORDER_ADMIN_JOBTITLE = "UPDATE_ORDER_ADMIN_JOBTITLE";
         #endregion
 
+        #region DepEvaluationType
+        public const string VIEW_ADMIN_DEPEVALUATIONTYPE = "VIEW_ADMIN_DEPEVALUATIONTYPE";
+        public const string ADD_ADMIN_DEPEVALUATIONTYPE = "ADD_ADMIN_DEPEVALUATIONTYPE";
+        public const string EDIT_ADMIN_DEPEVALUATIONTYPE = "EDIT_ADMIN_DEPEVALUATIONTYPE";
+        public const string DELETE_ADMIN_DEPEVALUATIONTYPE = "DELETE_ADMIN_DEPEVALUATIONTYPE";
+        public const string EDIT_ORDER_ADMIN_DEPEVALUATIONTYPE = "EDIT_ORDER_ADMIN_DEPEVALUATIONTYPE";
+        #endregion
+
         #region SCHOOL
 
         public const string VIEW_ADMIN_SCHOOL = "VIEW_ADMIN_SCHOOL";
@@ -664,6 +688,42 @@ public static class ConstantKeys
         public const string ADD_ADMIN_ORGTREE = "ADD_ADMIN_ORGTREE";
         public const string EDIT_ADMIN_ORGTREE = "EDIT_ADMIN_ORGTREE";
         public const string DELETE_ADMIN_ORGTREE = "DELETE_ADMIN_ORGTREE";
+
+        #endregion
+
+        #region EVALFORMTYPE
+
+        public const string VIEW_ADMIN_EVALFORMTYPE = "VIEW_ADMIN_EVALFORMTYPE";
+        public const string ADD_ADMIN_EVALFORMTYPE = "ADD_ADMIN_EVALFORMTYPE";
+        public const string EDIT_ADMIN_EVALFORMTYPE = "EDIT_ADMIN_EVALFORMTYPE";
+        public const string DELETE_ADMIN_EVALFORMTYPE = "DELETE_ADMIN_EVALFORMTYPE";
+
+        #endregion
+
+        #region EDUCATIONLEVEL
+
+        public const string VIEW_ADMIN_EDUCATIONLEVEL = "VIEW_ADMIN_EDUCATIONLEVEL";
+        public const string ADD_ADMIN_EDUCATIONLEVEL = "ADD_ADMIN_EDUCATIONLEVEL";
+        public const string EDIT_ADMIN_EDUCATIONLEVEL = "EDIT_ADMIN_EDUCATIONLEVEL";
+        public const string DELETE_ADMIN_EDUCATIONLEVEL = "DELETE_ADMIN_EDUCATIONLEVEL";
+
+        #endregion
+
+        #region EMPLOYEE
+
+        public const string VIEW_ADMIN_EMPLOYEE = "VIEW_ADMIN_EMPLOYEE";
+        public const string ADD_ADMIN_EMPLOYEE = "ADD_ADMIN_EMPLOYEE";
+        public const string EDIT_ADMIN_EMPLOYEE = "EDIT_ADMIN_EMPLOYEE";
+        public const string DELETE_ADMIN_EMPLOYEE = "DELETE_ADMIN_EMPLOYEE";
+
+        #endregion
+
+        #region EVALUATIONPARTIES
+
+        public const string VIEW_ADMIN_EVALUATIONPARTIES = "VIEW_ADMIN_EVALUATIONPARTIES";
+        public const string ADD_ADMIN_EVALUATIONPARTIES = "ADD_ADMIN_EVALUATIONPARTIES";
+        public const string EDIT_ADMIN_EVALUATIONPARTIES = "EDIT_ADMIN_EVALUATIONPARTIES";
+        public const string DELETE_ADMIN_EVALUATIONPARTIES = "DELETE_ADMIN_EVALUATIONPARTIES";
 
         #endregion
 
@@ -684,6 +744,24 @@ public static class ConstantKeys
         public const string ADD_WEB_EVALFORMS = "ADD_WEB_EVALFORMS";
         public const string EDIT_WEB_EVALFORMS = "EDIT_WEB_EVALFORMS";
         public const string DELETE_WEB_EVALFORMS = "DELETE_WEB_EVALFORMS";
+
+        #endregion
+
+        #region FORMITEMS
+
+        public const string VIEW_WEB_FORMITEMS = "VIEW_WEB_FORMITEMS";
+        public const string ADD_WEB_FORMITEMS = "ADD_WEB_FORMITEMS";
+        public const string EDIT_WEB_FORMITEMS = "EDIT_WEB_FORMITEMS";
+        public const string DELETE_WEB_FORMITEMS = "DELETE_WEB_FORMITEMS";
+
+        #endregion
+
+        #region SUBFORMITEMS
+
+        public const string VIEW_WEB_SUBFORMITEMS = "VIEW_WEB_SUBFORMITEMS";
+        public const string ADD_WEB_SUBFORMITEMS = "ADD_WEB_SUBFORMITEMS";
+        public const string EDIT_WEB_SUBFORMITEMS = "EDIT_WEB_SUBFORMITEMS";
+        public const string DELETE_WEB_SUBFORMITEMS = "DELETE_WEB_SUBFORMITEMS";
 
         #endregion
 
