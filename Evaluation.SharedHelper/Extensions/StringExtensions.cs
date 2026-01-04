@@ -86,9 +86,14 @@ namespace Evaluation.SharedHelper.Extensions
         }
 
 
-        public static TSource? StringToObject<TSource>(string source)
+        public static TSource StringToObject<TSource>(this string source)
         {
-            return JsonConvert.DeserializeObject<TSource>(source);
+            var result = JsonConvert.DeserializeObject<TSource>(source);
+
+            if (result == null)
+                throw new InvalidOperationException($"Failed to deserialize JSON into {typeof(TSource).Name}");
+
+            return result;
         }
         public static string GetStringfromObj(object _obj)
         {

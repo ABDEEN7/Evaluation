@@ -136,14 +136,41 @@ function onEventDrop(info) {
         cancelButtonText: "إلغاء"
     }).then(result => {
         if (result.isConfirmed) {
-            updateEventDates(info);
+            let eventResult = calendarResults.find(item => item.id === info.event.id);
+            if (validateEventDates(info, eventResult)) {
+                updateEventDates(info, eventResult);
+            }
         } else {
             info.revert();
         }
     });
 }
 
-function updateEventDates(info) {
+function validateEventDates(info, eventResult) {
+    if (eventResult.source == 'ServiceRequest') {
+
+        let parent = calendarResults.find(item => item.id === eventResult.parentId);
+        //date.setDate(date.getDate() + 1);
+
+        let parentStartDate = new Date(parent.start);
+        let parentEndDate = new Date(parent.end);
+        parentEndDate = parentEndDate.setDate(parentEndDate.getDate() - 1);
+
+        if (!(parentStartDate <= info.event.start && parentEndDate >= info.event.end))
+        {
+            Swal.fire({
+                icon: "error",
+                title: "خطأ",
+                text: "يجب ان تكون الخدمة ضمن فترة الطلب"
+            });
+
+            info.revert();
+            return false;
+        }
+    }
+    return true;
+}
+function updateEventDates(info, eventResult) {
     const payload = {
         id: info.event.id,
         Title: info.event.title,
@@ -151,7 +178,18 @@ function updateEventDates(info) {
         End: info.event.end
     };
 
-    jqClient().Post("/EvaluationRequest/UpdateEvaluationRequest", payload)
+    let url = '';
+
+    if (eventResult.source == 'ServiceRequest')
+    {
+        url = "/EvaluationRequest/UpdateEvaluationServiceRequest";
+    }
+    else
+    {
+        url = "/EvaluationRequest/UpdateEvaluationRequest";
+    }
+
+    jqClient().Post(url, payload)
         .done((res) => {
             Swal.fire({
                 icon: "success",

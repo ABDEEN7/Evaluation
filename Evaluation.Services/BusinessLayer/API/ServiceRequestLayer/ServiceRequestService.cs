@@ -28,4 +28,18 @@ public class ServiceRequestService(IServiceScopeFactory serviceScopeFactory,
             .Include(d => d.Status)
             .ToListAsync();
     }
+
+    public async Task<ServiceRequest> UpdateEvaluationServiceRequest(ServiceRequest serviceRequest)
+    {
+        unitOfWork.GetRepository<ServiceRequest>().Update(serviceRequest);
+        await uow.CommitAsync();
+
+        return serviceRequest;
+    }
+    public async Task<ServiceRequest> GetEvaluationServiceRequestById(Guid Id)
+    {
+        return await unitOfWork.GetRepository<ServiceRequest>()
+                    .GetByIDActiveNonDeleted(Id);
+    }
+
 }

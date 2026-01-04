@@ -12,7 +12,7 @@
     <link href="~/assets/img/moe-logo2.png" rel="icon">
     <link href="~/assets/img/moe-logo2.png" rel="apple-touch-icon">
 
-    
+    <link href="~/lib/tabular/css/tabulator.min.css" rel="stylesheet" />
 
     <link rel="stylesheet" href="~/assets/vendor/bootstrap/css/bootstrap.min.css">
 
@@ -24,19 +24,27 @@
     @await RenderSectionAsync("Styles", required: false)
 
     <!-- Vendor JS Files -->
+    <script src="~/lib/moment/moment.min.js" asp-append-version="true"></script>
+    <script src="~/lib/moment/moment-timezone.min.js" asp-append-version="true"></script>
+    <script src="~/lib/moment/moment-timezone-with-data.min.js" asp-append-version="true"></script>
     <script src='~/assets/js/jquery.min.js'></script>
     <script src="~/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <!-- <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>-->
     <script src="~/assets/vendor/swiper/swiper-bundle.min.js"></script>
-    <script src="~/lib/toastr/toastr.min.js" asp-append-version="true"></script>
-    <script src="~/js/shared/jq-message-util.js" asp-append-version="true"></script>
+    <script src="~/lib/toastr/toastr.js" asp-append-version="true"></script>
+   
     <script src="~/lib/sweetalert2/js/sweetalert2.min.js" asp-append-version="true"></script>
+    <script src="~/lib/select2/dist/js/select2.js" asp-append-version="true"></script>
     <script src="~/js/shared/session-timer.js"></script>
     <script src="~/js/shared/ajax-setup.js" asp-append-version="true"></script>
+
     <script src="~/js/shared/general-params.js"></script>
     <script src="~/js/shared/shared-utility.js" asp-append-version="true"></script>
     <script src="~/js/shared/jq-client-util.js" asp-append-version="true"></script>
-
+    <script src="~/lib/tabular/js/tabulator.min.js" asp-append-version="true"></script>
+    <script src="~/js/shared/jq-helper-util.js" asp-append-version="true"></script>
+    <script src="~/js/shared/jq-table-util.js" asp-append-version="true"></script>
+    <script src="~/js/shared/jq-message-util.js" asp-append-version="true"></script>
     <!-- Template Main JS File -->
     <script src="~/assets/js/main.js"></script>
 
@@ -55,13 +63,40 @@
     <footer id="footer" class="footer">
         <div class="container copyright text-center"><p>جميع حقوق الملكية محفوظة © 2025 وزارة التربية والتعليم والتعليم العالي .</p></div>
     </footer>
+    <!-- Modal for adding new rows -->
+    <div class="modal" id="ModalPopup">
+        <div class="modal-dialog modal-xl  modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"></h5>
+                    <button type="button" id="btn-close_popup" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" style="max-height:75vh">
 
+                    <div class="row">
+                        <input id="PopupId" hidden />
+                        <form id="PopupForm">
+
+                        </form>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="btn-clear_popup" class="btn btn-secondary"></button>
+                    <button type="button" id="btn-back_popup" class="btn btn-secondary"></button>
+                    <button type="button" id="btn-submit_popup" class="btn btn-primary"></button>
+                </div>
+
+            </div>
+        </div>
+    </div>
     <!-- Scroll Top -->
     <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i class="fa-solid fa-arrow-up"></i></a>
     <script src="~/js/layout.js" asp-append-version="true"></script>
     <script src="~/js/shared/populate-ui-control.js" asp-append-version="true"></script>
     <script src="~/js/shared/populate-system-setting.js" asp-append-version="true"></script>
     <script src="~/js/shared/populate-web-app-configs.js" asp-append-version="true"></script>
+    <script src="~/js/shared/jq-dropdown-util.js" asp-append-version="true"></script>
+    <script src="~/js/shared/shared-fn.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 
 

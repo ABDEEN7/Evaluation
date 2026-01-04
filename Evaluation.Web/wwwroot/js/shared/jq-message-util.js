@@ -1,114 +1,106 @@
-﻿const notificationUtil = ((customOptions = {}) => {
-    // ---------------------------------------------
-    // 🧩 Base Toastr Config (merge with overrides)
-    // ---------------------------------------------
-    const toastrDefaults = {
-        closeButton: true,
-        progressBar: true,
-        positionClass: "toast-bottom-full-width",
-        timeOut: 5000,
-        extendedTimeOut: 1000,
-        showDuration: 300,
-        hideDuration: 1000,
-        showMethod: "fadeIn",
-        hideMethod: "fadeOut",
-        preventDuplicates: false,
-        newestOnTop: false
+﻿const notificationUtil = (function (options) {
+
+    //alertify.success('Current position : ' + alertify.get('notifier', 'position'));
+
+    const success = (data) => {
+        //alertify.success(data);
+        toastr["success"](data);
     };
 
-    toastr.options = { ...toastrDefaults, ...customOptions };
-
-    // ---------------------------------------------
-    // 📣 Simple notification wrappers
-    // ---------------------------------------------
-    const notify = (type, msg) => {
-        if (!msg) return;
-        const fn = toastr[type];
-        if (typeof fn === "function") fn(msg);
-        else console.warn(`Unknown toastr type: ${type}`);
+    const error = (data) => {
+        //alertify.error(data);
+        toastr["error"](data);
     };
 
-    const success = (msg) => notify("success", msg);
-    const error = (msg) => notify("error", msg);
-    const warning = (msg) => notify("warning", msg);
-    const message = (msg) => notify("info", msg);
+    const warning = (data) => {
+        //alertify.warning(data);
+        toastr["warning"](data);
+    };
 
-    // ---------------------------------------------
-    // 💬 Popup (SweetAlert)
-    // ---------------------------------------------
-    const popup = ({
-        title = "Notice",
-        body = "",
-        icon = "info",
-        okText = "OK",
-        cancelText = "",
-        showCloseButton = false,
-        showCancelButton = false
-    } = {}) => {
-        return Swal.fire({
-            title: `<strong>${title}</strong>`,
-            icon,
+    const message = (data) => {
+        //alertify.message(data);
+        toastr["info"](data);
+    }
+
+    const popup = ({ title, body, icon, okText, cancelText, showCloseButton, showCancelButton }) => {
+
+        Swal.fire({
+            title: `<strong><u>${title}</u></strong>`,
+            icon: icon ?? 'error',
             html: body,
-            showCloseButton,
-            showCancelButton,
+            showCloseButton: showCloseButton ?? false,
+            showCancelButton: showCancelButton ?? false,
             focusConfirm: false,
-            confirmButtonText: `<i class="fa fa-check"></i> ${okText}`,
-            cancelButtonText: cancelText ? `<i class="fa fa-times"></i> ${cancelText}` : undefined
-        });
-    };
+            confirmButtonText: `<i class="fa fa-check"></i> ${okText ?? 'Ok'}`,
+            confirmButtonAriaLabel: `${okText ?? 'Ok'}`,
+            cancelButtonText: `<i class="fa fa-times"></i> ${cancelText ?? ''}`,
+            cancelButtonAriaLabel: `${cancelText ?? ''}`
+        })
+    }
 
-    // ---------------------------------------------
-    // ❓ Confirmation (Promise-based)
-    // ---------------------------------------------
-    const confirmation = ({
-        title = "Are you sure?",
-        body = "",
-        okText = "Confirm",
-        cancelText = "Cancel",
-        width = "400px",
-        showCancelButton = true
-    } = {}) => {
-        return Swal.fire({
-            title,
+    const confirmation = ({ title, body, okText, cancelText, data, width, showCancelButton = true }, confirmationCallback, cancelCallback) => {
+        Swal.fire({
+            title: `${title}`,
+            //showDenyButton: true,
+            width: `${width}`,
             html: body,
-            width,
-            icon: "question",
-            showCancelButton,
-            confirmButtonText: okText,
-            cancelButtonText: cancelText,
-            allowOutsideClick: false,
-            buttonsStyling: false,
-            customClass: {
-                confirmButton: "btn btn-primary mx-1",
-                cancelButton: "btn btn-secondary"
+            showCancelButton: showCancelButton,
+            confirmButtonText: `${okText}`,
+            cancelButtonText: `${cancelText}`,
+            allowOutsideClick: false, // Prevent clicking outside to close
+            //denyButtonText: `${cancelText}`,
+        }).then((result) => {
+            /* Read more about isConfirmed, isDenied below */
+            if (result.isConfirmed) {
+                // Swal.fire('Saved!', '', 'success')
+                confirmationCallback(result);
+            } else {
+                Swal.close();
+                if (cancelCallback)
+                    cancelCallback(result);
+                //Swal.close(); // Close the dialog manually
             }
-        }).then(result => result.isConfirmed);
-    };
+            /* else if (result.isDenied) {
+                 Swal.fire('Changes are not saved', '', 'info')
+             }*/
 
-    // ---------------------------------------------
-    // 🚨 Server error handler (optional)
-    // ---------------------------------------------
+        })
+    }
+
     const serverError = (errors) => {
-        if (!errors) return;
-        if (Array.isArray(errors)) {
-            errors.forEach(e => error(e?.message || e));
-        } else if (typeof errors === "object" && errors.message) {
-            error(errors.message);
-        } else {
-            error(JSON.stringify(errors));
-        }
+
+    }
+    //https://codeseven.github.io/toastr/demo.html
+    const position = 'bottom-right';
+    toastr.options = {
+        //"positionClass": "toaster-css",
+        "closeButton": true,
+        "debug": false,
+        "newestOnTop": false,
+        "progressBar": true,
+        //"positionClass": "toast-top-center",
+        "positionClass": "toast-bottom-full-width",
+        "preventDuplicates": false,
+        "onclick": null,
+        "showDuration": "300",
+        "hideDuration": "1000",
+        "timeOut": "5000",
+        "extendedTimeOut": "1000",
+        "showEasing": "swing",
+        "hideEasing": "linear",
+        "showMethod": "fadeIn",
+        "hideMethod": "fadeOut"
     };
 
-    // ---------------------------------------------
-    // 🧱 Public API
-    // ---------------------------------------------
-    return {
-        success,
-        error,
-        warning,
-        message,
-        popup,
-        confirmation,
-        serverError
-    };
+    let result = {};
+    result.success = success;
+    result.error = error;
+    result.warning = warning;
+    result.message = message;
+    result.popup = popup;
+    result.serverError = serverError;
+    result.confirmation = confirmation;
+
+    return result;
+
 })();

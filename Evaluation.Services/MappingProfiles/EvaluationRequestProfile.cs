@@ -25,6 +25,7 @@ public class EvaluationRequestProfile : Profile
 
         CreateMap<ServiceRequest, EvaluationRequestCalenderDto>()
             .ForMember(d => d.Id, opt => opt.MapFrom(src => src.Id))
+            .ForMember(d => d.ParentId, opt => opt.MapFrom(src => src.EvaluationRequestId))
             .ForMember(d => d.Title, opt => opt.MapFrom(src => src.RequestNumber))
             .ForMember(d => d.Start, opt => opt.MapFrom(src => src.VisitDateFrom!.Value.ToString("yyyy-MM-dd'T'HH:mm:ss")))
             .ForMember(d => d.End, opt => opt.MapFrom(src => src.VisitDateTo!.Value.ToString("yyyy-MM-dd'T'HH:mm:ss")))

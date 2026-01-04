@@ -21,7 +21,6 @@ public class FormController : ControllerBase
         _masterBl = masterBl;
     }
 
-
     [HttpGet]
     public async Task<Result<List<FormItemDto>>> GetItems([FromQuery] Guid formId)
     {
