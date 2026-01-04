@@ -1,0 +1,14 @@
+﻿.custom-checkbox1.radio .checkmark {
+    border-radius: 50%;
+}
+
+.custom-checkbox1.radio input:checked ~ .checkmark::after {
+    content: "";
+    width: 8px;
+    height: 8px;
+    background: #8a1538;
+    border-radius: 50%;
+    position: absolute;
+    top: 4px;
+    left: 4px;
+}

@@ -11,7 +11,8 @@
         allMembers: [],
         selectedTeamMembers: [],
         scopes: [],
-        pendingRemoval: new Set() // تتبع العناصر المحددة للحذف
+        pendingRemoval: new Set(),
+        teamLeaderId: null
     };
 
     // ================== ID HELPER ==================
@@ -223,11 +224,15 @@
                         </div>
                     </td>
                     <td>
-                        <div class="form-check custom-radio">
-                            <input class="form-check-input team-leader-radio" type="radio" 
-                                   name="teamLeader" value="${member.id}" 
-                                   ${index === 0 ? 'checked' : ''}>
-                        </div>
+              <label class="custom-checkbox1 radio">
+                <input type="radio"
+                        class="team-leader-radio"
+                        name="teamLeader"
+                        value="${member.id}"
+                        ${state.teamLeaderId == member.id ? 'checked' : ''}>
+                <span class="checkmark"></span>
+            </label>
+
                     </td>
                 </tr>
             `;
@@ -322,6 +327,14 @@
     // ================== EVENT HANDLERS ==================
 
     function initEventListeners() {
+        //Added event to Radio button
+        $(document).off('change', '.team-leader-radio')
+            .on('change', '.team-leader-radio', function () {
+                const leaderId = $(this).val();
+                state.teamLeaderId = leaderId;
+
+                console.log('👑 قائد الفريق:', leaderId);
+            });
         // Select All في جدول الأعضاء
         $(document).off('change', id('selectAllMembers')).on('change', id('selectAllMembers'), function () {
             const isChecked = this.checked;
@@ -352,7 +365,9 @@
                     scopes: [],
                     nda: null
                 });
-
+                if (!state.teamLeaderId) {
+                    state.teamLeaderId = memberId;
+                }
                 const memberName = member.name || member.fullName || member.memberName;
                 showSuccess('تم إضافة ' + memberName);
                 renderSelectedTeamTable();
@@ -482,17 +497,7 @@
             }
 
             console.log('📦 بيانات الفريق:', teamData);
-
-            // TODO: Add your save API call here
-            // Example:
-            // TeamApi.saveTeam(teamData)
-            //     .then(response => {
-            //         showSuccess('تم حفظ الفريق بنجاح');
-            //     })
-            //     .catch(error => {
-            //         showError('حدث خطأ في حفظ الفريق');
-            //     });
-
+           
             showSuccess(`تم حفظ الفريق بنجاح (${teamData.totalMembers} أعضاء)`);
         });
     }

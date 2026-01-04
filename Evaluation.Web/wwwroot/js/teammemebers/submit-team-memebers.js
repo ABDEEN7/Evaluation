@@ -1,6 +1,11 @@
 ﻿(function (window) {
     'use strict';
-    window.getTeamMembers = function (tableId) {
+
+    function getTableIdFromFieldId(fieldId) {
+        return `${fieldId}_selectedTeamTable`;
+    }
+
+    function extractTeamData(tableId) {
         const teamData = {
             members: [],
             leaderId: null,
@@ -15,28 +20,27 @@
                 minute: '2-digit'
             })
         };
+
         try {
             const $table = $(`#${tableId}`);
 
             if (!$table.length) {
-                console.error('Table not founded', tableId);
+                console.error('❌ Table not found:', tableId);
                 return null;
             }
 
-            const $tbody = $table.find('tbody');
-            const $rows = $tbody.find('tr[data-selected-id]');
+            const $rows = $table.find('tbody tr[data-selected-id]');
 
             $rows.each(function () {
                 const $row = $(this);
                 const memberId = $row.data('selected-id');
-
                 if (!memberId) return;
 
                 const memberName = $row.find('td:eq(1) h6').text().trim();
                 const memberPosition = $row.find('td:eq(2) h6').first().text().trim();
 
                 const $scopeSelect = $row.find('.multiCheckSelect-dynamic');
-                const selectedScopes = $scopeSelect.val() || [];
+                const selectedScopes = ($scopeSelect.val() || []).map(Number);
                 const scopeNames = [];
 
                 $scopeSelect.find('option:selected').each(function () {
@@ -49,13 +53,14 @@
                     teamData.leaderId = memberId;
                     teamData.leaderName = memberName;
                 }
+
                 teamData.members.push({
                     id: memberId,
                     name: memberName,
                     position: memberPosition,
-                    scopes: selectedScopes.map(s => parseInt(s)),
-                    scopeNames: scopeNames,
-                    isLeader: isLeader
+                    scopes: selectedScopes,
+                    scopeNames,
+                    isLeader
                 });
             });
 
@@ -66,18 +71,23 @@
             console.error('❌ خطأ في استخراج بيانات الفريق:', error);
             return null;
         }
+    }
+
+    // ================= PUBLIC API =================
+
+    window.getTeamDataByFieldId = function (fieldId) {
+        const tableId = getTableIdFromFieldId(fieldId);
+        return extractTeamData(tableId);
     };
 
-    window.getTeamMembers = function (tableId) {
-        const data = window.getTeamMembers(tableId);
+    window.getTeamMembersByFieldId = function (fieldId) {
+        const data = window.getTeamDataByFieldId(fieldId);
         return data ? data.members : [];
     };
-    window.getTeamLeader = function (tableId) {
-        const data = window.getTeamMembers(tableId);
 
-        if (!data) return null;
-
-        const leader = data.members.find(m => m.isLeader);
-        return leader || null;
+    window.getTeamLeaderByFieldId = function (fieldId) {
+        const data = window.getTeamDataByFieldId(fieldId);
+        return data?.members.find(m => m.isLeader) || null;
     };
+
 })(window);

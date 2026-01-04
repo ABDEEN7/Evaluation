@@ -9,6 +9,7 @@
 @import url("../vendor/select2/css/select2.min.css"); /*Select2 CSS*/
 @import url("../vendor/flatpickr/css/flatpickr.min.css"); /*Flatpickr CSS*/
 @import url("custom-checkbox.css"); /*Flatpickr CSS*/
+@import url("cutsom-radiobutton.css"); /*Flatpickr CSS*/
 @import url("../vendor/datatables/css/jquery.dataTables.min.css"); /*dataTables CSS*/
 @import url("../vendor/datatables/css/dataTables.bootstrap5.min.css"); /*dataTables CSS*/
 @import url('../css/cairo.css'); /*Cairo CSS*/
