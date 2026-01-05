@@ -35,9 +35,26 @@
         <div class="card app-card">
             <form enctype="multipart/form-data" id="app-form">
                 <input id="Id" hidden />
+                <input id="evalformidvalue" hidden />
+                <input id="evalformitemidvalue" hidden />
                 <div class="card-body" >
                     <div id="formcontent"></div>
+                    <div id="itemcontent">
+                        <button type="button" id="btnAddParent" class="btn btn-danger mb-2 ADDPARENT"></button>
 
+                        <table id="formitemTable" class="table table-bordered">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th style="width:40px"></th>
+                                    <th style="width:100px"></th>
+                                    <th class="EvalFormsNameAr"></th>
+                                    <th class="EvalFormsNameEn"></th>
+                                    <th style="display:none"></th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
 
                     <div class="d-flex justify-content-end gap-2" id="action-container">
                         <button type="button" id="btn-back" class="btn btn-secondary BACKBUTTON"></button>
@@ -47,7 +64,9 @@
             </form>
         </div>
     </section>
+    
 </div>
+
 @section Scripts {
    
     <script src="~/js/EvaluationForm/evaluation-form.js" asp-append-version="true"></script>
@@ -61,18 +80,26 @@
             await webAppConfigsSetup().Init({
                 pageNames: [
                     '@nameof(ConstantKeys.WebAppCommon)',
-                    '@nameof(ConstantKeys.WebAppPages.WebEvaluationForm)'
+                    '@nameof(ConstantKeys.WebAppPages.WebEvaluationForm)',
+                    '@nameof(ConstantKeys.WebAppPages.WebEvaluationFormItem)',
+                    '@nameof(ConstantKeys.WebAppPages.WebEvaluationSubFormItem)'
                 ],
                  pages: [
                     '@nameof(ConstantKeys.WebAppCommon)',
-                    '@nameof(ConstantKeys.WebAppPages.WebEvaluationForm)'
+                    '@nameof(ConstantKeys.WebAppPages.WebEvaluationForm)',
+                    '@nameof(ConstantKeys.WebAppPages.WebEvaluationFormItem)',
+                    '@nameof(ConstantKeys.WebAppPages.WebEvaluationSubFormItem)'
                 ],
                  permissions: [
                     '@nameof(ConstantKeys.WebPermissions.ADD_WEB_EVALFORMS)',
+                    '@nameof(ConstantKeys.WebPermissions.ADD_WEB_FORMITEMS)',,
+                    '@nameof(ConstantKeys.WebPermissions.ADD_WEB_SUBFORMITEMS)',
                 ],
             }).then((result) => {
-              
-                 uiControlItems = result.uiControlItems.filter(x => x.rowOrder > 0);
+
+                 uiControlItems = result.uiControlItems.filter(x => x.rowOrder > 0 && x.permissionBackendName=='@ConstantKeys.WebPermissions.ADD_WEB_EVALFORMS');
+                 FormItemuiControlItems = result.uiControlItems.filter(x => x.rowOrder > 0 && x.permissionBackendName=='@ConstantKeys.WebPermissions.ADD_WEB_FORMITEMS');
+                  SubFormItemuiControlItems = result.uiControlItems.filter(x => x.rowOrder > 0 && x.permissionBackendName=='@ConstantKeys.WebPermissions.ADD_WEB_SUBFORMITEMS');
                 textDir = result.currentlanguage === "ar" ? "RTL" : "LTR";
                 permissionsList = result.permissionsList;
                 controlsList = result.controlsList;
@@ -84,10 +111,20 @@
                 targetSetting = result.targetSetting;
                 containsOrderNo = result.containsOrderNo;
                 controlvalidationlist = uiControlItems;
+                FormItemcontrolvalidationlist = FormItemuiControlItems;
+                SubFormItemcontrolvalidationlist = SubFormItemuiControlItems;
 
                 IsEdit = permissionsList?.some(p => p === '@ConstantKeys.WebPermissions.EDIT_WEB_EVALFORMS') ?? false;
                 IsDelete = permissionsList?.some(p => p === '@ConstantKeys.WebPermissions.DELETE_WEB_EVALFORMS') ?? false;
                  IsAdd = permissionsList?.some(p => p === '@ConstantKeys.WebPermissions.ADD_WEB_EVALFORMS') ?? false;
+                 IsAddFormItem = permissionsList?.some(p => p === '@ConstantKeys.WebPermissions.ADD_WEB_FORMITEMS') ?? false;
+                 IsViewFormItem = permissionsList?.some(p => p === '@ConstantKeys.WebPermissions.VIEW_WEB_FORMITEMS') ?? false;
+                  IsEditFormItem = permissionsList?.some(p => p === '@ConstantKeys.WebPermissions.EDIT_WEB_FORMITEMS') ?? false;
+                   IsDeleteFormItem = permissionsList?.some(p => p === '@ConstantKeys.WebPermissions.DELETE_WEB_FORMITEMS') ?? false;
+                    IsAddSubFormItem = permissionsList?.some(p => p === '@ConstantKeys.WebPermissions.ADD_WEB_SUBFORMITEMS') ?? false;
+                 IsViewSubFormItem = permissionsList?.some(p => p === '@ConstantKeys.WebPermissions.VIEW_WEB_SUBFORMITEMS') ?? false;
+                  IsEditSubFormItem = permissionsList?.some(p => p === '@ConstantKeys.WebPermissions.EDIT_WEB_SUBFORMITEMS') ?? false;
+                   IsDeleteSubFormItem = permissionsList?.some(p => p === '@ConstantKeys.WebPermissions.DELETE_WEB_SUBFORMITEMS') ?? false;
                  initTables();
             });
 

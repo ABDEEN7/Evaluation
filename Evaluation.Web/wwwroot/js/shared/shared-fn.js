@@ -1424,7 +1424,7 @@ const sharedFn = (options) => {
         }
         const clazzList = event.target.classList;
         if (clazzList.contains('view')) {
-            InitialPageControls(controlvalidationlist);
+            
             ClearvalidateForm("form-control");
             clearForm();
             edit(pkId);
@@ -1437,7 +1437,7 @@ const sharedFn = (options) => {
             }
         }
         else if (clazzList.contains('edit')) {
-            InitialPageControls(controlvalidationlist);
+           
             ClearvalidateForm("form-control");
             if (typeof popupname == 'undefined' || popupname == "") {
                 clearForm();
@@ -1464,6 +1464,7 @@ const sharedFn = (options) => {
    
     //===========================================================
     const clearForm = () => {
+        $('#Id').val('');
         $("#app-form").trigger("reset");
         $("#app-form select").each(function () {
             $(this).val('').trigger('change');
@@ -1804,7 +1805,8 @@ const sharedFn = (options) => {
 
     //===========================================================
     const InitialPopup = async (modaltitle, ControlItems, groupObject, tablecolumnlist, settingList) => {
-        $('#ModalPopup .modal-body').empty();
+        $("#PopupId").val('');
+        $('#ModalPopup .modal-body #PopupForm').empty();
         $('#ModalPopup .modal-title').empty();
         $('#ModalPopup .modal-title').html(modaltitle);
         $("#btn-back_popup").html(getUiControlText("BACK_BUTTON"));
@@ -1814,65 +1816,66 @@ const sharedFn = (options) => {
         if (ControlItems) {
             var formData = new FormData();
             formData.append('request', JSON.stringify(ControlItems));
+            $.ajax({
+                url: "/Home/UiControlList",
+                type: "POST",
+                dataType: "html",
+                processData: false,
+                contentType: false,
+                data: formData,
+                Mode: 'APP',
+                success: function (response) {
+                    if (response) {
+                        popupdivcontent = popupdivcontent + `${response}` + `</div>`;
+                        if (popupdivcontent) {
+                            if (tablecolumnlist) {
+                                popupdivcontent = popupdivcontent + '<div class="tabulator-wrapper"> <div id="divtable"></div> </div>';
+                                $('#ModalPopup .modal-body').html(popupdivcontent);
+                                table = tableUtil.createTabulator({
+                                    id: "divtable",
+                                    config: {
+                                        textDirection: txtDir,
+                                        pagination: "local",
+                                        paginationSize: 10,
+                                        placeholder: sharedFn().GetUiControlText('NO_DATA_FOUND'),
+                                        headerFilterPlaceholder: sharedFn().GetUiControlText('FILTER_COLUMN'),
+                                    },
+                                    isResponsiveLayout: false,
+                                    uniqueRowId: 'id',
+                                    sortColumn: "updateDate",
+                                    sortDir: "desc",
+                                    columns: tablecolumnlist,
+                                });
+                                if (window.hasOwnProperty("Loadtabledata")) {
+                                    Loadtabledata();
+                                }
 
-            try {
-                const response = await $.ajax({
-                    url: "Home/UiControlList",
-                    type: "POST",
-                    dataType: 'html',
-                    processData: false,
-                    contentType: false,
-                    data: formData,
-                });
+                            }
+                            else {
+                                $('#ModalPopup .modal-body #PopupForm').html(popupdivcontent);
+                            }
+                            initializePopupControl(ControlItems, settingList);
+                            if (window.hasOwnProperty("SetDropDown")) {
+                                SetDropDown();
+                            }
 
-                if (response) {
-                    popupdivcontent = popupdivcontent + `${response}` + `</div>`;
+                            SetValueFromDropdown();
+                            SetValueToDropdown();
+                            SetPopupData(ControlItems, groupObject);
+
+                            ValidateInput();
+
+                        }
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error("UI Control load failed:", error);
                 }
-            } catch (xhr) {
-                commonUtil.serverError(xhr);
-            }
+            });
         }
 
 
-        if (popupdivcontent) {
-            if (tablecolumnlist) {
-                popupdivcontent = popupdivcontent + '<div class="tabulator-wrapper"> <div id="divtable"></div> </div>';
-                $('#ModalPopup .modal-body').html(popupdivcontent);
-                table = tableUtil.createTabulator({
-                    id: "divtable",
-                    config: {
-                        textDirection: txtDir,
-                        pagination: "local",
-                        paginationSize: 10,
-                        placeholder: sharedFn().GetUiControlText('NO_DATA_FOUND'),
-                        headerFilterPlaceholder: sharedFn().GetUiControlText('FILTER_COLUMN'),
-                    },
-                    isResponsiveLayout: false,
-                    uniqueRowId: 'id',
-                    sortColumn: "updateDate",
-                    sortDir: "desc",
-                    columns: tablecolumnlist,
-                });
-                if (window.hasOwnProperty("Loadtabledata")) {
-                    Loadtabledata();
-                }
-
-            }
-            else {
-                $('#ModalPopup .modal-body').html(popupdivcontent);
-            }
-            initializePopupControl(ControlItems, settingList);
-            if (window.hasOwnProperty("SetDropDown")) {
-                SetDropDown();
-            }
-
-            SetValueFromDropdown();
-            SetValueToDropdown();
-            SetPopupData(ControlItems, groupObject);
-            
-            ValidateInput();
-
-        }
+       
     };
     //===========================================================
     const OpenFormPopup = (modaltitle, ControlItems, groupObject = null, tablecolumnlist = null, settingList = null) => {
@@ -2034,7 +2037,7 @@ const sharedFn = (options) => {
     }
     //===========================================================
     const ResetVisibleControls = (formname) => {
-        $("#Id").val('');
+        $('#PopupId').val('');
         $("#" + formname + " :input:visible").each(function () {
 
             if (this.type === "checkbox" || this.type === "radio") {
@@ -2139,7 +2142,12 @@ const sharedFn = (options) => {
             }
         }
     }
-
+    //===========================================================
+    const ClearPopup = () => {
+        $("#ModalPopup").modal("hide");
+        $("#btn-submit_popup").removeAttr("disabled");
+        $('#PopupId').val('');
+    }
     let result = {};
     result.DisableDropdownOptions = DisableDropdownOptions;
     result.EnableDropdownOptions = EnableDropdownOptions;
@@ -2181,6 +2189,7 @@ const sharedFn = (options) => {
     result.ProcessDualListControls = processDualListControls;
     result.SetDefaultValueFromConfig = SetDefaultValueFromConfig;
     result.InitialPageControls = InitialPageControls;
+    result.ClearPopup = ClearPopup;
   
    
 
@@ -2225,6 +2234,7 @@ $("#btn-clear_popup").on("click", function () {
 $("#btn-close_popup").on("click", function () {
     $("#ModalPopup").modal("hide");
     $("#PopupForm").trigger("reset");
+    $("#PopupId").val('');
     popupname = "";
     $("#btn-add-content").removeAttr("disabled");
     sharedFn().ClearvalidateForm("form-control");
