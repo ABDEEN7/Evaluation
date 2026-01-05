@@ -18,10 +18,11 @@ namespace Evaluation.DAL.Models.Planing.EvaluationRequestEntity
         public EvaluationRequest? EvaluationRequest { get; set; }
         public Guid PartyTypeId { get; set; }
         public PartyType? PartyType { get; set; }
-        public bool? IsLeader { get; set; }
-        public bool? IsNDA { get; set; }
-        public bool? NDAStatusId { get; set; }
-        public bool? NDAApproveDate { get; set; }
+        public bool IsLeader { get; set; }
+        public bool IsNDA { get; set; }
+        public Guid? NdaStatusId { get; set; }
+        public NdaStatus? NdaStatus { get; set; }
+        public DateTime? NdaDate { get; set; }
         public string? Note { get; set; }
 
     }
