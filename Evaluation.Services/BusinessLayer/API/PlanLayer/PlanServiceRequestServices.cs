@@ -121,10 +121,12 @@ public class PlanServiceRequestServices(
         return await ExecuteWithResult(async () =>
         {
             await FillSystemFields(modelDto);
-
+            var planId = Guid.NewGuid();
+            modelDto.Id = planId;
             Plan plan = modelDto.ToPlan();
+            plan.Id = planId;
             plan.PlanJsonValue = JsonConvert.SerializeObject(modelDto);
-
+            
             await unitOfWork.GetRepository<Plan>().InsertAsync(plan);
 
             await InsertEvaluationRequests(plan.Id, modelDto);
