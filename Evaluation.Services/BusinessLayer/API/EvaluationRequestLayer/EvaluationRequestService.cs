@@ -16,6 +16,7 @@ using Evaluation.SharedHelper.Dtos.SchoolDto;
 using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Api.AttachmentsDTOs;
+using Evaluation.SharedHelper.Models.Api.EvaluationRequestEntities;
 using Evaluation.SharedHelper.Models.Api.FormBuilderDTO;
 using Evaluation.SharedHelper.Models.Api.ServiceRequestEntitiesDTO;
 using Microsoft.EntityFrameworkCore;
@@ -202,14 +203,18 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 		var userTask = srvUser.GetByIDActiveNonDeleted(userId);
 		var moduleTask = SrvSystemModule.GetSystemModuleByIdAsync(request.Service.SystemModuleId);
 		var fieldsTask = GetEvaluationRequestFieldsValueAsync(request);
-
-		await Task.WhenAll(userTask, moduleTask, fieldsTask);
+		var assignmentTask = GetEvaluationRequestAssignmentAsync(request.Id);
+		await Task.WhenAll(userTask, moduleTask, fieldsTask, assignmentTask);
 
 		var user = await userTask;
 		if (user == null)
 			throw new BusinessException(ExceptionMessage.UserNotFound);
 
 		var module = await moduleTask;
+		var assignment = await assignmentTask;
+		bool departmentRequiresNda = module?.Department?.IsNDA == true;
+		bool userAssignmentRequiresNda = departmentRequiresNda && assignment.Any(x=>x.MinistryUserId== userId && x.IsNDA == true && (x.NDAApproveDate == null || x.NDAStatusId == null));
+
 		var formGroups = await fieldsTask;
 
 		var preventPartyTypes = request.ServiceStatus.StatusPreventPartyTypes;
@@ -233,7 +238,7 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 		// bool hasFieldHistoryPermission = false;
 		// bool hasAllFieldHistoryPermission = false;
 
-		var evaluationPartiesTask = srvEvaluationParty.GetPartiesWithServicesAndRequestsAsync(request.Id, module.DepartmentId);
+		var evaluationPartiesTask = userAssignmentRequiresNda ? srvEvaluationParty.GetPartiesWithServicesAndRequestsAsync(request.Id, module!.DepartmentId): Task.FromResult<List<EvaluationPartyDTO>?>(null)!;
 		var attachmentsTask = GetAllEvaluationRequestAttachmentsAsync(request.Id, lang);
 		var actionTransactionsTask = SrvActionTransactionsLog.GetActionLog(request.Id, request.ServiceId, module?.Id, user);
 		var schoolTask = schoolRepository.GetSchoolDetails(request.OrgTreeId);
@@ -262,6 +267,7 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 			EvaluationParties=await evaluationPartiesTask,
 			//CanViewFieldHistory = hasFieldHistoryPermission,
 			//CanViewAllFieldHistory = hasAllFieldHistoryPermission
+			IsNdaApprovalPending= userAssignmentRequiresNda,
 		};
 		return requestDetails;
 	}
@@ -303,6 +309,21 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 		}
 
 		return false;
+	}
+
+	public async Task<List<EvaluationRequestAssignment>> GetEvaluationRequestAssignmentAsync(Guid evaluationRequestId)
+	{
+		using var scope = serviceScopeFactory.CreateScopedUow();
+
+		var RequestAssignment = await scope
+			.GetRepository<EvaluationRequestAssignment>()
+			.GetAllActiveNonDeleted(x =>x.EvaluationRequestId == evaluationRequestId)
+			.AsNoTracking()
+			.ToListAsync();
+
+			return RequestAssignment;
+
+
 	}
 
 	public async Task<List<FormGroupDTO>> GetEvaluationRequestFieldsValueAsync(EvaluationRequest request)
