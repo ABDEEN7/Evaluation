@@ -33,7 +33,9 @@ public class TeamMemberController : ControllerBase
     [HttpPost]
     public async Task<Result<bool>> AddEvaluationRequestAssignment([FromBody] List<EvalTeamRequestDto> model)
                  => await _masterBl.GetApiService<TeamMemberBL>().AddedRequestAssignment(model);
-
+    [HttpPost]
+    public async Task<Result<bool>> DeleteEvaluationRequestAssignment(Guid id)
+        => await _masterBl.GetApiService<TeamMemberBL>().DeleteEvaluationRequestAssignment(id);
     //[HttpGet]
     //public IActionResult GetMebmer()
     //{

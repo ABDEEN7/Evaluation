@@ -178,4 +178,17 @@ public class TeamMemberBL(IServiceScopeFactory serviceScopeFactory,
         await unitOfWork.CommitAsync();
         return true;
     }
+    public async Task<Result<bool>> DeleteEvaluationRequestAssignment(Guid id)
+    {
+        var existingAssignments = await unitOfWork
+          .GetRepository<EvaluationRequestAssignment>()
+          .GetAllActiveNonDeleted(x => x.Id == id)
+          .FirstOrDefaultAsync();
+        //if (existingAssignments!= null)
+
+        unitOfWork.GetRepository<EvaluationRequestAssignment>()
+            .Delete(existingAssignments);
+        //ask if delete the collection
+        return true;
+    }
 }
