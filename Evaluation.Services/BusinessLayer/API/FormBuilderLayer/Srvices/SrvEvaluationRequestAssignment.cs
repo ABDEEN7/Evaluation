@@ -319,8 +319,8 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 			}
 
 			assignment.Note = dto.ConflictReason;
-			//assignment.NDAApproveDate = DateTime.UtcNow;
-			assignment.NDAStatusId = dto.NDAStatusId;
+			assignment.NdaDate = DateTime.UtcNow;
+			assignment.NdaStatusId = dto.NDAStatusId;
 
 			await scope.CommitAsync();
 
