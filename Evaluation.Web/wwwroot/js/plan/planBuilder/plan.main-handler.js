@@ -3,7 +3,6 @@
 
     const ns = global.planUtility;
     const {
-        ACTION_TYPE,
         API_ENDPOINTS,
         PLAN_TYPE_BACKEND,
         TABLE_CONFIG
@@ -34,8 +33,6 @@
     function createInstanceState(fieldId) {
         return {
             fieldId: fieldId,
-            actionType: ACTION_TYPE.CREATE,
-            planId: null,
             isReadOnly: false,
             pageSize: TABLE_CONFIG.pageSize || 10,
             currentPage: 1,
@@ -54,22 +51,15 @@
 
     /* ===================== INIT ===================== */
 
-    const init = async (actionType, isReadOnly, planId = null, fieldId = null, planObject = null) => {
+    const init = async (isReadOnly, fieldId = null, planObject = null) => {
         if (!fieldId) {
             console.error('[PlanHandler] fieldId is required!');
             return;
         }
-
-        // ✅ إنشاء state منفصل لهذا الـ instance
         const state = createInstanceState(fieldId);
-        state.actionType = actionType;
-        state.planId = planId;
         state.isReadOnly = isReadOnly;
 
-        // ✅ حفظ الـ state في الـ Map
         instances.set(fieldId, state);
-
-        console.log(`[PlanHandler] Init instance: ${fieldId}`, state);
 
         try {
             // ✅ تحميل البيانات المشتركة (مرة واحدة فقط)
@@ -87,8 +77,9 @@
 
             if (planObject) {
                 renderPlanWithData(fieldId, planObject);
-            } else if (planId) {
-                await loadPlanData(fieldId, planId);
+            //}
+            //else if (planId) {
+            //    await loadPlanData(fieldId, planId);
             } else {
                 renderNewPlan(fieldId);
             }
@@ -174,7 +165,7 @@
         const state = instances.get(fieldId);
 
         // ✅ Render form with fieldId
-        const form = ns.renderPlanForm(fieldId, null, state.isReadOnly, state.actionType);
+        const form = ns.renderPlanForm(fieldId, null, state.isReadOnly);
         $p(fieldId, 'planFormContainer').find('.form-container').html(form);
 
         loadSchools(fieldId, 1);
@@ -194,7 +185,7 @@
         };
 
         // ✅ Render form with fieldId
-        const form = ns.renderPlanForm(fieldId, vm, state.isReadOnly, state.actionType);
+        const form = ns.renderPlanForm(fieldId, vm, state.isReadOnly);
         $p(fieldId, 'planFormContainer').find('.form-container').html(form);
 
         // Re-initialize selects after rendering
@@ -219,7 +210,7 @@
         }));
 
         // ✅ Render schools table
-        const tbody = ns.renderSchoolTable(fieldId, vm.schools, state.isReadOnly, state.actionType);
+        const tbody = ns.renderSchoolTable(fieldId, vm.schools, state.isReadOnly);
         $p(fieldId, 'planTable').find('tbody').replaceWith(tbody);
 
         attachRowEvents(fieldId);
@@ -255,8 +246,7 @@
                 const tbody = ns.renderSchoolTable(
                     fieldId,
                     state.allSchools,
-                    state.isReadOnly,
-                    state.actionType
+                    state.isReadOnly
                 );
 
                 $p(fieldId, 'planTable').find('tbody').replaceWith(tbody);

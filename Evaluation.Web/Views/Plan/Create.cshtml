@@ -116,19 +116,13 @@
 
       document.addEventListener('DOMContentLoaded', function () {
             planUtility.generatePlanFields('aaa');
-            PlanHandler.init(
-                '@Model.ActionType',
-                false,
-                @Html.Raw(Json.Serialize(Model.PlanId)),
+            PlanHandler.init(false,
                 'aaa',
                 planObject
             );
 
             planUtility.generatePlanFields('second');
-            PlanHandler.init(
-                '@Model.ActionType',
-                false,
-                @Html.Raw(Json.Serialize(Model.PlanId)),
+            PlanHandler.init(false,
                 'second'
             );
         });

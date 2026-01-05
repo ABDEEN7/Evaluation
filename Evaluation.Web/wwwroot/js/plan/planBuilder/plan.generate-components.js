@@ -26,8 +26,6 @@
 
     // ================== CONSTANTS ==================
     const {
-        ACTION_TYPE,
-        ReadOnly_ACTION_TYPES,
         PLAN_FIELD_TYPE,
         SCHOOL_FIELD_TYPE,
         VALIDATION_RULES,
@@ -313,7 +311,7 @@
 
     // ================== TABLE ROW GENERATOR ==================
 
-    const generateSchoolRow = (fieldId, school, isReadOnly, actionType) => {
+    const generateSchoolRow = (fieldId, school, isReadOnly) => {
         const readonly = isReadOnly;
         const row = $('<tr>');
 
@@ -358,7 +356,7 @@
     // ================== RENDER FUNCTIONS ==================
     // ✅ renderPlanForm: fieldId أول بارامتر
 
-    const renderPlanForm = (fieldId, planData, isReadOnly, actionType) => {
+    const renderPlanForm = (fieldId, planData, isReadOnly) => {
         const readonly = isReadOnly;
         const form = $('<form>').addClass('row').attr('id', `${fieldId}_planForm`);
 
@@ -426,7 +424,7 @@
         return form;
     };
 
-    const renderSchoolTable = (fieldId, schools, isReadOnly, actionType) => {
+    const renderSchoolTable = (fieldId, schools, isReadOnly) => {
         const tbody = $('<tbody>');
 
         if (!schools || schools.length === 0) {
@@ -440,7 +438,7 @@
             tbody.append(emptyRow);
         } else {
             schools.forEach(school => {
-                const row = generateSchoolRow(fieldId, school, isReadOnly, actionType);
+                const row = generateSchoolRow(fieldId, school, isReadOnly);
                 tbody.append(row);
             });
         }

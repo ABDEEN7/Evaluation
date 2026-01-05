@@ -14,12 +14,6 @@
         REQUEST_CHANGE: "REQUEST_CHANGE"     // Request changes
     };
 
-    // Action types that should be read-only
-    const ReadOnly_ACTION_TYPES = [
-        ACTION_TYPE.APPROVE,
-        ACTION_TYPE.REJECT,
-        ACTION_TYPE.VIEW
-    ];
 
     // Plan field types
     const PLAN_FIELD_TYPE = {
@@ -125,7 +119,6 @@
     global.PlanConstants = {
         uniqueIndexId,
         ACTION_TYPE,
-        ReadOnly_ACTION_TYPES,
         PLAN_FIELD_TYPE,
         SCHOOL_FIELD_TYPE,
         VALIDATION_RULES,

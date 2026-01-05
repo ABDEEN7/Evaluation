@@ -6,8 +6,6 @@ const planUtility = window.planUtility;
 
     // ================== CONSTANTS ==================
     const {
-        ACTION_TYPE,
-        ReadOnly_ACTION_TYPES,
         PLAN_FIELD_TYPE,
         SCHOOL_FIELD_TYPE,
         VALIDATION_RULES,
