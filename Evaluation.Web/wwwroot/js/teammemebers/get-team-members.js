@@ -274,12 +274,12 @@
                     <td>
                         <select class="form-select party-type-select" data-member-id="${member.id}">
                         ${userPartyTypes.length === 1
-                                ? `
+                    ? `
                             <option value="${userPartyTypes[0].partyType.id}" selected>
                                 ${userPartyTypes[0].partyType.name}
                             </option>
                             `
-                                : `
+                    : `
                             <option value="">اختر نوع الطرف</option>
                             ${userPartyTypes.map(upt => `
                                 <option value="${upt.partyType.id}"
@@ -288,7 +288,7 @@
                                 </option>
                             `).join('')}
                             `
-                        }
+                }
                         </select>
 
                     </td>
@@ -575,6 +575,7 @@
             renderMembersTable();
             showSuccess('تم حذف الأعضاء المحددين بنجاح');
         });
+    }
 
     // ================== HELPERS ==================
 
@@ -668,10 +669,6 @@
 
         // تهيئة معالجات الأحداث
         initEventListeners();
-
-        console.log('✅ اكتمل التهيئة بنجاح');
-        console.log('NDA Mode:', state.isNDA ? 'مفعّل ✅' : 'معطّل ❌');
-        console.log('========================================');
     };
 
 })(window.teamMembersLogic, jQuery);

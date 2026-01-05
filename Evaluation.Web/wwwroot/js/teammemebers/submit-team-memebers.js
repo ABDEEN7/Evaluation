@@ -185,7 +185,6 @@
             if (modal) modal.hide();
 
             alert('Plan saved successfully');
-            window.location.href = '/Plan/Index';
         } else {
             throw new Error(result.message || 'Failed to save the plan');
         }
