@@ -8,6 +8,11 @@ public class EvaluationRequestAssignmentProfile : Profile
 {
     public EvaluationRequestAssignmentProfile()
     {
-        CreateMap<EvaluationRequestAssignment, EvalTeamRequestDto>();
+        CreateMap<EvalTeamRequestDto, EvaluationRequestAssignment>()
+           .ForMember(dest => dest.MinistryUserId, opt => opt.MapFrom(src => src.UserId))
+           .ForMember(dest => dest.EvalRequestAssignmentScopies, opt => opt.Ignore());
+
+        CreateMap<EvaluationRequestAssignment, EvalTeamRequestDto>()
+            .ForMember(dest=> dest.UserId, opt=> opt.MapFrom(src=>src.MinistryUserId));
     }
 }

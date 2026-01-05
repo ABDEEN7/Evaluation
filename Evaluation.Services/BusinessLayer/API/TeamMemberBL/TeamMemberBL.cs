@@ -11,6 +11,7 @@ using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Api;
 using FluentResults;
+using HarfBuzzSharp;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -78,24 +79,103 @@ public class TeamMemberBL(IServiceScopeFactory serviceScopeFactory,
         var scopesDto = mapper.Map<List<ScopeDto>>(scopes);
         return scopesDto;
     }
+    //public async Task<bool> AddedRequestAssignment(List<EvalTeamRequestDto> model)
+    //{
+    //    var existingAssignments = unitOfWork
+    // .GetRepository<EvaluationRequestAssignment>()
+    // .GetAllActiveNonDeleted()
+    // .Select(x => new
+    // {
+    //     x.MinistryUserId,
+    //     x.PartyTypeId,
+    //     x.EvaluationRequestId
+    // }).ToList();
+
+    //    List<EvalTeamRequestDto> newAssignments = model
+    //  .Where(m => !existingAssignments.Any(db =>
+    //      db.MinistryUserId == m.UserId &&
+    //      db.PartyTypeId == m.PartyTypeId
+    //  ))
+    //  .ToList();
+
+    //    if (!newAssignments.Any())
+    //        return true; // No new assignments to add
+
+    //    var evaluationRequestAssignments = mapper.Map<List<EvaluationRequestAssignment>>(newAssignments);
+
+    //    await unitOfWork
+    //        .GetRepository<EvaluationRequestAssignment>()
+    //        .InsertRange(evaluationRequestAssignments);
+    //    await unitOfWork.CommitAsync();
+
+    //    var scopeAssignments = new List<EvalRequestAssignmentScope>();
+    //    for (int i = 0; i < newAssignments.Count; i++)
+    //    {
+    //        var dto = newAssignments[i];
+    //        var assignment = evaluationRequestAssignments[i];
+    //        if (dto.Scopes != null && dto.Scopes.Any())
+    //        {
+    //            foreach (var scope in dto.Scopes)
+    //            {
+    //                scopeAssignments.Add(new EvalRequestAssignmentScope
+    //                {
+    //                    EvaluationRequestAssignmentId = assignment.Id,
+    //                    ScopeId = scope.Id,
+    //                    Note = scope.Note
+    //                });
+    //            }
+    //        }
+    //    }
+    //    if (scopeAssignments.Any())
+    //    {
+    //        await unitOfWork
+    //            .GetRepository<EvalRequestAssignmentScope>()
+    //            .InsertRange(scopeAssignments);
+    //        await unitOfWork.CommitAsync();
+    //    }
+
+    //    var evaluationRequestScope = mapper.Map<List<EvalRequestAssignmentScope>>(newAssignments);
+    //    return true;
+    //}
     public async Task<bool> AddedRequestAssignment(List<EvalTeamRequestDto> model)
     {
-        bool evaluationRequestExist = await unitOfWork
-        .GetRepository<EvaluationRequestAssignment>()
-        .GetAllActiveNonDeleted()
-        .AnyAsync(dbItem =>
-            model.Any(m =>
-                m.UserId == dbItem.MinistryUserId &&
-                m.PartyTypeId == dbItem.PartyTypeId
-            )
-        );
-        if (evaluationRequestExist)
-            throw new BusinessException(ConstantKeys.ExceptionMessage.EvaluationTeamRequestNotExist);
-        var evaluationRequest = mapper.Map<List<EvaluationRequestAssignment>>(model);
+        var existingAssignments = unitOfWork
+            .GetRepository<EvaluationRequestAssignment>()
+            .GetAllActiveNonDeleted()
+            .Select(x => new
+            {
+                x.MinistryUserId,
+                x.PartyTypeId
+            })
+            .ToList();
+
+        var newAssignments = model
+            .Where(m => !existingAssignments.Any(db =>
+                db.MinistryUserId == m.UserId &&
+                db.PartyTypeId == m.PartyTypeId))
+            .ToList();
+
+        if (!newAssignments.Any())
+            return true;
+
+        var evaluationRequestAssignments = newAssignments.Select(dto => new EvaluationRequestAssignment
+        {
+            MinistryUserId = dto.UserId,
+            EvaluationRequestId = dto.EvaluationRequestId,
+            PartyTypeId = dto.PartyTypeId,
+            IsLeader = dto.IsLeader,
+            IsNDA = dto.IsNDA,
+            Note = dto.Note,
+            EvalRequestAssignmentScopies = dto.Scopes?.Select(scope => new EvalRequestAssignmentScope
+            {
+                ScopeId = scope.Id,
+                Note = scope.Note
+            }).ToList()
+        }).ToList();
         await unitOfWork
             .GetRepository<EvaluationRequestAssignment>()
-            .InsertRange(evaluationRequest);
+            .InsertRange(evaluationRequestAssignments);
+        await unitOfWork.CommitAsync();
         return true;
     }
-
 }

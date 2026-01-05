@@ -12,6 +12,6 @@ public class EvalTeamRequestDto
     public bool IsNDA { get; set; }
     public string? Note { get; set; }
     public Guid? NdaStatusId { get; set; }
-    public List<ScopesDTO>? Scopes { get; set; }
+    public List<EvalScopesDto>? Scopes { get; set; }
 
 }

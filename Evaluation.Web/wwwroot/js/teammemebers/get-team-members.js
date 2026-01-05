@@ -272,24 +272,25 @@
                         </div>
                     </td>
                     <td>
-                        <select class="form-select party-type-select" data-member-id="${member.id}" 
-                                ${userPartyTypes.length === 0 ? 'disabled' : ''}>
-                            ${userPartyTypes.length === 0 ? `
-                                <option value="">لا توجد أنواع أطراف متاحة</option>
-                            ` : userPartyTypes.length === 1 ? `
-                                <option value="${userPartyTypes[0].partyType.id}" selected>
-                                    ${userPartyTypes[0].partyType.name}
+                        <select class="form-select party-type-select" data-member-id="${member.id}">
+                        ${userPartyTypes.length === 1
+                                ? `
+                            <option value="${userPartyTypes[0].partyType.id}" selected>
+                                ${userPartyTypes[0].partyType.name}
+                            </option>
+                            `
+                                : `
+                            <option value="">اختر نوع الطرف</option>
+                            ${userPartyTypes.map(upt => `
+                                <option value="${upt.partyType.id}"
+                                    ${defaultPartyTypeId == upt.partyType.id ? 'selected' : ''}>
+                                    ${upt.partyType.name}
                                 </option>
-                            ` : `
-                                <option value="">اختر نوع الطرف</option>
-                                ${userPartyTypes.map(upt => `
-                                    <option value="${upt.partyType.id}" 
-                                            ${defaultPartyTypeId == upt.partyType.id ? 'selected' : ''}>
-                                        ${upt.partyType.name}
-                                    </option>
-                                `).join('')}
-                            `}
+                            `).join('')}
+                            `
+                        }
                         </select>
+
                     </td>
                     <td>
                         <label class="custom-checkbox1 radio">
@@ -439,29 +440,35 @@
             const member = state.members.find(m => m.id === memberId);
 
             if (!member) return;
-
-            if (!state.selectedTeamMembers.find(m => m.id === memberId)) {
-                // الحصول على أنواع الأطراف الخاصة بالعضو
-                const userPartyTypes = member.userPartyTypes || [];
-
-                // تحديد partyTypeId التلقائي
-                const autoSelectedPartyTypeId = userPartyTypes.length === 1
-                    ? userPartyTypes[0].partyType.id
-                    : null;
-
-                state.selectedTeamMembers.push({
-                    ...member,
-                    scopes: [],
-                    nda: null,
-                    partyTypeId: autoSelectedPartyTypeId
-                });
-                if (!state.teamLeaderId) {
-                    state.teamLeaderId = memberId;
-                }
-                const memberName = member.name || member.fullName || member.memberName;
-                showSuccess('تم إضافة ' + memberName);
-                renderSelectedTeamTable();
+            // الحصول على أنواع الأطراف الخاصة بالعضو
+            const userPartyTypes = member.userPartyTypes || [];
+            if (userPartyTypes.length === 0) {
+                this.checked = false;
+                showError(`'we can't add user don't have any party Type'`);
+                return;
             }
+            //Prvent Repetition
+            if (state.selectedTeamMembers.find(m => m.id === memberId)) {
+                return;
+            }
+
+            // تحديد partyTypeId التلقائي
+            const autoSelectedPartyTypeId = userPartyTypes.length === 1
+                ? userPartyTypes[0].partyType.id
+                : null;
+
+            state.selectedTeamMembers.push({
+                ...member,
+                scopes: [],
+                nda: null,
+                partyTypeId: autoSelectedPartyTypeId
+            });
+            if (!state.teamLeaderId) {
+                state.teamLeaderId = memberId;
+            }
+            const memberName = member.name || member.fullName || member.memberName;
+            showSuccess('تم إضافة ' + memberName);
+            renderSelectedTeamTable();
 
             updateSelectAllCheckbox();
         });
@@ -568,29 +575,6 @@
             renderMembersTable();
             showSuccess('تم حذف الأعضاء المحددين بنجاح');
         });
-
-        // زر حفظ الفريق
-        $(document).off('click', id('saveTeamBtn')).on('click', id('saveTeamBtn'), function (e) {
-            e.preventDefault();
-
-            if (state.selectedTeamMembers.length === 0) {
-                alert('الرجاء تحديد أعضاء الفريق');
-                return;
-            }
-
-            // استخدام الدالة الخارجية للحصول على البيانات
-            const teamData = window.getSelectedTeamData(`${state.fieldId}_selectedTeamTable`);
-
-            if (!teamData) {
-                showError('خطأ في استخراج بيانات الفريق');
-                return;
-            }
-
-            console.log('📦 بيانات الفريق:', teamData);
-
-            showSuccess(`تم حفظ الفريق بنجاح (${teamData.totalMembers} أعضاء)`);
-        });
-    }
 
     // ================== HELPERS ==================
 
