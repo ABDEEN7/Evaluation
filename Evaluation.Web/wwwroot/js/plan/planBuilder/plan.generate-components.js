@@ -26,8 +26,6 @@
 
     // ================== CONSTANTS ==================
     const {
-        PLAN_FIELD_TYPE,
-        SCHOOL_FIELD_TYPE,
         VALIDATION_RULES,
         RATING_CLASSES,
         PLAN_TYPE_BACKEND

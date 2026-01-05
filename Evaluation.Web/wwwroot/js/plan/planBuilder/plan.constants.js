@@ -2,37 +2,7 @@
     'use strict'; 
     const uniqueIndexId = 'IndexForPlanTable';
 
-    // Action types for workflow
-    const ACTION_TYPE = {
-        CREATE: "CREATE",                    // Creating new plan
-        EDIT: "EDIT",                        // Editing existing plan
-        APPROVE: "APPROVE",                  // Approving plan
-        REJECT: "REJECT",                    // Rejecting plan
-        VIEW: "VIEW",                        // View only
-        EDIT_DRAFT: "EDIT_DRAFT",           // Editing draft
-        APPROVE_WITH_CHANGES: "APPROVE_WITH_CHANGES", // Approve changes
-        REQUEST_CHANGE: "REQUEST_CHANGE"     // Request changes
-    };
-
-
-    // Plan field types
-    const PLAN_FIELD_TYPE = {
-        TITLE: 'title',
-        PLAN_TYPE: 'planType',
-        SEMESTER: 'semester',
-        DATE_RANGE: 'dateRange'
-    };
-
-    // School table field types
-    const SCHOOL_FIELD_TYPE = {
-        SELECT: 'select',
-        SCHOOL_NAME: 'schoolName',
-        VISIT_DATE: 'visitDate',
-        LAST_EVAL_DATE: 'lastEvalDate',
-        VISIT_TYPE: 'visitType',
-        ACADEMIC_YEAR: 'academicYear',
-        ACTIONS: 'actions'
-    };
+   
 
     // Plan validation rules
     const VALIDATION_RULES = {
@@ -118,9 +88,6 @@
     // Export all constants
     global.PlanConstants = {
         uniqueIndexId,
-        ACTION_TYPE,
-        PLAN_FIELD_TYPE,
-        SCHOOL_FIELD_TYPE,
         VALIDATION_RULES,
         TABLE_CONFIG,
         FILTER_FIELDS,
