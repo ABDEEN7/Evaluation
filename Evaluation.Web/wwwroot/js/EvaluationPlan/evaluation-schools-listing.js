@@ -40,18 +40,18 @@
                 title: uiControlsSetup().GetUiControlText("lblSchoolCode"),
                 className: "td-left code"
             },
-            //{
-            //    data: "typeName",
-            //    title: uiControlsSetup().GetUiControlText("lblSchoolType"),
-            //    className: "td-left type"
-            //},
+            {
+                data: "schoolTypeName",
+                title: uiControlsSetup().GetUiControlText("lblSchoolType"),
+                className: "td-left type"
+            },
             //{
             //    data: "phaseName",
             //    title: uiControlsSetup().GetUiControlText("lblSchoolPhase"),
             //    className: "td-left phase"
             //},
             //{
-            //    data: "regionName",
+            //    data: "region",
             //    title: uiControlsSetup().GetUiControlText("lblRegion"),
             //    className: "td-left region"
             //},
