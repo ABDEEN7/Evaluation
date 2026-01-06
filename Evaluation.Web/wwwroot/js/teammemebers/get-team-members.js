@@ -13,7 +13,8 @@
         scopes: [],
         pendingRemoval: new Set(),
         isNDA: false,
-        teamLeaderId: null
+        teamLeaderId: null,
+        ndaStatus: {}
     };
 
     // ================== ID HELPER ==================
@@ -33,6 +34,9 @@
         },
         getScopes() {
             return jqClient().Get(API_ENDPOINTS.GET_SCOPES);
+        },
+        getPendingStatus() {
+            return jqClient().Get(API_ENDPOINTS.GET_PENDING_STATUS);
         }
     };
 
@@ -51,7 +55,13 @@
             return false;
         }
     }
-
+    async function loadPendingNDA() {
+        const res = await TeamApi.getPendingStatus();
+        state.ndaStatus = {
+            id: res.value.id,
+            name: res.value.name
+        };
+    }
     async function loadAllMembers() {
         showMembersLoading();
         try {
@@ -242,27 +252,17 @@
                         </label>
                     </td>
                     <td><h6>${memberName}</h6></td>
-                    ${state.isNDA ? `
-                        <td>
-                            ${member.nda ? `
-                                <div class="d-flex align-items-center justify-content-between">
-                                    <div>
-                                        <h6>${member.nda.status}</h6>
-                                        <div class="square-bullet">
-                                            <div><i class="la la-calendar"></i> ${member.nda.date}</div>
-                                            <div><i class="la la-clock"></i> ${member.nda.time}</div>
-                                        </div>
-                                    </div>
-                                    ${member.nda.hasConflict ? `
-                                        <span class="btn btn-outline-primary btn-sm d-flex gap-2">
-                                            <i class="la la-info-circle"></i>ضعيف
-                                        </span>
-                                    ` : ''}
-                                </div>
-                            ` : `<h6>${memberPosition}</h6>`}
-                        </td>
+                ${state.isNDA ? `
+                    <td data-nda-id="${state.ndaStatus?.id ?? ''}">
+                        <div class="d-flex align-items-center nda-wrapper"
+                             data-nda-id="${state.ndaStatus?.id ?? ''}">
+                            <h6 class="nda-name">
+                                ${state.ndaStatus?.name}
+                            </h6>
+                        </div>
+                    </td>
                     ` : ''}
-                    <td>
+                <td>
                         <div class="mb-3 w-100">
                             <select multiple class="form-control multiCheckSelect-dynamic" data-member-id="${member.id}">
                                 ${state.scopes.map(scope => `
@@ -622,11 +622,6 @@
     // ================== INIT ==================
 
     ns.init = async function (fieldId) {
-        console.log('========================================');
-        console.log('🚀 Initializing Team Management System');
-        console.log('Field ID:', fieldId);
-        console.log('========================================');
-
         state.fieldId = fieldId;
 
         // التحقق من وجود العناصر الأساسية
@@ -662,6 +657,9 @@
         } else {
             console.error('❌ Failed to initialize: No teams loaded');
             showError('فشل تحميل البيانات الأساسية');
+        }
+        if (state.isNDA) {
+            await loadPendingNDA();
         }
 
         console.log('📥 جاري تحميل المجالات...');

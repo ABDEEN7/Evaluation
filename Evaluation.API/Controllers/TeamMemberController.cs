@@ -26,7 +26,7 @@ public class TeamMemberController : ControllerBase
     [HttpGet]
     public async Task<Result<List<MemberDto>>> GetMembersByTeamId([FromQuery] Guid? teamId)
          => await _masterBl.GetApiService<TeamMemberBL>().GetMembersByTeamId(teamId);
-
+    
     [HttpGet]
     public async Task<Result<List<ScopeDto>>> GetScopes()
          => await _masterBl.GetApiService<TeamMemberBL>().GetScopesAsync();

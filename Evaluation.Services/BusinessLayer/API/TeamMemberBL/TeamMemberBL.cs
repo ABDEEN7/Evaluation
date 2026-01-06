@@ -56,7 +56,7 @@ public class TeamMemberBL(IServiceScopeFactory serviceScopeFactory,
         TeamMembersResponse teamMembers = new TeamMembersResponse
         {
             Data = teamRespons,
-            IsNDA = isNdaActive
+            IsNDA = true
         };
         return teamMembers;
     }
@@ -165,6 +165,7 @@ public class TeamMemberBL(IServiceScopeFactory serviceScopeFactory,
             PartyTypeId = dto.PartyTypeId,
             IsLeader = dto.IsLeader,
             IsNDA = dto.IsNDA,
+            NdaStatusId = dto.NdaStatusId,
             Note = dto.Note,
             EvalRequestAssignmentScopies = dto.Scopes?.Select(scope => new EvalRequestAssignmentScope
             {

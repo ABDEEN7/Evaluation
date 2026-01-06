@@ -15,14 +15,9 @@
         }
 
         const $ndaCell = $row.find('td').eq(2); // العمود الثالث
-        const $statusElement = $ndaCell.find('h6').first();
+        const ndaId = $ndaCell.data('nda-id');
 
-        // إذا كان هناك محتوى NDA
-        if ($statusElement.length && $statusElement.text().trim() !== '') {
-            return null; // أو قيمة Guid إذا كانت متوفرة
-        }
-
-        return null;
+        return ndaId ?? null;
     }
 
     /**
