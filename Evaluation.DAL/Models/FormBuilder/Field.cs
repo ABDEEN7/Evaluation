@@ -1,5 +1,6 @@
 ﻿using Evaluation.DAL.Models.Audit;
 using Evaluation.DAL.Models.BaseModule;
+using Evaluation.DAL.Models.FormsModules;
 using Evaluation.DAL.Models.ServiceEnities;
 using System;
 using System.Collections.Generic;
@@ -47,6 +48,8 @@ namespace Evaluation.DAL.Models.FormBuilder
 		public Guid? FormGroupCustomListId { get; set; }
 		public FormGroupCustomList? FormGroupCustomList { get; set; }
 
+        public Guid? EvalFormId { get; set; }
+        public EvalForm? EvalForm { get; set; } = new List<ActionField>();
 		public virtual ICollection<ActionField>? ActionField { get; set; } = new List<ActionField>();
         public virtual ICollection<FieldAttributeValue>? FieldAttributeValues { get; set; }
         public virtual ICollection<FieldPartyType>? FieldPartyTypes { get; set; }

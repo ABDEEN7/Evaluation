@@ -35,6 +35,7 @@ public class SchoolRepository(IServiceScopeFactory serviceScopeFactory,
              .CreateScopedUow()
              .GetRepository<School>()
              .GetAllNonDeleted(filter)
+             .Include(x => x.SchoolType)
              .Include(x => x.SchoolLevel)
              .ThenInclude(x => x.EducationLevel);
         return await query.GetPaginatedResult(request.PageNumber, request.PageSize = 10);
