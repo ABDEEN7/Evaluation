@@ -152,7 +152,6 @@
 
         jqClient(options).Get(`/ServiceRequest/GetEvaluationDetails?requestId=${requestId}`);
     }
-
     function bindSchoolDetails(response) {
         const s = response && response.school ? response.school : null;
         if (!s) return;

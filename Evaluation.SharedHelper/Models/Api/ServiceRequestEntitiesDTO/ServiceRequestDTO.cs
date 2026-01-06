@@ -30,7 +30,10 @@ namespace Evaluation.SharedHelper.Models.Api.ServiceRequestEntitiesDTO
 		public string? CreateOn { get; set; }
 		public string? CreateOnTime { get; set; }
 		public DateTime? CreateDate { get; set; }
-		public List<FieldValueDTO>? FieldValueDTOs { get; set; }
+		public DateTime? UpdateDate { get; set; }
+
+        public string? CreateBy { get; set; }
+        public List<FieldValueDTO>? FieldValueDTOs { get; set; }
 		public List<FormGroupDTO>? formGroups { get; set; }
 		public List<DropDownValueDTO?>? DropDownValues { get; set; }
 

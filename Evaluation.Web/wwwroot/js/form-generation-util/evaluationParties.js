@@ -27,7 +27,7 @@
 
         return { open, closed };
     };
-
+   
     function renderEvaluationParties(parties, options = {}) {
         const containerId = options.containerId || "evaluationPartiesContainer";
         const parentAccordionId = options.parentAccordionId || "evaluationRootAccordion";
@@ -59,6 +59,19 @@
 
             const headerId = `partyHeader_${idx}`;
             const collapseId = `partyCollapse_${idx}`;
+            const partyid = party.id;
+            const gridId = `gridBody_${idx}`; 
+
+            const grouped = (party.services || [])
+                .flatMap(service => service.requests || [])
+                .reduce((acc, request) => {
+                    const key = request.statusId;
+
+                    if (!acc[key]) acc[key] = [];
+                    acc[key].push(request);
+
+                    return acc;
+                }, {});
 
             const services = Array.isArray(party.services) ? party.services : [];
             const { open, closed } = countOpenClosedInParty(party);
@@ -94,12 +107,37 @@
                 }).join("")}
                    </ul>`
                 : `<div class="text-muted">لا توجد خدمات</div>`;
+           
+            const cards = grouped
+                ? `
+    ${Object.entries(grouped).map(([statusId, requests]) => {
+        const latestDate = requests.reduce((latest, r) => {
+            // Pick the latest between createdDate and updatedDate
+            const created = new Date(r.createDate);
+            const updated = r.updateDate ? new Date(r.updateDate) : created; // if null, use createdDate
+            const currentLatest = updated > created ? updated : created;
 
+            // Compare with the latest found so far
+            return currentLatest > latest ? currentLatest : latest;
+        }, new Date(requests[0].createDate));
+                   
+                    const count = requests.length;
+        const status = requests[0].status;
+                    return `
+        <div class="status-card" style="border-color:'#ccc'"  onclick='window.loadRequestsByStatus("${gridId}",${JSON.stringify(requests)})'>
+          <div class="count">${count}</div>
+          <div class="label">${status}</div>
+          <div class="date">${formatEnglishDate(latestDate)}</div>
+        </div>
+      `;
+                }).join("")}
+    `
+                : ``;
             const expanded = expandFirst && idx === 0;
-
+           
             $accordion.append(`
                 <div class="accordion-item">
-                    <h2 class="accordion-header" id="${headerId}">
+                    <h2 class="accordion-header" id="${headerId}" data-id="${partyid}">
                         <button class="accordion-button ${expanded ? "" : "collapsed"} d-flex align-items-center justify-content-between"
                                 type="button"
                                 data-bs-toggle="collapse"
@@ -119,12 +157,102 @@
                             ${bodyHtml}
                         </div>
                     </div>
+                     <div id="${collapseId}"
+                         class="accordion-collapse collapse ${expanded ? "show" : ""}"
+                         aria-labelledby="${headerId}"
+                         data-bs-parent="#${escapeHtml(parentAccordionId)}">
+                        <div class="accordion-body">
+                            ${cards}
+                            <table class="gridtable" id="${gridId}">
+   <thead>
+      <tr>
+         <th>Service Name</th>
+         <th>Status</th>
+         <th>Created By</th>
+         <th>Created Date</th>
+      </tr>
+   </thead>
+   <tbody></tbody>
+</table>
+                        </div>
+                        
+                    </div>
                 </div>
             `);
         });
 
         $container.append($accordion);
     }
+
+    function formatEnglishDate(timestamp) {
+        if (!timestamp) return "-";
+
+        // Convert to Date if it's a string
+        let dateObj;
+        if (typeof timestamp === "string") {
+            // Remove microseconds if present
+            const cleanTimestamp = timestamp.includes(".") ? timestamp.split(".")[0] : timestamp;
+            dateObj = new Date(cleanTimestamp);
+        } else if (timestamp instanceof Date) {
+            dateObj = timestamp;
+        } else {
+            return "-";
+        }
+
+        // Format date (English)
+        const dateStr = new Intl.DateTimeFormat("en-US", {
+            day: "numeric",
+            month: "long",
+            year: "numeric"
+        }).format(dateObj);
+
+        // Format time (English 12-hour)
+        const timeStr = new Intl.DateTimeFormat("en-US", {
+            hour: "numeric",
+            minute: "numeric",
+            hour12: true
+        }).format(dateObj);
+
+        return `<div>
+  <i class="las la-regular las la-calendar"></i> <!-- Calendar Icon -->
+  <span> ${dateStr} </span>
+  <i class="las la-regular las la-clock"></i> <!-- Clock Icon -->
+  <span> ${timeStr} </span>
+</div>`;
+
+    }
+
+
+
+    window.loadRequestsByStatus = function (gridId,requests) {
+        const $tbody = $("#" + gridId + " tbody");
+        $tbody.empty();
+
+        let rows = "";
+
+        requests.forEach(r => {
+            rows += `
+            <tr>
+                <td>${r.service}</td>
+                <td>${r.status}</td>
+                <td>${r.createBy}</td>
+                 <td>${formatDate(r.createDate)}</td>
+            </tr>
+        `;
+        });
+        $tbody.html(rows)
+       
+    }
+    function formatDate(timestamp) {
+        if (!timestamp) return "-";
+        // Remove microseconds if present
+        const dateObj = new Date(timestamp.split(".")[0]);
+        const day = String(dateObj.getDate()).padStart(2, "0");
+        const month = String(dateObj.getMonth() + 1).padStart(2, "0");
+        const year = dateObj.getFullYear();
+        return `${day}/${month}/${year}`;
+    }
+
 
     $(document)
         .off("click", ".btn-add-eval-request")
