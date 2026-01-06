@@ -4,6 +4,7 @@ using Evaluation.DAL.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Evaluation.DAL.Migrations
 {
     [DbContext(typeof(EvaluationDbContext))]
-    partial class EvaluationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260104063426_AddNdaStatusId")]
+    partial class AddNdaStatusId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -2637,9 +2640,6 @@ namespace Evaluation.DAL.Migrations
                     b.Property<Guid?>("DropDownTypeId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("EvalFormId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<Guid>("FieldTypeId")
                         .HasColumnType("uniqueidentifier");
 
@@ -2703,8 +2703,6 @@ namespace Evaluation.DAL.Migrations
                     b.HasIndex("DropDownParentFieldId");
 
                     b.HasIndex("DropDownTypeId");
-
-                    b.HasIndex("EvalFormId");
 
                     b.HasIndex("FieldTypeId");
 
@@ -9063,9 +9061,6 @@ namespace Evaluation.DAL.Migrations
                         .HasColumnType("bit")
                         .HasDefaultValueSql("1");
 
-                    b.Property<bool>("IsAssignment")
-                        .HasColumnType("bit");
-
                     b.Property<bool?>("IsDeleted")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
@@ -11378,11 +11373,6 @@ namespace Evaluation.DAL.Migrations
                         .HasForeignKey("DropDownTypeId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Evaluation.DAL.Models.FormsModules.EvalForm", "EvalForm")
-                        .WithMany()
-                        .HasForeignKey("EvalFormId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("Evaluation.DAL.Models.FormBuilder.FieldType", "FieldType")
                         .WithMany()
                         .HasForeignKey("FieldTypeId")
@@ -11433,8 +11423,6 @@ namespace Evaluation.DAL.Migrations
                     b.Navigation("DropDownParentField");
 
                     b.Navigation("DropDownType");
-
-                    b.Navigation("EvalForm");
 
                     b.Navigation("FieldType");
 

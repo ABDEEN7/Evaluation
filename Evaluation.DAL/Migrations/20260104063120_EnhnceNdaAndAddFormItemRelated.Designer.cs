@@ -4,6 +4,7 @@ using Evaluation.DAL.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Evaluation.DAL.Migrations
 {
     [DbContext(typeof(EvaluationDbContext))]
-    partial class EvaluationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260104063120_EnhnceNdaAndAddFormItemRelated")]
+    partial class EnhnceNdaAndAddFormItemRelated
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -2637,9 +2640,6 @@ namespace Evaluation.DAL.Migrations
                     b.Property<Guid?>("DropDownTypeId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("EvalFormId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<Guid>("FieldTypeId")
                         .HasColumnType("uniqueidentifier");
 
@@ -2703,8 +2703,6 @@ namespace Evaluation.DAL.Migrations
                     b.HasIndex("DropDownParentFieldId");
 
                     b.HasIndex("DropDownTypeId");
-
-                    b.HasIndex("EvalFormId");
 
                     b.HasIndex("FieldTypeId");
 
@@ -6044,12 +6042,6 @@ namespace Evaluation.DAL.Migrations
                     b.Property<Guid>("MinistryUserId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime?>("NdaDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("NdaStatusId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("Note")
                         .HasColumnType("nvarchar(max)");
 
@@ -6071,8 +6063,6 @@ namespace Evaluation.DAL.Migrations
                     b.HasIndex("EvaluationRequestId");
 
                     b.HasIndex("MinistryUserId");
-
-                    b.HasIndex("NdaStatusId");
 
                     b.HasIndex("PartyTypeId");
 
@@ -9063,9 +9053,6 @@ namespace Evaluation.DAL.Migrations
                         .HasColumnType("bit")
                         .HasDefaultValueSql("1");
 
-                    b.Property<bool>("IsAssignment")
-                        .HasColumnType("bit");
-
                     b.Property<bool?>("IsDeleted")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
@@ -11378,11 +11365,6 @@ namespace Evaluation.DAL.Migrations
                         .HasForeignKey("DropDownTypeId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Evaluation.DAL.Models.FormsModules.EvalForm", "EvalForm")
-                        .WithMany()
-                        .HasForeignKey("EvalFormId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("Evaluation.DAL.Models.FormBuilder.FieldType", "FieldType")
                         .WithMany()
                         .HasForeignKey("FieldTypeId")
@@ -11433,8 +11415,6 @@ namespace Evaluation.DAL.Migrations
                     b.Navigation("DropDownParentField");
 
                     b.Navigation("DropDownType");
-
-                    b.Navigation("EvalForm");
 
                     b.Navigation("FieldType");
 
@@ -13202,11 +13182,6 @@ namespace Evaluation.DAL.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Evaluation.DAL.Models.Planing.EvaluationRequestEntity.NdaStatus", "NdaStatus")
-                        .WithMany()
-                        .HasForeignKey("NdaStatusId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("Evaluation.DAL.Models.UserEntiy.PartyType", "PartyType")
                         .WithMany()
                         .HasForeignKey("PartyTypeId")
@@ -13225,8 +13200,6 @@ namespace Evaluation.DAL.Migrations
                     b.Navigation("EvaluationRequest");
 
                     b.Navigation("MinistryUser");
-
-                    b.Navigation("NdaStatus");
 
                     b.Navigation("PartyType");
 
