@@ -50,6 +50,7 @@ const generateAccordionItem = ({ id, title, icon, content, badge }) => `
 `;
 
 const generateFormAccordionItem = (rowsHtml, hasAnyNote) => `
+${relatedItemPopup}
 <div class="accordion-item mb-3 rounded">
     <div id="item3" class="accordion-collapse collapse show">
         <div class="accordion-body">
@@ -121,13 +122,15 @@ const createRow = ({
     ` : ''}
 
     <td>${order}</td>
-    <td class="text-start">${escapeHtml(item.name)}</td>
+    <td class="text-start">${escapeHtml(item.name)} 
+    ${item.relatedItemName != null ? `<span class="info-icon" onclick=" openRelatedItemModal('${item.relatedItemName}', '${item.relatedItemValue}', '${item.relatedItemNote}')">ⓘ</span>`: ''}
+    </td>
     <td>${buildSelection(item, fieldId, readOnly)}</td>
     ${hasAnyNote ? `<td>${buildNote(item, fieldId, readOnly)}</td>` : ''}
 </tr>
 `;
 
-// ==============================
+// ============================== 
 // Table Generator
 // ==============================
 const generateTableBodyHtml = async (items, hasAnyNote, hasAnyChildren, fieldId, readOnly) => {
@@ -181,6 +184,30 @@ const generateFullFormPageHtml = async ({ formId, fieldId, readOnly }) => {
 
     return `${generateFormAccordionItem(rowsHtml, hasAnyNote)}`;
 };
+
+const relatedItemPopup = `<div class="modal fade" id="RealatedItemModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header align-items-start border-0">
+                <div>
+                    <h4 class="modal-title fw-semibold mb-2" id="modalTitle"></h4>
+                </div>
+
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body py-0">
+                <div class="row">
+                    <div class="col-md-12" id="modalBodyContent">
+                    </div>
+                    <div class="col-md-12" id="modalNote">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>`;
+
 
 // ==============================
 // Initialize Controls
@@ -250,15 +277,26 @@ async function initializeControls(formId, fieldId, controlValues) {
 // ==============================
 //document.addEventListener('DOMContentLoaded', async () => {
 //    try {
-//        const html = await generateFullFormPageHtml({
-//            formId: 'b8fb67a9-b09a-4e0c-a466-d0625d92521d',
-//            fieldId: 'ADD_YOUR_FIELD_ID_HERE',
-//            readOnly: false
-//        });
+        //const html = await generateFullFormPageHtml({
+        //    formId: 'b8fb67a9-b09a-4e0c-a466-d0625d92521d',
+        //    fieldId: 'ADD_YOUR_FIELD_ID_HERE',
+        //    readOnly: false
+        //});
 
-//        document.getElementById('app').innerHTML = html;
+        //document.getElementById('app').innerHTML = html;
 
 //    } catch (error) {
 //        console.error('Form builder error:', error);
 //    }
 //});
+
+function openRelatedItemModal(title, bodyContent, note) {
+    // Set values
+    document.getElementById('modalTitle').innerText = title;
+    document.getElementById('modalBodyContent').innerHTML = bodyContent;
+    document.getElementById('modalNote').innerHTML = note;
+
+    // Show modal (Bootstrap 5)
+    var modal = new bootstrap.Modal(document.getElementById('RealatedItemModal'));
+    modal.show();
+}

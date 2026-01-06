@@ -182,6 +182,22 @@ public partial class EvaluationDbContext : DbContext
             Assembly.GetExecutingAssembly()
             .GetTypes()
             .Where(t => t.IsClass && !t.IsAbstract && t.IsSubclassOf(baseType));
+
+        modelBuilder.Entity<FormItemRelated>(entity =>
+        {
+            entity.HasKey(x => new { x.FormItemId, x.RelatedItemId });
+
+            entity.HasOne(x => x.FormItem)
+                .WithMany(f => f.RelatedFrom)
+                .HasForeignKey(x => x.FormItemId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(x => x.RelatedItem)
+                .WithMany(f => f.RelatedTo)
+                .HasForeignKey(x => x.RelatedItemId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
         foreach (var type in derivedTypes)
         {
             modelBuilder.Entity(type).ToTable(type.Name + "s");
