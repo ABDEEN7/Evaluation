@@ -21,11 +21,24 @@ internal class Program
 
         builder.Services.AddScoped<HttpClient>();
 
-        builder.Services.AddControllersWithViews(options =>
+        if (builder.Environment.IsDevelopment())
         {
-            options.Filters.Add<PopulateRequestInfoFilter>();
-            options.Filters.Add<PopulateResponseInfoFilter>();
-        });
+            builder.Services.AddControllersWithViews(options =>
+            {
+                options.Filters.Add<PopulateRequestInfoFilter>();
+                options.Filters.Add<PopulateResponseInfoFilter>();
+            }).AddRazorRuntimeCompilation();
+        }
+        else
+        {
+            builder.Services.AddControllersWithViews(options =>
+            {
+                options.Filters.Add<PopulateRequestInfoFilter>();
+                options.Filters.Add<PopulateResponseInfoFilter>();
+            });
+        }
+
+            
 
         var app = builder.Build();
 

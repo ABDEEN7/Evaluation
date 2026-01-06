@@ -1,7 +1,8 @@
-using System.Diagnostics;
+using Evaluation.SharedHelper.Models.Api;
+using Evaluation.SharedHelper.Extensions;
 using Evaluation.Web.Models;
 using Microsoft.AspNetCore.Mvc;
-
+using System.Diagnostics;
 namespace Evaluation.Web.Controllers
 {
     [Route("{language}")]
@@ -27,5 +28,16 @@ namespace Evaluation.Web.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+        
+
+        [HttpPost]
+        public IActionResult UiControlList()
+        {
+            var model = Request.Form["request"][0]?.StringToObject<List<UiControlItemDTO>>();
+
+            return ViewComponent("UiControlList", model);
+        }
+
+       
     }
 }

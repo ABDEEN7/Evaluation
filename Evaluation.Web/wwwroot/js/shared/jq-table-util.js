@@ -392,14 +392,17 @@ const tableUtil = (function () {
                     resizable: config?.resizable ?? true,
                     tooltip: c.tooltip ?? function(e, cell, onRendered) {
                         // prefer rendered text (handles formatters)
-                        const txt = cell.getElement().textContent?.trim();
-                        if (txt) return txt;
+                        if (cell) {
+                            const txt = cell.getElement().textContent?.trim();
+                            if (txt) return txt;
 
-                        const v = cell.getValue();
-                        if (v == null) return "";
-                        if (Array.isArray(v)) return v.join(", ");
-                        if (typeof v === "object") return v.value ?? v.label ?? JSON.stringify(v);
-                        return String(v);
+                            const v = cell.getValue();
+                            if (v == null) return "";
+                            if (Array.isArray(v)) return v.join(", ");
+                            if (typeof v === "object") return v.value ?? v.label ?? JSON.stringify(v);
+                            return String(v);
+                        }
+                        
                     }
                 }
             }) ?? [],

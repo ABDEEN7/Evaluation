@@ -30,15 +30,15 @@
     <ul id="menu" class="nav w-100">
         @foreach (var item in SideBars.OrderBy(c => c.OrderNo))
         {
-            var HasChild = item.ChildList?.Any()??false;
+            var HasChild = item.ChildList?.Any() ?? false;
             var Permission = item.PermissionId;
             string ChildClass = HasChild ? "dropdown" : "";
             var trimname = Regex.Replace(item.Name, "[^a-zA-Z0-9\u0600-\u06FF]", "");
             parentIndex++;
-            
+
             if (HasChild)
             {
-               
+
 
                 <li class="nav-item" id="@item.Id">
                     <a href="#@trimname" class="nav-link" data-bs-toggle="collapse" aria-bs-expanded="false" aria-controls="@trimname">
