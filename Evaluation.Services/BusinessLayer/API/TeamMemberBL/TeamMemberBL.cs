@@ -181,15 +181,27 @@ public class TeamMemberBL(IServiceScopeFactory serviceScopeFactory,
     }
     public async Task<Result<bool>> DeleteEvaluationRequestAssignment(Guid id)
     {
-        var existingAssignments = await unitOfWork
-          .GetRepository<EvaluationRequestAssignment>()
-          .GetAllActiveNonDeleted(x => x.Id == id)
-          .FirstOrDefaultAsync();
-        //if (existingAssignments!= null)
+        var assignmentRepo = unitOfWork.GetRepository<EvaluationRequestAssignment>();
+        var scopeRepo = unitOfWork.GetRepository<EvalRequestAssignmentScope>();
 
-        unitOfWork.GetRepository<EvaluationRequestAssignment>()
-            .Delete(existingAssignments);
-        //ask if delete the collection
+        var assignment = await assignmentRepo
+            .GetAllActiveNonDeleted(
+                x => x.Id == id,
+                includeProperties: x => x.EvalRequestAssignmentScopies!
+            )
+            .FirstOrDefaultAsync();
+
+        if (assignment == null)
+            return false;
+        if (assignment.EvalRequestAssignmentScopies?.Any() == true)
+        {
+            scopeRepo.DeleteRange(assignment.EvalRequestAssignmentScopies);
+        }
+        assignmentRepo.Delete(assignment);
+
+        await unitOfWork.CommitAsync();
+
         return true;
     }
+
 }
