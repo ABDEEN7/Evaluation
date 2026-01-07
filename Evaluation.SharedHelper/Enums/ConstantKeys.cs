@@ -169,6 +169,7 @@ public static class ConstantKeys
         public static readonly string EvaluationPartiesExistsEvalForm = "EvaluationPartiesExistsEvalForm";
         public static readonly string EvaluationTypeExistsEvaluationRequestHistory = "EvaluationTypeExistsEvaluationRequestHistory";
         public static readonly string DropdownTypeExistsField = "DropdownTypeExistsField";
+        public static readonly string NdaStatusCannotDelete = "NdaStatusCannotDelete";
     }
 
     public static class AdminSettings
@@ -312,6 +313,7 @@ public static class ConstantKeys
         public static readonly string AdminFormEvalMarixValue = "AdminFormEvalMarixValue";
         public static readonly string AdminCssClass = "AdminCssClass";
         public static readonly string AdminDropDownType = "AdminDropDownType";
+        public static readonly string AdminNDAStatus = "AdminNDAStatus";
     }
     public static class WebAppPages
     {
@@ -766,6 +768,14 @@ public static class ConstantKeys
         public const string EDIT_ADMIN_DROPDOWNTYPE = "EDIT_ADMIN_DROPDOWNTYPE";
         public const string DELETE_ADMIN_DROPDOWNTYPE = "DELETE_ADMIN_DROPDOWNTYPE";
 
+        #endregion
+
+        #region NDAStatus
+        public const string VIEW_ADMIN_NDAStatus = "VIEW_ADMIN_NDASTATUS";
+        public const string ADD_ADMIN_NDAStatus = "ADD_ADMIN_NDASTATUS";
+        public const string EDIT_ADMIN_NDAStatus = "EDIT_ADMIN_NDASTATUS";
+        public const string DELETE_ADMIN_NDAStatus = "DELETE_ADMIN_NDASTATUS";
+        public const string UPDATE_ORDER_ADMIN_NDAStatus = "UPDATE_ORDER_ADMIN_NDASTATUS";
         #endregion
 
     }
