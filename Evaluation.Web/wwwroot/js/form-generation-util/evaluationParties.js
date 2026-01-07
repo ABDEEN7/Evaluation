@@ -110,29 +110,30 @@
            
             const cards = grouped
                 ? `
-    ${Object.entries(grouped).map(([statusId, requests]) => {
-        const latestDate = requests.reduce((latest, r) => {
-            // Pick the latest between createdDate and updatedDate
-            const created = new Date(r.createDate);
-            const updated = r.updateDate ? new Date(r.updateDate) : created; // if null, use createdDate
-            const currentLatest = updated > created ? updated : created;
+      <div class="status-cards-container">
+        ${Object.entries(grouped).map(([statusId, requests]) => {
+                    const latestDate = requests.reduce((latest, r) => {
+                        const created = new Date(r.createDate);
+                        const updated = r.updateDate ? new Date(r.updateDate) : created;
+                        const currentLatest = updated > created ? updated : created;
+                        return currentLatest > latest ? currentLatest : latest;
+                    }, new Date(requests[0].createDate));
 
-            // Compare with the latest found so far
-            return currentLatest > latest ? currentLatest : latest;
-        }, new Date(requests[0].createDate));
-                   
                     const count = requests.length;
-        const status = requests[0].status;
+                    const status = requests[0].status;
+
                     return `
-        <div class="status-card" style="border-color:'#ccc'"  onclick='window.loadRequestsByStatus("${gridId}",${JSON.stringify(requests)})'>
-          <div class="count">${count}</div>
-          <div class="label">${status}</div>
-          <div class="date">${formatEnglishDate(latestDate)}</div>
-        </div>
-      `;
+              <div class="status-card" onclick='window.loadRequestsByStatus("${gridId}",${JSON.stringify(requests)})'>
+                  <div class="count">${count}</div>
+                  <div class="label">${status}</div>
+                  <div class="date">${formatEnglishDate(latestDate)}</div>
+              </div>
+            `;
                 }).join("")}
+      </div>
     `
                 : ``;
+
             const expanded = expandFirst && idx === 0;
            
             $accordion.append(`

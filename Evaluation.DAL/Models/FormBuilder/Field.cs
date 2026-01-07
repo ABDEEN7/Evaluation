@@ -49,7 +49,7 @@ namespace Evaluation.DAL.Models.FormBuilder
 		public FormGroupCustomList? FormGroupCustomList { get; set; }
 
         public Guid? EvalFormId { get; set; }
-        public EvalForm? EvalForm { get; set; } = new List<ActionField>();
+        public EvalForm? EvalForm { get; set; } 
 		public virtual ICollection<ActionField>? ActionField { get; set; } = new List<ActionField>();
         public virtual ICollection<FieldAttributeValue>? FieldAttributeValues { get; set; }
         public virtual ICollection<FieldPartyType>? FieldPartyTypes { get; set; }
