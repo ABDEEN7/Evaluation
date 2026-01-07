@@ -36,11 +36,11 @@
             isReadOnly: false,
             pageSize: TABLE_CONFIG.pageSize || 10,
             currentPage: 1,
+            totalRecords: 0,
             filters: {},
             searchTerm: '',
             selectedSchools: [],
-            allSchools: [],
-            filteredSchools: [] 
+            allSchools: []
         };
     }
 
@@ -82,10 +82,10 @@
             }
 
             bindEvents(fieldId);
-            initializeFilterDatePickers(fieldId); // ✅ تفعيل date pickers للفلتر
-            populateFilterVisitTypes(fieldId); // ✅ ملء قائمة أنواع الزيارات
+            initializeFilterDatePickers(fieldId);
+            populateFilterVisitTypes(fieldId);
 
-            console.log(`[PlanHandler] Instance ${fieldId} initialized successfully`);
+            console.log(`[PlanHandler] Instance ${fieldId} initialized (Backend filtering only)`);
 
         } catch (e) {
             console.error(`[PlanHandler] Init failed for ${fieldId}`, e);
@@ -163,6 +163,7 @@
             $select.append(`<option value="${type.id}">${type.name}</option>`);
         });
     };
+
     const initializeFilterDatePickers = (fieldId) => {
         const dateFields = ['filterLastEvalDate', 'filterCreatedDate', 'filterNextEvalDate'];
 
@@ -187,6 +188,7 @@
         const form = ns.renderPlanForm(fieldId, null, state.isReadOnly);
         $p(fieldId, 'planFormContainer').find('.form-container').html(form);
 
+        // ✅ تحميل المدارس من Backend
         loadSchools(fieldId, 1);
         initCustomMode(fieldId);
     };
@@ -216,6 +218,7 @@
         }
         $p(fieldId, 'parentDate').val(vm.dateRange);
 
+        // ✅ حفظ المدارس المحددة
         state.selectedSchools = vm.schools.map(s => ({
             ...s,
             id: s.id || s.schoolId,
@@ -224,6 +227,7 @@
             visitTypeId: s.visitTypeId
         }));
 
+        // ✅ عرض المدارس الموجودة في planObject
         const tbody = ns.renderSchoolTable(fieldId, vm.schools, state.isReadOnly);
         $p(fieldId, 'planTable').find('tbody').replaceWith(tbody);
 
@@ -231,95 +235,152 @@
         initializeDatePickers(fieldId, vm);
     };
 
-    /* ===================== SCHOOLS ===================== */
+    /* ===================== SCHOOLS (Backend Only) ===================== */
 
     const loadSchools = (fieldId, page = 1, filters = {}) => {
         const state = instances.get(fieldId);
         state.currentPage = page;
         state.filters = filters;
 
+        // ✅ بناء الـ query parameters
         const params = new URLSearchParams({
             page,
             pageSize: state.pageSize
         });
 
+        // ✅ إضافة البحث
         if (state.searchTerm) {
             params.append('search', state.searchTerm);
         }
 
+        // ✅ إضافة الفلاتر
         Object.keys(filters).forEach(k => {
             if (filters[k]) params.append(k, filters[k]);
         });
 
         showLoadingState(fieldId);
 
+        console.log(`[PlanHandler] Loading schools from backend: ${API_ENDPOINTS.GET_SCHOOLS}?${params}`);
+
+        // ✅ استدعاء API
         jqClient().Get(`${API_ENDPOINTS.GET_SCHOOLS}?${params}`)
             .done(r => {
                 state.allSchools = r.items || [];
-                state.filteredSchools = [...state.allSchools];
+                state.totalRecords = r.totalCount || 0;
 
-                applyClientSideFilters(fieldId);
+                console.log(`[PlanHandler] Loaded ${state.allSchools.length} schools (Total: ${state.totalRecords})`);
 
-                console.log(`[PlanHandler] Schools loaded for ${fieldId}:`, state.allSchools.length);
+                const tbody = ns.renderSchoolTable(
+                    fieldId,
+                    state.allSchools,
+                    state.isReadOnly
+                );
+
+                $p(fieldId, 'planTable').find('tbody').replaceWith(tbody);
+
+                // ✅ عرض Pagination
+                renderPagination(fieldId);
+
+                attachRowEvents(fieldId);
+                initChildPickerForTable(fieldId);
             })
             .fail(err => {
-                console.error(`[PlanHandler] Failed to load schools for ${fieldId}`, err);
+                console.error(`[PlanHandler] Failed to load schools`, err);
                 showErrorState(fieldId);
             });
     };
 
-    
-    const applyClientSideFilters = (fieldId) => {
+    /* ===================== PAGINATION ===================== */
+
+    const renderPagination = (fieldId) => {
         const state = instances.get(fieldId);
-        let filtered = [...state.allSchools];
+        const totalPages = Math.ceil(state.totalRecords / state.pageSize);
 
-        if (state.searchTerm) {
-            const term = state.searchTerm.toLowerCase();
-            filtered = filtered.filter(school =>
-                school.name?.toLowerCase().includes(term) ||
-                school.academicYear?.toLowerCase().includes(term)
-            );
+        if (totalPages <= 1) {
+            $p(fieldId, 'dtPagination').empty();
+            return;
         }
 
-        const filters = state.filters;
+        const pagination = $('<ul>').addClass('pagination pagination-sm mb-0');
 
-        if (filters.schoolName) {
-            const name = filters.schoolName.toLowerCase();
-            filtered = filtered.filter(s => s.name?.toLowerCase().includes(name));
+        // Previous button
+        if (state.currentPage > 1) {
+            const prevItem = $('<li>').addClass('page-item');
+            const prevLink = $('<a>')
+                .addClass('page-link')
+                .attr('href', '#')
+                .text('السابق')
+                .on('click', function (e) {
+                    e.preventDefault();
+                    loadSchools(fieldId, state.currentPage - 1, state.filters);
+                });
+            prevItem.append(prevLink);
+            pagination.append(prevItem);
         }
 
-        if (filters.lastEvalDate) {
-            filtered = filtered.filter(s => s.lastEvaluationDate === filters.lastEvalDate);
+        // Page numbers (محدودة لـ 5 صفحات فقط للعرض)
+        const startPage = Math.max(1, state.currentPage - 2);
+        const endPage = Math.min(totalPages, state.currentPage + 2);
+
+        if (startPage > 1) {
+            pagination.append(createPageItem(fieldId, 1, state.currentPage === 1, state.filters));
+            if (startPage > 2) {
+                pagination.append($('<li>').addClass('page-item disabled').append(
+                    $('<span>').addClass('page-link').text('...')
+                ));
+            }
         }
 
-        if (filters.createdDate) {
-            filtered = filtered.filter(s => s.createdDate === filters.createdDate);
+        for (let i = startPage; i <= endPage; i++) {
+            pagination.append(createPageItem(fieldId, i, state.currentPage === i, state.filters));
         }
 
-        if (filters.nextEvalDate) {
-            filtered = filtered.filter(s => s.nextEvaluationDate === filters.nextEvalDate);
+        if (endPage < totalPages) {
+            if (endPage < totalPages - 1) {
+                pagination.append($('<li>').addClass('page-item disabled').append(
+                    $('<span>').addClass('page-link').text('...')
+                ));
+            }
+            pagination.append(createPageItem(fieldId, totalPages, state.currentPage === totalPages, state.filters));
         }
 
-        if (filters.previousResult) {
-            filtered = filtered.filter(s => s.rating === filters.previousResult);
+        // Next button
+        if (state.currentPage < totalPages) {
+            const nextItem = $('<li>').addClass('page-item');
+            const nextLink = $('<a>')
+                .addClass('page-link')
+                .attr('href', '#')
+                .text('التالي')
+                .on('click', function (e) {
+                    e.preventDefault();
+                    loadSchools(fieldId, state.currentPage + 1, state.filters);
+                });
+            nextItem.append(nextLink);
+            pagination.append(nextItem);
         }
 
-        if (filters.visitType) {
-            const visitTypeName = ns.visitTypes.find(v => v.id == filters.visitType)?.name;
-            filtered = filtered.filter(s =>
-                s.visitType === visitTypeName || s.visitTypeId == filters.visitType
-            );
+        $p(fieldId, 'dtPagination').html(pagination);
+    };
+
+    const createPageItem = (fieldId, pageNum, isActive, filters) => {
+        const pageItem = $('<li>').addClass('page-item');
+        if (isActive) {
+            pageItem.addClass('active');
         }
 
-        state.filteredSchools = filtered;
+        const pageLink = $('<a>')
+            .addClass('page-link')
+            .attr('href', '#')
+            .text(pageNum)
+            .on('click', function (e) {
+                e.preventDefault();
+                if (!isActive) {
+                    loadSchools(fieldId, pageNum, filters);
+                }
+            });
 
-        const tbody = ns.renderSchoolTable(fieldId, filtered, state.isReadOnly);
-        $p(fieldId, 'planTable').find('tbody').replaceWith(tbody);
-
-        attachRowEvents(fieldId);
-        initChildPickerForTable(fieldId);
-
-        console.log(`[PlanHandler] Filtered ${filtered.length} of ${state.allSchools.length} schools`);
+        pageItem.append(pageLink);
+        return pageItem;
     };
 
     /* ===================== EVENTS ===================== */
@@ -334,7 +395,6 @@
             return;
         }
 
-        // Form events
         $wrapper.off('change', pid(fieldId, 'ddlPlanType'))
             .on('change', pid(fieldId, 'ddlPlanType'), function () {
                 onPlanTypeChange(fieldId, this);
@@ -350,13 +410,13 @@
                 onSaveClick(fieldId, e);
             });
 
-        // ✅ FIXED: البحث يعمل على المدارس المعروضة
+        // ✅ البحث: استدعاء API بعد 300ms من التوقف عن الكتابة
         $wrapper.off('input', pid(fieldId, 'customSearch'))
             .on('input', pid(fieldId, 'customSearch'), function () {
                 onSearch(fieldId, this);
             });
 
-        // ✅ FIXED: الفلترة تعمل بشكل صحيح
+        // ✅ الفلتر: استدعاء API مع الفلاتر
         $wrapper.off('submit', pid(fieldId, 'filterForm'))
             .on('submit', pid(fieldId, 'filterForm'), function (e) {
                 onFilter(fieldId, e);
@@ -463,7 +523,7 @@
         }
     };
 
-    /* ===================== SEARCH & FILTER ===================== */
+    /* ===================== SEARCH & FILTER (Backend) ===================== */
 
     const onSearch = (fieldId, element) => {
         const state = instances.get(fieldId);
@@ -471,7 +531,9 @@
 
         clearTimeout(state.searchTimeout);
         state.searchTimeout = setTimeout(() => {
-            applyClientSideFilters(fieldId);
+            console.log(`[PlanHandler] Search term: "${state.searchTerm}"`);
+            // ✅ استدعاء API مع البحث
+            loadSchools(fieldId, 1, state.filters);
         }, 300);
     };
 
@@ -479,7 +541,7 @@
         e.preventDefault();
         const state = instances.get(fieldId);
 
-       
+        // ✅ جمع قيم الفلاتر
         state.filters = {
             schoolName: $p(fieldId, 'filterSchoolName').val(),
             lastEvalDate: $p(fieldId, 'filterLastEvalDate').val(),
@@ -489,21 +551,21 @@
             visitType: $p(fieldId, 'filterVisitType').val()
         };
 
-        // إزالة القيم الفارغة
+        // حذف القيم الفارغة
         Object.keys(state.filters).forEach(key => {
             if (!state.filters[key]) delete state.filters[key];
         });
 
-        applyClientSideFilters(fieldId);
+        console.log(`[PlanHandler] Applying filters:`, state.filters);
+
+        // ✅ استدعاء API مع الفلاتر
+        loadSchools(fieldId, 1, state.filters);
 
         // إغلاق الـ offcanvas
         const offcanvas = bootstrap.Offcanvas.getInstance($p(fieldId, 'filterOffcanvas')[0]);
         if (offcanvas) offcanvas.hide();
-
-        console.log(`[PlanHandler] Filters applied:`, state.filters);
     };
 
-    // ✅ FIXED: مسح الفلاتر يعيد كل الحقول
     const clearFilters = (fieldId) => {
         const state = instances.get(fieldId);
 
@@ -511,7 +573,7 @@
         state.filters = {};
         state.searchTerm = '';
 
-        // مسح الحقول من الـ UI
+        // مسح الحقول من UI
         $p(fieldId, 'filterSchoolName').val('');
         $p(fieldId, 'filterLastEvalDate').val('');
         $p(fieldId, 'filterCreatedDate').val('');
@@ -520,9 +582,10 @@
         $p(fieldId, 'filterVisitType').val('');
         $p(fieldId, 'customSearch').val('');
 
-        applyClientSideFilters(fieldId);
+        console.log(`[PlanHandler] Filters cleared`);
 
-        console.log(`[PlanHandler] Filters cleared for ${fieldId}`);
+        // ✅ إعادة تحميل كل المدارس
+        loadSchools(fieldId, 1);
     };
 
     /* ===================== SAVE ===================== */
@@ -558,7 +621,7 @@
 
         $p(fieldId, 'planTable').find('.selectRow:checked').each(function () {
             const schoolId = $(this).data('school-id');
-            const school = state.filteredSchools.find(s => s.id === schoolId);
+            const school = state.allSchools.find(s => s.id === schoolId);
             if (!school) return;
 
             state.selectedSchools.push({
@@ -568,7 +631,7 @@
             });
         });
 
-        console.log(`[PlanHandler] Selected schools updated for ${fieldId}:`, state.selectedSchools.length);
+        console.log(`[PlanHandler] Selected schools: ${state.selectedSchools.length}`);
     };
 
     const showLoadingState = (fieldId) => {
@@ -586,7 +649,11 @@
         $p(fieldId, 'planTable').find('tbody').html(`
             <tr>
                 <td colspan="7" class="text-center text-danger py-5">
-                    حدث خطأ أثناء تحميل البيانات
+                    <i class="la la-exclamation-triangle la-3x mb-2"></i>
+                    <p>حدث خطأ أثناء تحميل البيانات</p>
+                    <button class="btn btn-sm btn-primary" onclick="location.reload()">
+                        إعادة المحاولة
+                    </button>
                 </td>
             </tr>
         `);
