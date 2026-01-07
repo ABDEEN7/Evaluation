@@ -170,6 +170,8 @@ public static class ConstantKeys
         public static readonly string EvaluationTypeExistsEvaluationRequestHistory = "EvaluationTypeExistsEvaluationRequestHistory";
         public static readonly string DropdownTypeExistsField = "DropdownTypeExistsField";
         public static readonly string NdaStatusCannotDelete = "NdaStatusCannotDelete";
+        public static readonly string EvaluationRequestAssignment = "EvaluationRequestAssignment";
+        public static readonly string NdaStatusNotFound = "NdaStatusNotFound";
     }
 
     public static class AdminSettings

@@ -5,6 +5,7 @@ using Evaluation.DAL.Repositories;
 using Evaluation.Services.Models.Admin;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Enums;
+using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Admin;
 using Microsoft.EntityFrameworkCore;
@@ -55,34 +56,41 @@ public class SrvNdaStatusBL : AdminBase
     public async Task<NdaStatusDto> DeleteNdaStatusAsync(Guid? id)
     {
         var repository = uow.GetRepository<NdaStatus>();
-        var NdaStatus = await repository
+        var ndaStatus = await repository
             .GetAllActiveNonDeleted(x => x.Id == id)
             .FirstOrDefaultAsync()
             .ConfigureAwait(false);
-        if (NdaStatus == null)
+        if (ndaStatus == null)
         {
             return new NdaStatusDto
             {
                 ResponseStatus = DBResult.NotFound
             };
         }
-        repository.Delete(NdaStatus);
+        var evaluationRequestAssignment = await uow
+            .GetRepository<EvaluationRequestAssignment>()
+            .GetAllActiveNonDeleted()
+            .AnyAsync(x => x.NdaStatusId == ndaStatus.Id);
+        if (evaluationRequestAssignment)
+            throw new BusinessException(ConstantKeys.ExceptionMessage.EvaluationRequestAssignment);
+
+        repository.Delete(ndaStatus);
         await uow.CommitAsync();
-        var result = mapper.Map<NdaStatusDto>(NdaStatus, opts =>
+        var result = mapper.Map<NdaStatusDto>(ndaStatus, opts =>
         opts.Items["Language"] = _requestInfo.Lang);
         result.ResponseStatus = DBResult.Deleted;
         return result;
     }
-    public async Task<NdaStatusDto> UpdateNdaStatus(NdaStatusDto NdaStatus)
+    public async Task<NdaStatusDto> UpdateNdaStatus(NdaStatusDto ndaStatus)
     {
-        if (NdaStatus == null)
+        if (ndaStatus == null)
         {
             return new NdaStatusDto
             {
                 ResponseStatus = DBResult.Error
             };
         }
-        if (NdaStatus.Id == null)
+        if (ndaStatus.Id == null)
         {
             return new NdaStatusDto
             {
@@ -90,19 +98,21 @@ public class SrvNdaStatusBL : AdminBase
             };
         }
         var repository = uow.GetRepository<NdaStatus>();
-        var job = await uow
+        var nda = await uow
             .GetRepository<NdaStatus>()
             .GetAllActiveNonDeleted()
-            .FirstOrDefaultAsync(x => x.Id == NdaStatus.Id);
-        job.NameAr = NdaStatus.NameAr;
-        job.NameEn = NdaStatus.NameEn;
-        job.IsActive = NdaStatus.IsActive;
-        job.UpdateById = userInfo.UserId;
-        job.UpdateDate = DateTime.UtcNow;
+            .FirstOrDefaultAsync(x => x.Id == ndaStatus.Id);
+        if (nda == null)
+            throw new BusinessException(ConstantKeys.ExceptionMessage.NdaStatusNotFound);
+        nda.NameAr = ndaStatus.NameAr;
+        nda.NameEn = ndaStatus.NameEn;
+        nda.IsActive = ndaStatus.IsActive;
+        nda.UpdateById = userInfo.UserId;
+        nda.UpdateDate = DateTime.UtcNow;
 
-        repository.Update(job);
+        repository.Update(nda);
         await uow.CommitAsync().ConfigureAwait(false);
-        var result = mapper.Map<NdaStatusDto>(job);
+        var result = mapper.Map<NdaStatusDto>(nda);
         result.ResponseStatus = DBResult.Updated;
         return result;
     }
