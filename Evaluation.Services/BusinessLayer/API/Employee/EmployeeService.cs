@@ -1,13 +1,18 @@
 ﻿using AutoMapper;
 using Evaluation.DAL.Helper;
+using Evaluation.DAL.Models.DepartementEntites;
 using Evaluation.DAL.Models.Master;
 using Evaluation.DAL.Models.Org;
 using Evaluation.DAL.Models.Planing;
 using Evaluation.DAL.Repositories;
 using Evaluation.Services.Special;
+using Evaluation.SharedHelper.Dtos.SchoolDto;
+using Evaluation.SharedHelper.Extensions;
+using Evaluation.SharedHelper.Helper;
 using Evaluation.SharedHelper.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using System.Linq.Expressions;
 
 namespace Evaluation.Services.BusinessLayer.API;
 
@@ -28,6 +33,13 @@ public class EmployeeService(IServiceScopeFactory serviceScopeFactory,
                     .GetAllNonDeleted()
                     .Where(c => c.QID.ToLower() == qId)
                     .FirstOrDefaultAsync();
+    }
+    public async Task<PaginatedResult<Employee>> GetEmployeeAsync(SchoolRequest request, Guid? targetOrgTreeId, List<Guid> employees)
+    {
+        var filter = BuildFilterExpression(request, targetOrgTreeId, employees);
+        var query = unitOfWork.GetRepository<Employee>()
+                    .GetAllNonDeleted(filter);
+        return await query.GetPaginatedResult(request.PageNumber, request.PageSize);
     }
 
     public async Task<JobTitle> GetJobTitle(string jobNo)
@@ -50,6 +62,17 @@ public class EmployeeService(IServiceScopeFactory serviceScopeFactory,
                     .GetAllNonDeleted()
                     .Where(c => c.HRCode.ToLower() == orgClass)
                     .FirstOrDefaultAsync();
+    }
+    private Expression<Func<Employee, bool>> BuildFilterExpression(SchoolRequest request, Guid? targetOrgTreeId, List<Guid> employees)
+    {
+        Expression<Func<Employee, bool>> filter = s => true;
+        filter = filter.And(c => c.OrgParentId == targetOrgTreeId && employees.Contains(c.Id));
+
+        if (!string.IsNullOrWhiteSpace(request.Name))
+            filter = filter.And(s => s.NameEn.Contains(request.Name) || s.NameAr.Contains(request.Name));
+        //if(request.VisitType != null)
+        //    filter = filter.And(x=>x.)
+        return filter;
     }
 
 }
