@@ -148,7 +148,7 @@ const planUtility = window.planUtility;
                                            placeholder="ابحث هنا...">
                                 </div>
                                 <div class="col-md-4 mb-3">
-                                    <button class="btn filterbtn"
+                                    <button type="button" class="btn filterbtn"
                                             data-bs-toggle="offcanvas"
                                             data-bs-target="#${pid(fieldId, 'filterOffcanvas')}">
                                         <i class="la la-filter"></i> تصفية
@@ -214,31 +214,101 @@ const planUtility = window.planUtility;
                  tabindex="-1"
                  id="${pid(fieldId, 'filterOffcanvas')}">
 
-                <div class="offcanvas-header">
-                    <h5>تصفية النتائج</h5>
-                    <button type="button" class="btn-close"
-                            data-bs-dismiss="offcanvas"></button>
+                <div class="offcanvas-header justify-content-between p-4">
+                    <h5 class="offcanvas-title border d-flex align-items-center w-75 justify-content-between px-3 py-2 rounded">
+                        <span>تصفية النتائج</span>
+                        <i class="la la-filter"></i>
+                    </h5>
+                    <button type="button" class="btn btn-lg border d-flex align-items-center h-100"
+                            data-bs-dismiss="offcanvas">
+                        <i class="la la-angle-right"></i>
+                    </button>
                 </div>
 
-                <div class="offcanvas-body">
+                <div class="offcanvas-body p-4">
                     <form id="${pid(fieldId, 'filterForm')}">
 
                         <div class="mb-3">
-                            <label>اسم المدرسة</label>
+                            <label class="form-label">اسم المدرسة</label>
                             <input type="text"
                                    id="${pid(fieldId, 'filterSchoolName')}"
-                                   class="form-control">
+                                   name="schoolName"
+                                   class="form-control"
+                                   placeholder="أكتب هنا...">
                         </div>
+                        <hr>
 
+                        <!-- تاريخ آخر تقييم -->
                         <div class="mb-3">
-                            <label>آخر تقييم</label>
-                            <input type="text"
-                                   id="${pid(fieldId, 'filterLastEvalDate')}"
-                                   class="form-control">
+                            <label class="form-label">تاريخ آخر تقييم</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="la la-calendar"></i></span>
+                                <input type="text"
+                                       id="${pid(fieldId, 'filterLastEvalDate')}"
+                                       name="lastEvalDate"
+                                       class="form-control filter-date-picker"
+                                       placeholder="اختر التاريخ">
+                            </div>
+                        </div>
+                        <hr>
+
+                        <!-- تاريخ الإنشاء -->
+                        <div class="mb-3">
+                            <label class="form-label">تاريخ الإنشاء</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="la la-calendar"></i></span>
+                                <input type="text"
+                                       id="${pid(fieldId, 'filterCreatedDate')}"
+                                       name="createdDate"
+                                       class="form-control filter-date-picker"
+                                       placeholder="اختر التاريخ">
+                            </div>
+                        </div>
+                        <hr>
+
+                        <!-- تاريخ التقييم القادم -->
+                        <div class="mb-3">
+                            <label class="form-label">تاريخ التقييم القادم</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="la la-calendar"></i></span>
+                                <input type="text"
+                                       id="${pid(fieldId, 'filterNextEvalDate')}"
+                                       name="nextEvalDate"
+                                       class="form-control filter-date-picker"
+                                       placeholder="اختر التاريخ">
+                            </div>
+                        </div>
+                        <hr>
+
+                        <!-- النتيجة السابقة -->
+                        <div class="mb-3">
+                            <label class="form-label">النتيجة السابقة</label>
+                            <select id="${pid(fieldId, 'filterPreviousResult')}"
+                                    name="previousResult"
+                                    class="form-control">
+                                <option value="">الكل</option>
+                                <option value="Perfect">ممتاز</option>
+                                <option value="VeryGood">جيد جداً</option>
+                                <option value="Good">جيد</option>
+                                <option value="Acceptable">مقبول</option>
+                                <option value="Week">ضعيف</option>
+                            </select>
+                        </div>
+                        <hr>
+
+                        <!-- نوع الزيارة -->
+                        <div class="mb-3">
+                            <label class="form-label">نوع الزيارة</label>
+                            <select id="${pid(fieldId, 'filterVisitType')}"
+                                    name="visitType"
+                                    class="form-control">
+                                <option value="">الكل</option>
+                                <!-- Will be populated dynamically -->
+                            </select>
                         </div>
 
-                        <div class="d-flex gap-2">
-                            <button class="btn btn-primary w-100">
+                        <div class="d-flex gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary w-100">
                                 تطبيق
                             </button>
                             <button type="button"
