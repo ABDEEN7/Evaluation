@@ -78,7 +78,7 @@ public class NdaStatusController : Controller
         return Ok(result);
     }
     [HttpPost]
-    [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.AdminPermission.UPDATE_ORDER_ADMIN_NDAStatus })]
+    [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.AdminPermission.EDIT_ADMIN_NDAStatus })]
     public async Task<IActionResult> UpdateNDAStatusOrder()
     {
         var model = Request.Form["OrderObj"][0]?.StringToObject<List<OrderingDTO>>();
