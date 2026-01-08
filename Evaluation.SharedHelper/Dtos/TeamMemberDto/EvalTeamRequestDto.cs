@@ -10,7 +10,6 @@ public class EvalTeamRequestDto
     public Guid PartyTypeId { get; set; }
     public bool IsLeader { get; set; }
     public bool IsNDA { get; set; }
-    public Guid? NdaStatus { get; set; }
     public string? Note { get; set; }
     public Guid? NdaStatusId { get; set; }
     public List<EvalScopesDto>? Scopes { get; set; }

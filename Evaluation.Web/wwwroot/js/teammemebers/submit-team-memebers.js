@@ -14,8 +14,9 @@
             return null;
         }
 
-        const $ndaCell = $row.find('td').eq(2); // العمود الثالث
-        const ndaId = $ndaCell.data('nda-id');
+        const $ndaCell = $row.find('td').eq(2);
+        const rawNdaId = $ndaCell.data('nda-id');
+        const ndaId = rawNdaId === "" ? null : rawNdaId;
 
         return ndaId ?? null;
     }
@@ -144,7 +145,7 @@
                     NdaStatusId: ndaStatusId,
                     NdaDate: null,
                     Note: null,
-                    EvalRequestAssignmentScopies: evalRequestAssignmentScopies.length > 0 ? evalRequestAssignmentScopies : null
+                    Scopes: evalRequestAssignmentScopies.length > 0 ? evalRequestAssignmentScopies : null
                 };
 
                 teamMembers.push(memberDto);
