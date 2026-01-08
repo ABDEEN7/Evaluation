@@ -179,6 +179,16 @@ public class TeamMemberBL(IServiceScopeFactory serviceScopeFactory,
         await unitOfWork.CommitAsync();
         return true;
     }
+    public async Task<Result<List<EvaluationRequestAssignmentDto>>> GetTeamByEvaluationRequestId(Guid evaluationRequestId)
+    {
+        var team = unitOfWork
+            .GetRepository<EvaluationRequestAssignment>()
+            .GetAllActiveNonDeleted(x => x.EvaluationRequestId == evaluationRequestId)
+            .Include(s => s.EvalRequestAssignmentScopies)
+            .ToList();
+        var evaluationRequestAssignmentDto = mapper.Map<List<EvaluationRequestAssignmentDto>>(team);
+        return evaluationRequestAssignmentDto;
+    }
     public async Task<Result<bool>> DeleteEvaluationRequestAssignment(Guid id)
     {
         var assignmentRepo = unitOfWork.GetRepository<EvaluationRequestAssignment>();

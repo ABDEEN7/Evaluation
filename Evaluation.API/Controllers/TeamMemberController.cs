@@ -18,15 +18,19 @@ public class TeamMemberController : ControllerBase
     {
         _masterBl = masterBl;
     }
+    //public async Task<Result><SelectedTeamMember> GetTeamMeberById(Guid evaluationRequestAssignmentId)
+    //{
+
+    //}
 
     [HttpGet]
     public async Task<Result<TeamMembersResponse>> GetTeams()
         => await _masterBl.GetApiService<TeamMemberBL>().GetTeamsAsync();
 
     [HttpGet]
-    public async Task<Result<List<MemberDto>>> GetMembersByTeamId([FromQuery] Guid? teamId)
+    public async Task<Result<List<MemberDto>>> GetMembersByTeam([FromQuery] Guid? teamId)
          => await _masterBl.GetApiService<TeamMemberBL>().GetMembersByTeamId(teamId);
-    
+
     [HttpGet]
     public async Task<Result<List<ScopeDto>>> GetScopes()
          => await _masterBl.GetApiService<TeamMemberBL>().GetScopesAsync();
@@ -36,10 +40,10 @@ public class TeamMemberController : ControllerBase
     [HttpPost]
     public async Task<Result<bool>> DeleteEvaluationRequestAssignment(Guid id)
         => await _masterBl.GetApiService<TeamMemberBL>().DeleteEvaluationRequestAssignment(id);
-    //[HttpGet]
-    //public IActionResult GetMebmer()
-    //{
-    //    var member = _masterBl.GetApiService<>
-    //        return Ok(member);
-    //}
+    [HttpGet]
+    public Task<Result<List<EvaluationRequestAssignmentDto>>> GetTeamMemberByEvaluationRequest(Guid evaluationRequestId)
+    {
+        var member = _masterBl.GetApiService<TeamMemberBL>().GetTeamByEvaluationRequestId(evaluationRequestId);
+        return member;
+    }
 }

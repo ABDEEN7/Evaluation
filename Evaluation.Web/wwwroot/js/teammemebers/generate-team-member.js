@@ -226,5 +226,24 @@ const teamMembersUtility = window.teamMembersUtility;
             </label>
         `;
     }
+    function generateCheckBoxFormBuilder(id) {
+        const label = $('<label>', {
+            class: 'custom-checkbox1'
+        });
+
+        const input = $('<input>', {
+            type: 'checkbox',
+            id: id
+        });
+
+        const span = $('<span>', {
+            class: 'checkmark'
+        });
+
+        label.append(input, span);
+
+        return label;
+    }
+
 
 })(teamMembersUtility);

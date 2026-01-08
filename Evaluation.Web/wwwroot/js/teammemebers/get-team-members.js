@@ -6,6 +6,7 @@
     // ================== STATE ==================
     const state = {
         fieldId: null,
+        evaluationRequestId: null,
         teams: [],
         members: [],
         allMembers: [],
@@ -14,7 +15,8 @@
         pendingRemoval: new Set(),
         isNDA: false,
         teamLeaderId: null,
-        ndaStatus: {}
+        ndaStatus: {},
+        existingAssignments: []
     };
 
     // ================== ID HELPER ==================
@@ -37,6 +39,11 @@
         },
         getPendingStatus() {
             return jqClient().Get(API_ENDPOINTS.GET_PENDING_STATUS);
+        },
+        getTeamMembersByEvaluationRequest(evaluationRequestId) {
+            return jqClient().Get(
+                `${API_ENDPOINTS.GET_TEAM_MEMBERS_BY_EVALUATION_REQUEST}?evaluationRequestId=${evaluationRequestId}`
+            );
         }
     };
 
@@ -55,6 +62,7 @@
             return false;
         }
     }
+
     async function loadPendingNDA() {
         const res = await TeamApi.getPendingStatus();
         state.ndaStatus = {
@@ -62,6 +70,7 @@
             name: res.value.name
         };
     }
+
     async function loadAllMembers() {
         showMembersLoading();
         try {
@@ -80,7 +89,6 @@
             const res = await TeamApi.getMembersByTeam(teamId);
             state.members = res?.value ?? [];
 
-            // Add to allMembers if not exists
             state.members.forEach(member => {
                 if (!state.allMembers.find(m => m.id === member.id)) {
                     state.allMembers.push(member);
@@ -98,6 +106,75 @@
             state.scopes = res?.value ?? [];
         } catch {
             showError('خطأ في تحميل المجالات');
+        }
+    }
+
+    /**
+     * Load existing team members from evaluation request
+     */
+    async function loadExistingTeamMembers(evaluationRequestId) {
+        if (!evaluationRequestId) {
+            return;
+        }
+
+        try {
+            const res = await TeamApi.getTeamMembersByEvaluationRequest(evaluationRequestId);
+
+            if (!res?.isSuccess || !res?.value) {
+                console.warn('⚠️ No existing team members found');
+                return;
+            }
+
+            const assignments = res.value;
+            state.existingAssignments = assignments;
+
+            for (const assignment of assignments) {
+                const memberId = assignment.ministryUserId;
+
+                let member = state.allMembers.find(m => m.id === memberId);
+
+                if (!member) {
+                    member = state.members.find(m => m.id === memberId);
+
+                    if (!member) {
+                        console.warn(`⚠️ Member ${memberId} not found in available members`);
+                        continue;
+                    }
+                }
+
+                if (state.selectedTeamMembers.find(m => m.id === memberId && m.partyTypeId === assignment.partyTypeId)) {
+                    continue;
+                }
+
+                // Map scopes from API format to array of IDs
+                const scopes = (assignment.evalRequestAssignmentScopies || [])
+                    .map(scope => scope.scopeId)
+                    .filter(Boolean);
+
+                state.selectedTeamMembers.push({
+                    ...member,
+                    id: memberId,
+                    partyTypeId: assignment.partyTypeId,
+                    scopes: scopes,
+                    nda: assignment.isNDA ? assignment.ndaStatusId : null,
+                    isLeader: assignment.isLeader,
+                    assignmentData: assignment
+                });
+
+                if (assignment.isLeader) {
+                    state.teamLeaderId = memberId;
+                }
+
+                $(`${id('userTable')} tr[data-id="${memberId}"] .row-select`).prop('checked', true);
+            }
+
+            renderSelectedTeamTable();
+            updateSelectAllCheckbox();
+
+            console.log('✅ Loaded existing team members:', state.selectedTeamMembers.length);
+        } catch (error) {
+            console.error('❌ Error loading existing team members:', error);
+            showError('خطأ في تحميل أعضاء الفريق المحفوظين');
         }
     }
 
@@ -123,7 +200,6 @@
         $select.off('change').on('change', function () {
             const teamId = $(this).val();
             if (teamId) {
-                const team = state.teams.find(t => t.id === teamId);
                 loadMembersByTeam(teamId);
             } else {
                 loadAllMembers();
@@ -140,7 +216,6 @@
             return;
         }
 
-        // بناء الـ header حسب isNDA
         let headerHTML = `
             <th style="width:50px;">
                 <label class="custom-checkbox1">
@@ -151,7 +226,6 @@
             <th>اسم العضو</th>
         `;
 
-        // إضافة عمود NDA فقط إذا كان مفعل
         if (state.isNDA) {
             headerHTML += `<th>NDA</th>`;
         }
@@ -218,7 +292,7 @@
         }
 
         if (!state.selectedTeamMembers.length) {
-            const colspan = state.isNDA ? 6 : 5; // حساب عدد الأعمدة حسب isNDA
+            const colspan = state.isNDA ? 6 : 5;
             $tbody.html(`
                 <tr>
                     <td colspan="${colspan}" class="text-center text-muted py-4">
@@ -235,36 +309,62 @@
             const memberPosition = member.position || member.jobTitle || member.title || 'غير محدد';
             const isPending = state.pendingRemoval.has(member.id);
 
-            // الحصول على أنواع الأطراف الخاصة بهذا العضو
             const userPartyTypes = member.userPartyTypes || [];
 
-            // إذا كان هناك نوع واحد فقط، اختره تلقائيًا
-            const defaultPartyTypeId = userPartyTypes.length === 1
-                ? userPartyTypes[0].partyType.id
-                : member.partyTypeId;
+            // Use member.partyTypeId if it exists (from loaded data), otherwise auto-select
+            const defaultPartyTypeId = member.partyTypeId ||
+                (userPartyTypes.length === 1 ? userPartyTypes[0].partyType.id : null);
+
+            // Build party type options
+            const partyTypeOptionsHTML = userPartyTypes.length === 1
+                ? `<option value="${userPartyTypes[0].partyType.id}" selected>
+                       ${userPartyTypes[0].partyType.name}
+                   </option>`
+                : `<option value="">اختر نوع الطرف</option>
+                   ${userPartyTypes.map(upt => `
+                       <option value="${upt.partyType.id}"
+                           ${defaultPartyTypeId == upt.partyType.id ? 'selected' : ''}>
+                           ${upt.partyType.name}
+                       </option>
+                   `).join('')}`;
+
+            // Build NDA cell if enabled
+            let ndaCellHTML = '';
+            if (state.isNDA) {
+                const ndaChecked = member.nda === state.ndaStatus.id ? 'checked' : '';
+                ndaCellHTML = `
+                    <td data-nda-id="${member.nda || ''}">
+                        <label class="custom-checkbox1">
+                            <input type="checkbox" class="nda-checkbox" 
+                                   data-member-id="${member.id}" 
+                                   ${ndaChecked}>
+                            <span class="checkmark"></span>
+                        </label>
+                    </td>
+                `;
+            }
+
+            // Check if this member is team leader
+            const isLeaderChecked = member.id === state.teamLeaderId || member.isLeader ? 'checked' : '';
 
             return `
                 <tr data-selected-id="${member.id}">
                     <td>
                         <label class="custom-checkbox1 ${isPending ? 'minus' : 'plus'}">
-                            <input type="checkbox" class="selected-row-checkbox" ${isPending ? 'checked' : ''}>
+                            <input type="checkbox" class="selected-row-checkbox" 
+                                   ${isPending ? 'checked' : ''}>
                             <span class="checkmark"></span>
                         </label>
                     </td>
-                    <td><h6>${memberName}</h6></td>
-                ${state.isNDA ? `
-                    <td data-nda-id="${state.ndaStatus?.id ?? ''}">
-                        <div class="d-flex align-items-center nda-wrapper"
-                             data-nda-id="${state.ndaStatus?.id ?? ''}">
-                            <h6 class="nda-name">
-                                ${state.ndaStatus?.name}
-                            </h6>
-                        </div>
+                    <td>
+                        <h6>${memberName}</h6>
+                        <small class="text-muted">${memberPosition}</small>
                     </td>
-                    ` : ''}
-                <td>
+                    ${ndaCellHTML}
+                    <td>
                         <div class="mb-3 w-100">
-                            <select multiple class="form-control multiCheckSelect-dynamic" data-member-id="${member.id}">
+                            <select multiple class="form-control multiCheckSelect-dynamic" 
+                                    data-member-id="${member.id}">
                                 ${state.scopes.map(scope => `
                                     <option value="${scope.id}">${scope.name}</option>
                                 `).join('')}
@@ -273,32 +373,17 @@
                     </td>
                     <td>
                         <select class="form-select party-type-select" data-member-id="${member.id}">
-                        ${userPartyTypes.length === 1
-                    ? `
-                            <option value="${userPartyTypes[0].partyType.id}" selected>
-                                ${userPartyTypes[0].partyType.name}
-                            </option>
-                            `
-                    : `
-                            <option value="">اختر نوع الطرف</option>
-                            ${userPartyTypes.map(upt => `
-                                <option value="${upt.partyType.id}"
-                                    ${defaultPartyTypeId == upt.partyType.id ? 'selected' : ''}>
-                                    ${upt.partyType.name}
-                                </option>
-                            `).join('')}
-                            `
-                }
+                            ${partyTypeOptionsHTML}
                         </select>
-
                     </td>
                     <td>
                         <label class="custom-checkbox1 radio">
                             <input type="radio"
-                                    class="team-leader-radio"
-                                    name="teamLeader"
-                                    value="${member.id}"
-                                    ${state.teamLeaderId == member.id ? 'checked' : ''}>
+                                   class="team-leader-radio"
+                                   name="${state.fieldId}_teamLeader"
+                                   value="${member.id}"
+                                   data-member-id="${member.id}"
+                                   ${isLeaderChecked}>
                             <span class="checkmark"></span>
                         </label>
                     </td>
@@ -307,6 +392,8 @@
         }).join('');
 
         $tbody.html(rows);
+
+        // Initialize Select2 after rendering
         setTimeout(() => {
             initializeSelect2();
         }, 100);
@@ -317,6 +404,7 @@
     // ================== SELECT2 INITIALIZATION ==================
 
     function initializeSelect2() {
+        // Destroy existing Select2 instances
         if ($(".multiCheckSelect-dynamic").hasClass("select2-hidden-accessible")) {
             $(".multiCheckSelect-dynamic").select2('destroy');
         }
@@ -341,65 +429,95 @@
             dir: 'rtl'
         });
 
+        // Handle Select2 opening and pre-selecting checkboxes
         $(".multiCheckSelect-dynamic").on("select2:open", function () {
             const memberId = $(this).data('member-id');
             const member = state.selectedTeamMembers.find(m => m.id === memberId);
             const selected = member?.scopes || [];
 
             setTimeout(() => {
+                // Pre-check the checkboxes based on member's scopes
                 $(".chk").each(function () {
-                    const id = parseInt($(this).data("id"));
-                    $(this).prop("checked", selected.includes(id));
+                    const scopeId = $(this).data("id");
+                    const isSelected = selected.includes(scopeId);
+                    $(this).prop("checked", isSelected);
                 });
 
+                // Handle checkbox change
                 $(".chk").off("change").on("change", function () {
-                    const id = parseInt($(this).data("id"));
+                    const scopeId = $(this).data("id");
                     const selectElement = $(`.multiCheckSelect-dynamic[data-member-id='${memberId}']`);
                     let current = selectElement.val() || [];
-                    current = current.map(v => parseInt(v));
+
+                    // Convert to proper type (string IDs)
+                    current = current.map(v => String(v));
 
                     if (this.checked) {
-                        if (!current.includes(id)) {
-                            current.push(id);
+                        if (!current.includes(String(scopeId))) {
+                            current.push(String(scopeId));
                         }
                     } else {
-                        current = current.filter(v => v !== id);
+                        current = current.filter(v => v !== String(scopeId));
                     }
 
-                    selectElement.val(current.map(String)).trigger("change");
+                    selectElement.val(current).trigger("change");
 
+                    // Update state
                     if (member) {
-                        member.scopes = current;
+                        member.scopes = current.map(id => String(id));
                     }
                 });
             }, 50);
+        });
+
+        // Pre-select values for loaded data
+        state.selectedTeamMembers.forEach(member => {
+            if (member.scopes && member.scopes.length > 0) {
+                const $select = $(`.multiCheckSelect-dynamic[data-member-id='${member.id}']`);
+                if ($select.length) {
+                    $select.val(member.scopes.map(String)).trigger('change');
+                }
+            }
         });
     }
 
     // ================== UPDATE CHECKBOXES ==================
 
     function updateSelectAllCheckbox() {
-        const total = $(`${id('userTable')} .row-select`).length;
-        const checked = $(`${id('userTable')} .row-select:checked`).length;
+        const $selectAll = $(id('selectAllMembers'));
+        if (!$selectAll.length) return;
 
-        $(id('selectAllMembers')).prop('checked', total > 0 && total === checked);
+        const $visibleCheckboxes = $(`${id('userTable')} tbody tr:visible .row-select`);
+        const allChecked = $visibleCheckboxes.length > 0 &&
+            $visibleCheckboxes.length === $visibleCheckboxes.filter(':checked').length;
+
+        $selectAll.prop('checked', allChecked);
     }
 
     function updateSelectedCheckboxHeader() {
-        const total = $('.selected-row-checkbox').length;
-        const checked = $('.selected-row-checkbox:checked').length;
+        const $selectAll = $(id('selectAllSelected'));
+        if (!$selectAll.length) return;
 
-        $(id('selectAllSelected')).prop('checked', total > 0 && total === checked);
+        const $checkboxes = $('.selected-row-checkbox');
+        const allChecked = $checkboxes.length > 0 &&
+            $checkboxes.length === $checkboxes.filter(':checked').length;
+
+        $selectAll.prop('checked', allChecked);
     }
 
     // ================== EVENT HANDLERS ==================
 
     function initEventListeners() {
-        //Added event to Radio button
+        // Team Leader Radio
         $(document).off('change', '.team-leader-radio')
             .on('change', '.team-leader-radio', function () {
                 const leaderId = $(this).val();
                 state.teamLeaderId = leaderId;
+
+                // Update isLeader flag for all members
+                state.selectedTeamMembers.forEach(member => {
+                    member.isLeader = member.id === leaderId;
+                });
 
                 console.log('👑 قائد الفريق:', leaderId);
             });
@@ -412,169 +530,184 @@
 
                 const member = state.selectedTeamMembers.find(m => m.id === memberId);
                 if (member) {
-                    member.partyTypeId = partyTypeId ? parseInt(partyTypeId) : null;
+                    member.partyTypeId = partyTypeId;
                     console.log('🏢 نوع الطرف للعضو', memberId, ':', partyTypeId);
                 }
             });
 
-        // Select All في جدول الأعضاء
-        $(document).off('change', id('selectAllMembers')).on('change', id('selectAllMembers'), function () {
-            const isChecked = this.checked;
-            $(`${id('userTable')} .row-select`).each(function () {
-                if ($(this).prop('checked') !== isChecked) {
-                    $(this).prop('checked', isChecked).trigger('change');
+        // NDA Checkbox
+        $(document).off('change', '.nda-checkbox')
+            .on('change', '.nda-checkbox', function () {
+                const $checkbox = $(this);
+                const memberId = $checkbox.data('member-id');
+                const $cell = $checkbox.closest('td');
+
+                const member = state.selectedTeamMembers.find(m => m.id === memberId);
+
+                if (!member) return;
+
+                if ($checkbox.is(':checked')) {
+                    member.nda = state.ndaStatus.id;
+                    $cell.attr('data-nda-id', state.ndaStatus.id);
+                } else {
+                    member.nda = null;
+                    $cell.attr('data-nda-id', '');
                 }
             });
-        });
+
+        // Select All في جدول الأعضاء
+        $(document).off('change', id('selectAllMembers'))
+            .on('change', id('selectAllMembers'), function () {
+                const isChecked = this.checked;
+                $(`${id('userTable')} .row-select`).each(function () {
+                    if ($(this).prop('checked') !== isChecked) {
+                        $(this).prop('checked', isChecked).trigger('change');
+                    }
+                });
+            });
 
         // إضافة عضو للفريق المحدد
-        $(document).off('change', `${id('userTable')} .row-select`).on('change', `${id('userTable')} .row-select`, function () {
-            // منع الإزالة من الجدول الأعلى - الأعلى إضافة فقط
-            if (!this.checked) {
-                this.checked = true;
-                return;
-            }
+        $(document).off('change', `${id('userTable')} .row-select`)
+            .on('change', `${id('userTable')} .row-select`, function () {
+                if (!this.checked) {
+                    this.checked = true;
+                    return;
+                }
 
-            const row = $(this).closest('tr');
-            const memberId = row.data('id');
-            const member = state.members.find(m => m.id === memberId);
+                const row = $(this).closest('tr');
+                const memberId = row.data('id');
+                const member = state.members.find(m => m.id === memberId);
 
-            if (!member) return;
-            // الحصول على أنواع الأطراف الخاصة بالعضو
-            const userPartyTypes = member.userPartyTypes || [];
-            if (userPartyTypes.length === 0) {
-                this.checked = false;
-                showError(`'we can't add user don't have any party Type'`);
-                return;
-            }
-            //Prvent Repetition
-            if (state.selectedTeamMembers.find(m => m.id === memberId)) {
-                return;
-            }
+                if (!member) return;
 
-            // تحديد partyTypeId التلقائي
-            const autoSelectedPartyTypeId = userPartyTypes.length === 1
-                ? userPartyTypes[0].partyType.id
-                : null;
+                const userPartyTypes = member.userPartyTypes || [];
+                if (userPartyTypes.length === 0) {
+                    this.checked = false;
+                    showError(`لا يمكن إضافة المستخدم لأنه لا يملك أي نوع طرف`);
+                    return;
+                }
 
-            state.selectedTeamMembers.push({
-                ...member,
-                scopes: [],
-                nda: null,
-                partyTypeId: autoSelectedPartyTypeId
-            });
-            if (!state.teamLeaderId) {
-                state.teamLeaderId = memberId;
-            }
-            const memberName = member.name || member.fullName || member.memberName;
-            showSuccess('تم إضافة ' + memberName);
-            renderSelectedTeamTable();
+                if (state.selectedTeamMembers.find(m => m.id === memberId)) {
+                    return;
+                }
 
-            updateSelectAllCheckbox();
-        });
+                const autoSelectedPartyTypeId = userPartyTypes.length === 1
+                    ? userPartyTypes[0].partyType.id
+                    : null;
 
-        // التعامل مع checkbox في الجدول السفلي - الضغطة الأولى: minus، الثانية: حذف
-        $(document).off('change', '.selected-row-checkbox').on('change', '.selected-row-checkbox', function () {
-            const $checkbox = $(this);
-            const $row = $checkbox.closest('tr');
-            const $label = $checkbox.closest('.custom-checkbox1');
-            const memberId = $row.data('selected-id');
-            const isChecked = $checkbox.prop('checked');
+                state.selectedTeamMembers.push({
+                    ...member,
+                    scopes: [],
+                    nda: null,
+                    partyTypeId: autoSelectedPartyTypeId,
+                    isLeader: false
+                });
 
-            if (isChecked) {
-                // الضغطة الأولى: إضافة للحذف وتغيير إلى minus
-                state.pendingRemoval.add(memberId);
-                $label.removeClass('plus').addClass('minus');
-            } else {
-                // الضغطة الثانية: تنفيذ الحذف الفعلي
-                state.pendingRemoval.delete(memberId);
+                if (!state.teamLeaderId) {
+                    state.teamLeaderId = memberId;
+                }
 
-                // إزالة من الفريق
-                const member = state.selectedTeamMembers.find(m => m.id === memberId);
-                state.selectedTeamMembers = state.selectedTeamMembers.filter(m => m.id !== memberId);
-
-                // إعادة تفعيل العضو في الجدول الأعلى
-                $(`${id('userTable')} tr[data-id="${memberId}"] .row-select`).prop('checked', false);
-
-                const memberName = member?.name || member?.fullName || member?.memberName;
-                showSuccess('تم حذف ' + memberName);
-
-                // إعادة رسم الجدول
+                const memberName = member.name || member.fullName || member.memberName;
+                showSuccess('تم إضافة ' + memberName);
                 renderSelectedTeamTable();
-            }
+                updateSelectAllCheckbox();
+            });
 
-            updateSelectAllCheckbox();
-            updateSelectedCheckboxHeader();
-        });
-
-        // Select All في جدول الفريق المحدد
-        $(document).off('change', id('selectAllSelected')).on('change', id('selectAllSelected'), function () {
-            const isChecked = this.checked;
-
-            $('.selected-row-checkbox').each(function () {
+        // التعامل مع checkbox في الجدول السفلي
+        $(document).off('change', '.selected-row-checkbox')
+            .on('change', '.selected-row-checkbox', function () {
                 const $checkbox = $(this);
                 const $row = $checkbox.closest('tr');
                 const $label = $checkbox.closest('.custom-checkbox1');
                 const memberId = $row.data('selected-id');
+                const isChecked = $checkbox.prop('checked');
 
                 if (isChecked) {
-                    // تحديد الكل: إضافة شعار minus
-                    $checkbox.prop('checked', true);
                     state.pendingRemoval.add(memberId);
                     $label.removeClass('plus').addClass('minus');
                 } else {
-                    // إلغاء التحديد: إزالة من pending
-                    $checkbox.prop('checked', false);
                     state.pendingRemoval.delete(memberId);
-                    $label.removeClass('minus').addClass('plus');
+
+                    const member = state.selectedTeamMembers.find(m => m.id === memberId);
+                    state.selectedTeamMembers = state.selectedTeamMembers.filter(m => m.id !== memberId);
+
+                    $(`${id('userTable')} tr[data-id="${memberId}"] .row-select`).prop('checked', false);
+
+                    const memberName = member?.name || member?.fullName || member?.memberName;
+                    showSuccess('تم حذف ' + memberName);
+
+                    renderSelectedTeamTable();
                 }
+
+                updateSelectAllCheckbox();
+                updateSelectedCheckboxHeader();
             });
-        });
+
+        // Select All في جدول الفريق المحدد
+        $(document).off('change', id('selectAllSelected'))
+            .on('change', id('selectAllSelected'), function () {
+                const isChecked = this.checked;
+
+                $('.selected-row-checkbox').each(function () {
+                    const $checkbox = $(this);
+                    const $row = $checkbox.closest('tr');
+                    const $label = $checkbox.closest('.custom-checkbox1');
+                    const memberId = $row.data('selected-id');
+
+                    if (isChecked) {
+                        $checkbox.prop('checked', true);
+                        state.pendingRemoval.add(memberId);
+                        $label.removeClass('plus').addClass('minus');
+                    } else {
+                        $checkbox.prop('checked', false);
+                        state.pendingRemoval.delete(memberId);
+                        $label.removeClass('minus').addClass('plus');
+                    }
+                });
+            });
 
         // البحث
-        $(document).off('keyup', id('customSearch')).on('keyup', id('customSearch'), function () {
-            const searchTerm = $(this).val().toLowerCase();
+        $(document).off('keyup', id('customSearch'))
+            .on('keyup', id('customSearch'), function () {
+                const searchTerm = $(this).val().toLowerCase();
 
-            $(`${id('userTable')} tbody tr`).each(function () {
-                const name = $(this).find('td:eq(1)').text().toLowerCase();
-                const position = $(this).find('td:eq(2)').text().toLowerCase();
+                $(`${id('userTable')} tbody tr`).each(function () {
+                    const name = $(this).find('td:eq(1)').text().toLowerCase();
+                    const position = $(this).find('td:eq(2)').text().toLowerCase();
 
-                if (name.includes(searchTerm) || position.includes(searchTerm)) {
-                    $(this).show();
-                } else {
-                    $(this).hide();
-                }
+                    if (name.includes(searchTerm) || position.includes(searchTerm)) {
+                        $(this).show();
+                    } else {
+                        $(this).hide();
+                    }
+                });
             });
-        });
 
         // زر حذف المحدد
-        $(document).off('click', id('deleteSelectedBtn')).on('click', id('deleteSelectedBtn'), function (e) {
-            e.preventDefault();
+        $(document).off('click', id('deleteSelectedBtn'))
+            .on('click', id('deleteSelectedBtn'), function (e) {
+                e.preventDefault();
 
-            if (state.pendingRemoval.size === 0) {
-                alert('الرجاء تحديد الأعضاء المراد حذفهم');
-                return;
-            }
+                if (state.pendingRemoval.size === 0) {
+                    alert('الرجاء تحديد الأعضاء المراد حذفهم');
+                    return;
+                }
 
-            if (!confirm(`هل أنت متأكد من حذف ${state.pendingRemoval.size} عضو؟`)) {
-                return;
-            }
+                if (!confirm(`هل أنت متأكد من حذف ${state.pendingRemoval.size} عضو؟`)) {
+                    return;
+                }
 
-            // حذف الأعضاء المحددين
-            state.pendingRemoval.forEach(memberId => {
-                state.selectedTeamMembers = state.selectedTeamMembers.filter(m => m.id !== memberId);
+                state.pendingRemoval.forEach(memberId => {
+                    state.selectedTeamMembers = state.selectedTeamMembers.filter(m => m.id !== memberId);
+                    $(`${id('userTable')} tr[data-id="${memberId}"] .row-select`).prop('checked', false);
+                });
 
-                // إعادة تفعيل العضو في الجدول الأعلى
-                $(`${id('userTable')} tr[data-id="${memberId}"] .row-select`).prop('checked', false);
+                state.pendingRemoval.clear();
+
+                renderSelectedTeamTable();
+                renderMembersTable();
+                showSuccess('تم حذف الأعضاء المحددين بنجاح');
             });
-
-            // مسح قائمة الانتظار
-            state.pendingRemoval.clear();
-
-            renderSelectedTeamTable();
-            renderMembersTable();
-            showSuccess('تم حذف الأعضاء المحددين بنجاح');
-        });
     }
 
     // ================== HELPERS ==================
@@ -598,7 +731,6 @@
     function showSuccess(msg) {
         const $alert = $(id('successAlert'));
         if (!$alert.length) {
-            // Try alternative success alert
             const $bgSuccess = $('.bg-success-light');
             if ($bgSuccess.length) {
                 $bgSuccess.find('p').text(msg);
@@ -621,10 +753,10 @@
 
     // ================== INIT ==================
 
-    ns.init = async function (fieldId) {
+    ns.init = async function (fieldId, evaluationRequestId = null) {
         state.fieldId = fieldId;
+        state.evaluationRequestId = evaluationRequestId;
 
-        // التحقق من وجود العناصر الأساسية
         const $teamFilter = $(id('teamFilter'));
         const $userTable = $(id('userTable'));
         const $selectedTeamTable = $(id('selectedTeamTable'));
@@ -641,32 +773,40 @@
             console.error('❌ عنصر selectedTeamTable غير موجود');
         }
 
-        // إخفاء تنبيه النجاح
         $('.bg-success-light').hide();
 
-        // تحميل البيانات
-        console.log('📥 جاري تحميل الفرق...');
         const teamsLoaded = await loadTeams();
 
-        // تحديث رأس جدول الفريق المحدد بناءً على isNDA
         updateSelectedTeamTableHeader();
 
         if (teamsLoaded) {
-            console.log('📥 جاري تحميل الأعضاء...');
             await loadAllMembers();
         } else {
-            console.error('❌ Failed to initialize: No teams loaded');
             showError('فشل تحميل البيانات الأساسية');
         }
+
         if (state.isNDA) {
             await loadPendingNDA();
         }
 
-        console.log('📥 جاري تحميل المجالات...');
         await loadScopes();
 
-        // تهيئة معالجات الأحداث
+        // Load existing team members if evaluationRequestId is provided
+        if (evaluationRequestId) {
+            await loadExistingTeamMembers(evaluationRequestId);
+        }
+
         initEventListeners();
+    };
+
+    // ================== PUBLIC API ==================
+
+    ns.getState = function () {
+        return state;
+    };
+
+    ns.getSelectedTeamMembers = function () {
+        return state.selectedTeamMembers;
     };
 
 })(window.teamMembersLogic, jQuery);

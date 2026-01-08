@@ -36,6 +36,7 @@
 
         return hasNDA;
     }
+
     // ================= VALIDATION =================
     function validateTeamData(teamData) {
         const errors = [];
@@ -55,13 +56,13 @@
 
         // التحقق من البيانات المطلوبة لكل عضو
         teamData.forEach((member, index) => {
-            if (!member.UserId) {
+            if (!member.MinistryUserId) {
                 errors.push(`العضو رقم ${index + 1}: معرف المستخدم مطلوب`);
             }
             if (!member.PartyTypeId) {
                 errors.push(`العضو رقم ${index + 1}: نوع الطرف مطلوب`);
             }
-            if (!member.Scopes || member.Scopes.length === 0) {
+            if (!member.EvalRequestAssignmentScopies || member.EvalRequestAssignmentScopies.length === 0) {
                 errors.push(`العضو رقم ${index + 1}: يجب تحديد مجال واحد على الأقل`);
             }
         });
@@ -76,6 +77,7 @@
 
     /**
      * الحصول على بيانات الفريق بصيغة API باستخدام fieldId
+     * Works with Select2 multi-select
      */
     window.getTeamDataByFieldId = function (fieldId, evaluationRequestId = null) {
         const tableId = getTableIdFromFieldId(fieldId);
@@ -105,41 +107,49 @@
                 const $row = $(this);
 
                 // استخراج البيانات الأساسية
-                const userId = $row.data('selected-id');
+                const ministryUserId = $row.data('selected-id');
 
                 // استخراج PartyTypeId
                 const $partyTypeSelect = $row.find('.party-type-select');
                 const partyTypeId = $partyTypeSelect.val();
 
                 if (!partyTypeId) {
-                    console.warn('⚠️ عضو بدون نوع طرف:', userId);
+                    console.warn('⚠️ عضو بدون نوع طرف:', ministryUserId);
                     return; // skip this member
                 }
 
-                // استخراج Scopes
+                // استخراج Scopes من Select2
                 const $scopeSelect = $row.find('.multiCheckSelect-dynamic');
-                const selectedScopes = ($scopeSelect.val() || []).map(scopeId => ({
-                    Id: scopeId
+                const selectedScopes = $scopeSelect.val() || [];
+
+                const evalRequestAssignmentScopies = selectedScopes.map(scopeId => ({
+                    ScopeId: String(scopeId),
+                    Note: null
                 }));
+
+                // استخراج قائد الفريق
                 const $leaderRadio = $row.find('.team-leader-radio');
                 const isLeader = $leaderRadio.is(':checked');
 
+                // استخراج NDA
                 const ndaStatusId = extractNDAStatus($row, hasNDA);
+                const isNDA = hasNDA && ndaStatusId !== null;
 
                 const memberDto = {
-                    Id: null,
-                    UserId: userId,
+                    UserId: ministryUserId,
                     EvaluationRequestId: evaluationRequestId,
                     PartyTypeId: partyTypeId,
                     IsLeader: isLeader,
-                    IsNDA: hasNDA && ndaStatusId !== null,
-                    Note: null,
+                    IsNDA: isNDA,
                     NdaStatusId: ndaStatusId,
-                    Scopes: selectedScopes.length > 0 ? selectedScopes : null
+                    NdaDate: null,
+                    Note: null,
+                    EvalRequestAssignmentScopies: evalRequestAssignmentScopies.length > 0 ? evalRequestAssignmentScopies : null
                 };
 
                 teamMembers.push(memberDto);
             });
+
             return teamMembers;
 
         } catch (error) {
@@ -151,8 +161,8 @@
     /**
      * التحقق من صحة البيانات
      */
-    window.validateTeamByFieldId = function (fieldId) {
-        const data = window.getTeamDataByFieldId(fieldId);
+    window.validateTeamByFieldId = function (fieldId, evaluationRequestId = null) {
+        const data = window.getTeamDataByFieldId(fieldId, evaluationRequestId);
         return validateTeamData(data);
     };
 
@@ -165,24 +175,177 @@
 
         if (!validation.isValid) {
             console.error('❌ أخطاء في بيانات الفريق:', validation.errors);
+            alert('يرجى تصحيح الأخطاء التالية:\n' + validation.errors.join('\n'));
             return null;
         }
 
         return data;
     };
+
+    /**
+     * إرسال بيانات فريق التقييم
+     */
     async function submitEvalRequestAssignment(data) {
         const submitBtn = $('#btn-submit');
-        submitBtn.prop('disabled', true).text('Saving...');
-        let endpoint = API_ENDPOINTS.SUBMIT_EVALUATION_REQUEST_ASSIGNMENT;
-        const result = await jqClient().Post(endpoint, data);
-        if (result.success) {
-            const modal = bootstrap.Modal.getInstance(document.getElementById('confirmation-modal'));
-            if (modal) modal.hide();
+        submitBtn.prop('disabled', true).text('جاري الحفظ...');
 
-            alert('Plan saved successfully');
-        } else {
-            throw new Error(result.message || 'Failed to save the plan');
+        try {
+            let endpoint = API_ENDPOINTS.SUBMIT_EVALUATION_REQUEST_ASSIGNMENT;
+            const result = await jqClient().Post(endpoint, data);
+
+            if (result.success || result.isSuccess) {
+                const modal = bootstrap.Modal.getInstance(document.getElementById('confirmation-modal'));
+                if (modal) modal.hide();
+
+                alert('تم حفظ الفريق بنجاح');
+                return result;
+            } else {
+                throw new Error(result.message || 'فشل في حفظ الفريق');
+            }
+        } catch (error) {
+            console.error('❌ خطأ في حفظ الفريق:', error);
+            alert('حدث خطأ أثناء حفظ الفريق');
+            throw error;
+        } finally {
+            submitBtn.prop('disabled', false).text('حفظ');
         }
     }
+
+    /**
+     * حفظ الفريق
+     */
+    window.saveTeamByFieldId = async function (fieldId, evaluationRequestId = null) {
+        try {
+            const teamData = window.getValidatedTeamData(fieldId, evaluationRequestId);
+
+            if (!teamData) {
+                return false;
+            }
+
+            const result = await submitEvalRequestAssignment(teamData);
+
+            return result.success || result.isSuccess;
+        } catch (error) {
+            console.error('❌ خطأ في حفظ الفريق:', error);
+            return false;
+        }
+    };
+
+    /**
+     * حذف تعيين تقييم
+     */
+    window.deleteEvalRequestAssignment = async function (fieldId, evalRequestAssignmentId) {
+        if (!evalRequestAssignmentId) {
+            console.error('❌ معرف التعيين مطلوب');
+            return false;
+        }
+
+        if (!confirm('هل أنت متأكد من حذف هذا التعيين؟')) {
+            return false;
+        }
+
+        try {
+            const endpoint = `${API_ENDPOINTS.DELETE_EVALUATION_REQUEST_ASSIGNMENT}/${evalRequestAssignmentId}`;
+            const result = await jqClient().Delete(endpoint);
+
+            if (result.success || result.isSuccess) {
+                alert('تم حذف التعيين بنجاح');
+                return true;
+            } else {
+                throw new Error(result.message || 'فشل في حذف التعيين');
+            }
+        } catch (error) {
+            console.error('❌ خطأ في حذف التعيين:', error);
+            alert('حدث خطأ أثناء حذف التعيين');
+            return false;
+        }
+    };
+
+    // ================= UTILITY FUNCTIONS =================
+
+    window.hasTeamChanges = function (fieldId) {
+        if (!window.teamMembersLogic) {
+            return false;
+        }
+
+        const state = window.teamMembersLogic.getState();
+        if (!state) {
+            return false;
+        }
+
+        const currentData = window.getTeamDataByFieldId(fieldId, state.evaluationRequestId);
+        const originalData = state.existingAssignments;
+
+        if (!originalData || originalData.length === 0) {
+            return currentData && currentData.length > 0;
+        }
+
+        return JSON.stringify(currentData) !== JSON.stringify(originalData);
+    };
+
+    window.getTeamChangeSummary = function (fieldId) {
+        const state = window.teamMembersLogic?.getState();
+        if (!state) {
+            return null;
+        }
+
+        const currentData = window.getTeamDataByFieldId(fieldId, state.evaluationRequestId);
+        const originalData = state.existingAssignments || [];
+
+        const summary = {
+            added: [],
+            removed: [],
+            modified: []
+        };
+
+        currentData.forEach(current => {
+            const exists = originalData.find(orig =>
+                orig.ministryUserId === current.MinistryUserId &&
+                orig.partyTypeId === current.PartyTypeId
+            );
+
+            if (!exists) {
+                summary.added.push(current);
+            }
+        });
+
+        originalData.forEach(orig => {
+            const exists = currentData.find(current =>
+                current.MinistryUserId === orig.ministryUserId &&
+                current.PartyTypeId === orig.partyTypeId
+            );
+
+            if (!exists) {
+                summary.removed.push(orig);
+            }
+        });
+
+        currentData.forEach(current => {
+            const original = originalData.find(orig =>
+                orig.ministryUserId === current.MinistryUserId &&
+                orig.partyTypeId === current.PartyTypeId
+            );
+
+            if (original && JSON.stringify(original) !== JSON.stringify(current)) {
+                summary.modified.push({ original, current });
+            }
+        });
+
+        return summary;
+    };
+
+    // ================= DEBUGGING =================
+
+    window.debugTeamData = function (fieldId, evaluationRequestId = null) {
+        const data = window.getTeamDataByFieldId(fieldId, evaluationRequestId);
+        console.log('=== Team Data Debug ===');
+        console.log('Raw Data:', data);
+        console.log('JSON:', JSON.stringify(data, null, 2));
+
+        const validation = validateTeamData(data);
+        console.log('Validation:', validation);
+
+        return data;
+    };
 
 })(window);

@@ -13,6 +13,13 @@ public class EvaluationRequestAssignmentProfile : Profile
            .ForMember(dest => dest.EvalRequestAssignmentScopies, opt => opt.Ignore());
 
         CreateMap<EvaluationRequestAssignment, EvalTeamRequestDto>()
-            .ForMember(dest=> dest.UserId, opt=> opt.MapFrom(src=>src.MinistryUserId));
+            .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.MinistryUserId));
+
+        CreateMap<EvaluationRequestAssignment, EvaluationRequestAssignmentDto>()
+            .ForMember(dest => dest.EvalRequestAssignmentScopies,
+                       opt => opt.MapFrom(src => src.EvalRequestAssignmentScopies));
+
+        CreateMap<EvalRequestAssignmentScope, EvalRequestAssignmentScopeDto>();
+
     }
 }
