@@ -52,4 +52,14 @@ public class EmployeeService(IServiceScopeFactory serviceScopeFactory,
                     .FirstOrDefaultAsync();
     }
 
+    public async Task<Employee> GetEmployeeById(Guid Id)
+    {
+        return await unitOfWork.GetRepository<Employee>()
+                    .GetAllNonDeleted()
+                    .Include(e=>e.UserGender)
+                    .Include(e=>e.JobTitle)
+                    .Where(c => c.Id == Id)
+                    .FirstOrDefaultAsync();
+    }
+
 }

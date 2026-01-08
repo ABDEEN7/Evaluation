@@ -32,7 +32,7 @@
                
                 render: function (data, type, row) {
                     const safe = data || "";
-                    return `<a href="javascript:void(0)" data-bs-toggle= 'modal' data-bs-target= '#schoolDetailsModal' class="text-decoration-none text-primary fw-bold school-details-link" data-id="${row.id}">${safe}</a>`;
+                    return `<a href="javascript:void(0)" data-bs-toggle= 'modal' data-bs-target= '#SCHOOL' class="text-decoration-none text-primary fw-bold school-details-link" data-id="${row.id}">${safe}</a>`;
                 }
             },
             {
@@ -69,27 +69,27 @@
         ],
         onRowClick: function (rowData, event) {
             if ($(event.target).closest('.school-details-link').length) return;
-            openSchoolDetails(rowData.id);
+            //openSchoolDetails(rowData.id);
         },
         onDraw: function () {
             $('#schoolTable').off('click', '.school-details-link').on('click', '.school-details-link', function (e) {
                 e.preventDefault();
-                const id = $(this).data('id');
-                openSchoolDetails(id);
+                //const id = $(this).data('id');
+                //openSchoolDetails(id);
             });
         }
     });
 
-    function openSchoolDetails(schoolId) {
-        const options = {
-            success: function (response) {
-                $('#schoolModalLabel').text(response.name || '');
-                $('#schoolModalBody').html(response.htmlContent || '');
-                $('#schoolDetailsModal').modal('show');
-            }
-        };
-        //jqClient(options).Get(`/School/GetSchoolDetails?schoolID=${schoolId}`);
-    }
+    //function openSchoolDetails(schoolId) {
+    //    const options = {
+    //        success: function (response) {
+    //            $('#schoolModalLabel').text(response.name || '');
+    //            $('#schoolModalBody').html(response.htmlContent || '');
+    //            $('#schoolDetailsModal').modal('show');
+    //        }
+    //    };
+    //    //jqClient(options).Get(`/School/GetSchoolDetails?schoolID=${schoolId}`);
+    //}
 
     schoolsListing.reload();
 });
