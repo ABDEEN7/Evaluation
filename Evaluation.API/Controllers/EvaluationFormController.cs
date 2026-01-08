@@ -36,6 +36,13 @@ public class EvaluationFormController : ControllerBase
         return Ok(await _masterBl.GetApiService<EvaluationFormBL>().GetAllEvalFormItems(EvalformId));
     }
 
+    [HttpGet]
+    //[CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.VIEW_WEB_FORMITEMS })]
+    public async Task<IActionResult> GetAllFormItemsFromDepartment(Guid EvalformId)
+    {
+        return Ok(await _masterBl.GetApiService<EvaluationFormBL>().GetAllFormItemsFromDepartment(EvalformId));
+    }
+
     [HttpPost]
     //[CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.ADD_WEB_EVALFORMS })]
     public async Task<IActionResult> SaveEvaluationForm()

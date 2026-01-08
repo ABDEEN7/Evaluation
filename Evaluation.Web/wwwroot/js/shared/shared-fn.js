@@ -1974,7 +1974,7 @@ const sharedFn = (options) => {
 
         const obj = groupObject;
         if (obj) {
-            $('#Id').val(obj.id);
+            $('#PopupId').val(obj.id);
             if (ControlItems.length > 0) {
                 var notduallistcontrollist = ControlItems.filter(c => c.constraint.controlType != 'DUAL_LIST');
                 notduallistcontrollist.forEach(item => {
@@ -1994,11 +1994,8 @@ const sharedFn = (options) => {
                         $('#' + contrains.uibackendName).val(obj[fieldname]).trigger('change');
                     }
                     else if (contrains.controlType == 'MULTIDROPDOWN') {
-                        var Ids = String(obj[fieldname]).split(',').map(function (item) {
-                            return item.trim();
-                        });
-                        $('#' + contrains.uibackendName).attr("data-value", Ids);
-                        $('#' + contrains.uibackendName).val(Ids).trigger('change');
+                        $('#' + contrains.uibackendName).attr("data-value", obj[fieldname]);
+                        $('#' + contrains.uibackendName).val(obj[fieldname]).trigger('change');
                     }
                     else if (contrains.controlType == 'TEXT_TINY') {
                         tinyMCE.get(contrains.uibackendName).setContent(obj[fieldname]);
