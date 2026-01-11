@@ -20,16 +20,28 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
     public async Task<Result<List<FormItemDto>>> GetFormItems(Guid FormId)
     {
         var formItems = await formService.GetFormItems();
-        var mappedData = mapper.Map<List<FormItemDto>>(formItems.Where(s => s.EvalFormId == FormId).ToList());
-
-        foreach (var item in mappedData)
+        var selectedFormItems = formItems.Where(s => s.EvalFormId == FormId).ToList();
+        var mappedData = mapper.Map<List<FormItemDto>>(selectedFormItems);
+        foreach (var item in selectedFormItems)
         {
-            if (item.RelatedItemId != Guid.Empty)
+            var relatedItemDtos = new List<RelatedItemDto>();
+
+            foreach (var relatedFromItem in item.RelatedFrom) 
             {
-                var formItemValue = await formService.GetFormItemValueByItemId(item.RelatedItemId);
-                item.RelatedItemNote = formItemValue.Note;
-                item.RelatedItemValue = formItemValue.Value.ToString();
+                if (relatedFromItem.RelatedItemId != Guid.Empty)
+                {
+                    var formItemValue = await formService.GetFormItemValueByItemId(relatedFromItem.RelatedItemId);
+
+                        relatedItemDtos.Add(new RelatedItemDto()
+                        {
+                            Id = relatedFromItem.RelatedItemId,
+                            Note = formItemValue?.Note,
+                            Value = formItemValue?.Value?.ToString(),
+                            Name = relatedFromItem.RelatedItem.NameAr
+                        });
+                }
             }
+            mappedData.Where(md => md.Id == item.Id).FirstOrDefault().RelatedItems = relatedItemDtos;
         }
 
         return mappedData;

@@ -50,7 +50,6 @@ const generateAccordionItem = ({ id, title, icon, content, badge }) => `
 `;
 
 const generateFormAccordionItem = (rowsHtml, hasAnyNote) => `
-${relatedItemPopup}
 <div class="accordion-item mb-3 rounded">
     <div id="item3" class="accordion-collapse collapse show">
         <div class="accordion-body">
@@ -123,10 +122,29 @@ const createRow = ({
 
     <td>${order}</td>
     <td class="text-start">${escapeHtml(item.name)} 
-    ${item.relatedItemName != null ? `<span class="info-icon" onclick=" openRelatedItemModal('${item.relatedItemName}', '${item.relatedItemValue}', '${item.relatedItemNote}')">ⓘ</span>`: ''}
+    ${Array.isArray(item.relatedItems) && item.relatedItems.length > 0
+        ? `<span class="info-icon" onclick="openRelatedItemModal('${item.id}')">ⓘ</span>`
+        : ''
+}
+    
     </td>
     <td>${buildSelection(item, fieldId, readOnly)}</td>
     ${hasAnyNote ? `<td>${buildNote(item, fieldId, readOnly)}</td>` : ''}
+</tr>
+`;
+
+
+
+const createRowRelatedItem = ({
+    item,
+    order,
+    hasAnyNote
+}) => `
+<tr class="main-row align-middle">
+    <td>${order}</td>
+    <td class="text-start">${escapeHtml(item.name)}</td>
+    <td>${escapeHtml(item.value)}</td>
+    ${hasAnyNote ? `<td>${escapeHtml(item.note)}</td>` : ''}
 </tr>
 `;
 
@@ -164,8 +182,20 @@ const generateTableBodyHtml = async (items, hasAnyNote, hasAnyChildren, fieldId,
     }).join('');
 };
 
+const generateTableBodyHtmlForRelatedItems = async (items, hasAnyNote) => {
+    return items.map((item, i) => {
+
+        const mainRow = createRowRelatedItem({
+            item,
+            order: i + 1,
+            hasAnyNote
+        });
+        return mainRow;
+    }).join('');
+};
+
 // ==============================
-// Page Generator
+// Page Generator 
 // ==============================
 const generateFullFormPageHtml = async ({ formId, fieldId, readOnly }) => {
     itemsResult = await jqClient().Get(`/Form/GetItems?formId=${formId}`);
@@ -185,7 +215,8 @@ const generateFullFormPageHtml = async ({ formId, fieldId, readOnly }) => {
     return `${generateFormAccordionItem(rowsHtml, hasAnyNote)}`;
 };
 
-const relatedItemPopup = `<div class="modal fade" id="RealatedItemModal" tabindex="-1" aria-hidden="true">
+
+const relatedItemPopup = (rowsHtml) => `<div class="modal fade" id="RealatedItemModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header align-items-start border-0">
@@ -198,15 +229,48 @@ const relatedItemPopup = `<div class="modal fade" id="RealatedItemModal" tabinde
 
             <div class="modal-body py-0">
                 <div class="row">
-                    <div class="col-md-12" id="modalBodyContent">
-                    </div>
-                    <div class="col-md-12" id="modalNote">
-                    </div>
+                    <table class="table table-bordered text-center align-middle">
+                        <thead class="table-grey">
+                            <tr>
+                                <th>#</th>
+                                <th>البند</th>
+                                <th>القيمة</th>
+                                <th>ملاحظات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${rowsHtml}
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
 </div>`;
+
+
+//const relatedItemPopup = `<div class="modal fade" id="RealatedItemModal" tabindex="-1" aria-hidden="true">
+//    <div class="modal-dialog modal-xl modal-dialog-centered">
+//        <div class="modal-content">
+//            <div class="modal-header align-items-start border-0">
+//                <div>
+//                    <h4 class="modal-title fw-semibold mb-2" id="modalTitle"></h4>
+//                </div>
+
+//                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+//            </div>
+
+//            <div class="modal-body py-0">
+//                <div class="row">
+//                    <div class="col-md-12" id="modalBodyContent">
+//                    </div>
+//                    <div class="col-md-12" id="modalNote">
+//                    </div>
+//                </div>
+//            </div>
+//        </div>
+//    </div>
+//</div>`;
 
 
 // ==============================
@@ -290,13 +354,27 @@ async function initializeControls(formId, fieldId, controlValues) {
 //    }
 //});
 
-function openRelatedItemModal(title, bodyContent, note) {
-    // Set values
-    document.getElementById('modalTitle').innerText = title;
-    document.getElementById('modalBodyContent').innerHTML = bodyContent;
-    document.getElementById('modalNote').innerHTML = note;
+async function openRelatedItemModal(id) {
 
-    // Show modal (Bootstrap 5)
-    var modal = new bootstrap.Modal(document.getElementById('RealatedItemModal'));
+
+    let relatedItems = itemsResult?.value.find(r => r.id == id)?.relatedItems ?? [];
+
+    const relatedItemsRowsHtml = await generateTableBodyHtmlForRelatedItems(
+        relatedItems
+    );
+
+    const popupHtml = await relatedItemPopup(relatedItemsRowsHtml);
+
+    document.body.insertAdjacentHTML('beforeend', popupHtml);
+
+    let modalElement = document.getElementById('RealatedItemModal');
+
+    let modal = new bootstrap.Modal(modalElement);
+
+    // Remove modal from DOM after it is closed
+    modalElement.addEventListener('hidden.bs.modal', () => {
+        modalElement.remove();
+    });
+
     modal.show();
 }

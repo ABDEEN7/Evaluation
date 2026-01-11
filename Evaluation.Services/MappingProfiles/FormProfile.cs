@@ -15,8 +15,8 @@ public class FormProfile : Profile
             //.ForMember(d => d.OrderNo, opt => opt.MapFrom(src => src.OrderNo))
             .ForMember(d => d.HasNote, opt => opt.MapFrom(src => src.HasNote))
             .ForMember(d => d.SubFormItems, opt => opt.MapFrom(src => src.SubFormItems))
-            .ForMember(d => d.RelatedItemName, opt => opt.MapFrom(src => src.RelatedFrom.FirstOrDefault().RelatedItem.NameAr))
-            .ForMember(d => d.RelatedItemId, opt => opt.MapFrom(src => src.RelatedFrom.FirstOrDefault().RelatedItemId))
+            //.ForMember(d => d.RelatedItemName, opt => opt.MapFrom(src => src.RelatedFrom.FirstOrDefault().RelatedItem.NameAr))
+            //.ForMember(d => d.RelatedItemId, opt => opt.MapFrom(src => src.RelatedFrom.FirstOrDefault().RelatedItemId))
             .ReverseMap();
 
         CreateMap<SubFormItem, SubFormItemDto>()
@@ -29,6 +29,13 @@ public class FormProfile : Profile
           .ForMember(d => d.Note, opt => opt.MapFrom(src => src.Note))
           .ForMember(d => d.Id, opt => opt.MapFrom(src => src.FormItemId))
           .ForMember(d => d.ValueId, opt => opt.MapFrom(src => src.Id))
+          .ReverseMap();
+
+
+        CreateMap<FormItemValue, RelatedItemDto>()
+          .ForMember(d => d.Value, opt => opt.MapFrom(src => src.Value))
+          .ForMember(d => d.Note, opt => opt.MapFrom(src => src.Note))
+          .ForMember(d => d.Id, opt => opt.MapFrom(src => src.FormItemId))
           .ReverseMap();
 
         CreateMap<SubFormItemValue, SubFormItemEvaluationDto>()
