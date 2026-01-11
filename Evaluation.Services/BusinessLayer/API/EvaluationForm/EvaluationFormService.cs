@@ -7,6 +7,7 @@ using Evaluation.SharedHelper.Dtos.EvalFormDto;
 using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Models;
+using Evaluation.SharedHelper.Models.Api;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -42,40 +43,76 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
 
     public async Task<List<EvaluationFormItemDto>> GetEvaluationFormItemList(Guid EvalformId)
     {
+        var items = await uow.GetRepository<FormItem>()
+    .GetAllNonDeleted()
+    .Where(x => x.EvalFormId == EvalformId)
+    .Include(x => x.SubFormItems)
+    .OrderByDescending(x => x.CreateDate)
+    .ToListAsync();   // <-- SQL stops here
+
+        var relatedformitems = await uow.GetRepository<FormItemRelated>()
+    .GetAllNonDeleted()
+    .ToListAsync();   // memory
+
+        var result = items.Select(x => new EvaluationFormItemDto
+        {
+            Id = x.Id,
+            NameAr = x.NameAr,
+            NameEn = x.NameEn,
+            Min = x.Min,
+            Max = x.Max,
+            IsEvaluation = x.IsEvaluation,
+            Weight = x.Weight,
+            EvalFormId = x.EvalFormId,
+            CalcMethodId = x.CalcMethodId,
+            ScopeId = x.ScopeId,
+            IsActive = x.IsActive,
+            HasNote = x.HasNote,
+            DropDownTypeId = x.DropDownTypeId,
+
+            SubFormItems = x.SubFormItems
+        .Where(s => s.IsDeleted==false)
+        .Select(s => new EvaluationFormSubItemDto
+        {
+            Id = s.Id,
+            FormItemId = s.FormItemId,
+            NameAr = s.NameAr,
+            NameEn = s.NameEn,
+            IsOption = s.IsOption,
+            DropDownTypeId = s.DropDownTypeId,
+            IsActive = s.IsActive
+        })
+        .ToList(),
+
+            FormItemRelated = relatedformitems
+        .Where(r => r.IsDeleted ==false && r.FormItemId == x.Id)
+        .Select(r => r.RelatedItemId)
+        .ToArray()
+        })
+.ToList();
+        return result;
+
+    }
+
+    public async Task<List<DropdownItem>> GetAllFormItemsFromDepartment(Guid EvalformId)
+    {
+        var Departmnentid=await uow.GetRepository<EvalForm>().GetAllNonDeleted().Include(x=>x.FormEvalMatrix)
+            .Where(x=>x.Id==EvalformId)
+            .Select(x=>x.FormEvalMatrix!.DepartmentId)
+            .FirstOrDefaultAsync();
+
         var result = await uow.GetRepository<FormItem>()
     .GetAllNonDeleted()
-    .Where(x=>x.EvalFormId==EvalformId)
-    .Include(x => x.CreateBy)
-    .Include(x => x.SubFormItems)   // ← let EF load children
+    .Include(x=>x.EvalForm)
+    .ThenInclude(x=>x!.FormEvalMatrix)
+    .Where(x=>x.EvalFormId!=EvalformId && x.EvalForm!.FormEvalMatrix!.DepartmentId==Departmnentid)
     .OrderByDescending(x => x.CreateDate)
-    .Select(x => new EvaluationFormItemDto
+    .Select(x => new DropdownItem
     {
         Id = x.Id,
         NameAr = x.NameAr,
-        NameEn = x.NameEn,
-        Min = x.Min,
-        Max = x.Max,
-        IsEvaluation = x.IsEvaluation,
-        Weight = x.Weight,
-        EvalFormId = x.EvalFormId,
-        CalcMethodId = x.CalcMethodId,
-        ScopeId = x.ScopeId,
-        IsActive = x.IsActive,
-        HasNote = x.HasNote,
-        DropDownTypeId = x.DropDownTypeId,
-
-        SubFormItems = x.SubFormItems.Where(x=>x.IsDeleted==false).Select(z => new EvaluationFormSubItemDto
-        {
-            Id = z.Id,
-            FormItemId = z.FormItemId,
-            NameAr = z.NameAr,
-            NameEn = z.NameEn,
-            IsOption = z.IsOption,
-            DropDownTypeId = z.DropDownTypeId,
-            IsActive = z.IsActive
-        }).ToList()
-    })
-    .ToListAsync();
+        NameEn = x.NameEn
+    }).ToListAsync();
 
         return result;
 
@@ -200,7 +237,25 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
         obj.IsActive = message.IsActive;
 
         uow.GetRepository<FormItem>().Insert(obj);
+        //insert values to FormItemRelated
+        if (message.FormItemRelated != null)
+        {
+            List<FormItemRelated> objentitylist=new List<FormItemRelated>();
+            foreach (var item in message.FormItemRelated)
+            {
+                FormItemRelated objentity = new FormItemRelated();
+                objentity.RelatedItemId = item;
+                objentity.FormItemId = obj.Id;
+                objentity.IsActive = true;
+                objentitylist.Add(objentity);
+            }
+            if (objentitylist.Count > 0)
+            {
+                await uow.GetRepository<FormItemRelated>().InsertRange(objentitylist);
+            }
 
+
+        }
 
         await uow.CommitAsync();
         message.Id = obj.Id;
@@ -230,6 +285,47 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
             obj.DropDownTypeId = message.DropDownTypeId;
             obj.IsActive = message.IsActive;
             uow.GetRepository<FormItem>().Update(obj);
+            //update values to FormItemRelated
+            List<FormItemRelated>  objFormItemRelateddelete = await uow.GetRepository<FormItemRelated>()
+                                      .GetAllNonDeleted()
+                                      .Where(x => x.FormItemId == obj.Id)
+                                      .ToListAsync();
+
+            var FormItemRelatedexistids =new List<Guid>();
+            if (objFormItemRelateddelete.Count > 0)
+            {
+                foreach (var item in objFormItemRelateddelete)
+                {
+                    if (message.FormItemRelated != null && message.FormItemRelated.Contains(item.RelatedItemId))
+                    {
+                        FormItemRelatedexistids.Add(item.RelatedItemId);
+                    }
+                    else
+                    {
+                        uow.GetRepository<FormItemRelated>().Delete(item);
+                    }
+
+                }
+            }
+            if (message.FormItemRelated != null)
+            {
+                var notInSelected = message.FormItemRelated.Except(FormItemRelatedexistids).ToList();
+                List<FormItemRelated> objentitylist=new List<FormItemRelated>();
+                foreach (var item in notInSelected)
+                {
+                    FormItemRelated objentity = new FormItemRelated();
+                    objentity.FormItemId = obj.Id;
+                    objentity.RelatedItemId = item;
+                    objentity.IsActive = true;
+                    objentitylist.Add(objentity);
+                }
+                if (objentitylist.Count > 0)
+                {
+                    await uow.GetRepository<FormItemRelated>().InsertRange(objentitylist);
+                }
+
+
+            }
             await uow.CommitAsync();
             message.ResponseStatus = DBResult.Updated;
         }
@@ -267,6 +363,15 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
             if (SubFormItem.Count > 0)
             {
                 throw new BusinessException(ConstantKeys.ExceptionMessage.FormItemExistsSubFormItem);
+            }
+
+            var FormItemRelated = await uow.GetRepository<FormItemRelated>()
+.GetAllNonDeleted()
+                      .Where(x => x.FormItemId == obj.Id||x.RelatedItemId==obj.Id)
+                      .ToListAsync();
+            if (FormItemRelated.Count > 0)
+            {
+                throw new BusinessException(ConstantKeys.ExceptionMessage.FormItemExistsFormItemRelated);
             }
             uow.GetRepository<FormItem>().Delete(obj);
             await uow.CommitAsync();

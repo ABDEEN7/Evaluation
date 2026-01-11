@@ -61,7 +61,54 @@ $("#btnAddParent").click(function () {
     sharedFn().OpenFormPopup(modaltitle, FormItemcontrolvalidationlist, null, null, null);
 
 });
+function SetDropDown() {
+    if (popupname == "EvalFormItem") {
+        var EvalformId = $("#Id").val();
+        const options = {
+            success: function (result) {
+                if (result) {
 
+                    const ddlData = result.map(item => (
+                        {
+                            id: item.id,
+                            text: txtDir === "RTL" ? item.nameAr : item.nameEn
+                        }
+                    ));
+                    var $dropdown = $('#EvalFormItemFormItemRelated');
+                    $dropdown.empty();
+                    $dropdown.select2({
+                        allowClear: true,
+                        width: '100%',
+                        multiple: true,
+                        data: ddlData,
+                        placeholder: sharedFn().GetUiControlText('EvalFormItemFormItemRelated'),
+                        dropdownCssClass: "manageselect2zindex",
+                        dropdownParent: $("#ModalPopup"),
+                    });
+                    var raw = $dropdown.attr("data-value");   // NOT .data()
+
+                    if (raw) {
+                        var values = raw.split(",");         // convert CSV → array
+
+                        // Trim spaces (important)
+                        values = values.map(x => x.trim());
+
+                        // Set to Select2
+                        $dropdown.val(values).trigger("change.select2");
+                    }
+                    else {
+                        $dropdown.val(null).trigger("change.select2");
+                    }
+
+                    
+
+                }
+            }
+        };
+        jqClient(options).Get("/EvaluationForm/GetAllFormItemsFromDepartment".concat('?EvalformId=', EvalformId));
+    }
+    
+}
 function BindFormItem() {
     $("#formitemTable tbody").empty();
     var EvalformId = $("#Id").val();
@@ -167,7 +214,6 @@ $(document).on("click", ".editParent", function () {
     var jsonString = row.find("td:last").text();
     var objdata = JSON.parse(jsonString);
     popupname = "EvalFormItem";
-   
     var modaltitle = sharedFn().GetUiControlText('FormItemHeader');
     sharedFn().OpenFormPopup(modaltitle, FormItemcontrolvalidationlist, objdata, null, null);
     $("#PopupId").val(id);

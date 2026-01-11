@@ -1,6 +1,7 @@
 using Evaluation.Admin.ActionFilter;
 using Evaluation.Admin.Extensions;
 using Evaluation.Admin.Models;
+using Evaluation.DAL.Models.FormsModules;
 using Evaluation.Services.BusinessLayer;
 using Evaluation.Services.Models.Admin;
 using Evaluation.SharedHelper.Enums;
@@ -215,7 +216,15 @@ namespace Evaluation.Admin.Controllers
             response.Add("Field", Field);
             return Ok(new ResponseEntity(response));
         }
-
+        [HttpGet]
+        [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.AdminPermission.VIEW_ADMIN_FIELD_CONDITION })]
+        public async Task<IActionResult> GetAllEvalForm(Guid systemmoduleid)
+        {
+            Dictionary<string, object> response = new Dictionary<string, object>();
+            var EvalForm = await masterBL.GetAdminService<SrvFormGroupBL>().GetAllEvalForm(systemmoduleid);
+            response.Add("EvalForm", EvalForm);
+            return Ok(new ResponseEntity(response));
+        }
         [HttpGet]
         [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.AdminPermission.VIEW_ADMIN_FIELD_CONDITION })]
         public async Task<IActionResult> GetAllFieldFormGroupList(Guid serviceid)
