@@ -319,6 +319,7 @@ public static class ConstantKeys
         public static readonly string WebEvaluationForm = "WebEvaluationForm";
         public static readonly string WebEvaluationFormItem = "WebEvaluationFormItem";
         public static readonly string WebEvaluationSubFormItem = "WebEvaluationSubFormItem";
+        public static readonly string WebEvaluationFormScopes = "WebEvaluationFormScopes";
     }
     public static class AdminPermission
     {
@@ -804,6 +805,15 @@ public static class ConstantKeys
         public const string ADD_WEB_SUBFORMITEMS = "ADD_WEB_SUBFORMITEMS";
         public const string EDIT_WEB_SUBFORMITEMS = "EDIT_WEB_SUBFORMITEMS";
         public const string DELETE_WEB_SUBFORMITEMS = "DELETE_WEB_SUBFORMITEMS";
+
+        #endregion
+
+        #region FORMSCOPES
+
+        public const string VIEW_WEB_FORMSCOPES = "VIEW_WEB_FORMSCOPES";
+        public const string ADD_WEB_FORMSCOPES = "ADD_WEB_FORMSCOPES";
+        public const string EDIT_WEB_FORMSCOPES = "EDIT_WEB_FORMSCOPES";
+        public const string DELETE_WEB_FORMSCOPES = "DELETE_WEB_FORMSCOPES";
 
         #endregion
 

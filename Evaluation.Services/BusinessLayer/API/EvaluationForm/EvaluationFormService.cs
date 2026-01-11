@@ -93,7 +93,22 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
         return result;
 
     }
+    public async Task<List<FormScopeDTO>> GetAllFormScopeList(Guid formIdValue)
+    {
 
+
+        var list = await uow.GetRepository<FormScope>()
+                .GetAllNonDeleted()
+                .Where(x=>x.EvalFormId==formIdValue)
+                .Include(x => x.CreateBy)
+                .OrderByDescending(x => x.CreateDate)
+                .ToListAsync();
+
+        var result = mapper.Map<List<FormScopeDTO>>(list, opts => opts.Items["Language"] = requestInfo.Lang);
+        return result;
+
+
+    }
     public async Task<List<DropdownItem>> GetAllFormItemsFromDepartment(Guid EvalformId)
     {
         var Departmnentid=await uow.GetRepository<EvalForm>().GetAllNonDeleted().Include(x=>x.FormEvalMatrix)
@@ -443,6 +458,73 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
             uow.GetRepository<SubFormItem>().Delete(obj);
             await uow.CommitAsync();
             result = mapper.Map<EvaluationFormSubItemDto>(obj, opts => opts.Items["Language"] = requestInfo.Lang);
+            result.ResponseStatus = DBResult.Deleted;
+        }
+        return result;
+
+
+    }
+
+    public async Task<FormScopeDTO> SaveFormScope(FormScopeDTO message)
+    {
+
+
+        FormScope obj = new FormScope();
+        obj.EvalFormId = message.EvalFormId;
+        obj.ScopeId = message.ScopeId;
+        obj.Wegiht = message.Wegiht;
+        obj.IsActive = message.IsActive;
+
+        uow.GetRepository<FormScope>().Insert(obj);
+
+
+        await uow.CommitAsync();
+        var result = mapper.Map<FormScopeDTO>(obj, opts => opts.Items["Language"] = requestInfo.Lang);
+        result.ResponseStatus = DBResult.Inserted;
+        return result;
+
+    }
+    public async Task<FormScopeDTO> UpdateFormScope(FormScopeDTO message)
+    {
+        var result = new FormScopeDTO();
+
+        if (message.Id != null)
+        {
+            FormScope obj = await uow.GetRepository<FormScope>()
+                                      .GetAllNonDeleted()
+                                      .Include(x => x.CreateBy)
+                                      .Where(x => x.Id == message.Id)
+                                      .FirstAsync();
+            obj.EvalFormId = message.EvalFormId;
+            obj.ScopeId = message.ScopeId;
+            obj.Wegiht = message.Wegiht;
+            obj.IsActive = message.IsActive;
+
+            uow.GetRepository<FormScope>().Update(obj);
+            await uow.CommitAsync();
+            result = mapper.Map<FormScopeDTO>(obj, opts => opts.Items["Language"] = requestInfo.Lang);
+            result.ResponseStatus = DBResult.Updated;
+        }
+        return result;
+
+    }
+
+    public async Task<FormScopeDTO> DeleteFormScope(Guid? Id)
+    {
+
+
+
+
+        var result = new FormScopeDTO();
+        if (Id is not null)
+        {
+            FormScope obj = await uow.GetRepository<FormScope>()
+                                      .GetAllNonDeleted()
+                                      .Where(x => x.Id == Id)
+                                      .FirstAsync();
+            uow.GetRepository<FormScope>().Delete(obj);
+            await uow.CommitAsync();
+            result = mapper.Map<FormScopeDTO>(obj, opts => opts.Items["Language"] = requestInfo.Lang);
             result.ResponseStatus = DBResult.Deleted;
         }
         return result;

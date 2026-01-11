@@ -27,6 +27,12 @@ public class EvaluationFormBL(IServiceScopeFactory serviceScopeFactory, CacheDat
         var result = await evaluationFormService.GetEvaluationFormItemList(EvalformId);
         return result;
     }
+
+    public async Task<List<FormScopeDTO>> GetAllFormScope(Guid formIdValue)
+    {
+        var result = await evaluationFormService.GetAllFormScopeList(formIdValue);
+        return result;
+    }
     public async Task<List<DropdownItem>> GetAllFormItemsFromDepartment(Guid EvalformId)
     {
         var result = await evaluationFormService.GetAllFormItemsFromDepartment(EvalformId);
@@ -113,6 +119,34 @@ public class EvaluationFormBL(IServiceScopeFactory serviceScopeFactory, CacheDat
     public async Task<EvaluationFormSubItemDto> DeleteEvaluationSubFormItem(Guid Id)
     {
         var result = await evaluationFormService.DeleteEvaluationSubFormItem(Id!);
+        return result;
+    }
+
+    public async Task<FormScopeDTO> SaveFormScope(FormScopeDTO model)
+    {
+        var result = new FormScopeDTO();
+        bool validateObject = await ValidateObject(model!, ConstantKeys.WebPermissions.ADD_WEB_FORMSCOPES);
+        if (validateObject)
+        {
+            result = await evaluationFormService.SaveFormScope(model!);
+
+        }
+        return result;
+    }
+    public async Task<FormScopeDTO> UpdateFormScope(FormScopeDTO model)
+    {
+        var result = new FormScopeDTO();
+        bool validateObject = await ValidateObject(model!, ConstantKeys.WebPermissions.ADD_WEB_FORMSCOPES);
+        if (validateObject)
+        {
+            result = await evaluationFormService.UpdateFormScope(model!);
+
+        }
+        return result;
+    }
+    public async Task<FormScopeDTO> DeleteFormScope(Guid Id)
+    {
+        var result = await evaluationFormService.DeleteFormScope(Id!);
         return result;
     }
 
