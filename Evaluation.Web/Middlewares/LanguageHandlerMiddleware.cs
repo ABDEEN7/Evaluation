@@ -30,8 +30,9 @@
                 pathSegments.Insert(0, mainLang);             // Prepend the default language
 
                 // Construct the new path
-                var defaultWebGroup = config.GetValue<string>("defaultWebGroup");
-                var newPath = $"/{string.Join('/', pathSegments)}/{defaultWebGroup}";
+               // var defaultWebGroup = config.GetValue<string>("defaultWebGroup");
+                //var newPath = $"/{string.Join('/', pathSegments)}/{defaultWebGroup}";
+                var newPath = $"/{string.Join('/', pathSegments)}";
                 var newUrl = $"{(context.Request.IsHttps ? "https" : "http")}://{context.Request.Host}{newPath}{context.Request.QueryString}";
 
                 // Redirect to the URL with the correct language
