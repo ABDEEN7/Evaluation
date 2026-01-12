@@ -314,6 +314,7 @@ public static class ConstantKeys
         public static readonly string AdminCssClass = "AdminCssClass";
         public static readonly string AdminDropDownType = "AdminDropDownType";
         public static readonly string AdminSchoolLevel = "AdminSchoolLevel";
+        public static readonly string AdminSystemSetting = "AdminSystemSetting";
     }
     public static class WebAppPages
     {
@@ -777,6 +778,12 @@ public static class ConstantKeys
         public const string ADD_ADMIN_SCHOOLLEVEL = "ADD_ADMIN_SCHOOLLEVEL";
         public const string EDIT_ADMIN_SCHOOLLEVEL = "EDIT_ADMIN_SCHOOLLEVEL";
         public const string DELETE_ADMIN_SCHOOLLEVEL = "DELETE_ADMIN_SCHOOLLEVEL";
+
+        #endregion
+        #region SYSTEMSETTING
+
+        public const string VIEW_ADMIN_SYSTEMSETTING = "VIEW_ADMIN_SYSTEMSETTING";
+        public const string EDIT_ADMIN_SYSTEMSETTING = "EDIT_ADMIN_SYSTEMSETTING";
 
         #endregion
 
