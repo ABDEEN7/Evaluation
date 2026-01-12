@@ -313,6 +313,7 @@ public static class ConstantKeys
         public static readonly string AdminFormEvalMarixValue = "AdminFormEvalMarixValue";
         public static readonly string AdminCssClass = "AdminCssClass";
         public static readonly string AdminDropDownType = "AdminDropDownType";
+        public static readonly string AdminSchoolLevel = "AdminSchoolLevel";
     }
     public static class WebAppPages
     {
@@ -767,6 +768,15 @@ public static class ConstantKeys
         public const string ADD_ADMIN_DROPDOWNTYPE = "ADD_ADMIN_DROPDOWNTYPE";
         public const string EDIT_ADMIN_DROPDOWNTYPE = "EDIT_ADMIN_DROPDOWNTYPE";
         public const string DELETE_ADMIN_DROPDOWNTYPE = "DELETE_ADMIN_DROPDOWNTYPE";
+
+        #endregion
+
+        #region SCHOOLLEVEL
+
+        public const string VIEW_ADMIN_SCHOOLLEVEL = "VIEW_ADMIN_SCHOOLLEVEL";
+        public const string ADD_ADMIN_SCHOOLLEVEL = "ADD_ADMIN_SCHOOLLEVEL";
+        public const string EDIT_ADMIN_SCHOOLLEVEL = "EDIT_ADMIN_SCHOOLLEVEL";
+        public const string DELETE_ADMIN_SCHOOLLEVEL = "DELETE_ADMIN_SCHOOLLEVEL";
 
         #endregion
 
