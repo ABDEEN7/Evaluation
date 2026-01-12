@@ -66,7 +66,9 @@
     </section>
     
 </div>
-
+<div>
+    <input id="formIdValue" hidden />
+</div>
 @section Scripts {
    
     <script src="~/js/EvaluationForm/evaluation-form.js" asp-append-version="true"></script>
@@ -82,24 +84,28 @@
                     '@nameof(ConstantKeys.WebAppCommon)',
                     '@nameof(ConstantKeys.WebAppPages.WebEvaluationForm)',
                     '@nameof(ConstantKeys.WebAppPages.WebEvaluationFormItem)',
-                    '@nameof(ConstantKeys.WebAppPages.WebEvaluationSubFormItem)'
+                    '@nameof(ConstantKeys.WebAppPages.WebEvaluationSubFormItem)',
+                    '@nameof(ConstantKeys.WebAppPages.WebEvaluationFormScopes)'
                 ],
                  pages: [
                     '@nameof(ConstantKeys.WebAppCommon)',
                     '@nameof(ConstantKeys.WebAppPages.WebEvaluationForm)',
                     '@nameof(ConstantKeys.WebAppPages.WebEvaluationFormItem)',
-                    '@nameof(ConstantKeys.WebAppPages.WebEvaluationSubFormItem)'
+                    '@nameof(ConstantKeys.WebAppPages.WebEvaluationSubFormItem)',
+                    '@nameof(ConstantKeys.WebAppPages.WebEvaluationFormScopes)'
                 ],
                  permissions: [
                     '@nameof(ConstantKeys.WebPermissions.ADD_WEB_EVALFORMS)',
                     '@nameof(ConstantKeys.WebPermissions.ADD_WEB_FORMITEMS)',,
                     '@nameof(ConstantKeys.WebPermissions.ADD_WEB_SUBFORMITEMS)',
+                     '@nameof(ConstantKeys.WebPermissions.ADD_WEB_FORMSCOPES)',
                 ],
             }).then((result) => {
 
                  uiControlItems = result.uiControlItems.filter(x => x.rowOrder > 0 && x.permissionBackendName=='@ConstantKeys.WebPermissions.ADD_WEB_EVALFORMS');
                  FormItemuiControlItems = result.uiControlItems.filter(x => x.rowOrder > 0 && x.permissionBackendName=='@ConstantKeys.WebPermissions.ADD_WEB_FORMITEMS');
                   SubFormItemuiControlItems = result.uiControlItems.filter(x => x.rowOrder > 0 && x.permissionBackendName=='@ConstantKeys.WebPermissions.ADD_WEB_SUBFORMITEMS');
+                   FormScopeuiControlItems = result.uiControlItems.filter(x => x.rowOrder > 0 && x.permissionBackendName=='@ConstantKeys.WebPermissions.ADD_WEB_FORMSCOPES');
                 textDir = result.currentlanguage === "ar" ? "RTL" : "LTR";
                 permissionsList = result.permissionsList;
                 controlsList = result.controlsList;
@@ -107,24 +113,37 @@
                     ...c.constraint,
                     pageName: c.control.pageName
                 }));
+
                 settingList = result.settingList;
                 targetSetting = result.targetSetting;
                 containsOrderNo = result.containsOrderNo;
                 controlvalidationlist = uiControlItems;
                 FormItemcontrolvalidationlist = FormItemuiControlItems;
                 SubFormItemcontrolvalidationlist = SubFormItemuiControlItems;
-
+                FormScopecontrolvalidationlist = FormScopeuiControlItems;
+                FormScopecolumnList = FormScopeuiControlItems.filter(x => x.constraint.showInGrid === true && x.control).map(c => ({
+                    ...c.constraint,
+                    pageName: c.control.pageName
+                }));
+                //EvalForms
                 IsEdit = permissionsList?.some(p => p === '@ConstantKeys.WebPermissions.EDIT_WEB_EVALFORMS') ?? false;
                 IsDelete = permissionsList?.some(p => p === '@ConstantKeys.WebPermissions.DELETE_WEB_EVALFORMS') ?? false;
                  IsAdd = permissionsList?.some(p => p === '@ConstantKeys.WebPermissions.ADD_WEB_EVALFORMS') ?? false;
+                 //FormItem
                  IsAddFormItem = permissionsList?.some(p => p === '@ConstantKeys.WebPermissions.ADD_WEB_FORMITEMS') ?? false;
                  IsViewFormItem = permissionsList?.some(p => p === '@ConstantKeys.WebPermissions.VIEW_WEB_FORMITEMS') ?? false;
                   IsEditFormItem = permissionsList?.some(p => p === '@ConstantKeys.WebPermissions.EDIT_WEB_FORMITEMS') ?? false;
                    IsDeleteFormItem = permissionsList?.some(p => p === '@ConstantKeys.WebPermissions.DELETE_WEB_FORMITEMS') ?? false;
+                     //SubFormItem
                     IsAddSubFormItem = permissionsList?.some(p => p === '@ConstantKeys.WebPermissions.ADD_WEB_SUBFORMITEMS') ?? false;
                  IsViewSubFormItem = permissionsList?.some(p => p === '@ConstantKeys.WebPermissions.VIEW_WEB_SUBFORMITEMS') ?? false;
                   IsEditSubFormItem = permissionsList?.some(p => p === '@ConstantKeys.WebPermissions.EDIT_WEB_SUBFORMITEMS') ?? false;
                    IsDeleteSubFormItem = permissionsList?.some(p => p === '@ConstantKeys.WebPermissions.DELETE_WEB_SUBFORMITEMS') ?? false;
+                     //FormScope
+                    IsAddFormScope = permissionsList?.some(p => p === '@ConstantKeys.WebPermissions.ADD_WEB_FORMSCOPES') ?? false;
+                 IsViewFormScope = permissionsList?.some(p => p === '@ConstantKeys.WebPermissions.VIEW_WEB_FORMSCOPES') ?? false;
+                  IsEditFormScope = permissionsList?.some(p => p === '@ConstantKeys.WebPermissions.EDIT_WEB_FORMSCOPES') ?? false;
+                   IsDeleteFormScope = permissionsList?.some(p => p === '@ConstantKeys.WebPermissions.DELETE_WEB_FORMSCOPES') ?? false;
                  initTables();
             });
 

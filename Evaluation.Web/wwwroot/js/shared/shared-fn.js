@@ -1000,7 +1000,7 @@ const sharedFn = (options) => {
             editMode();
         }
         else {
-            $('#Id').val(id);
+            $('#PopupId').val(id);
         }
        
 
@@ -1830,7 +1830,7 @@ const sharedFn = (options) => {
                         if (popupdivcontent) {
                             if (tablecolumnlist) {
                                 popupdivcontent = popupdivcontent + '<div class="tabulator-wrapper"> <div id="divtable"></div> </div>';
-                                $('#ModalPopup .modal-body').html(popupdivcontent);
+                                $('#ModalPopup .modal-body #PopupForm').html(popupdivcontent);
                                 table = tableUtil.createTabulator({
                                     id: "divtable",
                                     config: {
@@ -2035,6 +2035,7 @@ const sharedFn = (options) => {
     //===========================================================
     const ResetVisibleControls = (formname) => {
         $('#PopupId').val('');
+        $("#btn-submit_popup").removeAttr("disabled");
         $("#" + formname + " :input:visible").each(function () {
 
             if (this.type === "checkbox" || this.type === "radio") {

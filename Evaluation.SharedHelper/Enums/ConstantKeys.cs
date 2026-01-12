@@ -313,12 +313,16 @@ public static class ConstantKeys
         public static readonly string AdminFormEvalMarixValue = "AdminFormEvalMarixValue";
         public static readonly string AdminCssClass = "AdminCssClass";
         public static readonly string AdminDropDownType = "AdminDropDownType";
+        public static readonly string AdminSchoolLevel = "AdminSchoolLevel";
+        public static readonly string AdminSystemSetting = "AdminSystemSetting";
+        public static readonly string AdminUiControl = "AdminUiControl";
     }
     public static class WebAppPages
     {
         public static readonly string WebEvaluationForm = "WebEvaluationForm";
         public static readonly string WebEvaluationFormItem = "WebEvaluationFormItem";
         public static readonly string WebEvaluationSubFormItem = "WebEvaluationSubFormItem";
+        public static readonly string WebEvaluationFormScopes = "WebEvaluationFormScopes";
     }
     public static class AdminPermission
     {
@@ -769,6 +773,27 @@ public static class ConstantKeys
 
         #endregion
 
+        #region SCHOOLLEVEL
+
+        public const string VIEW_ADMIN_SCHOOLLEVEL = "VIEW_ADMIN_SCHOOLLEVEL";
+        public const string ADD_ADMIN_SCHOOLLEVEL = "ADD_ADMIN_SCHOOLLEVEL";
+        public const string EDIT_ADMIN_SCHOOLLEVEL = "EDIT_ADMIN_SCHOOLLEVEL";
+        public const string DELETE_ADMIN_SCHOOLLEVEL = "DELETE_ADMIN_SCHOOLLEVEL";
+
+        #endregion
+        #region SYSTEMSETTING
+
+        public const string VIEW_ADMIN_SYSTEMSETTING = "VIEW_ADMIN_SYSTEMSETTING";
+        public const string EDIT_ADMIN_SYSTEMSETTING = "EDIT_ADMIN_SYSTEMSETTING";
+
+        #endregion
+        #region UICONTROL
+
+        public const string VIEW_ADMIN_UICONTROL = "VIEW_ADMIN_UICONTROL";
+        public const string EDIT_ADMIN_UICONTROL = "EDIT_ADMIN_UICONTROL";
+
+        #endregion
+
     }
 
     public static class CustomDataSource
@@ -804,6 +829,15 @@ public static class ConstantKeys
         public const string ADD_WEB_SUBFORMITEMS = "ADD_WEB_SUBFORMITEMS";
         public const string EDIT_WEB_SUBFORMITEMS = "EDIT_WEB_SUBFORMITEMS";
         public const string DELETE_WEB_SUBFORMITEMS = "DELETE_WEB_SUBFORMITEMS";
+
+        #endregion
+
+        #region FORMSCOPES
+
+        public const string VIEW_WEB_FORMSCOPES = "VIEW_WEB_FORMSCOPES";
+        public const string ADD_WEB_FORMSCOPES = "ADD_WEB_FORMSCOPES";
+        public const string EDIT_WEB_FORMSCOPES = "EDIT_WEB_FORMSCOPES";
+        public const string DELETE_WEB_FORMSCOPES = "DELETE_WEB_FORMSCOPES";
 
         #endregion
 
