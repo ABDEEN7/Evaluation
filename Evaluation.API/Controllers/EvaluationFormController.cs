@@ -36,6 +36,20 @@ public class EvaluationFormController : ControllerBase
         return Ok(await _masterBl.GetApiService<EvaluationFormBL>().GetAllEvalFormItems(EvalformId));
     }
 
+    [HttpGet]
+    //[CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.VIEW_WEB_FORMSCOPES })]
+    public async Task<IActionResult> GetAllFormScope(Guid formIdValue)
+    {
+        return Ok(await _masterBl.GetApiService<EvaluationFormBL>().GetAllFormScope(formIdValue));
+    }
+
+    [HttpGet]
+    //[CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.VIEW_WEB_FORMITEMS })]
+    public async Task<IActionResult> GetAllFormItemsFromDepartment(Guid EvalformId)
+    {
+        return Ok(await _masterBl.GetApiService<EvaluationFormBL>().GetAllFormItemsFromDepartment(EvalformId));
+    }
+
     [HttpPost]
     //[CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.ADD_WEB_EVALFORMS })]
     public async Task<IActionResult> SaveEvaluationForm()
@@ -104,6 +118,30 @@ public class EvaluationFormController : ControllerBase
     {
 
         return Ok(await _masterBl.GetApiService<EvaluationFormBL>().DeleteEvaluationSubFormItem(Id!));
+
+    }
+
+    [HttpPost]
+    //[CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.ADD_WEB_FORMSCOPES })]
+    public async Task<IActionResult> SaveFormScope()
+    {
+        var request = Request.Form["request"][0]?.StringToObject<FormScopeDTO>();
+        return Ok(await _masterBl.GetApiService<EvaluationFormBL>().SaveFormScope(request!));
+    }
+
+    [HttpPost]
+    //[CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.EDIT_WEB_FORMSCOPES })]
+    public async Task<IActionResult> UpdateFormScope()
+    {
+        var request = Request.Form["request"][0]?.StringToObject<FormScopeDTO>();
+        return Ok(await _masterBl.GetApiService<EvaluationFormBL>().UpdateFormScope(request!));
+    }
+    [HttpPost]
+    // [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.DELETE_WEB_FORMSCOPES })]
+    public async Task<IActionResult> DeleteFormScope(Guid Id)
+    {
+
+        return Ok(await _masterBl.GetApiService<EvaluationFormBL>().DeleteFormScope(Id!));
 
     }
 

@@ -1,15 +1,12 @@
 ﻿using AutoMapper;
-using Azure.Core;
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.FormsModules;
 using Evaluation.DAL.Repositories;
-using Evaluation.Services.Models.Admin;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Dtos.EvalFormDto;
 using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Models;
-using Evaluation.SharedHelper.Models.Admin;
-using Microsoft.AspNetCore.Mvc;
+using Evaluation.SharedHelper.Models.Api;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Evaluation.Services.BusinessLayer.API.EvaluationForm;
@@ -28,6 +25,17 @@ public class EvaluationFormBL(IServiceScopeFactory serviceScopeFactory, CacheDat
     public async Task<List<EvaluationFormItemDto> >GetAllEvalFormItems(Guid EvalformId)
     {
         var result = await evaluationFormService.GetEvaluationFormItemList(EvalformId);
+        return result;
+    }
+
+    public async Task<List<FormScopeDTO>> GetAllFormScope(Guid formIdValue)
+    {
+        var result = await evaluationFormService.GetAllFormScopeList(formIdValue);
+        return result;
+    }
+    public async Task<List<DropdownItem>> GetAllFormItemsFromDepartment(Guid EvalformId)
+    {
+        var result = await evaluationFormService.GetAllFormItemsFromDepartment(EvalformId);
         return result;
     }
 
@@ -111,6 +119,34 @@ public class EvaluationFormBL(IServiceScopeFactory serviceScopeFactory, CacheDat
     public async Task<EvaluationFormSubItemDto> DeleteEvaluationSubFormItem(Guid Id)
     {
         var result = await evaluationFormService.DeleteEvaluationSubFormItem(Id!);
+        return result;
+    }
+
+    public async Task<FormScopeDTO> SaveFormScope(FormScopeDTO model)
+    {
+        var result = new FormScopeDTO();
+        bool validateObject = await ValidateObject(model!, ConstantKeys.WebPermissions.ADD_WEB_FORMSCOPES);
+        if (validateObject)
+        {
+            result = await evaluationFormService.SaveFormScope(model!);
+
+        }
+        return result;
+    }
+    public async Task<FormScopeDTO> UpdateFormScope(FormScopeDTO model)
+    {
+        var result = new FormScopeDTO();
+        bool validateObject = await ValidateObject(model!, ConstantKeys.WebPermissions.ADD_WEB_FORMSCOPES);
+        if (validateObject)
+        {
+            result = await evaluationFormService.UpdateFormScope(model!);
+
+        }
+        return result;
+    }
+    public async Task<FormScopeDTO> DeleteFormScope(Guid Id)
+    {
+        var result = await evaluationFormService.DeleteFormScope(Id!);
         return result;
     }
 
