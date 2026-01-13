@@ -10,4 +10,5 @@ public class Team : EntityBase
     public string NameEn { get; set; } = null!;
     public Guid DepartmentId { get; set; }
     public Department? Department { get; set; }
+    public ICollection<UserTeam>? UserTeams { get; set; }
 }

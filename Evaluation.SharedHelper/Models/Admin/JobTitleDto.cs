@@ -7,4 +7,5 @@ public class JobTitleDto : EntityBaseDTO
     public int OrderNo { get; set; } = 0;
     public string? HrCode { get; set; }
     public bool IsOrgManager { get; set; }
+    public bool IsActive { get; set; }
 }
