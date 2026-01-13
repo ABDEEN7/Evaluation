@@ -2,9 +2,7 @@
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
 using Evaluation.DAL.Repositories;
-using Evaluation.Services.BusinessLayer.API.TeamMemberBL;
 using Evaluation.Services.Special;
-using Evaluation.SharedHelper.Consts;
 using Evaluation.SharedHelper.Dtos.TeamMemberDto;
 using Evaluation.SharedHelper.Models;
 using FluentResults;
@@ -29,13 +27,16 @@ public class NdaBL(IServiceScopeFactory serviceScopeFactory,
     {
         var pendingData =
             await unitOfWork
-            .GetRepository<NdaStatus>()
-            .GetAllActiveNonDeleted(x => x.BackendName == NDAStatic.Pending)
+            .GetRepository<NdaStatusDepartment>()
+            .GetAllActiveNonDeleted()
+            .Include(x => x.NdaStatus)
+            .Where(x => x.NdaStatus.BackendName == NDAStatic.Pending)
             .FirstOrDefaultAsync();
         NDADto result = new NDADto
         {
-            Id = pendingData.Id,
-            Name = pendingData.NameEn
+            Id = pendingData.Id
+            //,
+            //Name = pendingData.NameEn
         };
         return result;
     }
