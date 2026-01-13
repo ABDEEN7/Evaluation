@@ -25,4 +25,6 @@ public class Department : EntityBase
     public int OrderNo { get; set; } = 0;
     public virtual ICollection<UserDepartment>? UserDepartments { get; set; }
     public virtual ICollection<AcademicYear>? AcademicYears { get; set; }
+    public virtual ICollection<WebGroup>? WebGroup { get; set; }
+
 }
