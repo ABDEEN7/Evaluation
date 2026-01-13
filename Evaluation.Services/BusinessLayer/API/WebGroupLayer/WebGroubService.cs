@@ -10,7 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Evaluation.Services.BusinessLayer.API.DepartmentLayer;
 
-public class WebGroubService(IServiceScopeFactory serviceScopeFactory,
+public class WebGroupService(IServiceScopeFactory serviceScopeFactory,
     CacheDataProvider cacheDataProvider,
     UnitOfWork unitOfWork,
     LoggingServices loggingServices,
@@ -20,7 +20,7 @@ public class WebGroubService(IServiceScopeFactory serviceScopeFactory,
     RequestInfo requestInfo
     ) : ApiBase(serviceScopeFactory, cacheDataProvider, unitOfWork, loggingServices, mapper, userInfo, serviceProvider, requestInfo)
 {
-    public async Task<WebGroup> GetWebGroubByPath(string path)
+    public async Task<WebGroup> GetWebGroupByPath(string path)
     {
             var webGroup = await unitOfWork.GetRepository<WebGroup>()
                   .GetAllActiveNonDeleted(x => x.RoutingPath == path).FirstOrDefaultAsync();

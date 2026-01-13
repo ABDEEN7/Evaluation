@@ -171,6 +171,8 @@ function renderDepartmentsTable(departments) {
 }
 
 const loadMainBanner = () => {
+    let webGroupPath = webgroup;
+
     const options = {
         success: function (response) {
             let swiperWrapper = $('#banner-swiper-wrapper');
@@ -195,7 +197,7 @@ const loadMainBanner = () => {
 
         }
     };
-    return jqClient(options).Get('/website/getbanner');
+    return jqClient(options).Get(`/website/getbanner?webGroupPath=${webGroupPath}`);
 };
 
 $(document).ready(function () {

@@ -49,10 +49,11 @@ namespace Evaluation.API.Controllers
             return navbars;
         }
         [HttpGet()]
-        public async Task<List<BannerDTO>> GetBanner()
+        public async Task<List<BannerDTO>> GetBanner([FromQuery] string webGroupPath )
         {
             var lang = _requestInfo.Lang;
-            var banners = await _masterBl.GetApiService<WebsiteBL>().GetBanners(lang);
+
+            var banners = await _masterBl.GetApiService<WebsiteBL>().GetBanners(webGroupPath, lang);
             return banners;
         }
     }

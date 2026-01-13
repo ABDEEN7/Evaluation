@@ -10,7 +10,7 @@ namespace Evaluation.Services.BusinessLayer.API.DepartmentLayer;
 
 public class DepartmentBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider,
         UnitOfWork uow, LoggingServices loggingServices, IMapper mapper, UserInfo userInfo,
-        IServiceProvider serviceProvider, RequestInfo requestInfo, DepartmentService departmentService, WebGroubService webGroubService)
+        IServiceProvider serviceProvider, RequestInfo requestInfo, DepartmentService departmentService, WebGroupService webGroupService)
         : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, requestInfo)
 {
     public async Task<List<DepartmentDto>> GetAllDepartments()
@@ -22,7 +22,7 @@ public class DepartmentBL(IServiceScopeFactory serviceScopeFactory, CacheDataPro
 
     public async Task<List<DepartmentDto>?> GetAllDepartmentsForWebGroup(string webGroupPath)
     {
-        var webGroup = await webGroubService.GetWebGroubByPath(webGroupPath);
+        var webGroup = await webGroupService.GetWebGroupByPath(webGroupPath);
 
         if (webGroup == null)
             return null;
