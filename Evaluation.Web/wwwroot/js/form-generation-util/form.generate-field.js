@@ -805,7 +805,7 @@ var formGenerateFieldUtility = window.formUtility;
         'dropdown': generateDropdownField,
         'list': generateListTable,
         'phone': generatePhoneField,
-        //'evaluationPlan': generateEvaluationPlanField,
+        'evaluationPlan': generateEvaluationPlanField,
         'evl_Form': generateEvlFormField,
     };
 
