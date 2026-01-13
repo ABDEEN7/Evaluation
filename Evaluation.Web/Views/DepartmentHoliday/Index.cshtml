@@ -1,0 +1,120 @@
+﻿@using Evaluation.SharedHelper.Enums
+@{
+    ViewData["Title"] = "Evaluation Form";
+}
+@section styles {
+
+    <link href="assets/vendor/bootstrap/css/bootstrap.rtl.min.css" rel="stylesheet">
+
+    <!-- Custom Styles -->
+    <link href="assets/css/style.css" rel="stylesheet">
+    <link href="assets/css/style-ar.css" rel="stylesheet">
+
+    <link href="assets/css/istemara-styles.css" rel="stylesheet">
+
+}
+<div class="sub-page-container">
+    <section id="tbltemplatecontainer" class="section-container">
+        <div class="card app-card">
+            <div class="card-header justify-content-end d-flex align-items-center bg-light">
+
+                <button id="btnaddcontent" type="button" class="btn btn-primary ADDRECORD">
+                    <i class="fa fa-plus-circle"></i>
+                </button>
+
+
+            </div>
+            <div class="card-body">
+
+                <div id="view-container"></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="display-none" id="formsection">
+        <div class="card app-card">
+            <form enctype="multipart/form-data" id="app-form">
+                <input id="Id" hidden />
+                <input id="evalformidvalue" hidden />
+                <input id="evalformitemidvalue" hidden />
+                <div class="card-body">
+                    <div id="formcontent"></div>
+                    <div id="itemcontent">
+                        <button type="button" id="btnAddParent" class="btn btn-danger mb-2 ADDPARENT"></button>
+
+                        <table id="formitemTable" class="table table-bordered">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th style="width:40px"></th>
+                                    <th style="width:100px"></th>
+                                    <th class="HolidayNameAr"></th>
+                                    <th class="HolidayNameEn"></th>
+                                    <th style="display:none"></th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2" id="action-container">
+                        <button type="button" id="btn-back" class="btn btn-secondary BACKBUTTON"></button>
+                        <button type="button" id="btn-submit" class="btn btn-primary SAVEBUTTON"></button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </section>
+
+</div>
+<div>
+    <input id="formIdValue" hidden />
+</div>
+@section Scripts {
+    <script src="~/js/DepartmentHoliday/department-holiday.js" asp-append-version="true"></script>
+    <script>
+        $(document).ready(async function () {
+
+            //  if (!sharedUtility().ExistingToken()) {
+            //     sharedUtility().RedirectUnauthorized();
+            // }
+            await webAppConfigsSetup().Init({
+                pageNames: [
+                    '@nameof(ConstantKeys.WebAppCommon)',
+                    '@nameof(ConstantKeys.WebAppPages.WebDepartmentHoliday)'
+                ],
+                 pages: [
+                    '@nameof(ConstantKeys.WebAppCommon)',
+                    '@nameof(ConstantKeys.WebAppPages.WebDepartmentHoliday)'
+                ],
+                 permissions: [
+                    '@nameof(ConstantKeys.WebPermissions.ADD_WEB_DEPARTMENT_HOLIDAY)'
+                ],
+            }).then((result) => {
+
+                 uiControlItems = result.uiControlItems.filter(x => x.rowOrder > 0 && x.permissionBackendName=='@ConstantKeys.WebPermissions.ADD_WEB_DEPARTMENT_HOLIDAY');
+                textDir = result.currentlanguage === "ar" ? "RTL" : "LTR";
+                permissionsList = result.permissionsList;
+                controlsList = result.controlsList;
+                columnList = uiControlItems.filter(x => x.constraint.showInGrid === true && x.control).map(c => ({
+                    ...c.constraint,
+                    pageName: c.control.pageName
+                }));
+
+                settingList = result.settingList;
+                targetSetting = result.targetSetting;
+                containsOrderNo = result.containsOrderNo;
+                controlvalidationlist = uiControlItems;
+
+                //DepartmentHoliday
+                IsEdit = true;
+                IsDelete = true;
+                 IsAdd = true;
+                 initTables();
+            });
+
+
+        });
+    </script>
+
+
+}
