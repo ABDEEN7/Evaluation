@@ -77,8 +77,8 @@
 
 
 function loadDepartments() {
-
-    jqClient().Get(`/Website/GetDepartments`)
+    let webGroupPath = webgroup;
+    jqClient().Get(`/Website/GetDepartmentsForWebGroup?webGroupPath=${webGroupPath}`)
         .done((result) => {
 
             const data = (result && result.result) ? result.result : [];
@@ -171,6 +171,8 @@ function renderDepartmentsTable(departments) {
 }
 
 const loadMainBanner = () => {
+    let webGroupPath = webgroup;
+
     const options = {
         success: function (response) {
             let swiperWrapper = $('#banner-swiper-wrapper');
@@ -195,7 +197,7 @@ const loadMainBanner = () => {
 
         }
     };
-    return jqClient(options).Get('/website/getbanner');
+    return jqClient(options).Get(`/website/getbanner?webGroupPath=${webGroupPath}`);
 };
 
 $(document).ready(function () {

@@ -42,7 +42,11 @@ namespace Evaluation.API.Controllers
 		{
 			return await _serviceRequestBL.GetApplicationDetailsAsync(requestId);
 		}
-
+		[HttpGet]
+		public async Task<EvaluationRequestDTO> GetEvaluationDetails(Guid requestId)
+		{
+			return await _serviceRequestBL.GetEvaluationDetailsAsync(requestId);
+		}
 		[HttpPost]
 		public async Task<ServiceRequestDTO> HandleRequest(
 			[FromForm] ActionFormDTO dto,

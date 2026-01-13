@@ -41,6 +41,7 @@ public static class ConstantKeys
         public static readonly string DraftPlanWithSameAcademicYearAlreadyExists = "DraftPlanWithSameAcademicYearAlreadyExists";
         public static readonly string PlanIsNotFound = "PlanIsNotFound";
         public static readonly string InvalidApprovePlan = "InvalidApprovePlan";
+        public static readonly string InvalidEvaluationDate = "InvalidEvaluationDate";
         public static readonly string PlanInThePastIsNotAllowed = "PlanInThePastIsNotAllowed";
         public static readonly string InvalidDraftPlan = "InvalidDraftPlan";
 
@@ -313,6 +314,9 @@ public static class ConstantKeys
         public static readonly string AdminFormEvalMarixValue = "AdminFormEvalMarixValue";
         public static readonly string AdminCssClass = "AdminCssClass";
         public static readonly string AdminDropDownType = "AdminDropDownType";
+        public static readonly string AdminSchoolLevel = "AdminSchoolLevel";
+        public static readonly string AdminSystemSetting = "AdminSystemSetting";
+        public static readonly string AdminUiControl = "AdminUiControl";
     }
     public static class WebAppPages
     {
@@ -767,6 +771,27 @@ public static class ConstantKeys
         public const string ADD_ADMIN_DROPDOWNTYPE = "ADD_ADMIN_DROPDOWNTYPE";
         public const string EDIT_ADMIN_DROPDOWNTYPE = "EDIT_ADMIN_DROPDOWNTYPE";
         public const string DELETE_ADMIN_DROPDOWNTYPE = "DELETE_ADMIN_DROPDOWNTYPE";
+
+        #endregion
+
+        #region SCHOOLLEVEL
+
+        public const string VIEW_ADMIN_SCHOOLLEVEL = "VIEW_ADMIN_SCHOOLLEVEL";
+        public const string ADD_ADMIN_SCHOOLLEVEL = "ADD_ADMIN_SCHOOLLEVEL";
+        public const string EDIT_ADMIN_SCHOOLLEVEL = "EDIT_ADMIN_SCHOOLLEVEL";
+        public const string DELETE_ADMIN_SCHOOLLEVEL = "DELETE_ADMIN_SCHOOLLEVEL";
+
+        #endregion
+        #region SYSTEMSETTING
+
+        public const string VIEW_ADMIN_SYSTEMSETTING = "VIEW_ADMIN_SYSTEMSETTING";
+        public const string EDIT_ADMIN_SYSTEMSETTING = "EDIT_ADMIN_SYSTEMSETTING";
+
+        #endregion
+        #region UICONTROL
+
+        public const string VIEW_ADMIN_UICONTROL = "VIEW_ADMIN_UICONTROL";
+        public const string EDIT_ADMIN_UICONTROL = "EDIT_ADMIN_UICONTROL";
 
         #endregion
 
