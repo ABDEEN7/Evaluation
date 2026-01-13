@@ -68,7 +68,6 @@ public partial class EvaluationDbContext : DbContext
     public virtual DbSet<OrgType> OrgTypes { get; set; }
     public virtual DbSet<Plan> Plans { get; set; }
     public virtual DbSet<PlanHistory> PlanHistory { get; set; }
-    public virtual DbSet<EvaluationRequest> EvaluationRequests { get; set; }
     public virtual DbSet<PlanStatus> PlanStatuses { get; set; }
     public virtual DbSet<EmailTemplate> EmailTemplates { get; set; }
     public virtual DbSet<EmailTemplateDocument> EmailTemplateDocuments { get; set; }
@@ -116,6 +115,7 @@ public partial class EvaluationDbContext : DbContext
     public virtual DbSet<DepartmentRoleAttributeValue> DepartmentRoleAttributeValue { get; set; }
     public virtual DbSet<FormItemRelated> FormItemRelated { get; set; }
     public virtual DbSet<NdaStatus> NdaStatus { get; set; }
+    public virtual DbSet<NdaStatusDepartment> NdaStatusDepartments { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {

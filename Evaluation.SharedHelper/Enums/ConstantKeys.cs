@@ -41,6 +41,7 @@ public static class ConstantKeys
         public static readonly string DraftPlanWithSameAcademicYearAlreadyExists = "DraftPlanWithSameAcademicYearAlreadyExists";
         public static readonly string PlanIsNotFound = "PlanIsNotFound";
         public static readonly string InvalidApprovePlan = "InvalidApprovePlan";
+        public static readonly string InvalidEvaluationDate = "InvalidEvaluationDate";
         public static readonly string PlanInThePastIsNotAllowed = "PlanInThePastIsNotAllowed";
         public static readonly string InvalidDraftPlan = "InvalidDraftPlan";
 
@@ -167,6 +168,9 @@ public static class ConstantKeys
         public static readonly string EvaluationPartiesExistsService = "EvaluationPartiesExistsService";
         public static readonly string EvaluationPartiesExistsServiceRequest = "EvaluationPartiesExistsServiceRequest";
         public static readonly string EvaluationPartiesExistsEvalForm = "EvaluationPartiesExistsEvalForm";
+        public static readonly string EvaluationTypeExistsEvaluationRequestHistory = "EvaluationTypeExistsEvaluationRequestHistory";
+        public static readonly string DropdownTypeExistsField = "DropdownTypeExistsField";
+        public static readonly string FormItemExistsFormItemRelated = "FormItemExistsFormItemRelated";
     }
 
     public static class AdminSettings
@@ -306,12 +310,20 @@ public static class ConstantKeys
         public static readonly string AdminEducationLevel = "AdminEducationLevel";
         public static readonly string AdminEmployees = "AdminEmployees";
         public static readonly string AdminEvaluationParties = "AdminEvaluationParties";
+        public static readonly string AdminEvaluationType = "AdminEvaluationType";
+        public static readonly string AdminFormEvalMarixValue = "AdminFormEvalMarixValue";
+        public static readonly string AdminCssClass = "AdminCssClass";
+        public static readonly string AdminDropDownType = "AdminDropDownType";
+        public static readonly string AdminSchoolLevel = "AdminSchoolLevel";
+        public static readonly string AdminSystemSetting = "AdminSystemSetting";
+        public static readonly string AdminUiControl = "AdminUiControl";
     }
     public static class WebAppPages
     {
         public static readonly string WebEvaluationForm = "WebEvaluationForm";
         public static readonly string WebEvaluationFormItem = "WebEvaluationFormItem";
         public static readonly string WebEvaluationSubFormItem = "WebEvaluationSubFormItem";
+        public static readonly string WebEvaluationFormScopes = "WebEvaluationFormScopes";
     }
     public static class AdminPermission
     {
@@ -727,6 +739,62 @@ public static class ConstantKeys
 
         #endregion
 
+        #region EVALUATIONTYPE
+
+        public const string VIEW_ADMIN_EVALUATIONTYPE = "VIEW_ADMIN_EVALUATIONTYPE";
+        public const string ADD_ADMIN_EVALUATIONTYPE = "ADD_ADMIN_EVALUATIONTYPE";
+        public const string EDIT_ADMIN_EVALUATIONTYPE = "EDIT_ADMIN_EVALUATIONTYPE";
+        public const string DELETE_ADMIN_EVALUATIONTYPE = "DELETE_ADMIN_EVALUATIONTYPE";
+
+        #endregion
+
+        #region FORMEVAL_MATRIX_VALUE
+
+        public const string VIEW_ADMIN_FORMEVAL_MATRIX_VALUE = "VIEW_ADMIN_FORMEVAL_MATRIX_VALUE";
+        public const string ADD_ADMIN_FORMEVAL_MATRIX_VALUE = "ADD_ADMIN_FORMEVAL_MATRIX_VALUE";
+        public const string EDIT_ADMIN_FORMEVAL_MATRIX_VALUE = "EDIT_ADMIN_FORMEVAL_MATRIX_VALUE";
+        public const string DELETE_ADMIN_FORMEVAL_MATRIX_VALUE = "DELETE_ADMIN_FORMEVAL_MATRIX_VALUE";
+
+        #endregion
+
+        #region CSSCLASS
+
+        public const string VIEW_ADMIN_CSSCLASS = "VIEW_ADMIN_CSSCLASS";
+        public const string ADD_ADMIN_CSSCLASS = "ADD_ADMIN_CSSCLASS";
+        public const string EDIT_ADMIN_CSSCLASS = "EDIT_ADMIN_CSSCLASS";
+        public const string DELETE_ADMIN_CSSCLASS = "DELETE_ADMIN_CSSCLASS";
+
+        #endregion
+        #region DROPDOWNTYPE
+
+        public const string VIEW_ADMIN_DROPDOWNTYPE = "VIEW_ADMIN_DROPDOWNTYPE";
+        public const string ADD_ADMIN_DROPDOWNTYPE = "ADD_ADMIN_DROPDOWNTYPE";
+        public const string EDIT_ADMIN_DROPDOWNTYPE = "EDIT_ADMIN_DROPDOWNTYPE";
+        public const string DELETE_ADMIN_DROPDOWNTYPE = "DELETE_ADMIN_DROPDOWNTYPE";
+
+        #endregion
+
+        #region SCHOOLLEVEL
+
+        public const string VIEW_ADMIN_SCHOOLLEVEL = "VIEW_ADMIN_SCHOOLLEVEL";
+        public const string ADD_ADMIN_SCHOOLLEVEL = "ADD_ADMIN_SCHOOLLEVEL";
+        public const string EDIT_ADMIN_SCHOOLLEVEL = "EDIT_ADMIN_SCHOOLLEVEL";
+        public const string DELETE_ADMIN_SCHOOLLEVEL = "DELETE_ADMIN_SCHOOLLEVEL";
+
+        #endregion
+        #region SYSTEMSETTING
+
+        public const string VIEW_ADMIN_SYSTEMSETTING = "VIEW_ADMIN_SYSTEMSETTING";
+        public const string EDIT_ADMIN_SYSTEMSETTING = "EDIT_ADMIN_SYSTEMSETTING";
+
+        #endregion
+        #region UICONTROL
+
+        public const string VIEW_ADMIN_UICONTROL = "VIEW_ADMIN_UICONTROL";
+        public const string EDIT_ADMIN_UICONTROL = "EDIT_ADMIN_UICONTROL";
+
+        #endregion
+
     }
 
     public static class CustomDataSource
@@ -762,6 +830,15 @@ public static class ConstantKeys
         public const string ADD_WEB_SUBFORMITEMS = "ADD_WEB_SUBFORMITEMS";
         public const string EDIT_WEB_SUBFORMITEMS = "EDIT_WEB_SUBFORMITEMS";
         public const string DELETE_WEB_SUBFORMITEMS = "DELETE_WEB_SUBFORMITEMS";
+
+        #endregion
+
+        #region FORMSCOPES
+
+        public const string VIEW_WEB_FORMSCOPES = "VIEW_WEB_FORMSCOPES";
+        public const string ADD_WEB_FORMSCOPES = "ADD_WEB_FORMSCOPES";
+        public const string EDIT_WEB_FORMSCOPES = "EDIT_WEB_FORMSCOPES";
+        public const string DELETE_WEB_FORMSCOPES = "DELETE_WEB_FORMSCOPES";
 
         #endregion
 

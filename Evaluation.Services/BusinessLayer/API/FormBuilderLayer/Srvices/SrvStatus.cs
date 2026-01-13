@@ -156,8 +156,8 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
             var filteredPartyTypes = PartyTypes.FirstOrDefault(id => DepartementUserId.Contains(id));
             var status = cacheDataProvider.GetStatusAllWithDeleted().Result.FirstOrDefault(c => c.Id == statusId);
-            var result = lang == "ar" ? status.NameAr : status.NameEn;
-            var partydisplay = status.StatusPartyTypeDisplayNames.Where(x => x.IsDeleted != true)
+            var result = lang == "ar" ? status!.NameAr : status!.NameEn;
+            var partydisplay = status.StatusPartyTypeDisplayNames!.Where(x => x.IsDeleted != true)
                 .FirstOrDefault(c => c.PartyTypeId == filteredPartyTypes);
             if (partydisplay != null && !string.IsNullOrEmpty(partydisplay.TitleAr)) { result = lang == "ar" ? partydisplay.TitleAr : partydisplay.TitleEn; }
             return result;

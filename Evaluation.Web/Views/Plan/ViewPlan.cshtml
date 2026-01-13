@@ -1,0 +1,217 @@
+﻿@model Guid?
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "عرض الخطة";
+}
+
+<!-- Pass only plan ID to JavaScript -->
+<script>
+     window.PLAN_PAGE_CONFIG = {
+        planId: "@Model"
+    };
+</script>
+
+<style>
+    /* View-only specific styles */
+    .info-card {
+        background-color: #ffffff;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 15px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .info-label {
+        font-weight: 600;
+        color: #6c757d;
+        font-size: 0.875rem;
+        margin-bottom: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .info-value {
+        color: #212529;
+        font-size: 1.1rem;
+        font-weight: 500;
+    }
+
+    .status-badge {
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 0.875rem;
+        font-weight: 600;
+    }
+
+    .school-card {
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 12px;
+        transition: all 0.2s;
+    }
+
+        .school-card:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+
+    .school-number {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 1.1rem;
+    }
+
+    .school-name-header {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 8px;
+    }
+
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+    .detail-label {
+        color: #6c757d;
+        font-weight: 500;
+        font-size: 0.9rem;
+    }
+
+    .detail-value {
+        color: #212529;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    /* Print Styles */
+
+    .main-content {
+        margin: 0 !important;
+        padding: 20px !important;
+    }
+
+    .card {
+        border: none !important;
+        box-shadow: none !important;
+        page-break-inside: avoid;
+    }
+
+    .school-card {
+        page-break-inside: avoid;
+        box-shadow: none !important;
+    }
+
+    }
+
+    /* Loading Animation */
+    .skeleton {
+        animation: skeleton-loading 1s linear infinite alternate;
+    }
+
+    .skeleton-text {
+        height: 20px;
+        border-radius: 4px;
+        margin-bottom: 10px;
+    }
+
+    .skeleton-card {
+        height: 120px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+    }
+</style>
+
+<main class="main-content">
+    <section>
+        <div class="card card-table mb-4">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3 class="mb-0">@ViewData["Title"]</h3>
+                    <div class="no-print">
+                        <button type="button" class="btn btn-outline-secondary" onclick="window.print()">
+                            <i class="la la-print"></i> طباعة
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Breadcrumbs -->
+                <nav aria-label="breadcrumb" class="no-print">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">الرئيسية</a></li>
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index", "Plan")">الخطط</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">@ViewData["Title"]</li>
+                    </ol>
+                </nav>
+
+                <!-- Plan Status Box -->
+                <div id="planStatusBox" style="display: none;">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+
+                <!-- Plan Details Container -->
+                <div id="planDetailsContainer" class="mb-4">
+                    <!-- Loading skeleton -->
+                    <div id="loadingSkeleton">
+                        <div class="skeleton skeleton-card"></div>
+                        <div class="skeleton skeleton-card"></div>
+                        <div class="skeleton skeleton-card"></div>
+                    </div>
+                    <!-- Will be populated by JavaScript -->
+                </div>
+
+                <!-- Schools Container -->
+                <div id="schoolsContainer" class="mb-4">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="row mt-4 no-print">
+                    <div class="col-md-12">
+                        <div class="d-flex gap-2 align-items-center">
+                            <a href="@Url.Action("Index", "Plan")" class="btn btn-primary">
+                                <i class="la la-arrow-right"></i> العودة للخطط
+                            </a>
+                            <button type="button" id="btnEditPlan" class="btn btn-outline-primary" style="display: none;">
+                                <i class="la la-edit"></i> تعديل الخطة
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+@section Styles {
+    <!-- Custom CSS -->
+    <link href="~/plan-assets/css/style.css" rel="stylesheet">
+}
+
+@section Scripts {
+    <!-- Core Libraries -->
+    <script src="~/plan-assets/vendor/select2/js/select2.min.js"></script>
+
+    <!-- Shared JS -->
+    <script src="~/js/shared/populate-ui-control.js"></script>
+
+    <!-- Plan System Files -->
+    <script src="~/js/plan/planBuilder/plan.constants.js"></script>
+    <script src="~/js/plan/view/plan.view-simple.js"></script>
+}

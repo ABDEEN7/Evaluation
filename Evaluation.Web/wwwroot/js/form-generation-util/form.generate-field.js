@@ -140,6 +140,47 @@ var formGenerateFieldUtility = window.formUtility;
         return inputElement;
     };
 
+    const generateEvlFormField = (field, readonly) => {
+        const container = $('<div>')
+            .addClass('evl-form-wrapper')
+            .attr('data-field-id', field.fieldId);
+
+        container.html(`<div class="text-muted py-2">Loading evaluation form...</div>`);
+
+        (async () => {
+            try {
+                const formId =
+                    field.formId ||
+                    field.attributes?.find(a => (a.name || '').toLowerCase() === 'formid')?.value ||
+                    field.value?.formId ||
+                    field.value || null;
+
+                //if (!formId) {
+                //    container.html(`<div class="text-danger">Missing formId for evl_Form.</div>`);
+                //    return;
+                //}
+
+                const html = await generateFullFormPageHtml({
+                    formId,
+                    fieldId: field.fieldId,
+                    readOnly: readonly
+                });
+
+                container.html(html);
+
+                const controlValues = (typeof field.value === 'object' && field.value?.items) ? field.value : null;
+
+                await initializeControls(formId, field.fieldId, controlValues);
+
+            } catch (err) {
+                console.error('evl_Form render failed:', err);
+                container.html(`<div class="text-danger">Failed to load evaluation form.</div>`);
+            }
+        })();
+
+        return container;
+    };
+
     const isBase64Value = (val) => {
         if (!val) return false;
         return typeof val === "string" && val.length > 100 && /^[A-Za-z0-9+/=]+$/.test(val);
@@ -764,6 +805,8 @@ var formGenerateFieldUtility = window.formUtility;
         'dropdown': generateDropdownField,
         'list': generateListTable,
         'phone': generatePhoneField,
+        //'evaluationPlan': generateEvaluationPlanField,
+        'evl_Form': generateEvlFormField,
     };
 
     const generateField = (field, renderType, actionType = null, options = {}) => {
@@ -1272,7 +1315,7 @@ var formGenerateFieldUtility = window.formUtility;
                             isOld: options?.isOld === true,
                             disableAllForOld: options?.disableAllForOld === true || disableAllForOld
                         });
-
+                        if (field.type != 'evl_Form') { 
                         fieldElement.attr(
                             'id',
                             renderType === RENDER_TYPE.PREVIEW
@@ -1284,6 +1327,14 @@ var formGenerateFieldUtility = window.formUtility;
                             colContainer.hide();
                         }
 
+                            applyAttributes(fieldElement, field);
+                            fieldElement.on('keyup paste input', function () {
+                                if (ns.validateInput) {
+                                    ns.validateInput(this, field);
+                                }
+                            });
+
+                        }
                         if (field.type === 'label') {
                             colContainer.append(fieldLabel);
                         } else {
@@ -1303,7 +1354,7 @@ var formGenerateFieldUtility = window.formUtility;
                             }
                         }
 
-                        applyAttributes(fieldElement, field);
+                        
 
                         if (field.conditions && field.conditions.length > 0) {
                             ns.conditionalFields.push({
@@ -1312,11 +1363,7 @@ var formGenerateFieldUtility = window.formUtility;
                             });
                         }
 
-                        fieldElement.on('keyup paste input', function () {
-                            if (ns.validateInput) {
-                                ns.validateInput(this, field);
-                            }
-                        });
+                      
 
                         const errorContainer = $('<div>')
                             .attr('id', `error_${field.fieldId}`)

@@ -2637,6 +2637,9 @@ namespace Evaluation.DAL.Migrations
                     b.Property<Guid?>("DropDownTypeId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("EvalFormId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid>("FieldTypeId")
                         .HasColumnType("uniqueidentifier");
 
@@ -2700,6 +2703,8 @@ namespace Evaluation.DAL.Migrations
                     b.HasIndex("DropDownParentFieldId");
 
                     b.HasIndex("DropDownTypeId");
+
+                    b.HasIndex("EvalFormId");
 
                     b.HasIndex("FieldTypeId");
 
@@ -5686,6 +5691,9 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("BackendName")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<Guid?>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
@@ -6364,6 +6372,74 @@ namespace Evaluation.DAL.Migrations
                     b.HasIndex("UpdateById");
 
                     b.ToTable("NdaStatus");
+                });
+
+            modelBuilder.Entity("Evaluation.DAL.Models.Planing.EvaluationRequestEntity.NdaStatusDepartment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("CreateById")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreateDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("getdate()");
+
+                    b.Property<Guid?>("DeleteById")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("DeleteDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("DepartmentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool?>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValueSql("1");
+
+                    b.Property<bool?>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValueSql("0");
+
+                    b.Property<string>("NameAr")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NameEn")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("NdaStatusId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("OrderNo")
+                        .HasColumnType("int");
+
+                    b.Property<Guid?>("UpdateById")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("UpdateDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreateById");
+
+                    b.HasIndex("DeleteById");
+
+                    b.HasIndex("DepartmentId");
+
+                    b.HasIndex("NdaStatusId");
+
+                    b.HasIndex("UpdateById");
+
+                    b.ToTable("NdaStatusDepartments");
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.Planing.OrgType", b =>
@@ -11373,6 +11449,11 @@ namespace Evaluation.DAL.Migrations
                         .HasForeignKey("DropDownTypeId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("Evaluation.DAL.Models.FormsModules.EvalForm", "EvalForm")
+                        .WithMany()
+                        .HasForeignKey("EvalFormId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("Evaluation.DAL.Models.FormBuilder.FieldType", "FieldType")
                         .WithMany()
                         .HasForeignKey("FieldTypeId")
@@ -11423,6 +11504,8 @@ namespace Evaluation.DAL.Migrations
                     b.Navigation("DropDownParentField");
 
                     b.Navigation("DropDownType");
+
+                    b.Navigation("EvalForm");
 
                     b.Navigation("FieldType");
 
@@ -13127,7 +13210,7 @@ namespace Evaluation.DAL.Migrations
                         .IsRequired();
 
                     b.HasOne("Evaluation.DAL.Models.Planing.Plan", "Plan")
-                        .WithMany()
+                        .WithMany("EvaluationRequests")
                         .HasForeignKey("PlanId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -13405,6 +13488,46 @@ namespace Evaluation.DAL.Migrations
                     b.Navigation("CreateBy");
 
                     b.Navigation("DeleteBy");
+
+                    b.Navigation("UpdateBy");
+                });
+
+            modelBuilder.Entity("Evaluation.DAL.Models.Planing.EvaluationRequestEntity.NdaStatusDepartment", b =>
+                {
+                    b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "CreateBy")
+                        .WithMany()
+                        .HasForeignKey("CreateById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "DeleteBy")
+                        .WithMany()
+                        .HasForeignKey("DeleteById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Evaluation.DAL.Models.DepartementEntites.Department", "Department")
+                        .WithMany()
+                        .HasForeignKey("DepartmentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Evaluation.DAL.Models.Planing.EvaluationRequestEntity.NdaStatus", "NdaStatus")
+                        .WithMany()
+                        .HasForeignKey("NdaStatusId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "UpdateBy")
+                        .WithMany()
+                        .HasForeignKey("UpdateById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("CreateBy");
+
+                    b.Navigation("DeleteBy");
+
+                    b.Navigation("Department");
+
+                    b.Navigation("NdaStatus");
 
                     b.Navigation("UpdateBy");
                 });
@@ -15256,6 +15379,11 @@ namespace Evaluation.DAL.Migrations
             modelBuilder.Entity("Evaluation.DAL.Models.Planing.OrgType", b =>
                 {
                     b.Navigation("Organizations");
+                });
+
+            modelBuilder.Entity("Evaluation.DAL.Models.Planing.Plan", b =>
+                {
+                    b.Navigation("EvaluationRequests");
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.ServiceEnities.Service", b =>

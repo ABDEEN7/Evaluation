@@ -1,18 +1,19 @@
 ﻿using AutoMapper;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Evaluation.SharedHelper.Models.Api.FormBuilderDTO;
-using System.Text.Json;
-using Evaluation.Services.Special;
 using Evaluation.DAL.Helper;
-using Evaluation.SharedHelper.Enums;
-using Evaluation.Services.Extensions;
-using static Evaluation.SharedHelper.Enums.ConstantKeys;
-using Evaluation.SharedHelper.Models;
 using Evaluation.DAL.Models.Calendars;
 using Evaluation.DAL.Models.FormBuilder;
 using Evaluation.DAL.Models.ServiceRequestEntities;
 using Evaluation.DAL.Repositories;
+using Evaluation.Services.Extensions;
+using Evaluation.Services.Special;
+using Evaluation.SharedHelper.Enums;
+using Evaluation.SharedHelper.Models;
+using Evaluation.SharedHelper.Models.Api.FormBuilderDTO;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
+using System.Text.Json;
+using static Evaluation.SharedHelper.Enums.ConstantKeys;
 
 namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 {
@@ -478,7 +479,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
         {
             
             var allowedTablesSettingValue = await cacheDataProvider.GetSystemSettingValue(SystemSettings.DropDownDataSourceAllowedTables);
-            var allowedTables = JsonSerializer.Deserialize<List<string>>( string.IsNullOrWhiteSpace(allowedTablesSettingValue) ? "[]" : allowedTablesSettingValue) ?? new();
+            var allowedTables = System.Text.Json.JsonSerializer.Deserialize<List<string>>( string.IsNullOrWhiteSpace(allowedTablesSettingValue) ? "[]" : allowedTablesSettingValue) ?? new();
             using var scopedUow = serviceScopeFactory.CreateScopedUow();
 
             List<Dictionary<string, object>> result;
@@ -551,6 +552,47 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             if (birthDate.Date > today.AddYears(-age)) age--;
             return age;
         }
-   
-    }
+		public async Task<string> ResolveDropDownTextAsync(string lang, string rawValue, Guid dropDownTypeId, Guid? PlanId)
+		{
+			if (Guid.TryParse(rawValue, out var singleId) && singleId != Guid.Empty)
+			{
+				var v = await GetDropDownValue(lang, singleId, dropDownTypeId, null, PlanId);
+				if (v != null) return lang == "ar" ? v.TitleAr ?? "" : v.TitleEn ?? "";
+				return rawValue;
+			}
+			var ids = TryParseGuidList(rawValue);
+			if (ids.Count == 0) return rawValue ?? string.Empty;
+
+			var titles = new List<string>(ids.Count);
+			foreach (var id in ids)
+			{
+				var v = await GetDropDownValue(lang, id, dropDownTypeId, null, PlanId);
+				titles.Add(v != null ? (lang == "ar" ? v.TitleAr ?? "" : v.TitleEn ?? "") : id.ToString());
+			}
+			var sep = lang == "ar" ? "، " : ", ";
+			return string.Join(sep, titles.Where(t => !string.IsNullOrWhiteSpace(t)));
+		}
+		private static List<Guid> TryParseGuidList(string? raw)
+		{
+			var result = new List<Guid>();
+			if (string.IsNullOrWhiteSpace(raw)) return result;
+			try
+			{
+				var asArray = JsonConvert.DeserializeObject<List<string>>(raw!);
+				if (asArray != null && asArray.Count > 0)
+				{
+					foreach (var s in asArray)
+						if (Guid.TryParse(s, out var g)) result.Add(g);
+					if (result.Count > 0) return result;
+				}
+			}
+			catch { }
+
+			var parts = raw.Split(new[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+			foreach (var p in parts)
+				if (Guid.TryParse(p, out var g)) result.Add(g);
+
+			return result;
+		}
+	}
 }
