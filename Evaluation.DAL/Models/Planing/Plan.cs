@@ -1,4 +1,5 @@
-﻿using Evaluation.DAL.Models.BaseModule;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using Evaluation.DAL.Models.BaseModule;
 using Evaluation.DAL.Models.Calendars;
 using Evaluation.DAL.Models.DepartementEntites;
 using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
@@ -21,6 +22,6 @@ public class Plan : EntityBase
     public Semester? Semester { get; set; }
     public string? PlanJsonValue { get; set; }
 
-   // public virtual ICollection<EvaluationRequest>? EvaluationRequests { get; set; }
+    public virtual ICollection<EvaluationRequest>? EvaluationRequests { get; set; }
 
 }

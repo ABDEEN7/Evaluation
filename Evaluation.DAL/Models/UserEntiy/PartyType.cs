@@ -18,6 +18,5 @@ public class PartyType : EntityBase, IAuditLogEntity
     public Guid SystemModuleId { get; set; }
     public SystemModule? SystemModule { get; set; }
     public bool IsAssignment { get; set; }
-    //public Guid? DepartmentId { get; set; }
-    //   public Department? Department { get; set; }
+    
 }

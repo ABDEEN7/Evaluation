@@ -1,5 +1,4 @@
 ﻿
-
 namespace Evaluation.SharedHelper.Models.Admin
 {
     public class FieldDTO: EntityBaseDTO
@@ -39,5 +38,8 @@ namespace Evaluation.SharedHelper.Models.Admin
         public FormGroupCustomListDTO? FormGroupCustomList { get; set; }
         public List<AttributeDTO> Attributes { get; set; } = new();
         public string? FormGroupName { get; set; }
+
+        public Guid? EvalFormId { get; set; }
+        public string? EvalForm { get; set; }
     }
 }

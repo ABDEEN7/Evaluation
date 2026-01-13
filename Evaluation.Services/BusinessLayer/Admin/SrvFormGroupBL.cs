@@ -2,7 +2,9 @@
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.Attachments;
 using Evaluation.DAL.Models.Calendars;
+using Evaluation.DAL.Models.DepartementEntites;
 using Evaluation.DAL.Models.FormBuilder;
+using Evaluation.DAL.Models.FormsModules;
 using Evaluation.DAL.Models.Master;
 using Evaluation.DAL.Models.ServiceEnities;
 using Evaluation.DAL.Models.UserEntiy;
@@ -153,6 +155,7 @@ namespace Evaluation.Services.Models.Admin
                     ClassName=g.ClassName,
                     Description=g.Description,
                     MappingFieldId=g.MappingFieldId,
+                    EvalFormId=g.EvalFormId,
                     DropDownParentFieldId=g.DropDownParentFieldId,
                     DropDownTypeId=g.DropDownTypeId,
                     UpdateBy=(g.UpdateBy != null?(_requestInfo.Lang == "ar" ?g.UpdateBy.NameAr: g.UpdateBy.NameEn):(_requestInfo.Lang == "ar" ?g.CreateBy!.NameAr: g.CreateBy!.NameEn)),
@@ -463,6 +466,30 @@ namespace Evaluation.Services.Models.Admin
                     })
                     .ToListAsync();
            
+
+            return rslt;
+
+
+        }
+
+        public async Task<List<DropdownItem>> GetAllEvalForm(Guid systemmoduleid)
+        {
+            var departmentid=await uow.GetRepository<SystemModule>().GetAllNonDeleted().Where(x=>x.Id==systemmoduleid).Select(x=>x.DepartmentId).FirstOrDefaultAsync();
+
+
+            var rslt = await uow.GetRepository<EvalForm>()
+                    .GetAllNonDeleted()
+                    .Include(x=>x.FormEvalMatrix)
+                    .Where(x=>x.FormEvalMatrix!.DepartmentId==departmentid)
+                    .OrderByDescending(x => x.CreateDate)
+                    .Select(x=>new DropdownItem
+                    {
+                        Id=x.Id,
+                        NameAr=x.NameAr,
+                        NameEn=x.NameEn
+                    })
+                    .ToListAsync();
+
 
             return rslt;
 
@@ -935,6 +962,7 @@ namespace Evaluation.Services.Models.Admin
                 obj.ReadFieldId = message.ReadFieldId;
                 obj.MappingFieldId = message.MappingFieldId;
                 obj.FormGroupListId = message.FormGroupListId;
+                obj.EvalFormId = message.EvalFormId;
 
                 uow.GetRepository<Field>().Insert(obj);
 
@@ -1023,8 +1051,8 @@ namespace Evaluation.Services.Models.Admin
                     {
                         obj.IsActive = message.IsActive;
                     }
-
-                    uow.GetRepository<Field>().Update(obj);
+                obj.EvalFormId = message.EvalFormId;
+                uow.GetRepository<Field>().Update(obj);
 
 
                     var existingPartyTypes = await  uow.GetRepository<FieldPartyType>()
