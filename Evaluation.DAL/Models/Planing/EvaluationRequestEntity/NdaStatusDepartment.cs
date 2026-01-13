@@ -10,6 +10,8 @@ public class NdaStatusDepartment : EntityBase, IAuditLogEntity
     public Department? Department { get; set; }
     public Guid NdaStatusId { get; set; }
     public NdaStatus? NdaStatus { get; set; }
+    public string NameAr { get; set; } = null!;
+    public string NameEn { get; set; } = null!;
     public int OrderNo { get; set; } = 0;
 
 }
