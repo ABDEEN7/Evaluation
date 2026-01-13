@@ -132,19 +132,19 @@
                     }
                 );
 
-                //if(response.isNdaApprovalPending)
-                //{
-                //    const container =
-                //        document.getElementById('evaluationMainContainer') ||
-                //        document.querySelector('#content-container');
+                if(response.isNdaApprovalPending)
+                {
+                    const container =
+                        document.getElementById('evaluationMainContainer') ||
+                        document.querySelector('#content-container');
 
-                //    container.insertAdjacentHTML('afterbegin', generateNdaApprovalDiv());
-                //    NdaSubmit(response);
-                //}
-                //else
-                //{
+                    container.insertAdjacentHTML('afterbegin', generateNdaApprovalDiv());
+                    NdaSubmit(response);
+                }
+                else
+                {
                     renderEvaluationPartiesSection(response);
-                //}
+                }
 
                 bindSchoolDetails(response);
             }

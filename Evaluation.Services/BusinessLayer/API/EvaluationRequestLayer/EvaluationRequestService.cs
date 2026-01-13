@@ -212,8 +212,8 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 
 		var module = await moduleTask;
 		var assignment = await assignmentTask;
-		bool departmentRequiresNda = false;// module?.Department?.IsNDA == true;
-		bool userAssignmentRequiresNda = departmentRequiresNda && assignment.Any(x=>x.MinistryUserId== userId && x.IsNDA == true && (x.NdaDate == null || x.NdaStatusId == null));
+		bool departmentRequiresNda =  module?.Department?.IsNDA == true;
+		bool userAssignmentRequiresNda = true; //departmentRequiresNda && assignment.Any(x=>x.MinistryUserId== userId && x.IsNDA == true && (x.NdaDate == null || x.NdaStatusId == null));
 
 		var formGroups = await fieldsTask;
 
@@ -238,8 +238,8 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 		// bool hasFieldHistoryPermission = false;
 		// bool hasAllFieldHistoryPermission = false;
 
-		//var evaluationPartiesTask = userAssignmentRequiresNda ? srvEvaluationParty.GetPartiesWithServicesAndRequestsAsync(request.Id, module!.DepartmentId): Task.FromResult<List<EvaluationPartyDTO>?>(null)!;
-		var evaluationPartiesTask = srvEvaluationParty.GetPartiesWithServicesAndRequestsAsync(request.Id, module!.DepartmentId);
+		var evaluationPartiesTask = userAssignmentRequiresNda ? srvEvaluationParty.GetPartiesWithServicesAndRequestsAsync(request.Id, module!.DepartmentId): Task.FromResult<List<EvaluationPartyDTO>?>(null)!;
+		//var evaluationPartiesTask = srvEvaluationParty.GetPartiesWithServicesAndRequestsAsync(request.Id, module!.DepartmentId);
 		var attachmentsTask = GetAllEvaluationRequestAttachmentsAsync(request.Id, lang);
 		var actionTransactionsTask = SrvActionTransactionsLog.GetActionLog(request.Id, request.ServiceId, module?.Id, user);
 		var schoolTask = schoolRepository.GetSchoolDetails(request.OrgTreeId);
