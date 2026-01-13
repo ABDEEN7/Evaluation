@@ -82,11 +82,9 @@ public class SrvDepartmentEvaluationPartyBL : AdminBase
             .GetAllActiveNonDeleted()
             .FirstOrDefaultAsync(x => x.Id == DepartmentEvaluationParty.Id);
         response.NameAr = DepartmentEvaluationParty.NameAr;
+        response.DepartmentId = DepartmentEvaluationParty.DepartmentId;
         response.NameEn = DepartmentEvaluationParty.NameEn;
         response.IsActive = DepartmentEvaluationParty.IsActive;
-        response.UpdateById = userInfo.UserId;
-        response.UpdateDate = DateTime.UtcNow;
-
         repository.Update(response);
         await uow.CommitAsync().ConfigureAwait(false);
         var result = mapper.Map<DepartmentEvaluationPartyDto>(response);
