@@ -1,4 +1,7 @@
 
+@import url("~/lib/datatable/jquery.dataTables.min.css"); /*Line Awesome*/
+@import url(".~/lib/datatable/buttons.dataTables.min.css"); /*Line Awesome*/
+@import url("~/lib/datatable/jquery.datatables.min.css"); /*Line Awesome*/
 :root {
     --bg-white: #ffffff; /* Background color for the entire website, including individual sections */
     --surface-color: #ffffff; /* The surface color is used as a background of boxed elements within sections, such as cards, icon boxes, or other elements that require a visual separation from the global background. */
@@ -15,9 +18,51 @@
     .features .nav-link {
     padding: 5px 15px;
 }
-/*.application-request.card .requeststableBody tr {
-    min-height: 250px
-}*/
+
+.nav-tabs.main-tabs .nav-link {
+    font-size: 22px;
+    font-weight: 600;
+    color: #6b1225;
+    border: none;
+    padding: 10px 25px;
+    background-color:transparent
+}
+
+    .nav-tabs.main-tabs .nav-link.active {
+        color: #000;
+        border-bottom: 3px solid #6b1225;
+    }
+
+.nav-tabs.sub-tabs .nav-link {
+    font-size: 18px;
+    font-weight: 500;
+    color: #6b1225;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    padding: 8px 20px;
+}
+
+    .nav-tabs.sub-tabs .nav-link.active {
+        background: var(--color-primary);
+        border: 1px solid var(--color-primary);
+        color: #fff;
+    }
+
+
+.add-request-btn {
+    background-color: #6b1225;
+    color: #fff;
+    border-radius: 8px;
+    padding: 9px 18px;
+    font-size: 16px;
+    font-weight: 600;
+    border: none;
+    transition: 0.2s;
+}
+
+    .add-request-btn:hover {
+        background-color: #8e1a33;
+    }
 
     .application-request.card .requeststableBody tr td.createOnTimeClaz, #scholarshiptable.card #ScholarshipTableBody tr td.createOnTimeClaz {
         position: absolute;

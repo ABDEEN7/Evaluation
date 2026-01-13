@@ -2,6 +2,7 @@
 
 namespace Evaluation.Web.Controllers
 {
+
 	public class EvaluationPlanController : Controller
 	{
 		public IActionResult Index()
@@ -12,5 +13,7 @@ namespace Evaluation.Web.Controllers
         {
             return View();
         }
-    }
+
+
+	}
 }

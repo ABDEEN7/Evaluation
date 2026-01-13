@@ -4,7 +4,7 @@ using Evaluation.SharedHelper.Dtos.SchoolDto;
 
 namespace Evaluation.Services.MappingProfiles;
 
-public class SchoolPlanProfile: Profile
+public class SchoolPlanProfile : Profile
 {
     public SchoolPlanProfile()
     {
@@ -17,6 +17,10 @@ public class SchoolPlanProfile: Profile
         CreateMap<School, ResponseSchoolsPlans>()
             .ForMember(d => d.Name, opt => opt.MapFrom(src => src.NameEn))
             .ForMember(d => d.SchoolLevel, opt => opt.MapFrom(src => src.SchoolLevel))
+            .ReverseMap();
+
+        CreateMap<Employee, ResponseSchoolsPlans>()
+            .ForMember(d => d.Name, opt => opt.MapFrom(src => src.NameEn))
             .ReverseMap();
     }
 }
