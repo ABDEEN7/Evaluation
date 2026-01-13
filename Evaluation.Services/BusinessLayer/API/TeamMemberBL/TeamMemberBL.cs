@@ -56,7 +56,7 @@ public class TeamMemberBL(IServiceScopeFactory serviceScopeFactory,
         TeamMembersResponse teamMembers = new TeamMembersResponse
         {
             Data = teamRespons,
-            IsNDA = true
+            IsNDA = isNdaActive
         };
         return teamMembers;
     }
