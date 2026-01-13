@@ -64,8 +64,26 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             return result;
         }
 
+		public async Task<bool> IsAllowedToViewAllRequestsAsync(Guid userId, Guid? ModuleId)
 
-        public async Task<bool> IsAllowedToViewAllRequestsWitoutFilterationAsync(Guid? userId, Guid? ModuleId)
+		{
+			if (ModuleId is null)
+			{
+				return false;
+			}
+
+			var result = await serviceScopeFactory.CreateScopedUow()
+									   .GetRepository<UserPartyType>()
+										.GetAllQueryFiltered()
+										.Include(x => x.PartyType)
+										.Where(x => x.UserId == userId)
+										.Where(x => x.PartyType!.SystemModuleId == ModuleId)
+										.AnyAsync(x => x.PartyType!.CanViewAllRequests);
+
+			return result;
+		}
+
+		public async Task<bool> IsAllowedToViewAllRequestsWitoutFilterationAsync(Guid? userId, Guid? ModuleId)
         {
             if (ModuleId is null)
             {
