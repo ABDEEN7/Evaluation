@@ -1,4 +1,8 @@
-﻿<!DOCTYPE html>
+﻿@{
+    var lang = "en";
+}
+
+<!DOCTYPE html>
 <html lang="en" class="">
 <head>
     <meta charset="utf-8">
@@ -14,21 +18,28 @@
 
     <link href="~/lib/tabular/css/tabulator.min.css" rel="stylesheet" />
 
-    <link rel="stylesheet" href="~/assets/vendor/bootstrap/css/bootstrap.min.css">
+    @if (lang == "ar")
+    {
+        <link rel="stylesheet" href="~/assets/vendor/bootstrap/css/bootstrap.rtl.min.css"/>
+        <!-- Template Main CSS File -->
+        <link href="~/assets/css/style.css" rel="stylesheet">
+        <link href="~/assets/css/style-ar.css" rel="stylesheet">
+    }
+    else
+    {
+        <link rel="stylesheet" href="~/assets/vendor/bootstrap/css/bootstrap.min.css">
+        <!-- Template Main CSS File -->
+        <link href="~/assets/css/style.css" rel="stylesheet">
+    }
 
-    <!-- Template Main CSS File -->
-    <link href="~/assets/css/style.css" rel="stylesheet">
-    <link href="~/assets/css/style-ar.css" rel="stylesheet">
-    <link href="~/css/style.css" rel="stylesheet" />
-    <link href="~/css/style-ar.css" rel="stylesheet" />
     @await RenderSectionAsync("Styles", required: false)
 
     <!-- Vendor JS Files -->
     <script src="~/lib/moment/moment.min.js" asp-append-version="true"></script>
     <script src="~/lib/moment/moment-timezone.min.js" asp-append-version="true"></script>
     <script src="~/lib/moment/moment-timezone-with-data.min.js" asp-append-version="true"></script>
-    <script src='~/assets/js/jquery.min.js'></script>
     <script src="~/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src='~/assets/js/jquery.min.js'></script>
     <!-- <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>-->
     <script src="~/assets/vendor/swiper/swiper-bundle.min.js"></script>
     <script src="~/lib/toastr/toastr.js" asp-append-version="true"></script>

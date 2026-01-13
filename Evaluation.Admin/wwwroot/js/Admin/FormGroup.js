@@ -10,6 +10,7 @@ let DropDownTypeList = [];
 let ParentDropDownFieldList = [];
 let FieldList = [];
 let FormGroupList = [];
+let EvalFormList = [];
 let FormGroupListByTypeList = [];
 let DropDownValueList = [];
 let AttributeList = [];
@@ -556,15 +557,23 @@ function SetDropDown() {
                                 showdropdown(true);
                                 $("#FieldFormGroupList").parent().hide();
                                 $("#FieldFormGroupList").val('').trigger('change');
+                                $("#FieldEvalFormId").parent().hide();
+                                $("#FieldEvalFormId").val('').trigger('change');
                             }
                             else if (selectedvalue == "list")
                             {
                                 $("#FieldFormGroupList").parent().show();
                                 showdropdown(false);
                             }
+                            else if (selectedvalue == "Evl_Form") {
+                                $("#FieldEvalFormId").parent().show();
+                                showdropdown(false);
+                            }
                             else {
                                 $("#FieldFormGroupList").parent().hide();
                                 $("#FieldFormGroupList").val('').trigger('change');
+                                $("#FieldEvalFormId").parent().hide();
+                                $("#FieldEvalFormId").val('').trigger('change');
                                 showdropdown(false);
                                
                             }
@@ -574,12 +583,16 @@ function SetDropDown() {
                             showdropdown(false);
                             $("#FieldFormGroupList").parent().hide();
                             $("#FieldFormGroupList").val('').trigger('change');
+                            $("#FieldEvalFormId").parent().hide();
+                            $("#FieldEvalFormId").val('').trigger('change');
                         }
                         
                     }).on("select2:unselecting", function (e) {
                         showdropdown(false);
                         $("#FieldFormGroupList").parent().hide();
                         $("#FieldFormGroupList").val('').trigger('change');
+                        $("#FieldEvalFormId").parent().hide();
+                        $("#FieldEvalFormId").val('').trigger('change');
 
                     });
                     $dropdown.val('').trigger('change');
@@ -815,6 +828,34 @@ function SetDropDown() {
                     
 
                 };
+                if (constrain.controlName == "EvalFormId") {
+                  
+                       var ddldata = EvalFormList.map(item => (
+                            {
+                                id: item.id,
+                               text: txtDir === "RTL" ? item.nameAr : item.nameEn
+                            }
+                        ));
+                        var $dropdown = $('#' + constrain.uibackendName);
+                        $dropdown.empty();
+                        $dropdown.select2({
+                            width: 'resolve',
+                            allowClear: true,
+                            data: ddldata,
+                            placeholder: sharedFn().GetUiControlText(constrain.uibackendName),
+                            dropdownCssClass: "manageselect2zindex",
+                            dropdownParent: $("#ModalPopup"),
+                        });
+                        var datavalue = $dropdown.attr("data-value");
+                        if (datavalue) {
+                            $dropdown.val(datavalue).trigger('change');
+                        }
+                        else {
+                            $dropdown.val('').trigger('change');
+                        }
+
+                    
+                };
             });
         }
     }
@@ -955,6 +996,8 @@ function showdropdown(condition) {
         $("#FieldDropDownParentField").parent().show();
         $("#FieldFormGroupList").parent().hide();
         $("#FieldFormGroupList").val('').trigger('change');
+        $("#FieldEvalFormId").parent().hide();
+        $("#FieldEvalFormId").val('').trigger('change');
     }
     else {
         $("#FieldDropDownType").parent().hide();
@@ -1138,6 +1181,19 @@ const getlookup = () => {
         }
     };
     jqClientAdvanced(options8).Get("FormGroup/GetAllParentDropDownField".concat('?serviceid=', serviceid));
+
+    const options9 = {
+        success: function (result) {
+            if (result) {
+                const { data } = result;
+                if (data) {
+                    const { EvalForm } = data;
+                    EvalFormList = EvalForm;
+                }
+            }
+        }
+    };
+    jqClientAdvanced(options9).Get("FormGroup/GetAllEvalForm".concat('?systemmoduleid=', systemmoduleid));
 
 }
 function searchFormGroup() {
