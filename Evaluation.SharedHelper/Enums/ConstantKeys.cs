@@ -1019,4 +1019,9 @@ public static class ConstantKeys
 		public static readonly string Forms = "Forms";
 		public static readonly string Complain = "Complain";
 	}
+    public static class NDAStatic
+    {
+        public static string Pending = "PENDING";
+        public static string Objection = "OBJECTION";
+    }
 }
