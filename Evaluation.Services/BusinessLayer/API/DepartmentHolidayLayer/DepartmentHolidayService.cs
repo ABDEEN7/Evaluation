@@ -2,12 +2,10 @@
 using Evaluation.DAL.Dtos;
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.Calendars;
-using Evaluation.DAL.Models.Master;
 using Evaluation.DAL.Repositories;
 using Evaluation.Services.Special;
-using Evaluation.SharedHelper.Dtos.EvalFormDto;
 using Evaluation.SharedHelper.Models;
-using Microsoft.EntityFrameworkCore;
+using FluentResults;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Evaluation.Services.BusinessLayer.API.DepartmentHolidayLayer;
@@ -19,21 +17,26 @@ public class DepartmentHolidayService(IServiceScopeFactory serviceScopeFactory,
     IMapper mapper,
     UserInfo userInfo,
     IServiceProvider serviceProvider,
-    RequestInfo requestInfo
-    ) : ApiBase(serviceScopeFactory, cacheDataProvider, unitOfWork, loggingServices, mapper, userInfo, serviceProvider, requestInfo)
+    RequestInfo requestInfo,
+    DepartmentHolidayRepository departmentHolidayRepository
+    ) : ApiBase(serviceScopeFactory, cacheDataProvider, unitOfWork, loggingServices, mapper, userInfo,
+        serviceProvider, requestInfo)
 {
-    public async Task<List<DepartmentHoliday>> GetDepartmentHolidayList(int Page)
+    public async Task<Result<List<DepartmentHolidayDto>>> GetDepartmentHoliday(Guid AcademicYearId)
     {
-        var list = await unitOfWork.GetRepository<DepartmentHoliday>()
-                .GetAllNonDeleted()
-                .Include(x => x.CreateBy)
-                .OrderByDescending(x => x.CreateDate)
-                 .Skip(Page * 20)
-                .Take(20)
-                .ToListAsync();
-        return list;
-
-
+        return await ExecuteWithResult(async () =>
+        {
+            List<DepartmentHoliday> model = await departmentHolidayRepository.GetDepartmentHolidays(AcademicYearId);
+            List<DepartmentHolidayDto> result = model.Select(x => new DepartmentHolidayDto
+            {
+                Id = x.Id,
+                StartDate = x.StartDate,
+                Name = x.NameEn,
+                IsCronExpression = x.IsCronExpression,
+                CronExpression = x.CronExpression,
+                EndDate = x.EndDate.HasValue ? x.EndDate.Value : null,
+            }).ToList();
+            return result;
+        });
     }
-
 }
