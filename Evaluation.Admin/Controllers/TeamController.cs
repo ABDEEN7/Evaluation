@@ -25,7 +25,7 @@ public class TeamController : Controller
     public async Task<IActionResult> Index()
     {
         var model = new TeamVM(httpContextAccessor);
-        await model.LoadAllAData(new string[] { ConstantKeys.AdminPages.AdminTeam },
+        await model.LoadAllAData(new string[] { ConstantKeys.AdminPages.AdminTeam, ConstantKeys.AdminPages.AdminUserTeamScope },
                 new string[] { ConstantKeys.AdminPermission.ADD_ADMIN_TEAM });
         var property = typeof(Team).GetProperty("OrderNo");
         model.containsOrderNo = property != null ? true : false;
@@ -79,12 +79,5 @@ public class TeamController : Controller
         }
         return Ok(result);
     }
-    //[HttpPost]
-    //[CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.AdminPermission.EDIT_ADMIN_Team })]
-    //public async Task<IActionResult> UpdateTeamOrder()
-    //{
-    //    var model = Request.Form["OrderObj"][0]?.StringToObject<List<OrderingDTO>>();
-    //    var result = await masterBL.GetAdminService<SrvTeamBL>().UpdateTeamOrderAsync(model!);
-    //    return Ok(result);
-    //}
+
 }

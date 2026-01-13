@@ -317,6 +317,7 @@ public static class ConstantKeys
         public static readonly string AdminSchoolLevel = "AdminSchoolLevel";
         public static readonly string AdminSystemSetting = "AdminSystemSetting";
         public static readonly string AdminUiControl = "AdminUiControl";
+        public static readonly string AdminUserTeamScope = "AdminUserTeamScope";
     }
     public static class WebAppPages
     {
@@ -800,6 +801,15 @@ public static class ConstantKeys
 
         public const string VIEW_ADMIN_UICONTROL = "VIEW_ADMIN_UICONTROL";
         public const string EDIT_ADMIN_UICONTROL = "EDIT_ADMIN_UICONTROL";
+
+        #endregion
+
+        #region USERTEAMSCOPE
+
+        public const string VIEW_ADMIN_USERTEAMSCOPE = "VIEW_ADMIN_USERTEAMSCOPE";
+        public const string ADD_ADMIN_USERTEAMSCOPE = "ADD_ADMIN_USERTEAMSCOPE";
+        public const string EDIT_ADMIN_USERTEAMSCOPE = "EDIT_ADMIN_USERTEAMSCOPE";
+        public const string DELETE_ADMIN_USERTEAMSCOPE = "DELETE_ADMIN_USERTEAMSCOPE";
 
         #endregion
 
