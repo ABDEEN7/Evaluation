@@ -5,6 +5,9 @@ using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 namespace Evaluation.Web.Controllers
 {
+    [Route("{language}/[controller]/[action]")]
+    [Route("{language}/")]
+    [Route("/")]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -14,11 +17,14 @@ namespace Evaluation.Web.Controllers
             _logger = logger;
         }
 
-        public IActionResult Index(string id)
+        [HttpGet("{id?}")]
+        public IActionResult Index(string? id)
         {
+            id = (id == "en" || id == "ar") ? "default" : id;
+            ViewBag.Webgroup = id;
+
             return View();
         }
-
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
