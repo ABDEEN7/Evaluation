@@ -3,7 +3,7 @@ const gridContainerId = "view-container",
     $tblContentContainer = $('#tbltemplatecontainer'),
     $formSection = $('#formsection'),
     $formContent = $('#formcontent'),
-    $btnAddbutton = $('#btnaddcontent'),
+    $btnAddbutton = $('#btnaddHoliday'),
     btnSubmitId = "btn-submit";
 let lang = sharedUtility().GetCookie('lang');
 let txtDir = lang === "ar" ? "RTL" : "LTR";
@@ -105,7 +105,7 @@ $("#btn-submit").click(function (e) {
         if (id) {
             url = "/DepartmentHoliday/UpdateDepartmentHoliday";
         } else {
-            url = "/DepartmentHoliday/SaveDepartmentHoliday";
+            url = "/DepartmentHoliday/AddDepartmentHoliday";
         }
         jqClient(options).PostFormData(url, requestdata);
     }
