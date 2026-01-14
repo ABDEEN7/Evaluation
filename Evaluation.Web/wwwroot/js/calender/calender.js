@@ -127,13 +127,14 @@ document.addEventListener("DOMContentLoaded", () => {
  * Event Handlers
  *****************************/
 function onEventDrop(info) {
+
     Swal.fire({
-        title: "هل أنت متأكد؟",
-        text: "هل تريد تعديل تاريخ الطلب؟",
+        title: uiControlsSetup().GetUiControlText("CaledarAreYouSure"),// "هل أنت متأكد؟",
+        text: uiControlsSetup().GetUiControlText("CalendarDoyouWantEditTheRequest"),//"هل تريد تعديل تاريخ الطلب؟",
         icon: "warning",
         showCancelButton: true,
-        confirmButtonText: "نعم، تعديل",
-        cancelButtonText: "إلغاء"
+        confirmButtonText: uiControlsSetup().GetUiControlText("CalendarYesEdit"),//"نعم، تعديل",
+        cancelButtonText: uiControlsSetup().GetUiControlText("CalendarCancel"),//"إلغاء"
     }).then(result => {
         if (result.isConfirmed) {
             let eventResult = calendarResults.find(item => item.id === info.event.id);
@@ -160,8 +161,8 @@ function validateEventDates(info, eventResult) {
         {
             Swal.fire({
                 icon: "error",
-                title: "خطأ",
-                text: "يجب ان تكون الخدمة ضمن فترة الطلب"
+                title: uiControlsSetup().GetUiControlText("CalendarError"),//"خطأ",
+                text: uiControlsSetup().GetUiControlText("CalendarServiceShouldBeInsideTheRequestPeriod"),//"يجب ان تكون الخدمة ضمن فترة الطلب"
             });
 
             info.revert();
@@ -193,14 +194,14 @@ function updateEventDates(info, eventResult) {
         .done((res) => {
             Swal.fire({
                 icon: "success",
-                title: "تم التعديل",
-                text: "تم تعديل تاريخ الطلب"
+                title: uiControlsSetup().GetUiControlText("CalendarHasBeenEdited"),//"تم التعديل",
+                text: uiControlsSetup().GetUiControlText("CalendarRequestDateHasBeenEdited"),//"تم تعديل تاريخ الطلب"
             });
         }).fail((err) => {
             Swal.fire({
                 icon: "error",
-                title: "خطأ",
-                text: "حدث خطأ أثناء تعديل الطلب"
+                title: uiControlsSetup().GetUiControlText("CalendarError"),//"خطأ",
+                text: uiControlsSetup().GetUiControlText("CalenderErrorOccurredDuringEditTheRequest"),//"حدث خطأ أثناء تعديل الطلب"
             });
             info.revert();
         });
