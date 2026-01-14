@@ -1,6 +1,6 @@
-﻿using Evaluation.DAL.Models.Calendars;
-using Evaluation.Services.BusinessLayer;
+﻿using Evaluation.Services.BusinessLayer;
 using Evaluation.Services.BusinessLayer.API.DepartmentHolidayLayer;
+using Evaluation.SharedHelper.Models.Api.DepartmentHolidaysDto;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Evaluation.API.Controllers;
@@ -17,5 +17,15 @@ public class DepartmentHolidayController : ControllerBase
     public async Task<IActionResult> GetAllHolidayDepartments(int page = 1)
     {
         return Ok(await _masterBL.GetApiService<DepartmentHolidayBL>().GetDepartmentHolidayList(page));
+    }
+    [HttpPost]
+    public async Task<IActionResult> AddDepartmentHoliday(CreateDepartmentHolidayDto model)
+    {
+        return Ok(await _masterBL.GetApiService<DepartmentHolidayBL>().AddDepartmentHoliday(model));
+    }
+    [HttpPost]
+    public async Task<IActionResult> UpdateDepartmentHoliday(CreateDepartmentHolidayDto model)
+    {
+        return Ok(await _masterBL.GetApiService<DepartmentHolidayBL>().AddDepartmentHoliday(model));
     }
 }

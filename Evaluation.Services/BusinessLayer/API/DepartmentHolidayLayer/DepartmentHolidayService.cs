@@ -1,11 +1,8 @@
 ﻿using AutoMapper;
-using Evaluation.DAL.Dtos;
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.Calendars;
-using Evaluation.DAL.Models.Master;
 using Evaluation.DAL.Repositories;
 using Evaluation.Services.Special;
-using Evaluation.SharedHelper.Dtos.EvalFormDto;
 using Evaluation.SharedHelper.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,8 +16,7 @@ public class DepartmentHolidayService(IServiceScopeFactory serviceScopeFactory,
     IMapper mapper,
     UserInfo userInfo,
     IServiceProvider serviceProvider,
-    RequestInfo requestInfo
-    ) : ApiBase(serviceScopeFactory, cacheDataProvider, unitOfWork, loggingServices, mapper, userInfo, serviceProvider, requestInfo)
+    RequestInfo requestInfo) : ApiBase(serviceScopeFactory, cacheDataProvider, unitOfWork, loggingServices, mapper, userInfo, serviceProvider, requestInfo)
 {
     public async Task<List<DepartmentHoliday>> GetDepartmentHolidayList(int Page)
     {
@@ -32,8 +28,30 @@ public class DepartmentHolidayService(IServiceScopeFactory serviceScopeFactory,
                 .Take(20)
                 .ToListAsync();
         return list;
-
-
     }
+    public async Task<DepartmentHoliday> GetDepartmentHoliday(Guid id)
+    {
+        var holiday = await unitOfWork.GetRepository<DepartmentHoliday>()
+                .GetAllNonDeleted()
+                .FirstOrDefaultAsync(x => x.Id == id);
+        return holiday ?? throw new ArgumentNullException(nameof(holiday));
+    }
+    public async Task<DepartmentHoliday> InsertDepartmentHoliday(DepartmentHoliday departmentHoliday)
+    {
+        if (departmentHoliday == null)
+            throw new ArgumentNullException(nameof(departmentHoliday));
 
+        await uow.GetRepository<DepartmentHoliday>().InsertAsync(departmentHoliday);
+        await uow.CommitAsync();
+        return departmentHoliday;
+    }
+    public async Task<DepartmentHoliday> UpdateDepartmentHoliday(DepartmentHoliday departmentHoliday)
+    {
+        if (departmentHoliday == null)
+            throw new ArgumentNullException(nameof(departmentHoliday));
+
+        uow.GetRepository<DepartmentHoliday>().Update(departmentHoliday);
+        await uow.CommitAsync();
+        return departmentHoliday;
+    }
 }
