@@ -45,6 +45,13 @@ public class DepartmentHolidayService(IServiceScopeFactory serviceScopeFactory,
         await uow.CommitAsync();
         return departmentHoliday;
     }
+    public async Task DeleteDepartmentHoliday(DepartmentHoliday departmentHoliday)
+    {
+        if (departmentHoliday == null)
+            throw new ArgumentNullException(nameof(departmentHoliday));
+        uow.GetRepository<DepartmentHoliday>().Delete(departmentHoliday);
+        await uow.CommitAsync();
+    }
     public async Task<DepartmentHoliday> UpdateDepartmentHoliday(DepartmentHoliday departmentHoliday)
     {
         if (departmentHoliday == null)

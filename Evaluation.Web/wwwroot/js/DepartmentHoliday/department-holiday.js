@@ -72,7 +72,7 @@ $("#btn-submit").click(function (e) {
         sharedFn().GetUiControlText('WEB_MSG_MIN_CHAR_LENGTH'))) {
 
         commonUtil.btnProgress(btnSubmitId);
-        var requestdata = sharedFn().GetSaveObject(controlvalidationlist, $('#Id').val());
+        var requestdata = sharedFn().GetSaveObjectJson(controlvalidationlist, $('#Id').val());
 
         const options = {
             success: function (response) {
@@ -107,7 +107,7 @@ $("#btn-submit").click(function (e) {
         } else {
             url = "/DepartmentHoliday/AddDepartmentHoliday";
         }
-        jqClient(options).PostFormData(url, requestdata);
+        jqClient(options).Post(url, requestdata);
     }
 });
 

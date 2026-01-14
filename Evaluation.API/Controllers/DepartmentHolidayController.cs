@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Evaluation.API.Controllers;
 
+[Route("api/[controller]/[action]")]
+[ApiController]
 public class DepartmentHolidayController : ControllerBase
 {
     private readonly MasterBL _masterBL;
@@ -24,8 +26,14 @@ public class DepartmentHolidayController : ControllerBase
         return Ok(await _masterBL.GetApiService<DepartmentHolidayBL>().AddDepartmentHoliday(model));
     }
     [HttpPost]
-    public async Task<IActionResult> UpdateDepartmentHoliday(CreateDepartmentHolidayDto model)
+    public async Task<IActionResult> UpdateDepartmentHoliday(UpdateDepartmentHolidayDto model)
     {
-        return Ok(await _masterBL.GetApiService<DepartmentHolidayBL>().AddDepartmentHoliday(model));
+        return Ok(await _masterBL.GetApiService<DepartmentHolidayBL>().UpdateDepartmentHoliday(model));
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> DeleteDepartmentHoliday(Guid departmentHolidayId)
+    {
+        return Ok(await _masterBL.GetApiService<DepartmentHolidayBL>().DeleteDepartmentHoliday(departmentHolidayId));
     }
 }
