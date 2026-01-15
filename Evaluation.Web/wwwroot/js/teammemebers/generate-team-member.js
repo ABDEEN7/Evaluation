@@ -4,6 +4,16 @@ const teamMembersUtility = window.teamMembersUtility;
 (function (ns) {
     'use strict';
 
+    // ================== LOCALIZATION HELPER ==================
+    function t(key, fallback = '') {
+        try {
+            const text = uiControlsSetup()?.GetUiControlText(key);
+            return text || fallback || key;
+        } catch {
+            return fallback || key;
+        }
+    }
+
     // ================== ID HELPER ==================
     function tid(fieldId, name) {
         return `${fieldId}_${name}`;
@@ -15,6 +25,7 @@ const teamMembersUtility = window.teamMembersUtility;
         let html = '';
         html += generateMembersCard(fieldId);
         html += generateSelectedTeamCard(fieldId);
+
         return `
             <main class="main-content">
                 ${html}
@@ -54,7 +65,7 @@ const teamMembersUtility = window.teamMembersUtility;
         return `
             <div class="row align-items-center mb-3">
                 <div class="col-xl-4">
-                    <h4>الأعضاء</h4>
+                    <h4>${t('lblMembers')}</h4>
                 </div>
                 <div class="col-xl-8">
                     <div class="row">
@@ -77,8 +88,9 @@ const teamMembersUtility = window.teamMembersUtility;
         return `
             <select id="${tid(fieldId, 'teamFilter')}"
                     class="form-select form-select-lg">
-                <option value="">جميع الفرق</option>
-                <!-- سيتم تعبئة الخيارات من JavaScript -->
+                <option value="">
+                    ${t('lblAllTeams')}
+                </option>
             </select>
         `;
     }
@@ -92,7 +104,7 @@ const teamMembersUtility = window.teamMembersUtility;
                 <input type="text"
                        id="${tid(fieldId, 'customSearch')}"
                        class="form-control"
-                       placeholder="ابحث هنا...">
+                       placeholder="${t('phSearchHere')}">
             </div>
         `;
     }
@@ -102,7 +114,7 @@ const teamMembersUtility = window.teamMembersUtility;
             <button class="btn filterbtn"
                     data-bs-toggle="offcanvas"
                     data-bs-target="#${tid(fieldId, 'filterOffcanvas')}">
-                <i class="la la-filter"></i> تصفية
+                <i class="la la-filter"></i> ${t('btnFilter')}
             </button>
         `;
     }
@@ -117,14 +129,14 @@ const teamMembersUtility = window.teamMembersUtility;
                             <th style="width:50px;">
                                 ${generateCheckbox(tid(fieldId, 'selectAllMembers'))}
                             </th>
-                            <th>اسم العضو</th>
-                            <th>المسمى الوظيفي</th>
+                            <th>${t('lblMemberName')}</th>
+                            <th>${t('lblJobTitle')}</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
                             <td colspan="3" class="text-center py-4">
-                                جاري التحميل...
+                                ${t('lblLoading')}
                             </td>
                         </tr>
                     </tbody>
@@ -151,7 +163,7 @@ const teamMembersUtility = window.teamMembersUtility;
         return `
             <div class="row align-items-center mb-3">
                 <div class="col-md-8">
-                    <h4>فريق الزيارة المحدد</h4>
+                    <h4>${t('lblSelectedVisitTeam')}</h4>
                 </div>
                 <div class="col-md-4">
                     ${generateSuccessAlert(fieldId)}
@@ -164,7 +176,7 @@ const teamMembersUtility = window.teamMembersUtility;
         return `
             <div id="${tid(fieldId, 'successAlert')}"
                  class="alert alert-success d-none">
-                تم إضافة الأعضاء بنجاح
+                ${t('msgMembersAddedSuccessfully')}
             </div>
         `;
     }
@@ -179,17 +191,17 @@ const teamMembersUtility = window.teamMembersUtility;
                             <th style="width:50px;">
                                 ${generateCheckbox(tid(fieldId, 'selectAllSelected'))}
                             </th>
-                            <th>اسم العضو</th>
-                            <th>NDA</th>
-                            <th>المجال</th>
-                            <th>قائد الفريق</th>
+                            <th>${t('lblMemberName')}</th>
+                            <th>${t('lblNDA')}</th>
+                            <th>${t('lblDomain')}</th>
+                            <th>${t('lblTeamLeader')}</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
                             <td colspan="5"
                                 class="text-center py-4 text-muted">
-                                لا يوجد أعضاء محددين
+                                ${t('lblNoSelectedMembers')}
                             </td>
                         </tr>
                     </tbody>
@@ -204,12 +216,12 @@ const teamMembersUtility = window.teamMembersUtility;
                 <div class="col-md-6 d-flex gap-2">
                     <button id="${tid(fieldId, 'saveTeamBtn')}"
                             class="btn btn-primary">
-                        <i class="las la-save"></i> حفظ الفريق
+                        <i class="las la-save"></i> ${t('btnSaveTeam')}
                     </button>
 
                     <button id="${tid(fieldId, 'deleteSelectedBtn')}"
                             class="btn btn-outline-danger">
-                        <i class="las la-trash"></i> حذف المحدد
+                        <i class="las la-trash"></i> ${t('btnDeleteSelected')}
                     </button>
                 </div>
             </div>
@@ -226,24 +238,14 @@ const teamMembersUtility = window.teamMembersUtility;
             </label>
         `;
     }
+
     function generateCheckBoxFormBuilder(id) {
-        const label = $('<label>', {
-            class: 'custom-checkbox1'
-        });
-
-        const input = $('<input>', {
-            type: 'checkbox',
-            id: id
-        });
-
-        const span = $('<span>', {
-            class: 'checkmark'
-        });
+        const label = $('<label>', { class: 'custom-checkbox1' });
+        const input = $('<input>', { type: 'checkbox', id });
+        const span = $('<span>', { class: 'checkmark' });
 
         label.append(input, span);
-
         return label;
     }
-
 
 })(teamMembersUtility);
