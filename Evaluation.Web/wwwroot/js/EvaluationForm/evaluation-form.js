@@ -262,7 +262,47 @@ function Loadtabledata() {
     }
 
 }
+function SetPopupMode() {
+    if (popupname == "EvalFormItem") {
+        if ($("#EvalFormsHasEvaluation").prop("checked")) {
+            $("#EvalFormItemIsEvaluation").prop("checked", true);
+            $("#EvalFormItemDropDownTypeId").val('').trigger('change');
+            $("#EvalFormItemDropDownTypeId").parent().hide();
+        }
+        else {
+            $("#EvalFormItemIsEvaluation").prop("checked", false);
+            $("#EvalFormItemDropDownTypeId").parent().show();
+        }
+        if ($("#EvalFormItemIsEvaluation").prop("checked")) {
+            $("#EvalFormItemDropDownTypeId").val('').trigger('change');
+            $("#EvalFormItemDropDownTypeId").parent().hide();
+        }
+        else {
+            $("#EvalFormItemDropDownTypeId").parent().show();
+        }
+        $("#EvalFormsHasEvaluation").on("change", function () {
+            if (this.checked) {
+                $("#EvalFormItemIsEvaluation").prop("checked", true);
+                $("#EvalFormItemDropDownTypeId").val('').trigger('change');
+                $("#EvalFormItemDropDownTypeId").parent().hide();
+            }
+            else {
+                $("#EvalFormItemIsEvaluation").prop("checked", false);
+                $("#EvalFormItemDropDownTypeId").parent().show();
+            }
+        })
 
+        $("#EvalFormItemIsEvaluation").on("change", function () {
+            if (this.checked) {
+                $("#EvalFormItemDropDownTypeId").val('').trigger('change');
+                $("#EvalFormItemDropDownTypeId").parent().hide();
+            }
+            else {
+                $("#EvalFormItemDropDownTypeId").parent().show();
+            }
+        })
+    }
+}
 function SetDropDown() {
     if (popupname == "EvalFormItem") {
         var EvalformId = $("#Id").val();
@@ -308,9 +348,11 @@ function SetDropDown() {
             }
         };
         jqClient(options).Get("/EvaluationForm/GetAllFormItemsFromDepartment".concat('?EvalformId=', EvalformId));
+       
     }
     
 }
+
 function BindFormItem() {
     $("#formitemTable tbody").empty();
     var EvalformId = $("#Id").val();
