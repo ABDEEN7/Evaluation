@@ -26,7 +26,7 @@ public class TeamController : Controller
     {
         var model = new TeamVM(httpContextAccessor);
         await model.LoadAllAData(new string[] { ConstantKeys.AdminPages.AdminTeam, ConstantKeys.AdminPages.AdminUserTeamScope },
-                new string[] { ConstantKeys.AdminPermission.ADD_ADMIN_TEAM });
+                new string[] { ConstantKeys.AdminPermission.ADD_ADMIN_TEAM, ConstantKeys.AdminPermission.ADD_ADMIN_USERTEAMSCOPE });
         var property = typeof(Team).GetProperty("OrderNo");
         model.containsOrderNo = property != null ? true : false;
         return View(model);

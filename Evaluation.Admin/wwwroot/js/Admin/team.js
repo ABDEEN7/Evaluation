@@ -1,5 +1,5 @@
 ﻿const dailogId = commonUtil.CONTENT_DAILOG_ID;
-let showMore = false, table = null, dialogElem = null;
+let showMore = false, table = null, tableCondition=null, dialogElem = null;
 let currentPage = 0;
 let isSearch = false;
 let isLoading = true;
@@ -80,9 +80,68 @@ $(window).scroll(function () {
         }
     }
 });
+function ClearControlByPage() {
+    $("#UserTeamScopeRelationbutton").hide();
+    if (IsView_UserTeamScope == "True") {
+        $("#UserTeamScopeRelationdiv").show();
+        $("#UserTeamScopeRelationtabulator").css("pointer-events", "");
+        IsEdit = '';
+        IsDelete = IsDelete_UserTeamScope;
+        IsView = '';
+        let ConditionTableColumns = sharedFn().PopulateColumn(UserTeamScopecolumnList);
+        tableCondition = tableUtil.createTabulator({
+            id: "UserTeamScopeRelationtabulator",
+            config: {
+                textDirection: txtDir,
+                paginationSize: 10,
+                placeholder: sharedFn().GetUiControlText('NO_DATA_FOUND'),
+                headerFilterPlaceholder: sharedFn().GetUiControlText('FILTER_COLUMN'),
+                movableRows: true,
+            },
+            uniqueRowId: 'id',
+            sortColumn: "updateDate",
+            sortDir: "desc",
+            columns: ConditionTableColumns,
 
+        });
+        tableCondition.addRow({
+            id: 0,
+            scopeId: null,
+            userId: null,
+            isActive: true,
+            updateBy: "",
+            updateDate: ""
+        });
+
+        //const options = {
+        //    success: function (data) {
+        //        if (data) {
+
+
+        //            if (data && data.length > 0) {
+        //                tableCondition.addData(data);
+
+        //            }
+        //            else {
+        //                //tableCondition.setData([]);
+        //            }
+
+        //        }
+        //    }
+        //};
+
+        //jqClientAdvanced(options).Get("Team/GetAllUserTeamScope".concat('?reminderid=', reminderid));
+    }
+    else {
+        $("#UserTeamScopeRelationdiv").hide();
+    }
+    $("#UserTeamScopeRelationdiv").parent().show();
+}
 $(document).ready(function () {
-
+    IsEdit = IsEdit_Team;
+    IsDelete = IsDelete_Team;
+    IsView = IsView_Team;
+    let TableColumns = sharedFn().PopulateColumn(columnList);
 
 
     table = tableUtil.createTabulator({
@@ -137,9 +196,10 @@ $(document).ready(function () {
     $(`#${btnAddContentId}`).click(function (e) {
         sharedFn().ClearForm();
         sharedFn().EditMode();
-
+        $("#UserTeamScopeRelationdiv").parent().hide();
+        $("#UserTeamScopeRelationbutton").hide();
     });
-
+    
 
     $("#btn-submit").click(function (e) {
         if (sharedFn().NewvalidateForm("form-control", sharedFn().GetUiControlText('ADMIN_CNTRL_REQUIRED'), sharedFn().GetUiControlText('ADMIN_MSG_MAX_CHAR_LENGTH'), sharedFn().GetUiControlText('ADMIN_MSG_MIN_CHAR_LENGTH'))) {
