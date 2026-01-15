@@ -25,6 +25,8 @@ namespace Evaluation.SharedHelper.Models.Api.ServiceRequestEntitiesDTO
 		public bool? StatusISOPen { get; set; }
 		public string? Service { get; set; }
 		public Guid? ServiceId { get; set; }
+		public string? EvaluationParty { get; set; }
+		public Guid? EvaluationPartyId { get; set; }
 		public string? CreateOn { get; set; }
 		public string? CreateOnTime { get; set; }
 		public DateTime? CreateDate { get; set; }

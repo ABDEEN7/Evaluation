@@ -4,15 +4,19 @@ using Evaluation.DAL.Models.DepartementEntites;
 using Evaluation.DAL.Models.Org;
 using Evaluation.DAL.Models.Planing;
 using Evaluation.DAL.Repositories;
+using Evaluation.Services.BusinessLayer.API.AcademicYearLayer;
+using Evaluation.Services.BusinessLayer.API.DepartmentLayer;
 using Evaluation.Services.Extensions;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Dtos.SchoolDto;
 using Evaluation.SharedHelper.Extensions;
 using Evaluation.SharedHelper.Helper;
 using Evaluation.SharedHelper.Models;
+using FluentResults;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace Evaluation.Services.BusinessLayer.API.SchooLayer;
 
@@ -27,16 +31,15 @@ public class SchoolRepository(IServiceScopeFactory serviceScopeFactory,
     ) : ApiBase(serviceScopeFactory, cacheDataProvider, unitOfWork, loggingServices, mapper, userInfo,
         serviceProvider, requestInfo)
 {
-    public async Task<PaginatedResult<School>> GetSchoolsAsync(SchoolRequest request)
+    public async Task<PaginatedResult<School>> GetSchoolsAsync(SchoolRequest request, Guid? targetOrgTreeId, List<Guid> currentSelectedSchools)
     {
-        var filter = BuildFilterExpression(request);
-
+        var filter = BuildFilterExpression(request, targetOrgTreeId, currentSelectedSchools);
         var query = serviceScopeFactory
              .CreateScopedUow()
              .GetRepository<School>()
              .GetAllNonDeleted(filter)
              .Include(x => x.SchoolType)
-             .Include(x => x.SchoolLevel)
+             .Include(x => x.SchoolLevel!)
              .ThenInclude(x => x.EducationLevel);
         return await query.GetPaginatedResult(request.PageNumber, request.PageSize = 10);
     }
@@ -64,19 +67,27 @@ public class SchoolRepository(IServiceScopeFactory serviceScopeFactory,
         var school = await serviceProvider
            .CreateScopedUow()
            .GetRepository<School>().GetByIDActiveNonDeleted(SchoolID);
-        
+
         return school;
     }
 
-    public IQueryable<VisitType> GetVisitTypes()
-        => unitOfWork
-            .GetRepository<VisitType>()
-            .GetAllActiveNonDeleted();
-
-
-    private Expression<Func<School, bool>> BuildFilterExpression(SchoolRequest request)
+    public async Task<IQueryable<DepEvaluationType>> GetVisitTypes()
     {
+        Guid? departmentId = await serviceProvider.GetRequiredService<DepartmentService>().GetDepartmentIdAsync();
+        var visitTypes =
+        unitOfWork
+        .GetRepository<DepEvaluationType>()
+        .GetAllActiveNonDeleted(x => x.DepartmentId == departmentId);
+        return visitTypes;
+    }
+
+
+    private Expression<Func<School, bool>> BuildFilterExpression(SchoolRequest request, Guid? targetOrgTreeId, List<Guid> currentSchools)
+    {
+
         Expression<Func<School, bool>> filter = s => true;
+        filter = filter.And(c => c.OrgParentId == targetOrgTreeId && currentSchools.Contains(c.Id));
+
         if (!string.IsNullOrWhiteSpace(request.Name))
             filter = filter.And(s => s.NameEn.Contains(request.Name) || s.NameAr.Contains(request.Name));
         if (request.EstablishmentDate != null)

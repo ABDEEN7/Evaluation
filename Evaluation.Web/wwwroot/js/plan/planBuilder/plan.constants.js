@@ -1,50 +1,8 @@
 ﻿(function (global) {
+    'use strict'; 
     const uniqueIndexId = 'IndexForPlanTable';
 
-    // Render types for different viewing modes
-    const RENDER_TYPE = {
-        PREVIEW: 'preview',      // View-only mode
-        ACTION: 'action',        // Edit/Create mode
-        COMPARISON: 'comparison' // Side-by-side comparison (old vs new)
-    };
-
-    // Action types for workflow
-    const ACTION_TYPE = {
-        CREATE: "CREATE",                    // Creating new plan
-        EDIT: "EDIT",                        // Editing existing plan
-        APPROVE: "APPROVE",                  // Approving plan
-        REJECT: "REJECT",                    // Rejecting plan
-        VIEW: "VIEW",                        // View only
-        EDIT_DRAFT: "EDIT_DRAFT",           // Editing draft
-        APPROVE_WITH_CHANGES: "APPROVE_WITH_CHANGES", // Approve changes
-        REQUEST_CHANGE: "REQUEST_CHANGE"     // Request changes
-    };
-
-    // Action types that should be read-only
-    const ReadOnly_ACTION_TYPES = [
-        ACTION_TYPE.APPROVE,
-        ACTION_TYPE.REJECT,
-        ACTION_TYPE.VIEW
-    ];
-
-    // Plan field types
-    const PLAN_FIELD_TYPE = {
-        TITLE: 'title',
-        PLAN_TYPE: 'planType',
-        SEMESTER: 'semester',
-        DATE_RANGE: 'dateRange'
-    };
-
-    // School table field types
-    const SCHOOL_FIELD_TYPE = {
-        SELECT: 'select',
-        SCHOOL_NAME: 'schoolName',
-        VISIT_DATE: 'visitDate',
-        LAST_EVAL_DATE: 'lastEvalDate',
-        VISIT_TYPE: 'visitType',
-        ACADEMIC_YEAR: 'academicYear',
-        ACTIONS: 'actions'
-    };
+   
 
     // Plan validation rules
     const VALIDATION_RULES = {
@@ -122,20 +80,14 @@
         GET_VISITS: '/School/GetVisits',
         GET_VACATION_DATES: '/AcademicYear/GetVcationDate',
         CREATE_PLAN: '/Plan/CreatePlan',
-        //APPROVE_PLAN: '/Plan/ApprovePlan',
-        APPROVE_PLAN: '/Plan/Approve',
+        INSERTORUPDATEPLAN: '/Plan/InsertOrUpdatePlan',
         UPDATE_PLAN: '/Plan/UpdatePlan',
-        GET_PLAN_DETAILS: '/Plan/GetPlanDetails'
+        GET_PLAN_DETAILS: '/Plan/GetPlansWithunSelectedSchoolsDetails'
     };
 
     // Export all constants
     global.PlanConstants = {
         uniqueIndexId,
-        RENDER_TYPE,
-        ACTION_TYPE,
-        ReadOnly_ACTION_TYPES,
-        PLAN_FIELD_TYPE,
-        SCHOOL_FIELD_TYPE,
         VALIDATION_RULES,
         TABLE_CONFIG,
         FILTER_FIELDS,

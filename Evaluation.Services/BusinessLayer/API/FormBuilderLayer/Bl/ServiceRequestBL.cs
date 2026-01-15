@@ -31,10 +31,10 @@ namespace Evaluation.Services.Models.API
 
     public class ServiceRequestBL(
         IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow, SrvNotification SrvNotification, SrvUser SrvUser, 
-        LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, SrvField SrvField, SrvAction SrvAction, 
-        SrvStatus SrvStatus, SrvAssignment SrvAssignment, SrvDropdown SrvDropdown, SrvActionTransactionsLog SrvActionTransactionsLog,  PerformActionBL _performActionBL,
+        LoggingServices loggingServices, IMapper mapper, UserInfo userInfo,   SrvAction SrvAction, 
+        SrvStatus SrvStatus, SrvAssignment SrvAssignment,  SrvActionTransactionsLog SrvActionTransactionsLog,  PerformActionBL _performActionBL,
 
-		SrvService SrvService, SrvServiceRequest _srvServiceRequest, SrvAttachments _srvAttachments, IServiceProvider serviceProvider,RequestInfo _requestInfo)
+		SrvService SrvService, SrvServiceRequest _srvServiceRequest, EvaluationRequestService _evaluationRequestService, SrvAttachments _srvAttachments, IServiceProvider serviceProvider,RequestInfo _requestInfo)
             : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, _requestInfo)
     {
 
@@ -46,12 +46,16 @@ namespace Evaluation.Services.Models.API
 		public async Task<WebAppEvaluationRequestsDTO> GetEvaluationRequestsAsync(FilterRequestsDTO filter)
 		{
 			var userId = userInfo.UserId ?? Guid.Parse("C2536611-576B-4EB8-84F4-747F4ECE9A23");
-			return await _srvServiceRequest.GetEvaluationRequestsAsync(userId, filter);
+			return await _evaluationRequestService.GetEvaluationRequestsAsync(userId, filter);
 		}
 
 		public async Task<ServiceRequestDTO> GetApplicationDetailsAsync(Guid requestId)
 		{
 			return await _srvServiceRequest.GetRequestDetailsAsync(requestId);
+		}
+		public async Task<EvaluationRequestDTO> GetEvaluationDetailsAsync(Guid requestId)
+		{
+			return await _evaluationRequestService.GetEvaluationDetailsAsync(requestId);
 		}
 		public async Task<ServiceRequestDTO> HandleServiceRequestAsync(ActionFormDTO? actionFormDTO, Guid? planId,
 			Guid serviceId, string actionName, string fieldValuesJson, List<AssignUserDTO?> assignUsers,
@@ -119,15 +123,15 @@ namespace Evaluation.Services.Models.API
 				};
 
 				var validateRequestTask = ValidateCanCreateRequest(planId, serviceObj);
-				if (actionFormDTO?.FieldValues != null)
-				{
-					var validateActionTask = SrvAction.ValidateActionAndActionFieldAsync(null,  actionFormDTO?.FieldValues!, remarks, othersAttachement, serviceObj, status.Id, action, fileFields, saveAsDraft);
-					await Task.WhenAll(validateRequestTask, validateActionTask);
+				//if (actionFormDTO?.FieldValues != null)
+				//{
+				//	var validateActionTask = SrvAction.ValidateActionAndActionFieldAsync(null,  actionFormDTO?.FieldValues!, remarks, othersAttachement, serviceObj, status.Id, action, fileFields, saveAsDraft);
+				//	await Task.WhenAll(validateRequestTask, validateActionTask);
 
-					var validatedFields = await validateActionTask;
+				//	var validatedFields = await validateActionTask;
 
-					actionFormDTO!.FieldValues = (await _srvAttachments.UploadAndInsertAttachments(validatedFields.ToList(), request.Id, request.PlanId, fileFields, filesWithFieldId)).Cast<FieldValueDTO?>().ToList();
-				}
+				//	actionFormDTO!.FieldValues = (await _srvAttachments.UploadAndInsertAttachments(validatedFields.ToList(), request.Id, request.PlanId, fileFields, filesWithFieldId)).Cast<FieldValueDTO?>().ToList();
+				//}
 
 
 

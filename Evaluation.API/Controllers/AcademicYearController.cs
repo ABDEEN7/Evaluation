@@ -1,11 +1,14 @@
 ﻿using Evaluation.Services.BusinessLayer;
 using Evaluation.Services.BusinessLayer.API.PlanLayer;
+using Evaluation.Services.Models.Admin;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Evaluation.API.Controllers;
+[Route("api/[controller]/[action]")]
 
-public class AcademicYearController(MasterBL masterBL) : ControllerBase
+public class AcademicYearController(MasterBL masterBl) : ControllerBase
 {
+    [HttpGet]
     public async Task<IActionResult> GetVcationDate()
     {
         //var vcationDate = await masterBL.GetApiService<>
@@ -21,6 +24,11 @@ public class AcademicYearController(MasterBL masterBL) : ControllerBase
         });
 
     }
+    public class VacationDateDto
+    {
+        public DateTime Date { get; set; }
+    }
+    [HttpGet]
     public async Task<List<VacationDateDto>> GetVacationDatesAsync()
     {
         return new List<VacationDateDto>
@@ -29,9 +37,10 @@ public class AcademicYearController(MasterBL masterBL) : ControllerBase
         new VacationDateDto { Date = new DateTime(2025, 2, 14) }
     };
     }
-    public class VacationDateDto
+    [HttpGet]
+    public async Task<IActionResult> GetAcademicYearByDepartment()
     {
-        public DateTime Date { get; set; }
+        var result = await masterBl.GetAdminService<SrvAcademicYearBL>().GetAcademicYearListByCureentDepartment();
+        return Ok(result);
     }
-
 }

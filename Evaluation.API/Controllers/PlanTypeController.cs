@@ -10,7 +10,7 @@ namespace Evaluation.API.Controllers;
 public class PlanTypeController(MasterBL masterBl) : ControllerBase
 {
     [HttpGet]
-    [CheckRolePermisionFilter(true, ConstantKeys.WebPermission.GET_WEB_PLAN_TYPE_REQUEST)]
+    //[CheckRolePermisionFilter(true, ConstantKeys.WebPermission.GET_WEB_PLAN_TYPE_REQUEST)]
     public async Task<IActionResult> GetPlanTypes()
     {
         var planTypes = await masterBl.GetApiService<PlanServiceRequestServices>().GetPlanTypes();

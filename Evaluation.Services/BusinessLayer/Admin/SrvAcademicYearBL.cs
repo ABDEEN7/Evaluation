@@ -3,6 +3,7 @@ using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.Calendars;
 using Evaluation.DAL.Models.FormsModules;
 using Evaluation.DAL.Repositories;
+using Evaluation.Services.BusinessLayer.API.DepartmentLayer;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Exceptions;
@@ -14,7 +15,9 @@ namespace Evaluation.Services.Models.Admin
 {
     public class SrvAcademicYearBL : AdminBase
     {
-        public SrvAcademicYearBL(IServiceProvider serviceProvider, UnitOfWork uow, LoggingServices loggingServices, IMapper mapper, UserInfo userInfo,IServiceScopeFactory serviceScopeFactory,RequestInfo requestInfo) : base(serviceProvider, uow, loggingServices, mapper, userInfo, serviceScopeFactory, requestInfo)
+        public SrvAcademicYearBL(IServiceProvider 
+            serviceProvider, UnitOfWork uow, LoggingServices loggingServices, IMapper mapper, UserInfo userInfo
+            ,IServiceScopeFactory serviceScopeFactory,RequestInfo requestInfo) : base(serviceProvider, uow, loggingServices, mapper, userInfo, serviceScopeFactory, requestInfo)
         {
             
         }
@@ -30,6 +33,21 @@ namespace Evaluation.Services.Models.Admin
                 .OrderByDescending(x => x.CreateDate)
                  .Skip(Page*PageSize)
                 .Take(PageSize)
+                .ToListAsync();
+
+            var result = mapper.Map<List<AcademicYearDTO>>(list, opts => opts.Items["Language"] = _requestInfo.Lang);
+            return result;
+
+
+        }
+        public async Task<List<AcademicYearDTO>> GetAcademicYearListByCureentDepartment()
+        {
+
+            var departmentId =await serviceProvider.GetRequiredService<DepartmentService>().GetDepartmentIdAsync();
+            var list = await uow.GetRepository<AcademicYear>()
+                .GetAllNonDeleted(x=>x.DepartmentId == departmentId)
+                //.Include(x => x.CreateBy)
+                .OrderByDescending(x => x.CreateDate)
                 .ToListAsync();
 
             var result = mapper.Map<List<AcademicYearDTO>>(list, opts => opts.Items["Language"] = _requestInfo.Lang);
