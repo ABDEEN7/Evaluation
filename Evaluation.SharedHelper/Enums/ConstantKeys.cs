@@ -171,6 +171,7 @@ public static class ConstantKeys
         public static readonly string EvaluationTypeExistsEvaluationRequestHistory = "EvaluationTypeExistsEvaluationRequestHistory";
         public static readonly string DropdownTypeExistsField = "DropdownTypeExistsField";
         public static readonly string FormItemExistsFormItemRelated = "FormItemExistsFormItemRelated";
+        public static readonly string CurrentAcademiUser = "CurrentAcademiUser";
     }
 
     public static class AdminSettings
@@ -277,6 +278,7 @@ public static class ConstantKeys
         public static readonly string AdminActionFieldAttribute = "AdminActionFieldAttribute";
         public static readonly string AdminActionCondition = "AdminActionCondition";
         public static readonly string AdminAcademicYear = "AdminAcademicYear";
+        public static readonly string AdminOrgAcademicYear = "AdminOrgAcademicYear";
         public static readonly string AdminFormEvalMatrix = "AdminFormEvalMatrix";
         public static readonly string AdminDepEvalMatrix = "AdminDepEvalMatrix";
         public static readonly string AdminAcademicYearScope = "AdminAcademicYearScope";
@@ -324,6 +326,8 @@ public static class ConstantKeys
         public static readonly string WebEvaluationFormItem = "WebEvaluationFormItem";
         public static readonly string WebEvaluationSubFormItem = "WebEvaluationSubFormItem";
         public static readonly string WebEvaluationFormScopes = "WebEvaluationFormScopes";
+        public static readonly string WebDepartmentHoliday = "WebDepartmentHoliday";
+
     }
     public static class AdminPermission
     {
@@ -474,6 +478,14 @@ public static class ConstantKeys
 
         #endregion
 
+        #region ORG_ACADEMIC_YEAR
+
+        public const string DELETE_ADMIN_ORG_ACADEMIC_YEAR = "DELETE_ADMIN_ORG_ACADEMIC_YEAR";
+        public const string ADD_ADMIN_ORG_ACADEMIC_YEAR = "ADD_ADMIN_ORG_ACADEMIC_YEAR";
+        public const string EDIT_ADMIN_ORG_ACADEMIC_YEAR = "EDIT_ADMIN_ORG_ACADEMIC_YEAR";
+        public const string VIEW_ADMIN_ORG_ACADEMIC_YEAR = "VIEW_ADMIN_ORG_ACADEMIC_YEAR";
+
+        #endregion
 
         #region FORM_EVAL_MATRIX
 
@@ -812,6 +824,15 @@ public static class ConstantKeys
         public const string ADD_WEB_EVALFORMS = "ADD_WEB_EVALFORMS";
         public const string EDIT_WEB_EVALFORMS = "EDIT_WEB_EVALFORMS";
         public const string DELETE_WEB_EVALFORMS = "DELETE_WEB_EVALFORMS";
+
+        #endregion
+         
+        #region DEPARTMENTHOLIDAY
+
+        public const string VIEW_WEB_DEPARTMENT_HOLIDAY = "VIEW_WEB_DEPARTMENT_HOLIDAY";
+        public const string ADD_WEB_DEPARTMENT_HOLIDAY = "ADD_WEB_DEPARTMENT_HOLIDAY";
+        public const string EDIT_WEB_DEPARTMENT_HOLIDAY = "EDIT_WEB_DEPARTMENT_HOLIDAY";
+        public const string DELETE_WEB_DEPARTMENT_HOLIDAY = "DELETE_WEB_DEPARTMENT_HOLIDAY";
 
         #endregion
 
