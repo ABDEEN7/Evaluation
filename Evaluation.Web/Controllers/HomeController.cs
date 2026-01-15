@@ -31,7 +31,7 @@ namespace Evaluation.Web.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
-        
+
 
         [HttpPost]
         public IActionResult UiControlList()
@@ -41,6 +41,6 @@ namespace Evaluation.Web.Controllers
             return ViewComponent("UiControlList", model);
         }
 
-       
+        
     }
 }

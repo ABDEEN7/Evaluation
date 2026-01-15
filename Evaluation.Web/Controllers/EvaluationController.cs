@@ -2,7 +2,9 @@
 
 namespace Evaluation.Web.Controllers
 {
-	public class EvaluationController : Controller
+    [Route("{language}")]
+    [Route("{language}/Evaluation")]
+    public class EvaluationController : Controller
 	{
 		public IActionResult Index()
 		{

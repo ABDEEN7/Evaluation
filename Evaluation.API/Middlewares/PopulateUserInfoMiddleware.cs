@@ -27,28 +27,29 @@ namespace Evaluation.API.Middlewares
             userInfo.Name = "Test User";
             userInfo.UserType = "MinistryUser";
             userInfo.DBName = "EvaluationDB";
+            var RoleId = Guid.Parse("ffe7ba17-0375-4616-b526-29b0989a67ec");
             userInfo.PartyTypes = new List<Guid>
             {
                 Guid.Parse("22222222-2222-2222-2222-222222222222"),
                 Guid.Parse("33333333-3333-3333-3333-333333333333")
             };
+            userInfo.PermissionList = GetPermissions(RoleId);
 
+            //userInfo.PermissionList = new List<string>
+            //    {
+            //        // Evaluation Plans
+            //        "ViewEvaluationPlans",
+            //        "CreateEvaluationPlan",
+            //        "EditEvaluationPlan",
+            //        "DeleteEvaluationPlan",
+            //        "ApproveEvaluation",
 
-            userInfo.PermissionList = new List<string>
-                {
-                    // Evaluation Plans
-                    "ViewEvaluationPlans",
-                    "CreateEvaluationPlan",
-                    "EditEvaluationPlan",
-                    "DeleteEvaluationPlan",
-                    "ApproveEvaluation",
-
-                    // Web Plan Permissions
-                    "GET_WEB_PLAN_TYPE_REQUEST",
-                    "ADD_WEB_PLAN_REQUEST",
-                    "APPROVE_WEB_PLAN_REQUEST",
-                    "GET_SEMESTERS_REQUEST"
-                };
+            //        // Web Plan Permissions
+            //        "GET_WEB_PLAN_TYPE_REQUEST",
+            //        "ADD_WEB_PLAN_REQUEST",
+            //        "APPROVE_WEB_PLAN_REQUEST",
+            //        "GET_SEMESTERS_REQUEST"
+            //    };
 
             await _next(context);
         }
