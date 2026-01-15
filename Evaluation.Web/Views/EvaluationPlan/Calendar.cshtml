@@ -1,4 +1,5 @@
-﻿@{
+﻿@using Evaluation.SharedHelper.Enums
+@{
     var today = DateTime.Now.Date.ToString("yyyy-MM-dd");
 }
 @section Styles {
@@ -10,7 +11,25 @@
 @section Scripts {
     <script src="~/assets/vendor/fullcalendar/index.global.min.js"></script>
     <script>
+        $(document).ready(async function () {
 
+             if (!sharedUtility().ExistingToken()) {
+                sharedUtility().RedirectUnauthorized();
+            }
+            await webAppConfigsSetup().Init({
+                pageNames: [
+                    '@nameof(ConstantKeys.WebAppCommon)'
+                ],
+                 additional_keys:[]
+            }).then(() => {
+                uiControlsSetup().UpdatPageTitle();
+               $('body').show();
+               //initHomePage();
+                
+            });
+
+
+        });
         async function GetEvaluationRequests() {
             try {
                 const result = await jqClient().Get('/EvaluationRequest/GetEvaluationRequests');
