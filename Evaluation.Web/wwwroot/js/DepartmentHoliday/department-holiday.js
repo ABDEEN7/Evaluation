@@ -29,13 +29,13 @@ const loadData = () => {
 $btnAddbutton.click(function () {
     sharedFn().InitialPageControls(uiControlItems);
     setTimeout(() => {
-        //$('.date').flatpicker({
-        //    mode: "range",
-        //    dateFormat: "Y-m-d",
-        //    allowInput: true,
-        //    locale: lang === "ar" ? "ar" : "en",
-        //    disableMobile: true
-        //});
+        $('.date').flatpickr({
+            mode: "range",
+            dateFormat: "Y-m-d",
+            allowInput: true,
+            locale: lang === "ar" ? "ar" : "en",
+            disableMobile: true
+        });
         // Set up checkbox behavior
         const $checkbox = $('#DepartmentHolidayIsCronExpression');
         const $cronInput = $('#DepartmentHolidayCronExpression');
