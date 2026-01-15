@@ -5,6 +5,7 @@ using Evaluation.DAL.Models.Org;
 using Evaluation.DAL.Repositories;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Enums;
+using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Admin;
 using Microsoft.EntityFrameworkCore;
@@ -84,7 +85,6 @@ namespace Evaluation.Services.Models.Admin
 
                 obj.NameAr = message.NameAr;
                 obj.NameEn = message.NameEn;
-                obj.BackendName = message.BackendName;
                 obj.ParentId = message.ParentId;
                 obj.DepartmentId = message.DepartmentId;
 
@@ -112,6 +112,16 @@ namespace Evaluation.Services.Models.Admin
                 {
                     result.ResponseStatus = DBResult.NotFound;
                     return result;
+                }
+
+                var parentScopeType = await uow.GetRepository<ScopeType>()
+                                         .GetAllNonDeleted()
+                                         .Where(x => x.ParentId == obj.Id)
+                                         .ToListAsync();
+
+                if (parentScopeType.Count > 0)
+                {
+                    throw new BusinessException(ConstantKeys.ExceptionMessage.ParentScopeTypeExistsScopeType);
                 }
 
                 uow.GetRepository<ScopeType>().Delete(obj);
