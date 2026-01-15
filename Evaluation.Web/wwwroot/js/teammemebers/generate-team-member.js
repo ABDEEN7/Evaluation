@@ -34,18 +34,26 @@ const teamMembersUtility = window.teamMembersUtility;
     };
 
     ns.generateTeamMembers = function (fieldId) {
-        const html = ns.generateTeamMembersHTML(fieldId);
+        $(document).ready(async function () {
+            await webAppConfigsSetup().Init({
+                pageNames: [
+                    'TeamMember'
+                ]
+            }).then(() => {
+                const html = ns.generateTeamMembersHTML(fieldId);
 
-        const mainContent =
-            document.querySelector('.main-content') ||
-            document.querySelector('main') ||
-            document.body;
+                const mainContent =
+                    document.querySelector('.main-content') ||
+                    document.querySelector('main') ||
+                    document.body;
 
-        const wrapper = document.createElement('div');
-        wrapper.id = tid(fieldId, 'wrapper');
-        wrapper.innerHTML = html;
+                const wrapper = document.createElement('div');
+                wrapper.id = tid(fieldId, 'wrapper');
+                wrapper.innerHTML = html;
 
-        mainContent.appendChild(wrapper);
+                mainContent.appendChild(wrapper);
+            });
+        }); 
     };
 
     // ================== MEMBERS CARD ==================

@@ -3,6 +3,16 @@
 (function (ns, $) {
     'use strict';
 
+    // ================== LOCALIZATION HELPER ==================
+    function t(key, fallback = '') {
+        try {
+            const text = uiControlsSetup()?.GetUiControlText(key);
+            return text || fallback || key;
+        } catch {
+            return fallback || key;
+        }
+    }
+
     // ================== STATE ==================
     const state = {
         fieldId: null,
@@ -223,7 +233,7 @@
                     <span class="checkmark"></span>
                 </label>
             </th>
-            <th>اسم العضو</th>
+            <th>${t('lblMemberName')}</th>
         `;
 
         if (state.isNDA) {
@@ -231,9 +241,9 @@
         }
 
         headerHTML += `
-            <th>المجال</th>
-            <th>نوع الطرف</th>
-            <th>قائد الفريق</th>
+            <th>${t('lblDomain')}</th>
+            <th>${t('lblPartyType')}</th>
+            <th>${t('lblTeamLeader')}</th>
         `;
 
         $thead.html(headerHTML);
@@ -252,7 +262,7 @@
             $tbody.html(`
                 <tr>
                     <td colspan="3" class="text-center text-muted py-4">
-                        لا يوجد أعضاء
+                        ${t('lblNoMembers')}
                     </td>
                 </tr>
             `);
@@ -296,7 +306,7 @@
             $tbody.html(`
                 <tr>
                     <td colspan="${colspan}" class="text-center text-muted py-4">
-                        لا يوجد أعضاء محددين
+                        ${t('lblNoSelectedMembers')}
                     </td>
                 </tr>
             `);
@@ -810,3 +820,4 @@
     };
 
 })(window.teamMembersLogic, jQuery);
+
