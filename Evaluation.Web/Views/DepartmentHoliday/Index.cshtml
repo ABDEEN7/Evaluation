@@ -89,9 +89,9 @@
                 controlvalidationlist = uiControlItems;
 
                 //DepartmentHoliday
-                IsEdit = true;
-                IsDelete = true;
-                 IsAdd = true;
+             IsEdit = permissionsList?.some(p => p === '@ConstantKeys.WebPermissions.EDIT_WEB_DEPARTMENT_HOLIDAY') ?? false;
+                IsDelete = permissionsList?.some(p => p === '@ConstantKeys.WebPermissions.DELETE_WEB_DEPARTMENT_HOLIDAY') ?? false;
+                 IsAdd = permissionsList?.some(p => p === '@ConstantKeys.WebPermissions.ADD_WEB_DEPARTMENT_HOLIDAY') ?? false;
                  initTables();
             });
 
