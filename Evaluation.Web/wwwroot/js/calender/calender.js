@@ -207,11 +207,23 @@ function updateEventDates(info, eventResult) {
         });
 }
 
-
 $(document).ready(async function () {
+
+    //if (!sharedUtility().ExistingToken()) {
+    //    sharedUtility().RedirectUnauthorized();
+    //}
     await webAppConfigsSetup().Init({
         pageNames: [
+            '@nameof(ConstantKeys.WebAppCommon)',
             'calendar'
-        ]
+        ],
+        additional_keys: []
+    }).then(() => {
+        uiControlsSetup().UpdatPageTitle();
+        $('body').show();
+        //initHomePage();
+
     });
+
+
 });

@@ -53,8 +53,10 @@
     </section>
 </main>
 
-<script>
-    const webgroup = "@ViewBag.Webgroup";
-</script>
-<script src="~/assets/vendor/swiper/swiper-bundle.min.js" asp-append-version="true"></script>
-<script src="~/js/home/index.js"></script>
+@section Scripts {
+    <script>
+        const webgroup = "@ViewBag.Webgroup";
+    </script>
+    <script src="~/assets/vendor/swiper/swiper-bundle.min.js" asp-append-version="true"></script>
+    <script src="~/js/home/index.js"></script>
+}

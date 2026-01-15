@@ -1,13 +1,14 @@
-﻿
-<div id='calendar'></div>
-
-
+﻿@using Evaluation.SharedHelper.Enums
+@{
+    var today = DateTime.Now.Date.ToString("yyyy-MM-dd");
+}
 @section Styles {
     <link href="~/css/fullcalendar.css" rel="stylesheet" />
 }
-<!-- Bootstrap JS bundle (includes collapse) -->
+    <section class="calender-evaluation">
+            <div id='calendar'></div>
+    </section>
 @section Scripts {
-
     <script src="~/assets/vendor/fullcalendar/index.global.min.js"></script>
     <script src="~/js/calender/calender.js"></script>
 }
