@@ -121,13 +121,34 @@ const createRow = ({
     ` : ''}
 
     <td>${order}</td>
-    <td class="text-start">${escapeHtml(item.name)}</td>
+    <td class="text-start">${escapeHtml(item.name)} 
+    ${Array.isArray(item.relatedItems) && item.relatedItems.length > 0
+        ? `<span class="info-icon" onclick="openRelatedItemModal('${item.id}')">ⓘ</span>`
+        : ''
+}
+    
+    </td>
     <td>${buildSelection(item, fieldId, readOnly)}</td>
     ${hasAnyNote ? `<td>${buildNote(item, fieldId, readOnly)}</td>` : ''}
 </tr>
 `;
 
-// ==============================
+
+
+const createRowRelatedItem = ({
+    item,
+    order,
+    hasAnyNote
+}) => `
+<tr class="main-row align-middle">
+    <td>${order}</td>
+    <td class="text-start">${escapeHtml(item.name)}</td>
+    <td>${escapeHtml(item.value)}</td>
+    ${hasAnyNote ? `<td>${escapeHtml(item.note)}</td>` : ''}
+</tr>
+`;
+
+// ============================== 
 // Table Generator
 // ==============================
 const generateTableBodyHtml = async (items, hasAnyNote, hasAnyChildren, fieldId, readOnly) => {
@@ -161,8 +182,20 @@ const generateTableBodyHtml = async (items, hasAnyNote, hasAnyChildren, fieldId,
     }).join('');
 };
 
+const generateTableBodyHtmlForRelatedItems = async (items, hasAnyNote) => {
+    return items.map((item, i) => {
+
+        const mainRow = createRowRelatedItem({
+            item,
+            order: i + 1,
+            hasAnyNote
+        });
+        return mainRow;
+    }).join('');
+};
+
 // ==============================
-// Page Generator
+// Page Generator 
 // ==============================
 const generateFullFormPageHtml = async ({ formId, fieldId, readOnly }) => {
     var formId ='b8fb67a9-b09a-4e0c-a466-d0625d92521d'
@@ -182,6 +215,64 @@ const generateFullFormPageHtml = async ({ formId, fieldId, readOnly }) => {
 
     return `${generateFormAccordionItem(rowsHtml, hasAnyNote)}`;
 };
+
+
+const relatedItemPopup = (rowsHtml) => `<div class="modal fade" id="RealatedItemModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header align-items-start border-0">
+                <div>
+                    <h4 class="modal-title fw-semibold mb-2" id="modalTitle"></h4>
+                </div>
+
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body py-0">
+                <div class="row">
+                    <table class="table table-bordered text-center align-middle">
+                        <thead class="table-grey">
+                            <tr>
+                                <th>#</th>
+                                <th>البند</th>
+                                <th>القيمة</th>
+                                <th>ملاحظات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${rowsHtml}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>`;
+
+
+//const relatedItemPopup = `<div class="modal fade" id="RealatedItemModal" tabindex="-1" aria-hidden="true">
+//    <div class="modal-dialog modal-xl modal-dialog-centered">
+//        <div class="modal-content">
+//            <div class="modal-header align-items-start border-0">
+//                <div>
+//                    <h4 class="modal-title fw-semibold mb-2" id="modalTitle"></h4>
+//                </div>
+
+//                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+//            </div>
+
+//            <div class="modal-body py-0">
+//                <div class="row">
+//                    <div class="col-md-12" id="modalBodyContent">
+//                    </div>
+//                    <div class="col-md-12" id="modalNote">
+//                    </div>
+//                </div>
+//            </div>
+//        </div>
+//    </div>
+//</div>`;
+
 
 // ==============================
 // Initialize Controls
@@ -251,15 +342,40 @@ async function initializeControls(formId, fieldId, controlValues) {
 // ==============================
 //document.addEventListener('DOMContentLoaded', async () => {
 //    try {
-//        const html = await generateFullFormPageHtml({
-//            formId: 'b8fb67a9-b09a-4e0c-a466-d0625d92521d',
-//            fieldId: 'ADD_YOUR_FIELD_ID_HERE',
-//            readOnly: false
-//        });
+        //const html = await generateFullFormPageHtml({
+        //    formId: 'b8fb67a9-b09a-4e0c-a466-d0625d92521d',
+        //    fieldId: 'ADD_YOUR_FIELD_ID_HERE',
+        //    readOnly: false
+        //});
 
-//        document.getElementById('app').innerHTML = html;
+        //document.getElementById('app').innerHTML = html;
 
 //    } catch (error) {
 //        console.error('Form builder error:', error);
 //    }
 //});
+
+async function openRelatedItemModal(id) {
+
+
+    let relatedItems = itemsResult?.value.find(r => r.id == id)?.relatedItems ?? [];
+
+    const relatedItemsRowsHtml = await generateTableBodyHtmlForRelatedItems(
+        relatedItems
+    );
+
+    const popupHtml = await relatedItemPopup(relatedItemsRowsHtml);
+
+    document.body.insertAdjacentHTML('beforeend', popupHtml);
+
+    let modalElement = document.getElementById('RealatedItemModal');
+
+    let modal = new bootstrap.Modal(modalElement);
+
+    // Remove modal from DOM after it is closed
+    modalElement.addEventListener('hidden.bs.modal', () => {
+        modalElement.remove();
+    });
+
+    modal.show();
+}
