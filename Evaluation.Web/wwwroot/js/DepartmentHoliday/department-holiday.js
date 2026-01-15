@@ -28,6 +28,29 @@ const loadData = () => {
 
 $btnAddbutton.click(function () {
     sharedFn().InitialPageControls(uiControlItems);
+    setTimeout(() => {
+        //$('.date').flatpicker({
+        //    mode: "range",
+        //    dateFormat: "Y-m-d",
+        //    allowInput: true,
+        //    locale: lang === "ar" ? "ar" : "en",
+        //    disableMobile: true
+        //});
+        // Set up checkbox behavior
+        const $checkbox = $('#DepartmentHolidayIsCronExpression');
+        const $cronInput = $('#DepartmentHolidayCronExpression');
+
+        // Initialize state
+        $cronInput.prop('disabled', !$checkbox.is(':checked'));
+
+        // Handle changes
+        $checkbox.on('change', function () {
+            $cronInput.prop('disabled', !$(this).is(':checked'));
+            if (!$(this).is(':checked')) {
+                $cronInput.val(''); // Clear value when disabled
+            }
+        });
+    }, 100);
 });
 
 const deleteData = (id) => {
