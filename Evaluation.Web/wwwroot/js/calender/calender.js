@@ -206,3 +206,12 @@ function updateEventDates(info, eventResult) {
             info.revert();
         });
 }
+
+
+$(document).ready(async function () {
+    await webAppConfigsSetup().Init({
+        pageNames: [
+            'calendar'
+        ]
+    });
+});
