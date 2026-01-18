@@ -349,34 +349,33 @@
 <partial name="_PartialFileModal" />
 
 @section Scripts {
-
-    <script src="~/lib/jquery/jquery.min.js"></script>
-    <script src="~/lib/datatable/jquery.dataTables.min.js"></script>
+    <!-- Tables -->
+   <script src="~/lib/datatable/jquery.dataTables.min.js"></script>
     <script src="~/lib/datatable/dataTables.buttons.min.js"></script>
     <script src="~/lib/datatable/buttons.html5.min.js"></script>
-    <script src="~/js/shared/jq-table-util.js"></script>
+
+    <!-- Evaluation Plan Modules -->
     <script src="~/js/evaluationplan/evaluation-common-listing.js"></script>
     <script src="~/js/evaluationplan/evaluation-plans-listing.js"></script>
     <script src="~/js/evaluationplan/evaluation-schools-listing.js"></script>
     <script src="~/js/evaluationplan/evaluation-operations-listing.js"></script>
     <script src="~/js/evaluationplan/evaluation-plan-requests-listing.js"></script>
+    <script src="~/js/evaluationplan/createrequest.js"></script>
 
-    <script src="/lib/jquery/jquery.min.js"></script>
-    <script src="~/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <!-- Form Generation -->
     <script src="/js/form-generation-util/form.constants.js"></script>
     <script src="/js/form-generation-util/form.api.js"></script>
-@*     <script src="~/js/form-generation-util/form.evaluationplanfield.js"></script>
-
- *@   
-       <script src="~/js/forms/get-forms.js"></script>
-    <script src="~/js/forms/submit-form.js"></script>
- <script src="/js/form-generation-util/form.generate-field.js"></script>
+    <script src="/js/form-generation-util/form.generate-field.js"></script>
     <script src="/js/form-generation-util/form.render.js"></script>
     <script src="/js/form-generation-util/form.submit.js"></script>
     <script src="/js/form-generation-util/form.init.js"></script>
     <script src="/js/form-generation-util/form.namespace.js"></script>
-    <script src="~/js/evaluationplan/createrequest.js"></script>
     <script src="~/js/form-generation-util/evaluationparties.js"></script>
+
+    <!-- Forms -->
+    <script src="~/js/forms/get-forms.js"></script>
+    <script src="~/js/forms/submit-form.js"></script>
+
    
     <script>
         $(document).ready(async function () {

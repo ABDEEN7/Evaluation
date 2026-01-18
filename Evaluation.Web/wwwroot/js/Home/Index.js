@@ -77,8 +77,8 @@
 
 
 function loadDepartments() {
-
-    jqClient().Get(`/Website/GetDepartments`)
+    let webGroupPath = webgroup;
+    jqClient().Get(`/Website/GetDepartmentsForWebGroup?webGroupPath=${webGroupPath}`)
         .done((result) => {
 
             const data = (result && result.result) ? result.result : [];
@@ -171,13 +171,16 @@ function renderDepartmentsTable(departments) {
 }
 
 const loadMainBanner = () => {
+    let webGroupPath = webgroup;
+
     const options = {
         success: function (response) {
-            let swiperWrapper = $('#banner-swiper-wrapper');
-            bannerLoop = response.length > 1;
-            response.forEach(function (banner) {
-                let titleWords = banner.title;
-                let slideHtml = `
+            if (response) {
+                let swiperWrapper = $('#banner-swiper-wrapper');
+                bannerLoop = response.length > 1;
+                response.forEach(function (banner) {
+                    let titleWords = banner.title;
+                    let slideHtml = `
         <div class="swiper-slide">
           <img src="${banner.imgURL}" alt="${banner.imgName}" class="img-fluid main-img">
            <div class="banner-content">
@@ -186,8 +189,10 @@ const loadMainBanner = () => {
       </div>
         </div>`;
 
-                swiperWrapper.append(slideHtml);
-            });
+                    swiperWrapper.append(slideHtml);
+                });
+            }
+           
 
 
         },
@@ -195,7 +200,7 @@ const loadMainBanner = () => {
 
         }
     };
-    return jqClient(options).Get('/website/getbanner');
+    return jqClient(options).Get(`/website/getbanner?webGroupPath=${webGroupPath}`);
 };
 
 $(document).ready(function () {

@@ -2,6 +2,7 @@
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.Website;
 using Evaluation.DAL.Repositories;
+using Evaluation.Services.BusinessLayer.API.DepartmentLayer;
 using Evaluation.Services.Extensions;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Enums;
@@ -15,9 +16,11 @@ namespace Evaluation.Services.BusinessLayer.API
 {
     public class WebsiteBL : ApiBase
     {
-        public WebsiteBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow, LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, IServiceProvider serviceProvider, RequestInfo requestInfo)
+        private WebGroupService _webGroupService;
+        public WebsiteBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow, LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, IServiceProvider serviceProvider, RequestInfo requestInfo, WebGroupService webGroupService)
             : base(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, requestInfo)
         {
+            _webGroupService = webGroupService;
         }
         public async Task<List<NavbarDTO>> GetNavbarList(string Lang = "ar")
         {
@@ -98,8 +101,13 @@ namespace Evaluation.Services.BusinessLayer.API
             return result;
         }
 
-        public async Task<List<BannerDTO>> GetBanners(string Lang = "ar")
+        public async Task<List<BannerDTO>> GetBanners(string webGroupPath, string Lang = "ar")
         {
+            var webGroup = await _webGroupService.GetWebGroupByPath(webGroupPath);
+
+            if (webGroup == null)
+                return null;
+
             string MissingImage = await cacheDataProvider.GetSystemSettingValue(ConstantKeys.WebAppSettings.DefaultWebsiteBannerImage);
             DateTime today = DateTime.Now;
             var qry = serviceProvider.CreateScopedUow().GetRepository<Banner>()
@@ -116,6 +124,9 @@ namespace Evaluation.Services.BusinessLayer.API
                 qry = qry.Where(c => c.ShowEn);
 
             }
+
+            qry = qry.Where(c => c.WebGroupId == webGroup.Id);
+
             var rslt = await qry.Select(c => new BannerDTO
             {
                 Summary = Lang == "ar" ? c.SummaryAr : c.SummaryEn,
