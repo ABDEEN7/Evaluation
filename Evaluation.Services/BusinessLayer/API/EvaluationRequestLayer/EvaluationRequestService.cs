@@ -49,14 +49,20 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 
 	) : ApiBase(serviceScopeFactory, cacheDataProvider, unitOfWork, loggingServices, mapper, userInfo, serviceProvider, requestInfo)
 {
-    public async Task<List<EvaluationRequest>> GetEvaluationRequests()
+    public async Task<List<EvaluationRequest>> GetEvaluationRequests(string[] monthes)
     {
+        var monthInts = monthes.Select(int.Parse).ToList();
+
         return unitOfWork.GetRepository<EvaluationRequest>()
                     .GetAllActiveNonDeleted()
                     .Include(d => d.Plan)
                     .Include(d => d.OrgTree)
                     .Include(d => d.DepEvaluationType)
-                    .ToList();
+                    .Include(d => d.ServiceStatus)
+                     .Where(er =>
+            monthInts.Contains(er.FromDate.Year * 100 + er.FromDate.Month) ||
+            monthInts.Contains(er.ToDate.Year * 100 + er.ToDate.Month))
+        .ToList();
     }
 
 
@@ -211,9 +217,9 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 			throw new BusinessException(ExceptionMessage.UserNotFound);
 
 		var module = await moduleTask;
-		var assignment = await assignmentTask;
+		//var assignment = await assignmentTask;
 		bool departmentRequiresNda =  module?.Department?.IsNDA == true;
-		bool userAssignmentRequiresNda = true; //departmentRequiresNda && assignment.Any(x=>x.MinistryUserId== userId && x.IsNDA == true && (x.NdaDate == null || x.NdaStatusId == null));
+		bool userAssignmentRequiresNda = false; //departmentRequiresNda && assignment.Any(x=>x.MinistryUserId== userId && x.IsNDA == true && (x.NdaDate == null || x.NdaStatusId == null));
 
 		var formGroups = await fieldsTask;
 
@@ -238,8 +244,7 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 		// bool hasFieldHistoryPermission = false;
 		// bool hasAllFieldHistoryPermission = false;
 
-		var evaluationPartiesTask = userAssignmentRequiresNda ? srvEvaluationParty.GetPartiesWithServicesAndRequestsAsync(request.Id, module!.DepartmentId): Task.FromResult<List<EvaluationPartyDTO>?>(null)!;
-		//var evaluationPartiesTask = srvEvaluationParty.GetPartiesWithServicesAndRequestsAsync(request.Id, module!.DepartmentId);
+		var evaluationPartiesTask = srvEvaluationParty.GetPartiesWithServicesAndRequestsAsync(request.Id, module.DepartmentId);
 		var attachmentsTask = GetAllEvaluationRequestAttachmentsAsync(request.Id, lang);
 		var actionTransactionsTask = SrvActionTransactionsLog.GetActionLog(request.Id, request.ServiceId, module?.Id, user);
 		var schoolTask = schoolRepository.GetSchoolDetails(request.OrgTreeId);

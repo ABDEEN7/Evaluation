@@ -25,7 +25,6 @@ public class FormItem : EntityBase, IAuditLogEntity
     //public int OrderNo { get; set; } = 0;
     public bool HasNote { get; set; } = false;
     public virtual ICollection<SubFormItem>? SubFormItems { get; set; }
-
-
-
+    public ICollection<FormItemRelated>? RelatedFrom { get; set; }
+    public ICollection<FormItemRelated>? RelatedTo { get; set; }
 }

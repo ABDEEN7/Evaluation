@@ -1,5 +1,24 @@
 ﻿$(document).ready(function () {
 
+    function getUiText(key, fallback = '') {
+        try {
+            const text = uiControlsSetup().GetUiControlText(key);
+
+            if (
+                text === null ||
+                text === undefined ||
+                text === '' ||
+                (typeof text === 'string' && text.startsWith('Missing ['))
+            ) {
+                return fallback;
+            }
+
+            return text;
+        } catch {
+            return fallback;
+        }
+    }
+
     function getEvaluationRequestFilter() {
         return {
             RequestNo: $('#evaluationRequestNoFilter').val(),
@@ -128,7 +147,7 @@
                         actionsContainerId: 'actions-container',
                         templateContainerId: 'divTemplates',
                         modalContainerId: 'Action-container-fields',
-                        ctx: { root: '#evaluationRequestDetailsModal' }
+                        root: '#evaluationRequestDetailsModal' 
                     }
                 );
 
