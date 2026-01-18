@@ -1,6 +1,6 @@
 ﻿namespace Evaluation.SharedHelper.Dtos.TeamMemberDto;
 
-public class MemberDto
+public class AssignmentDto
 {
     public Guid Id { get; set; }
     public string Name { get; set; }

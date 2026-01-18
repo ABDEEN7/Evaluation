@@ -101,7 +101,7 @@
                 return [];
             }
 
-            const teamMembers = [];
+            const assignments = [];
 
             // استخراج بيانات كل عضو
             $rows.each(function () {
@@ -148,10 +148,10 @@
                     Scopes: evalRequestAssignmentScopies.length > 0 ? evalRequestAssignmentScopies : null
                 };
 
-                teamMembers.push(memberDto);
+                assignments.push(memberDto);
             });
 
-            return teamMembers;
+            return assignments;
 
         } catch (error) {
             console.error('❌ خطأ في استخراج بيانات الفريق:', error);
@@ -265,11 +265,11 @@
     // ================= UTILITY FUNCTIONS =================
 
     window.hasTeamChanges = function (fieldId) {
-        if (!window.teamMembersLogic) {
+        if (!window.assignmentsLogic) {
             return false;
         }
 
-        const state = window.teamMembersLogic.getState();
+        const state = window.assignmentsLogic.getState();
         if (!state) {
             return false;
         }
@@ -285,7 +285,7 @@
     };
 
     window.getTeamChangeSummary = function (fieldId) {
-        const state = window.teamMembersLogic?.getState();
+        const state = window.assignmentsLogic?.getState();
         if (!state) {
             return null;
         }

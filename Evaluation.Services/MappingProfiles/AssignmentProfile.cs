@@ -7,15 +7,15 @@ using Evaluation.SharedHelper.Models;
 
 namespace Evaluation.Services.MappingProfiles;
 
-public class TeamProfile : Profile
+public class AssignmentProfile : Profile
 {
-    public TeamProfile()
+    public AssignmentProfile()
     {
         CreateMap<Team, TeamDto>().
             ForMember(x => x.Name, opt => opt.MapFrom(src => src.NameEn)).
             ReverseMap();
 
-        CreateMap<MinistryUser, MemberDto>()
+        CreateMap<MinistryUser, AssignmentDto>()
            .ForMember(x => x.Name, opt =>
                opt.MapFrom<TeamResolver, Guid>(src => src.Id))
            .ForMember(x => x.JobTitle, opt =>
@@ -55,7 +55,7 @@ public class PartyTypeResolver : IMemberValueResolver<PartyType, PartyTypeDto, G
         );
     }
 }
-public class TeamResolver : IMemberValueResolver<MinistryUser, MemberDto, Guid, string?>
+public class TeamResolver : IMemberValueResolver<MinistryUser, AssignmentDto, Guid, string?>
 {
     private readonly RequestInfo _requestInfo;
 
@@ -66,7 +66,7 @@ public class TeamResolver : IMemberValueResolver<MinistryUser, MemberDto, Guid, 
 
     public string? Resolve(
         MinistryUser source,
-        MemberDto destination,
+        AssignmentDto destination,
         Guid sourceMember,
         string? destMember,
         ResolutionContext context)
@@ -78,7 +78,7 @@ public class TeamResolver : IMemberValueResolver<MinistryUser, MemberDto, Guid, 
         );
     }
 }
-public class JobTitleResolver : IMemberValueResolver<MinistryUser, MemberDto, Guid, string?>
+public class JobTitleResolver : IMemberValueResolver<MinistryUser, AssignmentDto, Guid, string?>
 {
     private readonly RequestInfo _requestInfo;
 
@@ -89,7 +89,7 @@ public class JobTitleResolver : IMemberValueResolver<MinistryUser, MemberDto, Gu
 
     public string? Resolve(
         MinistryUser source,
-        MemberDto destination,
+        AssignmentDto destination,
         Guid sourceMember,
         string? destMember,
         ResolutionContext context)

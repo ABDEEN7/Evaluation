@@ -1,5 +1,5 @@
-﻿window.teamMembersUtility = window.teamMembersUtility || {};
-const teamMembersUtility = window.teamMembersUtility;
+﻿window.assignmentsUtility = window.assignmentsUtility || {};
+const assignmentsUtility = window.assignmentsUtility;
 
 (function (ns) {
     'use strict';
@@ -21,7 +21,7 @@ const teamMembersUtility = window.teamMembersUtility;
 
     // ================== PUBLIC ==================
 
-    ns.generateTeamMembersHTML = function (fieldId) {
+    ns.generateAssignmentsHTML = function (fieldId) {
         let html = '';
         html += generateMembersCard(fieldId);
         html += generateSelectedTeamCard(fieldId);
@@ -33,14 +33,14 @@ const teamMembersUtility = window.teamMembersUtility;
         `;
     };
 
-    ns.generateTeamMembers = function (fieldId) {
+    ns.generateAssignments = function (fieldId) {
         $(document).ready(async function () {
             await webAppConfigsSetup().Init({
                 pageNames: [
-                    'TeamMember'
+                    'Assignment'
                 ]
             }).then(() => {
-                const html = ns.generateTeamMembersHTML(fieldId);
+                const html = ns.generateAssignmentsHTML(fieldId);
 
                 const mainContent =
                     document.querySelector('.main-content') ||
@@ -256,4 +256,4 @@ const teamMembersUtility = window.teamMembersUtility;
         return label;
     }
 
-})(teamMembersUtility);
+})(assignmentsUtility);

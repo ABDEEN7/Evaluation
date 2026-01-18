@@ -11,7 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Evaluation.Services.BusinessLayer.API.TeamMemberBL;
 
-public class TeamMemberService(IServiceScopeFactory serviceScopeFactory,
+public class AssignmentService(IServiceScopeFactory serviceScopeFactory,
     CacheDataProvider cacheDataProvider,
     UnitOfWork unitOfWork,
     LoggingServices loggingServices,

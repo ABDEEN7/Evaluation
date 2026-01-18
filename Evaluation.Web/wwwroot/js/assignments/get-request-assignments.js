@@ -1,4 +1,4 @@
-﻿window.teamMembersLogic = window.teamMembersLogic || {};
+﻿window.assignmentsLogic = window.assignmentsLogic || {};
 
 (function (ns, $) {
     'use strict';
@@ -20,7 +20,7 @@
         teams: [],
         members: [],
         allMembers: [],
-        selectedTeamMembers: [],
+        selectedAssignments: [],
         scopes: [],
         pendingRemoval: new Set(),
         isNDA: false,
@@ -50,7 +50,7 @@
         getPendingStatus() {
             return jqClient().Get(API_ENDPOINTS.GET_PENDING_STATUS);
         },
-        getTeamMembersByEvaluationRequest(evaluationRequestId) {
+        getAssignmentsByEvaluationRequest(evaluationRequestId) {
             return jqClient().Get(
                 `${API_ENDPOINTS.GET_TEAM_MEMBERS_BY_EVALUATION_REQUEST}?evaluationRequestId=${evaluationRequestId}`
             );
@@ -122,13 +122,13 @@
     /**
      * Load existing team members from evaluation request
      */
-    async function loadExistingTeamMembers(evaluationRequestId) {
+    async function loadExistingAssignments(evaluationRequestId) {
         if (!evaluationRequestId) {
             return;
         }
 
         try {
-            const res = await TeamApi.getTeamMembersByEvaluationRequest(evaluationRequestId);
+            const res = await TeamApi.getAssignmentsByEvaluationRequest(evaluationRequestId);
 
             if (!res?.isSuccess || !res?.value) {
                 console.warn('⚠️ No existing team members found');
@@ -152,7 +152,7 @@
                     }
                 }
 
-                if (state.selectedTeamMembers.find(m => m.id === memberId && m.partyTypeId === assignment.partyTypeId)) {
+                if (state.selectedAssignments.find(m => m.id === memberId && m.partyTypeId === assignment.partyTypeId)) {
                     continue;
                 }
 
@@ -161,7 +161,7 @@
                     .map(scope => scope.scopeId)
                     .filter(Boolean);
 
-                state.selectedTeamMembers.push({
+                state.selectedAssignments.push({
                     ...member,
                     id: memberId,
                     partyTypeId: assignment.partyTypeId,
@@ -181,7 +181,7 @@
             renderSelectedTeamTable();
             updateSelectAllCheckbox();
 
-            console.log('✅ Loaded existing team members:', state.selectedTeamMembers.length);
+            console.log('✅ Loaded existing team members:', state.selectedAssignments.length);
         } catch (error) {
             console.error('❌ Error loading existing team members:', error);
             showError('خطأ في تحميل أعضاء الفريق المحفوظين');
@@ -271,7 +271,7 @@
         }
 
         const rows = state.members.map(m => {
-            const checked = state.selectedTeamMembers.some(x => x.id === m.id);
+            const checked = state.selectedAssignments.some(x => x.id === m.id);
             const memberName = m.name || m.fullName || m.memberName || 'غير محدد';
             const memberPosition = m.position || m.jobTitle || m.title || 'غير محدد';
 
@@ -301,7 +301,7 @@
             return;
         }
 
-        if (!state.selectedTeamMembers.length) {
+        if (!state.selectedAssignments.length) {
             const colspan = state.isNDA ? 6 : 5;
             $tbody.html(`
                 <tr>
@@ -314,7 +314,7 @@
             return;
         }
 
-        const rows = state.selectedTeamMembers.map((member, index) => {
+        const rows = state.selectedAssignments.map((member, index) => {
             const memberName = member.name || member.fullName || member.memberName || 'غير محدد';
             const memberPosition = member.position || member.jobTitle || member.title || 'غير محدد';
             const isPending = state.pendingRemoval.has(member.id);
@@ -442,7 +442,7 @@
         // Handle Select2 opening and pre-selecting checkboxes
         $(".multiCheckSelect-dynamic").on("select2:open", function () {
             const memberId = $(this).data('member-id');
-            const member = state.selectedTeamMembers.find(m => m.id === memberId);
+            const member = state.selectedAssignments.find(m => m.id === memberId);
             const selected = member?.scopes || [];
 
             setTimeout(() => {
@@ -481,7 +481,7 @@
         });
 
         // Pre-select values for loaded data
-        state.selectedTeamMembers.forEach(member => {
+        state.selectedAssignments.forEach(member => {
             if (member.scopes && member.scopes.length > 0) {
                 const $select = $(`.multiCheckSelect-dynamic[data-member-id='${member.id}']`);
                 if ($select.length) {
@@ -525,7 +525,7 @@
                 state.teamLeaderId = leaderId;
 
                 // Update isLeader flag for all members
-                state.selectedTeamMembers.forEach(member => {
+                state.selectedAssignments.forEach(member => {
                     member.isLeader = member.id === leaderId;
                 });
 
@@ -538,7 +538,7 @@
                 const memberId = $(this).data('member-id');
                 const partyTypeId = $(this).val();
 
-                const member = state.selectedTeamMembers.find(m => m.id === memberId);
+                const member = state.selectedAssignments.find(m => m.id === memberId);
                 if (member) {
                     member.partyTypeId = partyTypeId;
                     console.log('🏢 نوع الطرف للعضو', memberId, ':', partyTypeId);
@@ -552,7 +552,7 @@
                 const memberId = $checkbox.data('member-id');
                 const $cell = $checkbox.closest('td');
 
-                const member = state.selectedTeamMembers.find(m => m.id === memberId);
+                const member = state.selectedAssignments.find(m => m.id === memberId);
 
                 if (!member) return;
 
@@ -597,7 +597,7 @@
                     return;
                 }
 
-                if (state.selectedTeamMembers.find(m => m.id === memberId)) {
+                if (state.selectedAssignments.find(m => m.id === memberId)) {
                     return;
                 }
 
@@ -605,7 +605,7 @@
                     ? userPartyTypes[0].partyType.id
                     : null;
 
-                state.selectedTeamMembers.push({
+                state.selectedAssignments.push({
                     ...member,
                     scopes: [],
                     nda: null,
@@ -638,8 +638,8 @@
                 } else {
                     state.pendingRemoval.delete(memberId);
 
-                    const member = state.selectedTeamMembers.find(m => m.id === memberId);
-                    state.selectedTeamMembers = state.selectedTeamMembers.filter(m => m.id !== memberId);
+                    const member = state.selectedAssignments.find(m => m.id === memberId);
+                    state.selectedAssignments = state.selectedAssignments.filter(m => m.id !== memberId);
 
                     $(`${id('userTable')} tr[data-id="${memberId}"] .row-select`).prop('checked', false);
 
@@ -708,7 +708,7 @@
                 }
 
                 state.pendingRemoval.forEach(memberId => {
-                    state.selectedTeamMembers = state.selectedTeamMembers.filter(m => m.id !== memberId);
+                    state.selectedAssignments = state.selectedAssignments.filter(m => m.id !== memberId);
                     $(`${id('userTable')} tr[data-id="${memberId}"] .row-select`).prop('checked', false);
                 });
 
@@ -803,7 +803,7 @@
 
         // Load existing team members if evaluationRequestId is provided
         if (evaluationRequestId) {
-            await loadExistingTeamMembers(evaluationRequestId);
+            await loadExistingAssignments(evaluationRequestId);
         }
 
         initEventListeners();
@@ -815,9 +815,9 @@
         return state;
     };
 
-    ns.getSelectedTeamMembers = function () {
-        return state.selectedTeamMembers;
+    ns.getSelectedAssignments = function () {
+        return state.selectedAssignments;
     };
 
-})(window.teamMembersLogic, jQuery);
+})(window.assignmentsLogic, jQuery);
 

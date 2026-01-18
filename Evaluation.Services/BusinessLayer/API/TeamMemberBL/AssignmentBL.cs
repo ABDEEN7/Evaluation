@@ -1,23 +1,21 @@
 ﻿using AutoMapper;
 using Evaluation.DAL.Helper;
+using Evaluation.DAL.Migrations;
 using Evaluation.DAL.Models.DepartementEntites;
 using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
 using Evaluation.DAL.Models.UserEntiy;
 using Evaluation.DAL.Repositories;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Dtos.TeamMemberDto;
-using Evaluation.SharedHelper.Enums;
-using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Api;
 using FluentResults;
-using HarfBuzzSharp;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Evaluation.Services.BusinessLayer.API.TeamMemberBL;
 
-public class TeamMemberBL(IServiceScopeFactory serviceScopeFactory,
+public class AssignmentBL(IServiceScopeFactory serviceScopeFactory,
     CacheDataProvider cacheDataProvider,
     UnitOfWork unitOfWork,
     LoggingServices loggingServices,
@@ -25,7 +23,7 @@ public class TeamMemberBL(IServiceScopeFactory serviceScopeFactory,
     UserInfo userInfo,
     IServiceProvider serviceProvider,
     RequestInfo requestInfo,
-    TeamMemberService teamMemberService
+    AssignmentService teamMemberService
     ) : ApiBase(serviceScopeFactory, cacheDataProvider, unitOfWork, loggingServices, mapper, userInfo,
         serviceProvider, requestInfo)
 {
@@ -43,7 +41,7 @@ public class TeamMemberBL(IServiceScopeFactory serviceScopeFactory,
     //                    .ToListAsync();
     //    return teams;
     //}
-    public async Task<Result<TeamMembersResponse>> GetTeamsAsync()
+    public async Task<Result<AssignmentsResponse>> GetTeamsAsync()
     {
         var team = await teamMemberService.GetTeamAsync();
         bool isNdaActive = await
@@ -53,14 +51,14 @@ public class TeamMemberBL(IServiceScopeFactory serviceScopeFactory,
           .OrderByDescending(x => x.CreateDate)
           .AnyAsync();
         var teamRespons = mapper.Map<List<TeamDto>>(team);
-        TeamMembersResponse teamMembers = new TeamMembersResponse
+        AssignmentsResponse teamMembers = new AssignmentsResponse
         {
             Data = teamRespons,
             IsNDA = isNdaActive
         };
         return teamMembers;
     }
-    public async Task<Result<List<MemberDto>>> GetMembersByTeamId(Guid? teamId)
+    public async Task<Result<List<AssignmentDto>>> GetMembersByTeamId(Guid? teamId)
     {
         var member = unitOfWork.GetRepository<MinistryUser>()
                .GetAllActiveNonDeleted();
@@ -70,7 +68,7 @@ public class TeamMemberBL(IServiceScopeFactory serviceScopeFactory,
         var memberWithParty = await member
             .Include(x => x.UserPartTypes!)
             .ThenInclude(w => w.PartyType).ToListAsync();
-        var memberTeamDto = mapper.Map<List<MemberDto>>(memberWithParty);
+        var memberTeamDto = mapper.Map<List<AssignmentDto>>(memberWithParty);
         return memberTeamDto;
     }
     public async Task<List<ScopeDto>> GetScopesAsync()
@@ -81,44 +79,25 @@ public class TeamMemberBL(IServiceScopeFactory serviceScopeFactory,
     }
     public async Task<bool> AddedRequestAssignment(List<EvalTeamRequestDto> model)
     {
-        var existingAssignments = unitOfWork
-            .GetRepository<EvaluationRequestAssignment>()
-            .GetAllActiveNonDeleted()
-            .Select(x => new
-            {
-                x.MinistryUserId,
-                x.PartyTypeId
-            })
-            .ToList();
-
-        var newAssignments = model
-            .Where(m => !existingAssignments.Any(db =>
-                db.MinistryUserId == m.UserId &&
-                db.PartyTypeId == m.PartyTypeId))
-            .ToList();
-
-        if (!newAssignments.Any())
+        if (model == null || !model.Any())
             return true;
 
-        var evaluationRequestAssignments = newAssignments.Select(dto => new EvaluationRequestAssignment
+        var evaluationRequestId = model.First().EvaluationRequestId;
+
+        var hasAssignments = await
+            unitOfWork.GetRepository<EvaluationRequestAssignment>()
+            .GetAllActiveNonDeleted()
+            .AnyAsync(x =>
+            x.EvaluationRequestId == evaluationRequestId);
+
+        if (!hasAssignments)
         {
-            MinistryUserId = dto.UserId,
-            EvaluationRequestId = dto.EvaluationRequestId,
-            PartyTypeId = dto.PartyTypeId,
-            IsLeader = dto.IsLeader,
-            IsNDA = dto.IsNDA,
-            NdaStatusId = dto.NdaStatusId,
-            Note = dto.Note,
-            EvalRequestAssignmentScopies = dto.Scopes?.Select(scope => new EvalRequestAssignmentScope
-            {
-                ScopeId = scope.Id,
-                Note = scope.Note
-            }).ToList()
-        }).ToList();
-        await unitOfWork
-            .GetRepository<EvaluationRequestAssignment>()
-            .InsertRange(evaluationRequestAssignments);
-        await unitOfWork.CommitAsync();
+            await AddAssignments(model);
+        }
+        else
+        {
+            await UpdateOrDeleteAssignments(model);
+        }
         return true;
     }
     public async Task<Result<List<EvaluationRequestAssignmentDto>>> GetTeamByEvaluationRequestId(Guid evaluationRequestId)
@@ -155,5 +134,82 @@ public class TeamMemberBL(IServiceScopeFactory serviceScopeFactory,
 
         return true;
     }
+    private async Task AddAssignments(List<EvalTeamRequestDto> model)
+    {
+        var exsitingAssignments = unitOfWork
+            .GetRepository<EvaluationRequestAssignment>()
+            .GetAllActiveNonDeleted()
+            .Select(x => new
+            {
+                x.MinistryUserId,
+                x.PartyTypeId
+            })
+            .ToList();
 
+        var newAssignments = model
+            .Where(m => !exsitingAssignments.Any(db =>
+            db.MinistryUserId == m.UserId &&
+            db.PartyTypeId == m.PartyTypeId))
+            .ToList();
+
+        if (!newAssignments.Any())
+            return;
+        var evaluationRequestAssignments = newAssignments.Select(dto =>
+        new EvaluationRequestAssignment
+        {
+            MinistryUserId = dto.UserId,
+            EvaluationRequestId = dto.EvaluationRequestId,
+            PartyTypeId = dto.PartyTypeId,
+            IsLeader = dto.IsLeader,
+            Note = dto.Note,
+            EvalRequestAssignmentScopies = dto.Scopes?.Select(scope =>
+                new EvalRequestAssignmentScope
+                {
+                    ScopeId = scope.Id
+                }).ToList()
+        }).ToList();
+        await unitOfWork
+            .GetRepository<EvaluationRequestAssignment>()
+            .InsertRange(evaluationRequestAssignments);
+    }
+    private async Task UpdateOrDeleteAssignments(List<EvalTeamRequestDto> model)
+    {
+        var evaluationRequestId = model.First().EvaluationRequestId;
+        var repo = unitOfWork.GetRepository<EvaluationRequestAssignment>();
+        var existingAssignments = await repo
+       .GetAllActiveNonDeleted(x => x.EvaluationRequestId == evaluationRequestId)
+       .Include(x => x.EvalRequestAssignmentScopies)
+       .ToListAsync();
+
+        //Delete missing Assignment
+        var toDelete = existingAssignments
+            .Where(db => !model.Any(m =>
+            m.UserId == db.MinistryUserId &&
+            m.PartyTypeId == db.PartyTypeId))
+            .ToList();
+        if (toDelete.Any())
+            repo.DeleteRange(toDelete);
+        // Update exsiting 
+        foreach (var dto in model)
+        {
+            var entity = existingAssignments.FirstOrDefault(db =>
+              db.MinistryUserId == dto.UserId &&
+              db.PartyTypeId == dto.PartyTypeId);
+            if (entity == null)
+                continue;
+
+            entity.IsLeader = dto.IsLeader;
+            entity.Note = dto.Note;
+            entity.EvalRequestAssignmentScopies.Clear();
+            if (dto.Scopes != null)
+            {
+                entity.EvalRequestAssignmentScopies = dto.Scopes.Select(s =>
+                    new EvalRequestAssignmentScope
+                    {
+                        ScopeId = s.Id,
+                    }).ToList();
+            }
+            repo.Update(entity);
+        }
+    }
 }

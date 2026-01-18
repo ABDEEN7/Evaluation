@@ -2,7 +2,7 @@
 
 namespace Evaluation.Web.Controllers;
 
-public class TeamMembersController : Controller
+public class AssignmentsController : Controller
 {
     [HttpGet]
     public IActionResult Create()
