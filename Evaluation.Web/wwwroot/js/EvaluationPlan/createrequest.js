@@ -1,4 +1,5 @@
 ﻿(function (w, $) {
+    var DepartmentRouting = sharedUtility().extractDepartmentName();
 
     const fu = w.formUtility || {};
     const ActionTypes = (w.FormConstants && w.FormConstants.ACTION_TYPE) || {};
@@ -166,7 +167,7 @@
 
     async function CheckCanCreateingDraft() {
         try {
-            const url = `/EvaluationPlanRequest/CheckCanCreateingDraft?planId=${PlanId}`;
+            const url = `/EvaluationPlanRequest/${DepartmentRouting}/CheckCanCreateingDraft?planId=${PlanId}`;
             const response = await jqClient().SyncGet(url);
             return response;
         } catch (e) {
@@ -176,7 +177,7 @@
 
     async function GetActionFields() {
         try {
-            let url = `/EvaluationPlanRequest/GetActionField?planId=${PlanId}`;
+            let url = `/EvaluationPlanRequest/${DepartmentRouting}/GetActionField?planId=${PlanId}`;
             if (initialAction) url += `&actionBackendKey=${encodeURIComponent(initialAction)}`;
             if (SchoolId) url += `&schoolId=${encodeURIComponent(SchoolId)}`;
 

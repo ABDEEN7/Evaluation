@@ -202,10 +202,11 @@ internal class Program
             // -------------------------------------
             var app = builder.Build();
 
-            // -------------------------------------
-            // 7️⃣ Middlewares (correct order)
-            // -------------------------------------
-            app.UseMiddleware<SecurityLayerMiddleware>();
+			app.UseRouting(); 
+							  // -------------------------------------
+							  // 7️⃣ Middlewares (correct order)
+							  // -------------------------------------
+			app.UseMiddleware<SecurityLayerMiddleware>();
             app.UseMiddleware<ExceptionHandlingMiddleware>();
 
             if (app.Environment.IsDevelopment())
@@ -231,19 +232,25 @@ internal class Program
             app.UseSession(); // ✅ Must be after UseRouting
 
             app.UseCors("AllowWebAndAdmin");
-            app.UseAuthentication();
+
+			app.UseMiddleware<PopulateUserInfoMiddleware>();
+			app.UseMiddleware<PopulateRequestInfoMiddleware>();
+
+			app.UseAuthentication();
             app.UseAuthorization();
 
-            app.UseMiddleware<PopulateUserInfoMiddleware>();
-            app.UseMiddleware<PopulateRequestInfoMiddleware>();
-
+           
             app.MapControllers();
+			//app.MapControllerRoute(
+			//	name: "api_no_dep",
+			//	pattern: "api/{controller}/{action}/{id?}",
+			//	constraints: new { controller = "^(?!ServiceRequest$|EvaluationPlan$).+$" });
 
-            app.MapControllerRoute(
-                name: "default",
-                pattern: "api/{controller=Home}/{action=Index}/{id?}");
+			//app.MapControllerRoute(
+			//	name: "api_with_dep",
+			//	pattern: "api/{controller}/{depRouting}/{action}/{id?}");
 
-            app.Run();
+			app.Run();
         }
     }
 }
