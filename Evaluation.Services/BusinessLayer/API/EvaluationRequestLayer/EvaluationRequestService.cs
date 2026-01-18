@@ -210,6 +210,10 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 			throw new BusinessException(ExceptionMessage.UserNotFound);
 
 		var module = await moduleTask;
+		var assignment = await assignmentTask;
+		bool departmentRequiresNda =  module?.Department?.IsNDA == true;
+		bool userAssignmentRequiresNda = false; //departmentRequiresNda && assignment.Any(x=>x.MinistryUserId== userId && x.IsNDA == true && (x.NdaDate == null || x.NdaStatusId == null));
+
 		var formGroups = await fieldsTask;
 
 		var preventPartyTypes = request.ServiceStatus.StatusPreventPartyTypes;
@@ -233,7 +237,8 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 		// bool hasFieldHistoryPermission = false;
 		// bool hasAllFieldHistoryPermission = false;
 
-		var evaluationPartiesTask = srvEvaluationParty.GetPartiesWithServicesAndRequestsAsync(request.Id, module.DepartmentId);
+		//var evaluationPartiesTask = userAssignmentRequiresNda ? srvEvaluationParty.GetPartiesWithServicesAndRequestsAsync(request.Id, module!.DepartmentId): Task.FromResult<List<EvaluationPartyDTO>?>(null)!;
+		var evaluationPartiesTask = srvEvaluationParty.GetPartiesWithServicesAndRequestsAsync(request.Id, module!.DepartmentId);
 		var attachmentsTask = GetAllEvaluationRequestAttachmentsAsync(request.Id, lang);
 		var actionTransactionsTask = SrvActionTransactionsLog.GetActionLog(request.Id, request.ServiceId, module?.Id, user);
 		var schoolTask = schoolRepository.GetSchoolDetails(request.OrgTreeId);

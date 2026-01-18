@@ -1402,6 +1402,60 @@ var formGenerateFieldUtility = window.formUtility;
         return container;
     };
 
+
+    function generateEvaluationPlanField  (field, readonly) {
+        const fieldId = field.fieldId;
+
+        const container = $('<div>')
+            .addClass('evaluation-plan-wrapper')
+            .attr('data-field-id', fieldId);
+
+        container.html(`<div class="text-muted py-2">Loading evaluation plan...</div>`);
+        (async () => {
+            try {
+                const pu = window.planUtility || window.planutility;
+                const PH = window.PlanHandler;
+                if (!pu) {
+                    container.html(`<div class="text-danger">planUtility not found on window.</div>`);
+                    return;
+                }
+                    pu.generatePlanFields(fieldId);
+
+                    const wrapperId = `${fieldId}_wrapper`;
+                    const moved = document.getElementById(wrapperId);
+
+                    if (moved) {
+                        container.empty().append($(moved));
+                    } else {
+                        container.html(`<div class="text-danger">Failed to render plan wrapper (${wrapperId}).</div>`);
+                        return;
+                    }
+                PH.init(
+                    
+                    readonly,
+                    fieldId,
+                    field.value
+                );
+                if (readonly) {
+                    container
+                        .find('input, select, textarea, button')
+                        .prop('disabled', true)
+                        .attr('aria-disabled', 'true');
+
+                    container.find(`[id$="_btnSavePlan"], [id$="_btnSubmit"]`).hide();
+
+                    container.find('[data-bs-toggle="offcanvas"]').addClass('disabled').attr('tabindex', '-1');
+                }
+
+            } catch (err) {
+                console.error('evaluationPlan render failed:', err);
+                container.html(`<div class="text-danger">Failed to load evaluation plan.</div>`);
+            }
+        })();
+
+        return container;
+    };
+
     // ================== EXPORT ON NAMESPACE ==================
 
     ns.fieldElementGenerators = fieldElementGenerators;

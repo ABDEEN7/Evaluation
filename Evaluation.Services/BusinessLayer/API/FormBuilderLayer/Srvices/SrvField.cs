@@ -114,7 +114,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 				var repository = scopedUow.GetRepository<Field>();
 
 				data = await repository.GetAllQueryFiltered()
-									.Include(f => f.ActionsStepsField)
+									.Include(f => f.ActionField)
 									.Include(f => f.Service)
 				.Include(f => f.FieldType)
 				.Include(f => f.FormGroup)
@@ -123,7 +123,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 				.Include(f => f.FieldAttributeValues)
 				.Include(f => f.MappingField)
 				.Where(x => x.ServiceId == ServiceId )
-				.Where(X => X.ActionsStepsField!.Any(X => X.ServiceActionId == actionId))
+				.Where(X => X.ActionField!.Any(X => X.ServiceActionId == actionId))
 				.AsSplitQuery()
 				.AsNoTracking()
 				.ToListAsync();
@@ -148,7 +148,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 				var repository = scopedUow.GetRepository<Field>();
 
 				data = await repository.GetAllQueryFiltered()
-									.Include(f => f.ActionsStepsField)
+									.Include(f => f.ActionField)
 									.Include(f => f.Service)
 				.Include(f => f.FieldType)
 				.Include(f => f.FormGroup)
