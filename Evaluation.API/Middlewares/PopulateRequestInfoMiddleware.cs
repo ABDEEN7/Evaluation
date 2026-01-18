@@ -58,7 +58,6 @@ namespace Evaluation.API.Middlewares
                 var currentToken = authHeader.Replace("Bearer ", "");
                 requestInfo.Token = currentToken;
             }
-            requestInfo.DepRouting = context.GetRouteValue("depRouting")?.ToString();
 
             var requiresDepRouting = EndpointRequiresDepRouting(context);
 			var path = context.Request.Path.Value ?? "";
@@ -66,20 +65,20 @@ namespace Evaluation.API.Middlewares
 			if (requiresDepRouting && parts.Length < 4)
                 throw new BusinessException("depRouting is required");
 
-            if (!string.IsNullOrWhiteSpace(requestInfo.DepRouting))
-            {
-				if (parts.Length >= 4)
-				{
-					requestInfo.Controller = parts[1];
-					requestInfo.DepRouting = "/" + parts[2];
-					requestInfo.Action = parts[3];
-				}
 
-				requestInfo.DepId = GetDepartmentIdByRoutingPath(parts[2]);
+            if (parts.Length >= 4)
+            {
+                requestInfo.Controller = parts[1];
+                requestInfo.DepRouting = "/" + parts[2];
+                requestInfo.Action = parts[3];
+                requestInfo.DepId = GetDepartmentIdByRoutingPath(parts[2]);
 
                 if (requiresDepRouting && requestInfo.DepId == null)
                     throw new BusinessException("Invalid depRouting");
             }
+
+				
+            
             //_logger.LogInformation($"RequestContext: Lang={requestContext.Lang}, Page={requestContext.PageNumber}, UserAgent={requestContext.UserAgent}, UserIp={requestContext.UserIp}");
 
             await _next(context);
@@ -113,10 +112,9 @@ namespace Evaluation.API.Middlewares
 				if (string.IsNullOrWhiteSpace(routingPath))
 					return null;
 
-				// Normalize: ensure starts with "/"
 				routingPath = routingPath.Trim();
-				if (!routingPath.StartsWith("/"))
-					routingPath = "/" + routingPath;
+				//if (!routingPath.StartsWith("/"))
+				//	routingPath = "/" + routingPath;
 
 				using (var scope = serviceProvider.CreateScopedUow())
 				{
