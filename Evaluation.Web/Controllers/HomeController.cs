@@ -20,7 +20,7 @@ namespace Evaluation.Web.Controllers
         [HttpGet("{id?}")]
         public IActionResult Index(string? id)
         {
-            id = (id == "en" || id == "ar") ? "default" : id;
+            id = (id == "en" || id == "ar" || id == null) ? "default" : id;
             ViewBag.Webgroup = id;
 
             return View();
