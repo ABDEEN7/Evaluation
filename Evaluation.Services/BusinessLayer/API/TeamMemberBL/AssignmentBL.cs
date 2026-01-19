@@ -108,7 +108,7 @@ public class AssignmentBL(IServiceScopeFactory serviceScopeFactory,
         var team = unitOfWork
             .GetRepository<EvaluationRequestAssignment>()
             .GetAllQueryFiltered(x => x.EvaluationRequestId == evaluationRequestId)
-            .Include(x => x.EvalRequestAssignmentScopies
+            .Include(x => x.EvalRequestAssignmentScopies)
             .ToList();
         var evaluationRequestAssignmentDto = mapper.Map<List<EvaluationRequestAssignmentDto>>(team);
         return evaluationRequestAssignmentDto;
