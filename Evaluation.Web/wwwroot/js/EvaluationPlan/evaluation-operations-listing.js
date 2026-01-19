@@ -1,4 +1,5 @@
 ﻿$(document).ready(function () {
+    var DepartmentRouting = sharedUtility().extractDepartmentName();
 
     function getEvaluationRequestFilter() {
         return {
@@ -13,7 +14,7 @@
 
     const evaluationRequestsListing = evaluationListing.createListing({
         tableId: 'evaluationRequestTable',
-        ajaxUrl: '/ServiceRequest/GetEvaluationRequests',
+        ajaxUrl: '/ServiceRequest/${DepartmentRouting}/GetEvaluationRequests',
         getFilterInput: getEvaluationRequestFilter,
 
         filterFormId: 'evaluation-request-filter-form-id',
@@ -139,7 +140,7 @@
             }
         };
 
-        jqClient(options).Get(`/ServiceRequest/GetEvaluationDetails?requestId=${requestId}`);
+        jqClient(options).Get(`/ServiceRequest/${DepartmentRouting}/GetEvaluationDetails?requestId=${requestId}`);
     }
 
     function bindSchoolDetails(response) {

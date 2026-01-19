@@ -20,7 +20,31 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
     public async Task<Result<List<FormItemDto>>> GetFormItems(Guid FormId)
     {
         var formItems = await formService.GetFormItems();
-        return mapper.Map<List<FormItemDto>>(formItems.Where(s => s.EvalFormId == FormId).ToList());
+        var selectedFormItems = formItems.Where(s => s.EvalFormId == FormId).ToList();
+        var mappedData = mapper.Map<List<FormItemDto>>(selectedFormItems);
+        foreach (var item in selectedFormItems)
+        {
+            var relatedItemDtos = new List<RelatedItemDto>();
+
+            foreach (var relatedFromItem in item.RelatedFrom) 
+            {
+                if (relatedFromItem.RelatedItemId != Guid.Empty)
+                {
+                    var formItemValue = await formService.GetFormItemValueByItemId(relatedFromItem.RelatedItemId);
+
+                        relatedItemDtos.Add(new RelatedItemDto()
+                        {
+                            Id = relatedFromItem.RelatedItemId,
+                            Note = formItemValue?.Note,
+                            Value = formItemValue?.ActualValue?.ToString(),
+                            Name = relatedFromItem.RelatedItem.NameAr
+                        });
+                }
+            }
+            mappedData.Where(md => md.Id == item.Id).FirstOrDefault().RelatedItems = relatedItemDtos;
+        }
+
+        return mappedData;
     }
 
     public async Task<Result<FormEvaluationDto>> SaveEvaluationForm(FormEvaluationDto formEvaluationDto)
@@ -46,7 +70,7 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
                     var formItemsValue = await formService.GetFormItemValue(item.Id);
                     if (formItemsValue != null)
                     {
-                        formItemsValue.Value = item.Value;
+                        formItemsValue.ActualValue = item.ActualValue;
                         formItemsValue.Note = item.Note;
                     }
                     await formService.UpdateFormItemValue(formItemsValue);
@@ -100,7 +124,7 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
             var formItemsValue = await formService.GetFormItemValue(item.Id);
             if (formItemsValue != null)
             {
-                formItemsValue.Value = item.Value;
+                formItemsValue.ActualValue = item.ActualValue;
                 formItemsValue.Note = item.Note;
             }
             await formService.UpdateFormItemValue(formItemsValue);

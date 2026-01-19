@@ -135,6 +135,7 @@ public static class ConstantKeys
         public static readonly string ScopeExistsScopeAcademicYear = "ScopeExistsScopeAcademicYear";
         public static readonly string FormEvalMatrixExistsFormEval = "FormEvalMatrixExistsFormEval";
         public static readonly string DepEvalMatrixExistsFormItemValue = "DepEvalMatrixExistsFormItemValue";
+        public static readonly string ParentScopeTypeExistsScopeType = "ParentScopeTypeExistsScopeType";
         public static readonly string DepEvalMatrixExistsOrgEvalResults = "DepEvalMatrixExistsOrgEvalResults";
         public static readonly string ScopeExistsAcademicYearScope = "ScopeExistsAcademicYearScope";
         public static readonly string SchoolTypesExistsOrganization = "SchoolTypesExistsOrganization";
@@ -171,6 +172,10 @@ public static class ConstantKeys
         public static readonly string EvaluationTypeExistsEvaluationRequestHistory = "EvaluationTypeExistsEvaluationRequestHistory";
         public static readonly string DropdownTypeExistsField = "DropdownTypeExistsField";
         public static readonly string FormItemExistsFormItemRelated = "FormItemExistsFormItemRelated";
+        public static readonly string CurrentAcademiUser = "CurrentAcademiUser";
+        public static readonly string NdaStatusCannotDelete = "NdaStatusCannotDelete";
+        public static readonly string EvaluationRequestAssignment = "EvaluationRequestAssignment";
+        public static readonly string NdaStatusNotFound = "NdaStatusNotFound";
         public static readonly string ScopeNotExistsFormAssignment = "ScopeNotExistsFormAssignment";
     }
 
@@ -278,6 +283,7 @@ public static class ConstantKeys
         public static readonly string AdminActionFieldAttribute = "AdminActionFieldAttribute";
         public static readonly string AdminActionCondition = "AdminActionCondition";
         public static readonly string AdminAcademicYear = "AdminAcademicYear";
+        public static readonly string AdminOrgAcademicYear = "AdminOrgAcademicYear";
         public static readonly string AdminFormEvalMatrix = "AdminFormEvalMatrix";
         public static readonly string AdminDepEvalMatrix = "AdminDepEvalMatrix";
         public static readonly string AdminAcademicYearScope = "AdminAcademicYearScope";
@@ -299,6 +305,7 @@ public static class ConstantKeys
         public static readonly string AdminRole = "AdminRole";
         public static readonly string AdminWebGroups = "AdminWebGroups";
         public static readonly string AdminScopes = "AdminScopes";
+        public static readonly string AdminScopeType = "AdminScopeType";
         public static readonly string AdminSchoolTypes = "AdminSchoolTypes";
         public static readonly string AdminPlanTypeDep = "AdminPlanTypeDep";
         public static readonly string AdminPlanStatuses = "AdminPlanStatuses";
@@ -318,6 +325,7 @@ public static class ConstantKeys
         public static readonly string AdminSchoolLevel = "AdminSchoolLevel";
         public static readonly string AdminSystemSetting = "AdminSystemSetting";
         public static readonly string AdminUiControl = "AdminUiControl";
+        public static readonly string AdminNDAStatus = "AdminNDAStatus";
     }
     public static class WebAppPages
     {
@@ -325,6 +333,8 @@ public static class ConstantKeys
         public static readonly string WebEvaluationFormItem = "WebEvaluationFormItem";
         public static readonly string WebEvaluationSubFormItem = "WebEvaluationSubFormItem";
         public static readonly string WebEvaluationFormScopes = "WebEvaluationFormScopes";
+        public static readonly string WebDepartmentHoliday = "WebDepartmentHoliday";
+
     }
     public static class AdminPermission
     {
@@ -475,6 +485,14 @@ public static class ConstantKeys
 
         #endregion
 
+        #region ORG_ACADEMIC_YEAR
+
+        public const string DELETE_ADMIN_ORG_ACADEMIC_YEAR = "DELETE_ADMIN_ORG_ACADEMIC_YEAR";
+        public const string ADD_ADMIN_ORG_ACADEMIC_YEAR = "ADD_ADMIN_ORG_ACADEMIC_YEAR";
+        public const string EDIT_ADMIN_ORG_ACADEMIC_YEAR = "EDIT_ADMIN_ORG_ACADEMIC_YEAR";
+        public const string VIEW_ADMIN_ORG_ACADEMIC_YEAR = "VIEW_ADMIN_ORG_ACADEMIC_YEAR";
+
+        #endregion
 
         #region FORM_EVAL_MATRIX
 
@@ -643,6 +661,13 @@ public static class ConstantKeys
         public const string DELETE_ADMIN_SCOPES = "DELETE_ADMIN_SCOPES";
         #endregion
 
+        #region SCOPE_TYPE
+        public const string VIEW_ADMIN_SCOPE_TYPE = "VIEW_ADMIN_SCOPE_TYPE";
+        public const string ADD_ADMIN_SCOPE_TYPE = "ADD_ADMIN_SCOPE_TYPE";
+        public const string EDIT_ADMIN_SCOPE_TYPE = "EDIT_ADMIN_SCOPE_TYPE";
+        public const string DELETE_ADMIN_SCOPE_TYPE = "DELETE_ADMIN_SCOPE_TYPE";
+        #endregion
+
         #region SCHOOL_TYPES
         public const string VIEW_ADMIN_SCHOOL_TYPES = "VIEW_ADMIN_SCHOOL_TYPES";
         public const string ADD_ADMIN_SCHOOL_TYPES = "ADD_ADMIN_SCHOOL_TYPES";
@@ -796,6 +821,14 @@ public static class ConstantKeys
 
         #endregion
 
+        #region NDAStatus
+        public const string VIEW_ADMIN_NDAStatus = "VIEW_ADMIN_NDASTATUS";
+        public const string ADD_ADMIN_NDAStatus = "ADD_ADMIN_NDASTATUS";
+        public const string EDIT_ADMIN_NDAStatus = "EDIT_ADMIN_NDASTATUS";
+        public const string DELETE_ADMIN_NDAStatus = "DELETE_ADMIN_NDASTATUS";
+        public const string UPDATE_ORDER_ADMIN_NDAStatus = "UPDATE_ORDER_ADMIN_NDASTATUS";
+        #endregion
+
     }
 
     public static class CustomDataSource
@@ -813,6 +846,15 @@ public static class ConstantKeys
         public const string ADD_WEB_EVALFORMS = "ADD_WEB_EVALFORMS";
         public const string EDIT_WEB_EVALFORMS = "EDIT_WEB_EVALFORMS";
         public const string DELETE_WEB_EVALFORMS = "DELETE_WEB_EVALFORMS";
+
+        #endregion
+         
+        #region DEPARTMENTHOLIDAY
+
+        public const string VIEW_WEB_DEPARTMENT_HOLIDAY = "VIEW_WEB_DEPARTMENT_HOLIDAY";
+        public const string ADD_WEB_DEPARTMENT_HOLIDAY = "ADD_WEB_DEPARTMENT_HOLIDAY";
+        public const string EDIT_WEB_DEPARTMENT_HOLIDAY = "EDIT_WEB_DEPARTMENT_HOLIDAY";
+        public const string DELETE_WEB_DEPARTMENT_HOLIDAY = "DELETE_WEB_DEPARTMENT_HOLIDAY";
 
         #endregion
 

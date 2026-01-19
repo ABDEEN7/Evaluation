@@ -17,7 +17,7 @@ using static Evaluation.SharedHelper.Enums.ConstantKeys;
 namespace Evaluation.API.Controllers
 {
 	[ApiController]
-	[Route("api/[controller]/[action]")]
+	[Route("api/[controller]/{depRouting}/[action]")]
 	public class ServiceRequestController : ControllerBase
 	{
 		private readonly ServiceRequestBL _serviceRequestBL;

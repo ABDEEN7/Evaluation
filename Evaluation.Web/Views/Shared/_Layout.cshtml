@@ -1,5 +1,7 @@
 ﻿@{
     var lang = "en";
+    var title = "وزارة التربية والتعليم والتعليم العالي";
+    var footerText = "جميع حقوق الملكية محفوظة © 2025 وزارة التربية والتعليم والتعليم العالي .";
 }
 
 <!DOCTYPE html>
@@ -8,7 +10,7 @@
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-    <title>وزارة التربية والتعليم والتعليم العالي</title>
+    <title>@title</title>
     <meta content="" name="description">
     <meta content="" name="keywords">
 
@@ -34,45 +36,16 @@
 
     @await RenderSectionAsync("Styles", required: false)
 
-    <!-- Vendor JS Files -->
-    <script src="~/lib/moment/moment.min.js" asp-append-version="true"></script>
-    <script src="~/lib/moment/moment-timezone.min.js" asp-append-version="true"></script>
-    <script src="~/lib/moment/moment-timezone-with-data.min.js" asp-append-version="true"></script>
-    <script src="~/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <script src='~/assets/js/jquery.min.js'></script>
-    <!-- <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>-->
-    <script src="~/assets/vendor/swiper/swiper-bundle.min.js"></script>
-    <script src="~/lib/toastr/toastr.js" asp-append-version="true"></script>
-   
-    <script src="~/lib/sweetalert2/js/sweetalert2.min.js" asp-append-version="true"></script>
-    <script src="~/lib/select2/dist/js/select2.js" asp-append-version="true"></script>
-    <script src="~/js/shared/session-timer.js"></script>
-    <script src="~/js/shared/ajax-setup.js" asp-append-version="true"></script>
-
-    <script src="~/js/shared/general-params.js"></script>
-    <script src="~/js/shared/shared-utility.js" asp-append-version="true"></script>
-    <script src="~/js/shared/jq-client-util.js" asp-append-version="true"></script>
-    <script src="~/lib/tabular/js/tabulator.min.js" asp-append-version="true"></script>
-    <script src="~/js/shared/jq-helper-util.js" asp-append-version="true"></script>
-    <script src="~/js/shared/jq-table-util.js" asp-append-version="true"></script>
-    <script src="~/js/shared/jq-message-util.js" asp-append-version="true"></script>
-    <!-- Template Main JS File -->
-    <script src="~/assets/js/main.js"></script>
-
-
 </head>
 
 <body>
     <!-- ======= Top Bar ======= -->
-    <div id="topbar"></div>
-    <!-- ======= Header ======= -->
     @await Component.InvokeAsync("Navbar")
-    <div class="layout">
-        <main class="main-content"> @RenderBody()</main>
-   
-    </div>
+    <!-- ======= Header ======= -->
+    <main class="main-content"> @RenderBody()</main>
+
     <footer id="footer" class="footer">
-        <div class="container copyright text-center"><p>جميع حقوق الملكية محفوظة © 2025 وزارة التربية والتعليم والتعليم العالي .</p></div>
+        <div class="container copyright text-center"><p>@footerText</p></div>
     </footer>
     <!-- Modal for adding new rows -->
     <div class="modal" id="ModalPopup">
@@ -102,12 +75,46 @@
     </div>
     <!-- Scroll Top -->
     <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i class="fa-solid fa-arrow-up"></i></a>
-    <script src="~/js/layout.js" asp-append-version="true"></script>
+
+    <!-- Core Libraries -->
+    <script src='~/assets/js/jquery.min.js'></script>
+    <script src="~/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Date & Time -->
+    <script src="~/lib/moment/moment.min.js" asp-append-version="true"></script>
+    <script src="~/lib/moment/moment-timezone-with-data.min.js" asp-append-version="true"></script>
+
+    <!-- UI / Plugins -->
+    <script src="~/assets/vendor/swiper/swiper-bundle.min.js"></script>
+    <script src="~/lib/select2/dist/js/select2.js" asp-append-version="true"></script>
+    <script src="~/lib/toastr/toastr.js" asp-append-version="true"></script>
+    <script src="~/lib/sweetalert2/js/sweetalert2.min.js" asp-append-version="true"></script>
+
+    <!-- Tables -->
+    <script src="~/lib/tabular/js/tabulator.min.js" asp-append-version="true"></script>
+
+    <!-- Populate / Config -->
     <script src="~/js/shared/populate-ui-control.js" asp-append-version="true"></script>
     <script src="~/js/shared/populate-system-setting.js" asp-append-version="true"></script>
     <script src="~/js/shared/populate-web-app-configs.js" asp-append-version="true"></script>
+
+    <!-- Global / Shared Utilities -->
+    <script src="~/js/shared/ajax-setup.js" asp-append-version="true"></script>
+    <script src="~/js/shared/session-timer.js"></script>
+    <script src="~/js/shared/general-params.js"></script>
+    <script src="~/js/shared/shared-utility.js" asp-append-version="true"></script>
+    <script src="~/js/shared/jq-helper-util.js" asp-append-version="true"></script>
+    <script src="~/js/shared/jq-client-util.js" asp-append-version="true"></script>
+    <script src="~/js/shared/jq-message-util.js" asp-append-version="true"></script>
     <script src="~/js/shared/jq-dropdown-util.js" asp-append-version="true"></script>
+    <script src="~/js/shared/jq-table-util.js" asp-append-version="true"></script>
     <script src="~/js/shared/shared-fn.js" asp-append-version="true"></script>
+
+    <!-- Layout -->
+    <script src="~/assets/js/main.js"></script>
+    <script src="~/js/layout.js" asp-append-version="true"></script>
+
+    
     @await RenderSectionAsync("Scripts", required: false)
 
 
