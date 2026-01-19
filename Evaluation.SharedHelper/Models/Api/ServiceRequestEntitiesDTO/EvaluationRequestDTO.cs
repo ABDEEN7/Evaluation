@@ -77,6 +77,7 @@ namespace Evaluation.SharedHelper.Models.Api.ServiceRequestEntitiesDTO
 
 		public Guid OrgTreeId { get; set; }
 		public string? OrgTreeName { get; set; }
+		public bool IsNdaApprovalPending { get; set; }
 
 		public List<EvaluationPartyDTO> EvaluationParties { get; set; }
 	}

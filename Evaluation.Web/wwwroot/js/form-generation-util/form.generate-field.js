@@ -805,7 +805,7 @@ var formGenerateFieldUtility = window.formUtility;
         'dropdown': generateDropdownField,
         'list': generateListTable,
         'phone': generatePhoneField,
-        //'evaluationPlan': generateEvaluationPlanField,
+        'evaluationPlan': generateEvaluationPlanField,
         'evl_Form': generateEvlFormField,
     };
 
@@ -841,20 +841,27 @@ var formGenerateFieldUtility = window.formUtility;
     // ================== LABEL + HISTORY ==================
 
     const createFieldLabel = (field) => {
-        const fieldLabel = $('<label>').addClass('form-label');
+        const isRequired = field.attributes?.some(a => (a.name || '').toLowerCase() === "required");
+
+        const isRadioGroup = field.type === 'radio' || field.type === 'radio_inline';
+
+        const fieldLabel = $('<label>')
+            .addClass(`form-label ${isRadioGroup ? 'fw-bold d-block' : 'fw-semibold'}`);
+
+        if (isRequired) {
+            fieldLabel.append('<span class="text-danger">*</span> ');
+        }
 
         if (field.type === 'label' || field.type === 'checkbox') {
-            fieldLabel.html(field.fieldName);
+            fieldLabel.append(field.fieldName);
         } else {
-            fieldLabel.text(field.fieldName);
+            fieldLabel.append(document.createTextNode(field.fieldName || ''));
         }
 
         if (field.type === 'checkbox') {
             fieldLabel.attr('for', `field_${field.fieldId}`);
         }
-        if (field.attributes && field.attributes.some(attr => attr.name === "required")) {
-            fieldLabel.append('<span class="text-danger">*</span>');
-        }
+
         if (field.fieldTooltip) {
             const fieldInfo = $('<span class="px-1">')
                 .addClass('fa fa-info-circle')
@@ -866,6 +873,7 @@ var formGenerateFieldUtility = window.formUtility;
 
         return fieldLabel;
     };
+
 
     const appendHistoryIcon = (field, fieldLabel) => {
         let showHistory_attribute = false;
@@ -1304,7 +1312,7 @@ var formGenerateFieldUtility = window.formUtility;
                 const maxColumns = Math.max(...rowFields.map(field => field.column));
 
                 for (let col = 1; col <= maxColumns; col++) {
-                    const colContainer = $('<div>').addClass(`colContainer col-md-${12 / maxColumns} mb-3`);
+                    const colContainer = $('<div>').addClass(`colContainer col-md-${12 / maxColumns}`);
                     const field = group.fields.find(field => field.column === col && field.row === row);
 
                     if (field) {
@@ -1336,21 +1344,28 @@ var formGenerateFieldUtility = window.formUtility;
 
                         }
                         if (field.type === 'label') {
-                            colContainer.append(fieldLabel);
+                            const block = $('<div>').addClass('mb-4');
+                            block.append(fieldLabel);
+                            colContainer.append(block);
                         } else {
+                            const block = $('<div>').addClass('mb-4');
+
                             if (actionType === ACTION_TYPE.RETURNBACK || actionType === ACTION_TYPE.RequestDataChange) {
                                 const DisableReturn = hasAttribute(field, 'disabled');
+
                                 const approvalDiv = $('<div>').addClass('d-flex gap-4');
                                 const radioElement = createToggler(field, DisableReturn);
 
-                                approvalDiv.append(radioElement);
-
-                                const innerdiv = $('<div class="w-75">');
+                                const innerdiv = $('<div>').addClass('w-75');
                                 innerdiv.append(fieldLabel, fieldElement);
-                                approvalDiv.append(innerdiv);
-                                colContainer.append(approvalDiv);
+
+                                approvalDiv.append(radioElement, innerdiv);
+
+                                block.append(approvalDiv);
+                                colContainer.append(block);
                             } else {
-                                colContainer.append(fieldLabel, fieldElement);
+                                block.append(fieldLabel, fieldElement);
+                                colContainer.append(block);
                             }
                         }
 
@@ -1402,6 +1417,60 @@ var formGenerateFieldUtility = window.formUtility;
         return container;
     };
 
+
+    function generateEvaluationPlanField  (field, readonly) {
+        const fieldId = field.fieldId;
+
+        const container = $('<div>')
+            .addClass('evaluation-plan-wrapper')
+            .attr('data-field-id', fieldId);
+
+        container.html(`<div class="text-muted py-2">Loading evaluation plan...</div>`);
+        (async () => {
+            try {
+                const pu = window.planUtility || window.planutility;
+                const PH = window.PlanHandler;
+                if (!pu) {
+                    container.html(`<div class="text-danger">planUtility not found on window.</div>`);
+                    return;
+                }
+                    pu.generatePlanFields(fieldId);
+
+                    const wrapperId = `${fieldId}_wrapper`;
+                    const moved = document.getElementById(wrapperId);
+
+                    if (moved) {
+                        container.empty().append($(moved));
+                    } else {
+                        container.html(`<div class="text-danger">Failed to render plan wrapper (${wrapperId}).</div>`);
+                        return;
+                    }
+                PH.init(
+                    
+                    readonly,
+                    fieldId,
+                    field.value
+                );
+                if (readonly) {
+                    container
+                        .find('input, select, textarea, button')
+                        .prop('disabled', true)
+                        .attr('aria-disabled', 'true');
+
+                    container.find(`[id$="_btnSavePlan"], [id$="_btnSubmit"]`).hide();
+
+                    container.find('[data-bs-toggle="offcanvas"]').addClass('disabled').attr('tabindex', '-1');
+                }
+
+            } catch (err) {
+                console.error('evaluationPlan render failed:', err);
+                container.html(`<div class="text-danger">Failed to load evaluation plan.</div>`);
+            }
+        })();
+
+        return container;
+    };
+
     // ================== EXPORT ON NAMESPACE ==================
 
     ns.fieldElementGenerators = fieldElementGenerators;
@@ -1414,6 +1483,7 @@ var formGenerateFieldUtility = window.formUtility;
     ns.handleListFieldConditionalFields = handleListFieldConditionalFields;
     ns.evaluateConditionsAfterLoadForList = evaluateConditionsAfterLoadForList;
     ns.renderFormGroups = renderFormGroups;
+    //ns.generateEvaluationPlanField = generateEvaluationPlanField;
     ns.applyAttributes = applyAttributes;
     ns.applyCssClasses = applyCssClasses;
 
