@@ -1,8 +1,8 @@
 ﻿(function (global) {
-    'use strict'; 
+    'use strict';
     const uniqueIndexId = 'IndexForPlanTable';
 
-   
+
 
     // Plan validation rules
     const VALIDATION_RULES = {
@@ -78,7 +78,7 @@
         GET_PLAN_TYPES: '/PlanType/GetPlanTypes',
         GET_SEMESTERS: '/Plan/GetSemesters',
         GET_VISITS: '/School/GetVisits',
-        GET_VACATION_DATES: '/AcademicYear/GetVcationDate',
+        GET_VACATION_DATES: '/DepartmentHoliday/GetAllHolidayDepartmentsOrg',
         CREATE_PLAN: '/Plan/CreatePlan',
         INSERTORUPDATEPLAN: '/Plan/InsertOrUpdatePlan',
         UPDATE_PLAN: '/Plan/UpdatePlan',

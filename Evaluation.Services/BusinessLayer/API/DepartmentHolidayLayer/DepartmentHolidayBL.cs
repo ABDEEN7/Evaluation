@@ -5,6 +5,7 @@ using Evaluation.DAL.Models.Calendars;
 using Evaluation.DAL.Repositories;
 using Evaluation.Services.BusinessLayer.API.AcademicYearLayer;
 using Evaluation.Services.Special;
+using Evaluation.SharedHelper.Dtos.HrDto;
 using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Api.DepartmentHolidaysDto;
 using Microsoft.AspNetCore.Mvc;
@@ -22,6 +23,12 @@ public class DepartmentHolidayBL(IServiceScopeFactory serviceScopeFactory, Cache
     {
         var result = await departmentHolidayService.GetDepartmentHolidayList(page);
         var response = mapper.Map<List<DepartmentHolidayDto>>(result, opts => opts.Items["Language"] = requestInfo.Lang);
+        return response;
+    }
+    public async Task<List<DepartmentHolidayOrgDto>> GetDepartmentHolidayList()
+    {
+        var result = await departmentHolidayService.GetDepartmentHolidayList();
+        var response = mapper.Map<List<DepartmentHolidayOrgDto>>(result, opts => opts.Items["Language"] = requestInfo.Lang);
         return response;
     }
     public async Task<CreateDepartmentHolidayDto> AddDepartmentHoliday(CreateDepartmentHolidayDto model)
