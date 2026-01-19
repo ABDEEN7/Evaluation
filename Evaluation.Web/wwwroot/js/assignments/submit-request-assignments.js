@@ -6,24 +6,7 @@
         return `${fieldId}_selectedTeamTable`;
     }
 
-    /**
-     * استخراج بيانات NDA من الخلية
-     */
-    function extractNDAStatus($row, hasNDAColumn) {
-        if (!hasNDAColumn) {
-            return null;
-        }
 
-        const $ndaCell = $row.find('td').eq(2);
-        const rawNdaId = $ndaCell.data('nda-id');
-        const ndaId = rawNdaId === "" ? null : rawNdaId;
-
-        return ndaId ?? null;
-    }
-
-    /**
-     * التحقق من وجود عمود NDA في الجدول
-     */
     function hasNDAColumn($table) {
         const $headers = $table.find('thead th');
         let hasNDA = false;
@@ -80,7 +63,7 @@
      * الحصول على بيانات الفريق بصيغة API باستخدام fieldId
      * Works with Select2 multi-select
      */
-    window.getTeamDataByFieldId = function (fieldId, evaluationRequestId = null) {
+    window.getAssignmentsDataByFieldId = function (fieldId) {
         const tableId = getTableIdFromFieldId(fieldId);
         try {
             const $table = $(`#${tableId}`);
@@ -124,27 +107,19 @@
                 const selectedScopes = $scopeSelect.val() || [];
 
                 const evalRequestAssignmentScopies = selectedScopes.map(scopeId => ({
-                    ScopeId: String(scopeId),
-                    Note: null
+                    Id: String(scopeId)
                 }));
 
                 // استخراج قائد الفريق
                 const $leaderRadio = $row.find('.team-leader-radio');
                 const isLeader = $leaderRadio.is(':checked');
-
-                // استخراج NDA
-                const ndaStatusId = extractNDAStatus($row, hasNDA);
-                const isNDA = hasNDA && ndaStatusId !== null;
+                const isNDA = hasNDA;
 
                 const memberDto = {
                     UserId: ministryUserId,
-                    EvaluationRequestId: evaluationRequestId,
                     PartyTypeId: partyTypeId,
                     IsLeader: isLeader,
-                    IsNDA: isNDA,
-                    NdaStatusId: ndaStatusId,
-                    NdaDate: null,
-                    Note: null,
+                    //IsNDA: isNDA,
                     Scopes: evalRequestAssignmentScopies.length > 0 ? evalRequestAssignmentScopies : null
                 };
 
@@ -162,16 +137,16 @@
     /**
      * التحقق من صحة البيانات
      */
-    window.validateTeamByFieldId = function (fieldId, evaluationRequestId = null) {
-        const data = window.getTeamDataByFieldId(fieldId, evaluationRequestId);
+    window.validateTeamByFieldId = function (fieldId) {
+        const data = window.getAssignmentsDataByFieldId(fieldId);
         return validateTeamData(data);
     };
 
     /**
      * الحصول على البيانات مع التحقق
      */
-    window.getValidatedTeamData = function (fieldId, evaluationRequestId = null) {
-        const data = window.getTeamDataByFieldId(fieldId, evaluationRequestId);
+    window.getValidatedTeamData = function (fieldId) {
+        const data = window.getAssignmentsDataByFieldId(fieldId);
         const validation = validateTeamData(data);
 
         if (!validation.isValid) {
@@ -197,10 +172,9 @@
             if (result.success || result.isSuccess) {
                 const modal = bootstrap.Modal.getInstance(document.getElementById('confirmation-modal'));
                 if (modal) modal.hide();
-
-                alert('تم حفظ الفريق بنجاح');
                 return result;
-            } else {
+            }
+            else {
                 throw new Error(result.message || 'فشل في حفظ الفريق');
             }
         } catch (error) {
@@ -274,7 +248,7 @@
             return false;
         }
 
-        const currentData = window.getTeamDataByFieldId(fieldId, state.evaluationRequestId);
+        const currentData = window.getAssignmentsDataByFieldId(fieldId);
         const originalData = state.existingAssignments;
 
         if (!originalData || originalData.length === 0) {
@@ -290,7 +264,7 @@
             return null;
         }
 
-        const currentData = window.getTeamDataByFieldId(fieldId, state.evaluationRequestId);
+        const currentData = window.getAssignmentsDataByFieldId(fieldId);
         const originalData = state.existingAssignments || [];
 
         const summary = {
@@ -337,11 +311,8 @@
 
     // ================= DEBUGGING =================
 
-    window.debugTeamData = function (fieldId, evaluationRequestId = null) {
-        const data = window.getTeamDataByFieldId(fieldId, evaluationRequestId);
-        console.log('=== Team Data Debug ===');
-        console.log('Raw Data:', data);
-        console.log('JSON:', JSON.stringify(data, null, 2));
+    window.debugTeamData = function (fieldId) {
+        const data = window.getAssignmentsDataByFieldId(fieldId);
 
         const validation = validateTeamData(data);
         console.log('Validation:', validation);

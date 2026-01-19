@@ -1,17 +1,20 @@
 ﻿using AutoMapper;
 using Evaluation.DAL.Helper;
-using Evaluation.DAL.Migrations;
 using Evaluation.DAL.Models.DepartementEntites;
 using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
 using Evaluation.DAL.Models.UserEntiy;
 using Evaluation.DAL.Repositories;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Dtos.TeamMemberDto;
+using Evaluation.SharedHelper.Enums;
+using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Api;
 using FluentResults;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Evaluation.SharedHelper.Extensions;
+using System.Xml.Serialization;
 
 namespace Evaluation.Services.BusinessLayer.API.TeamMemberBL;
 
@@ -77,12 +80,11 @@ public class AssignmentBL(IServiceScopeFactory serviceScopeFactory,
         var scopesDto = mapper.Map<List<ScopeDto>>(scopes);
         return scopesDto;
     }
-    public async Task<bool> AddedRequestAssignment(List<EvalTeamRequestDto> model)
+    public async Task<bool> AddedRequestAssignment(Guid evaluationRequestId, List<EvalTeamRequestDto> model)
     {
         if (model == null || !model.Any())
             return true;
 
-        var evaluationRequestId = model.First().EvaluationRequestId;
 
         var hasAssignments = await
             unitOfWork.GetRepository<EvaluationRequestAssignment>()
@@ -92,12 +94,13 @@ public class AssignmentBL(IServiceScopeFactory serviceScopeFactory,
 
         if (!hasAssignments)
         {
-            await AddAssignments(model);
+            await AddAssignments(evaluationRequestId, model);
         }
         else
         {
-            await UpdateOrDeleteAssignments(model);
+            await UpdateOrDeleteAssignments(evaluationRequestId, model);
         }
+        await unitOfWork.CommitAsync();
         return true;
     }
     public async Task<Result<List<EvaluationRequestAssignmentDto>>> GetTeamByEvaluationRequestId(Guid evaluationRequestId)
@@ -105,46 +108,24 @@ public class AssignmentBL(IServiceScopeFactory serviceScopeFactory,
         var team = unitOfWork
             .GetRepository<EvaluationRequestAssignment>()
             .GetAllActiveNonDeleted(x => x.EvaluationRequestId == evaluationRequestId)
-            .Include(s => s.EvalRequestAssignmentScopies)
+            .Include(x => x.EvalRequestAssignmentScopies
+            /*.Where(s => s.IsActive && !s.IsDeleted)*/)
             .ToList();
         var evaluationRequestAssignmentDto = mapper.Map<List<EvaluationRequestAssignmentDto>>(team);
         return evaluationRequestAssignmentDto;
     }
-    public async Task<Result<bool>> DeleteEvaluationRequestAssignment(Guid id)
+    private async Task AddAssignments(Guid evaluationRequestId, List<EvalTeamRequestDto> model)
     {
-        var assignmentRepo = unitOfWork.GetRepository<EvaluationRequestAssignment>();
-        var scopeRepo = unitOfWork.GetRepository<EvalRequestAssignmentScope>();
-
-        var assignment = await assignmentRepo
-            .GetAllActiveNonDeleted(
-                x => x.Id == id,
-                includeProperties: x => x.EvalRequestAssignmentScopies!
-            )
-            .FirstOrDefaultAsync();
-
-        if (assignment == null)
-            return false;
-        if (assignment.EvalRequestAssignmentScopies?.Any() == true)
-        {
-            scopeRepo.DeleteRange(assignment.EvalRequestAssignmentScopies);
-        }
-        assignmentRepo.Delete(assignment);
-
-        await unitOfWork.CommitAsync();
-
-        return true;
-    }
-    private async Task AddAssignments(List<EvalTeamRequestDto> model)
-    {
-        var exsitingAssignments = unitOfWork
+        var exsitingAssignments = await unitOfWork
             .GetRepository<EvaluationRequestAssignment>()
             .GetAllActiveNonDeleted()
+            .Where(x => x.EvaluationRequestId == evaluationRequestId)
             .Select(x => new
             {
                 x.MinistryUserId,
                 x.PartyTypeId
             })
-            .ToList();
+            .ToListAsync();
 
         var newAssignments = model
             .Where(m => !exsitingAssignments.Any(db =>
@@ -158,7 +139,7 @@ public class AssignmentBL(IServiceScopeFactory serviceScopeFactory,
         new EvaluationRequestAssignment
         {
             MinistryUserId = dto.UserId,
-            EvaluationRequestId = dto.EvaluationRequestId,
+            EvaluationRequestId = evaluationRequestId,
             PartyTypeId = dto.PartyTypeId,
             IsLeader = dto.IsLeader,
             Note = dto.Note,
@@ -172,44 +153,108 @@ public class AssignmentBL(IServiceScopeFactory serviceScopeFactory,
             .GetRepository<EvaluationRequestAssignment>()
             .InsertRange(evaluationRequestAssignments);
     }
-    private async Task UpdateOrDeleteAssignments(List<EvalTeamRequestDto> model)
+    private async Task UpdateOrDeleteAssignments(Guid evaluationRequestId, List<EvalTeamRequestDto> model)
     {
-        var evaluationRequestId = model.First().EvaluationRequestId;
         var repo = unitOfWork.GetRepository<EvaluationRequestAssignment>();
-        var existingAssignments = await repo
-       .GetAllActiveNonDeleted(x => x.EvaluationRequestId == evaluationRequestId)
-       .Include(x => x.EvalRequestAssignmentScopies)
-       .ToListAsync();
 
-        //Delete missing Assignment
-        var toDelete = existingAssignments
+        var existingAssignments = await repo
+            .GetAllActiveNonDeleted(x => x.EvaluationRequestId == evaluationRequestId)
+            .Include(x => x.EvalRequestAssignmentScopies)
+            .ToListAsync();
+
+        // 1️⃣ حدد المحذوفين
+        var assignmentsToDelete = existingAssignments
             .Where(db => !model.Any(m =>
-            m.UserId == db.MinistryUserId &&
-            m.PartyTypeId == db.PartyTypeId))
+                m.UserId == db.MinistryUserId))
             .ToList();
-        if (toDelete.Any())
-            repo.DeleteRange(toDelete);
-        // Update exsiting 
+
+        if (assignmentsToDelete.Any())
+            repo.DeleteRange(assignmentsToDelete);
+
+        // 2️⃣ حدّث فقط الموجودين
+        var assignmentsToUpdate = existingAssignments
+            .Except(assignmentsToDelete)
+            .ToList();
+
         foreach (var dto in model)
         {
-            var entity = existingAssignments.FirstOrDefault(db =>
-              db.MinistryUserId == dto.UserId &&
-              db.PartyTypeId == dto.PartyTypeId);
+            var entity = assignmentsToUpdate.FirstOrDefault(db =>
+                db.MinistryUserId == dto.UserId &&
+                db.PartyTypeId == dto.PartyTypeId);
+
             if (entity == null)
                 continue;
 
             entity.IsLeader = dto.IsLeader;
             entity.Note = dto.Note;
-            entity.EvalRequestAssignmentScopies.Clear();
-            if (dto.Scopes != null)
+
+            if (dto.Scopes == null)
+                throw new BusinessException(
+                    ConstantKeys.ExceptionMessage.ScopeNotExistsFormAssignment);
+
+            SyncAssignmentScopes(entity, dto.Scopes);
+        }
+
+        // 3️⃣ أضف الجديد
+        var newAssignments = model
+            .Where(m => !existingAssignments.Any(db =>
+                db.MinistryUserId == m.UserId &&
+                db.PartyTypeId == m.PartyTypeId))
+            .Select(dto => new EvaluationRequestAssignment
             {
-                entity.EvalRequestAssignmentScopies = dto.Scopes.Select(s =>
+                MinistryUserId = dto.UserId,
+                EvaluationRequestId = evaluationRequestId,
+                PartyTypeId = dto.PartyTypeId,
+                IsLeader = dto.IsLeader,
+                Note = dto.Note,
+                EvalRequestAssignmentScopies = dto.Scopes.Select(s =>
                     new EvalRequestAssignmentScope
                     {
-                        ScopeId = s.Id,
-                    }).ToList();
-            }
-            repo.Update(entity);
+                        ScopeId = s.Id
+                    }).ToList()
+            })
+            .ToList();
+
+        if (newAssignments.Any())
+            await repo.InsertRange(newAssignments);
+    }
+
+    private void SyncAssignmentScopes(EvaluationRequestAssignment entity, List<EvalScopesDto> incomingScopes)
+    {
+        var scopeRepo = unitOfWork.GetRepository<EvalRequestAssignmentScope>();
+
+        var existingScopes = entity.EvalRequestAssignmentScopies.ToList();
+
+        var incomingIds = incomingScopes.Select(s => s.Id).ToHashSet();
+        var existingIds = existingScopes.Select(es => es.ScopeId).ToHashSet();
+
+        // Soft Delete
+        foreach (var scope in existingScopes
+            .Where(es => !incomingIds.Contains(es.ScopeId)))
+        {
+            scope.IsDeleted = true;
+            scopeRepo.Update(scope);
         }
+
+        // Add new
+        var scopesToAdd = incomingIds.Except(existingIds)
+        .Select(scopeId => new EvalRequestAssignmentScope
+        {
+            ScopeId = scopeId,
+            EvaluationRequestAssignmentId = entity.Id
+        })
+        .ToList();
+        if (scopesToAdd.Any())
+            scopeRepo.InsertRange(scopesToAdd);
+
+        //foreach (var scopeId in incomingIds.Except(existingIds))
+        //{
+        //    entity.EvalRequestAssignmentScopies.Add(
+        //        new EvalRequestAssignmentScope
+        //        {
+        //            ScopeId = scopeId,
+        //            EvaluationRequestAssignmentId = entity.Id
+        //        });
+        //}
     }
 }

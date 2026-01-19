@@ -171,6 +171,7 @@ public static class ConstantKeys
         public static readonly string EvaluationTypeExistsEvaluationRequestHistory = "EvaluationTypeExistsEvaluationRequestHistory";
         public static readonly string DropdownTypeExistsField = "DropdownTypeExistsField";
         public static readonly string FormItemExistsFormItemRelated = "FormItemExistsFormItemRelated";
+        public static readonly string ScopeNotExistsFormAssignment = "ScopeNotExistsFormAssignment";
     }
 
     public static class AdminSettings

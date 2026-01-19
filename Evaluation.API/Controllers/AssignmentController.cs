@@ -33,11 +33,8 @@ public class AssignmentController : ControllerBase
     public async Task<Result<List<ScopeDto>>> GetScopes()
          => await _masterBl.GetApiService<AssignmentBL>().GetScopesAsync();
     [HttpPost]
-    public async Task<Result<bool>> AddEvaluationRequestAssignment([FromBody] List<EvalTeamRequestDto> model)
-                 => await _masterBl.GetApiService<AssignmentBL>().AddedRequestAssignment(model);
-    [HttpPost]
-    public async Task<Result<bool>> DeleteEvaluationRequestAssignment(Guid id)
-        => await _masterBl.GetApiService<AssignmentBL>().DeleteEvaluationRequestAssignment(id);
+    public async Task<Result<bool>> AddEvaluationRequestAssignment(Guid evaluationRequestId, [FromBody] List<EvalTeamRequestDto> model)
+                 => await _masterBl.GetApiService<AssignmentBL>().AddedRequestAssignment(evaluationRequestId, model);
     [HttpGet]
     public Task<Result<List<EvaluationRequestAssignmentDto>>> GetAssignmentByEvaluationRequest(Guid evaluationRequestId)
     {
