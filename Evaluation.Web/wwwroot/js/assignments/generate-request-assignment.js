@@ -83,9 +83,6 @@ const assignmentsUtility = window.assignmentsUtility;
                         <div class="col-md-4 mb-2">
                             ${generateSearchBox(fieldId)}
                         </div>
-                        <div class="col-md-4 mb-2">
-                            ${generateFilterButton(fieldId)}
-                        </div>
                     </div>
                 </div>
             </div>
