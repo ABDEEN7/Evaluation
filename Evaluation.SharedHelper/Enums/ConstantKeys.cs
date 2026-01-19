@@ -135,6 +135,7 @@ public static class ConstantKeys
         public static readonly string ScopeExistsScopeAcademicYear = "ScopeExistsScopeAcademicYear";
         public static readonly string FormEvalMatrixExistsFormEval = "FormEvalMatrixExistsFormEval";
         public static readonly string DepEvalMatrixExistsFormItemValue = "DepEvalMatrixExistsFormItemValue";
+        public static readonly string ParentScopeTypeExistsScopeType = "ParentScopeTypeExistsScopeType";
         public static readonly string DepEvalMatrixExistsOrgEvalResults = "DepEvalMatrixExistsOrgEvalResults";
         public static readonly string ScopeExistsAcademicYearScope = "ScopeExistsAcademicYearScope";
         public static readonly string SchoolTypesExistsOrganization = "SchoolTypesExistsOrganization";
@@ -303,6 +304,7 @@ public static class ConstantKeys
         public static readonly string AdminRole = "AdminRole";
         public static readonly string AdminWebGroups = "AdminWebGroups";
         public static readonly string AdminScopes = "AdminScopes";
+        public static readonly string AdminScopeType = "AdminScopeType";
         public static readonly string AdminSchoolTypes = "AdminSchoolTypes";
         public static readonly string AdminPlanTypeDep = "AdminPlanTypeDep";
         public static readonly string AdminPlanStatuses = "AdminPlanStatuses";
@@ -656,6 +658,13 @@ public static class ConstantKeys
         public const string ADD_ADMIN_SCOPES = "ADD_ADMIN_SCOPES";
         public const string EDIT_ADMIN_SCOPES = "EDIT_ADMIN_SCOPES";
         public const string DELETE_ADMIN_SCOPES = "DELETE_ADMIN_SCOPES";
+        #endregion
+
+        #region SCOPE_TYPE
+        public const string VIEW_ADMIN_SCOPE_TYPE = "VIEW_ADMIN_SCOPE_TYPE";
+        public const string ADD_ADMIN_SCOPE_TYPE = "ADD_ADMIN_SCOPE_TYPE";
+        public const string EDIT_ADMIN_SCOPE_TYPE = "EDIT_ADMIN_SCOPE_TYPE";
+        public const string DELETE_ADMIN_SCOPE_TYPE = "DELETE_ADMIN_SCOPE_TYPE";
         #endregion
 
         #region SCHOOL_TYPES

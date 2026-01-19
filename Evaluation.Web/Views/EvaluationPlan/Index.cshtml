@@ -376,7 +376,8 @@
             //     ],
             //         additional_keys: []
             // });
-             let departmentName = await sharedUtility().extractDepartmentName();
+               
+
             if (sharedUtility().ExistingToken()) {
                             //uiControlsSetup().UpdatPageTitle('WebAppScholarship');
                     $('body').show();
@@ -423,69 +424,81 @@
          });
     </script>
 
- @*    <div class="modal fade" id="CreatePlanModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-xl modal-dialog-scrollable">
-            <div class="modal-content">
-
-                <div class="modal-header">
-                    <h5 class="modal-title">إضافة طلب خطة تقييم</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-
-                <div class="modal-body">
-                    <div id="CreatePlanModalBody">
-                    </div>
-                </div>
-
-            </div>
-        </div>
-    </div> *@
 
     <div class="modal fade" id="CreateRequestModal" tabindex="-1" aria-labelledby="CreateRequestModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
 
-        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-dialog modal-fullscreen modal-dialog-scrollable">
             <div class="modal-content">
 
-                <div class="modal-header">
-                    <h5 class="modal-title" id="CreateRequestModalLabel">
-                        إنشاء طلب خطة تقييم
-                    </h5>
-                    <button type="button"
-                            class="btn-close"
-                            data-bs-dismiss="modal"
-                            aria-label="Close"></button>
+                <div class="modal-header align-items-start border-0">
+                    <div class="w-100">
+
+                        <div class="row align-items-start">
+                            <div class="col-md-9">
+                                <div class="d-flex gap-3 align-items-center mb-2 heading">
+                                    <i class="la la-angle-left fs-32"></i>
+
+                                    <div>
+                                        <h3 class="fw-bold m-0" id="CreateRequestModalLabel">
+                                            إنشاء طلب خطة تقييم
+                                        </h3>
+
+                                        <nav aria-label="breadcrumb">
+                                            <ol class="breadcrumb">
+                                                <li class="breadcrumb-item"><a href="#">الخطط</a></li>
+                                                <li class="breadcrumb-item active" aria-current="page">إنشاء طلب</li>
+                                            </ol>
+                                        </nav>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-3 d-flex justify-content-end align-items-start gap-2">
+                                <button type="button"
+                                        class="btn-close"
+                                        data-bs-dismiss="modal"
+                                        aria-label="Close">
+                                    <i class="la la-close mt-1"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
                 </div>
 
-                <div class="modal-body">
+                <div class="modal-body py-0">
 
-                    <form id="create-plan-form" autocomplete="off">
+                    <div class="card card-table mb-4">
+                        <div class="card-body">
 
-                        <div class="row">
-                            <div class="col-12">
+                            <form id="create-plan-form" autocomplete="off">
 
-                               
-                                <div class="accordion mt-4" id="accordionExample" hidden>
-                                    <select id="partyTypeSelect" class="form-select mb-3"></select>
+                                <div class="row">
+                                    <div class="col-12">
 
-                                    <div id="user-wrapper">
-                                        <div id="user-tables"></div>
+                                        <div class="accordion mt-4" id="accordionExample" hidden>
+                                            <select id="partyTypeSelect" class="form-select mb-3"></select>
+
+                                            <div id="user-wrapper">
+                                                <div id="user-tables"></div>
+                                            </div>
+                                        </div>
+
+                                        <div id="content-container"></div>
+
                                     </div>
                                 </div>
 
-                                <div id="content-container"></div>
-
-                            </div>
-                        </div>
-
-                        <div class="row mt-3" id="divForCreatedRequestButtons">
-                            <div class="col-12">
-                                <div id="Requestbtns"
-                                     class="d-flex justify-content-end gap-2">
+                                <div class="row mt-3" id="divForCreatedRequestButtons">
+                                    <div class="col-12">
+                                        <div id="Requestbtns" class="d-flex justify-content-end gap-2"></div>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
 
-                    </form>
+                            </form>
+
+                        </div>
+                    </div>
 
                 </div>
 
