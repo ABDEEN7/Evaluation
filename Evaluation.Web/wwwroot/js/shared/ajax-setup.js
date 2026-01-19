@@ -89,11 +89,18 @@ $.ajaxSetup({
         const baseUrl = options.Mode === "APP"
             ? decodeURIComponent(sharedUtility().BaseAppUrl())
             : decodeURIComponent(sharedUtility().BaseApiUrl());
+                if (
+                    options.dataType === 'script' ||
+                    options.url.includes('/js/') ||
+                    /^https?:\/\//i.test(options.url)
+                ) {
+                    return;
+                }
 
         options.url = baseUrl + options.url;
                 options.headers = sharedUtility().SharedHeader();
 
-                console.log('>> AJAX', options.type || options.method, options.url, options.headers);
+                
             } catch (e) { console.error(e); return false; }
         
     },
