@@ -11,7 +11,7 @@ namespace Evaluation.Services.Mappers.Admin
     {
         public FormEvalMarixValueProfile()
         {
-            CreateMap<FormEvalMarixValue, FormEvalMarixValueDTO>()
+            CreateMap<FormEvalMatrixValue, FormEvalMarixValueDTO>()
                 .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive))
                 .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => src.IsDeleted))
                  .ForMember(dest => dest.UpdateBy, opt => opt.MapFrom<UserProfileResolver, Guid?>(src => src.UpdateById.HasValue ? src.UpdateById : src.CreateById))
