@@ -4,12 +4,12 @@
 
 const sharedUtility = () => {
     const createAuthorizationAjaxHeader = (isMultipart = false) => {
-
+        
         if (isMultipart)
             return {
                 "Authorization": "Bearer " + "",// GetLocalStorageValue(LocalStorageKeys.Token),
                 "type": "",// GetLocalStorageValue(LocalStorageKeys.Type),
-                'lang': getCookie('lang') ? getCookie('lang') : 'en'
+                'lang': getCookie('lang') ? getCookie('lang') : 'en',
             }
 
         else
@@ -17,7 +17,7 @@ const sharedUtility = () => {
                 "Authorization": "Bearer " + "",// GetLocalStorageValue(LocalStorageKeys.Token),
                 "type": "",//GetLocalStorageValue(LocalStorageKeys.Type),
                 'Content-Type': 'application/json',
-                'lang': getCookie('lang') ? getCookie('lang') : 'en'
+                'lang': getCookie('lang') ? getCookie('lang') : 'en',
             }
     }
 
@@ -277,18 +277,18 @@ const sharedUtility = () => {
     }
     //--------------------------------------------------------------------
     function extractDepartmentName() {
-        let pathArray = window.location.pathname.split('/');
+        const parts = window.location.pathname.split('/').filter(Boolean);
 
-        if (pathArray[2] == '') { return null; }
-        // Check if the URL is "/home/index"
-        if (pathArray[1].toLowerCase() === "home" && pathArray[2].toLowerCase() === "index") {
+        if (parts.length < 3) return null;
+
+        const lang = parts[0];
+        const controller = parts[1];
+
+        if (controller.toLowerCase() === "home" && (parts[2] || "").toLowerCase() === "index") {
             return null;
         }
-        if (!pathArray[2]) return null;
 
-        let departmentName = '/' + pathArray[2];
-
-        return departmentName;
+        return parts[2];
     }
 
     //--------------------------------------------------------------------------------------

@@ -1,4 +1,7 @@
 ﻿$(document).ready(function () {
+
+    var DepartmentRouting = sharedUtility().extractDepartmentName();
+
     function getPlanRequestFilter() {
         return {
             RequestNo: $('#planRequestNoFilter').val(),
@@ -12,7 +15,7 @@
 
     const planRequestsListing = evaluationListing.createListing({
         tableId: 'planRequestTable',
-        ajaxUrl: '/ServiceRequest/GetPlanRequests',
+        ajaxUrl: `/ServiceRequest/${DepartmentRouting}/GetPlanRequests`,
         getFilterInput: getPlanRequestFilter,
         filterFormId: 'plan-request-filter-form-id',
         filterBtnId: 'filterPlanRequestBtnId',
@@ -112,7 +115,7 @@
             }
         };
 
-        jqClient(options).Get(`/ServiceRequest/GetApplicationDetails?requestId=${requestId}`);
+        jqClient(options).Get(`/ServiceRequest/${DepartmentRouting}/GetApplicationDetails?requestId=${requestId}`);
     }
 
 
