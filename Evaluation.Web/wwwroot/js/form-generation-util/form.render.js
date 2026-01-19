@@ -7,7 +7,7 @@ window.serviceRequestForm = window.serviceRequestForm || {};
 (function (ns, fu) {
 
     const { RENDER_TYPE, ACTION_TYPE } = window.FormConstants || {};
-
+    var DepartmentRouting = sharedUtility().extractDepartmentName();
     // #region 🧩 Helpers
 
     const getText = (key) =>
@@ -83,7 +83,7 @@ window.serviceRequestForm = window.serviceRequestForm || {};
         const actionModalRoot = $('#' + actionModalId);
 
         const url =
-            `/ServiceRequest/GetActionField` +
+            `/ServiceRequest/${DepartmentRouting}/GetActionField` +
             `?ActionbackendKey=${encodeURIComponent(backendKey)}` +
             `&requestId=${encodeURIComponent(requestId)}` +
             `&serviceId=${encodeURIComponent(serviceId || "")}`;

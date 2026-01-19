@@ -10,8 +10,13 @@ window.formUtility = window.formUtility || {};
 
     // #region ========== Helpers ==========
 
-    const getUiText = (key) =>
-        (window.uiControlsSetup ? uiControlsSetup().GetUiControlText(key) || "" : "");
+    function getUiText(key, fallback = '') {
+        try {
+            return uiControlsSetup().GetUiControlText(key) || fallback;
+        } catch {
+            return fallback;
+        }
+    }
 
     function formatDateFromString(value) {
         if (!value) return null;
@@ -1105,6 +1110,7 @@ window.formUtility = window.formUtility || {};
     ns.initializeJQTEFields = initializeJQTEFields;
     ns.initializeDropzoneFields = initializeDropzoneFields;
     ns.initializeTinyMceFields = initializeTinyMceFields;
+    ns.getUiText = getUiText;
 
     window.initializeFormFieldsAndConditions = initializeFormFieldsAndConditions;
 
