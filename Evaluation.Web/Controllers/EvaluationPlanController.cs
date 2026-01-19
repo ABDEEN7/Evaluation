@@ -2,14 +2,18 @@
 
 namespace Evaluation.Web.Controllers
 {
-
+	[Route("{language=ar}/[controller]/{depRouting}")]
 	public class EvaluationPlanController : Controller
 	{
+		[HttpGet("")]
+		[HttpGet("Index")]
 		public IActionResult Index()
 		{
 			return View();
 		}
-        public IActionResult Calendar()
+
+		[HttpGet("Calendar")]
+		public IActionResult Calendar()
         {
             return View();
         }

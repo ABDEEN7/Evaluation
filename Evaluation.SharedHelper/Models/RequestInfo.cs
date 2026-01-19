@@ -16,7 +16,9 @@ namespace Evaluation.SharedHelper.Models
         public string UserIp { get; set; } = null!;
         public string Controller { get; set; } = null!;
         public string Action { get; set; } = null!;
+		public string? DepRouting { get; set; }
+		public Guid? DepId { get; set; }
 
-        public Dictionary<string, string> AdditionalParameters { get; set; } = new();
+		public Dictionary<string, string> AdditionalParameters { get; set; } = new();
     }
 }
