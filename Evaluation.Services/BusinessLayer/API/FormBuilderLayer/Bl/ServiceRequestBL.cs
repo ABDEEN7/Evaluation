@@ -303,7 +303,7 @@ namespace Evaluation.Services.Models.API
 										.GetAllQueryFiltered()
 										.Include(c => c.Status)
 										.Where(c => c.PlanId == PlanId || serviceObj.Initialservice)
-										.Where(c => c.ServiceId == serviceObj.Id && c.Status!.IsOpen && !c.IsDeleted!.Value)
+										.Where(c => c.ServiceId == serviceObj.Id && c.Status!.IsOpen && !c.IsDeleted)
 										//.Where(c => c.OrgTreeId == userInfo!.UserId || isMinistry)
 										.CountAsync();
 
