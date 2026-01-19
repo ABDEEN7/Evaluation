@@ -25,7 +25,7 @@ public class FormProfile : Profile
             .ReverseMap();
 
         CreateMap<FormItemValue, FormItemEvaluationDto>()
-          .ForMember(d => d.Value, opt => opt.MapFrom(src => src.Value))
+          .ForMember(d => d.Value, opt => opt.MapFrom(src => src.ActualValue))
           .ForMember(d => d.Note, opt => opt.MapFrom(src => src.Note))
           .ForMember(d => d.Id, opt => opt.MapFrom(src => src.FormItemId))
           .ForMember(d => d.ValueId, opt => opt.MapFrom(src => src.Id))
@@ -33,7 +33,7 @@ public class FormProfile : Profile
 
 
         CreateMap<FormItemValue, RelatedItemDto>()
-          .ForMember(d => d.Value, opt => opt.MapFrom(src => src.Value))
+          .ForMember(d => d.Value, opt => opt.MapFrom(src => src.ActualValue))
           .ForMember(d => d.Note, opt => opt.MapFrom(src => src.Note))
           .ForMember(d => d.Id, opt => opt.MapFrom(src => src.FormItemId))
           .ReverseMap();
@@ -70,7 +70,7 @@ public class FormProfile : Profile
               });
 
 
-        CreateMap<FormEvalMarixValue, FormEvalMarixValueDto>()
+        CreateMap<FormEvalMatrixValue, FormEvalMarixValueDto>()
          .ForMember(d => d.Id, opt => opt.MapFrom(src => src.Id))
          .ForMember(d => d.Name, opt => opt.MapFrom(src => src.NameEn))
          .ForMember(d => d.MaxValue, opt => opt.MapFrom(src => src.MaxValue))

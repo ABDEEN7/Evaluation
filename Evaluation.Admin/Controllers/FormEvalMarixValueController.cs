@@ -42,7 +42,7 @@ namespace Evaluation.Admin.Controllers
                  ConstantKeys.AdminSettings.ADMIN_FILE_COUNT
             });
 
-            var property = typeof(FormEvalMarixValue).GetProperty("OrderNo");
+            var property = typeof(FormEvalMatrixValue).GetProperty("OrderNo");
             model.containsOrderNo = property != null ? true : false;
             return View(model);
         }
