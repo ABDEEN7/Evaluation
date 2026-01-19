@@ -20,6 +20,11 @@ public class DepartmentHolidayController : ControllerBase
     {
         return Ok(await _masterBL.GetApiService<DepartmentHolidayBL>().GetDepartmentHolidayList(page));
     }
+    [HttpGet]
+    public async Task<IActionResult> GetAllHolidayDepartmentsOrg()
+    {
+        return Ok(await _masterBL.GetApiService<DepartmentHolidayBL>().GetDepartmentHolidayList());
+    }
     [HttpPost]
     public async Task<IActionResult> AddDepartmentHoliday(CreateDepartmentHolidayDto model)
     {
