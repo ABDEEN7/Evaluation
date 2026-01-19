@@ -841,20 +841,27 @@ var formGenerateFieldUtility = window.formUtility;
     // ================== LABEL + HISTORY ==================
 
     const createFieldLabel = (field) => {
-        const fieldLabel = $('<label>').addClass('form-label');
+        const isRequired = field.attributes?.some(a => (a.name || '').toLowerCase() === "required");
+
+        const isRadioGroup = field.type === 'radio' || field.type === 'radio_inline';
+
+        const fieldLabel = $('<label>')
+            .addClass(`form-label ${isRadioGroup ? 'fw-bold d-block' : 'fw-semibold'}`);
+
+        if (isRequired) {
+            fieldLabel.append('<span class="text-danger">*</span> ');
+        }
 
         if (field.type === 'label' || field.type === 'checkbox') {
-            fieldLabel.html(field.fieldName);
+            fieldLabel.append(field.fieldName);
         } else {
-            fieldLabel.text(field.fieldName);
+            fieldLabel.append(document.createTextNode(field.fieldName || ''));
         }
 
         if (field.type === 'checkbox') {
             fieldLabel.attr('for', `field_${field.fieldId}`);
         }
-        if (field.attributes && field.attributes.some(attr => attr.name === "required")) {
-            fieldLabel.append('<span class="text-danger">*</span>');
-        }
+
         if (field.fieldTooltip) {
             const fieldInfo = $('<span class="px-1">')
                 .addClass('fa fa-info-circle')
@@ -866,6 +873,7 @@ var formGenerateFieldUtility = window.formUtility;
 
         return fieldLabel;
     };
+
 
     const appendHistoryIcon = (field, fieldLabel) => {
         let showHistory_attribute = false;
@@ -1336,21 +1344,28 @@ var formGenerateFieldUtility = window.formUtility;
 
                         }
                         if (field.type === 'label') {
-                            colContainer.append(fieldLabel);
+                            const block = $('<div>').addClass('mb-4');
+                            block.append(fieldLabel);
+                            colContainer.append(block);
                         } else {
+                            const block = $('<div>').addClass('mb-4');
+
                             if (actionType === ACTION_TYPE.RETURNBACK || actionType === ACTION_TYPE.RequestDataChange) {
                                 const DisableReturn = hasAttribute(field, 'disabled');
+
                                 const approvalDiv = $('<div>').addClass('d-flex gap-4');
                                 const radioElement = createToggler(field, DisableReturn);
 
-                                approvalDiv.append(radioElement);
-
-                                const innerdiv = $('<div class="w-75">');
+                                const innerdiv = $('<div>').addClass('w-75');
                                 innerdiv.append(fieldLabel, fieldElement);
-                                approvalDiv.append(innerdiv);
-                                colContainer.append(approvalDiv);
+
+                                approvalDiv.append(radioElement, innerdiv);
+
+                                block.append(approvalDiv);
+                                colContainer.append(block);
                             } else {
-                                colContainer.append(fieldLabel, fieldElement);
+                                block.append(fieldLabel, fieldElement);
+                                colContainer.append(block);
                             }
                         }
 
