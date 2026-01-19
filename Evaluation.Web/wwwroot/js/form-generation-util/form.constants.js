@@ -5,7 +5,7 @@
         PREVIEW: 'preview',
         ACTION: 'action',
     };
-
+    const DepartmentRouting = sharedUtility().extractDepartmentName();
     const ACTION_TYPE = {
         INFO: "INFO",
         APPROVE: "APPROVE",
