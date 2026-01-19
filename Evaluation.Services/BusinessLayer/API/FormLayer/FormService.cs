@@ -32,9 +32,9 @@ public class FormService(IServiceScopeFactory serviceScopeFactory,
             .GetByIdAsync(id);
     }
 
-    public async Task<List<FormEvalMarixValue>> GetFormEvalMatrixValues(Guid id)
+    public async Task<List<FormEvalMatrixValue>> GetFormEvalMatrixValues(Guid id)
     {
-        return await unitOfWork.GetRepository<FormEvalMarixValue>()
+        return await unitOfWork.GetRepository<FormEvalMatrixValue>()
             .GetAllActiveNonDeleted()
             .Where(x=>x.FormEvalMatrixId == id)
             .ToListAsync();
@@ -43,7 +43,10 @@ public class FormService(IServiceScopeFactory serviceScopeFactory,
     public async Task<List<FormItem>> GetFormItems()
     {
             var formItems = await unitOfWork.GetRepository<FormItem>()
-                      .GetAllActiveNonDeleted().Include(d => d.SubFormItems).ToListAsync();
+                      .GetAllActiveNonDeleted()
+                      .Include(d => d.SubFormItems)
+                      .Include(f => f.RelatedFrom)
+                      .ToListAsync();
 
             return formItems;
     }
@@ -76,6 +79,11 @@ public class FormService(IServiceScopeFactory serviceScopeFactory,
     public async Task<FormItemValue> GetFormItemValue(Guid ValueId)
     {
         return await unitOfWork.GetRepository<FormItemValue>().GetByIDActiveNonDeleted(ValueId!);
+    }
+
+    public async Task<FormItemValue> GetFormItemValueByItemId(Guid ItemId)
+    {
+        return await unitOfWork.GetRepository<FormItemValue>().GetAllActiveNonDeleted().Where(x=>x.FormItemId == ItemId).FirstOrDefaultAsync();
     }
 
     public async Task<SubFormItemValue> GetSubFormItemValue(Guid ValueId)

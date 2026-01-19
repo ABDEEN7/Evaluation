@@ -42,4 +42,13 @@ public class DepartmentService(IServiceScopeFactory serviceScopeFactory,
             .FirstOrDefaultAsync();
         return department?.Id;
     }
+
+
+    public async Task<List<Department>> GetDepartmentsByWebGroupId(Guid wepGroupId)
+    {
+        var departments = await unitOfWork.GetRepository<DepWebGroup>()
+            .GetAllActiveNonDeleted(x =>
+                x.WebGroupId == wepGroupId).Select(x=> x.Department).ToListAsync();
+        return departments;
+    }
 }

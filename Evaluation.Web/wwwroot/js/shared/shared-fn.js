@@ -75,6 +75,61 @@ const sharedFn = (options) => {
     }
 
     //===========================================================
+    const getSaveObjectJson = (controlvalidationlist, Idvalue) => {
+
+        var data = {};
+
+        if (controlvalidationlist.length > 0) {
+
+            data.Id = Idvalue || null;
+            data.IsEdit = !!Idvalue;
+
+            controlvalidationlist.forEach(item => {
+
+                if (item.constraint.controlType == "DATE") {
+                    data[item.controlName] =
+                        sharedFn().GetActionDate($('#' + item.uibackendName).val(), commonUtil.DATE_FORMAT.DASH_YYYY_MM_DD);
+                }
+                else if (item.constraint.controlType == "DATETIME") {
+                    data[item.controlName] =
+                        sharedFn().GetActionDate($('#' + item.uibackendName).val(), commonUtil.DATE_FORMAT.DASH_YYYY_MM_DD_HH_mm_ss);
+                }
+                else if (["CHECK_BOX", "CHECK_BOX_HIDDEN", "CHECK_BOX_DISABLED", "RADIO_BUTTON"]
+                    .includes(item.constraint.controlType)) {
+
+                    data[item.controlName] = $('#' + item.uibackendName).prop("checked");
+                }
+                else if (item.constraint.controlType == "TEXT_TINY") {
+                    data[item.controlName] = tinyMCE.get(item.uibackendName).getContent();
+                }
+                else if (item.constraint.controlType == "MULTIDROPDOWN") {
+                    let val = $('#' + item.uibackendName).val();
+                    data[item.controlName] = Array.isArray(val) ? val : [val];
+                }
+                else if (item.constraint.controlType == "DUAL_LIST") {
+                    let idsArray = Array.from(
+                        document.querySelectorAll("#" + item.uibackendName + " li")
+                    ).map(li => li.getAttribute("data-id"));
+                    data[item.controlName] = idsArray;
+                }
+                else if (item.constraint.controlType == "TAGS") {
+                    data[item.controlName] = $('#' + item.uibackendName).val()?.join(',') ?? '';
+                }
+                else if (item.constraint.controlType == "CHECK_BOX_LIST") {
+                    let selected = document.getElementById(item.uibackendName)
+                        .querySelectorAll("input[type='checkbox']:checked");
+
+                    data[item.controlName] = Array.from(selected).map(cb => cb.value);
+                }
+                else {
+                    data[item.controlName] = $('#' + item.uibackendName).val();
+                }
+            });
+        }
+
+        return data;
+    };
+
     const getSaveObject = (controlvalidationlist, Idvalue) => {
         var formData = new FormData();
         var data = {};
@@ -1000,7 +1055,7 @@ const sharedFn = (options) => {
             editMode();
         }
         else {
-            $('#Id').val(id);
+            $('#PopupId').val(id);
         }
        
 
@@ -1158,6 +1213,7 @@ const sharedFn = (options) => {
 
             }
         }
+        
     }
     //===========================================================
     async function processDualListControls(duallistcontrollist, obj) {
@@ -1830,7 +1886,7 @@ const sharedFn = (options) => {
                         if (popupdivcontent) {
                             if (tablecolumnlist) {
                                 popupdivcontent = popupdivcontent + '<div class="tabulator-wrapper"> <div id="divtable"></div> </div>';
-                                $('#ModalPopup .modal-body').html(popupdivcontent);
+                                $('#ModalPopup .modal-body #PopupForm').html(popupdivcontent);
                                 table = tableUtil.createTabulator({
                                     id: "divtable",
                                     config: {
@@ -1974,7 +2030,7 @@ const sharedFn = (options) => {
 
         const obj = groupObject;
         if (obj) {
-            $('#Id').val(obj.id);
+            $('#PopupId').val(obj.id);
             if (ControlItems.length > 0) {
                 var notduallistcontrollist = ControlItems.filter(c => c.constraint.controlType != 'DUAL_LIST');
                 notduallistcontrollist.forEach(item => {
@@ -1994,11 +2050,8 @@ const sharedFn = (options) => {
                         $('#' + contrains.uibackendName).val(obj[fieldname]).trigger('change');
                     }
                     else if (contrains.controlType == 'MULTIDROPDOWN') {
-                        var Ids = String(obj[fieldname]).split(',').map(function (item) {
-                            return item.trim();
-                        });
-                        $('#' + contrains.uibackendName).attr("data-value", Ids);
-                        $('#' + contrains.uibackendName).val(Ids).trigger('change');
+                        $('#' + contrains.uibackendName).attr("data-value", obj[fieldname]);
+                        $('#' + contrains.uibackendName).val(obj[fieldname]).trigger('change');
                     }
                     else if (contrains.controlType == 'TEXT_TINY') {
                         tinyMCE.get(contrains.uibackendName).setContent(obj[fieldname]);
@@ -2038,6 +2091,7 @@ const sharedFn = (options) => {
     //===========================================================
     const ResetVisibleControls = (formname) => {
         $('#PopupId').val('');
+        $("#btn-submit_popup").removeAttr("disabled");
         $("#" + formname + " :input:visible").each(function () {
 
             if (this.type === "checkbox" || this.type === "radio") {
@@ -2175,6 +2229,7 @@ const sharedFn = (options) => {
     result.InitializePopupControl = initializePopupControl;
     result.Edit = edit;
     result.GetSaveObject = getSaveObject;
+    result.GetSaveObjectJson = getSaveObjectJson;
     result.InitialPopup = InitialPopup;
     result.OpenFormPopup = OpenFormPopup;
     result.SetValueFromDropdown = SetValueFromDropdown;

@@ -1,807 +1,670 @@
-﻿// ============= MAIN PLAN HANDLER =============
+﻿(function (global) {
+    'use strict';
 
-(function () {
+    const ns = global.planUtility;
     const {
-        RENDER_TYPE,
-        ACTION_TYPE,
         API_ENDPOINTS,
         PLAN_TYPE_BACKEND,
-        TABLE_CONFIG
-    } = window.PlanConstants || {};
+        TABLE_CONFIG,
+        FILTER_FIELDS
+    } = global.PlanConstants;
 
-    const ns = window.planUtility;
+    /* ===================== jqClient ===================== */
 
-    // ================== INITIALIZATION ==================
-    jsPlan(ns);
-    function jsPlan(ns) {
-        return ns;
-    }
-    const initializePage = (options = {}) => {
-        const {
-            renderType = RENDER_TYPE.ACTION,
-            actionType = ACTION_TYPE.CREATE,
-            planId = null,
-            oldPlanId = null
-        } = options;
-
-        // Store current mode
-        ns.currentRenderType = renderType;
-        ns.currentActionType = actionType;
-        ns.currentPlanId = planId;
-
-        // Load initial data
-        Promise.all([
-            loadPlanTypes(),
-            loadSemesters(),
-            loadVisitTypes(),
-            loadVacationDays()
-        ]).then(() => {
-            if (renderType === RENDER_TYPE.COMPARISON && oldPlanId && planId) {
-                // Load both plans for comparison
-                loadComparisonView(oldPlanId, planId);
-            } else if (planId) {
-                // Load existing plan
-                loadPlanData(planId, renderType, actionType);
-            } else {
-                // New plan
-                renderNewPlan(renderType, actionType);
-            }
-        });
-
-        // Initialize event handlers
-        initializeEventHandlers();
-    };
-
-    // ================== DATA LOADING ==================
-
-    const loadPlanTypes = () => {
-        return jqClient().Get(API_ENDPOINTS.GET_PLAN_TYPES)
-            .done(result => {
-                ns.planTypes = result?.result || [];
-            })
-            .fail((jqXHR, textStatus, err) => {
-                console.error('Load plan types failed', textStatus, err);
-            });
-    };
-
-    const loadSemesters = () => {
-        return jqClient().Get(API_ENDPOINTS.GET_SEMESTERS)
-            .done(result => {
-                ns.semesters = result?.result || [];
-            })
-            .fail((jqXHR, textStatus, err) => {
-                console.error('Load semesters failed', textStatus, err);
-            });
-    };
-
-    const loadVisitTypes = () => {
-        return jqClient().Get(API_ENDPOINTS.GET_VISITS)
-            .done(result => {
-                ns.visitTypes = result?.result || [];
-            })
-            .fail((jqXHR, textStatus, err) => {
-                console.error('Load visit types failed', textStatus, err);
-            });
-    };
-
-    const loadVacationDays = () => {
-        return jqClient().Get(API_ENDPOINTS.GET_VACATION_DATES)
-            .done(result => {
-                const data = result?.result || [];
-                ns.holidays = data.map(item => ({ date: item.date }));
-            })
-            .fail((jqXHR, textStatus, err) => {
-                console.error('Load vacation days failed', textStatus, err);
-            });
-    };
-
-    const loadSchoolsData = (page = 1, filters = {}) => {
-        const params = new URLSearchParams({
-            page: page,
-            pageSize: ns.pageSize || TABLE_CONFIG.pageSize
-        });
-
-        // Add filters
-        Object.keys(filters).forEach(key => {
-            if (filters[key]) {
-                params.append(key, filters[key]);
-            }
-        });
-
-        showLoadingState();
-
-        return jqClient().Get(`${API_ENDPOINTS.GET_SCHOOLS}?${params.toString()}`)
-            .done(result => {
-                const data = result?.items || [];
-                ns.allSchools = data;
-                ns.filteredSchools = data;
-
-                // Render table
-                const tbody = ns.renderSchoolTable(
-                    ns.filteredSchools,
-                    ns.currentRenderType,
-                    ns.currentActionType
-                );
-                $('#planTable tbody').replaceWith(tbody);
-
-                // Render pagination
-                const totalRecords = result.totalCount || ns.filteredSchools.length;
-                const pagination = ns.renderPagination(totalRecords);
-                $('#dtPagination').html(pagination);
-
-                // Re-initialize date pickers
-                reinitializeDatePickers();
-
-                // Attach event handlers to new rows
-                attachRowEventHandlers();
-            })
-            .fail((jqXHR, textStatus, err) => {
-                console.error('Load schools failed', textStatus, err);
-                showErrorState();
-            });
-    };
-
-    const loadPlanData = (planId, renderType, actionType) => {
-        return jqClient().Get(`${API_ENDPOINTS.GET_PLAN_DETAILS}?planId=${planId}`)
-            .done(result => {
-                const planData = result?.result;
-                renderPlanWithData(planData, renderType, actionType);
-            })
-            .fail((jqXHR, textStatus, err) => {
-                console.error('Load plan data failed', textStatus, err);
-            });
-    };
-
-    const loadComparisonView = (oldPlanId, newPlanId) => {
-        Promise.all([
-            jqClient().Get(`${API_ENDPOINTS.GET_PLAN_DETAILS}?planId=${oldPlanId}`),
-            jqClient().Get(`${API_ENDPOINTS.GET_PLAN_DETAILS}?planId=${newPlanId}`)
-        ]).then(([oldResult, newResult]) => {
-            const oldPlan = oldResult?.result;
-            const newPlan = newResult?.result;
-
-            const comparisonView = ns.generateComparisonView(oldPlan, newPlan);
-            $('#planFormContainer').html(comparisonView);
-        }).catch(err => {
-            console.error('Load comparison failed', err);
-        });
-    };
-
-    // ================== RENDERING ==================
-
-    const renderNewPlan = (renderType, actionType) => {
-        // Render empty plan form
-        const planForm = ns.renderPlanForm(null, renderType, actionType);
-        $('#planFormContainer').html(planForm);
-
-        // Initialize Select2 for dropdowns
-        $('#ddlPlanType').select2({
-            placeholder: "اختر نوع الخطة",
-            allowClear: true,
-            width: '100%'
-        });
-
-        $('#ddlSemester').select2({
-            placeholder: "اختر الفصل الدراسي",
-            allowClear: true,
-            width: '100%'
-        });
-
-        // Load schools
-        loadSchoolsData(1);
-
-        // Initialize date picker in custom mode by default
-        initCustomMode();
-    };
-
-    const renderPlanWithData = (planData, renderType, actionType) => {
-        // Render plan form with data
-        const planForm = ns.renderPlanForm(planData, renderType, actionType);
-        $('#planFormContainer').html(planForm);
-
-        // Initialize Select2
-        $('#ddlPlanType').select2({
-            placeholder: "اختر نوع الخطة",
-            allowClear: true,
-            width: '100%'
-        });
-
-        $('#ddlSemester').select2({
-            placeholder: "اختر الفصل الدراسي",
-            allowClear: true,
-            width: '100%'
-        });
-
-        // Set selected schools
-        ns.selectedSchools = planData.schools || [];
-
-        // Render schools table with data
-        const tbody = ns.renderSchoolTable(
-            planData.schools || [],
-            renderType,
-            actionType
-        );
-        $('#planTable tbody').replaceWith(tbody);
-
-        // Initialize date pickers based on plan type
-        initializeDatePickersForPlanType(planData);
-
-        // Attach event handlers
-        attachRowEventHandlers();
-    };
-
-    const showLoadingState = () => {
-        const tbody = $('#planTable tbody');
-        tbody.html(`
-            <tr>
-                <td colspan="7" class="text-center py-5">
-                    <div class="spinner-border text-primary" role="status">
-                        <span class="visually-hidden">جاري التحميل...</span>
-                    </div>
-                    <p class="mt-2 text-muted">جاري تحميل البيانات...</p>
-                </td>
-            </tr>
-        `);
-    };
-
-    const showErrorState = () => {
-        const tbody = $('#planTable tbody');
-        tbody.html(`
-            <tr>
-                <td colspan="7" class="text-center py-5 text-danger">
-                    <i class="la la-exclamation-triangle fs-1"></i>
-                    <p class="mt-2">حدث خطأ أثناء تحميل البيانات</p>
-                </td>
-            </tr>
-        `);
-    };
-
-    // ================== EVENT HANDLERS ==================
-
-    const initializeEventHandlers = () => {
-        // Plan type change
-        $(document).on('change', '#ddlPlanType', handlePlanTypeChange);
-
-        // Semester change
-        $(document).on('change', '#ddlSemester', handleSemesterChange);
-
-        // Select all checkbox
-        $(document).on('change', '#selectAll', handleSelectAll);
-
-        // Search
-        let searchTimeout;
-        $(document).on('input', '#customSearch', function () {
-            clearTimeout(searchTimeout);
-            const term = $(this).val().trim();
-            searchTimeout = setTimeout(() => performSearch(term), 300);
-        });
-
-        // Filter form
-        $(document).on('submit', '#filterForm', handleFilterSubmit);
-        $(document).on('click', '#clearFiltersBtn', handleClearFilters);
-
-        // Pagination
-        $(document).on('click', '#dtPagination .page-link', handlePaginationClick);
-
-        // Save button
-        //$(document).on('click', '#btn-submit', handleSavePlan);
-
-        // Open confirmation modal
-        $(document).on('click', '[data-bs-target="#confirmation-modal"]', handleOpenConfirmation);
-    };
-
-    const handlePlanTypeChange = function () {
-        const selectedOption = $(this).select2('data')[0];
-
-        if (!selectedOption) {
-            $('#semesterContainer').hide();
-            initCustomMode();
-            return;
-        }
-
-        const backendName = selectedOption.element?.dataset?.backendname || selectedOption.backendName;
-
-        // Hide semester by default
-        $('#semesterContainer').hide();
-        ns.destroyChildPicker();
-
-        switch (backendName) {
-            case PLAN_TYPE_BACKEND.YEAR:
-                initYearMode();
-                break;
-            case PLAN_TYPE_BACKEND.MONTH:
-                initMonthMode();
-                break;
-            case PLAN_TYPE_BACKEND.SEMESTER:
-                initSemesterMode();
-                break;
-            default:
-                initCustomMode();
-                break;
-        }
-    };
-
-    const handleSemesterChange = function () {
-        const selectedOption = $(this).select2('data')[0];
-
-        if (!selectedOption) {
-            ns.destroyChildPicker();
-            $('#parentDate').val('');
-            return;
-        }
-
-        const startDate = selectedOption.element?.dataset?.startdate || selectedOption.startDate;
-        const endDate = selectedOption.element?.dataset?.enddate || selectedOption.endDate;
-
-        if (startDate && endDate) {
-            const start = new Date(startDate);
-            const end = new Date(endDate);
-
-            const startStr = ns.formatDateISO(start);
-            const endStr = ns.formatDateISO(end);
-
-            $('#parentDate').val(`${startStr} to ${endStr}`).prop('disabled', true);
-
-            // Store dates in data attributes
-            $('#parentDate').data('startDate', startStr);
-            $('#parentDate').data('endDate', endStr);
-
-            ns.initChildPicker(start, end);
-        }
-    };
-
-    const handleSelectAll = function () {
-        const isChecked = $(this).is(':checked');
-        $('.selectRow').not(':disabled').prop('checked', isChecked);
-        updateSelectedSchools();
-    };
-
-    const handleFilterSubmit = function (e) {
-        e.preventDefault();
-
-        ns.currentFilters = {
-            Name: $('#filterSchoolName').val().trim(),
-            lastEvalDate: $('#filterLastEvalDate').val(),
-            establishmentDate: $('#filterCreatedDate').val(),
-            nextEvalDate: $('#filterNextEvalDate').val(),
-            previousResult: $('#filterPreviousResult').val(),
-            visitType: $('#filterVisitType').val()
-        };
-
-        // Remove empty filters
-        Object.keys(ns.currentFilters).forEach(key => {
-            if (!ns.currentFilters[key]) delete ns.currentFilters[key];
-        });
-
-        updateFilterBadge();
-        ns.currentPage = 1;
-        loadSchoolsData(1, ns.currentFilters);
-
-        // Close offcanvas
-        const offcanvas = bootstrap.Offcanvas.getInstance(document.getElementById('filterOffcanvas'));
-        if (offcanvas) offcanvas.hide();
-    };
-
-    const handleClearFilters = function () {
-        $('#filterForm')[0].reset();
-        ns.currentFilters = {};
-        updateFilterBadge();
-        ns.currentPage = 1;
-        loadSchoolsData(1);
-    };
-
-    const handlePaginationClick = function (e) {
-        e.preventDefault();
-        const page = parseInt($(this).data('page'));
-        ns.currentPage = page;
-        loadSchoolsData(page, ns.currentFilters);
-    };
-
-    const handleOpenConfirmation = function (e) {
-        e.preventDefault();
-        updateSelectedSchools();
-        const count = ns.selectedSchools.length;
-        $('#confirmationMessage').html(`تم تحديد (${count.toString().padStart(2, '0')}) مدرسة للإضافة للخطة`);
-    };
-
-    const handleSavePlan = function () {
-        if (validatePlan()) {
-            const planData = collectPlanData();
-            savePlan(planData);
-        }
-    };
-
-    const attachRowEventHandlers = () => {
-        // Checkbox change
-        $('.selectRow').off('change').on('change', function () {
-            updateSelectedSchools();
-        });
-
-        // Visit date change
-        $('.childDate').off('change').on('change', function () {
-            const schoolId = $(this).data('school-id');
-            const dateRange = $(this).val();
-            updateSchoolVisitDate(schoolId, dateRange);
-        });
-
-        // Visit type change
-        $('.visitTypeSelect').off('change').on('change', function () {
-            const schoolId = $(this).data('school-id');
-            const visitTypeId = $(this).val();
-            updateSchoolVisitType(schoolId, visitTypeId);
-        });
-    };
-
-    // ================== HELPER FUNCTIONS ==================
-
-    const initYearMode = () => {
-        const currentYear = new Date().getFullYear();
-        const startDate = `${currentYear}-01-01`;
-        const endDate = `${currentYear}-12-31`;
-
-        $('#parentDate').val(`${startDate} to ${endDate}`).prop('disabled', true);
-
-        // Store dates in data attributes
-        $('#parentDate').data('startDate', startDate);
-        $('#parentDate').data('endDate', endDate);
-
-        const minDate = new Date(currentYear, 0, 1);
-        const maxDate = new Date(currentYear, 11, 31);
-        ns.initChildPicker(minDate, maxDate);
-    };
-
-    const initMonthMode = () => {
-        // Enable parent date picker in month selection mode
-        $('#parentDate').val('').prop('disabled', false).attr('placeholder', 'اختر الشهر');
-        ns.initParentPicker('month');
-        ns.destroyChildPicker();
-    };
-
-    const initSemesterMode = () => {
-        $('#semesterContainer').show();
-        $('#parentDate').val('').prop('disabled', true);
-        ns.destroyChildPicker();
-    };
-
-    const initCustomMode = () => {
-        $('#parentDate').val('').prop('disabled', false).attr('placeholder', 'اختر تاريخ بداية ونهاية الخطة');
-        ns.initParentPicker('custom');
-        ns.destroyChildPicker();
-    };
-
-    const initializeDatePickersForPlanType = (planData) => {
-        const planType = ns.planTypes.find(t => t.id === planData.planTypeId);
-
-        if (!planType) {
-            initCustomMode();
-            if (planData.dateRange) {
-                $('#parentDate').val(planData.dateRange);
-                const range = getDateRangeFromInput();
-                if (range) {
-                    ns.initChildPicker(range.startDateObj, range.endDateObj);
-                }
-            }
-            return;
-        }
-
-        switch (planType.backendName) {
-            case PLAN_TYPE_BACKEND.YEAR:
-                initYearMode();
-                break;
-
-            case PLAN_TYPE_BACKEND.MONTH:
-                // For existing month plan, show the selected month
-                if (planData.dateRange) {
-                    $('#parentDate').val(planData.dateRange).prop('disabled', false);
-                    const range = getDateRangeFromInput();
-                    if (range) {
-                        // Store in data attributes
-                        $('#parentDate').data('startDate', range.startDate);
-                        $('#parentDate').data('endDate', range.endDate);
-                        ns.initParentPicker('month');
-                        ns.initChildPicker(range.startDateObj, range.endDateObj);
-                    }
-                } else {
-                    initMonthMode();
-                }
-                break;
-
-            case PLAN_TYPE_BACKEND.SEMESTER:
-                $('#semesterContainer').show();
-                if (planData.dateRange) {
-                    $('#parentDate').val(planData.dateRange).prop('disabled', true);
-                    const range = getDateRangeFromInput();
-                    if (range) {
-                        $('#parentDate').data('startDate', range.startDate);
-                        $('#parentDate').data('endDate', range.endDate);
-                        ns.initChildPicker(range.startDateObj, range.endDateObj);
-                    }
-                }
-                break;
-
-            default:
-                if (planData.dateRange) {
-                    $('#parentDate').val(planData.dateRange);
-                    const range = getDateRangeFromInput();
-                    if (range) {
-                        ns.initParentPicker('custom');
-                        ns.initChildPicker(range.startDateObj, range.endDateObj);
-                    }
-                } else {
-                    initCustomMode();
-                }
-                break;
-        }
-    };
-
-    const reinitializeDatePickers = () => {
-        const parentDate = $('#parentDate').val();
-        if (parentDate) {
-            const range = getDateRangeFromInput();
-            if (range) {
-                ns.initChildPicker(range.startDateObj, range.endDateObj);
-            }
-        }
-    };
-
-    const getDateRangeFromInput = () => {
-        const dateRangeStr = $('#parentDate').val();
-
-        if (!dateRangeStr || dateRangeStr.trim() === '') {
-            return null;
-        }
-
-        // Try different separators
-        let parts = dateRangeStr.split(' إلى ');
-        if (parts.length !== 2) {
-            parts = dateRangeStr.split(' to ');
-        }
-
-        if (parts.length === 2) {
-            const startStr = parts[0].trim();
-            const endStr = parts[1].trim();
-
-            // Check if we have data attributes (from month selection)
-            const storedStart = $('#parentDate').data('startDate');
-            const storedEnd = $('#parentDate').data('endDate');
-
+    if (typeof window.jqClient !== 'function') {
+        window.jqClient = function () {
             return {
-                startDate: storedStart || startStr,
-                endDate: storedEnd || endStr,
-                startDateObj: new Date(storedStart || startStr),
-                endDateObj: new Date(storedEnd || endStr)
+                Get: url => $.ajax({ url, method: 'GET', dataType: 'json' }),
+                Post: (url, data) => $.ajax({
+                    url,
+                    method: 'POST',
+                    data: JSON.stringify(data),
+                    contentType: 'application/json',
+                    dataType: 'json'
+                })
             };
-        }
+        };
+    }
 
-        return null;
+    /* ===================== INSTANCES MAP ===================== */
+    const instances = new Map();
+
+    /* ===================== INSTANCE STATE ===================== */
+    function createInstanceState(fieldId) {
+        return {
+            fieldId: fieldId,
+            isReadOnly: false,
+            pageSize: TABLE_CONFIG.pageSize || 10,
+            currentPage: 1,
+            totalRecords: 0,
+            filters: {},
+            searchTerm: '',
+            selectedSchools: [],
+            allSchools: []
+        };
+    }
+
+    /* ===================== PREFIX HELPERS ===================== */
+
+    const pid = (fieldId, id) => `#${fieldId}_${id}`;
+    const pidRaw = (fieldId, id) => `${fieldId}_${id}`;
+    const $p = (fieldId, id) => window.jQuery(pid(fieldId, id));
+
+    /* ===================== INIT ===================== */
+
+    const init = async (isReadOnly, fieldId = null, planObject = null) => {
+        if (!fieldId) {
+            console.error('[PlanHandler] fieldId is required!');
+            return;
+        }
+        const state = createInstanceState(fieldId);
+        state.isReadOnly = isReadOnly;
+
+        instances.set(fieldId, state);
+
+        try {
+            if (!ns.planTypes || ns.planTypes.length === 0) {
+                await Promise.all([
+                    loadPlanTypes(),
+                    loadSemesters(),
+                    loadVisitTypes(),
+                    loadVacationDays()
+                ]);
+            }
+
+            populatePlanTypes(fieldId);
+            populateSemesters(fieldId);
+
+            if (planObject) {
+                renderPlanWithData(fieldId, planObject);
+            } else {
+                renderNewPlan(fieldId);
+            }
+
+            bindEvents(fieldId);
+            initializeFilterDatePickers(fieldId);
+            populateFilterVisitTypes(fieldId);
+
+            console.log(`[PlanHandler] Instance ${fieldId} initialized (Backend filtering only)`);
+
+        } catch (e) {
+            console.error(`[PlanHandler] Init failed for ${fieldId}`, e);
+            alert('حدث خطأ أثناء التحميل');
+        }
     };
 
-    const updateSelectedSchools = () => {
-        ns.selectedSchools = [];
-        $('.selectRow:checked').each(function () {
-            const schoolId = $(this).data('id');
-            const school = ns.allSchools.find(s => s.id === schoolId);
-            if (school) {
-                const visitDate = $(`.childDate[data-school-id="${schoolId}"]`).val();
-                const visitTypeId = $(`.visitTypeSelect[data-school-id="${schoolId}"]`).val();
+    /* ===================== LOAD DATA ===================== */
 
-                ns.selectedSchools.push({
-                    ...school,
-                    visitDate: visitDate,
-                    visitTypeId: visitTypeId
+    const loadPlanTypes = () =>
+        jqClient().Get(API_ENDPOINTS.GET_PLAN_TYPES)
+            .then(r => ns.planTypes = r?.result || []);
+
+    const loadSemesters = () =>
+        jqClient().Get(API_ENDPOINTS.GET_SEMESTERS)
+            .then(r => ns.semesters = r?.result || []);
+
+    const loadVisitTypes = () =>
+        jqClient().Get(API_ENDPOINTS.GET_VISITS)
+            .then(r => ns.visitTypes = r?.result || []);
+
+    const loadVacationDays = () =>
+        jqClient().Get(API_ENDPOINTS.GET_VACATION_DATES)
+            .then(r => ns.holidays = (r?.result || []).map(x => ({ date: x.date })));
+
+    const loadPlanData = async (fieldId, planId) => {
+        const r = await jqClient().Get(`${API_ENDPOINTS.GET_PLAN_DETAILS}/${planId}`);
+        renderPlanWithData(fieldId, r.result);
+    };
+
+    /* ===================== POPULATE ===================== */
+
+    const populatePlanTypes = (fieldId) => {
+        const $s = $p(fieldId, 'ddlPlanType');
+
+        if ($s.hasClass("select2-hidden-accessible")) {
+            $s.select2('destroy');
+        }
+
+        $s.empty().append('<option value="">اختر نوع الخطة</option>');
+
+        ns.planTypes.forEach(t =>
+            $s.append(`<option value="${t.id}" data-backendname="${t.backendName}">${t.name}</option>`)
+        );
+
+        $s.select2({ width: '100%', allowClear: true });
+    };
+
+    const populateSemesters = (fieldId) => {
+        const $s = $p(fieldId, 'ddlSemester');
+
+        if ($s.hasClass("select2-hidden-accessible")) {
+            $s.select2('destroy');
+        }
+
+        $s.empty().append('<option value="">اختر الفصل الدراسي</option>');
+
+        ns.semesters.forEach(s =>
+            $s.append(
+                `<option value="${s.id}"
+                         data-startdate="${s.startDate}"
+                         data-enddate="${s.endDate}">
+                    ${s.name}
+                 </option>`
+            )
+        );
+
+        $s.select2({ width: '100%', allowClear: true });
+    };
+
+    const populateFilterVisitTypes = (fieldId) => {
+        const $select = $p(fieldId, 'filterVisitType');
+
+        ns.visitTypes.forEach(type => {
+            $select.append(`<option value="${type.id}">${type.name}</option>`);
+        });
+    };
+
+    const initializeFilterDatePickers = (fieldId) => {
+        const dateFields = ['filterLastEvalDate', 'filterCreatedDate', 'filterNextEvalDate'];
+
+        dateFields.forEach(field => {
+            const $input = $p(fieldId, field);
+
+            if ($input.length && typeof flatpickr !== 'undefined') {
+                flatpickr($input[0], {
+                    locale: "en",
+                    dateFormat: "Y-m-d",
+                    allowInput: true
                 });
             }
         });
     };
 
-    const updateSchoolVisitDate = (schoolId, dateRange) => {
-        const school = ns.selectedSchools.find(s => s.id === schoolId);
-        if (school) {
-            school.visitDate = dateRange;
-        }
+    /* ===================== RENDER ===================== */
+
+    const renderNewPlan = (fieldId) => {
+        const state = instances.get(fieldId);
+
+        const form = ns.renderPlanForm(fieldId, null, state.isReadOnly);
+        $p(fieldId, 'planFormContainer').find('.form-container').html(form);
+
+        // ✅ تحميل المدارس من Backend
+        loadSchools(fieldId, 1);
+        initCustomMode(fieldId);
     };
 
-    const updateSchoolVisitType = (schoolId, visitTypeId) => {
-        const school = ns.selectedSchools.find(s => s.id === schoolId);
-        if (school) {
-            school.visitTypeId = visitTypeId;
+    const renderPlanWithData = (fieldId, plan) => {
+        const state = instances.get(fieldId);
+
+        const vm = {
+            title: plan.name || '',
+            planTypeId: plan.planTypeDepId || plan.PlanTypeDepId,
+            semesterId: plan.semesterId,
+            dateRange: plan.startDate && plan.endDate ?
+                `${plan.startDate} to ${plan.endDate}` : '',
+            schools: plan.schools || []
+        };
+
+        const form = ns.renderPlanForm(fieldId, vm, state.isReadOnly);
+        $p(fieldId, 'planFormContainer').find('.form-container').html(form);
+
+        populatePlanTypes(fieldId);
+        populateSemesters(fieldId);
+
+        $p(fieldId, 'planTitle').val(vm.title);
+        $p(fieldId, 'ddlPlanType').val(vm.planTypeId).trigger('change');
+        if (vm.semesterId) {
+            $p(fieldId, 'ddlSemester').val(vm.semesterId).trigger('change');
         }
+        $p(fieldId, 'parentDate').val(vm.dateRange);
+
+        // ✅ حفظ المدارس المحددة
+        state.selectedSchools = vm.schools.map(s => ({
+            ...s,
+            id: s.id || s.schoolId,
+            visitDate: s.visitDate || (s.startEvaluationDate && s.endEvaluationDate ?
+                `${s.startEvaluationDate} to ${s.endEvaluationDate}` : ''),
+            visitTypeId: s.visitTypeId
+        }));
+
+        // ✅ عرض المدارس الموجودة في planObject
+        const tbody = ns.renderSchoolTable(fieldId, vm.schools, state.isReadOnly);
+        $p(fieldId, 'planTable').find('tbody').replaceWith(tbody);
+
+        attachRowEvents(fieldId);
+        initializeDatePickers(fieldId, vm);
     };
 
-    const updateFilterBadge = () => {
-        const filterCount = Object.keys(ns.currentFilters).length;
-        $('.filterbtn .badge').text(filterCount);
+    /* ===================== SCHOOLS (Backend Only) ===================== */
+
+    const loadSchools = (fieldId, page = 1, filters = {}) => {
+        const state = instances.get(fieldId);
+        state.currentPage = page;
+        state.filters = filters;
+
+        // ✅ بناء الـ query parameters
+        const params = new URLSearchParams({
+            page,
+            pageSize: state.pageSize
+        });
+
+        // ✅ إضافة البحث
+        if (state.searchTerm) {
+            params.append('search', state.searchTerm);
+        }
+
+        // ✅ إضافة الفلاتر
+        Object.keys(filters).forEach(k => {
+            if (filters[k]) params.append(k, filters[k]);
+        });
+
+        showLoadingState(fieldId);
+
+        console.log(`[PlanHandler] Loading schools from backend: ${API_ENDPOINTS.GET_SCHOOLS}?${params}`);
+
+        // ✅ استدعاء API
+        jqClient().Get(`${API_ENDPOINTS.GET_SCHOOLS}?${params}`)
+            .done(r => {
+                state.allSchools = r.items || [];
+                state.totalRecords = r.totalCount || 0;
+
+                console.log(`[PlanHandler] Loaded ${state.allSchools.length} schools (Total: ${state.totalRecords})`);
+
+                const tbody = ns.renderSchoolTable(
+                    fieldId,
+                    state.allSchools,
+                    state.isReadOnly
+                );
+
+                $p(fieldId, 'planTable').find('tbody').replaceWith(tbody);
+
+                // ✅ عرض Pagination
+                renderPagination(fieldId);
+
+                attachRowEvents(fieldId);
+                initChildPickerForTable(fieldId);
+            })
+            .fail(err => {
+                console.error(`[PlanHandler] Failed to load schools`, err);
+                showErrorState(fieldId);
+            });
     };
 
-    const performSearch = (term) => {
-        if (!term) {
-            ns.filteredSchools = ns.allSchools;
-        } else {
-            ns.filteredSchools = ns.allSchools.filter(s =>
-                (s.name && s.name.includes(term)) ||
-                (s.type && s.type.includes(term))
-            );
+    /* ===================== PAGINATION ===================== */
+
+    const renderPagination = (fieldId) => {
+        const state = instances.get(fieldId);
+        const totalPages = Math.ceil(state.totalRecords / state.pageSize);
+
+        if (totalPages <= 1) {
+            $p(fieldId, 'dtPagination').empty();
+            return;
         }
 
-        ns.currentPage = 1;
-        const tbody = ns.renderSchoolTable(ns.filteredSchools, ns.currentRenderType, ns.currentActionType);
-        $('#planTable tbody').replaceWith(tbody);
+        const pagination = $('<ul>').addClass('pagination pagination-sm mb-0');
 
-        const pagination = ns.renderPagination(ns.filteredSchools.length);
-        $('#dtPagination').html(pagination);
-
-        reinitializeDatePickers();
-        attachRowEventHandlers();
-    };
-
-    // ================== VALIDATION ==================
-
-    const validatePlan = () => {
-        let isValid = true;
-        clearErrors();
-
-        // Validate title
-        const title = $('#planTitle').val().trim();
-        if (!title) {
-            showError('planTitle', 'يرجى إدخال عنوان الخطة');
-            isValid = false;
+        // Previous button
+        if (state.currentPage > 1) {
+            const prevItem = $('<li>').addClass('page-item');
+            const prevLink = $('<a>')
+                .addClass('page-link')
+                .attr('href', '#')
+                .text('السابق')
+                .on('click', function (e) {
+                    e.preventDefault();
+                    loadSchools(fieldId, state.currentPage - 1, state.filters);
+                });
+            prevItem.append(prevLink);
+            pagination.append(prevItem);
         }
 
-        // Validate plan type
-        const planTypeId = $('#ddlPlanType').val();
-        if (!planTypeId) {
-            showError('ddlPlanType', 'يرجى اختيار نوع الخطة');
-            isValid = false;
-        }
+        // Page numbers (محدودة لـ 5 صفحات فقط للعرض)
+        const startPage = Math.max(1, state.currentPage - 2);
+        const endPage = Math.min(totalPages, state.currentPage + 2);
 
-        // Validate date range
-        const dateRange = $('#parentDate').val();
-        if (!dateRange || dateRange.trim() === '') {
-            showError('parentDate', 'يرجى اختيار الفترة الزمنية');
-            isValid = false;
-        } else {
-            // Validate date range format
-            const range = getDateRangeFromInput();
-            if (!range || !range.startDateObj || !range.endDateObj ||
-                isNaN(range.startDateObj.getTime()) || isNaN(range.endDateObj.getTime())) {
-                showError('parentDate', 'تاريخ غير صحيح');
-                isValid = false;
+        if (startPage > 1) {
+            pagination.append(createPageItem(fieldId, 1, state.currentPage === 1, state.filters));
+            if (startPage > 2) {
+                pagination.append($('<li>').addClass('page-item disabled').append(
+                    $('<span>').addClass('page-link').text('...')
+                ));
             }
         }
 
-        // Validate semester if visible
-        if ($('#semesterContainer').is(':visible')) {
-            const semesterId = $('#ddlSemester').val();
-            if (!semesterId) {
-                showError('ddlSemester', 'يرجى اختيار الفصل الدراسي');
-                isValid = false;
-            }
+        for (let i = startPage; i <= endPage; i++) {
+            pagination.append(createPageItem(fieldId, i, state.currentPage === i, state.filters));
         }
 
-        // Validate schools
-        updateSelectedSchools();
-        if (ns.selectedSchools.length === 0) {
-            alert('يرجى تحديد مدرسة واحدة على الأقل');
-            isValid = false;
+        if (endPage < totalPages) {
+            if (endPage < totalPages - 1) {
+                pagination.append($('<li>').addClass('page-item disabled').append(
+                    $('<span>').addClass('page-link').text('...')
+                ));
+            }
+            pagination.append(createPageItem(fieldId, totalPages, state.currentPage === totalPages, state.filters));
         }
 
-        // Validate each school has visit date and type
-        for (const school of ns.selectedSchools) {
-            if (!school.visitDate) {
-                alert(`يرجى تحديد تاريخ الزيارة للمدرسة: ${school.name}`);
-                isValid = false;
-                break;
-            }
-            if (!school.visitTypeId) {
-                alert(`يرجى تحديد نوع الزيارة للمدرسة: ${school.name}`);
-                isValid = false;
-                break;
-            }
+        // Next button
+        if (state.currentPage < totalPages) {
+            const nextItem = $('<li>').addClass('page-item');
+            const nextLink = $('<a>')
+                .addClass('page-link')
+                .attr('href', '#')
+                .text('التالي')
+                .on('click', function (e) {
+                    e.preventDefault();
+                    loadSchools(fieldId, state.currentPage + 1, state.filters);
+                });
+            nextItem.append(nextLink);
+            pagination.append(nextItem);
         }
 
-        return isValid;
+        $p(fieldId, 'dtPagination').html(pagination);
     };
 
-    const showError = (fieldId, message) => {
-        $(`#${fieldId}`).addClass('is-invalid');
-        $(`#${fieldId}`).siblings('.invalid-feedback').text(message).show();
+    const createPageItem = (fieldId, pageNum, isActive, filters) => {
+        const pageItem = $('<li>').addClass('page-item');
+        if (isActive) {
+            pageItem.addClass('active');
+        }
+
+        const pageLink = $('<a>')
+            .addClass('page-link')
+            .attr('href', '#')
+            .text(pageNum)
+            .on('click', function (e) {
+                e.preventDefault();
+                if (!isActive) {
+                    loadSchools(fieldId, pageNum, filters);
+                }
+            });
+
+        pageItem.append(pageLink);
+        return pageItem;
     };
 
-    const clearErrors = () => {
-        $('.is-invalid').removeClass('is-invalid');
-        $('.invalid-feedback').hide();
+    /* ===================== EVENTS ===================== */
+
+    const bindEvents = (fieldId) => {
+        console.log(`[PlanHandler] Binding events for ${fieldId}`);
+
+        const $wrapper = $p(fieldId, 'wrapper');
+
+        if (!$wrapper.length) {
+            console.error(`[PlanHandler] Wrapper not found for ${fieldId}`);
+            return;
+        }
+
+        $wrapper.off('change', pid(fieldId, 'ddlPlanType'))
+            .on('change', pid(fieldId, 'ddlPlanType'), function () {
+                onPlanTypeChange(fieldId, this);
+            });
+
+        $wrapper.off('change', pid(fieldId, 'ddlSemester'))
+            .on('change', pid(fieldId, 'ddlSemester'), function () {
+                onSemesterChange(fieldId, this);
+            });
+
+        $wrapper.off('click', pid(fieldId, 'btnSavePlan'))
+            .on('click', pid(fieldId, 'btnSavePlan'), function (e) {
+                onSaveClick(fieldId, e);
+            });
+
+        // ✅ البحث: استدعاء API بعد 300ms من التوقف عن الكتابة
+        $wrapper.off('input', pid(fieldId, 'customSearch'))
+            .on('input', pid(fieldId, 'customSearch'), function () {
+                onSearch(fieldId, this);
+            });
+
+        // ✅ الفلتر: استدعاء API مع الفلاتر
+        $wrapper.off('submit', pid(fieldId, 'filterForm'))
+            .on('submit', pid(fieldId, 'filterForm'), function (e) {
+                onFilter(fieldId, e);
+            });
+
+        $wrapper.off('click', pid(fieldId, 'clearFiltersBtn'))
+            .on('click', pid(fieldId, 'clearFiltersBtn'), function () {
+                clearFilters(fieldId);
+            });
+
+        console.log(`[PlanHandler] Events bound for ${fieldId}`);
     };
 
-    // ================== DATA COLLECTION & SAVE ==================
+    const attachRowEvents = (fieldId) => {
+        const $table = $p(fieldId, 'planTable');
 
-    const collectPlanData = () => {
-        const dateRange = getDateRangeFromInput();
+        $table.find('.selectRow').off('change').on('change', function () {
+            updateSelectedSchools(fieldId);
+        });
+
+        $table.find('.childDate').off('change').on('change', function () {
+            updateSelectedSchools(fieldId);
+        });
+
+        $table.find('.visitTypeSelect').off('change').on('change', function () {
+            updateSelectedSchools(fieldId);
+        });
+    };
+
+    /* ===================== HANDLERS ===================== */
+
+    const onPlanTypeChange = (fieldId, element) => {
+        const backend = $(element).find(':selected').data('backendname');
+
+        console.log(`[PlanHandler] Plan type changed for ${fieldId}:`, backend);
+
+        $p(fieldId, 'semesterContainer').hide();
+        ns.destroyChildPicker();
+
+        switch (backend) {
+            case PLAN_TYPE_BACKEND.YEAR: return initYearMode(fieldId);
+            case PLAN_TYPE_BACKEND.MONTH: return initMonthMode(fieldId);
+            case PLAN_TYPE_BACKEND.SEMESTER: return initSemesterMode(fieldId);
+            default: return initCustomMode(fieldId);
+        }
+    };
+
+    const onSemesterChange = (fieldId, element) => {
+        const opt = $(element).find(':selected');
+        const start = new Date(opt.data('startdate'));
+        const end = new Date(opt.data('enddate'));
+
+        $p(fieldId, 'parentDate')
+            .val(`${ns.formatDateISO(start)} to ${ns.formatDateISO(end)}`)
+            .prop('disabled', true);
+
+        ns.initChildPicker(start, end);
+    };
+
+    const initYearMode = (fieldId) => {
+        const y = new Date().getFullYear();
+        const start = `${y}-01-01`;
+        const end = `${y}-12-31`;
+
+        $p(fieldId, 'parentDate').val(`${start} to ${end}`).prop('disabled', true);
+        ns.initChildPicker(new Date(start), new Date(end));
+    };
+
+    const initMonthMode = (fieldId) => {
+        $p(fieldId, 'parentDate').val('').prop('disabled', false);
+        ns.initParentPicker(fieldId, 'month', null, null, null);
+    };
+
+    const initSemesterMode = (fieldId) => {
+        $p(fieldId, 'semesterContainer').show();
+        $p(fieldId, 'parentDate').val('').prop('disabled', true);
+    };
+
+    const initCustomMode = (fieldId) => {
+        $p(fieldId, 'parentDate').val('').prop('disabled', false);
+        ns.initParentPicker(fieldId, 'custom', null, null, null);
+    };
+
+    const initializeDatePickers = (fieldId, plan) => {
+        if (!plan.dateRange) return;
+
+        const parts = plan.dateRange.split(' to ');
+        if (parts.length === 2) {
+            const startDate = new Date(parts[0].trim());
+            const endDate = new Date(parts[1].trim());
+            ns.initChildPicker(startDate, endDate);
+        }
+    };
+
+    const initChildPickerForTable = (fieldId) => {
+        const dateRange = $p(fieldId, 'parentDate').val();
+        if (dateRange && dateRange.includes(' to ')) {
+            const parts = dateRange.split(' to ');
+            if (parts.length === 2) {
+                const startDate = new Date(parts[0].trim());
+                const endDate = new Date(parts[1].trim());
+                ns.initChildPicker(startDate, endDate);
+            }
+        }
+    };
+
+    /* ===================== SEARCH & FILTER (Backend) ===================== */
+
+    const onSearch = (fieldId, element) => {
+        const state = instances.get(fieldId);
+        state.searchTerm = $(element).val().trim();
+
+        clearTimeout(state.searchTimeout);
+        state.searchTimeout = setTimeout(() => {
+            console.log(`[PlanHandler] Search term: "${state.searchTerm}"`);
+            // ✅ استدعاء API مع البحث
+            loadSchools(fieldId, 1, state.filters);
+        }, 300);
+    };
+
+    const onFilter = (fieldId, e) => {
+        e.preventDefault();
+        const state = instances.get(fieldId);
+
+        // ✅ جمع قيم الفلاتر
+        state.filters = {
+            schoolName: $p(fieldId, 'filterSchoolName').val(),
+            lastEvalDate: $p(fieldId, 'filterLastEvalDate').val(),
+            createdDate: $p(fieldId, 'filterCreatedDate').val(),
+            nextEvalDate: $p(fieldId, 'filterNextEvalDate').val(),
+            previousResult: $p(fieldId, 'filterPreviousResult').val(),
+            visitType: $p(fieldId, 'filterVisitType').val()
+        };
+
+        // حذف القيم الفارغة
+        Object.keys(state.filters).forEach(key => {
+            if (!state.filters[key]) delete state.filters[key];
+        });
+
+        console.log(`[PlanHandler] Applying filters:`, state.filters);
+
+        // ✅ استدعاء API مع الفلاتر
+        loadSchools(fieldId, 1, state.filters);
+
+        // إغلاق الـ offcanvas
+        const offcanvas = bootstrap.Offcanvas.getInstance($p(fieldId, 'filterOffcanvas')[0]);
+        if (offcanvas) offcanvas.hide();
+    };
+
+    const clearFilters = (fieldId) => {
+        const state = instances.get(fieldId);
+
+        // مسح state
+        state.filters = {};
+        state.searchTerm = '';
+
+        // مسح الحقول من UI
+        $p(fieldId, 'filterSchoolName').val('');
+        $p(fieldId, 'filterLastEvalDate').val('');
+        $p(fieldId, 'filterCreatedDate').val('');
+        $p(fieldId, 'filterNextEvalDate').val('');
+        $p(fieldId, 'filterPreviousResult').val('');
+        $p(fieldId, 'filterVisitType').val('');
+        $p(fieldId, 'customSearch').val('');
+
+        console.log(`[PlanHandler] Filters cleared`);
+
+        // ✅ إعادة تحميل كل المدارس
+        loadSchools(fieldId, 1);
+    };
+
+    /* ===================== SAVE ===================== */
+
+    const collect = (fieldId) => {
+        const state = instances.get(fieldId);
 
         return {
-            id: ns.currentPlanId,
-            title: $('#planTitle').val().trim(),
-            planTypeId: $('#ddlPlanType').val(),
-            semesterId: $('#ddlSemester').val() || null,
-            startDate: dateRange ? dateRange.startDate : null,
-            endDate: dateRange ? dateRange.endDate : null,
-            dateRange: $('#parentDate').val(), // Keep the display format
-            schools: ns.selectedSchools.map(school => ({
-                schoolId: school.id,
-                visitDate: school.visitDate,
-                visitTypeId: school.visitTypeId
+            fieldId: fieldId,
+            title: $p(fieldId, 'planTitle').val(),
+            planTypeId: $p(fieldId, 'ddlPlanType').val(),
+            semesterId: $p(fieldId, 'ddlSemester').val(),
+            dateRange: $p(fieldId, 'parentDate').val(),
+            schools: state.selectedSchools.map(s => ({
+                schoolId: s.id,
+                visitDate: s.visitDate,
+                visitTypeId: s.visitTypeId
             }))
         };
     };
 
-    const savePlan = (planData) => {
-        const endpoint = planData.id ? API_ENDPOINTS.UPDATE_PLAN : API_ENDPOINTS.APPROVE_PLAN;
+    const onSaveClick = (fieldId, e) => {
+        e.preventDefault();
+        const payload = collect(fieldId);
+        console.log(`[PlanHandler] SAVE PAYLOAD for ${fieldId}:`, payload);
+    };
 
-        jqClient().Post(endpoint, planData)
-            .done(result => {
-                if (result.success) {
-                    alert('تم حفظ الخطة بنجاح');
-                    // Redirect or refresh
-                    window.location.href = '/Plan/Index';
-                } else {
-                    alert('حدث خطأ أثناء حفظ الخطة');
-                }
-            })
-            .fail((jqXHR, textStatus, err) => {
-                console.error('Save plan failed', textStatus, err);
-                alert('حدث خطأ أثناء حفظ الخطة');
-            })
-            .always(() => {
-                $('#confirmation-modal').modal('hide');
+    /* ===================== HELPERS ===================== */
+
+    const updateSelectedSchools = (fieldId) => {
+        const state = instances.get(fieldId);
+        state.selectedSchools = [];
+
+        $p(fieldId, 'planTable').find('.selectRow:checked').each(function () {
+            const schoolId = $(this).data('school-id');
+            const school = state.allSchools.find(s => s.id === schoolId);
+            if (!school) return;
+
+            state.selectedSchools.push({
+                ...school,
+                visitDate: $p(fieldId, 'planTable').find(`.childDate[data-school-id="${schoolId}"]`).val(),
+                visitTypeId: $p(fieldId, 'planTable').find(`.visitTypeSelect[data-school-id="${schoolId}"]`).val()
             });
+        });
+
+        console.log(`[PlanHandler] Selected schools: ${state.selectedSchools.length}`);
     };
 
-    // ================== PUBLIC API ==================
-
-    window.PlanHandler = {
-        initialize: initializePage,
-        loadSchools: loadSchoolsData,
-        savePlan: handleSavePlan,
-        getRenderType: () => ns.currentRenderType,
-        getActionType: () => ns.currentActionType,
-        getSelectedSchools: () => ns.selectedSchools
+    const showLoadingState = (fieldId) => {
+        $p(fieldId, 'planTable').find('tbody').html(`
+            <tr>
+                <td colspan="7" class="text-center py-5">
+                    <div class="spinner-border text-primary"></div>
+                    <p class="mt-2 text-muted">جاري التحميل...</p>
+                </td>
+            </tr>
+        `);
     };
 
-})();
+    const showErrorState = (fieldId) => {
+        $p(fieldId, 'planTable').find('tbody').html(`
+            <tr>
+                <td colspan="7" class="text-center text-danger py-5">
+                    <i class="la la-exclamation-triangle la-3x mb-2"></i>
+                    <p>حدث خطأ أثناء تحميل البيانات</p>
+                    <button class="btn btn-sm btn-primary" onclick="location.reload()">
+                        إعادة المحاولة
+                    </button>
+                </td>
+            </tr>
+        `);
+    };
 
-// ================== DOCUMENT READY ==================
+    /* ===================== EXPORT ===================== */
 
-$(document).ready(function () {
-    // Initialize with default mode (CREATE)
-    // For edit mode, pass planId
-    // For comparison mode, pass oldPlanId and planId with renderType: RENDER_TYPE.COMPARISON
-
-    const urlParams = new URLSearchParams(window.location.search);
-    const planId = urlParams.get('planId');
-    const oldPlanId = urlParams.get('oldPlanId');
-    const mode = urlParams.get('mode'); // 'edit', 'view', 'approve', 'comparison'
-
-    let renderType, actionType;
-
-    if (mode === 'comparison' && oldPlanId && planId) {
-        renderType = window.PlanConstants.RENDER_TYPE.COMPARISON;
-        actionType = window.PlanConstants.ACTION_TYPE.APPROVE_WITH_CHANGES;
-    } else if (mode === 'view' || mode === 'approve') {
-        renderType = window.PlanConstants.RENDER_TYPE.PREVIEW;
-        actionType = mode === 'approve'
-            ? window.PlanConstants.ACTION_TYPE.APPROVE
-            : window.PlanConstants.ACTION_TYPE.VIEW;
-    } else if (planId) {
-        renderType = window.PlanConstants.RENDER_TYPE.ACTION;
-        actionType = window.PlanConstants.ACTION_TYPE.EDIT;
-    } else {
-        renderType = window.PlanConstants.RENDER_TYPE.ACTION;
-        actionType = window.PlanConstants.ACTION_TYPE.CREATE;
-    }
-
-    window.PlanHandler.initialize({
-        renderType: renderType,
-        actionType: actionType,
-        planId: planId,
-        oldPlanId: oldPlanId
+    global.PlanHandler = Object.freeze({
+        init,
+        collect,
+        getInstance: (fieldId) => instances.get(fieldId)
     });
-});
+
+})(window);

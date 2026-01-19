@@ -38,7 +38,7 @@ internal class Program
             });
         }
 
-            
+
 
         var app = builder.Build();
 
@@ -55,7 +55,7 @@ internal class Program
         app.UseMiddleware<MSVerifyRedirectionMiddleware>();
 
         app.UseMiddleware<LanguageHandlerMiddleware>();
-       
+
 
         app.UseRouting();
 
@@ -71,8 +71,13 @@ internal class Program
         });
 
         app.MapControllerRoute(
-           "default",
-           "{language=ar}/{controller=Home}/{action=Index}/{id?}");
+                     name: "withDepRouting",
+                     pattern: "{language=ar}/{controller=Home}/{depRouting}/{action=Index}/{id?}");
+
+        app.MapControllerRoute(
+                    name: "default",
+                    pattern: "{language=ar}/{controller=Home}/{action=Index}/{id?}");
+
         app.Run();
     }
 }

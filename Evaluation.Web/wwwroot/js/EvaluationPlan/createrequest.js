@@ -1,4 +1,5 @@
 ﻿(function (w, $) {
+    var DepartmentRouting = sharedUtility().extractDepartmentName();
 
     const fu = w.formUtility || {};
     const ActionTypes = (w.FormConstants && w.FormConstants.ACTION_TYPE) || {};
@@ -31,7 +32,7 @@
         }
 
         const serviceName = (w.currentLang === "ar" ? createPlanService.nameAr : createPlanService.nameEn) || "";
-        const headerEl = document.getElementById("serviceName");
+        const headerEl = document.getElementById("CreateRequestModalLabel");
         if (headerEl) headerEl.textContent = serviceName ? " - " + serviceName : "";
 
         const actions = createPlanService.actions || [];
@@ -42,6 +43,46 @@
             $("#ActionsDropDown").hide();
             $("label[for='ActionsDropDown']").hide();
             await RenderActionFields(createPlanService.serviceRequestDTO);
+        } else {
+            fillActionDropDown(actions);
+        }
+    }
+    async function InitializeCreateEvaluationPartRequest(serviceId) {
+        if (!serviceId) {
+            console.error("ServiceId is required");
+            redirectToDefault();
+            return;
+        }
+        const CreateEvaluationPartyService = await fu.fetchJSON(
+            `/FormRender/GetCreateEvaluationPartyService?serviceId=${encodeURIComponent(serviceId)}`
+        );
+
+        if (!CreateEvaluationPartyService) {
+            redirectToDefault();
+            return;
+        }
+
+        const serviceName =
+            (w.currentLang === "ar"
+                ? CreateEvaluationPartyService.nameAr
+                : CreateEvaluationPartyService.nameEn) || "";
+
+        const headerEl = document.getElementById("CreateRequestModalLabel");
+        if (headerEl) headerEl.textContent = serviceName ? " - " + serviceName : "";
+
+        const actions = CreateEvaluationPartyService.actions || [];
+
+        if (actions.filter(a => a.isInitialAction === true).length === 1) {
+            const firstAction = actions.find(
+                a => a.actionTypeBackEndKey !== ActionTypes.SaveAsDraft
+            );
+
+            initialAction = firstAction ? firstAction.bakendName : initialAction;
+
+            $("#ActionsDropDown").hide();
+            $("label[for='ActionsDropDown']").hide();
+
+            await RenderActionFields(CreateEvaluationPartyService.serviceRequestDTO);
         } else {
             fillActionDropDown(actions);
         }
@@ -126,7 +167,7 @@
 
     async function CheckCanCreateingDraft() {
         try {
-            const url = `/EvaluationPlanRequest/CheckCanCreateingDraft?planId=${PlanId}`;
+            const url = `/EvaluationPlanRequest/${DepartmentRouting}/CheckCanCreateingDraft?planId=${PlanId}`;
             const response = await jqClient().SyncGet(url);
             return response;
         } catch (e) {
@@ -136,7 +177,7 @@
 
     async function GetActionFields() {
         try {
-            let url = `/EvaluationPlanRequest/GetActionField?planId=${PlanId}`;
+            let url = `/EvaluationPlanRequest/${DepartmentRouting}/GetActionField?planId=${PlanId}`;
             if (initialAction) url += `&actionBackendKey=${encodeURIComponent(initialAction)}`;
             if (SchoolId) url += `&schoolId=${encodeURIComponent(SchoolId)}`;
 
@@ -185,6 +226,7 @@
     }
 
     w.InitializeCreatePlanRequest = InitializeCreatePlanRequest;
+    w.InitializeCreateEvaluationPartRequest = InitializeCreateEvaluationPartRequest;
     w.GetActionFields = GetActionFields;
     w.RenderActionFields = RenderActionFields;
     w.configureSchoolModal = configureSchoolModal;
@@ -194,7 +236,7 @@
     $(function () {
         PlanId = GetUrlParam("planId") || GetUrlParam("PlanId") || PlanId;
         SchoolId = GetUrlParam("schoolId") || GetUrlParam("SchoolId") || SchoolId;
-        InitializeCreatePlanRequest();
+        //InitializeCreatePlanRequest();
     });
 
 })(window, jQuery);

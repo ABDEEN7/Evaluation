@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Evaluation.API.Controllers
 {
 	[ApiController]
-	[Route("api/[controller]/[action]")]
+	[Route("api/[controller]/{depRouting}/[action]")]
 	public class FormRenderController : ControllerBase
 	{
 		private readonly ServiceRequestBL _serviceRequestBL;
@@ -39,7 +39,11 @@ namespace Evaluation.API.Controllers
 		{
 			return await _formRenderBL.GetCreatePlanService(serviceId);
 		}
-
+		[HttpGet]
+		public async Task<ServiceDTO> GetCreateEvaluationPartyService(Guid DepartementId, Guid serviceId)
+		{
+			return await _formRenderBL.GetCreateEvaluationPartyService(DepartementId, serviceId);
+		}
 		[HttpGet]
 		public async Task<List<ServiceDTO>> GetServicesWebApp(string? moduelName)
 		{

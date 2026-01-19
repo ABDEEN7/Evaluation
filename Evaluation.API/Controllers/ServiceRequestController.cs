@@ -17,7 +17,7 @@ using static Evaluation.SharedHelper.Enums.ConstantKeys;
 namespace Evaluation.API.Controllers
 {
 	[ApiController]
-	[Route("api/[controller]/[action]")]
+	[Route("api/[controller]/{depRouting}/[action]")]
 	public class ServiceRequestController : ControllerBase
 	{
 		private readonly ServiceRequestBL _serviceRequestBL;
@@ -42,7 +42,11 @@ namespace Evaluation.API.Controllers
 		{
 			return await _serviceRequestBL.GetApplicationDetailsAsync(requestId);
 		}
-
+		[HttpGet]
+		public async Task<EvaluationRequestDTO> GetEvaluationDetails(Guid requestId)
+		{
+			return await _serviceRequestBL.GetEvaluationDetailsAsync(requestId);
+		}
 		[HttpPost]
 		public async Task<ServiceRequestDTO> HandleRequest(
 			[FromForm] ActionFormDTO dto,

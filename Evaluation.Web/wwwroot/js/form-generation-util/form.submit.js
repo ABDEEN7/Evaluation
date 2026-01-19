@@ -19,9 +19,23 @@ window.serviceRequestForm = window.serviceRequestForm || {};
         const params = new URLSearchParams(window.location.search);
         return (params.get(key) || "").replace("#", "");
     };
+    const DisplayAlert = (msg, icon = null) => {
 
+        if (msg) {
+
+            if (icon && icon == 'success') {
+                notificationUtil.success(msg);
+            } else {
+                if (icon && icon == 'warning') {
+                    notificationUtil.warning(msg);
+                } else {
+                    notificationUtil.error(msg);
+                }
+            }
+        }
+    }
     const getRequestId = () => getUrlParam("id");
-    const getScholarshipId = () => getUrlParam("scholarshipId") || getUrlParam("schId");
+    const getPlanId = () => getUrlParam("PlanId") || getUrlParam("PlanId");
 
     const normalizeFormGroups = (formGroups) => {
         if (!formGroups) return [];
@@ -159,108 +173,116 @@ window.serviceRequestForm = window.serviceRequestForm || {};
             value: valuesMap[f.fieldId]
         }));
 
-        formData.append("RequestId", getRequestId());
-        const schId = getScholarshipId();
-        if (schId) {
-            formData.append("ScholarshipId", schId);
-        }
+        formData.append("requestId", getRequestId());
 
-        if (actionDetails?.actionId) {
-            formData.append("ActionId", actionDetails.actionId);
-        }
-        if (actionDetails?.actionType?.backEndName) {
-            formData.append("ActionType", actionDetails.actionType.backEndName);
-        }
+        formData.append("fieldValues", JSON.stringify(payloadFields));
 
-        formData.append("Fields", JSON.stringify(payloadFields));
+        // formData.append("users", JSON.stringify(assignUsers));
+
+         //formData.append("ActionRemarks", remarksValue);
 
         if (typeof fu.validateRemarks === "function") {
             const remarksOk = fu.validateRemarks(formData);
-            if (!remarksOk) {
-                return { formData, ok: false };
-            }
+            if (!remarksOk) return { formData, ok: false };
         }
 
         if (typeof fu.addAssignmentData === "function") {
-            const actionTypeName = actionDetails?.actionType?.backEndName;
+            const actionTypeName = actionDetails?.actionType?.backEndName || actionDetails?.bakendName || "";
             const assignOk = fu.addAssignmentData(formData, actionTypeName);
-            if (!assignOk) {
-                return { formData, ok: false };
-            }
+            if (!assignOk) return { formData, ok: false };
         }
 
         return { formData, ok: true };
     }
 
+
     // ================================
     // #region 🔹 submitAction
     // ================================
    
-    async function submitAction(actionDetails, formGroups, options = {}) {
-        const url = options.url || "/FormRender/PerformAction";
+    async function submitAction(actionDetails, formGroups, saveAsDraft) {
+        const baseUrl =  `/ServiceRequest/${DepartmentRouting}/HandleRequest`;
         const renderType = RENDER_TYPE.ACTION;
 
         const normalizedGroups = normalizeFormGroups(formGroups);
 
         const validationResult = validateAll(normalizedGroups, renderType);
-        if (!validationResult.isValid) {
-            return;
-        }
+        if (!validationResult.isValid) return;
 
         const { formData, ok } = buildFormData(actionDetails, normalizedGroups, renderType);
-        if (!ok) {
-            return;
-        }
+        if (!ok) return;
 
-        fu.coverSpin && fu.coverSpin(true);
+        const actionName =actionDetails?.bakendName ||"";
 
-        try {
-            const resp = await fetch(url, {
-                method: "POST",
-                body: formData
-            });
+        const planId = getPlanId();
 
-            if (!resp.ok) {
-                const text = await resp.text();
-                if (typeof options.onError === "function") {
-                    options.onError(text, resp);
-                } else {
-                    console.error("Submit error:", text);
-                    const msg = getText("lblDefaultValidationMessage");
-                    if (msg && typeof window.DisplayAlert === "function") {
-                        window.DisplayAlert(msg, "error");
-                    }
-                }
+        const serviceId =  actionDetails?.serviceId;
+        if (serviceId) formData.set("serviceId", serviceId);
+
+        formData.set("saveAsDraft", String(saveAsDraft));
+
+        const qs = new URLSearchParams();
+        qs.set("actionName", actionName);
+        if (planId) qs.set("planId", planId);
+
+        const postUrl = `${baseUrl}?${qs.toString()}`;
+
+        const successFunction = function (result) {
+            if (!result) {
+                DisplayAlert("Unexpected empty response.", "danger");
                 return;
             }
 
-            const data = await resp.json().catch(() => null);
+            if (window.requestId) {
+                window.tempFileStorage = {};
+                sharedFn().DisplayAlert('Form submitted successfully!', 'success');
+                setTimeout(() => {
+                    sharedUtility().RedirectToModuleOrDefault();
+                }, 1000);
+            } else {
+                let message = saveAsDraft
+                    ? uiControlsSetup().GetUiControlText('lblRequestSavedAsDraftSuccessfully')
+                    : uiControlsSetup().GetUiControlText('lblRequestCreatedSuccessfully');
 
-            if (typeof options.onSuccess === "function") {
-                options.onSuccess(data);
-            } else {
-                const successMsg = getText("lblActionSuccess");
-                if (successMsg && typeof window.DisplayAlert === "function") {
-                    window.DisplayAlert(successMsg, "success");
+                if (result.requestNumber) {
+                    message = message.replace('{requestNumber}', result.requestNumber);
                 }
-                if (data && data.redirectUrl) {
-                    window.location.href = data.redirectUrl;
-                }
+
+                notificationUtil.confirmation(
+                    {
+                        title: message,
+                        body: '',
+                        okText: uiControlsSetup().GetUiControlText('lblOk'),
+                        showCancelButton: false,
+                    },
+                    function () {
+                        sharedUtility().RedirectToModuleOrDefault();
+                    }
+                );
             }
-        } catch (err) {
-            console.error("Submit exception:", err);
-            if (typeof options.onError === "function") {
-                options.onError(err);
-            } else {
-                const msg = getText("lblDefaultValidationMessage");
-                if (msg && typeof window.DisplayAlert === "function") {
-                    window.DisplayAlert(msg, "error");
+        };
+
+        const errorFunction = function (xhr) {
+            try {
+                const response = xhr?.responseText ? JSON.parse(xhr.responseText) : null;
+                if (Array.isArray(response)) {
+                    showErrors(response);
+                } else {
+                    DisplayAlert(response?.message || "An unexpected error occurred.", 'danger');
                 }
+            } catch {
+                DisplayAlert("An unexpected error occurred.", 'danger');
             }
-        } finally {
-            fu.coverSpin && fu.coverSpin(false);
-        }
+        };
+
+        jqClient({})
+            .PostFormData(postUrl, formData)
+            .done(successFunction)
+            .fail(errorFunction);
     }
+
+
+
 
     // ================================
     // #region 🔹 Expose

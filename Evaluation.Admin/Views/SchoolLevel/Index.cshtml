@@ -1,0 +1,86 @@
+﻿@using Evaluation.Admin.Extensions
+@using static Evaluation.SharedHelper.Enums.ConstantKeys
+
+
+@model SchoolLevelVM
+@{
+
+    string Lang = Model.CurrentLanguage;
+    var uiControlItems = Model.UiControlItems.Where(x => x.RowOrder > 0).ToList();
+    var textDir = Lang == "ar" ? "RTL" : "LTR";
+    var permissionsList = Model.PermissionsList;
+    var controlsList = Model.ControlsList;
+    var settingList = Model.SettingList;
+    var containsOrderNo = Model.containsOrderNo;
+    var columnList = Model.UiControlItems.Where(x => x.Constraint.ShowInGrid == true).ToList();
+}
+@section Styles {
+   
+   
+}
+<section id="tbl-template-container" class="section-container">
+    <div class="card app-card">
+        <div class="card-header justify-content-end d-flex align-items-center bg-light">
+            @if (permissionsList.IsPermissionAvailabe(AdminPermission.ADD_ADMIN_SCHOOLLEVEL))
+            {
+                <button id="btn-add-content" type="button" class="btn btn-primary">
+                    <i class="fa fa-plus-circle"></i> &nbsp;@controlsList.GetUiControlText(AdminBackendUI.ADD_RECORD)
+                </button>
+            }
+
+        </div>
+        <div class="card-body">
+
+            <div id="view-container"></div>
+        </div>
+    </div>
+</section>
+
+<section class="display-none" id="form-section">
+    <div class="card app-card">
+        <form enctype="multipart/form-data" id="app-form">
+            <input id="Id" hidden />
+            <div class="card-header justify-content-end d-flex align-items-center bg-light"><div class="closeit">  <i class="fa fa-close"></i></div></div>
+            <div class="card-body">
+                @if (uiControlItems != null)
+                {
+                    <div class="row">
+                        @{
+                            @await Component.InvokeAsync("UiControlList", uiControlItems)
+                        }
+                    </div>
+                }
+
+
+                <div class="btns-group mb-0 mt-3" id="action-container">
+                    <button type="button" id="btn-back" class="btn btn-secondary">@controlsList.GetUiControlText(AdminBackendUI.BACK_BUTTON)</button>
+                    <button type="button" id="btn-submit" class="btn btn-primary">@controlsList.GetUiControlText(AdminBackendUI.SAVE_BUTTON)</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+
+@section Scripts {
+   
+  
+    
+    <script>
+         var controlsList = JSON.parse(`@Html.Raw(Json.Serialize(controlsList))`);
+         var columnList = @Html.Raw(Json.Serialize(columnList));
+        const settingList = JSON.parse(`@Html.Raw(Json.Serialize(settingList))`);
+         sharedFn().PopulateUiControl(controlsList);
+         var lang='@Lang';
+        let txtDir = '@textDir';
+        let containsOrderNo='@containsOrderNo';
+          const controlvalidationlist = @Html.Raw(Json.Serialize(uiControlItems));
+        let IsEdit='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.EDIT_ADMIN_SCHOOLLEVEL))';
+        let IsDelete='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.DELETE_ADMIN_SCHOOLLEVEL))';
+        let IsView='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.VIEW_ADMIN_SCHOOLLEVEL))';
+        let TableColumns = sharedFn().PopulateColumn(columnList);
+        sharedFn().InitializeControl(controlvalidationlist, settingList);
+
+   </script>
+    <script src="~/js/admin/SchoolLevel.js" asp-append-version="true"></script>
+    
+}

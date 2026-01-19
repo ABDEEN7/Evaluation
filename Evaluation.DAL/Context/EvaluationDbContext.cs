@@ -68,7 +68,6 @@ public partial class EvaluationDbContext : DbContext
     public virtual DbSet<OrgType> OrgTypes { get; set; }
     public virtual DbSet<Plan> Plans { get; set; }
     public virtual DbSet<PlanHistory> PlanHistory { get; set; }
-    public virtual DbSet<EvaluationRequest> EvaluationRequests { get; set; }
     public virtual DbSet<PlanStatus> PlanStatuses { get; set; }
     public virtual DbSet<EmailTemplate> EmailTemplates { get; set; }
     public virtual DbSet<EmailTemplateDocument> EmailTemplateDocuments { get; set; }
@@ -116,6 +115,8 @@ public partial class EvaluationDbContext : DbContext
     public virtual DbSet<DepartmentRoleAttributeValue> DepartmentRoleAttributeValue { get; set; }
     public virtual DbSet<FormItemRelated> FormItemRelated { get; set; }
     public virtual DbSet<NdaStatus> NdaStatus { get; set; }
+    public virtual DbSet<NdaStatusDepartment> NdaStatusDepartments { get; set; }
+    public virtual DbSet<Country> Countries { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -182,6 +183,22 @@ public partial class EvaluationDbContext : DbContext
             Assembly.GetExecutingAssembly()
             .GetTypes()
             .Where(t => t.IsClass && !t.IsAbstract && t.IsSubclassOf(baseType));
+
+        modelBuilder.Entity<FormItemRelated>(entity =>
+        {
+            entity.HasKey(x => new { x.FormItemId, x.RelatedItemId });
+
+            entity.HasOne(x => x.FormItem)
+                .WithMany(f => f.RelatedFrom)
+                .HasForeignKey(x => x.FormItemId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(x => x.RelatedItem)
+                .WithMany(f => f.RelatedTo)
+                .HasForeignKey(x => x.RelatedItemId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
         foreach (var type in derivedTypes)
         {
             modelBuilder.Entity(type).ToTable(type.Name + "s");
