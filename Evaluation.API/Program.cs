@@ -241,14 +241,10 @@ internal class Program
 
            
             app.MapControllers();
-			//app.MapControllerRoute(
-			//	name: "api_no_dep",
-			//	pattern: "api/{controller}/{action}/{id?}",
-			//	constraints: new { controller = "^(?!ServiceRequest$|EvaluationPlan$).+$" });
+			app.MapControllerRoute(
+			name: "default",
+			pattern: "api/{controller=Home}/{action=Index}/{id?}");
 
-			//app.MapControllerRoute(
-			//	name: "api_with_dep",
-			//	pattern: "api/{controller}/{depRouting}/{action}/{id?}");
 
 			app.Run();
         }
