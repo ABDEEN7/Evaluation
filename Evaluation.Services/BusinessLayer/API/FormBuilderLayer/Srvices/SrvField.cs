@@ -105,11 +105,11 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 		public async Task<List<Field>> GetFieldsByActionId(Guid actionId, Guid ServiceId)
 		{
 			// 1. Try to get the full list from cache
-			var data = cacheDataProvider.GetFromCache<List<Field>>(WebAppCacheTableName.CACHE_FIELDS);
+			var data =new List<Field>(); //cacheDataProvider.GetFromCache<List<Field>>(WebAppCacheTableName.CACHE_FIELDS);
 
 			// 2. If cache miss, fetch from DB and cache the result
-			if (data == null)
-			{
+			//if (data == null)
+			//{
 				using var scopedUow = serviceScopeFactory.CreateScopedUow();
 				var repository = scopedUow.GetRepository<Field>();
 
@@ -122,13 +122,14 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 				.Include(f => f.FieldViewConditions)
 				.Include(f => f.FieldAttributeValues)
 				.Include(f => f.MappingField)
-				.Where(x => x.ServiceId == ServiceId)
+				.Where(x => x.ServiceId == ServiceId )
+				.Where(X => X.ActionsStepsField!.Any(X => X.ServiceActionId == actionId))
 				.AsSplitQuery()
 				.AsNoTracking()
 				.ToListAsync();
 
 				await cacheDataProvider.SetToCache(WebAppCacheTableName.CACHE_FIELDS, data);
-			}
+			//}
 
 			return data;
 
