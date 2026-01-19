@@ -3,12 +3,12 @@ using Evaluation.DAL.Models.UserEntiy;
 
 namespace Evaluation.DAL.Models.BaseModule;
 
-public abstract class EntityBase :  IEntity
+public abstract class EntityBase : IEntity
 {
     public Guid Id { get; set; } = Guid.NewGuid();
-    public bool? IsActive { get; set; }
-    public Guid? CreateById { get; set; }
-    public MinistryUser? CreateBy { get; set; }
+    public bool IsActive { get; set; } = true;
+    public Guid CreateById { get; set; }
+    public MinistryUser CreateBy { get; set; }
     public DateTime CreateDate { get; set; }
     public Guid? UpdateById { get; set; }
     public MinistryUser? UpdateBy { get; set; }
@@ -16,7 +16,7 @@ public abstract class EntityBase :  IEntity
     public Guid? DeleteById { get; set; }
     public MinistryUser? DeleteBy { get; set; }
     public DateTime? DeleteDate { get; set; }
-    public bool? IsDeleted { get; set; }
+    public bool IsDeleted { get; set; } = false;
 }
 public interface IViewEntity<T>
 {
