@@ -33,7 +33,7 @@
 
     const evaluationRequestsListing = evaluationListing.createListing({
         tableId: 'evaluationRequestTable',
-        ajaxUrl: '/ServiceRequest/${DepartmentRouting}/GetEvaluationRequests',
+        ajaxUrl: `/ServiceRequest/${DepartmentRouting}/GetEvaluationRequests`,
         getFilterInput: getEvaluationRequestFilter,
 
         filterFormId: 'evaluation-request-filter-form-id',
@@ -54,13 +54,13 @@
                 render: function (data, type, row) {
 
                     if (row.StatusISOPen === false) {
-                        return ` <span class="badge bg-success-light fw-semibold br-0">
+                        return ` <span class="badge bg-success-light ms-auto me-2 fw-semibold br-0">
                                     <i class="la la-check fs-14"></i>
                                     مكتمل
                                 </span>`;
                     }
                     else
-                    return `<span class="badge bg-danger-light fw-semibold br-0">
+                        return `<span class="badge bg-danger-light ms-auto me-2 fw-semibold br-0">
                             <i class="las la-times fs-14"></i>
                             غير مكتمل
                         </span>`;

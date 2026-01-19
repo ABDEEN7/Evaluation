@@ -17,7 +17,7 @@
 </div>End Page Title -->
 
 
-<section id="evaluation" class="banner px-0 ">
+<section id="evaluation" class="banner px-0 pt-5 mt-5">
     <div class="container-fluid container-xxxl">
         <div class="row">
             <div class="col-lg-12">
@@ -95,39 +95,33 @@
     <div class="modal-dialog modal-fullscreen modal-dialog-scrollable">
         <div class="modal-content">
 
-            <div class="modal-header align-items-start border-0">
-                <div class="w-100">
-                    <div class="row align-items-start">
-                        <div class="col-md-9">
-                            <div class="d-flex gap-3 align-items-center mb-2 heading">
-                                <i class="la la-angle-left fs-32"></i>
-                                <div>
-                                    <h3 class="fw-bold m-0" id="evaluationRequestModalLabel"></h3>
+            <div class="modal-header align-items-start border-0 justify-content-between">
+               
+                    <div>
+                        <h4 class="fw-bold m-0" id="evaluationRequestModalLabel"></h4>
 
-                                    <nav aria-label="breadcrumb">
-                                        <ol class="breadcrumb">
-                                            <li class="breadcrumb-item">
-                                                <a href="#" id="breadcrumbSchoolName">مدرسة</a>
-                                            </li>
-                                            <li class="breadcrumb-item active" aria-current="page">
-                                                رقم الطلب:
-                                                <strong id="evaluationRequestNoText"></strong>
-                                            </li>
-                                        </ol>
-                                    </nav>
-                                </div>
-                            </div>
-                        </div>
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item">
+                                    <a href="#" id="breadcrumbSchoolName">مدرسة</a>
+                                </li>
+                                <li class="breadcrumb-item active" aria-current="page">
+                                    رقم الطلب:
+                                    <strong id="evaluationRequestNoText"></strong>
+                                </li>
+                            </ol>
+                        </nav>
+                    </div>
 
-                        <div class="col-md-3 d-flex justify-content-end align-items-start gap-2">
+                    <div class="d-flex justify-content-end align-items-center gap-3">
                             <div class="dropdown" id="actions-container"></div>
 
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
                                 <i class="la la-close mt-1"></i>
                             </button>
                         </div>
-                    </div>
-                </div>
+                   
+                
             </div>
 
             <div class="modal-body py-0">
@@ -199,52 +193,38 @@
     <div class="modal-dialog modal-fullscreen modal-dialog-scrollable">
         <div class="modal-content">
 
-            <div class="modal-header align-items-start border-0">
-                <div class="w-100">
+            <div class="modal-header align-items-start border-0 justify-content-between">
+                <div>
+                    <h4 class="modal-title fw-semibold mb-2">
+                        <span id="planRequestModalLabel"></span>
+                        <span class="text-muted"> - </span>
+                        <span class="text-primary">
+                            <i class="fas fa-file-alt me-1"></i>
+                            <span id="planRequestNoText"></span>
+                        </span>
+                    </h4>
 
-                    <div class="row align-items-start">
-                        <div class="col-md-9">
-                            <div class="d-flex gap-3 align-items-center mb-2 heading">
-                                <i class="la la-angle-left fs-32"></i>
-
-                                <div>
-                                    <h3 class="fw-bold m-0">
-                                        <span id="planRequestModalLabel"></span>
-                                        <span class="text-muted"> - </span>
-                                        <span class="text-primary">
-                                            <i class="fas fa-file-alt me-1"></i>
-                                            <span id="planRequestNoText"></span>
-                                        </span>
-                                    </h3>
-
-                                    <nav aria-label="breadcrumb">
-                                        <ol class="breadcrumb">
-                                            <li class="breadcrumb-item">
-                                                <a href="#">الخطط</a>
-                                            </li>
-                                            <li class="breadcrumb-item active" aria-current="page">
-                                                تفاصيل الطلب
-                                            </li>
-                                        </ol>
-                                    </nav>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-3 d-flex justify-content-end align-items-start gap-3">
-                            <h5 class="fw-semibold m-0" id="planRequestModalSubTitle"></h5>
-
-                            <div class="dropdown" id="plan-actions-container"></div>
-
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
-                                <i class="la la-close mt-1"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <h5 class="fw-semibold mt-2" id="planRequestModalDetailsLabel"></h5>
-
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item">
+                                <a href="#">الخطط</a>
+                            </li>
+                            <li class="breadcrumb-item active" aria-current="page">
+                                تفاصيل الطلب
+                            </li>
+                        </ol>
+                    </nav>
                 </div>
+                <div class="d-flex justify-content-end align-items-center gap-3">
+                    <h5 class="fw-semibold m-0" id="planRequestModalSubTitle"></h5>
+
+                    <div class="dropdown" id="plan-actions-container"></div>
+
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                        <i class="la la-close mt-1"></i>
+                    </button>
+                </div>
+                
             </div>
 
             <div class="modal-body py-0">
@@ -431,39 +411,26 @@
             <div class="modal-content">
 
                 <div class="modal-header align-items-start border-0">
-                    <div class="w-100">
+                    <div>
+                   
+                    <h4 class="modal-title fw-semibold mb-2" id="CreateRequestModalLabel">
+                        إنشاء طلب خطة تقييم
+                    </h4>
 
-                        <div class="row align-items-start">
-                            <div class="col-md-9">
-                                <div class="d-flex gap-3 align-items-center mb-2 heading">
-                                    <i class="la la-angle-left fs-32"></i>
-
-                                    <div>
-                                        <h3 class="fw-bold m-0" id="CreateRequestModalLabel">
-                                            إنشاء طلب خطة تقييم
-                                        </h3>
-
-                                        <nav aria-label="breadcrumb">
-                                            <ol class="breadcrumb">
-                                                <li class="breadcrumb-item"><a href="#">الخطط</a></li>
-                                                <li class="breadcrumb-item active" aria-current="page">إنشاء طلب</li>
-                                            </ol>
-                                        </nav>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-3 d-flex justify-content-end align-items-start gap-2">
-                                <button type="button"
-                                        class="btn-close"
-                                        data-bs-dismiss="modal"
-                                        aria-label="Close">
-                                    <i class="la la-close mt-1"></i>
-                                </button>
-                            </div>
-                        </div>
-
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="#">الخطط</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">إنشاء طلب</li>
+                        </ol>
+                        </nav>
                     </div>
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close">
+                        <i class="la la-close mt-1"></i>
+                    </button>
+                   
                 </div>
 
                 <div class="modal-body py-0">

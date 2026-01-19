@@ -1312,7 +1312,7 @@ var formGenerateFieldUtility = window.formUtility;
                 const maxColumns = Math.max(...rowFields.map(field => field.column));
 
                 for (let col = 1; col <= maxColumns; col++) {
-                    const colContainer = $('<div>').addClass(`colContainer col-md-${12 / maxColumns} mb-3`);
+                    const colContainer = $('<div>').addClass(`colContainer col-md-${12 / maxColumns}`);
                     const field = group.fields.find(field => field.column === col && field.row === row);
 
                     if (field) {
