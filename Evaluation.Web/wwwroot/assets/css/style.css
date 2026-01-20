@@ -205,6 +205,10 @@ button:focus:not(:focus-visible) {
     display: flex;
     align-items: center;
 }
+section, .section {
+    padding: 3rem 0;
+}
+
 /*--------------------------------------------------------------
 # Main Structure
 --------------------------------------------------------------*/
@@ -1105,3 +1109,404 @@ input:checked + .slider-small:before {
     .slider-small.round:before {
         border-radius: 50%;
     }
+
+/*--------------------------------------------------------------
+# Banner Section
+--------------------------------------------------------------*/
+.banner {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    margin-top: 90px;
+}
+
+    .banner img {
+        width: 100%;
+        height: 40vh; /* Adjust height */
+        object-fit: cover;
+        filter: brightness(70%); /* Dark overlay effect on image */
+    }
+
+.banner-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #fff;
+    text-align: center;
+    z-index: 2;
+    animation: fadeInUp 1s ease-in-out;
+}
+
+.banner h1 {
+    font-size: 2.3rem;
+    font-weight: 700;
+}
+
+.banner p {
+    font-size: 1.2rem;
+    margin-top: 10px;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -40%);
+    }
+
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%);
+    }
+}
+
+@media (max-width:1199px) {
+    .banner img {
+        height: auto;
+    }
+
+    .banner h1 {
+        font-size: 2rem;
+    }
+
+    .banner p {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width:768px) {
+    #header {
+        top: 10px;
+    }
+
+    .banner {
+        margin-top: 60px;
+    }
+
+        .banner img {
+            height: 26vh;
+        }
+
+    .banner-content {
+        animation: none;
+        left: 0;
+        transform: translate(0%, -50%);
+        right: 0;
+    }
+
+    .banner h1 {
+        font-size: 1.2rem;
+    }
+
+    .banner p {
+        font-size: 1rem;
+    }
+}
+
+main {
+    background-color: #F6F6F3;
+}
+/*--------------------------------------------------------------
+# Card & List View Section
+--------------------------------------------------------------*/
+
+/* Smooth layout transitions */
+/* @keyframes cardFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.fade-switch > [class*="col-md-"] {
+  transition: all 0.8s ease-in-out;
+}
+
+/* Fade-out for the container */
+.fade-switch.switching {
+    opacity: 0;
+    transform: scale(0.98);
+    transition: all 0.3s ease-in-out;
+}
+
+.fade-switch {
+    opacity: 1;
+    transform: scale(1);
+    transition: all 0.3s ease-in-out;
+    justify-content: center;
+}
+/* Individual card fade-in */
+/* .fade-in {
+  animation: cardFadeIn 0.4s ease-in-out forwards;
+} */
+/* Container fade animation */
+#viewTabs.nav-tabs {
+    border-bottom: 2px solid var(--color-grey);
+}
+
+    #viewTabs.nav-tabs .nav-item {
+        text-align: center;
+    }
+
+        #viewTabs.nav-tabs .nav-item button {
+            width: 100%;
+            background-color: transparent;
+            border: 0;
+            width: 100%;
+            color: var(--color-black);
+            border-bottom: 2px solid transparent;
+            font-size: 1.1rem;
+        }
+
+            #viewTabs.nav-tabs .nav-item button.active {
+                color: var(--color-primary);
+                background-color: transparent;
+                border-color: var(--color-primary);
+            }
+/* .fade-switch {
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+  } */
+.fade-switch.active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Card view styles */
+
+.card.item-card .card-icon {
+    background-color: rgba(241, 230, 229, 1);
+    border: 0;
+    display: flex;
+    width: 4rem;
+    height: 4rem;
+    border-radius: .250rem;
+    align-items: center;
+    justify-content: center;
+}
+
+.card-view .item-card.card .card-icon i {
+    color: var(--color-primary);
+    font-size: 1.5rem;
+}
+
+
+
+.card-view .item-card.card {
+    background-color: rgba(255, 254, 251, 1);
+    /* transition: all 0.4s  ease-out 0s; */
+    height: 100%;
+}
+
+.card-view .item-card .card-link {
+    border: 0;
+    /* transition: all 0.4s  ease-out 0s; */
+    font-weight: 600;
+}
+
+.card-view .item-card .card-body {
+    gap: 1rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.card-view .item-card .card-icon {
+    background-color: rgba(241, 230, 229, 1);
+    border: 0;
+    display: flex;
+    width: 4rem;
+    height: 4rem;
+    border-radius: .250rem;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    margin-bottom: 1rem;
+}
+
+.card-view .item-card.card .card-icon i {
+    color: var(--color-primary);
+    font-size: 1.5rem;
+}
+
+.card-view .item-card.card .card-body .card-content {
+    text-align: center;
+}
+
+.card-view .item-card.card .card-body h5 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    line-height: 1.5;
+}
+
+
+/* Card view Hover styles */
+
+.card-view .item-card.card:hover {
+    background-color: var(--color-primary);
+}
+
+    .card-view .item-card.card:hover .card-link a {
+        color: var(--color-white)
+    }
+
+.card-view .item-card:hover .card-icon {
+    background-color: var(--color-white);
+}
+
+.card-view .item-card.card:hover .card-body h5,
+.card-view .item-card.card:hover .card-body .card-text {
+    color: var(--color-white) !important;
+}
+
+
+/* List view styles */
+.list-view .item-card {
+    display: flex;
+    flex-direction: column;
+    /* transition: all 0.3s ease; */
+}
+
+    .list-view .item-card .card-link {
+        border: 0;
+        /* transition: all 0.4s  ease-out 0s; */
+        order: 1;
+        display: flex;
+        font-weight: 600;
+    }
+
+    .list-view .item-card.card .card-icon i {
+        color: var(--color-primary);
+        font-size: 1.5rem;
+    }
+    /* List view Hover styles */
+    .list-view .item-card.card:hover {
+        background-color: var(--color-primary);
+    }
+
+        .list-view .item-card.card:hover .card-link a {
+            color: var(--color-white)
+        }
+
+    .list-view .item-card .card-body {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+    }
+
+        .list-view .item-card .card-body .main-card {
+            display: flex;
+            gap: 1rem;
+        }
+
+    .list-view .item-card.card:hover .card-body h5,
+    .list-view .item-card.card:hover .card-body .card-text {
+        color: var(--color-white) !important;
+    }
+
+.toggle-btn.active {
+    background-color: var(--color-primary);
+    color: var(--color-white);
+}
+
+@media (max-width: 768px) {
+    .list-view .item-card .card-body .main-card {
+        flex-wrap: wrap;
+    }
+}
+
+.toggle-btns {
+    border: 1px solid var(--color-grey);
+    padding: 2px;
+    border-radius: .250rem;
+}
+
+    .toggle-btns button.btn.toggle-btn {
+        border-radius: .250rem !important;
+    }
+
+        .toggle-btns button.btn.toggle-btn i {
+            color: var(--color-text) !important
+        }
+
+        .toggle-btns button.btn.toggle-btn.active i {
+            color: var(--color-white) !important;
+        }
+
+/*--------------------------------------------------------------
+# Authentication Module
+--------------------------------------------------------------*/
+.login-wrapper {
+    height: 100vh;
+    padding-top: 90px;
+}
+
+.login-background {
+    position: relative;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+    .login-background img {
+        width: 100%;
+        object-fit: cover;
+    }
+
+.authen-overlay-content {
+    position: absolute;
+    bottom: 10%;
+    width: 100%;
+    left: 0;
+    right: 0;
+    text-align: center;
+}
+
+.login-wrapper i {
+    color: rgba(153, 153, 153, 1);
+    font-size: 1.5rem;
+}
+
+@media (max-width: 768px) {
+    .login-wrapper {
+        height: calc(100vh - 120px)
+    }
+}
+
+
+/*--------------------------------------------------------------
+# 125% to 200% Screen Resoutions
+--------------------------------------------------------------*/
+
+@media (min-resolution: 1.25dppx) and (max-resolution: 2dppx) {
+    .login-wrapper {
+        height: auto
+    }
+}
+
+
+/*--------------------------------------------------------------
+# Global Footer
+--------------------------------------------------------------*/
+
+.footer {
+    color: var(--color-white);
+    background-color: var(--contrast-color);
+    position: relative;
+}
+
+    .footer .copyright {
+        padding: 25px 0;
+        border-top: 1px solid color-mix(in srgb, var(--default-color), transparent 90%);
+    }
+
+        .footer .copyright p {
+            margin-bottom: 0;
+        }
+
+.modal-backdrop.show {
+    opacity: 0.75;
+}

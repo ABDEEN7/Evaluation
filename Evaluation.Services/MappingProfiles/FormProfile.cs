@@ -74,6 +74,8 @@ public class FormProfile : Profile
          .ForMember(d => d.Id, opt => opt.MapFrom(src => src.Id))
          .ForMember(d => d.Name, opt => opt.MapFrom(src => src.NameEn))
          .ForMember(d => d.MaxValue, opt => opt.MapFrom(src => src.MaxValue))
+         .ForMember(d => d.MinValue, opt => opt.MapFrom(src => src.MinValue))
+         .ForMember(d => d.ActualMatrixValue, opt => opt.MapFrom(src => src.ActualMatrixValue))
          .ReverseMap();
 
     }

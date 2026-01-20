@@ -84,14 +84,13 @@ namespace Evaluation.API.Middlewares
             await _next(context);
         }
 
-		private static readonly string[] ControllersWithDepRouting =
+        private static readonly string[] ControllersWithDepRouting =
         {
-			"ServiceRequest",
-			"FormRender",
-	        "Evaluation",
-            "Plan",
-            "PlanType",
-            "DepartmentHoliday",
+            "ServiceRequest",
+            "FormRender",
+            "Evaluation",
+            "EvaluationRequest",
+            "Form",
             "School"
         };
 		private bool EndpointRequiresDepRouting(HttpContext context)
