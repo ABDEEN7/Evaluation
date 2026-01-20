@@ -8,8 +8,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Evaluation.API.Controllers;
 
-[Route("api/[controller]/[action]")]
 [ApiController]
+[Route("api/[controller]/{depRouting}/[action]")]
+
 public class SchoolController : ControllerBase
 {
 

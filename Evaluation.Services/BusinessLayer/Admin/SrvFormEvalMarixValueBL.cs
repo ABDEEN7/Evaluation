@@ -27,7 +27,7 @@ namespace Evaluation.Services.Models.Admin
 
            
 
-            var list = await uow.GetRepository<FormEvalMarixValue>()
+            var list = await uow.GetRepository<FormEvalMatrixValue>()
                 .GetAllNonDeleted()
                 .Include(x => x.CreateBy)
                 .OrderBy(x => x.OrderNo)
@@ -47,7 +47,7 @@ namespace Evaluation.Services.Models.Admin
         {
 
 
-            FormEvalMarixValue obj = new FormEvalMarixValue();
+            FormEvalMatrixValue obj = new FormEvalMatrixValue();
 
                 obj.FormEvalMatrixId = message.FormEvalMatrixId;
                 obj.NameAr = message.NameAr;
@@ -58,7 +58,7 @@ namespace Evaluation.Services.Models.Admin
                 obj.DescEn = message.DescEn;
                 obj.IsActive = message.IsActive;
 
-                uow.GetRepository<FormEvalMarixValue>().Insert(obj);
+                uow.GetRepository<FormEvalMatrixValue>().Insert(obj);
             
             await uow.CommitAsync();
             var result = mapper.Map<FormEvalMarixValueDTO>(obj, opts => opts.Items["Language"] = _requestInfo.Lang);
@@ -78,7 +78,7 @@ namespace Evaluation.Services.Models.Admin
 
             if (message.Id is not null)
             {
-                FormEvalMarixValue obj = await uow.GetRepository<FormEvalMarixValue>()
+                FormEvalMatrixValue obj = await uow.GetRepository<FormEvalMatrixValue>()
                                       .GetAllNonDeleted()
                                       .Include(x => x.CreateBy)
                                       .Where(x => x.Id == message.Id)
@@ -93,7 +93,7 @@ namespace Evaluation.Services.Models.Admin
                 obj.DescEn = message.DescEn;
                 obj.IsActive = message.IsActive;
 
-                uow.GetRepository<FormEvalMarixValue>().Update(obj);
+                uow.GetRepository<FormEvalMatrixValue>().Update(obj);
 
                 await uow.CommitAsync();
                 result = mapper.Map<FormEvalMarixValueDTO>(obj, opts => opts.Items["Language"] = _requestInfo.Lang);
@@ -108,7 +108,7 @@ namespace Evaluation.Services.Models.Admin
             bool rtn = false;
 
             var updatedRows = from updatedItem in message
-                              join rowToUpdate in uow.GetRepository<FormEvalMarixValue>().GetAllNonDeleted() on updatedItem.Id equals rowToUpdate.Id
+                              join rowToUpdate in uow.GetRepository<FormEvalMatrixValue>().GetAllNonDeleted() on updatedItem.Id equals rowToUpdate.Id
                               select new { Row = rowToUpdate, updatedItem.OrderNo };
 
 
@@ -131,12 +131,12 @@ namespace Evaluation.Services.Models.Admin
             var result = new FormEvalMarixValueDTO();
                 if (Id is not null)
                 {
-                FormEvalMarixValue obj = await uow.GetRepository<FormEvalMarixValue>()
+                FormEvalMatrixValue obj = await uow.GetRepository<FormEvalMatrixValue>()
                                       .GetAllNonDeleted()
                                       .Where(x => x.Id == Id)
                                       .FirstAsync();
 
-                uow.GetRepository<FormEvalMarixValue>().Delete(obj);
+                uow.GetRepository<FormEvalMatrixValue>().Delete(obj);
                     await uow.CommitAsync();
                 result = mapper.Map<FormEvalMarixValueDTO>(obj, opts => opts.Items["Language"] = _requestInfo.Lang);
                 result.ResponseStatus = DBResult.Deleted;

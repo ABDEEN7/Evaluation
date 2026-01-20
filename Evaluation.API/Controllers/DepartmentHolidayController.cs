@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Evaluation.API.Controllers;
 
-[Route("api/[controller]/[action]")]
+	[Route("api/[controller]/{depRouting}/[action]")]
 [ApiController]
 public class DepartmentHolidayController : ControllerBase
 {
@@ -19,6 +19,11 @@ public class DepartmentHolidayController : ControllerBase
     public async Task<IActionResult> GetAllHolidayDepartments(int page = 1)
     {
         return Ok(await _masterBL.GetApiService<DepartmentHolidayBL>().GetDepartmentHolidayList(page));
+    }
+    [HttpGet]
+    public async Task<IActionResult> GetAllHolidayDepartmentsOrg()
+    {
+        return Ok(await _masterBL.GetApiService<DepartmentHolidayBL>().GetDepartmentHolidayList());
     }
     [HttpPost]
     public async Task<IActionResult> AddDepartmentHoliday(CreateDepartmentHolidayDto model)

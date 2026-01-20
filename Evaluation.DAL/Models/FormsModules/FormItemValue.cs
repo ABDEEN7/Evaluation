@@ -11,9 +11,11 @@ public class FormItemValue : EntityBase ,IAuditLogEntity
     public FormItem? FormItem { get; set; }
     public Guid UserId { get; set; }
     public MinistryUser? User { get; set; }
-    public Guid? DepEvalMatrixId { get; set; }
+    public Guid? DepEvalMatrixId { get; set; }   // Copy Matrid Id
     public DepEvalMatrix? DepEvalMatrix { get; set; }
-    public string? DepEvalMatrixValue { get; set; }
-    public decimal? Value { get; set; }
+    public Guid? FormEvalMatrixValueId { get; set; }
+    public FormEvalMatrixValue? FormEvalMatrixValue { get; set; }
+    public string? DepEvalMatrixValueName { get; set; }   // Copy Text of Matrix Name
+    public decimal? ActualValue { get; set; }
     public string? Note { get; set; }
 }

@@ -32,11 +32,12 @@ public class FormService(IServiceScopeFactory serviceScopeFactory,
             .GetByIdAsync(id);
     }
 
-    public async Task<List<FormEvalMarixValue>> GetFormEvalMatrixValues(Guid id)
+    public async Task<List<FormEvalMatrixValue>> GetFormEvalMatrixValues(Guid id)
     {
-        return await unitOfWork.GetRepository<FormEvalMarixValue>()
+        return await unitOfWork.GetRepository<FormEvalMatrixValue>()
             .GetAllActiveNonDeleted()
             .Where(x=>x.FormEvalMatrixId == id)
+            .OrderBy(x=>x.OrderNo)
             .ToListAsync();
     }
 
