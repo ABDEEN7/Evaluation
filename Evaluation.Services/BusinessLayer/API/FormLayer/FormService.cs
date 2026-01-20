@@ -37,6 +37,7 @@ public class FormService(IServiceScopeFactory serviceScopeFactory,
         return await unitOfWork.GetRepository<FormEvalMatrixValue>()
             .GetAllActiveNonDeleted()
             .Where(x=>x.FormEvalMatrixId == id)
+            .OrderBy(x=>x.OrderNo)
             .ToListAsync();
     }
 

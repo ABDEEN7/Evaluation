@@ -8,6 +8,11 @@ namespace Evaluation.Web.Controllers
 		{
 			return View();
 		}
-       
+
+        [HttpGet("Calendar")]
+        public IActionResult Calendar()
+        {
+            return View();
+        }
     }
 }

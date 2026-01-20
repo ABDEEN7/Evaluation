@@ -30,29 +30,32 @@ const createPlaceholderOption = (text = 'Please select') => {
 // ==============================
 // Accordion Builders
 // ==============================
-const generateAccordionItem = ({ id, title, icon, content, badge }) => `
-<div class="accordion-item mb-3 rounded">
-    <h2 class="accordion-header">
-        <button class="accordion-button collapsed" type="button"
-                data-bs-toggle="collapse"
-                data-bs-target="#${id}">
-            <div class="d-flex align-items-center gap-2 fs-18">
-                <i class="la ${icon} text-primary fs-25"></i>
-                <span class="fw-semibold">${escapeHtml(title)}</span>
-                ${badge ? `<span class="badge bg-success ms-2">${escapeHtml(badge)}</span>` : ''}
-            </div>
-        </button>
-    </h2>
-    <div id="${id}" class="accordion-collapse collapse">
-        <div class="accordion-body">${content}</div>
-    </div>
-</div>
-`;
+//const generateAccordionItem = ({ id, title, icon, content, badge }) => `
+//<div class="accordion-item mb-3 rounded">
+//    <h2 class="accordion-header">
+//        <button class="accordion-button collapsed" type="button"
+//                data-bs-toggle="collapse"
+//                data-bs-target="#${id}">
+//            <div class="d-flex align-items-center gap-2 fs-18">
+//                <i class="la ${icon} text-primary fs-25"></i>
+//                <span class="fw-semibold">${escapeHtml(title)}</span>
+//                ${badge ? `<span class="badge bg-success ms-2">${escapeHtml(badge)}</span>` : ''}
+//            </div>
+//        </button>
+//    </h2>
+//    <div id="${id}" class="accordion-collapse collapse">
+//        <div class="accordion-body">${content}</div>
+//    </div>
+//</div>
+//`;
 
 const generateFormAccordionItem = (rowsHtml, hasAnyNote) => `
 <div class="accordion-item mb-3 rounded">
     <div id="item3" class="accordion-collapse collapse show">
         <div class="accordion-body">
+        <div id="index-table" class="table table-bordered text-center align-middle"></div>
+
+
             <table class="table table-bordered text-center align-middle">
                 <thead class="table-grey">
                     <tr>
@@ -194,6 +197,45 @@ const generateTableBodyHtmlForRelatedItems = async (items, hasAnyNote) => {
     }).join('');
 };
 
+
+function buildHorizontalTable(data) {
+    const table = document.createElement("table");
+    table.border = "1";
+    table.style.borderCollapse = "collapse";
+
+    const nameRow = document.createElement("tr");
+    const rangeRow = document.createElement("tr");
+
+    // Row 1: Names
+    const nameCell = document.createElement("th");
+    nameCell.textContent = "Name";
+    nameCell.className = 'table-grey';
+    nameRow.appendChild(nameCell);
+
+    // Row 2: Range
+    const rangeCell = document.createElement("td");
+    rangeCell.textContent = `Range`;
+    rangeRow.appendChild(rangeCell);
+
+    data.forEach(item => {
+        // Row 1: Names
+        const nameCell = document.createElement("th");
+        nameCell.textContent = item.name;
+        nameCell.className = 'table-grey';
+        nameRow.appendChild(nameCell);
+
+        // Row 2: Min - Max
+        const rangeCell = document.createElement("td");
+        rangeCell.textContent = `(${item.minValue} - ${item.maxValue})`;
+        rangeRow.appendChild(rangeCell);
+    });
+
+    table.appendChild(nameRow);
+    table.appendChild(rangeRow);
+
+    return table;
+}
+
 // ==============================
 // Page Generator 
 // ==============================
@@ -274,6 +316,7 @@ const relatedItemPopup = (rowsHtml) => `<div class="modal fade" id="RealatedItem
 //</div>`;
 
 
+
 // ==============================
 // Initialize Controls
 // ==============================
@@ -335,6 +378,10 @@ async function initializeControls(formId, fieldId, controlValues) {
             populateForm(subItem.id, true)
         );
     });
+
+
+    document.getElementById("index-table")
+        .appendChild(buildHorizontalTable(matrixValues));
 }
 
 // ==============================
