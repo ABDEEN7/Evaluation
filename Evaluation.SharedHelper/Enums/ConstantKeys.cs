@@ -1061,6 +1061,7 @@ public static class ConstantKeys
         public const string Reject = "REJECT";
         public const string Info = "INFO";
         public const string Assign = "ASSIGN";
+        public const string ASSIGNT_TEAM = "ASSIGNT_TEAM";
         public const string CloseAndUpdate = "CLOSE_AND_UPDATE";
         public const string EDIT = "Edit";
         public const string RETURNBACK = "RETURNBACK";
