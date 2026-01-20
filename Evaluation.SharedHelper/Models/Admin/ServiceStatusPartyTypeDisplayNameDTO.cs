@@ -9,7 +9,7 @@
         public string PartyTypeNameAr { get; set; } = null!;
         public string TitleAr { get; set; } = null!;
         public string TitleEn { get; set; } = null!;
-        public bool? IsActive { get; set; }
+        public bool IsActive { get; set; }
 
     }
 }

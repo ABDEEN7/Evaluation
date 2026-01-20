@@ -230,13 +230,13 @@ public partial class EvaluationDbContext : DbContext
                 .Property<DateTime>(nameof(EntityBase.CreateDate))
                 .HasDefaultValueSql("getdate()");
             modelBuilder.Entity(entityType)
-                .Property<bool?>(nameof(EntityBase.IsActive))
-                .HasDefaultValueSql("1");
+                .Property<bool>(nameof(EntityBase.IsActive))
+                .HasDefaultValue(1);
             modelBuilder.Entity(entityType)
-                .Property<bool?>(nameof(EntityBase.IsDeleted))
-                .HasDefaultValueSql("0");
+                .Property<bool>(nameof(EntityBase.IsDeleted))
+                .HasDefaultValue(0);
             modelBuilder.Entity(entityType)
-                .Property<Guid?>(nameof(EntityBase.CreateById));
+                .Property<Guid>(nameof(EntityBase.CreateById));
             //.HasDefaultValueSql("'1'");
 
             if (!excludedTypeFromGlobalQuery.Contains(entityType))

@@ -5,9 +5,9 @@ namespace Evaluation.DAL.Models.Generic;
 public interface IEntity
 {
     public Guid Id { get; set; }
-    public bool? IsActive { get; set; }
-    public Guid? CreateById { get; set; }
-    public MinistryUser? CreateBy { get; set; }
+    public bool IsActive { get; set; }
+    public Guid CreateById { get; set; }
+    public MinistryUser CreateBy { get; set; }
     public DateTime CreateDate { get; set; }
     public Guid? UpdateById { get; set; }
     public MinistryUser? UpdateBy { get; set; }
@@ -15,7 +15,7 @@ public interface IEntity
     public Guid? DeleteById { get; set; }
     public MinistryUser? DeleteBy { get; set; }
     public DateTime? DeleteDate { get; set; }
-    public bool? IsDeleted { get; set; }
+    public bool IsDeleted { get; set; }
 }
 
 public interface IEntity<T>
@@ -23,7 +23,7 @@ public interface IEntity<T>
     public T Id { get; set; }
     public bool? IsActive { get; set; }
     public Guid CreateById { get; set; }
-    public MinistryUser? CreateBy { get; set; }
+    public MinistryUser CreateBy { get; set; }
     public DateTime CreateDate { get; set; }
     public Guid? UpdateById { get; set; }
     public MinistryUser? UpdateBy { get; set; }

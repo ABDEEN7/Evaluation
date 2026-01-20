@@ -59,11 +59,46 @@
         return `${year}-${month}-${day}`;
     };
 
-    const isHoliday = (date) => {
-        const dateStr = formatDateISO(date);
-        return ns.holidays.some(h => h.date === dateStr);
-    };
+    const isHoliday = (dateObj) => {
+        const dateStr = formatDateISO(dateObj);
 
+        return ns.holidays?.some(holiday => {
+            // First check if date is within the holiday's valid period
+            const holidayStartStr = formatDateISO(holiday.start);
+            const holidayEndStr = formatDateISO(holiday.end);
+
+            if (dateStr < holidayStartStr || dateStr > holidayEndStr) {
+                return false; // Date is outside the holiday period
+            }
+
+            if (holiday.isCron && holiday.cron) {
+                // For cron holidays, check if the date matches the cron pattern
+                return matchesCronExpression(dateObj, holiday.cron, holiday.start, holiday.end);
+            } else {
+                // For regular range holidays, if date is within start-end, it's a holiday
+                return true; // Already confirmed above that date is within range
+            }
+        }) || false;
+    };
+    const matchesCronExpression = (date, cronExpression, startDate, endDate) => {
+        const cronParts = cronExpression.trim().split(/\s+/);
+        if (cronParts.length >= 5) {
+            const dayOfWeekCron = cronParts[4];
+            if (dayOfWeekCron.includes(",")) {
+                const days = dayOfWeekCron.split(",").map(d => parseInt(d));
+                return days.includes(currentDayOfWeek);
+            } else if (dayOfWeekCron.includes("-")) {
+                // Range like "1-5" (Monday to Friday)
+                const [start, end] = dayOfWeekCron.split("-").map(d => parseInt(d));
+                return currentDayOfWeek >= start && currentDayOfWeek <= end;
+            }
+            else {
+                //single day
+                return parseInt(dayOfWeekCron) === currentDayOfWeek;
+            }
+            return false;
+        }
+    }
     // ================== PLAN FORM FIELD GENERATORS ==================
     // ✅ جميع الدوال تستقبل fieldId
 
@@ -513,6 +548,22 @@
             onDayCreate: function (dObj, dStr, fp, dayElem) {
                 if (isHoliday(dayElem.dateObj)) {
                     dayElem.classList.add('blocked');
+                    // Make the day non-clickable
+                    dayElem.classList.add('flatpickr-disabled');
+                    // Remove the click event
+                    dayElem.style.pointerEvents = 'none';
+                }
+            },
+            onChange: function (selectedDates, dateStr, instance) {
+                // Double-check on change (for manual input via allowInput)
+                if (selectedDates.length > 0) {
+                    const startDate = selectedDates[0];
+                    const endDate = selectedDates[selectedDates.length - 1];
+
+                    if (isHoliday(startDate) || (selectedDates.length > 1 && isHoliday(endDate))) {
+                        instance.clear();
+                        alert('لا يمكن البدء أو الانتهاء في يوم عطلة');
+                    }
                 }
             }
         };
