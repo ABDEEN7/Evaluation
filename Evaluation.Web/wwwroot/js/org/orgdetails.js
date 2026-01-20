@@ -1,4 +1,6 @@
 ﻿let orgDetails; 
+let departmentRoutePath = sharedUtility().extractDepartmentName();
+
 const options = {
     success: function (result) {
         orgDetails = result;
@@ -9,7 +11,7 @@ const options = {
 };
 
 async function GetSchoolDetails(guid) {
-    await jqClient(options).Get(`/Org/GetOrgDetails?OrgID=${guid}`);
+    await jqClient(options).Get(`/Org/${departmentRoutePath}/GetOrgDetails?OrgID=${guid}`);
 
     console.log(orgDetails);
 };
