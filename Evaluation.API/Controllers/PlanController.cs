@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Evaluation.API.Controllers;
 
-[Route("api/[controller]/[action]")]
+	[Route("api/[controller]/{depRouting}/[action]")]
 public class PlanController(MasterBL masterBL) : ControllerBase
 {
 
