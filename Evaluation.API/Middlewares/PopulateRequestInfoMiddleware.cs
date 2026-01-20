@@ -88,7 +88,6 @@ namespace Evaluation.API.Middlewares
         {
 			"ServiceRequest",
 			"FormRender",
-	        "Evaluation"
         };
 		private bool EndpointRequiresDepRouting(HttpContext context)
 		{

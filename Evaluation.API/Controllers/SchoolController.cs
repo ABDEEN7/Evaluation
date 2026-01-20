@@ -7,8 +7,7 @@ using Evaluation.SharedHelper.Dtos.SchoolDto;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Evaluation.API.Controllers;
-
-[Route("api/[controller]/{depRouting}/[action]")]
+[Route("api/[controller]/[action]")]
 [ApiController]
 public class SchoolController : ControllerBase
 {

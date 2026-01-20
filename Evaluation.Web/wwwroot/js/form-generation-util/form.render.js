@@ -82,62 +82,70 @@ window.serviceRequestForm = window.serviceRequestForm || {};
         const actionModalId = ctx.actionModalId || 'actionModal';
         const actionModalRoot = $('#' + actionModalId);
 
-        const url =
-            `/ServiceRequest/${DepartmentRouting}/GetActionField` +
-            `?ActionbackendKey=${encodeURIComponent(backendKey)}` +
-            `&requestId=${encodeURIComponent(requestId)}` +
-            `&serviceId=${encodeURIComponent(serviceId || "")}`;
+        serviceId = '97F03B5D-C45D-4F23-A1EA-DABE0678AE83';
+        requestId = 'C7DA6434-CA53-4F78-9D53-087E298B43C2';
 
-        jqClient({
-            success: function (response) {
+        const isEvaluationRequest = true;
 
-                const actionDetails = response?.actionCustom || null;
-                const stepsData = response?.actionCustom?.steps || [];
-                const dropdownsData = response?.dropDownValues || [];
-                const attachments = response?.schAttachments || [];
+            const url =
+                `/FormRender/${DepartmentRouting}/GetActionField` +
+                `?ActionbackendKey=${encodeURIComponent(backendKey)}` +
+                `&requestId=${encodeURIComponent(requestId)}` +
+            `&serviceId=${encodeURIComponent(serviceId || "")}`+
+                    `&isEvaluationRequest=${isEvaluationRequest}`;
 
-                if (attachments.length > 0) {
-                    formUtility.attachments = formUtility.attachments || [];
-                    formUtility.attachments.push(...attachments);
+
+            jqClient({
+                success: function (response) {
+
+                    const actionDetails = response?.actionCustom || null;
+                    const stepsData = response?.actionCustom?.steps || [];
+                    const dropdownsData = response?.dropDownValues || [];
+                    const attachments = response?.schAttachments || [];
+
+                    if (attachments.length > 0) {
+                        formUtility.attachments = formUtility.attachments || [];
+                        formUtility.attachments.push(...attachments);
+                    }
+
+                    if (Array.isArray(dropdownsData)) {
+                        window.dropdowns = window.dropdowns || [];
+                        window.dropDownTypeIds = window.dropDownTypeIds || [];
+
+                        dropdownsData.forEach(item => {
+                            const exists = dropdowns.some(x => x.id === item.id && x.dropDownTypeId === item.dropDownTypeId);
+                            if (!exists) dropdowns.push(item);
+                        });
+                    }
+
+                    if (actionDetails) {
+                        const lang = window.currentLang || "en";
+                        const actionName = lang === "ar" ? (actionDetails.nameAr || "") : (actionDetails.nameEn || "");
+
+                        actionModalRoot.find('#submitModalForm').text(actionName);
+                        actionModalRoot.find('#ActionModalTitle').text(actionName);
+
+                        if (typeof applyNotesToModal === "function") applyNotesToModal();
+                    }
+
+                    if (typeof renderActionView === "function") {
+                        renderActionView(modalContainer, stepsData, actionDetails);
+                    }
+
+                    actionModalRoot.modal('show');
+
+                    actionModalRoot
+                        .off('shown.bs.modal.redraw')
+                        .on('shown.bs.modal.redraw', function () {
+                            if (window.Tabulator?.findTable) {
+                                Tabulator.findTable(`#${actionModalId} .tabulator`).forEach(t => t.redraw(true));
+                            }
+                        });
+
+                    $('.modal-backdrop').remove();
                 }
-
-                if (Array.isArray(dropdownsData)) {
-                    window.dropdowns = window.dropdowns || [];
-                    window.dropDownTypeIds = window.dropDownTypeIds || [];
-
-                    dropdownsData.forEach(item => {
-                        const exists = dropdowns.some(x => x.id === item.id && x.dropDownTypeId === item.dropDownTypeId);
-                        if (!exists) dropdowns.push(item);
-                    });
-                }
-
-                if (actionDetails) {
-                    const lang = window.currentLang || "en";
-                    const actionName = lang === "ar" ? (actionDetails.nameAr || "") : (actionDetails.nameEn || "");
-
-                    actionModalRoot.find('#submitModalForm').text(actionName);
-                    actionModalRoot.find('#ActionModalTitle').text(actionName);
-
-                    if (typeof applyNotesToModal === "function") applyNotesToModal();
-                }
-
-                if (typeof renderActionView === "function") {
-                    renderActionView(modalContainer, stepsData, actionDetails);
-                }
-
-                actionModalRoot.modal('show');
-
-                actionModalRoot
-                    .off('shown.bs.modal.redraw')
-                    .on('shown.bs.modal.redraw', function () {
-                        if (window.Tabulator?.findTable) {
-                            Tabulator.findTable(`#${actionModalId} .tabulator`).forEach(t => t.redraw(true));
-                        }
-                    });
-
-                $('.modal-backdrop').remove();
-            }
-        }).Get(url);
+            }).Get(url);
+        
     };
 
 
@@ -176,7 +184,8 @@ window.serviceRequestForm = window.serviceRequestForm || {};
                         $('<a>', {
                             class: 'dropdown-item py-0',
                             href: '#',
-                            'data-backend': action.bakendName
+                            'data-backend': action.bakendName,
+                            'data-actionTypeBackEndKey': action.actionTypeBackEndKey
                         }).html(`<small>${action.title}</small>`)
                     )
                 );
@@ -186,6 +195,7 @@ window.serviceRequestForm = window.serviceRequestForm || {};
                 e.preventDefault();
 
                 const backendName = $(this).data('backend');
+                const actionTypeBackEndKey = $(this).data('actiontypebackendkey');
 
                 fetchAndRenderActionData(
                     backendName,
@@ -345,23 +355,44 @@ window.serviceRequestForm = window.serviceRequestForm || {};
 
   
     function renderActionView(elementId, formGroups, actionDetails) {
+
         const groups = normalizeFormGroups(formGroups);
         const $container = $("#" + elementId);
         $container.empty();
         $("#user-wrapper").empty();
 
         const lang = window.currentLang || "en";
-        const requestId = getRequestId();
-        const actionTypeName = actionDetails?.actionType?.backEndName;
+
+        const actionTypeName = actionDetails?.actionType?.titleEn;
+
+        const requestId = actionDetails?.requestId || getRequestId();
 
         if ([ACTION_TYPE.ASSIGN, ACTION_TYPE.Approve_And_Assign].includes(actionTypeName)) {
-            if (typeof window.renderPartyTypeFilter === "function") {
-                window.renderPartyTypeFilter(actionDetails.assignUsers);
-            }
-            if (typeof fu.renderAssignTable === "function") {
-                fu.renderAssignTable(actionDetails.assignUsers || []);
-            }
+            fu.renderAssignTable(actionDetails.assignUsers || []);
         }
+
+        // =============== ASSIGN TEAM ===============
+        if (actionTypeName === ACTION_TYPE.ASSIGNT_TEAM) {
+
+            assignmentsUtility.generateAssignments('assign');
+
+            const moveAndInit = () => {
+                const $wrapper = $('#assign_wrapper');
+                if (!$wrapper.length) return false;
+
+                $container.empty().append($wrapper);
+
+                assignmentsLogic.init('assign', requestId);
+                return true;
+            };
+
+            if (!moveAndInit()) {
+                setTimeout(() => moveAndInit(), 100);
+            }
+
+           // return; 
+        }
+        // ==========================================
 
         const formGroupsContainer = fu.renderFormGroups
             ? fu.renderFormGroups(groups, RENDER_TYPE.ACTION, actionTypeName)
@@ -401,9 +432,7 @@ window.serviceRequestForm = window.serviceRequestForm || {};
                 .on('click', (e) => {
                     e.preventDefault();
                     e.stopPropagation();
-
-                    ns.submitAction(actionDetails, groups,  saveAsDraft= true );
-                    
+                    ns.submitAction(actionDetails, groups, saveAsDraft = true);
                 });
 
             $buttonsWrapper.append($draftBtn);
@@ -412,8 +441,8 @@ window.serviceRequestForm = window.serviceRequestForm || {};
         const submitBtnOrContainer = generateSubmitButton(requestId, groups, actionDetails, false);
         $buttonsWrapper.append(submitBtnOrContainer);
 
-        if (elementId === "Action-container-fields" && $("#Action-container-button").length) {
-            const $btnContainer = $("#Action-container-button");
+        const $btnContainer = $("#Action-container-button");
+        if ($btnContainer.length) {
             $btnContainer.empty().append($buttonsWrapper);
         } else {
             $container.append($buttonsWrapper);
@@ -422,6 +451,7 @@ window.serviceRequestForm = window.serviceRequestForm || {};
         fu.initializeFieldsAndConditions &&
             fu.initializeFieldsAndConditions(groups, elementId, RENDER_TYPE.ACTION, actionTypeName);
     }
+
 
     // #endregion
 
