@@ -776,20 +776,55 @@ const sharedFn = (options) => {
                 }
 
                 if (item.tabulatorConfig) {
-                    const tabulatorConfigarray = JSON.parse(item.tabulatorConfig);
-                    tabulatorConfigarray.forEach(configItem => {
+                    const tabulatorConfigArray = JSON.parse(item.tabulatorConfig);
+                    tabulatorConfigArray.forEach(configItem => {
                         for (const key in configItem) {
+
+                            // Editor
                             if (key === "editor") {
-                                columnfield[key] = configItem[key] == "true" ? true : false;
-                            }
-                            else {
-                                columnfield[key] = configItem[key] == "customImageFormatter" ? customImageFormatter : configItem[key];
+                                columnfield.editor = configItem[key] == "true" ? true : configItem[key] == "false" ? false : configItem[key]; // "select", "input", etc.
                             }
 
-                           
+                            // Formatter
+                            else if (key === "formatter") {
+                                if (configItem[key] === "customImageFormatter") {
+                                    columnfield.formatter = customImageFormatter;
+                                } else if (configItem[key] === "lookup") {
+                                    // Lookup formatter for dropdowns
+                                    columnfield.formatter = function (cell) {
+                                        const valuesKey = columnfield.editorParams?.valuesKey;
+                                        return lookupSources[valuesKey]?.[cell.getValue()] || "";
+                                    };
+                                } else {
+                                    columnfield.formatter = configItem[key]; // built-in Tabulator formatter
+                                }
+                            }
+
+                            // Other properties
+                            else {
+                                columnfield[key] = configItem[key];
+                            }
                         }
                     });
                 }
+
+                // Special handling for DROPDOWN columns if editorParams are missing
+                if (item.controlType === "DROPDOWN") {
+                    if (columnfield.editor != undefined) {
+                        
+                        const keyName = columnfield.editorParams.valuesKey;
+                        columnfield.editorParams = {
+                            valuesKey: keyName,
+                            values: lookupSources[keyName]
+                        };
+                        columnfield.formatter = function (cell) {
+                            const valuesKey = columnfield.editorParams.valuesKey;
+                            return lookupSources[valuesKey]?.[cell.getValue()] || "";
+                        };
+                    }
+                    
+                }
+
 
 
                 if (item.controlType == "DATE") {

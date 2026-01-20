@@ -70,7 +70,41 @@ const deleteData = (id) => {
 
     });
 };
+function getlookup() {
+    
+    //const options = {
+    //    success: function (data) {
+    //        if (data) {
+    //            if (data && data.length > 0) {
+    //                if (isSearch) {
+    //                    table.setData([]).then(function () {
 
+    //                    });
+    //                    currentPage = 1;
+    //                }
+    //                table.addData(data).then(function () {
+    //                    setAllColumnWidths(table, columnWidths);
+    //                });
+    //                currentPage = currentPage + 1;
+    //                isLoading = false;
+    //            }
+    //        }
+    //    }
+    //};
+    //jqClientAdvanced(options).Get("Team/GetAllTeam".concat('?page=', currentPage));
+}
+const lookupSources = {
+    ScopeList: [
+        { id: 1, name: "Admin Scope" },
+        { id: 2, name: "HR Scope" },
+        { id: 3, name: "Finance Scope" }
+    ],
+    UserList: [
+        { id: 10, name: "John Doe" },
+        { id: 11, name: "Sara Ahmed" },
+        { id: 12, name: "Ali Hassan" }
+    ]
+};
 
 
 $(window).scroll(function () {
@@ -80,6 +114,8 @@ $(window).scroll(function () {
         }
     }
 });
+
+
 function ClearControlByPage() {
     $("#UserTeamScopeRelationbutton").hide();
     if (IsView_UserTeamScope == "True") {
@@ -191,7 +227,7 @@ $(document).ready(function () {
 
     dialogElem = commonUtil.createDailog({ dailogId: dailogId });
     loadData();
-
+    getlookup();
 
     $(`#${btnAddContentId}`).click(function (e) {
         sharedFn().ClearForm();
