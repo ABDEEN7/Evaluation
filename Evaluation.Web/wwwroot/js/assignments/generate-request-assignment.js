@@ -158,7 +158,6 @@ const assignmentsUtility = window.assignmentsUtility;
                 <div class="card-body">
                     ${generateSelectedTeamHeader(fieldId)}
                     ${generateSelectedTeamTable(fieldId)}
-                    ${generateSelectedTeamActions(fieldId)}
                 </div>
             </div>
         `;
