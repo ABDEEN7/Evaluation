@@ -1,6 +1,6 @@
 ﻿namespace Evaluation.DAL.Dtos;
 
-public class DepartmentHolidayDto
+public class    DepartmentHolidayDto
 {
     public Guid Id { get; set; }
     public string NameAr { get; set; }

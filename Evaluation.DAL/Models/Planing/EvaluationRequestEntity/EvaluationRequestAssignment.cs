@@ -24,6 +24,6 @@ namespace Evaluation.DAL.Models.Planing.EvaluationRequestEntity
         public NdaStatus? NdaStatus { get; set; }
         public DateTime? NdaDate { get; set; }
         public string? Note { get; set; }
-
+        public ICollection<EvalRequestAssignmentScope>? EvalRequestAssignmentScopies { get; set; }
     }
 }

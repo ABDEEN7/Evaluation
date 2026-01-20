@@ -1,4 +1,6 @@
-﻿using Evaluation.DAL.Helper;
+﻿using Azure.Core;
+using Evaluation.DAL.Helper;
+using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
 using Evaluation.DAL.Models.ServiceRequestEntities;
 using Evaluation.Services.BusinessLayer;
 using Evaluation.Services.BusinessLayer.API;
@@ -8,10 +10,13 @@ using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Api.ActionEntitiesDTOs;
 using Evaluation.SharedHelper.Models.Api.AttachmentsDTOs;
+using Evaluation.SharedHelper.Models.Api.EvaluationRequestEntities;
 using Evaluation.SharedHelper.Models.Api.FormBuilderDTO;
 using Evaluation.SharedHelper.Models.Api.ServiceRequestEntitiesDTO;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
+using System.Net.Mail;
 using static Evaluation.SharedHelper.Enums.ConstantKeys;
 
 namespace Evaluation.API.Controllers
@@ -80,7 +85,12 @@ namespace Evaluation.API.Controllers
 		{
 			return await _serviceRequestBL.GetAttachmentUrlAsync(attachmentId, requestId, schId);
 		}
-
+		[HttpPost]
+		public async Task<IActionResult> ApproveNda([FromBody] NdaApproveRequest dto)
+		{
+			var result = await _serviceRequestBL.ApproveNda(dto);
+			return Ok(result);
+		}
 	}
 
 }
