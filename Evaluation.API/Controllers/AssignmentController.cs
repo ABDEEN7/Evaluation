@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Evaluation.API.Controllers;
 
-[Route("api/[controller]/[action]")]
+[Route("api/[controller]/{depRouting}/[action]")]
 public class AssignmentController : ControllerBase
 {
     private readonly MasterBL _masterBl;
