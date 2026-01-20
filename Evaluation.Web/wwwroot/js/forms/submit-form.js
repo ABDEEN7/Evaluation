@@ -1,4 +1,5 @@
-﻿
+﻿let departmentRoutePath = sharedUtility().extractDepartmentName();
+
 $(document).ready(function () {
     $("#btnSubmitForm").on("click", function (e) {
         e.preventDefault();
@@ -84,7 +85,7 @@ function evaluationFormResult() {
 
 function submitForm() {
     var result = evaluationFormResult();
-    jqClient().Post("/Form/SaveEvaluationForm", result)
+    jqClient().Post(`/Form/${departmentRoutePath}/SaveEvaluationForm`, result)
         .done((res) => {
             Swal.fire({
                 icon: "success",

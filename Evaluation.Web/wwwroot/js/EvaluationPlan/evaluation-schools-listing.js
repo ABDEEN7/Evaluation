@@ -10,10 +10,11 @@
             //DepartmentRoutingPath: departmentName
         };
     }
+    let departmentRoutePath = sharedUtility().extractDepartmentName();
 
     const schoolsListing = evaluationListing.createListing({
         tableId: 'schoolTable',
-        ajaxUrl: '/School/GetSchools',
+        ajaxUrl: `/School/${departmentRoutePath}/GetSchools`,
         getFilterInput: getSchoolFilterInput,
         filterFormId: 'school-filter-form-id',
         filterBtnId: 'filterSchoolBtnId',

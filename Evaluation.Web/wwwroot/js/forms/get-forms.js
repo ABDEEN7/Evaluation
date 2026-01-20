@@ -2,6 +2,8 @@
 // Globals & Constants
 // ==============================
 const params = new URLSearchParams(window.location.search);
+let departmentRoutePath = sharedUtility().extractDepartmentName();
+
 //const FORM_ID = params.get('formId');
 
 let matrixValues = [];
@@ -241,7 +243,7 @@ function buildHorizontalTable(data) {
 // ==============================
 const generateFullFormPageHtml = async ({ formId, fieldId, readOnly }) => {
     var formId ='b8fb67a9-b09a-4e0c-a466-d0625d92521d'
-    itemsResult = await jqClient().Get(`/Form/GetItems?formId=${formId}`);
+    itemsResult = await jqClient().Get(`/Form/${departmentRoutePath}/GetItems?formId=${formId}`);
     const items = itemsResult?.value ?? [];
 
     const hasAnyNote = items.some(i => i.hasNote);
@@ -322,7 +324,7 @@ const relatedItemPopup = (rowsHtml) => `<div class="modal fade" id="RealatedItem
 // ==============================
 async function initializeControls(formId, fieldId, controlValues) {
     var formId = 'b8fb67a9-b09a-4e0c-a466-d0625d92521d'
-    const matrixResponse = await jqClient().Get(`/Form/GetFormEvalMarixValues?formId=${formId}`);
+    const matrixResponse = await jqClient().Get(`/Form/${departmentRoutePath}/GetFormEvalMarixValues?formId=${formId}`);
 
     const items = itemsResult?.value ?? [];
     const matrixValues = matrixResponse?.value ?? matrixResponse ?? [];
