@@ -205,7 +205,17 @@ function buildHorizontalTable(data) {
 
     const nameRow = document.createElement("tr");
     const rangeRow = document.createElement("tr");
-    const valueRow = document.createElement("tr");
+
+    // Row 1: Names
+    const nameCell = document.createElement("th");
+    nameCell.textContent = "Name";
+    nameCell.className = 'table-grey';
+    nameRow.appendChild(nameCell);
+
+    // Row 2: Range
+    const rangeCell = document.createElement("td");
+    rangeCell.textContent = `Range`;
+    rangeRow.appendChild(rangeCell);
 
     data.forEach(item => {
         // Row 1: Names
@@ -218,16 +228,10 @@ function buildHorizontalTable(data) {
         const rangeCell = document.createElement("td");
         rangeCell.textContent = `(${item.minValue} - ${item.maxValue})`;
         rangeRow.appendChild(rangeCell);
-
-        // Row 3: Actual Matrix Value
-        const valueCell = document.createElement("td");
-        valueCell.textContent = item.actualMatrixValue;
-        valueRow.appendChild(valueCell);
     });
 
     table.appendChild(nameRow);
     table.appendChild(rangeRow);
-    table.appendChild(valueRow);
 
     return table;
 }
