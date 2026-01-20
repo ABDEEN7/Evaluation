@@ -1,7 +1,7 @@
-﻿let schoolDetails; 
+﻿let orgDetails; 
 const options = {
     success: function (result) {
-     schoolDetails = result;
+        orgDetails = result;
     },
     error: function () {
 
@@ -9,9 +9,9 @@ const options = {
 };
 
 async function GetSchoolDetails(guid) {
-    await jqClient(options).Get(`/School/GetSchoolDetails?SchoolID=${guid}`);
+    await jqClient(options).Get(`/Org/GetOrgDetails?OrgID=${guid}`);
 
-    console.log(schoolDetails);
+    console.log(orgDetails);
 };
 
 async function initSchoolDetailsPage(guid) {
