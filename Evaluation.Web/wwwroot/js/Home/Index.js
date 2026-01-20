@@ -107,10 +107,12 @@ function renderDepartmentsTable(departments) {
         return acc;
     }, {});
 
-    // Helper: render a department card
+    // Helper: render a department card  <img src="${item.imgBlobUrl}"/>
     const createDepartmentCard = (item) => `
         <div class="col-md-4 mb-4">
-            <div class="card item-card shadow-sm border-0">
+            <div class="card item-card shadow-sm border-0"
+            onclick="window.location.href='/evaluationplan/${item.routingPath}'"
+            style="cursor: pointer;">
                 <div class="card-body">
                     <div class="card-link"><a href="#">${item.name}</a></div>
                     <div class="main-card">

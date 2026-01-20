@@ -17,9 +17,9 @@ namespace Evaluation.SharedHelper.Models
         public string? UpdateBy { get; set; }
         public string? UpdateDate { get; set; }
 
-        public bool? IsActive { get; set; }
+        public bool IsActive { get; set; }
 
-        public bool? IsDeleted { get; set; }
+        public bool IsDeleted { get; set; }
 
         public DBResult ResponseStatus { get; set; }
         public string? ResponseMessage { get; set; }

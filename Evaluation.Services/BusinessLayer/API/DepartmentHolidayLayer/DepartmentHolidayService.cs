@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.Calendars;
+using Evaluation.DAL.Models.DepartementEntites;
 using Evaluation.DAL.Repositories;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Models;
@@ -26,6 +27,27 @@ public class DepartmentHolidayService(IServiceScopeFactory serviceScopeFactory,
                 .OrderByDescending(x => x.CreateDate)
                  .Skip(Page * 20)
                 .Take(20)
+                .ToListAsync();
+        return list;
+    }
+    public async Task<List<DepartmentHoliday>> GetDepartmentHolidayList()
+    {
+        var departmentId = unitOfWork
+            .GetRepository<Department>()
+            .GetAllActiveNonDeleted(x => x.UserDepartments.Any(x => x.UserId == userInfo.UserId))
+            .Select(x => x.Id)
+            .FirstOrDefault();
+
+        var academicYearId = unitOfWork
+            .GetRepository<AcademicYear>()
+            .GetAllActiveNonDeleted(x => x.DepartmentId == departmentId && x.IsCurrent)
+            .Select(s => s.Id)
+            .FirstOrDefault();
+
+        var list = await unitOfWork.GetRepository<DepartmentHoliday>()
+                .GetAllNonDeleted(x => x.AcademicYearId == academicYearId)
+                .Include(x => x.CreateBy)
+                .OrderByDescending(x => x.CreateDate)
                 .ToListAsync();
         return list;
     }

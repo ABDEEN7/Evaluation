@@ -109,7 +109,13 @@
 
     const loadVacationDays = () =>
         jqClient().Get(API_ENDPOINTS.GET_VACATION_DATES)
-            .then(r => ns.holidays = (r?.result || []).map(x => ({ date: x.date })));
+            .then(r => ns.holidays = (r || []).map(x =>
+            ({
+                start: new Date(x.startDate),
+                end: new Date(x.endDate),
+                isCron: x.isCronExpression,
+                cron: x.cronExpression
+            })));
 
     const loadPlanData = async (fieldId, planId) => {
         const r = await jqClient().Get(`${API_ENDPOINTS.GET_PLAN_DETAILS}/${planId}`);
