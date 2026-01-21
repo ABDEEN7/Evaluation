@@ -22,7 +22,8 @@ public class DepartmentService(IServiceScopeFactory serviceScopeFactory,
     public async Task<Department> GetDepartmentById(Guid Id)
     {
         var department = await unitOfWork.GetRepository<Department>()
-            .GetAllActiveNonDeleted().Include(d => d.Category)
+            .GetAllActiveNonDeleted()
+            //.Include(d => d.Category)
             .Where(d => d.Id == Id).FirstOrDefaultAsync();
         return department;
     }
@@ -31,7 +32,7 @@ public class DepartmentService(IServiceScopeFactory serviceScopeFactory,
         var departments = await unitOfWork.GetRepository<Department>()
             .GetAllActiveNonDeleted()
             .Include(d => d.WebsiteAttachment)
-            .Include(d=>d.Category)
+            //.Include(d=>d.Category)
             .ToListAsync();
         return departments;
     }

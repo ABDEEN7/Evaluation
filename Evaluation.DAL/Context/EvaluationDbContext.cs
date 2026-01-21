@@ -6,6 +6,7 @@ using Evaluation.DAL.Models.BaseModule;
 using Evaluation.DAL.Models.Calendars;
 using Evaluation.DAL.Models.DepartementEntites;
 using Evaluation.DAL.Models.EvalResult;
+using Evaluation.DAL.Models.FormBuilder;
 using Evaluation.DAL.Models.FormsModules;
 using Evaluation.DAL.Models.Master;
 using Evaluation.DAL.Models.Org;
@@ -117,6 +118,8 @@ public partial class EvaluationDbContext : DbContext
     public virtual DbSet<NdaStatus> NdaStatus { get; set; }
     public virtual DbSet<NdaStatusDepartment> NdaStatusDepartments { get; set; }
     public virtual DbSet<Country> Countries { get; set; }
+    public virtual DbSet<DepTargetOrgTree> DepTargetOrgTree { get; set; }
+    public virtual DbSet<CssClass> CssClass { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
