@@ -179,10 +179,10 @@ namespace Evaluation.Services.Models.Admin
                 .AnyAsync(x => x.Id == orgTreeId))
                 throw new BusinessException(ConstantKeys.ExceptionMessage.OrgTreeExistsSchool);
 
-            if (await uow.GetRepository<Department>()
-                .GetAllNonDeleted()
-                .AnyAsync(x => x.TargetOrgTreeId == orgTreeId))
-                throw new BusinessException(ConstantKeys.ExceptionMessage.OrgTreeExistsDepartment);
+            //if (await uow.GetRepository<Department>()
+            //    .GetAllNonDeleted()
+            //    .AnyAsync(x => x.TargetOrgTreeId == orgTreeId))
+            //    throw new BusinessException(ConstantKeys.ExceptionMessage.OrgTreeExistsDepartment);
 
             if (await uow.GetRepository<EvaluationRequest>()
                 .GetAllNonDeleted()

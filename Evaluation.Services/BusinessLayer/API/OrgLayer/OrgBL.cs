@@ -26,23 +26,23 @@ public class OrgBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider c
             throw new Exception("Department doesn't exist!");
         
         var orgDetails = new OrgDetailsDto();
-        switch (department.Category?.BackendName)
-        {
-            case "SCHOOL":
-                var school = await schoolRepository.GetSchoolDetails(Id);
-                var schoolManager = await employeeService.GetEmployee(school.ManagerQID);
-                orgDetails =  mapper.Map<OrgDetailsDto>(await schoolRepository.GetSchoolDetails(Id));
-                orgDetails.ManagerName = schoolManager?.NameEn;
-                break;
-            case "EMPLOYEE":
-                orgDetails =  mapper.Map<OrgDetailsDto>(await employeeService.GetEmployeeById(Id));
-                break;
-            case "ORGANIZATION":
-                orgDetails =  mapper.Map<OrgDetailsDto>(await organizationService.GetOrganizationById(Id));
-                break;
-            case "ORG_SELF":
-                break;
-        }
+        //switch (department.Category?.BackendName)
+        //{
+        //    case "SCHOOL":
+        //        var school = await schoolRepository.GetSchoolDetails(Id);
+        //        var schoolManager = await employeeService.GetEmployee(school.ManagerQID);
+        //        orgDetails =  mapper.Map<OrgDetailsDto>(await schoolRepository.GetSchoolDetails(Id));
+        //        orgDetails.ManagerName = schoolManager?.NameEn;
+        //        break;
+        //    case "EMPLOYEE":
+        //        orgDetails =  mapper.Map<OrgDetailsDto>(await employeeService.GetEmployeeById(Id));
+        //        break;
+        //    case "ORGANIZATION":
+        //        orgDetails =  mapper.Map<OrgDetailsDto>(await organizationService.GetOrganizationById(Id));
+        //        break;
+        //    case "ORG_SELF":
+        //        break;
+        //}
 
         return orgDetails;
     }

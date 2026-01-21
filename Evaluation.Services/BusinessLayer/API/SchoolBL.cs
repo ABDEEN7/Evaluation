@@ -59,49 +59,49 @@ public class SchoolBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvide
     //    var result = await schoolRepository.GetSchoolsAsync(request);
     //    return mapper.Map<PaginatedResult<ResponseSchools>>(result);
     //}
-    public async Task<PaginatedResult<ResponseSchoolsPlans>> GetSchoolsPlan(SchoolRequest request)
-    {
-        Department? department = GetAcademicYear();
-        int? academicYear = await GetCurrentAcademicYear(department);
-        Guid? targetOrgTreeId = department.TargetOrgTreeId;
-        List<Guid> currentOrgTree = await GetCurrentOrgTree(department, academicYear);
+    //public async Task<PaginatedResult<ResponseSchoolsPlans>> GetSchoolsPlan(SchoolRequest request)
+    //{
+    //    Department? department = GetAcademicYear();
+    //    int? academicYear = await GetCurrentAcademicYear(department);
+    //    //Guid? targetOrgTreeId = department.TargetOrgTreeId;
+    //    List<Guid> currentOrgTree = await GetCurrentOrgTree(department, academicYear);
 
-        PaginatedResult<ResponseSchoolsPlans> response;
-        switch (department.Category?.BackendName)
-        {
-            case DepartmentCateogry.Schools:
-                {
-                    var result = await schoolRepository.GetSchoolsAsync(request, targetOrgTreeId, currentOrgTree);
-                    response = mapper.Map<PaginatedResult<ResponseSchoolsPlans>>(result);
-                    break;
-                }
+    //    PaginatedResult<ResponseSchoolsPlans> response;
+    //    //switch (department.Category?.BackendName)
+    //    //{
+    //    //    case DepartmentCateogry.Schools:
+    //    //        {
+    //    //            var result = await schoolRepository.GetSchoolsAsync(request, targetOrgTreeId, currentOrgTree);
+    //    //            response = mapper.Map<PaginatedResult<ResponseSchoolsPlans>>(result);
+    //    //            break;
+    //    //        }
 
-            case DepartmentCateogry.Employee:
-                {
-                    var result = await employeeService.GetEmployeeAsync(request, targetOrgTreeId, currentOrgTree);
-                    response = mapper.Map<PaginatedResult<ResponseSchoolsPlans>>(result);
-                    break;
-                }
-            case DepartmentCateogry.Orgnization:
-                {
-                    var result = await orgnizationService.GetOrgnizationAsync(request, targetOrgTreeId, currentOrgTree);
-                    response = mapper.Map<PaginatedResult<ResponseSchoolsPlans>>(result);
-                    break;
-                }
+    //    //    case DepartmentCateogry.Employee:
+    //    //        {
+    //    //            var result = await employeeService.GetEmployeeAsync(request, targetOrgTreeId, currentOrgTree);
+    //    //            response = mapper.Map<PaginatedResult<ResponseSchoolsPlans>>(result);
+    //    //            break;
+    //    //        }
+    //    //    case DepartmentCateogry.Orgnization:
+    //    //        {
+    //    //            var result = await orgnizationService.GetOrgnizationAsync(request, targetOrgTreeId, currentOrgTree);
+    //    //            response = mapper.Map<PaginatedResult<ResponseSchoolsPlans>>(result);
+    //    //            break;
+    //    //        }
 
-            default:
-                throw new BusinessException("Unsupported department category");
-        }
+    //    //    default:
+    //    //        throw new BusinessException("Unsupported department category");
+    //    //}
 
-        return response;
-    }
+    //    return response;
+    //}
 
     private Department GetAcademicYear()
     {
         var department = uow.
                     GetRepository<Department>()
                     .GetAllActiveNonDeleted(x => x.Id == new Guid("B3726A76-83B6-4EF9-B2B2-E74EC5FCC819"))
-                    .Include(x => x.Category)
+                    //.Include(x => x.Category)
                     .FirstOrDefault();
         if (department == null)
             throw new Exception();
@@ -132,7 +132,7 @@ public class SchoolBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvide
     }
     private async Task<List<Guid>> GetCurrentOrgTree(Department department, int? academicYear)
        => await uow.GetRepository<OrgAcademicYear>()
-                                           .GetAllActiveNonDeleted(x => x.Year == academicYear && x.ParentOrgTreeId == department.TargetOrgTreeId)
+                                           .GetAllActiveNonDeleted(x => x.Year == academicYear )
                                            .Select(x => x.OrgTreeId)
                                            .ToListAsync();
 
