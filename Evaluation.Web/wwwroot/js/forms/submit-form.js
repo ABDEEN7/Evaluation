@@ -10,7 +10,7 @@ $(document).ready(function () {
 $(document).ready(function () {
     $("#btnSaveForm").on("click", function (e) {
         e.preventDefault();
-        saveForm();
+        validateForm();
     });
 });
 function evaluationFormResult() {
@@ -94,6 +94,17 @@ function submitForm() {
             });
         });
 }
+function validateForm() {
+    var result = evaluationFormResult();
+    jqClient().Post("/Form/ValidateEvaluationForm", result)
+        .done((res) => {
+
+            if (res.value.isValid) {
+                saveForm();
+            }
+        });
+}
+
 
 function saveForm() {
   return evaluationFormResult();
