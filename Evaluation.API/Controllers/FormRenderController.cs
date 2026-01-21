@@ -101,9 +101,9 @@ namespace Evaluation.API.Controllers
 			[FromQuery] Guid serviceId,
 			[FromQuery] string actionBackendKey,
 			[FromQuery] Guid? requestId = null,
-			[FromQuery] Guid? scholarshipId = null)
+			[FromQuery] Guid? planId = null, bool isEvaluationRequest = false)
 		{
-			return await _formRenderBL.GetActionFieldAsync(serviceId, actionBackendKey, requestId, scholarshipId);
+			return await _formRenderBL.GetActionFieldAsync(serviceId, actionBackendKey, requestId, planId, isEvaluationRequest);
 		}
 	}
 }

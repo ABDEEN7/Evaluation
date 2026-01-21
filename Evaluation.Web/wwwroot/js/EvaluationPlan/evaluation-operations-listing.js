@@ -1,6 +1,25 @@
 ﻿$(document).ready(function () {
     var DepartmentRouting = sharedUtility().extractDepartmentName();
 
+    function getUiText(key, fallback = '') {
+        try {
+            const text = uiControlsSetup().GetUiControlText(key);
+
+            if (
+                text === null ||
+                text === undefined ||
+                text === '' ||
+                (typeof text === 'string' && text.startsWith('Missing ['))
+            ) {
+                return fallback;
+            }
+
+            return text;
+        } catch {
+            return fallback;
+        }
+    }
+
     function getEvaluationRequestFilter() {
         return {
             RequestNo: $('#evaluationRequestNoFilter').val(),
@@ -14,7 +33,7 @@
 
     const evaluationRequestsListing = evaluationListing.createListing({
         tableId: 'evaluationRequestTable',
-        ajaxUrl: '/ServiceRequest/${DepartmentRouting}/GetEvaluationRequests',
+        ajaxUrl: `/ServiceRequest/${DepartmentRouting}/GetEvaluationRequests`,
         getFilterInput: getEvaluationRequestFilter,
 
         filterFormId: 'evaluation-request-filter-form-id',
@@ -35,13 +54,13 @@
                 render: function (data, type, row) {
 
                     if (row.StatusISOPen === false) {
-                        return ` <span class="badge bg-success-light fw-semibold br-0">
+                        return ` <span class="badge bg-success-light ms-auto me-2 fw-semibold br-0">
                                     <i class="la la-check fs-14"></i>
                                     مكتمل
                                 </span>`;
                     }
                     else
-                    return `<span class="badge bg-danger-light fw-semibold br-0">
+                        return `<span class="badge bg-danger-light ms-auto me-2 fw-semibold br-0">
                             <i class="las la-times fs-14"></i>
                             غير مكتمل
                         </span>`;
@@ -129,12 +148,23 @@
                         actionsContainerId: 'actions-container',
                         templateContainerId: 'divTemplates',
                         modalContainerId: 'Action-container-fields',
-                        ctx: { root: '#evaluationRequestDetailsModal' }
+                        root: '#evaluationRequestDetailsModal' 
                     }
                 );
 
+                if(response.isNdaApprovalPending)
+                {
+                    const container =
+                        document.getElementById('evaluationMainContainer') ||
+                        document.querySelector('#content-container');
 
-                renderEvaluationPartiesSection(response);
+                    container.insertAdjacentHTML('afterbegin', generateNdaApprovalDiv());
+                    NdaSubmit(response);
+                }
+                else
+                {
+                    renderEvaluationPartiesSection(response);
+                }
 
                 bindSchoolDetails(response);
             }
@@ -142,7 +172,6 @@
 
         jqClient(options).Get(`/ServiceRequest/${DepartmentRouting}/GetEvaluationDetails?requestId=${requestId}`);
     }
-
     function bindSchoolDetails(response) {
         const s = response && response.school ? response.school : null;
         if (!s) return;
@@ -191,8 +220,6 @@
         );
     }
 
-
-
     function renderEvaluationPartiesSection(response) {
         const parties = response?.evaluationParties || [];
 
@@ -207,6 +234,132 @@
             expandFirst: true
         });
     }
+
+//    function generateNdaApprovalDiv() {
+
+//        const title = getUiText(
+//            'lblNdaConflictTitle',
+//            'هل لديك تضارب مصالح مع هذه المدرسة؟'
+//        );
+
+//        const yesText = getUiText('lblYes', 'نعم');
+//        const noText = getUiText('lblNo', 'لا');
+
+//        const reasonLabel = getUiText(
+//            'lblNdaConflictReason',
+//            'أوضح سبب التضارب'
+//        );
+
+//        const reasonPlaceholder = getUiText(
+//            'lblNdaConflictReasonPlaceholder',
+//            'اكتب سبب تضارب المصالح هنا...'
+//        );
+
+//        const submitText = getUiText(
+//            'lblSubmit',
+//            'إرسال'
+//        );
+
+//        return `
+//<div id="ndaApprovalWrapper" class="card mt-3">
+//  <div class="card-body">
+
+//    <h5 class="text-center mb-4 fw-bold">
+//        ${title}
+//    </h5>
+
+//    <div class="d-flex justify-content-center gap-4 mb-3">
+//      <label class="d-flex align-items-center gap-2">
+//        <input type="radio" name="nda_conflict_choice" value="true">
+//        <span>${yesText}</span>
+//      </label>
+
+//      <label class="d-flex align-items-center gap-2">
+//        <input type="radio" name="nda_conflict_choice" value="false" checked>
+//        <span>${noText}</span>
+//      </label>
+//    </div>
+
+//    <div class="mb-2">
+//      <label class="form-label fw-bold">
+//        ${reasonLabel} <span class="text-danger">*</span>
+//      </label>
+
+//      <textarea id="ndaConflictReason"
+//                class="form-control"
+//                rows="4"
+//                placeholder="${reasonPlaceholder}"></textarea>
+
+//      <div id="ndaConflictError"
+//           class="text-danger small mt-1 d-none"></div>
+//    </div>
+
+//    <div class="d-flex justify-content-end mt-4">
+//      <button id="ndaSubmitBtn" class="btn btn-primary px-4">
+//        ${submitText}
+//        <i class="la la-send ms-2"></i>
+//      </button>
+//    </div>
+
+//  </div>
+//</div>`;
+//    }
+//    function NdaSubmit(response) {
+
+//        const btn = document.getElementById('ndaSubmitBtn');
+//        const reasonEl = document.getElementById('ndaConflictReason');
+//        const errEl = document.getElementById('ndaConflictError');
+
+//        const reasonRequiredText = getUiText('lblRequired','هذا الحقل مطلوب');
+
+//        btn.addEventListener('click', async function (e) {
+//            e.preventDefault();
+
+//            const reason = (reasonEl.value || '').trim();
+
+//            if (!reason) {
+//                errEl.textContent = reasonRequiredText;
+//                errEl.classList.remove('d-none');
+//                reasonEl.focus();
+//                return;
+//            }
+
+//            errEl.classList.add('d-none');
+
+//            const hasConflict =
+//                document.querySelector('input[name="nda_conflict_choice"]:checked')
+//                    ?.value === 'true';
+
+//            const payload = {
+//                evaluationRequestId: response.requestId,
+//                planId: response.planId,
+//                hasConflict: hasConflict,
+//                conflictReason: reason
+//            };
+
+//                const res = await $.ajax({
+//                    url: '/Evaluation/Nda/Approve',
+//                    method: 'POST',
+//                    contentType: 'application/json; charset=utf-8',
+//                    data: JSON.stringify(payload)
+//                });
+
+//                document.getElementById('ndaApprovalWrapper')?.remove();
+
+//                if (res?.isNdaApprovalPending === false) {
+//                    renderEvaluationPartiesSection(res);
+//                }
+
+//            } catch (err) {
+//                console.error(err);
+//                alert(getUiText('lblSaveFailed', 'حدث خطأ أثناء الحفظ'));
+//            } finally {
+//                if (window.formUtility?.coverSpin)
+//                    window.formUtility.coverSpin(false);
+//            }
+//        });
+    
+
 
     evaluationRequestsListing.reload();
 });
