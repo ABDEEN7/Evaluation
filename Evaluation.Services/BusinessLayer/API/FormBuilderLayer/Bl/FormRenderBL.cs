@@ -4,6 +4,7 @@ using Azure.Core;
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.ActionEntities;
 using Evaluation.DAL.Models.FormBuilder;
+using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
 using Evaluation.DAL.Models.ServiceRequestEntities;
 using Evaluation.DAL.Repositories;
 using Evaluation.Services.BusinessLayer.API;
@@ -37,7 +38,7 @@ using static Evaluation.SharedHelper.Enums.ConstantKeys;
 namespace Evaluation.Services.BusinessLayer.API
 {
     public class  FormRenderBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, SrvUser _srvUser, UnitOfWork uow, LoggingServices loggingServices, SrvAction _srvAction,
-				  IMapper mapper,UserInfo userInfo,   RequestInfo _requestInfo, SrvServiceRequest _srvServiceRequest, SrvService _srvService, SrvActionStatusConfiguration _srvActionStatusConfiguration
+				  IMapper mapper,UserInfo userInfo,   RequestInfo _requestInfo, SrvServiceRequest _srvServiceRequest, EvaluationRequestService _evaluationRequestService, SrvService _srvService, SrvActionStatusConfiguration _srvActionStatusConfiguration
 			, SrvAttachments _srvAttachments, SrvDropdown _srvDropdown, SrvStatus _srvStatus, SrvAssignment _srvAssignment,
 				SrvField _srvField, IServiceProvider serviceProvider)
             : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, _requestInfo)
@@ -687,7 +688,7 @@ namespace Evaluation.Services.BusinessLayer.API
 			Guid serviceId,
 			string actionBackendKey,
 			Guid? requestId = null,
-			Guid? PlanId = null)
+			Guid? PlanId = null,bool isEvaluationRequest = false)
 		{
 			string lang = _requestInfo.Lang;
 			var userId = userInfo.UserId;
@@ -698,11 +699,30 @@ namespace Evaluation.Services.BusinessLayer.API
 				? _srvStatus.GetInitialStatusIdByServiceId(serviceId)
 				: Task.FromResult<Guid?>(null);
 			var requestObjTask = requestId is not null
-				? _srvServiceRequest.GetRequestByIdAsync(requestId.Value)
-				: Task.FromResult<ServiceRequest?>(null);
-			var hasAccessTask = requestId is not null
-				? _srvServiceRequest.HasAccessToRequestAsync(requestId.Value, userId!.Value)
-				: Task.FromResult(true);
+							? (isEvaluationRequest
+								? _evaluationRequestService.GetEvaluationRequestByIdAsync(requestId.Value)
+									.ContinueWith<ServiceRequest?>(t =>
+									{
+										var er = t.Result;
+										if (er == null) return null;
+
+										return new ServiceRequest
+										{
+											Id = er.Id,                      
+											ServiceId = er.ServiceId,
+											StatusId = er.ServiceStatusId,   
+											OrgTreeId = er.OrgTreeId,
+											PlanId = er.PlanId,
+											RequestNumber = er.RequestNumber ?? "",
+											Sequence = er.Sequence
+										};
+									})
+								: _srvServiceRequest.GetRequestByIdAsync(requestId.Value))
+							: Task.FromResult<ServiceRequest?>(null);
+			var hasAccessTask = Task.FromResult(true);
+				//requestId is not null
+				//						? _srvServiceRequest.HasAccessToRequestAsync(requestId.Value, userId!.Value)
+				//						: Task.FromResult(true);
 
 			await Task.WhenAll(serviceTask, actionTask, statusIdTask, hasAccessTask);
 

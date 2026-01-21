@@ -46,6 +46,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
             var SystemModule = await scopedUow.GetRepository<SystemModule>()
                 .GetAllQueryFiltered()
+                .Include(c => c.Department)
                 .Include(c => c.Services)
                 .FirstOrDefaultAsync(c => c.Id == SystemModuleId);
 

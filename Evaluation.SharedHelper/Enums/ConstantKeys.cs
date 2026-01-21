@@ -177,6 +177,7 @@ public static class ConstantKeys
         public static readonly string NdaStatusCannotDelete = "NdaStatusCannotDelete";
         public static readonly string EvaluationRequestAssignment = "EvaluationRequestAssignment";
         public static readonly string NdaStatusNotFound = "NdaStatusNotFound";
+        public static readonly string ScopeNotExistsFormAssignment = "ScopeNotExistsFormAssignment";
     }
 
     public static class AdminSettings
@@ -1060,6 +1061,7 @@ public static class ConstantKeys
         public const string Reject = "REJECT";
         public const string Info = "INFO";
         public const string Assign = "ASSIGN";
+        public const string ASSIGNT_TEAM = "ASSIGNT_TEAM";
         public const string CloseAndUpdate = "CLOSE_AND_UPDATE";
         public const string EDIT = "Edit";
         public const string RETURNBACK = "RETURNBACK";
@@ -1105,4 +1107,9 @@ public static class ConstantKeys
 		public static readonly string Forms = "Forms";
 		public static readonly string Complain = "Complain";
 	}
+    public static class NDAStatic
+    {
+        public static string Pending = "PENDING";
+        public static string Objection = "OBJECTION";
+    }
 }

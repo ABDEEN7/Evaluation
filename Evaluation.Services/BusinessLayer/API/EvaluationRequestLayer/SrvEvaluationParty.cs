@@ -145,7 +145,10 @@ namespace Evaluation.Services.BusinessLayer.API.EvaluationRequestLayer
 					StatusNameEn = r.Status!.NameEn,
 					r.ServiceId,
 					r.EvaluationPartyId,
-					r.CreateDate
+					r.CreateDate,
+					r.CreateBy,
+					r.UpdateDate,
+					r.Service
 				})
 				.ToListAsync();
 
@@ -158,12 +161,16 @@ namespace Evaluation.Services.BusinessLayer.API.EvaluationRequestLayer
 						Id = r.Id,
 						RequestNumber = r.RequestNumber,
 						StatusId = r.StatusId,
-						StatusISOPen = r.IsOpen,
+						Service = Lang == "ar" ? r.Service!.NameAr : r.Service!.NameEn,
+                        StatusISOPen = r.IsOpen,
 						Status = Lang == "ar" ? r.StatusNameAr : r.StatusNameEn,
 						ServiceId = r.ServiceId,
 						EvaluationPartyId = r.EvaluationPartyId,
-						CreateDate = r.CreateDate
-					})
+						CreateDate = r.CreateDate,
+						UpdateDate = r.UpdateDate,
+                        CreateBy=Lang == "ar" ? r.CreateBy.NameAr : r.CreateBy.NameEn
+
+                    })
 					.OrderByDescending(x => x.CreateDate)
 					.ToList()
 				);
