@@ -200,8 +200,11 @@ window.serviceRequestForm = window.serviceRequestForm || {};
     // #region 🔹 submitAction
     // ================================
    
+
     async function submitAction(actionDetails, formGroups, saveAsDraft) {
-        const baseUrl =  "/ServiceRequest/HandleRequest";
+        var DepartmentRouting = sharedUtility().extractDepartmentName();
+
+        const baseUrl =  `/ServiceRequest/${DepartmentRouting}/HandleRequest`;
         const renderType = RENDER_TYPE.ACTION;
 
         const normalizedGroups = normalizeFormGroups(formGroups);

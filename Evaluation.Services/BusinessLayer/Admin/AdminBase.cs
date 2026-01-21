@@ -59,12 +59,12 @@ namespace Evaluation.Services.Models.Admin
                 cfg.CreateMap<T, K>()
                     .ForMember(dest => dest.CreateDate, opt => opt.MapFrom(src => src.CreateDate.ToString(mapperConfig.DateFormat))) // Convert DateTime to string
                     .ForMember(dest => dest.UpdateDate, opt => opt.MapFrom(src => src.UpdateDate.HasValue ? src.UpdateDate.Value.ToString(mapperConfig.DateFormat) : src.CreateDate.ToString(mapperConfig.DateFormat))) // Convert DateTime to string
-                    .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive ?? true)) // Default to true if null
-                    .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => src.IsDeleted ?? false)) // Default to false if null
+                    .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive)) // Default to true if null
+                    .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => src.IsDeleted)) // Default to false if null
                     .ForMember(dest => dest.CreateBy, opt => opt.MapFrom(src => (src.CreateBy!=null?(_requestInfo.Lang == "ar" ? src.CreateBy.NameAr : src.CreateBy.NameEn):""))) // Mapping for Arabic name
                    .ForMember(dest => dest.UpdateBy, opt => opt.MapFrom(src => src.UpdateById.HasValue
                         ? (userprofile.ContainsKey(src.UpdateById!.Value) ? userprofile[src.UpdateById!.Value] : null)
-                        : (userprofile.ContainsKey(src.CreateById??Guid.Empty) ? userprofile[src.CreateById??Guid.Empty] : null)));
+                        : (userprofile.ContainsKey(src.CreateById) ? userprofile[src.CreateById] : null)));
 
                 // Reverse mapping
                 cfg.CreateMap<K, T>()
@@ -110,12 +110,12 @@ namespace Evaluation.Services.Models.Admin
                 var mapSrc = cfg.CreateMap<T, K>()
                     .ForMember(dest => dest.CreateDate, opt => opt.MapFrom(src => src.CreateDate.ToString(mapperConfig.DateFormat)))
                     .ForMember(dest => dest.UpdateDate, opt => opt.MapFrom(src => src.UpdateDate.HasValue ? src.UpdateDate.Value.ToString(mapperConfig.DateFormat) : src.CreateDate.ToString(mapperConfig.DateFormat))) // Convert DateTime to string
-                    .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive ?? true))
-                    .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => src.IsDeleted ?? false))
+                    .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive))
+                    .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => src.IsDeleted))
                     .ForMember(dest => dest.CreateBy, opt => opt.MapFrom(src => (src.CreateBy!=null?(_requestInfo.Lang == "ar" ? src.CreateBy.NameAr : src.CreateBy.NameEn):"")))
                     .ForMember(dest => dest.UpdateBy, opt => opt.MapFrom(src => src.UpdateById != null
                         ? (userprofile.ContainsKey(src.UpdateById.Value) ? userprofile[src.UpdateById.Value] : null)
-                        : (userprofile.ContainsKey(src.CreateById??Guid.Empty) ? userprofile[src.CreateById??Guid.Empty] : null)));
+                        : (userprofile.ContainsKey(src.CreateById) ? userprofile[src.CreateById] : null)));
 
                 additionalSourceMappings?.ForEach((conf) => mapSrc.ForMember(conf.destinationMember, conf.memberOptions));
 

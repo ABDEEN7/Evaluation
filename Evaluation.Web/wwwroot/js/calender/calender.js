@@ -3,6 +3,7 @@
  *****************************/
 const loadedMonths = new Set();   // faster lookups than array
 let calendarResults = [];
+let departmentRoutePath = sharedUtility().extractDepartmentName();
 
 /*****************************
  * Date Utilities
@@ -59,7 +60,7 @@ async function fetchEvaluationRequests(months) {
     if (!months.length) return [];
 
     const url = buildUrl(
-        "/EvaluationRequest/GetEvaluationRequests",
+        `/EvaluationRequest/${departmentRoutePath}/GetEvaluationRequests`,
         months
     );
 
@@ -180,14 +181,13 @@ function updateEventDates(info, eventResult) {
     };
 
     let url = '';
-
     if (eventResult.source == 'ServiceRequest')
     {
-        url = "/EvaluationRequest/UpdateEvaluationServiceRequest";
+        url = `/EvaluationRequest/${departmentRoutePath}/UpdateEvaluationServiceRequest`;
     }
     else
     {
-        url = "/EvaluationRequest/UpdateEvaluationRequest";
+        url = `/EvaluationRequest/${departmentRoutePath}/UpdateEvaluationRequest`;
     }
 
     jqClient().Post(url, payload)

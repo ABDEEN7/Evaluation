@@ -22,8 +22,8 @@ const loadData = () => {
             }
         }
     };
-
-    jqClient(options).Get("/DepartmentHoliday/GetAllHolidayDepartments".concat('?page=', currentPage));
+    var deprouting = sharedUtility().extractDepartmentName();
+    jqClient(options).Get(`/DepartmentHoliday/${deprouting}/GetAllHolidayDepartments`.concat('?page=', currentPage));
 };
 
 $btnAddbutton.click(function () {

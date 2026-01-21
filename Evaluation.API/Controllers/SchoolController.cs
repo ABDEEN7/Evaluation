@@ -8,8 +8,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Evaluation.API.Controllers;
 
-[Route("api/[controller]/[action]")]
 [ApiController]
+[Route("api/[controller]/{depRouting}/[action]")]
+
 public class SchoolController : ControllerBase
 {
 
@@ -69,10 +70,10 @@ public class SchoolController : ControllerBase
         var result = await _masterBl.GetApiService<SchoolBL>().GetSchoolsByDepartmentId(depId);
         return Ok(result);
     }
-    [HttpGet]
-    public async Task<IActionResult> GetSchoolsPlan([FromQuery] SchoolRequest request)
-    {
-        var result = await _masterBl.GetApiService<SchoolBL>().GetSchoolsPlan(request);
-        return Ok(result);
-    }
+   // [HttpGet]
+    //public async Task<IActionResult> GetSchoolsPlan([FromQuery] SchoolRequest request)
+    //{
+    //    var result = await _masterBl.GetApiService<SchoolBL>().GetSchoolsPlan(request);
+    //    return Ok(result);
+    //}
 }

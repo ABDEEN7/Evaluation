@@ -1,8 +1,8 @@
 ﻿(function (global) {
-    'use strict'; 
+    'use strict';
     const uniqueIndexId = 'IndexForPlanTable';
 
-   
+
 
     // Plan validation rules
     const VALIDATION_RULES = {
@@ -71,18 +71,19 @@
         SEMESTER: 'Semester',
         CUSTOM: 'Custom'
     };
+    var deprouting = sharedUtility().extractDepartmentName();
 
     // API Endpoints
     const API_ENDPOINTS = {
-        GET_SCHOOLS: '/School/GetSchoolsPlan',
-        GET_PLAN_TYPES: '/PlanType/GetPlanTypes',
-        GET_SEMESTERS: '/Plan/GetSemesters',
-        GET_VISITS: '/School/GetVisits',
-        GET_VACATION_DATES: '/AcademicYear/GetVcationDate',
-        CREATE_PLAN: '/Plan/CreatePlan',
-        INSERTORUPDATEPLAN: '/Plan/InsertOrUpdatePlan',
-        UPDATE_PLAN: '/Plan/UpdatePlan',
-        GET_PLAN_DETAILS: '/Plan/GetPlansWithunSelectedSchoolsDetails'
+        GET_SCHOOLS: `/School/${deprouting}/GetSchoolsPlan`,
+        GET_PLAN_TYPES: `/PlanType/${deprouting}/GetPlanTypes`,
+        GET_SEMESTERS: `/Plan/${deprouting}/GetSemesters`,
+        GET_VISITS: `/School/${deprouting}/GetVisits`,
+        GET_VACATION_DATES: `/DepartmentHoliday/${deprouting}/GetAllHolidayDepartmentsOrg`,
+        CREATE_PLAN: `/Plan/${deprouting}/CreatePlan`,
+        INSERTORUPDATEPLAN: `/Plan/${deprouting}/InsertOrUpdatePlan`,
+        UPDATE_PLAN: `/Plan/${deprouting}/UpdatePlan`,
+        GET_PLAN_DETAILS: `/Plan/${deprouting}/GetPlansWithunSelectedSchoolsDetails`
     };
 
     // Export all constants

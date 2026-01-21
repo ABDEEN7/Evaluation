@@ -57,7 +57,7 @@ public class SchoolRepository(IServiceScopeFactory serviceScopeFactory,
            .CreateScopedUow()
            .GetRepository<School>()
            .GetAllNonDeleted()
-           .Where(c => c.OrgParentId == department.TargetOrgTreeId)
+           //.Where(c => c.OrgParentId == department.TargetOrgTreeId)
            .ToList();
 
         return schools;

@@ -86,8 +86,8 @@ namespace Evaluation.Services.Models.Admin
             obj.BackendName = BackendName;
             obj.RoutingPath = message.RoutingPath;
             obj.DepIcon = message.DepIcon;
-            obj.TargetOrgTreeId = message.TargetOrgTreeId;
-            obj.CategoryId = message.CategoryId;
+            //obj.TargetOrgTreeId = message.TargetOrgTreeId;
+            //obj.CategoryId = message.CategoryId;
             obj.IsNDA = message.IsNDA;
             obj.DescAr = message.DescAr;
             obj.DescEn = message.DescEn;
@@ -148,8 +148,8 @@ namespace Evaluation.Services.Models.Admin
                 obj.BackendName = obj.BackendName;
                 obj.RoutingPath = message.RoutingPath;
                 obj.DepIcon = message.DepIcon;
-                obj.TargetOrgTreeId = message.TargetOrgTreeId;
-                obj.CategoryId = message.CategoryId;
+                //obj.TargetOrgTreeId = message.TargetOrgTreeId;
+                //obj.CategoryId = message.CategoryId;
                 obj.IsNDA = message.IsNDA;
                 obj.DescAr = message.DescAr;
                 obj.DescEn = message.DescEn;

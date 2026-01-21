@@ -13,8 +13,10 @@ public class DepartmentProfile : Profile
             .ForMember(d => d.Desc, opt => opt.MapFrom(src => src.DescEn))
             .ForMember(d => d.Id, opt => opt.MapFrom(src => src.Id))
             .ForMember(d => d.DepIcon, opt => opt.MapFrom(src => src.DepIcon))
-            .ForMember(d => d.TypeId, opt => opt.MapFrom(src => src.CategoryId))
-            .ForMember(d => d.TypeName, opt => opt.MapFrom(src => src.Category.NameEn))
+            //.ForMember(d => d.TypeId, opt => opt.MapFrom(src => src.CategoryId))
+            //.ForMember(d => d.TypeName, opt => opt.MapFrom(src => src.Category.NameEn))
+            .ForMember(d => d.RoutingPath, opt => opt.MapFrom(src => src.RoutingPath))
+            .ForMember(d => d.ImgBlobUrl, opt => opt.MapFrom(src => src.WebsiteAttachment.BlobUrl))
             .ReverseMap();
     }
 }
