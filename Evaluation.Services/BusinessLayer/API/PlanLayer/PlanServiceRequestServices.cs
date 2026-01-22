@@ -1,6 +1,7 @@
 ﻿using Aspose.Words.Drawing;
 using AutoMapper;
 using Evaluation.DAL.Dtos;
+using Evaluation.DAL.Dtos.Form;
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.Calendars;
 using Evaluation.DAL.Models.DepartementEntites;
@@ -27,6 +28,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
+using System.ComponentModel.DataAnnotations;
 using static Evaluation.SharedHelper.Enums.ConstantKeys;
 
 namespace Evaluation.Services.BusinessLayer.API.PlanLayer;
@@ -95,6 +97,85 @@ public class PlanServiceRequestServices(
         PaginatedResult<PlanListDto> result = await planRepository.GetPlans(request);
         return mapper.Map<PaginatedResult<PlanListDto>>(result);
     }
+    //public async Task<Result<ValidationResult>> ValidatePlans(CreateEvaluationPlanDto model)
+    //{
+    //    return Validate(model);
+    //}
+    //public static ValidationResult Validate(CreateEvaluationPlanDto dto)
+    //{
+    //    var result = new ValidationResult();
+
+    //    if (dto == null)
+    //    {
+    //        result.Errors.Add("FormEvaluationDto is null.");
+    //        return result;
+    //    }
+
+    //    if (dto.Id == Guid.Empty)
+    //        result.Errors.Add("Id must not be empty.");
+
+    //    //TODO: Need to check before if required or not
+    //    if (string.IsNullOrWhiteSpace(dto.Strengths))
+    //        result.Errors.Add("Strengths is required.");
+
+    //    //TODO: Need to check before if required or not
+    //    if (string.IsNullOrWhiteSpace(dto.Improvements))
+    //        result.Errors.Add("Improvements is required.");
+
+    //    if (dto.Items == null || !dto.Items.Any())
+    //    {
+    //        result.Errors.Add("Items must contain at least one item.");
+    //        return result;
+    //    }
+
+    //    for (int i = 0; i < dto.Items.Count; i++)
+    //    {
+    //        var item = dto.Items[i];
+
+    //        if (item == null)
+    //        {
+    //            result.Errors.Add($"Items[{i}] is null.");
+    //            continue;
+    //        }
+
+    //        if (item.Id == Guid.Empty)
+    //            result.Errors.Add($"Items[{i}].Id must not be empty.");
+
+    //        if (!item.ValueId.HasValue)
+    //            result.Errors.Add($"Items[{i}].ValueId is required.");
+
+    //        if (item.Value < 0)
+    //            result.Errors.Add($"Items[{i}].Value must be greater than or equal to 0.");
+
+    //        if (item.SubItems == null || !item.SubItems.Any())
+    //        {
+    //            result.Errors.Add($"Items[{i}].SubItems must contain at least one item.");
+    //            continue;
+    //        }
+
+    //        for (int j = 0; j < item.SubItems.Count; j++)
+    //        {
+    //            var subItem = item.SubItems[j];
+
+    //            if (subItem == null)
+    //            {
+    //                result.Errors.Add($"Items[{i}].SubItems[{j}] is null.");
+    //                continue;
+    //            }
+
+    //            if (subItem.Id == Guid.Empty)
+    //                result.Errors.Add($"Items[{i}].SubItems[{j}].Id must not be empty.");
+
+    //            if (!subItem.ValueId.HasValue)
+    //                result.Errors.Add($"Items[{i}].SubItems[{j}].ValueId is required.");
+
+    //            if (subItem.Value == Guid.Empty)
+    //                result.Errors.Add($"Items[{i}].SubItems[{j}].Value must not be empty.");
+    //        }
+    //    }
+
+    //    return result;
+    //}
     //Validation Plans
     private async Task ValidateUpdatePlan(UpdatePlanDto model)
     {

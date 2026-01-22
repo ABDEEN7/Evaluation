@@ -1,12 +1,16 @@
 ﻿using Evaluation.API.ActionFilter;
 using Evaluation.API.Extensions;
 using Evaluation.DAL;
+using Evaluation.DAL.Dtos.Form;
 using Evaluation.Services.BusinessLayer;
+using Evaluation.Services.BusinessLayer.API.FormLayer;
 using Evaluation.Services.BusinessLayer.API.PlanLayer;
 using Evaluation.Services.BusinessLayer.API.SteamerLayer;
 using Evaluation.SharedHelper.Dtos.PlanDto;
 using Evaluation.SharedHelper.Dtos.SchoolDto;
+using FluentResults;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 
 namespace Evaluation.API.Controllers;
 
@@ -53,5 +57,14 @@ public class PlanController(MasterBL masterBL) : ControllerBase
         return Ok(await masterBL
             .GetApiService<PlanServiceRequestServices>()
             .GetPlansAsync(request));
+    }
+    [HttpPost]
+    public async Task<Result<ValidationResult>> ValidateEvaluationForm([FromBody] CreateEvaluationPlanDto planDtoRequest)
+    {
+        return await masterBL.GetApiService<PlanServiceRequestServices>().ValidateEvaluationForm(formEvaluation);
+    }
+    public async Task<Result<ValidationResult>> ValidateEvaluationForm(FormEvaluationDto formEvaluationDto)
+    {
+        return Validate(formEvaluationDto);
     }
 }
