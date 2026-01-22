@@ -1,6 +1,4 @@
-﻿using Microsoft.CodeAnalysis;
-
-namespace Evaluation.SharedHelper.Dtos.TeamMemberDto;
+﻿namespace Evaluation.SharedHelper.Dtos.TeamMemberDto;
 
 public class EvalScopesDto
 {
