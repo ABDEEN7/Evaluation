@@ -44,5 +44,5 @@ public class AssignmentController : ControllerBase
     }
     [HttpPost]
     public async Task<Result<ValidationResult>> ValidationEvaluationRequestAssignment(Guid evaluationRequestId, [FromBody] List<EvalTeamRequestDto> model)
-                => await _masterBl.GetApiService<AssignmentBL>().AddedRequestAssignment(evaluationRequestId, model);
+                => await _masterBl.GetApiService<AssignmentBL>().AssignmentValidationResult(evaluationRequestId, model);
 }
