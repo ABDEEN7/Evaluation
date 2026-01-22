@@ -37,24 +37,12 @@ public class CreateAssignmentsValidator
       ValidationResult result,
       int index)
     {
-        var prefix = $"TeamMembers[{index}]";
-
         if (member.UserId == Guid.Empty)
-            result.Add($"{prefix}: User is required.");
+            result.Add(ConstantKeys.ExceptionMessage.Requiredfield);
         // ===================== Scopes =====================
         if (member.Scopes == null || !member.Scopes.Any())
         {
-            result.Add($"{prefix}: At least one scope is required.");
-        }
-        else
-        {
-            for (int j = 0; j < member.Scopes.Count; j++)
-            {
-                if (member.Scopes[j].Id == Guid.Empty)
-                {
-                    result.Add($"{prefix}: Scope[{j}] is required.");
-                }
-            }
+            result.Add(ConstantKeys.ExceptionMessage.AtLeastHaveOneScopes);
         }
     }
 }

@@ -46,6 +46,7 @@ public static class ConstantKeys
         public static readonly string InvalidDraftPlan = "InvalidDraftPlan";
         public static readonly string InvalidAssignment = "InvalidAssignment";
         public static readonly string OneLeader = "OneLeader";
+        public static readonly string AtLeastHaveOneScopes = "AtLeastHaveOneScopes";
 
         public static readonly string ServiceRequestNotFound = "ServiceRequestNotFound";
         public static readonly string lblMajorOrDegreeIdMissing = "lblMajorOrDegreeIdMissing";
