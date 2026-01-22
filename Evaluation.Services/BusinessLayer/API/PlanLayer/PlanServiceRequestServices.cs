@@ -1,7 +1,5 @@
-﻿using Aspose.Words.Drawing;
-using AutoMapper;
+﻿using AutoMapper;
 using Evaluation.DAL.Dtos;
-using Evaluation.DAL.Dtos.Form;
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.Calendars;
 using Evaluation.DAL.Models.DepartementEntites;
@@ -9,7 +7,6 @@ using Evaluation.DAL.Models.Planing;
 using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
 using Evaluation.DAL.Models.ServiceEnities;
 using Evaluation.DAL.Models.StatusEntities;
-using Evaluation.DAL.Models.Template;
 using Evaluation.DAL.Repositories;
 using Evaluation.Services.BusinessLayer.API.AcademicYearLayer;
 using Evaluation.Services.BusinessLayer.API.DepartmentLayer;
@@ -22,14 +19,14 @@ using Evaluation.SharedHelper.Dtos.SchoolDto;
 using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Models;
+using Evaluation.SharedHelper.Models;
 using FluentResults;
-using Mapster;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
 using static Evaluation.SharedHelper.Enums.ConstantKeys;
+using ValidationResult = Evaluation.SharedHelper.Models.ValidationResult;
 
 namespace Evaluation.Services.BusinessLayer.API.PlanLayer;
 
@@ -97,98 +94,112 @@ public class PlanServiceRequestServices(
         PaginatedResult<PlanListDto> result = await planRepository.GetPlans(request);
         return mapper.Map<PaginatedResult<PlanListDto>>(result);
     }
-    //public async Task<Result<ValidationResult>> ValidatePlans(CreateEvaluationPlanDto model)
-    //{
-    //    return Validate(model);
-    //}
-    //public static ValidationResult Validate(CreateEvaluationPlanDto dto)
-    //{
-    //    var result = new ValidationResult();
-
-    //    if (dto == null)
-    //    {
-    //        result.Errors.Add("FormEvaluationDto is null.");
-    //        return result;
-    //    }
-
-    //    if (dto.Id == Guid.Empty)
-    //        result.Errors.Add("Id must not be empty.");
-
-    //    //TODO: Need to check before if required or not
-    //    if (string.IsNullOrWhiteSpace(dto.Strengths))
-    //        result.Errors.Add("Strengths is required.");
-
-    //    //TODO: Need to check before if required or not
-    //    if (string.IsNullOrWhiteSpace(dto.Improvements))
-    //        result.Errors.Add("Improvements is required.");
-
-    //    if (dto.Items == null || !dto.Items.Any())
-    //    {
-    //        result.Errors.Add("Items must contain at least one item.");
-    //        return result;
-    //    }
-
-    //    for (int i = 0; i < dto.Items.Count; i++)
-    //    {
-    //        var item = dto.Items[i];
-
-    //        if (item == null)
-    //        {
-    //            result.Errors.Add($"Items[{i}] is null.");
-    //            continue;
-    //        }
-
-    //        if (item.Id == Guid.Empty)
-    //            result.Errors.Add($"Items[{i}].Id must not be empty.");
-
-    //        if (!item.ValueId.HasValue)
-    //            result.Errors.Add($"Items[{i}].ValueId is required.");
-
-    //        if (item.Value < 0)
-    //            result.Errors.Add($"Items[{i}].Value must be greater than or equal to 0.");
-
-    //        if (item.SubItems == null || !item.SubItems.Any())
-    //        {
-    //            result.Errors.Add($"Items[{i}].SubItems must contain at least one item.");
-    //            continue;
-    //        }
-
-    //        for (int j = 0; j < item.SubItems.Count; j++)
-    //        {
-    //            var subItem = item.SubItems[j];
-
-    //            if (subItem == null)
-    //            {
-    //                result.Errors.Add($"Items[{i}].SubItems[{j}] is null.");
-    //                continue;
-    //            }
-
-    //            if (subItem.Id == Guid.Empty)
-    //                result.Errors.Add($"Items[{i}].SubItems[{j}].Id must not be empty.");
-
-    //            if (!subItem.ValueId.HasValue)
-    //                result.Errors.Add($"Items[{i}].SubItems[{j}].ValueId is required.");
-
-    //            if (subItem.Value == Guid.Empty)
-    //                result.Errors.Add($"Items[{i}].SubItems[{j}].Value must not be empty.");
-    //        }
-    //    }
-
-    //    return result;
-    //}
-    //Validation Plans
-    private async Task ValidateUpdatePlan(UpdatePlanDto model)
+    public async Task<Result<ValidationResult>> ValidateEvaluationPlan(CreateEvaluationPlanDto model)
     {
-        if (model is null || string.IsNullOrEmpty(model.Name))
-            throw new BusinessException(ConstantKeys.ExceptionMessage.InvalidDraftPlan);
-
-        var selectedYear = await serviceScopeFactory.CreateScopedUow().GetRepository<AcademicYear>()
-           .GetAllActiveNonDeleted()
-           .FirstOrDefaultAsync(x => x.Id == model.AcademicYearId);
-
-        if (selectedYear?.Year < DateTime.Now.Year)
-            throw new BusinessException(ConstantKeys.ExceptionMessage.PlanInThePastIsNotAllowed);
+        return CreateEvaluationPlanValidator(model);
     }
+    public static ValidationResult CreateEvaluationPlanValidator(CreateEvaluationPlanDto dto)
+    {
+        var result = new ValidationResult();
+
+        if (dto == null)
+        {
+            result.Errors.Add("FormEvaluationDto is null.");
+            return result;
+        }
+
+        // ===================== Required Fields =====================
+        if (string.IsNullOrWhiteSpace(dto.Name))
+            result.Add(ConstantKeys.ExceptionMessage.Requiredfield);
+        if (dto.PlanTypeDepId == Guid.Empty)
+            result.Add(ConstantKeys.ExceptionMessage.Requiredfield);
+        // ===================== Dates Validation =====================
+        if (dto.StartDate == default)
+            result.Add(ConstantKeys.ExceptionMessage.Requiredfield);
+        if (dto.EndDate == default)
+            result.Add(ConstantKeys.ExceptionMessage.Requiredfield);
+        if (dto.StartDate != default &&
+            dto.EndDate != default &&
+            dto.EndDate < dto.StartDate)
+        {
+            result.Add(ConstantKeys.ExceptionMessage.CompareDateException);
+        }
+        // ===================== Schools Validation =====================
+        if (dto.Schools != null && dto.Schools.Any())
+        {
+            for (int i = 0; i < dto.Schools.Count; i++)
+            {
+                ValidateSchool(
+                    dto.Schools[i],
+                    dto.StartDate,
+                    dto.EndDate,
+                    result,
+                    i);
+            }
+        }
+        return result;
+    }
+    private static void ValidateSchool(SelectedSchool school,
+    DateOnly planStartDate,
+    DateOnly planEndDate,
+    ValidationResult result,
+    int index)
+    {
+        var prefix = $"Schools[{index}]";
+
+        //Required id
+        if (school.Id == Guid.Empty)
+            result.Add($"{prefix}: School Id is Required.");
+        //Visit Type
+        // Evaluation Dates
+        if (school.StartEvaluationDate == default)
+            result.Add($"{prefix}: Start evaluation date is required.");
+
+        if (school.EndEvaluationDate == default)
+            result.Add($"{prefix}: End evaluation date is required.");
+
+        if (school.StartEvaluationDate != default &&
+            school.EndEvaluationDate != default &&
+            school.EndEvaluationDate < school.StartEvaluationDate)
+        {
+            result.Add($"{prefix}: End evaluation date must be after start evaluation date.");
+        }
+        // ===================== Range Check =====================
+        if (school.StartEvaluationDate != default)
+        {
+            var planStart = planStartDate.ToDateTime(TimeOnly.MinValue);
+            var planEnd = planEndDate.ToDateTime(TimeOnly.MaxValue);
+            if (school.StartEvaluationDate < planStart ||
+          school.StartEvaluationDate > planEnd)
+            {
+                result.Add($"{prefix}: Start evaluation date must be within plan date range.");
+            }
+        }
+        if (school.EndEvaluationDate != default)
+        {
+            var planStart = planStartDate.ToDateTime(TimeOnly.MinValue);
+            var planEnd = planEndDate.ToDateTime(TimeOnly.MaxValue);
+
+            if (school.EndEvaluationDate < planStart ||
+                school.EndEvaluationDate > planEnd)
+            {
+                result.Add($"{prefix}: End evaluation date must be within plan date range.");
+            }
+        }
+    }
+
+    //private async Task ValidateUpdatePlan(UpdatePlanDto model)
+    //{
+    //    if (model is null || string.IsNullOrEmpty(model.Name))
+    //        throw new BusinessException(ConstantKeys.ExceptionMessage.InvalidDraftPlan);
+
+    //    var selectedYear = await serviceScopeFactory.CreateScopedUow().GetRepository<AcademicYear>()
+    //       .GetAllActiveNonDeleted()
+    //       .FirstOrDefaultAsync(x => x.Id == model.AcademicYearId);
+
+    //    if (selectedYear?.Year < DateTime.Now.Year)
+    //        throw new BusinessException(ConstantKeys.ExceptionMessage.PlanInThePastIsNotAllowed);
+    //}
 
     private void ValidatedPlan(CreateEvaluationPlanDto model)
     {
@@ -207,7 +218,7 @@ public class PlanServiceRequestServices(
             Plan plan = modelDto.ToPlan();
             plan.Id = planId;
             plan.PlanJsonValue = JsonConvert.SerializeObject(modelDto);
-            
+
             await unitOfWork.GetRepository<Plan>().InsertAsync(plan);
 
             await InsertEvaluationRequests(plan.Id, modelDto);

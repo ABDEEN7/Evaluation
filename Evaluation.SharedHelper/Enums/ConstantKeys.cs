@@ -178,6 +178,8 @@ public static class ConstantKeys
         public static readonly string EvaluationRequestAssignment = "EvaluationRequestAssignment";
         public static readonly string NdaStatusNotFound = "NdaStatusNotFound";
         public static readonly string ScopeNotExistsFormAssignment = "ScopeNotExistsFormAssignment";
+        public static readonly string CompareDateException = "CompareDateException";
+
     }
 
     public static class AdminSettings
