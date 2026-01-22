@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Evaluation.DAL.Dtos;
 using Evaluation.DAL.Helper;
-using Evaluation.DAL.Models.Calendars;
 using Evaluation.DAL.Models.DepartementEntites;
 using Evaluation.DAL.Models.Planing;
 using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
@@ -11,7 +10,6 @@ using Evaluation.DAL.Repositories;
 using Evaluation.Services.BusinessLayer.API.AcademicYearLayer;
 using Evaluation.Services.BusinessLayer.API.DepartmentLayer;
 using Evaluation.Services.Special;
-using Evaluation.SharedHelper;
 using Evaluation.SharedHelper.Consts;
 using Evaluation.SharedHelper.Dtos.PlanDto;
 using Evaluation.SharedHelper.Dtos.PlanDto.EditDto;
@@ -19,12 +17,10 @@ using Evaluation.SharedHelper.Dtos.SchoolDto;
 using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Models;
-using Evaluation.SharedHelper.Models;
 using FluentResults;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
-using System.ComponentModel.DataAnnotations;
 using static Evaluation.SharedHelper.Enums.ConstantKeys;
 using ValidationResult = Evaluation.SharedHelper.Models.ValidationResult;
 
@@ -68,7 +64,7 @@ public class PlanServiceRequestServices(
     public async Task<Result<CreateEvaluationPlanDto>> InsertOrUpdatePlan(
     CreateEvaluationPlanDto modelDto)
     {
-        ValidatedPlan(modelDto);
+        //ValidatedPlan(modelDto);
         return modelDto.Id == Guid.Empty
      ? await InsertPlan(modelDto)
      : await UpdatePlan(modelDto);
@@ -104,7 +100,7 @@ public class PlanServiceRequestServices(
 
         if (dto == null)
         {
-            result.Errors.Add("FormEvaluationDto is null.");
+            result.Errors.Add(ConstantKeys.ExceptionMessage.InvalidPlan);
             return result;
         }
 
@@ -149,20 +145,20 @@ public class PlanServiceRequestServices(
 
         //Required id
         if (school.Id == Guid.Empty)
-            result.Add($"{prefix}: School Id is Required.");
+            result.Add($"{prefix}: {ConstantKeys.ExceptionMessage.Requiredfield}");
         //Visit Type
         // Evaluation Dates
         if (school.StartEvaluationDate == default)
-            result.Add($"{prefix}: Start evaluation date is required.");
+            result.Add(ConstantKeys.ExceptionMessage.Requiredfield);
 
         if (school.EndEvaluationDate == default)
-            result.Add($"{prefix}: End evaluation date is required.");
+            result.Add(ConstantKeys.ExceptionMessage.Requiredfield);
 
         if (school.StartEvaluationDate != default &&
             school.EndEvaluationDate != default &&
             school.EndEvaluationDate < school.StartEvaluationDate)
         {
-            result.Add($"{prefix}: End evaluation date must be after start evaluation date.");
+            result.Add(ConstantKeys.ExceptionMessage.CompareDateException);
         }
         // ===================== Range Check =====================
         if (school.StartEvaluationDate != default)
@@ -172,7 +168,7 @@ public class PlanServiceRequestServices(
             if (school.StartEvaluationDate < planStart ||
           school.StartEvaluationDate > planEnd)
             {
-                result.Add($"{prefix}: Start evaluation date must be within plan date range.");
+                result.Add(ConstantKeys.ExceptionMessage.StartSchoolPlanDateException);
             }
         }
         if (school.EndEvaluationDate != default)
@@ -183,7 +179,7 @@ public class PlanServiceRequestServices(
             if (school.EndEvaluationDate < planStart ||
                 school.EndEvaluationDate > planEnd)
             {
-                result.Add($"{prefix}: End evaluation date must be within plan date range.");
+                result.Add(ConstantKeys.ExceptionMessage.EndSchoolPlanDateException);
             }
         }
     }
@@ -200,14 +196,6 @@ public class PlanServiceRequestServices(
     //    if (selectedYear?.Year < DateTime.Now.Year)
     //        throw new BusinessException(ConstantKeys.ExceptionMessage.PlanInThePastIsNotAllowed);
     //}
-
-    private void ValidatedPlan(CreateEvaluationPlanDto model)
-    {
-        if (model is null || string.IsNullOrEmpty(model.Name))
-            throw new BusinessException(ConstantKeys.ExceptionMessage.InvalidApprovePlan);
-        if (model.StartDate >= model.EndDate)
-            throw new BusinessException(ConstantKeys.ExceptionMessage.InvalidEvaluationDate);
-    }
     private async Task<Result<CreateEvaluationPlanDto>> InsertPlan(CreateEvaluationPlanDto modelDto)
     {
         return await ExecuteWithResult(async () =>
