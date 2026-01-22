@@ -88,7 +88,6 @@ public partial class EvaluationDbContext : DbContext
     public virtual DbSet<ServiceRequestFieldsValue> ServiceRequestFieldsValue { get; set; }
     public virtual DbSet<EvaluationRequestAssignment> RequestAssignment { get; set; }
     public virtual DbSet<EvaluationRequest> EvaluationRequest { get; set; }
-    public virtual DbSet<EvaluationRequestFieldsValue> EvaluationRequestFieldsValue { get; set; }
     public virtual DbSet<EvaluationRequestHistory> EvaluationRequestHistory { get; set; }
     public virtual DbSet<EvaluationRequestHistoryFieldsValue> EvaluationRequestHistoryFieldsValue { get; set; }
     public virtual DbSet<JobTitle> JobTitle { get; set; }

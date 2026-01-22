@@ -45,6 +45,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                                        .GetRepository<Service>()
                 .GetAllQueryFiltered(x => x.Id == serviceId)
                 .Include(x=>x.SystemModule)
+                .Include(x=>x.SystemModule.SystemModuleType)
                 .AsNoTracking()
                 .FirstOrDefaultAsync();
 
@@ -58,6 +59,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                                        .GetRepository<Service>()
                 .GetAllQueryFiltered(x => x.Id == serviceId)
                 .Include(c=>c.SystemModule)
+                .Include(c=>c.SystemModule.SystemModuleType)
                 .Where(c =>(!c.StartDate.HasValue || today >= c.StartDate) && (null == c.EndDate || c.EndDate.Value.AddDays(1) >= today))
                 .AsNoTracking()
                 .FirstOrDefaultAsync();

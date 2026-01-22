@@ -296,7 +296,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 															  .GetRepository<ServiceRequestFieldsValue>()
 															  .GetAllQueryFiltered()
 															  .AsNoTracking()
-															  .Where(x => x.ServiceRequestId == applicationId && x.IsMissing == false)
+															  .Where(x => x.RefId == applicationId && x.IsMissing == false)
 															  .Select(c => c.FieldId).ToList();
 
 
