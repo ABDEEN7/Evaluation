@@ -1,6 +1,10 @@
 ﻿(function (global) {
     'use strict';
-
+    // =================== LOCALIZATION Helper ===================
+    function t(key, fallback = '') {
+        const text = uiControlsSetup()?.GetUiControlText(key);
+        return text || key;
+    }
     const ns = global.planUtility;
     const {
         API_ENDPOINTS,
@@ -128,7 +132,7 @@
             $s.select2('destroy');
         }
 
-        $s.empty().append('<option value="">اختر نوع الخطة</option>');
+        $s.empty().append($`<option value="">{t('lblChoosePlanType')}</option>`);
 
         ns.planTypes.forEach(t =>
             $s.append(`<option value="${t.id}" data-backendname="${t.backendName}">${t.name}</option>`)
@@ -144,7 +148,7 @@
             $s.select2('destroy');
         }
 
-        $s.empty().append('<option value="">اختر الفصل الدراسي</option>');
+        $s.empty().append(`<option value="">${t('lblChooseSemester')}</option>`);
 
         ns.semesters.forEach(s =>
             $s.append(
@@ -306,7 +310,7 @@
             const prevLink = $('<a>')
                 .addClass('page-link')
                 .attr('href', '#')
-                .text('السابق')
+                .text(`${t('lblPrevious')}`)
                 .on('click', function (e) {
                     e.preventDefault();
                     loadSchools(fieldId, state.currentPage - 1, state.filters);
@@ -347,7 +351,7 @@
             const nextLink = $('<a>')
                 .addClass('page-link')
                 .attr('href', '#')
-                .text('التالي')
+                .text(`${t('lblNext')}`)
                 .on('click', function (e) {
                     e.preventDefault();
                     loadSchools(fieldId, state.currentPage + 1, state.filters);
