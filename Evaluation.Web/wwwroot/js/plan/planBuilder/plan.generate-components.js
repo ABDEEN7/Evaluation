@@ -2,6 +2,12 @@
 
 (function (ns) {
 
+    // =================== LOCALIZATION Helper===================
+    function t(key, fallback = '') {
+        const text = uiControlsSetup()?.GetUiControlText(key);
+        return text || key;
+    }
+
     // ================== PREFIX CONFIGURATION ==================
     ns.fieldIdPrefixes = new Map();
 
@@ -100,15 +106,14 @@
         }
     }
     // ================== PLAN FORM FIELD GENERATORS ==================
-    // ✅ جميع الدوال تستقبل fieldId
-
+    // 1. In generateTitleField - FIX THE PLACEHOLDER
     const generateTitleField = (fieldId, field, readonly) => {
         const inputElement = $('<input>')
             .attr('type', 'text')
             .attr('id', `${fieldId}_planTitle`)
             .attr('name', 'PlanTitle')
             .addClass('form-control')
-            .attr('placeholder', 'أدخل عنوان الخطة')
+            .attr('placeholder', `${t('lblInsertPlan')}`)
             .val(field?.value || '');
 
         if (readonly) {
@@ -127,7 +132,7 @@
             .attr('id', `${fieldId}_ddlPlanType`)
             .attr('name', 'PlanTypeId')
             .addClass('form-control')
-            .append($('<option>').val('').text('اختر نوع الخطة'));
+            .append($('<option>').val('').text(`${t('lblChoosePlanType')}`));
 
         if (readonly) {
             selectElement.prop('disabled', true);
@@ -163,7 +168,7 @@
             .attr('id', `${fieldId}_ddlSemester`)
             .attr('name', 'SemesterId')
             .addClass('form-control')
-            .append($('<option>').val('').text('اختر الفصل الدراسي'));
+            .append($('<option>').val('').text(`${t('lblChooseSemester')}`));
 
         if (readonly) {
             selectElement.prop('disabled', true);
@@ -186,13 +191,13 @@
         const label = $('<label>')
             .addClass('form-label')
             .attr('for', `${fieldId}_ddlSemester`)
-            .html('الفصل الدراسي <span class="text-danger">*</span>');
+            .html(`${t('lblSemester')} <span class="text-danger">*</span>`);
 
         const formGroup = $('<div>').addClass('mb-4');
         formGroup.append(label, selectElement);
 
         if (!readonly) {
-            formGroup.append($('<div>').addClass('invalid-feedback').text('يرجى اختيار الفصل الدراسي'));
+            formGroup.append($('<div>').addClass('invalid-feedback').text(`${t('lblPleaseChooseSemester')}`));
         }
 
         container.append(formGroup);
@@ -205,7 +210,7 @@
             .attr('id', `${fieldId}_parentDate`)
             .attr('name', 'dateRange')
             .addClass('form-control')
-            .attr('placeholder', 'اختر تاريخ بداية ونهاية الخطة')
+            .attr('placeholder', `${t('lblChooseDateRange')}`)
             .val(field?.value || '');
 
         if (readonly) {
@@ -285,7 +290,7 @@
         const inputElement = $('<input>')
             .attr('type', 'text')
             .addClass('form-control form-control-sm childDate')
-            .attr('placeholder', 'اختر تاريخ بداية ونهاية الزيارة')
+            .attr('placeholder', `${t('lblChooseVisitDateRange')}`)
             .attr('data-school-id', school.id)
             .attr('data-field-id', dateId)
             .val(visitDateValue || '')
@@ -305,7 +310,7 @@
             .addClass('form-select visitTypeSelect')
             .attr('data-school-id', school.id)
             .attr('data-field-id', selectId)
-            .append($('<option>').val('').text('اختر نوع الزيارة'));
+            .append($('<option>').val('').text(`${t('lblChooseVisitType')}`));
 
         ns.visitTypes.forEach(type => {
             const option = $('<option>')
@@ -399,13 +404,13 @@
         const titleLabel = $('<label>')
             .addClass('form-label')
             .attr('for', `${fieldId}_planTitle`)
-            .html('عنوان <span class="text-danger">*</span>');
+            .html(`${t('lblTitle')} <span class="text-danger">*</span>`);
 
         const titleField = generateTitleField(fieldId, { value: planData?.title }, readonly);
         titleGroup.append(titleLabel, titleField);
 
         if (!readonly) {
-            titleGroup.append($('<div>').addClass('invalid-feedback').text('يرجى إدخال عنوان الخطة'));
+            titleGroup.append($('<div>').addClass('invalid-feedback').text(`${t('lblPleaseEnterPlanTitle')}`));
         }
 
         titleCol.append(titleGroup);
@@ -417,13 +422,13 @@
         const planTypeLabel = $('<label>')
             .addClass('form-label')
             .attr('for', `${fieldId}_ddlPlanType`)
-            .html('نوع الخطة <span class="text-danger">*</span>');
+            .html(`${t('lblPlanType')} <span class="text-danger">*</span>`);
 
         const planTypeField = generatePlanTypeField(fieldId, { value: planData?.planTypeId }, readonly);
         planTypeGroup.append(planTypeLabel, planTypeField);
 
         if (!readonly) {
-            planTypeGroup.append($('<div>').addClass('invalid-feedback').text('يرجى اختيار نوع الخطة'));
+            planTypeGroup.append($('<div>').addClass('invalid-feedback').text(`${t('lblPleaseChoosePlanType')}`));
         }
 
         planTypeCol.append(planTypeGroup);
@@ -442,13 +447,13 @@
         const dateRangeLabel = $('<label>')
             .addClass('form-label')
             .attr('for', `${fieldId}_parentDate`)
-            .html('الفترة الزمنية <span class="text-danger">*</span>');
+            .html(`${t('lblTimePeriod')} <span class="text-danger">*</span>`);
 
         const dateRangeField = generateDateRangeField(fieldId, { value: planData?.dateRange }, readonly);
         dateRangeGroup.append(dateRangeLabel, dateRangeField);
 
         if (!readonly) {
-            dateRangeGroup.append($('<div>').addClass('invalid-feedback').text('يرجى اختيار الفترة الزمنية'));
+            dateRangeGroup.append($('<div>').addClass('invalid-feedback').text(`${t('lblPleaseChooseTimePeriod')}`));
         }
 
         dateRangeCol.append(dateRangeGroup);
@@ -466,7 +471,7 @@
                 $('<td>')
                     .attr('colspan', '7')
                     .addClass('text-center text-muted')
-                    .text('لا توجد بيانات')
+                    .text(`${t('lblNoData')}`)
             );
             tbody.append(emptyRow);
         } else {
@@ -491,7 +496,7 @@
                 .addClass('page-link')
                 .attr('href', '#')
                 .attr('data-page', ns.currentPage - 1)
-                .text('السابق');
+                .text(`${t('lblPrevious')}`);
             prevItem.append(prevLink);
             pagination.append(prevItem);
         }
@@ -518,7 +523,7 @@
                 .addClass('page-link')
                 .attr('href', '#')
                 .attr('data-page', ns.currentPage + 1)
-                .text('التالي');
+                .text(`${t('lblNext')}`);
             nextItem.append(nextLink);
             pagination.append(nextItem);
         }
@@ -683,7 +688,7 @@
                     const cancel = document.createElement('button');
                     cancel.type = 'button';
                     cancel.className = 'fp-cancel';
-                    cancel.textContent = 'إلغاء';
+                    cancel.textContent = `${t('lblCancel')}`;
                     cancel.onclick = (e) => {
                         e.preventDefault();
                         instance.clear();
@@ -693,7 +698,7 @@
                     const apply = document.createElement('button');
                     apply.type = 'button';
                     apply.className = 'fp-apply';
-                    apply.textContent = 'تأكيد';
+                    apply.textContent = `${t('lblConfirm')}`; 
                     apply.onclick = (e) => {
                         e.preventDefault();
                         instance.close();
