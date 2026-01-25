@@ -23,13 +23,6 @@
         if (!prefix || !id) return id;
         return `${prefix}_${id}`;
     };
-
-    // ⚠️ هذه الدالة غير مستخدمة في النظام الجديد
-    ns.applyPrefixToIds = function (container) {
-        // Not needed anymore since we apply prefix during generation
-        console.log('[PrefixSystem] applyPrefixToIds is deprecated');
-    };
-
     // ================== CONSTANTS ==================
     const {
         VALIDATION_RULES,

@@ -84,9 +84,6 @@
             bindEvents(fieldId);
             initializeFilterDatePickers(fieldId);
             populateFilterVisitTypes(fieldId);
-
-            console.log(`[PlanHandler] Instance ${fieldId} initialized (Backend filtering only)`);
-
         } catch (e) {
             console.error(`[PlanHandler] Init failed for ${fieldId}`, e);
             alert('حدث خطأ أثناء التحميل');
@@ -265,17 +262,11 @@
         });
 
         showLoadingState(fieldId);
-
-        console.log(`[PlanHandler] Loading schools from backend: ${API_ENDPOINTS.GET_SCHOOLS}?${params}`);
-
         // ✅ استدعاء API
         jqClient().Get(`${API_ENDPOINTS.GET_SCHOOLS}?${params}`)
             .done(r => {
                 state.allSchools = r.items || [];
                 state.totalRecords = r.totalCount || 0;
-
-                console.log(`[PlanHandler] Loaded ${state.allSchools.length} schools (Total: ${state.totalRecords})`);
-
                 const tbody = ns.renderSchoolTable(
                     fieldId,
                     state.allSchools,
@@ -392,8 +383,6 @@
     /* ===================== EVENTS ===================== */
 
     const bindEvents = (fieldId) => {
-        console.log(`[PlanHandler] Binding events for ${fieldId}`);
-
         const $wrapper = $p(fieldId, 'wrapper');
 
         if (!$wrapper.length) {
@@ -432,8 +421,6 @@
             .on('click', pid(fieldId, 'clearFiltersBtn'), function () {
                 clearFilters(fieldId);
             });
-
-        console.log(`[PlanHandler] Events bound for ${fieldId}`);
     };
 
     const attachRowEvents = (fieldId) => {
@@ -456,9 +443,6 @@
 
     const onPlanTypeChange = (fieldId, element) => {
         const backend = $(element).find(':selected').data('backendname');
-
-        console.log(`[PlanHandler] Plan type changed for ${fieldId}:`, backend);
-
         $p(fieldId, 'semesterContainer').hide();
         ns.destroyChildPicker();
 
@@ -537,7 +521,6 @@
 
         clearTimeout(state.searchTimeout);
         state.searchTimeout = setTimeout(() => {
-            console.log(`[PlanHandler] Search term: "${state.searchTerm}"`);
             // ✅ استدعاء API مع البحث
             loadSchools(fieldId, 1, state.filters);
         }, 300);
@@ -561,9 +544,6 @@
         Object.keys(state.filters).forEach(key => {
             if (!state.filters[key]) delete state.filters[key];
         });
-
-        console.log(`[PlanHandler] Applying filters:`, state.filters);
-
         // ✅ استدعاء API مع الفلاتر
         loadSchools(fieldId, 1, state.filters);
 
@@ -587,9 +567,6 @@
         $p(fieldId, 'filterPreviousResult').val('');
         $p(fieldId, 'filterVisitType').val('');
         $p(fieldId, 'customSearch').val('');
-
-        console.log(`[PlanHandler] Filters cleared`);
-
         // ✅ إعادة تحميل كل المدارس
         loadSchools(fieldId, 1);
     };
@@ -616,7 +593,6 @@
     const onSaveClick = (fieldId, e) => {
         e.preventDefault();
         const payload = collect(fieldId);
-        console.log(`[PlanHandler] SAVE PAYLOAD for ${fieldId}:`, payload);
     };
 
     /* ===================== HELPERS ===================== */
@@ -636,8 +612,6 @@
                 visitTypeId: $p(fieldId, 'planTable').find(`.visitTypeSelect[data-school-id="${schoolId}"]`).val()
             });
         });
-
-        console.log(`[PlanHandler] Selected schools: ${state.selectedSchools.length}`);
     };
 
     const showLoadingState = (fieldId) => {
