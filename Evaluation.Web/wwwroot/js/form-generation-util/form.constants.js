@@ -5,19 +5,20 @@
         PREVIEW: 'preview',
         ACTION: 'action',
     };
-
+    const DepartmentRouting = sharedUtility().extractDepartmentName();
     const ACTION_TYPE = {
         INFO: "INFO",
         APPROVE: "APPROVE",
         REJECT: "REJECT",
+        ASSIGNT_TEAM: "ASSIGNT_TEAM",
         ASSIGN: "ASSIGN",
+        Approve_And_Assign: "APPROVE_AND_ASSIGN",
         INITIALACTION: "INITIALACTION",
         RETURNBACK: "RETURNBACK",
         CLOSE: "CLOSE",
         CLOSE_AND_UPDATE: "CLOSE_AND_UPDATE",
         EDIT: "Edit",
         EditDraft: "EditDraft",
-        Approve_And_Assign: "APPROVE_AND_ASSIGN",
         RequestDataChange: "REQUEST_DATA_CHANGE",
         SubmitMissingData: "SUBMIT_MISSING_DATA",
         SaveAsDraft: "SaveAsDraft",

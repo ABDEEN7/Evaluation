@@ -19,10 +19,20 @@ public class DepartmentService(IServiceScopeFactory serviceScopeFactory,
     RequestInfo requestInfo
     ) : ApiBase(serviceScopeFactory, cacheDataProvider, unitOfWork, loggingServices, mapper, userInfo, serviceProvider, requestInfo)
 {
+    public async Task<Department> GetDepartmentById(Guid Id)
+    {
+        var department = await unitOfWork.GetRepository<Department>()
+            .GetAllActiveNonDeleted()
+            //.Include(d => d.Category)
+            .Where(d => d.Id == Id).FirstOrDefaultAsync();
+        return department;
+    }
     public async Task<List<Department>> GetAllDepartments()
     {
         var departments = await unitOfWork.GetRepository<Department>()
-            .GetAllActiveNonDeleted().Include(d=>d.Category)
+            .GetAllActiveNonDeleted()
+            .Include(d => d.WebsiteAttachment)
+            //.Include(d=>d.Category)
             .ToListAsync();
         return departments;
     }
@@ -40,8 +50,11 @@ public class DepartmentService(IServiceScopeFactory serviceScopeFactory,
     public async Task<List<Department>> GetDepartmentsByWebGroupId(Guid wepGroupId)
     {
         var departments = await unitOfWork.GetRepository<DepWebGroup>()
-            .GetAllActiveNonDeleted(x =>
-                x.WebGroupId == wepGroupId).Select(x=> x.Department).ToListAsync();
+            .GetAllActiveNonDeleted(x => x.WebGroupId == wepGroupId)
+            .Include(x => x.Department)
+            .ThenInclude(d => d.WebsiteAttachment)
+            .Select(x=> x.Department)
+                .ToListAsync();
         return departments;
     }
 }

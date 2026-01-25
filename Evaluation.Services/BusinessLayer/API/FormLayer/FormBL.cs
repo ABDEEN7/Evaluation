@@ -36,7 +36,7 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
                         {
                             Id = relatedFromItem.RelatedItemId,
                             Note = formItemValue?.Note,
-                            Value = formItemValue?.Value?.ToString(),
+                            Value = formItemValue?.ActualValue?.ToString(),
                             Name = relatedFromItem.RelatedItem.NameAr
                         });
                 }
@@ -70,7 +70,7 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
                     var formItemsValue = await formService.GetFormItemValue(item.Id);
                     if (formItemsValue != null)
                     {
-                        formItemsValue.Value = item.Value;
+                        formItemsValue.ActualValue = item.ActualValue;
                         formItemsValue.Note = item.Note;
                     }
                     await formService.UpdateFormItemValue(formItemsValue);
@@ -124,7 +124,7 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
             var formItemsValue = await formService.GetFormItemValue(item.Id);
             if (formItemsValue != null)
             {
-                formItemsValue.Value = item.Value;
+                formItemsValue.ActualValue = item.ActualValue;
                 formItemsValue.Note = item.Note;
             }
             await formService.UpdateFormItemValue(formItemsValue);

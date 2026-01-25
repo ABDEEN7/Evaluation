@@ -26,4 +26,5 @@ public class EvaluationRequest : EntityBase
     public string? RequestNumber  { get; set; }
     public long Sequence { get; set; }
 
+
 }

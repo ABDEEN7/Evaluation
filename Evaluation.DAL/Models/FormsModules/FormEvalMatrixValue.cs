@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Evaluation.DAL.Models.FormsModules
 {
-    public  class FormEvalMarixValue : EntityBase , IAuditLogEntity
+    public  class FormEvalMatrixValue : EntityBase , IAuditLogEntity
     {
         public Guid FormEvalMatrixId { get; set; }
         public FormEvalMatrix? FormEvalMatrix { get; set; }
@@ -16,6 +16,7 @@ namespace Evaluation.DAL.Models.FormsModules
         public string NameEn { get; set; } = null!;
         public decimal MinValue { get; set; } 
         public decimal MaxValue { get; set; }
+        public decimal ActualMatrixValue { get; set; }
         public string? DescAr { get; set; }
         public string? DescEn { get; set; }
         public int OrderNo { get; set; } = 0;

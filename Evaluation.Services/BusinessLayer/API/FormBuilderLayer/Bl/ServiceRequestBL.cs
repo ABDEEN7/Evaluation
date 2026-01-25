@@ -15,6 +15,7 @@ using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Helper;
 using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Api.ActionEntitiesDTOs;
+using Evaluation.SharedHelper.Models.Api.EvaluationRequestEntities;
 using Evaluation.SharedHelper.Models.Api.FormBuilderDTO;
 using Evaluation.SharedHelper.Models.Api.ServiceRequestEntitiesDTO;
 using Microsoft.AspNetCore.Http;
@@ -32,7 +33,7 @@ namespace Evaluation.Services.Models.API
     public class ServiceRequestBL(
         IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow, SrvNotification SrvNotification, SrvUser SrvUser, 
         LoggingServices loggingServices, IMapper mapper, UserInfo userInfo,   SrvAction SrvAction, 
-        SrvStatus SrvStatus, SrvAssignment SrvAssignment,  SrvActionTransactionsLog SrvActionTransactionsLog,  PerformActionBL _performActionBL,
+        SrvStatus SrvStatus, SrvAssignment SrvAssignment,SrvEvaluationRequestAssignment _srvEvaluationRequestAssignment, SrvActionTransactionsLog SrvActionTransactionsLog,  PerformActionBL _performActionBL,
 
 		SrvService SrvService, SrvServiceRequest _srvServiceRequest, EvaluationRequestService _evaluationRequestService, SrvAttachments _srvAttachments, IServiceProvider serviceProvider,RequestInfo _requestInfo)
             : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, _requestInfo)
@@ -302,7 +303,7 @@ namespace Evaluation.Services.Models.API
 										.GetAllQueryFiltered()
 										.Include(c => c.Status)
 										.Where(c => c.PlanId == PlanId || serviceObj.Initialservice)
-										.Where(c => c.ServiceId == serviceObj.Id && c.Status!.IsOpen && !c.IsDeleted!.Value)
+										.Where(c => c.ServiceId == serviceObj.Id && c.Status!.IsOpen && !c.IsDeleted)
 										//.Where(c => c.OrgTreeId == userInfo!.UserId || isMinistry)
 										.CountAsync();
 
@@ -336,6 +337,11 @@ namespace Evaluation.Services.Models.API
 
 			var url = await _srvAttachments.GetAttachmentById(attachmentId, requestId);
 			return url!;
+		}
+
+		public async Task<NdaApproveResponse> ApproveNda(NdaApproveRequest dto)
+		{
+			return  await _srvEvaluationRequestAssignment.ApproveNda(dto);
 		}
 	}
 }

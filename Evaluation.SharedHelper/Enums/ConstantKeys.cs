@@ -160,6 +160,7 @@ public static class ConstantKeys
         public static readonly string OrgTreeExistsEvaluationRequest = "OrgTreeExistsEvaluationRequest";
         public static readonly string OrgTreeExistsOrgAcademicYear = "OrgTreeExistsOrgAcademicYear";
         public static readonly string JobTitleCannotDelete = "JobTitleCannotDelete";
+        public static readonly string DepartmentEvaluationParty = "DepartmentEvaluationParty";
         public static readonly string EvalFormExistsFormItem = "EvalFormExistsFormItem";
         public static readonly string EvalFormExistsFormScope = "EvalFormExistsFormScope";
         public static readonly string FormItemExistsFormItemValues = "FormItemExistsFormItemValues";
@@ -176,6 +177,7 @@ public static class ConstantKeys
         public static readonly string NdaStatusCannotDelete = "NdaStatusCannotDelete";
         public static readonly string EvaluationRequestAssignment = "EvaluationRequestAssignment";
         public static readonly string NdaStatusNotFound = "NdaStatusNotFound";
+        public static readonly string ScopeNotExistsFormAssignment = "ScopeNotExistsFormAssignment";
     }
 
     public static class AdminSettings
@@ -317,6 +319,7 @@ public static class ConstantKeys
         public static readonly string AdminEducationLevel = "AdminEducationLevel";
         public static readonly string AdminEmployees = "AdminEmployees";
         public static readonly string AdminEvaluationParties = "AdminEvaluationParties";
+        public static readonly string AdminDepartmentEvaluationParty = "AdminDepartmentEvaluationParty";
         public static readonly string AdminEvaluationType = "AdminEvaluationType";
         public static readonly string AdminFormEvalMarixValue = "AdminFormEvalMarixValue";
         public static readonly string AdminCssClass = "AdminCssClass";
@@ -830,6 +833,12 @@ public static class ConstantKeys
 
         #endregion
 
+        #region DepartmentEvaluationPartyVM
+        public const string VIEW_ADMIN_DEPARTMENTEVALUATIONPARTY = "VIEW_ADMIN_DEPARTMENTEVALUATIONPARTY";
+        public const string ADD_ADMIN_DEPARTMENTEVALUATIONPARTY = "ADD_ADMIN_DEPARTMENTEVALUATIONPARTY";
+        public const string EDIT_ADMIN_DEPARTMENTEVALUATIONPARTY = "EDIT_ADMIN_DEPARTMENTEVALUATIONPARTY";
+        public const string DELETE_ADMIN_DEPARTMENTEVALUATIONPARTY = "DELETE_ADMIN_DEPARTMENTEVALUATIONPARTY";
+        #endregion
         #region NDAStatus
         public const string VIEW_ADMIN_NDAStatus = "VIEW_ADMIN_NDASTATUS";
         public const string ADD_ADMIN_NDAStatus = "ADD_ADMIN_NDASTATUS";
@@ -1082,6 +1091,7 @@ public static class ConstantKeys
         public const string Reject = "REJECT";
         public const string Info = "INFO";
         public const string Assign = "ASSIGN";
+        public const string ASSIGNT_TEAM = "ASSIGNT_TEAM";
         public const string CloseAndUpdate = "CLOSE_AND_UPDATE";
         public const string EDIT = "Edit";
         public const string RETURNBACK = "RETURNBACK";
@@ -1127,4 +1137,9 @@ public static class ConstantKeys
 		public static readonly string Forms = "Forms";
 		public static readonly string Complain = "Complain";
 	}
+    public static class NDAStatic
+    {
+        public static string Pending = "PENDING";
+        public static string Objection = "OBJECTION";
+    }
 }

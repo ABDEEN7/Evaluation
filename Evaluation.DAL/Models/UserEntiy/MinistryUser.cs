@@ -1,5 +1,6 @@
 ﻿using Evaluation.DAL.Models.BaseModule;
 using Evaluation.DAL.Models.Master;
+using Evaluation.DAL.Models.Planing.TeamsModule;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -27,6 +28,7 @@ public class MinistryUser : EntityBase
     public string DirectManagerQId { get; set; } = string.Empty;
     public string? EmployeeNo { get; set; }
     public string? OrganizationNo { get; set; }
-    public ICollection<UserPartyType>? UserPartTypes { get; set; } = new List<UserPartyType>();
-    public ICollection<UserRole>? UserRoles { get; set; } = new List<UserRole>();
+    public ICollection<UserPartyType>? UserPartTypes { get; set; }
+    public ICollection<UserRole>? UserRoles { get; set; } 
+    public ICollection<UserTeam>? UserTeams { get; set; }
 }

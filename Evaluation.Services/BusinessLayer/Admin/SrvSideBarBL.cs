@@ -38,7 +38,7 @@ namespace Evaluation.Services.Models.Admin
                     OrderNo = c.OrderNo,
                     ParentId = c.ParentId,
                     Icon = c.Icon,
-                    IsActive = c.IsActive ?? false,
+                    IsActive = c.IsActive,
                     PermissionId = c.PermissionId
 
                 }).ToListAsync();
