@@ -1,4 +1,5 @@
-﻿using Evaluation.DAL.Models.BaseModule;
+﻿using Evaluation.DAL.Models.Audit;
+using Evaluation.DAL.Models.BaseModule;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Evaluation.DAL.Models.UserEntiy
 {
-   public class UserType : EntityBase
+   public class UserType : EntityBase, IAuditLogEntity
     {
         public string NameAr { get; set; } = null!;
         public string NameEn { get; set; } = null!;

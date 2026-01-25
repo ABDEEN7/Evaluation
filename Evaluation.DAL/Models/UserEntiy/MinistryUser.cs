@@ -1,4 +1,5 @@
-﻿using Evaluation.DAL.Models.BaseModule;
+﻿using Evaluation.DAL.Models.Audit;
+using Evaluation.DAL.Models.BaseModule;
 using Evaluation.DAL.Models.Master;
 using Evaluation.DAL.Models.Planing.TeamsModule;
 using Microsoft.EntityFrameworkCore;
@@ -7,7 +8,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Evaluation.DAL.Models.UserEntiy;
 [Index(nameof(QID), IsUnique = true)]
 
-public class MinistryUser : EntityBase
+public class MinistryUser : EntityBase, IAuditLogEntity
 {
     public string QID { get; set; } = null!;
     public string Email { get; set; } = null!;
