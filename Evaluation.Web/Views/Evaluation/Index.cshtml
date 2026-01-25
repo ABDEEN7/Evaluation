@@ -81,6 +81,7 @@
              if (!sharedUtility().ExistingToken()) {
                 sharedUtility().RedirectUnauthorized();
             }
+           
             await webAppConfigsSetup().Init({
                 pageNames: [
                     '@nameof(ConstantKeys.WebAppCommon)',

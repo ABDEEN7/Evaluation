@@ -33,13 +33,7 @@ namespace Evaluation.Web.Controllers
         }
 
 
-        [HttpPost]
-        public IActionResult UiControlList()
-        {
-            var model = Request.Form["request"][0]?.StringToObject<List<UiControlItemDTO>>();
-
-            return ViewComponent("UiControlList", model);
-        }
+      
 
         
     }
