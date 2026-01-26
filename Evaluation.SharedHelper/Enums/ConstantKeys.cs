@@ -40,7 +40,7 @@ public static class ConstantKeys
         public static readonly string StatusExistsServiceStatusPreventPartyType = "StatusExistsServiceStatusPreventPartyType";
         public static readonly string DraftPlanWithSameAcademicYearAlreadyExists = "DraftPlanWithSameAcademicYearAlreadyExists";
         public static readonly string PlanIsNotFound = "PlanIsNotFound";
-        public static readonly string InvalidApprovePlan = "InvalidApprovePlan";
+        public static readonly string InvalidPlan = "InvalidPlan";
         public static readonly string InvalidEvaluationDate = "InvalidEvaluationDate";
         public static readonly string PlanInThePastIsNotAllowed = "PlanInThePastIsNotAllowed";
         public static readonly string InvalidDraftPlan = "InvalidDraftPlan";
@@ -178,6 +178,10 @@ public static class ConstantKeys
         public static readonly string EvaluationRequestAssignment = "EvaluationRequestAssignment";
         public static readonly string NdaStatusNotFound = "NdaStatusNotFound";
         public static readonly string ScopeNotExistsFormAssignment = "ScopeNotExistsFormAssignment";
+        public static readonly string CompareDateException = "CompareDateException";
+        public static readonly string StartSchoolPlanDateException = "StartSchoolPlanDateException";
+        public static readonly string EndSchoolPlanDateException = "EndSchoolPlanDateException";
+
     }
 
     public static class AdminSettings
