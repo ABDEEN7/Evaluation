@@ -549,9 +549,9 @@
 
         // ✅ جمع قيم الفلاتر
         state.filters = {
-            schoolName: $p(fieldId, 'filterSchoolName').val(),
+            name: $p(fieldId, 'filterSchoolName').val(),
             lastEvalDate: $p(fieldId, 'filterLastEvalDate').val(),
-            createdDate: $p(fieldId, 'filterCreatedDate').val(),
+            establishmentDate: $p(fieldId, 'filterCreatedDate').val(),
             nextEvalDate: $p(fieldId, 'filterNextEvalDate').val(),
             previousResult: $p(fieldId, 'filterPreviousResult').val(),
             visitType: $p(fieldId, 'filterVisitType').val()

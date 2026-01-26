@@ -25,7 +25,8 @@
     }
 
     async function InitializeCreatePlanRequest() {
-        const createPlanService =  await fu.fetchJSON(`/FormRender/GetCreatePlanService`);
+        var deprouting = sharedUtility().extractDepartmentName();
+        const createPlanService = await fu.fetchJSON(`/FormRender/${deprouting}/GetCreatePlanService`);
         if (!createPlanService) {
             redirectToDefault();
             return;
