@@ -73,11 +73,10 @@ public class SchoolRepository(IServiceScopeFactory serviceScopeFactory,
 
     public async Task<IQueryable<DepEvaluationType>> GetVisitTypes()
     {
-        Guid? departmentId = await serviceProvider.GetRequiredService<DepartmentService>().GetDepartmentIdAsync();
         var visitTypes =
         unitOfWork
         .GetRepository<DepEvaluationType>()
-        .GetAllActiveNonDeleted(x => x.DepartmentId == departmentId);
+        .GetAllActiveNonDeleted(x => x.DepartmentId == requestInfo.DepId);
         return visitTypes;
     }
 

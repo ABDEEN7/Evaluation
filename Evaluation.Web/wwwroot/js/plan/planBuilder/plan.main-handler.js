@@ -403,11 +403,6 @@
                 onSemesterChange(fieldId, this);
             });
 
-        $wrapper.off('click', pid(fieldId, 'btnSavePlan'))
-            .on('click', pid(fieldId, 'btnSavePlan'), function (e) {
-                onSaveClick(fieldId, e);
-            });
-
         // ✅ البحث: استدعاء API بعد 300ms من التوقف عن الكتابة
         $wrapper.off('input', pid(fieldId, 'customSearch'))
             .on('input', pid(fieldId, 'customSearch'), function () {
