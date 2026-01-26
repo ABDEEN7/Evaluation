@@ -1105,13 +1105,11 @@ public static class ConstantKeys
 
 	public static class ModuleType
 	{
-		public static readonly string EvaluationPlan = "EvaluationPlan";
-		public static readonly string EvaluationPlanRequest = "EvaluationPlanRequest";
-		public static readonly string EvaluationParty = "EvaluationParty";
-		public static readonly string Forms = "Forms";
-		public static readonly string Complain = "Complain";
+		public const string EvaluationPlan = "EvaluationPlan";
+		public const string EvaluationRequest = "EvaluationRequest";
+		public const string EvaluationParty = "EvaluationParty";
 	}
-    public static class NDAStatic
+	public static class NDAStatic
     {
         public static string Pending = "PENDING";
         public static string Objection = "OBJECTION";

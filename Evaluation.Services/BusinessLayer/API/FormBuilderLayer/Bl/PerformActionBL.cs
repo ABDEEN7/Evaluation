@@ -11,6 +11,7 @@ using Evaluation.Services.BusinessLayer.API;
 using Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices;
 using Evaluation.Services.Extensions;
 using Evaluation.Services.Special;
+using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Helper;
 using Evaluation.SharedHelper.Models;
@@ -37,7 +38,7 @@ namespace Evaluation.Services.Models.API
             : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, _requestInfo)
     {
 
-		public async Task<PerforActionResponseDTO> PerformAction(ServiceRequest application, Service serviceObj, IList<FieldValueDTO> Fields, string actionname, List<AssignUserDTO> users, string Remarks, bool saveAsDraft = false)
+		public async Task<PerforActionResponseDTO> PerformAction(ServiceRequest application, RequestType RequestType, Service serviceObj, IList<FieldValueDTO> Fields, string actionname, List<AssignUserDTO> users, string Remarks, bool saveAsDraft = false)
 		{
 			string lang = _requestInfo.Lang;
 			var result = new PerforActionResponseDTO();
@@ -51,20 +52,15 @@ namespace Evaluation.Services.Models.API
 			var actionConfigurationTask = SrvAction.GetActionConfigurationAsync(actiondb!.Id, application.StatusId);
 			var existingFieldsTask = SrvServiceRequest.GetRequestFieldsValueAsync(application.Id);
 
-			Fields = await UpdateCustomFieldJsonSchemaValue(application.Id, Fields);
-
+			//Fields = await UpdateCustomFieldJsonSchemaValue(application.Id, Fields);
 
 			var currentStatus = application.StatusId;
-
-
-
-
 
 			var existingFields = await existingFieldsTask;
 			var approvedFieldIds = existingFields
 									.Where(f => f.IsApproved == true)
 									.Select(f => f.FieldId)
-									.ToHashSet();
+									.ToList();
 
 			var editableFields = actiondb.ActionFields!
 									 .Where(f =>
@@ -79,7 +75,7 @@ namespace Evaluation.Services.Models.API
 									 .ToList();
 			var actionConfiguration = await actionConfigurationTask;
 			result.notifications = actionConfiguration!.Notifications;
-			var actionTransactionlog = await SrvActionTransactionsLog.UpdateStatusAndLogAction(application, actiondb.Id, actionConfiguration.NextStatusId, Remarks, saveAsDraft);
+			var actionTransactionlog = await SrvActionTransactionsLog.UpdateStatusAndLogAction(RequestType,application, actiondb.Id, actionConfiguration.NextStatusId, Remarks, saveAsDraft);
 
 
 			var integrationFieldsDtos = actiondb.ActionFields!
@@ -115,34 +111,32 @@ namespace Evaluation.Services.Models.API
 
 
 			
-			var FieldsToUpdates = Fields
-								  .Where(c => editableFields.Contains(c.FieldId!.Value) || c.BackendName == "EntityContractId" || c.BackendName == "SectorId")
-								  .ToList();
+			var FieldsToUpdates = Fields.Where(c => editableFields.Contains(c.FieldId!.Value)).ToList();
 			switch (actiondb.ActionType.BackendName)
 			{
 				case ActionTypeKeys.Approve:
-					await ApproveUneditedFieldsAsync(application.ServiceId, application.Id, FieldsToUpdates, existingFields, Fields, lang, actiondb.Id);
+					await ApproveUneditedFieldsAsync(application.ServiceId, RequestType, application.Id, FieldsToUpdates, existingFields, Fields, lang, actiondb.Id);
 					break;
 
 				case ActionTypeKeys.Info:
 				case ActionTypeKeys.INFO_WITH_DRAFT:
-					var updatedfields = await PrepareAndUpdateFields(application.ServiceId, application.Id, FieldsToUpdates.ToList(), existingFields, lang, actiondb.Id, approvedIntegrationFields);
+					var updatedfields = await PrepareAndUpdateFields(application.ServiceId, RequestType, application.Id, FieldsToUpdates.ToList(), existingFields, lang, actiondb.Id, approvedIntegrationFields);
 					break;
 				case ActionTypeKeys.INFO_Override_Approve:
 					await UnApproveFields(existingFields, Fields);
-					await PrepareAndUpdateFields(application.ServiceId, application.Id, FieldsToUpdates.ToList(), existingFields, lang, actiondb.Id, approvedIntegrationFields);
+					await PrepareAndUpdateFields(application.ServiceId, RequestType, application.Id, FieldsToUpdates.ToList(), existingFields, lang, actiondb.Id, approvedIntegrationFields);
 					break;
 				case ActionTypeKeys.EDIT:
-					await PrepareAndUpdateFields(application.ServiceId, application.Id, FieldsToUpdates.ToList(), existingFields, lang, actiondb.Id, approvedIntegrationFields);
+					await PrepareAndUpdateFields(application.ServiceId, RequestType, application.Id, FieldsToUpdates.ToList(), existingFields, lang, actiondb.Id, approvedIntegrationFields);
 					break;
 				case ActionTypeKeys.Assign:
 					await SrvAssignment.PerformAssignAction(application.Id, users!);
-					await AddOrUpdateFields(Fields, existingFields, application.Id, lang, actiondb.Id);
+					await AddOrUpdateFields(Fields, RequestType, existingFields, application.Id, lang, actiondb.Id);
 					break;
 
 				case ActionTypeKeys.Approve_And_Assign:
 					await SrvAssignment.PerformAssignAction(application.Id, users!);
-					await ApproveUneditedFieldsAsync(application.ServiceId, application.Id, FieldsToUpdates, existingFields, Fields, lang, actiondb.Id);
+					await ApproveUneditedFieldsAsync(application.ServiceId, RequestType, application.Id, FieldsToUpdates, existingFields, Fields, lang, actiondb.Id);
 					break;
 
 				case ActionTypeKeys.Reject:
@@ -175,13 +169,13 @@ namespace Evaluation.Services.Models.API
 				//	await srvScholarship.UpdateScholarship(serviceObj, application, actiondb, ApprovedOrActionFields, lang);
 				//	break;
 				case ActionTypeKeys.Close:
-					await AddOrUpdateFields(FieldsToUpdates, existingFields, application.Id, lang, actiondb.Id);
+					await AddOrUpdateFields(FieldsToUpdates, RequestType, existingFields, application.Id, lang, actiondb.Id);
 					break;
 				case ActionTypeKeys.UPDATE_ITEGRATION_FIELDS:
-					await PrepareAndUpdateFields(application.ServiceId, application.Id, FieldsToUpdates.ToList(), existingFields, lang, actiondb.Id, approvedIntegrationFields);
+					await PrepareAndUpdateFields(application.ServiceId, RequestType, application.Id, FieldsToUpdates.ToList(), existingFields, lang, actiondb.Id, approvedIntegrationFields);
 					break;
 				default:
-					await PrepareAndUpdateFields(application.ServiceId, application.Id, Fields.ToList(), existingFields, lang, actiondb.Id, approvedIntegrationFields);
+					await PrepareAndUpdateFields(application.ServiceId, RequestType, application.Id, Fields.ToList(), existingFields, lang, actiondb.Id, approvedIntegrationFields);
 					break;
 			}
 
@@ -230,17 +224,17 @@ namespace Evaluation.Services.Models.API
 
 			return Guid.TryParse(valueStr, out var result) ? result : (Guid?)null;
 		}
-		private async Task<List<ServiceRequestFieldsValue>> ApproveUneditedFieldsAsync(Guid serviceId, Guid applicationId, List<FieldValueDTO> FieldsToUpdate, List<ServiceRequestFieldsValue> existingFields, IList<FieldValueDTO> allFields, string lang, Guid actionId)
+		private async Task<List<ServiceRequestFieldsValue>> ApproveUneditedFieldsAsync(Guid serviceId, RequestType RequestType, Guid applicationId, List<FieldValueDTO> FieldsToUpdate, List<ServiceRequestFieldsValue> existingFields, IList<FieldValueDTO> allFields, string lang, Guid actionId)
 		{
 			List<ServiceRequestFieldsValue> updatedFields = new();
 
 			if (FieldsToUpdate.Count > 0)
 			{
-				updatedFields = await PrepareAndUpdateFields(serviceId, applicationId, FieldsToUpdate, existingFields, lang, actionId);
+				updatedFields = await PrepareAndUpdateFields(serviceId, RequestType, applicationId, FieldsToUpdate, existingFields, lang, actionId);
 				existingFields.AddRange(updatedFields);
 			}
 
-			var editedFieldIds = new HashSet<Guid>(FieldsToUpdate.Select(f => f.FieldId!.Value));
+			var editedFieldIds = new List<Guid>(FieldsToUpdate.Select(f => f.FieldId!.Value));
 
 			var fieldsToApprove = existingFields
 				.Where(x =>
@@ -303,13 +297,13 @@ namespace Evaluation.Services.Models.API
 
 			return (allFields, approvedFields);
 		}
-		private async Task<List<ServiceRequestFieldsValue>> PrepareAndUpdateFields(Guid serviceId, Guid requestId, List<FieldValueDTO> fields, List<ServiceRequestFieldsValue> existingFields, string lang, Guid actionId, List<FieldValueDTO>? approvedIntegrationFields = null)
+		private async Task<List<ServiceRequestFieldsValue>> PrepareAndUpdateFields(Guid serviceId, RequestType RequestType, Guid requestId, List<FieldValueDTO> fields, List<ServiceRequestFieldsValue> existingFields, string lang, Guid actionId, List<FieldValueDTO>? approvedIntegrationFields = null)
 		{
 			if (fields == null || fields.Count == 0)
 				return existingFields;
 
 
-			var updatedFiels = await AddOrUpdateFields(fields, existingFields, requestId, lang, actionId, approvedIntegrationFields!);
+			var updatedFiels = await AddOrUpdateFields(fields, RequestType, existingFields, requestId, lang, actionId, approvedIntegrationFields!);
 			return updatedFiels;
 		}
 		private async Task HandleRejectAction(List<ServiceRequestFieldsValue> existingField, IList<FieldValueDTO> fields, Guid actionId)
@@ -336,7 +330,7 @@ namespace Evaluation.Services.Models.API
 				foreach (var fieldId in relatedFieldViewConditionsFieldIds)
 				{
 					var relatedFieldToBeRejected = await uow.GetRepository<ServiceRequestFieldsValue>()
-						.GetAllQueryFiltered(x => x.FieldId == fieldId && x.ServiceRequestId == item.ServiceRequestId)
+						.GetAllQueryFiltered(x => x.FieldId == fieldId && x.RefId == item.RefId)
 						.AsNoTracking().ToListAsync();
 
 					dependentRejectedFields.AddRange(relatedFieldToBeRejected);
@@ -454,7 +448,7 @@ namespace Evaluation.Services.Models.API
 
 			var list = await serviceScopeFactory.CreateScopedUow()
 												.GetRepository<ServiceRequestFieldsValue>()
-												.GetAllQueryFiltered(x => x.ServiceRequestId == requestId && fieldIdsList.Contains(x.FieldId))
+												.GetAllQueryFiltered(x => x.RefId == requestId && fieldIdsList.Contains(x.FieldId))
 												.Include(x => x.Field).AsNoTracking()
 												.Where(x => x.Field!.FormGroupListId != null)
 												.ToListAsync();
@@ -478,7 +472,7 @@ namespace Evaluation.Services.Models.API
 
 			return fields;
 		}
-		private async Task<List<ServiceRequestFieldsValue>> AddOrUpdateFields(IList<FieldValueDTO> fields, List<ServiceRequestFieldsValue> requestFieldsValues, Guid requestId, string lang, Guid actionId, List<FieldValueDTO>? approvedIntegrationFields = null)
+		private async Task<List<ServiceRequestFieldsValue>> AddOrUpdateFields(IList<FieldValueDTO> fields,RequestType RequestType, List<ServiceRequestFieldsValue> requestFieldsValues, Guid requestId, string lang, Guid actionId, List<FieldValueDTO>? approvedIntegrationFields = null)
 		{
 
 			var transactionLogs = new List<FieldValueTransactionsLog>();
@@ -519,7 +513,8 @@ namespace Evaluation.Services.Models.API
 					FieldId = field.FieldId!.Value,
 					Value = field.Value,
 					IsActive = true,
-					ServiceRequestId = requestId,
+					RefId = requestId,
+					RequestType = RequestType.ToString(),
 					IsApproved = isApproved
 				};
 			}).ToList();

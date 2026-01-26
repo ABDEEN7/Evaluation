@@ -1,22 +1,26 @@
 ﻿using AutoMapper;
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.DepartementEntites;
+using Evaluation.DAL.Models.ServiceEnities;
 using Evaluation.DAL.Models.UserEntiy;
 using Evaluation.DAL.Repositories;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper;
+using Evaluation.SharedHelper.Enums;
+using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Admin;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using static Evaluation.SharedHelper.Enums.ConstantKeys;
 
 
 namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 {
-    public class  SystemModuleSrv(IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow, LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, IServiceProvider serviceProvider, RequestInfo _requestInfo)
+    public class SystemModuleSrv(IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow, LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, IServiceProvider serviceProvider, RequestInfo _requestInfo)
             : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, _requestInfo)
-        {
-        
+    {
+
 
         public async Task<SystemModule> GetSystemModuleByRoutingAsync(string routing)
         {
@@ -102,5 +106,35 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             return result;
         }
 
-    }
+
+        ///////////////
+        ///
+        public  RequestType GetRequestType(Service service)
+        {
+            if (service == null)
+                throw new ArgumentNullException(nameof(service));
+
+            var backendName = service.SystemModule?
+                                     .SystemModuleType?
+                                     .BackendName;
+
+            return ResolveRequestTypeByBackendName(backendName);
+        }
+
+       
+
+		private static RequestType ResolveRequestTypeByBackendName(string? backendName)
+		{
+			return backendName switch
+			{
+				ModuleType.EvaluationRequest => RequestType.Evaluation,
+
+				ModuleType.EvaluationPlan or
+				ModuleType.EvaluationParty => RequestType.Service,
+
+				_ => RequestType.Service
+			};
+		}
+
+	}
 }

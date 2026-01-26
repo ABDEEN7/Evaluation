@@ -16,8 +16,7 @@ namespace Evaluation.DAL.Models.SystemLog
     {
         public Guid ServiceActionId { get; set; }
         public ServiceAction? ServiceAction { get; set; }
-        public Guid ServiceRequestId { get; set; }
-        public ServiceRequest? ServiceRequest { get; set; }
+        public string RequestType { get; set; }
         public Guid RefId { get; set; }
         public SystemModule? SystemModule { get; set; }
         public Guid? SystemModuleId { get; set; }

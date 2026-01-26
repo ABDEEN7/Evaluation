@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
+using Azure.Core;
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.Attachments;
 using Evaluation.DAL.Models.FormBuilder;
+using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
 using Evaluation.DAL.Repositories;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper;
@@ -47,7 +49,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                 return attachment;
 
         }
-        public async Task<List<FieldValueDTO>> UploadAndInsertAttachments(List<FieldValueDTO> FieldValueDTOs, Guid? RequestId, Guid? EvaluationRequestId, List<FileFieldDTO> fileFields, List<IFormFile> files)
+        public async Task<List<FieldValueDTO>> UploadAndInsertAttachments(List<FieldValueDTO> FieldValueDTOs, RequestType requestType, Guid? RequestId,Guid? EvaluationRequestId, List<FileFieldDTO> fileFields, List<IFormFile> files)
         {
             if (files.Any())
             {
@@ -59,8 +61,8 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                     {
                         throw new BusinessException(ConstantKeys.ExceptionMessage.IncompleteRequest);
                     }
-
-                    var attachmentsToBeInserted = new List<EvalAttachment>();
+					var (srId, erId) = ResolveOwner(requestType, RequestId);
+					var attachmentsToBeInserted = new List<EvalAttachment>();
                     uploadedFiles.ForEach(fileDTO =>
                     {
 
@@ -76,10 +78,10 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                                 UiFileName = parts.Length > 2 ? parts[2] : fileDTO.FileName,
                                 FileExtension = Path.GetExtension(fileDTO.FileName),
                                 FileSize = fileDTO.FileLength!.Value,
-                                ServiceRequestId = RequestId,
+                                ServiceRequestId = srId,
                                 ChildFieldId = parts.Length > 2 ? Guid.Parse(parts[0]) : null,
                                 Index = parts.Length > 2 ? parts[1] : null,
-                                EvaluationRequestId= EvaluationRequestId,
+                                EvaluationRequestId= erId ?? EvaluationRequestId,
                             };
 
                             attachmentsToBeInserted.Add(attachment);
@@ -122,7 +124,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             }
             return FieldValueDTOs;
         }
-        public async Task<List<EvalAttachment>> UploadAndInsertOtherAttachments(List<IFormFile> files, Guid? actionlog,Guid? EvaluationRequestId)
+        public async Task<List<EvalAttachment>> UploadAndInsertOtherAttachments(List<IFormFile> files, Guid? actionlog, RequestType requestType, Guid? RequestId, Guid? EvaluationRequestId )
         {
             if (files.Any())
             {
@@ -135,7 +137,10 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                     {
                         throw new BusinessException(ConstantKeys.ExceptionMessage.IncompleteRequest);
                     }
-                    var attachmentsToBeInserted = new List<EvalAttachment>();
+
+					var (srId, erId) = ResolveOwner(requestType, RequestId);
+
+					var attachmentsToBeInserted = new List<EvalAttachment>();
                     uploadedFiles.ForEach(fileDTO =>
                     {
                         var attachment = new EvalAttachment()
@@ -146,7 +151,9 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                             FileExtension = Path.GetExtension(fileDTO.FileName),
                             FileSize = fileDTO.FileLength!.Value,
                             IsOthers = true,
-                            EvaluationRequestId= EvaluationRequestId,
+                            ServiceRequestId = srId,
+                            EvaluationRequestId = erId ?? EvaluationRequestId ,
+
 
                         };
 
@@ -163,7 +170,14 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             return null!;
 
         }
-        public async Task<IEnumerable<EvalAttachment>> InsertAttachments(List<EvalAttachment> attachments)
+
+		private static (Guid? serviceRequestId, Guid? evaluationRequestId) ResolveOwner(RequestType requestType, Guid? requestId)
+		{
+			return requestType == RequestType.Evaluation
+				? (null, requestId)
+				: (requestId, null);
+		}
+		public async Task<IEnumerable<EvalAttachment>> InsertAttachments(List<EvalAttachment> attachments)
         {
             return await uow.GetRepository<EvalAttachment>().InsertRange(attachments);
         }

@@ -38,7 +38,7 @@ namespace Evaluation.DAL.Models.ServiceRequestEntities
         public DateTime? VisitDateFrom { get; set; }
         public DateTime? VisitDateTo { get; set; }
 
-        public virtual ICollection<EvaluationRequestFieldsValue>? ServiceRequestFieldsValues { get; set; }
+        public virtual ICollection<ServiceRequestFieldsValue>? ServiceRequestFieldsValues { get; set; }
 		public virtual ICollection<RequestAssignment>? Assignments { get; set; }
 	}
 }
