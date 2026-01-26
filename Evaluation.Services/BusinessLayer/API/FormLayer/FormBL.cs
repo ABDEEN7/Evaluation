@@ -10,6 +10,7 @@ using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Models;
 using FluentResults;
 using Microsoft.Extensions.DependencyInjection;
+using ValidationResult = Evaluation.SharedHelper.Dtos.Shared.ValidationResult;
 
 namespace Evaluation.Services.BusinessLayer.API.FormLayer;
 
