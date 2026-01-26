@@ -181,6 +181,9 @@ public static class ConstantKeys
         public static readonly string EvaluationRequestAssignment = "EvaluationRequestAssignment";
         public static readonly string NdaStatusNotFound = "NdaStatusNotFound";
         public static readonly string ScopeNotExistsFormAssignment = "ScopeNotExistsFormAssignment";
+        public static readonly string TheSelectedValueIsNotRecognized = "TheSelectedValueIsNotRecognized";
+        public static readonly string FormDataIsNotValid = "FormDataIsNotValid";
+        public static readonly string FormDataIsNull = "FormDataIsNull";
         public static readonly string CompareDateException = "CompareDateException";
         public static readonly string StartSchoolPlanDateException = "StartSchoolPlanDateException";
         public static readonly string EndSchoolPlanDateException = "EndSchoolPlanDateException";
