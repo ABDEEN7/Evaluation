@@ -2,6 +2,7 @@
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.ActionEntities;
 using Evaluation.DAL.Models.FormBuilder;
+using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
 using Evaluation.DAL.Models.ServiceEnities;
 using Evaluation.DAL.Models.ServiceRequestEntities;
 using Evaluation.DAL.Models.SystemLog;
@@ -11,6 +12,7 @@ using Evaluation.Services.BusinessLayer.API;
 using Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices;
 using Evaluation.Services.Extensions;
 using Evaluation.Services.Special;
+using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Helper;
 using Evaluation.SharedHelper.Models;
@@ -32,7 +34,7 @@ namespace Evaluation.Services.Models.API
 
     public class ServiceRequestBL(
         IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow, SrvNotification SrvNotification, SrvUser SrvUser, 
-        LoggingServices loggingServices, IMapper mapper, UserInfo userInfo,   SrvAction SrvAction, 
+        LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, SystemModuleSrv systemModuleSrv, SrvAction SrvAction, 
         SrvStatus SrvStatus, SrvAssignment SrvAssignment,SrvEvaluationRequestAssignment _srvEvaluationRequestAssignment, SrvActionTransactionsLog SrvActionTransactionsLog,  PerformActionBL _performActionBL,
 
 		SrvService SrvService, SrvServiceRequest _srvServiceRequest, EvaluationRequestService _evaluationRequestService, SrvAttachments _srvAttachments, IServiceProvider serviceProvider,RequestInfo _requestInfo)
@@ -71,7 +73,11 @@ namespace Evaluation.Services.Models.API
 			{
 				throw new BusinessException(ExceptionMessage.IncompleteRequest);
 			}
-
+			var requestType = systemModuleSrv.GetRequestType(serviceObj);
+			if (requestType == RequestType.Evaluation && (requestId == null || requestId == Guid.Empty))
+			{
+				throw new BusinessException("EvaluationRequest cannot be created from web app.");
+			}
 			var action = await SrvAction.GetActionByBackendNameAsync(serviceObj.Id, actionName) ??
 						 await SrvAction.GetInitialActionAsync(serviceId, actionName);
 
@@ -117,31 +123,31 @@ namespace Evaluation.Services.Models.API
 					StatusId = status.Id,
 					ServiceId = serviceId,
 					//OrgTreeId = OrgTreeId,
-					//ScholarshipId = scholarshipId,
+					//EvaluationRequestId  = EvaluationRequestId ,
 					//InitialHistoryId = InitialHistoryId,
 					
 
 				};
 
 				var validateRequestTask = ValidateCanCreateRequest(planId, serviceObj);
-				//if (actionFormDTO?.FieldValues != null)
-				//{
-				//	var validateActionTask = SrvAction.ValidateActionAndActionFieldAsync(null,  actionFormDTO?.FieldValues!, remarks, othersAttachement, serviceObj, status.Id, action, fileFields, saveAsDraft);
-				//	await Task.WhenAll(validateRequestTask, validateActionTask);
+				if (actionFormDTO?.FieldValues != null)
+				{
+					var validateActionTask = SrvAction.ValidateActionAndActionFieldAsync(null, actionFormDTO?.FieldValues!, remarks, othersAttachement, serviceObj, status.Id, action, fileFields, saveAsDraft);
+					await Task.WhenAll(validateRequestTask, validateActionTask);
 
-				//	var validatedFields = await validateActionTask;
+					var validatedFields = await validateActionTask;
 
-				//	actionFormDTO!.FieldValues = (await _srvAttachments.UploadAndInsertAttachments(validatedFields.ToList(), request.Id, request.PlanId, fileFields, filesWithFieldId)).Cast<FieldValueDTO?>().ToList();
-				//}
+					actionFormDTO!.FieldValues = (await _srvAttachments.UploadAndInsertAttachments(validatedFields.ToList(),requestType, request.Id, request.EvaluationRequestId, fileFields, filesWithFieldId)).Cast<FieldValueDTO?>().ToList();
+				}
 
 
 
 
 				resultRequest!.Id = request.Id;
 
-				var actionResult = await _performActionBL.PerformAction(request, serviceObj, actionFormDTO!.FieldValues!, action.BackendName, assignUsers.Where(c => c!.IsSelected).ToList()!, remarks, saveAsDraft);
+				var actionResult = await _performActionBL.PerformAction(request, requestType, serviceObj, actionFormDTO!.FieldValues!, action.BackendName, assignUsers.Where(c => c!.IsSelected).ToList()!, remarks, saveAsDraft);
 
-				var otherAttachmentsTask = _srvAttachments.UploadAndInsertOtherAttachments(othersAttachement, actionResult.actionlog, planId);
+				var otherAttachmentsTask = _srvAttachments.UploadAndInsertOtherAttachments(othersAttachement, actionResult.actionlog,requestType,requestId, request.EvaluationRequestId);
 				var sequence = request.Sequence;
 				var requestNumber = DateTime.Now.ToString(serviceObj.ReqNumberDef ?? "", new CultureInfo("en-US")) + sequence;
 
@@ -191,19 +197,17 @@ namespace Evaluation.Services.Models.API
 			}
 			else
 			{
-				// Handle  action for existing request
-				var application = await _srvServiceRequest.GetSrvServiceRequestByIdAsync(requestId!.Value, true);
-
+				var application = await GetRequestUnifiedAsync(requestId!.Value,requestType, true);
 
 				var allFields = JsonConvert.DeserializeObject<List<FieldValueDTO?>>(fieldValuesJson);
 				var validatedFields = await SrvAction.ValidateActionAndActionFieldAsync(application, allFields!, remarks, othersAttachement, serviceObj, application.StatusId, action, fileFields, saveAsDraft);
 
 
-				actionFormDTO!.FieldValues = (await _srvAttachments.UploadAndInsertAttachments(validatedFields.ToList(), requestId, application.PlanId, fileFields, filesWithFieldId)).Cast<FieldValueDTO?>().ToList();
+				actionFormDTO!.FieldValues = (await _srvAttachments.UploadAndInsertAttachments(validatedFields.ToList(),requestType, requestId, application.EvaluationRequestId, fileFields, filesWithFieldId)).Cast<FieldValueDTO?>().ToList();
 
-				var actionResult = await _performActionBL.PerformAction(application, serviceObj, actionFormDTO.FieldValues!, actionName, assignUsers.Where(c => c!.IsSelected).ToList()!, remarks, saveAsDraft);
+				var actionResult = await _performActionBL.PerformAction(application, requestType,serviceObj, actionFormDTO.FieldValues!, actionName, assignUsers.Where(c => c!.IsSelected).ToList()!, remarks, saveAsDraft);
 
-				var otherAttachments = await _srvAttachments.UploadAndInsertOtherAttachments(othersAttachement, actionResult.actionlog, application.PlanId);
+				var otherAttachments = await _srvAttachments.UploadAndInsertOtherAttachments(othersAttachement, actionResult.actionlog,requestType, application.Id, application.EvaluationRequestId);
 
 
 				await uow.CommitAsync();
@@ -216,6 +220,16 @@ namespace Evaluation.Services.Models.API
 			}
 
 			return resultRequest;
+		}
+		public async Task<ServiceRequest?> GetRequestUnifiedAsync(Guid requestId, RequestType requestType, bool useMainUow = false)
+		{
+			if (requestType == RequestType.Evaluation)
+			{
+				var er = await _evaluationRequestService.GetEvaluationRequestByIdAsync(requestId, useMainUow);
+				return er == null ? null : _evaluationRequestService.MapEvaluationToServiceRequest(er);
+			}
+
+			return await _srvServiceRequest.GetSrvServiceRequestByIdAsync(requestId, useMainUow);
 		}
 		public (Guid? fieldId, Guid? childFieldId, Guid? index) GetFieldDetailsFromFile(string contentDisposition)
 		{
@@ -314,9 +328,9 @@ namespace Evaluation.Services.Models.API
 			}
 		}
 
-		public async Task<string> GetAttachmentUrlAsync(Guid attachmentId, Guid requestId, Guid schId)
+		public async Task<string> GetAttachmentUrlAsync(Guid attachmentId, Guid requestId, Guid EvlReqtId )
 		{
-			if (requestId != Guid.Empty && schId != Guid.Empty)
+			if (requestId != Guid.Empty && EvlReqtId  != Guid.Empty)
 			{
 				throw new UnauthorizedAccessException("You do not have permission to view this request.");
 			}
@@ -329,8 +343,8 @@ namespace Evaluation.Services.Models.API
 				throw new UnauthorizedAccessException("You do not have permission to view this request.");
 			}
 
-			//if (schId != Guid.Empty &&
-			//	!await _srvScholarship.HasAccessToScholarship(schId))
+			//if (EvlReqtId  != Guid.Empty &&
+			//	!await _srvScholarship.HasAccessToScholarship(EvlReqtId ))
 			//{
 			//	throw new UnauthorizedAccessException("You do not have permission to view this request.");
 			//}

@@ -10,9 +10,26 @@ public class UserTeamConfiguration : IEntityTypeConfiguration<UserTeam>
     public void Configure(EntityTypeBuilder<UserTeam> builder)
     {
         builder.HasOne(x => x.User)
-            .WithMany(x => x.UserTeams);
+        .WithMany(x => x.UserTeams)
+        .OnDelete(DeleteBehavior.NoAction);
 
         builder.HasOne(x => x.Team)
-            .WithMany();
+            .WithMany()
+            .OnDelete(DeleteBehavior.NoAction);
+
+        builder.HasOne(x => x.CreateBy)
+            .WithMany()
+            .HasForeignKey(x => x.CreateById)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        builder.HasOne(x => x.UpdateBy)
+            .WithMany()
+            .HasForeignKey(x => x.UpdateById)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        builder.HasOne(x => x.DeleteBy)
+            .WithMany()
+            .HasForeignKey(x => x.DeleteById)
+            .OnDelete(DeleteBehavior.NoAction);
     }
 }

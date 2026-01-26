@@ -368,7 +368,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             var lazyFieldIds = lazyFields.Select(f => f.FieldId).ToList();
 
             var values = await requestValueRepo.GetAllQueryFiltered()
-                .Where(v => v.ServiceRequestId == requestId && lazyFieldIds.Contains(v.FieldId) && v.Value != null)
+                .Where(v => v.RefId == requestId && lazyFieldIds.Contains(v.FieldId) && v.Value != null)
                 .ToListAsync();
 
             var result = new List<DropDownValueDTO>();

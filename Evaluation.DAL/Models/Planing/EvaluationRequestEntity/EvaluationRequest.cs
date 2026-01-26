@@ -5,6 +5,7 @@ using Evaluation.DAL.Models.Master;
 using Evaluation.DAL.Models.Org;
 using Evaluation.DAL.Models.Planing;
 using Evaluation.DAL.Models.ServiceEnities;
+using Evaluation.DAL.Models.ServiceRequestEntities;
 using Evaluation.DAL.Models.StatusEntities;
 using Evaluation.DAL.Models.Template;
 
@@ -26,6 +27,8 @@ public class EvaluationRequest : EntityBase, IAuditLogEntity
 	public ServiceStatus? ServiceStatus { get; set; }
     public string? RequestNumber  { get; set; }
     public long Sequence { get; set; }
+	public virtual ICollection<ServiceRequestFieldsValue>? ServiceRequestFieldsValues { get; set; }
+
 
 
 }

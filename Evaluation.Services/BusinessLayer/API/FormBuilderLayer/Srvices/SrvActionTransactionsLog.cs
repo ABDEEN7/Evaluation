@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
+using Azure.Core;
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.Attachments;
+using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
 using Evaluation.DAL.Models.ServiceRequestEntities;
 using Evaluation.DAL.Models.StatusEntities;
 using Evaluation.DAL.Models.SystemLog;
@@ -9,11 +11,13 @@ using Evaluation.DAL.Repositories;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper;
 using Evaluation.SharedHelper.Enums;
+using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Api.AttachmentsDTOs;
 using Evaluation.SharedHelper.Models.Api.LogsDTO;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using static Evaluation.SharedHelper.Enums.ConstantKeys;
 
 
 namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
@@ -22,7 +26,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, requestInfo)
     {
 
-        public async Task<Guid> UpdateStatusAndLogAction(ServiceRequest application, Guid actionId, Guid nextStatusId, string Remarks, bool saveAsDraft = false)
+        public async Task<Guid> UpdateStatusAndLogAction(RequestType requestType, ServiceRequest application, Guid actionId, Guid nextStatusId, string Remarks, bool saveAsDraft = false)
         {
             var scopedUow = serviceScopeFactory.CreateScopedUow();
 
@@ -39,7 +43,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                 {
                     var lastLog =await scopedUow.GetRepository<ActionTransactionsLog>()
                                            .GetAllQueryFiltered()
-                                           .Where(c => c.ServiceRequestId == application.Id)
+                                           .Where(c => c.RefId == application.Id)
                                            .OrderByDescending(c => c.CreateDate)
                                            .FirstOrDefaultAsync();
 
@@ -50,7 +54,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                 {
                     var logs =await scopedUow.GetRepository<ActionTransactionsLog>()
                                         .GetAllQueryFiltered()
-                                        .Where(c => c.ServiceRequestId == application.Id)
+                                        .Where(c => c.RefId == application.Id)
                                         .OrderByDescending(c => c.CreateDate)
                                         .Take(2)
                                         .ToListAsync();
@@ -63,20 +67,37 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             if (saveAsDraft)
                 nextStatusId = application.StatusId;
 
-            var actionLogs = new ActionTransactionsLog
+			var actionLogs = new ActionTransactionsLog
+			{
+				ServiceActionId = actionId,
+				NextStatusId = nextStatusId,
+				PreviousStatusId = application.StatusId,
+				RefId = application.Id,
+				IsActive = true,
+				Remarks = Remarks,
+				RequestType= requestType.ToString(),
+			};
+			await uow.GetRepository<ActionTransactionsLog>().InsertAsync(actionLogs);
+
+
+
+            if (requestType == RequestType.Evaluation)
             {
-                ServiceActionId = actionId,
-                NextStatusId = nextStatusId,
-                PreviousStatusId = application.StatusId,
-                ServiceRequestId = application.Id,
-                IsActive = true,
-                Remarks = Remarks
-            };
+                var er = await uow.GetRepository<EvaluationRequest>()
+                    .GetAllQueryFiltered(x => x.Id == application.Id)
+                    .FirstOrDefaultAsync()
+                    ?? throw new BusinessException(ExceptionMessage.lblRequestNotValid);
 
-            application.StatusId = nextStatusId;
+                er.ServiceStatusId = nextStatusId;
+				uow.GetRepository<EvaluationRequest>().Update(er);
+            }
+            else
+            {
+                application.StatusId = nextStatusId;
 
-           await uow.GetRepository<ActionTransactionsLog>().InsertAsync(actionLogs);
-            uow.GetRepository<ServiceRequest>().Update(application);
+
+                uow.GetRepository<ServiceRequest>().Update(application);
+            }
 
             return actionLogs.Id;
         }
@@ -97,7 +118,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                         .Include(c => c.ServiceAction!.ActionShowLogPartyTypes)
                         .Include(c => c.EvalAttachments)
                         .AsSplitQuery()
-                        .Where(c => c.ServiceRequestId == id).ToListAsync();
+                        .Where(c => c.RefId == id).ToListAsync();
 
 
             //if (user is StudentUser)
