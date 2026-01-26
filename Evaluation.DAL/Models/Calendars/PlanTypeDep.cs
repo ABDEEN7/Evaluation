@@ -1,9 +1,10 @@
-﻿using Evaluation.DAL.Models.BaseModule;
+﻿using Evaluation.DAL.Models.Audit;
+using Evaluation.DAL.Models.BaseModule;
 using Evaluation.DAL.Models.DepartementEntites;
 
 namespace Evaluation.DAL.Models.Calendars;
 
-public class PlanTypeDep : EntityBase
+public class PlanTypeDep : EntityBase, IAuditLogEntity
 {
     public string NameAr { get; set; } = null!;
     public string NameEn { get; set; } = null!;

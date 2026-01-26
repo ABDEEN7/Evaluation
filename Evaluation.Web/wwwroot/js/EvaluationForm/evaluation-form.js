@@ -35,7 +35,7 @@ const loadData = () => {
 $btnAddbutton.click(function () {
     sharedFn().InitialPageControls(uiControlItems);
     $itemcontent.hide();
-
+    $('#Id').val('');
 });
 function ClearControlByPage() {
     if (popupname == "FormScope") {

@@ -31,7 +31,7 @@ public class SchoolRepository(IServiceScopeFactory serviceScopeFactory,
     ) : ApiBase(serviceScopeFactory, cacheDataProvider, unitOfWork, loggingServices, mapper, userInfo,
         serviceProvider, requestInfo)
 {
-    public async Task<PaginatedResult<School>> GetSchoolsAsync(SchoolRequest request, Guid? targetOrgTreeId, List<Guid> currentSelectedSchools)
+    public async Task<PaginatedResult<School>> GetSchoolsAsync(SchoolRequest request, List<Guid?> targetOrgTreeId, List<Guid> currentSelectedSchools)
     {
         var filter = BuildFilterExpression(request, targetOrgTreeId, currentSelectedSchools);
         var query = serviceScopeFactory
@@ -57,7 +57,7 @@ public class SchoolRepository(IServiceScopeFactory serviceScopeFactory,
            .CreateScopedUow()
            .GetRepository<School>()
            .GetAllNonDeleted()
-           //.Where(c => c.OrgParentId == department.TargetOrgTreeId)
+           .Where(c => c.OrgParentId == department.DepTargetOrgTrees.Select(x => x.TargetOrgTreeId).FirstOrDefault())
            .ToList();
 
         return schools;
@@ -82,11 +82,11 @@ public class SchoolRepository(IServiceScopeFactory serviceScopeFactory,
     }
 
 
-    private Expression<Func<School, bool>> BuildFilterExpression(SchoolRequest request, Guid? targetOrgTreeId, List<Guid> currentSchools)
+    private Expression<Func<School, bool>> BuildFilterExpression(SchoolRequest request, List<Guid?> targetOrgTreeIds, List<Guid> currentSchools)
     {
 
         Expression<Func<School, bool>> filter = s => true;
-        filter = filter.And(c => c.OrgParentId == targetOrgTreeId && currentSchools.Contains(c.Id));
+        filter = filter.And(c => targetOrgTreeIds.Contains(c.OrgParentId) && currentSchools.Contains(c.Id));
 
         if (!string.IsNullOrWhiteSpace(request.Name))
             filter = filter.And(s => s.NameEn.Contains(request.Name) || s.NameAr.Contains(request.Name));

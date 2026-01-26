@@ -1,9 +1,10 @@
-﻿using Evaluation.DAL.Models.BaseModule;
+﻿using Evaluation.DAL.Models.Audit;
+using Evaluation.DAL.Models.BaseModule;
 using Evaluation.DAL.Models.UserEntiy;
 
 namespace Evaluation.DAL.Models.PermissionEntity;
 
-public class Role : EntityBase
+public class Role : EntityBase, IAuditLogEntity
 {
     public required string NameAr { get; set; }
     public required string NameEn { get; set; }

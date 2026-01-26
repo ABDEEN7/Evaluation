@@ -1,11 +1,12 @@
-﻿using Evaluation.DAL.Models.BaseModule;
+﻿using Evaluation.DAL.Models.Audit;
+using Evaluation.DAL.Models.BaseModule;
 using Microsoft.EntityFrameworkCore;
 
 namespace Evaluation.DAL.Models.PermissionEntity;
 
 
 [Index(nameof(BackendName), IsUnique = true)]
-public class Permission : EntityBase
+public class Permission : EntityBase, IAuditLogEntity
 {
     public string BackendName { get; set; } = null!;
     public string? NameAr { get; set; }

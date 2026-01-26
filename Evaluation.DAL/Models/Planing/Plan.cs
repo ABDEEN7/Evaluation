@@ -1,12 +1,13 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using Evaluation.DAL.Models.Audit;
 using Evaluation.DAL.Models.BaseModule;
 using Evaluation.DAL.Models.Calendars;
 using Evaluation.DAL.Models.DepartementEntites;
 using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Evaluation.DAL.Models.Planing;
 
-public class Plan : EntityBase
+public class Plan : EntityBase, IAuditLogEntity
 {
     public string PlanName { get; set; } = null!;
     public DateOnly StartDate { get; set; }

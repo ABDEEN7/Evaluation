@@ -1,10 +1,11 @@
-﻿using Evaluation.DAL.Models.BaseModule;
+﻿using Evaluation.DAL.Models.Audit;
+using Evaluation.DAL.Models.BaseModule;
 using Evaluation.DAL.Models.DepartementEntites;
 using Microsoft.EntityFrameworkCore;
 
 namespace Evaluation.DAL.Models.SystemSetting;
 [Index(nameof(BackendName), IsUnique = true)]
-public class UiControl : EntityBase
+public class UiControl : EntityBase, IAuditLogEntity
 {
     public Guid? DepartmentId { get; set; }
     public Department? Department { get; set; }

@@ -41,17 +41,28 @@ public class FormService(IServiceScopeFactory serviceScopeFactory,
             .ToListAsync();
     }
 
-    public async Task<List<FormItem>> GetFormItems()
+    public async Task<List<FormItem>> GetFormItems(Guid formId)
     {
             var formItems = await unitOfWork.GetRepository<FormItem>()
                       .GetAllActiveNonDeleted()
+                      .Where(s => s.EvalFormId == formId)
                       .Include(d => d.SubFormItems)
                       .Include(f => f.RelatedFrom)
+                      .ThenInclude(y=>y.RelatedItem)
                       .ToListAsync();
 
             return formItems;
     }
-      
+
+    public async Task<FormItem> GetFormItem(Guid Id)
+    {
+        return await unitOfWork.GetRepository<FormItem>()
+            .GetAllQueryFiltered()
+            .Include(d => d.SubFormItems)
+            .Where(f => f.Id == Id!)
+            .FirstOrDefaultAsync();
+    }
+
     public async Task<FormItemValue> UpdateFormItemValue(FormItemValue formItemValue)
     {
         unitOfWork.GetRepository<FormItemValue>().Update(formItemValue);

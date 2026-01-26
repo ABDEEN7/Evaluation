@@ -1,6 +1,7 @@
 ﻿using Evaluation.Services.BusinessLayer;
 using Evaluation.Services.BusinessLayer.API.TeamMemberBL;
 using Evaluation.SharedHelper.Dtos.TeamMemberDto;
+using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Api;
 using FluentResults;
 using Microsoft.AspNetCore.Mvc;
@@ -41,4 +42,7 @@ public class AssignmentController : ControllerBase
         var member = _masterBl.GetApiService<AssignmentBL>().GetTeamByEvaluationRequestId(evaluationRequestId);
         return member;
     }
+    [HttpPost]
+    public async Task<Result<ValidationResult>> ValidationEvaluationRequestAssignment(Guid evaluationRequestId, [FromBody] List<EvalTeamRequestDto> model)
+                => await _masterBl.GetApiService<AssignmentBL>().AssignmentValidationResult(evaluationRequestId, model);
 }

@@ -34,9 +34,9 @@ public class EmployeeService(IServiceScopeFactory serviceScopeFactory,
                     .Where(c => c.QID.ToLower() == qId)
                     .FirstOrDefaultAsync();
     }
-    public async Task<PaginatedResult<Employee>> GetEmployeeAsync(SchoolRequest request, Guid? targetOrgTreeId, List<Guid> employees)
+    public async Task<PaginatedResult<Employee>> GetEmployeeAsync(SchoolRequest request, List<Guid?> targetOrgTreeIds, List<Guid> employees)
     {
-        var filter = BuildFilterExpression(request, targetOrgTreeId, employees);
+        var filter = BuildFilterExpression(request, targetOrgTreeIds, employees);
         var query = unitOfWork.GetRepository<Employee>()
                     .GetAllNonDeleted(filter);
         return await query.GetPaginatedResult(request.PageNumber, request.PageSize);
@@ -63,10 +63,10 @@ public class EmployeeService(IServiceScopeFactory serviceScopeFactory,
                     .Where(c => c.HRCode.ToLower() == orgClass)
                     .FirstOrDefaultAsync();
     }
-    private Expression<Func<Employee, bool>> BuildFilterExpression(SchoolRequest request, Guid? targetOrgTreeId, List<Guid> employees)
+    private Expression<Func<Employee, bool>> BuildFilterExpression(SchoolRequest request, List<Guid?> targetOrgTreeIds, List<Guid> employees)
     {
         Expression<Func<Employee, bool>> filter = s => true;
-        filter = filter.And(c => c.OrgParentId == targetOrgTreeId && employees.Contains(c.Id));
+        filter = filter.And(c => targetOrgTreeIds.Contains(c.OrgParentId) && employees.Contains(c.Id));
 
         if (!string.IsNullOrWhiteSpace(request.Name))
             filter = filter.And(s => s.NameEn.Contains(request.Name) || s.NameAr.Contains(request.Name));
@@ -79,8 +79,8 @@ public class EmployeeService(IServiceScopeFactory serviceScopeFactory,
     {
         return await unitOfWork.GetRepository<Employee>()
                     .GetAllNonDeleted()
-                    .Include(e=>e.UserGender)
-                    .Include(e=>e.JobTitle)
+                    .Include(e => e.UserGender)
+                    .Include(e => e.JobTitle)
                     .Where(c => c.Id == Id)
                     .FirstOrDefaultAsync();
     }

@@ -1,4 +1,5 @@
-﻿using Evaluation.DAL.Models.BaseModule;
+﻿using Evaluation.DAL.Models.Audit;
+using Evaluation.DAL.Models.BaseModule;
 using Evaluation.DAL.Models.DepartementEntites;
 using Evaluation.DAL.Models.Master;
 using Evaluation.DAL.Models.Org;
@@ -10,7 +11,7 @@ using Evaluation.DAL.Models.Template;
 
 namespace Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
 
-public class EvaluationRequest : EntityBase
+public class EvaluationRequest : EntityBase, IAuditLogEntity
 {
     public Guid PlanId { get; set; }
     public Plan? Plan { get; set; }

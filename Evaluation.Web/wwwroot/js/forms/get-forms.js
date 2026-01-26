@@ -4,14 +4,17 @@
 const params = new URLSearchParams(window.location.search);
 //let departmentRoutePath = sharedUtility().extractDepartmentName();
 
-//const FORM_ID = params.get('formId');
-
 let matrixValues = [];
 let itemsResult = [];
 
 const SELECTORS = {
     tbody: 'tbodyRows'
 };
+
+const ItemPropertyType = Object.freeze({
+    SELECT: 1,
+    NOTE: 2
+});
 
 // ==============================
 // Utilities
@@ -32,32 +35,12 @@ const createPlaceholderOption = (text = 'Please select') => {
 // ==============================
 // Accordion Builders
 // ==============================
-//const generateAccordionItem = ({ id, title, icon, content, badge }) => `
-//<div class="accordion-item mb-3 rounded">
-//    <h2 class="accordion-header">
-//        <button class="accordion-button collapsed" type="button"
-//                data-bs-toggle="collapse"
-//                data-bs-target="#${id}">
-//            <div class="d-flex align-items-center gap-2 fs-18">
-//                <i class="la ${icon} text-primary fs-25"></i>
-//                <span class="fw-semibold">${escapeHtml(title)}</span>
-//                ${badge ? `<span class="badge bg-success ms-2">${escapeHtml(badge)}</span>` : ''}
-//            </div>
-//        </button>
-//    </h2>
-//    <div id="${id}" class="accordion-collapse collapse">
-//        <div class="accordion-body">${content}</div>
-//    </div>
-//</div>
-//`;
 
 const generateFormAccordionItem = (rowsHtml, hasAnyNote) => `
 <div class="accordion-item mb-3 rounded">
     <div id="item3" class="accordion-collapse collapse show">
         <div class="accordion-body">
         <div id="index-table" class="table table-bordered text-center align-middle"></div>
-
-
             <table class="table table-bordered text-center align-middle">
                 <thead class="table-grey">
                     <tr>
@@ -130,11 +113,15 @@ const createRow = ({
     ${Array.isArray(item.relatedItems) && item.relatedItems.length > 0
         ? `<span class="info-icon" onclick="openRelatedItemModal('${item.id}')">ⓘ</span>`
         : ''
-}
+    }
     
     </td>
-    <td>${buildSelection(item, fieldId, readOnly)}</td>
-    ${hasAnyNote ? `<td>${buildNote(item, fieldId, readOnly)}</td>` : ''}
+    <td>${buildSelection(item, fieldId, readOnly)}
+        <span class="validation-message text-danger small mt-1" id="validation-${item.id}-${ItemPropertyType.SELECT}"style="display:none;"></span>
+    </td>
+    ${hasAnyNote ? `<td>${buildNote(item, fieldId, readOnly)}
+        <span class="validation-message text-danger small mt-1" id="validation-${item.id}-${ItemPropertyType.NOTE}"style="display:none;"></span>
+    </td>` : ''}
 </tr>
 `;
 
@@ -242,7 +229,6 @@ function buildHorizontalTable(data) {
 // Page Generator 
 // ==============================
 const generateFullFormPageHtml = async ({ formId, fieldId, readOnly }) => {
-    var formId ='b8fb67a9-b09a-4e0c-a466-d0625d92521d'
     itemsResult = await jqClient().Get(`/Form/${departmentRoutePath}/GetItems?formId=${formId}`);
     const items = itemsResult?.value ?? [];
 
@@ -292,32 +278,6 @@ const relatedItemPopup = (rowsHtml) => `<div class="modal fade" id="RealatedItem
         </div>
     </div>
 </div>`;
-
-
-//const relatedItemPopup = `<div class="modal fade" id="RealatedItemModal" tabindex="-1" aria-hidden="true">
-//    <div class="modal-dialog modal-xl modal-dialog-centered">
-//        <div class="modal-content">
-//            <div class="modal-header align-items-start border-0">
-//                <div>
-//                    <h4 class="modal-title fw-semibold mb-2" id="modalTitle"></h4>
-//                </div>
-
-//                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-//            </div>
-
-//            <div class="modal-body py-0">
-//                <div class="row">
-//                    <div class="col-md-12" id="modalBodyContent">
-//                    </div>
-//                    <div class="col-md-12" id="modalNote">
-//                    </div>
-//                </div>
-//            </div>
-//        </div>
-//    </div>
-//</div>`;
-
-
 
 // ==============================
 // Initialize Controls
@@ -386,23 +346,6 @@ async function initializeControls(formId, fieldId, controlValues) {
         .appendChild(buildHorizontalTable(matrixValues));
 }
 
-// ==============================
-// Init
-// ==============================
-//document.addEventListener('DOMContentLoaded', async () => {
-//    try {
-        //const html = await generateFullFormPageHtml({
-        //    formId: 'b8fb67a9-b09a-4e0c-a466-d0625d92521d',
-        //    fieldId: 'ADD_YOUR_FIELD_ID_HERE',
-        //    readOnly: false
-        //});
-
-        //document.getElementById('app').innerHTML = html;
-
-//    } catch (error) {
-//        console.error('Form builder error:', error);
-//    }
-//});
 
 async function openRelatedItemModal(id) {
 

@@ -7,7 +7,7 @@ using Evaluation.DAL.Models.Website;
 
 namespace Evaluation.DAL.Models.DepartementEntites;
 
-public class Department : EntityBase,IAuditLogEntity
+public class Department : EntityBase, IAuditLogEntity
 {
     public string NameAr { get; set; } = null!;
     public string NameEn { get; set; } = null!;
@@ -15,7 +15,7 @@ public class Department : EntityBase,IAuditLogEntity
     public string BackendName { get; set; } = null!;
     public string DepIcon { get; set; } = null!;
     public Guid? WebsiteAttachmentId { get; set; }
-    public WebsiteAttachment? WebsiteAttachment { get; set; }    
+    public WebsiteAttachment? WebsiteAttachment { get; set; }
     public bool IsNDA { get; set; }
     public string? DescAr { get; set; }
     public string? DescEn { get; set; }
@@ -23,5 +23,6 @@ public class Department : EntityBase,IAuditLogEntity
     public virtual ICollection<UserDepartment>? UserDepartments { get; set; }
     public virtual ICollection<AcademicYear>? AcademicYears { get; set; }
     public virtual ICollection<WebGroup>? WebGroup { get; set; }
+    public virtual ICollection<DepTargetOrgTree>? DepTargetOrgTrees { get; set; }
 
 }

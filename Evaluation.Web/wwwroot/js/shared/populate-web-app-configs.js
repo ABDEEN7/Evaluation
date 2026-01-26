@@ -6,11 +6,12 @@ const webAppConfigsSetup = (uiControlsOptions) => {
         mainSection.hide();
 
         const lang = sharedUtility().GetCookie('lang') || 'en';
-
+        const department = sharedUtility().extractDepartmentName();
         const configPayload = {
             keys: additional_keys,
             pageNames,
-            lang
+            lang,
+            department
         };
         const configForm = new FormData();
         configForm.append('request', JSON.stringify(configPayload));
