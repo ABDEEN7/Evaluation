@@ -310,7 +310,12 @@ namespace Evaluation.Services.Special
 				using var scopedUow = serviceScopeFactory.CreateScopedUow();
 				var repo = scopedUow.GetRepository<ActionPartyType>();
 				var list = await repo.GetAllActiveNonDeleted().ToListAsync();
-				return list.Adapt<List<ActionPartyTypeDTO>>();
+				return list.Select(x => new ActionPartyTypeDTO
+				{
+					Id = x.Id,
+					ServiceActionId = x.ServiceActionId,
+					PartyTypeId = x.PartyTypeId
+				}).ToList();
 			});
 		}
 

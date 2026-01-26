@@ -9,8 +9,10 @@ using Evaluation.DAL.Models.UserEntiy;
 using Evaluation.DAL.Repositories;
 using Evaluation.Services.BusinessLayer.API;
 using Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices;
+using Evaluation.Services.BusinessLayer.API.PlanLayer;
 using Evaluation.Services.Extensions;
 using Evaluation.Services.Special;
+using Evaluation.SharedHelper.Dtos.PlanDto;
 using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Helper;
@@ -23,9 +25,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using System.Globalization;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using static Evaluation.DAL.ConstantKeys;
 using static Evaluation.SharedHelper.Enums.ConstantKeys;
+using Newtonsoft.Json;
 
 namespace Evaluation.Services.Models.API
 {
@@ -34,7 +38,7 @@ namespace Evaluation.Services.Models.API
         IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow, SrvNotification SrvNotification, SrvUser SrvUser, 
         LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, SrvField SrvField, SrvAction SrvAction, 
         SrvStatus SrvStatus, SrvAssignment SrvAssignment, SrvDropdown SrvDropdown, SrvActionTransactionsLog SrvActionTransactionsLog, 
-        SrvService SrvService, SrvServiceRequest SrvServiceRequest, SrvAttachments SrvAttachments, IServiceProvider serviceProvider,RequestInfo _requestInfo)
+        SrvService SrvService, SrvServiceRequest SrvServiceRequest, PlanServiceRequestServices planServiceRequestServices, SrvAttachments SrvAttachments, IServiceProvider serviceProvider,RequestInfo _requestInfo)
             : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, _requestInfo)
     {
 
@@ -146,17 +150,34 @@ namespace Evaluation.Services.Models.API
 				case ActionTypeKeys.RequestDataChange:
 					await HandleRequestMissingAction(existingFields, Fields, actiondb.Id);
 					break;
-				//case ActionTypeKeys.CreateScholarship:
-				//	if (FieldsToUpdates.Count > 0)
-				//	{
+				case ActionTypeKeys.CreateEvaluationPlan:
+					{
+						if (FieldsToUpdates.Count > 0)
+						{
+							var updatedFields = await PrepareAndUpdateFields(application.ServiceId,RequestType,application.Id,FieldsToUpdates,existingFields,lang,actiondb.Id);
 
-				//		var updatedfiels = await PrepareAndUpdateFields(application.ServiceId, application.Id, FieldsToUpdates, existingFields, lang, actiondb.Id);
-				//		existingFields.AddRange(updatedfiels);
-				//	}
-				//	var ApprovedOrActionField = existingFields.Where(x => x.IsApproved == true || Fields.Any(f => f.FieldId == x.FieldId) || x.Field?.MappingSystemField?.BackendName == "EntityContractId" || x.Field?.MappingSystemField?.BackendName == "SectorId").ToList();
+							existingFields.AddRange(updatedFields);
+						}
 
-				//	await srvScholarship.CreateScholarship(serviceObj, application, application.Id, actiondb, ApprovedOrActionField, lang);
-				//	break;
+						var planField = existingFields
+							.Where(x => x.IsApproved)
+							.FirstOrDefault(x =>
+								x.Field?.FieldType?.BackendName == FieldTypeConstant.EvaluationPlan &&
+								!string.IsNullOrWhiteSpace(x.Value)
+							);
+
+						if (planField == null)
+							break;
+
+
+						var dto = Newtonsoft.Json.JsonConvert.DeserializeObject<CreateEvaluationPlanDto>(planField.Value.ToString());
+
+						if (dto == null) throw new BusinessException("Invalid Evaluation Plan data");
+
+						await planServiceRequestServices.InsertOrUpdatePlan(dto);
+
+						break;
+					}
 				//case ActionTypeKeys.CloseAndUpdate:
 				//	if (FieldsToUpdates.Count > 0)
 				//	{

@@ -2,7 +2,7 @@
 // Globals & Constants
 // ==============================
 const params = new URLSearchParams(window.location.search);
-let departmentRoutePath = sharedUtility().extractDepartmentName();
+//let departmentRoutePath = sharedUtility().extractDepartmentName();
 
 //const FORM_ID = params.get('formId');
 

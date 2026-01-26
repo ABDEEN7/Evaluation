@@ -1044,6 +1044,8 @@ public static class ConstantKeys
         public const string dropzone = "dropzone";
         public const string table = "table";
         public const string list = "list";
+        public const string EvaluationPlan = "EvaluationPlan";
+        public const string Evl_Form = "Evl_Form";
     }
 
     public static class Module

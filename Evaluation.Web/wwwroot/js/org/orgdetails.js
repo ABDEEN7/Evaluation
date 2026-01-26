@@ -1,5 +1,5 @@
 ﻿let orgDetails; 
-let departmentRoutePath = sharedUtility().extractDepartmentName();
+//let departmentRoutePath = sharedUtility().extractDepartmentName();
 
 const options = {
     success: function (result) {

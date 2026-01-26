@@ -1,7 +1,8 @@
 ﻿(function (w, $) {
-    var DepartmentRouting = sharedUtility().extractDepartmentName();
 
     const fu = w.formUtility || {};
+    const fapi = w.FormApi; // ✅ بدل w.formUtility
+
     const ActionTypes = (w.FormConstants && w.FormConstants.ACTION_TYPE) || {};
     w.dropdowns = w.dropdowns || [];
 
@@ -25,7 +26,7 @@
     }
 
     async function InitializeCreatePlanRequest() {
-        const createPlanService =  await fu.fetchJSON(`/FormRender/GetCreatePlanService`);
+        const createPlanService = await fapi.fetchJSON(`/FormRender/${departmentRoutePath}/GetCreatePlanService`);
         if (!createPlanService) {
             redirectToDefault();
             return;
@@ -53,8 +54,8 @@
             redirectToDefault();
             return;
         }
-        const CreateEvaluationPartyService = await fu.fetchJSON(
-            `/FormRender/GetCreateEvaluationPartyService?serviceId=${encodeURIComponent(serviceId)}`
+        const CreateEvaluationPartyService = await fapi.fetchJSON(
+            `/FormRender/${departmentRoutePath}/GetCreateEvaluationPartyService?serviceId=${encodeURIComponent(serviceId)}`
         );
 
         if (!CreateEvaluationPartyService) {
@@ -177,14 +178,14 @@
 
     async function GetActionFields() {
         try {
-            let url = `/EvaluationPlanRequest/${DepartmentRouting}/GetActionField?planId=${PlanId}`;
+            let url = `/EvaluationPlanRequest/${departmentRoutePath}/GetActionField?planId=${PlanId}`;
             if (initialAction) url += `&actionBackendKey=${encodeURIComponent(initialAction)}`;
             if (SchoolId) url += `&schoolId=${encodeURIComponent(SchoolId)}`;
 
             const ddIds = Array.isArray(fu.dropDownTypeIds) ? fu.dropDownTypeIds : [];
             url += `&dropDownTypeIds=${encodeURIComponent(ddIds.join(","))}`;
 
-            const request = null;// await fu.fetchJSON(url);
+            const request = await fapi.fetchJSON(url);
             await RenderActionFields(request);
         } catch (e) {
             console.error(e);

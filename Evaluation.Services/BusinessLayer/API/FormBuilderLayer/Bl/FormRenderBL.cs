@@ -47,7 +47,7 @@ namespace Evaluation.Services.BusinessLayer.API
 		public async Task<ActionCustomDTO> GetActionField(ServiceAction action, Guid serviceId, RequestType requestType, Guid? requestId = null , Guid? PlanId = null)
 		{
 			string lang = _requestInfo.Lang;
-			var result = action.Adapt<ActionCustomDTO>();
+			var result = mapper.Map<ActionCustomDTO>(action);
 
 			var integrationFieldsToProcess = new ConcurrentBag<FieldValueDTO>();
 			var schAttachmentIds = new ConcurrentBag<string>();

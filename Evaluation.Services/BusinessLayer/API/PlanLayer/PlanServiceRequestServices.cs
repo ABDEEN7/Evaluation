@@ -131,7 +131,7 @@ public class PlanServiceRequestServices(
 
             await InsertEvaluationRequests(plan.Id, modelDto);
 
-            await unitOfWork.CommitAsync();
+            //await unitOfWork.CommitAsync();
             return modelDto;
         });
     }
@@ -159,7 +159,7 @@ public class PlanServiceRequestServices(
 
             await ReplaceEvaluationRequests(plan.Id, modelDto);
 
-            await unitOfWork.CommitAsync();
+           // await unitOfWork.CommitAsync();
             return modelDto;
         });
     }

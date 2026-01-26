@@ -1,4 +1,4 @@
-﻿let departmentRoutePath = sharedUtility().extractDepartmentName();
+﻿//let departmentRoutePath = sharedUtility().extractDepartmentName();
 
 $(document).ready(function () {
     $("#btnSubmitForm").on("click", function (e) {
