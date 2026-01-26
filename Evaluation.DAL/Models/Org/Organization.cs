@@ -1,6 +1,8 @@
-﻿namespace Evaluation.DAL.Models.Org;
+﻿using Evaluation.DAL.Models.Audit;
 
-public class Organization : OrgTree
+namespace Evaluation.DAL.Models.Org;
+
+public class Organization : OrgTree, IAuditLogEntity
 {
     public Guid TypeId { get; set; }//بنين وبنات
     public SchoolType SchoolType { get; set; } = new();

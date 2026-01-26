@@ -1,8 +1,9 @@
-﻿using Evaluation.DAL.Models.BaseModule;
+﻿using Evaluation.DAL.Models.Audit;
+using Evaluation.DAL.Models.BaseModule;
 
 namespace Evaluation.DAL.Models.Calendars;
 
-public class DepartmentHoliday : EntityBase 
+public class DepartmentHoliday : EntityBase , IAuditLogEntity
 {
     public Guid AcademicYearId { get; set; }
     public AcademicYear? AcademicYear { get; set; } 

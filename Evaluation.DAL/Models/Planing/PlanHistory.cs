@@ -1,10 +1,11 @@
-﻿using Evaluation.DAL.Models.BaseModule;
+﻿using Evaluation.DAL.Models.Audit;
+using Evaluation.DAL.Models.BaseModule;
 using Evaluation.DAL.Models.Calendars;
 using Evaluation.DAL.Models.DepartementEntites;
 
 namespace Evaluation.DAL.Models.Planing;
 
-public class PlanHistory : EntityBase
+public class PlanHistory : EntityBase, IAuditLogEntity
 {
 	public Guid PlanId { get; set; }
 	public Plan? Plan { get; set; }
