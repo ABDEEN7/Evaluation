@@ -131,8 +131,7 @@
         if ($s.hasClass("select2-hidden-accessible")) {
             $s.select2('destroy');
         }
-
-        $s.empty().append($`<option value="">{t('lblChoosePlanType')}</option>`);
+        $s.empty().append(`<option value="">${t('lblChoosePlanType')}</option>`);
 
         ns.planTypes.forEach(t =>
             $s.append(`<option value="${t.id}" data-backendname="${t.backendName}">${t.name}</option>`)

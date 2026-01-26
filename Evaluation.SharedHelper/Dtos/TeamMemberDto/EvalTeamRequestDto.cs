@@ -1,6 +1,4 @@
-﻿using Evaluation.SharedHelper.Models.Admin;
-
-namespace Evaluation.SharedHelper.Dtos.TeamMemberDto;
+﻿namespace Evaluation.SharedHelper.Dtos.TeamMemberDto;
 
 public class EvalTeamRequestDto
 {

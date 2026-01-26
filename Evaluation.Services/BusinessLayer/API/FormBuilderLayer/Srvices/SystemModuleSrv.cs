@@ -7,7 +7,6 @@ using Evaluation.DAL.Repositories;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper;
 using Evaluation.SharedHelper.Enums;
-using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Admin;
 using Microsoft.EntityFrameworkCore;
@@ -105,10 +104,6 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
             return result;
         }
-
-
-        ///////////////
-        ///
         public  RequestType GetRequestType(Service service)
         {
             if (service == null)
@@ -121,13 +116,12 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             return ResolveRequestTypeByBackendName(backendName);
         }
 
-       
 
-		private static RequestType ResolveRequestTypeByBackendName(string? backendName)
+        private static RequestType ResolveRequestTypeByBackendName(string? backendName)
 		{
 			return backendName switch
 			{
-				ModuleType.EvaluationRequest => RequestType.Evaluation,
+				ModuleType.EvaluationPlanRequest => RequestType.Evaluation,
 
 				ModuleType.EvaluationPlan or
 				ModuleType.EvaluationParty => RequestType.Service,

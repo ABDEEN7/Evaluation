@@ -10,12 +10,10 @@ using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Api;
+using Evaluation.SharedHelper.Validations;
 using FluentResults;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Evaluation.SharedHelper.Extensions;
-using System.Xml.Serialization;
-
 namespace Evaluation.Services.BusinessLayer.API.TeamMemberBL;
 
 public class AssignmentBL(IServiceScopeFactory serviceScopeFactory,
@@ -256,4 +254,47 @@ public class AssignmentBL(IServiceScopeFactory serviceScopeFactory,
         //        });
         //}
     }
+    public async Task<Result<ValidationResult>> AssignmentValidationResult(Guid requestEvaluation, List<EvalTeamRequestDto> model)
+    {
+        var validation = CreateAssignmentsValidator.Validate(requestEvaluation, model);
+
+        // Stop early if basic validation failed
+        if (!validation.IsValid)
+            return Result.Ok(validation);
+        // ===================== Evaluation Request Exists =====================
+        var evaluationRequestExists = await unitOfWork
+      .GetRepository<EvaluationRequest>()
+      .GetAllActiveNonDeleted()
+      .AnyAsync(x => x.Id == requestEvaluation);
+
+        if (!evaluationRequestExists)
+        {
+            validation.Add(ConstantKeys.ExceptionMessage.EvalRequestNotExsit);
+            return Result.Ok(validation);
+        }
+
+        // ===================== Users Exist =====================
+
+        var userIds = model
+            .Select(x => x.UserId)
+            .Distinct()
+            .ToList();
+
+        var existingUserIds = await unitOfWork
+            .GetRepository<MinistryUser>()
+            .GetAllActiveNonDeleted()
+            .Where(x => userIds.Contains(x.Id))
+            .Select(x => x.Id)
+            .ToListAsync();
+
+        var missingUsers = userIds.Except(existingUserIds).ToList();
+
+        if (missingUsers.Any())
+        {
+            validation.Add(ConstantKeys.ExceptionMessage.UserNotExist);
+        }
+
+        return Result.Ok(validation);
+    }
+
 }
