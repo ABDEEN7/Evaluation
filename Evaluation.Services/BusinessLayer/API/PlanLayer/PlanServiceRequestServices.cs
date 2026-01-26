@@ -198,8 +198,6 @@ public class PlanServiceRequestServices(
             await unitOfWork.GetRepository<Plan>().InsertAsync(plan);
 
             await InsertEvaluationRequests(plan.Id, modelDto);
-
-            await unitOfWork.CommitAsync();
             return modelDto;
         });
     }
@@ -226,8 +224,6 @@ public class PlanServiceRequestServices(
             unitOfWork.GetRepository<Plan>().Update(plan);
 
             await ReplaceEvaluationRequests(plan.Id, modelDto);
-
-            await unitOfWork.CommitAsync();
             return modelDto;
         });
     }
