@@ -1,4 +1,5 @@
-﻿using Evaluation.DAL.Models.BaseModule;
+﻿using Evaluation.DAL.Models.Audit;
+using Evaluation.DAL.Models.BaseModule;
 using Evaluation.DAL.Models.Master;
 using Evaluation.DAL.Models.Org;
 using Evaluation.DAL.Models.Planing;
@@ -14,8 +15,8 @@ using System.Threading.Tasks;
 namespace Evaluation.DAL.Models.Planing.EvaluationRequestEntity
 {
 	
-	public class EvaluationRequestHistory : EntityBase
-	{
+	public class EvaluationRequestHistory : EntityBase, IAuditLogEntity
+    {
 		public Guid EvaluationRequestId { get; set; }
 		public EvaluationRequest? EvaluationRequest { get; set; }
 		public Guid PlanId { get; set; }

@@ -1,6 +1,10 @@
 ﻿(function (global) {
     'use strict';
-
+    // =================== LOCALIZATION Helper ===================
+    function t(key, fallback = '') {
+        const text = uiControlsSetup()?.GetUiControlText(key);
+        return text || key;
+    }
     const ns = global.planUtility;
     const {
         API_ENDPOINTS,
@@ -84,9 +88,6 @@
             bindEvents(fieldId);
             initializeFilterDatePickers(fieldId);
             populateFilterVisitTypes(fieldId);
-
-            console.log(`[PlanHandler] Instance ${fieldId} initialized (Backend filtering only)`);
-
         } catch (e) {
             console.error(`[PlanHandler] Init failed for ${fieldId}`, e);
             alert('حدث خطأ أثناء التحميل');
@@ -131,7 +132,7 @@
             $s.select2('destroy');
         }
 
-        $s.empty().append('<option value="">اختر نوع الخطة</option>');
+        $s.empty().append($`<option value="">{t('lblChoosePlanType')}</option>`);
 
         ns.planTypes.forEach(t =>
             $s.append(`<option value="${t.id}" data-backendname="${t.backendName}">${t.name}</option>`)
@@ -147,7 +148,7 @@
             $s.select2('destroy');
         }
 
-        $s.empty().append('<option value="">اختر الفصل الدراسي</option>');
+        $s.empty().append(`<option value="">${t('lblChooseSemester')}</option>`);
 
         ns.semesters.forEach(s =>
             $s.append(
@@ -265,17 +266,11 @@
         });
 
         showLoadingState(fieldId);
-
-        console.log(`[PlanHandler] Loading schools from backend: ${API_ENDPOINTS.GET_SCHOOLS}?${params}`);
-
         // ✅ استدعاء API
         jqClient().Get(`${API_ENDPOINTS.GET_SCHOOLS}?${params}`)
             .done(r => {
                 state.allSchools = r.items || [];
                 state.totalRecords = r.totalCount || 0;
-
-                console.log(`[PlanHandler] Loaded ${state.allSchools.length} schools (Total: ${state.totalRecords})`);
-
                 const tbody = ns.renderSchoolTable(
                     fieldId,
                     state.allSchools,
@@ -315,7 +310,7 @@
             const prevLink = $('<a>')
                 .addClass('page-link')
                 .attr('href', '#')
-                .text('السابق')
+                .text(`${t('lblPrevious')}`)
                 .on('click', function (e) {
                     e.preventDefault();
                     loadSchools(fieldId, state.currentPage - 1, state.filters);
@@ -356,7 +351,7 @@
             const nextLink = $('<a>')
                 .addClass('page-link')
                 .attr('href', '#')
-                .text('التالي')
+                .text(`${t('lblNext')}`)
                 .on('click', function (e) {
                     e.preventDefault();
                     loadSchools(fieldId, state.currentPage + 1, state.filters);
@@ -392,8 +387,6 @@
     /* ===================== EVENTS ===================== */
 
     const bindEvents = (fieldId) => {
-        console.log(`[PlanHandler] Binding events for ${fieldId}`);
-
         const $wrapper = $p(fieldId, 'wrapper');
 
         if (!$wrapper.length) {
@@ -432,8 +425,6 @@
             .on('click', pid(fieldId, 'clearFiltersBtn'), function () {
                 clearFilters(fieldId);
             });
-
-        console.log(`[PlanHandler] Events bound for ${fieldId}`);
     };
 
     const attachRowEvents = (fieldId) => {
@@ -456,9 +447,6 @@
 
     const onPlanTypeChange = (fieldId, element) => {
         const backend = $(element).find(':selected').data('backendname');
-
-        console.log(`[PlanHandler] Plan type changed for ${fieldId}:`, backend);
-
         $p(fieldId, 'semesterContainer').hide();
         ns.destroyChildPicker();
 
@@ -537,7 +525,6 @@
 
         clearTimeout(state.searchTimeout);
         state.searchTimeout = setTimeout(() => {
-            console.log(`[PlanHandler] Search term: "${state.searchTerm}"`);
             // ✅ استدعاء API مع البحث
             loadSchools(fieldId, 1, state.filters);
         }, 300);
@@ -549,9 +536,9 @@
 
         // ✅ جمع قيم الفلاتر
         state.filters = {
-            schoolName: $p(fieldId, 'filterSchoolName').val(),
+            name: $p(fieldId, 'filterSchoolName').val(),
             lastEvalDate: $p(fieldId, 'filterLastEvalDate').val(),
-            createdDate: $p(fieldId, 'filterCreatedDate').val(),
+            establishmentDate: $p(fieldId, 'filterCreatedDate').val(),
             nextEvalDate: $p(fieldId, 'filterNextEvalDate').val(),
             previousResult: $p(fieldId, 'filterPreviousResult').val(),
             visitType: $p(fieldId, 'filterVisitType').val()
@@ -561,9 +548,6 @@
         Object.keys(state.filters).forEach(key => {
             if (!state.filters[key]) delete state.filters[key];
         });
-
-        console.log(`[PlanHandler] Applying filters:`, state.filters);
-
         // ✅ استدعاء API مع الفلاتر
         loadSchools(fieldId, 1, state.filters);
 
@@ -587,9 +571,6 @@
         $p(fieldId, 'filterPreviousResult').val('');
         $p(fieldId, 'filterVisitType').val('');
         $p(fieldId, 'customSearch').val('');
-
-        console.log(`[PlanHandler] Filters cleared`);
-
         // ✅ إعادة تحميل كل المدارس
         loadSchools(fieldId, 1);
     };
@@ -616,7 +597,6 @@
     const onSaveClick = (fieldId, e) => {
         e.preventDefault();
         const payload = collect(fieldId);
-        console.log(`[PlanHandler] SAVE PAYLOAD for ${fieldId}:`, payload);
     };
 
     /* ===================== HELPERS ===================== */
@@ -636,8 +616,6 @@
                 visitTypeId: $p(fieldId, 'planTable').find(`.visitTypeSelect[data-school-id="${schoolId}"]`).val()
             });
         });
-
-        console.log(`[PlanHandler] Selected schools: ${state.selectedSchools.length}`);
     };
 
     const showLoadingState = (fieldId) => {

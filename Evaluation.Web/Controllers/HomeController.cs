@@ -31,16 +31,10 @@ namespace Evaluation.Web.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+
+
+      
+
         
-
-        [HttpPost]
-        public IActionResult UiControlList()
-        {
-            var model = Request.Form["request"][0]?.StringToObject<List<UiControlItemDTO>>();
-
-            return ViewComponent("UiControlList", model);
-        }
-
-       
     }
 }

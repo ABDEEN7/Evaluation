@@ -24,23 +24,37 @@ public class OrgnizationService(IServiceScopeFactory serviceScopeFactory,
     RequestInfo requestInfo
     ) : ApiBase(serviceScopeFactory, cacheDataProvider, unitOfWork, loggingServices, mapper, userInfo, serviceProvider, requestInfo)
 {
-    public async Task<PaginatedResult<Employee>> GetOrgnizationAsync(SchoolRequest request, Guid? targetOrgTreeId, List<Guid> currentOrganizations)
+    public async Task<PaginatedResult<Employee>> GetOrgnizationAsync(SchoolRequest request, List<Guid?> targetOrgTreeIds, List<Guid> currentOrganizations)
     {
-        var filter = BuildFilterExpression(request, targetOrgTreeId, currentOrganizations);
+        var filter = BuildFilterExpression(request, targetOrgTreeIds, currentOrganizations);
         var query = unitOfWork.GetRepository<Employee>()
                     .GetAllNonDeleted(filter);
         return await query.GetPaginatedResult(request.PageNumber, request.PageSize);
     }
-    private Expression<Func<Employee, bool>> BuildFilterExpression(SchoolRequest request, Guid? targetOrgTreeId, List<Guid> currentOrganizations)
+    public async Task<PaginatedResult<OrgTree>> GetMultipleOrgAsync(SchoolRequest request, List<Guid?> targetOrgTreeIds, List<Guid> currentOrganizations)
+    {
+        var filter = BuildFilterOrgExpression(request, targetOrgTreeIds, currentOrganizations);
+        var query = unitOfWork.GetRepository<OrgTree>()
+                    .GetAllNonDeleted(filter);
+        return await query.GetPaginatedResult(request.PageNumber, request.PageSize);
+    }
+    private Expression<Func<OrgTree, bool>> BuildFilterOrgExpression(SchoolRequest request, List<Guid?> targetOrgTreeIds, List<Guid> currentOrganizations)
+    {
+
+        Expression<Func<OrgTree, bool>> filter = s => true;
+        filter = filter.And(c => targetOrgTreeIds.Contains(c.OrgParentId) && currentOrganizations.Contains(c.Id));
+        if (!string.IsNullOrWhiteSpace(request.Name))
+            filter = filter.And(s => s.NameEn.Contains(request.Name) || s.NameAr.Contains(request.Name));
+        return filter;
+    }
+    private Expression<Func<Employee, bool>> BuildFilterExpression(SchoolRequest request, List<Guid?> targetOrgTreeIds, List<Guid> currentOrganizations)
     {
 
         Expression<Func<Employee, bool>> filter = s => true;
-        filter = filter.And(c => c.OrgParentId == targetOrgTreeId && currentOrganizations.Contains(c.Id));
+        filter = filter.And(c => targetOrgTreeIds.Contains(c.OrgParentId) && currentOrganizations.Contains(c.Id));
 
         if (!string.IsNullOrWhiteSpace(request.Name))
             filter = filter.And(s => s.NameEn.Contains(request.Name) || s.NameAr.Contains(request.Name));
-        //if(request.VisitType != null)
-        //    filter = filter.And(x=>x.)
         return filter;
     }
 }

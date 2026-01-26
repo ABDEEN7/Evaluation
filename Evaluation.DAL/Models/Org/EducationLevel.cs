@@ -1,8 +1,9 @@
-﻿using Evaluation.DAL.Models.BaseModule;
+﻿using Evaluation.DAL.Models.Audit;
+using Evaluation.DAL.Models.BaseModule;
 
 namespace Evaluation.DAL.Models.Org;
 
-public class EducationLevel : EntityBase
+public class EducationLevel : EntityBase, IAuditLogEntity
 {
     public string NameAr { get; set; } = null!;
     public string NameEn { get; set; } = null!;
