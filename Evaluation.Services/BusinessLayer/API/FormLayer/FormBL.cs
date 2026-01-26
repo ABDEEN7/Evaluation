@@ -20,10 +20,9 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
 {
     public async Task<Result<List<FormItemDto>>> GetFormItems(Guid FormId)
     {
-        var formItems = await formService.GetFormItems();
-        var selectedFormItems = formItems.Where(s => s.EvalFormId == FormId).ToList();
-        var mappedData = mapper.Map<List<FormItemDto>>(selectedFormItems);
-        foreach (var item in selectedFormItems)
+        var formItems = await formService.GetFormItems(FormId);
+        var mappedData = mapper.Map<List<FormItemDto>>(formItems);
+        foreach (var item in formItems)
         {
             var relatedItemDtos = new List<RelatedItemDto>();
 
@@ -61,9 +60,11 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
         if (dto == null || dto.Id == Guid.Empty)
             throw new BusinessException(ConstantKeys.ExceptionMessage.InvalidJson);
 
+        var formItems = await formService.GetFormItems(dto.Id);
+
         foreach (var item in dto.Items)
         {
-            var formItem = await formService.GetFormItem(item.Id);
+            var formItem = formItems.Where(f => f.Id == item.Id).FirstOrDefault();//await formService.GetFormItem(item.Id);
             var evalForm = await formService.GetEvalForm(dto.Id);
             var formEvalMatrixValues = await formService.GetFormEvalMatrixValues(evalForm.FormEvalMatrixId.Value);
 
@@ -221,9 +222,9 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
 
     public async Task<Result<List<FormItemDto>>> GetForm(Guid FormId)
     {
-        var formItems = await formService.GetFormItems();
+        var formItems = await formService.GetFormItems(FormId);
 
-        return mapper.Map<List<FormItemDto>>(formItems.Where(s => s.EvalFormId == FormId).ToList());
+        return mapper.Map<List<FormItemDto>>(formItems.ToList());
     }
 
     public async Task<Result<List<FormEvalMarixValueDto>>> GetFormEvalMarixValues(Guid FormId)

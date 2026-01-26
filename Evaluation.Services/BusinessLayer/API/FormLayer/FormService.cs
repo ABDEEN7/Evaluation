@@ -41,12 +41,14 @@ public class FormService(IServiceScopeFactory serviceScopeFactory,
             .ToListAsync();
     }
 
-    public async Task<List<FormItem>> GetFormItems()
+    public async Task<List<FormItem>> GetFormItems(Guid formId)
     {
             var formItems = await unitOfWork.GetRepository<FormItem>()
                       .GetAllActiveNonDeleted()
+                      .Where(s => s.EvalFormId == formId)
                       .Include(d => d.SubFormItems)
                       .Include(f => f.RelatedFrom)
+                      .ThenInclude(y=>y.RelatedItem)
                       .ToListAsync();
 
             return formItems;
