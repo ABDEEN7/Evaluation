@@ -17,5 +17,6 @@ namespace Evaluation.DAL.Models.ActionEntities
         public PartyType? PartyType { get; set; }
         public Guid Priority { get; set; }
         public string? ActionPartyTypeSettings { get; set; }
-    }
+
+	}
 }

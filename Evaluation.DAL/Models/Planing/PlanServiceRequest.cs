@@ -1,10 +1,11 @@
-﻿using System.Reflection.PortableExecutable;
+﻿using Evaluation.DAL.Models.Audit;
 using Evaluation.DAL.Models.BaseModule;
 using Evaluation.DAL.Models.Calendars;
+using System.Reflection.PortableExecutable;
 
 namespace Evaluation.DAL.Models.Planing;
 
-public class PlanServiceRequest : EntityBase
+public class PlanServiceRequest : EntityBase, IAuditLogEntity
 {
     public string Key { get; set; } = null!;
     public string Value { get; set; } = null!;

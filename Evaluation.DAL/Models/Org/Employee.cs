@@ -1,10 +1,11 @@
 ﻿
+using Evaluation.DAL.Models.Audit;
 using Evaluation.DAL.Models.Master;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace Evaluation.DAL.Models.Org;
 
-public class Employee : OrgTree
+public class Employee : OrgTree, IAuditLogEntity
 {
     public string EmployeeNo { get; set; } = null!;
     public Guid UserGenderId { get; set; }

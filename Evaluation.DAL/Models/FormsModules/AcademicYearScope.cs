@@ -1,9 +1,10 @@
-﻿using Evaluation.DAL.Models.BaseModule;
+﻿using Evaluation.DAL.Models.Audit;
+using Evaluation.DAL.Models.BaseModule;
 using Evaluation.DAL.Models.Calendars;
 
 namespace Evaluation.DAL.Models.FormsModules;
 
-public class AcademicYearScope : EntityBase
+public class AcademicYearScope : EntityBase, IAuditLogEntity
 {
     public Guid? ScopeId { get; set; }
     public Guid? ParentId { get; set; }

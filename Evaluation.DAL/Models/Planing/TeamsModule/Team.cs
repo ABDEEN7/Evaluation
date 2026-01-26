@@ -1,10 +1,11 @@
-﻿using System.ComponentModel;
+﻿using Evaluation.DAL.Models.Audit;
 using Evaluation.DAL.Models.BaseModule;
 using Evaluation.DAL.Models.DepartementEntites;
+using System.ComponentModel;
 
 namespace Evaluation.DAL.Models.Planing.TeamsModule;
 
-public class Team : EntityBase
+public class Team : EntityBase, IAuditLogEntity
 {
     public string NameAr { get; set; } = null!;
     public string NameEn { get; set; } = null!;

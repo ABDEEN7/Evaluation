@@ -22,7 +22,7 @@ const sharedFn = (options) => {
             var formData = new FormData();
             formData.append('request', JSON.stringify(ControlItems));
             $.ajax({
-                url: "/Home/UiControlList",
+                url: "/UiControl/UiControlList",
                 type: "POST",
                 dataType: "html",
                 processData: false,
@@ -1873,7 +1873,7 @@ const sharedFn = (options) => {
             var formData = new FormData();
             formData.append('request', JSON.stringify(ControlItems));
             $.ajax({
-                url: "/Home/UiControlList",
+                url: "/UiControl/UiControlList",
                 type: "POST",
                 dataType: "html",
                 processData: false,

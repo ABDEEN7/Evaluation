@@ -1,11 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Evaluation.DAL.Models.Audit;
 using Evaluation.DAL.Models.BaseModule;
 using Evaluation.DAL.Models.DepartementEntites;
+using Microsoft.EntityFrameworkCore;
 
 namespace Evaluation.DAL.Models.Calendars;
 [Index(nameof(DepartmentId), nameof(Year), IsUnique = true)]
 
-public class AcademicYear : EntityBase
+public class AcademicYear : EntityBase, IAuditLogEntity
 {
     public string NameAr { get; set; } = null!;
     public string NameEn { get; set; } = null!;

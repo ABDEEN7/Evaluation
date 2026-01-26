@@ -1,16 +1,15 @@
-﻿using Evaluation.API.ActionFilter;
-using Evaluation.API.Extensions;
-using Evaluation.DAL;
+﻿
 using Evaluation.Services.BusinessLayer;
 using Evaluation.Services.BusinessLayer.API.PlanLayer;
 using Evaluation.Services.BusinessLayer.API.SteamerLayer;
 using Evaluation.SharedHelper.Dtos.PlanDto;
-using Evaluation.SharedHelper.Dtos.SchoolDto;
+using Evaluation.SharedHelper.Models;
+using FluentResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Evaluation.API.Controllers;
 
-	[Route("api/[controller]/{depRouting}/[action]")]
+[Route("api/[controller]/{depRouting}/[action]")]
 public class PlanController(MasterBL masterBL) : ControllerBase
 {
 
@@ -19,7 +18,7 @@ public class PlanController(MasterBL masterBL) : ControllerBase
     public async Task<IActionResult> InsertOrUpdatePlan([FromBody] CreateEvaluationPlanDto approveDto)
     {
         await masterBL.GetApiService<PlanServiceRequestServices>().InsertOrUpdatePlan(approveDto);
-        return Ok(new {success= true});
+        return Ok(new { success = true });
     }
 
     [HttpGet]
@@ -46,7 +45,7 @@ public class PlanController(MasterBL masterBL) : ControllerBase
         var plan = await masterBL.GetApiService<PlanServiceRequestServices>().GetPlanWithSchoolsByIdAsync(planId);
         return Ok(new { result = plan });
     }
- 
+
     [HttpPost]
     public async Task<IActionResult> GetPlans(PlanDetailsRequestDto request)
     {
@@ -54,4 +53,10 @@ public class PlanController(MasterBL masterBL) : ControllerBase
             .GetApiService<PlanServiceRequestServices>()
             .GetPlansAsync(request));
     }
+    [HttpPost]
+    public async Task<Result<ValidationResult>> ValidateEvaluationPlan([FromBody] CreateEvaluationPlanDto planDtoRequest)
+    {
+        return await masterBL.GetApiService<PlanServiceRequestServices>().ValidateEvaluationPlan(planDtoRequest);
+    }
+
 }

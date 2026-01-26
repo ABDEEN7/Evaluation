@@ -39,12 +39,12 @@ namespace Evaluation.Services.BusinessLayer.API
 {
     public class  FormRenderBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, SrvUser _srvUser, UnitOfWork uow, LoggingServices loggingServices, SrvAction _srvAction,
 				  IMapper mapper,UserInfo userInfo,   RequestInfo _requestInfo, SrvServiceRequest _srvServiceRequest, EvaluationRequestService _evaluationRequestService, SrvService _srvService, SrvActionStatusConfiguration _srvActionStatusConfiguration
-			, SrvAttachments _srvAttachments, SrvDropdown _srvDropdown, SrvStatus _srvStatus, SrvAssignment _srvAssignment,
-				SrvField _srvField, IServiceProvider serviceProvider)
+			, SrvAttachments _srvAttachments, SrvDropdown _srvDropdown, SystemModuleSrv systemModuleSrv, SrvStatus _srvStatus, SrvAssignment _srvAssignment,
+				SrvField _srvField, IServiceProvider serviceProvider , ServiceRequestBL serviceRequestBL)
             : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, _requestInfo)
         {
 
-		public async Task<ActionCustomDTO> GetActionSteps(ServiceAction action, Guid serviceId, Guid? requestId = null, Guid? PlanId = null)
+		public async Task<ActionCustomDTO> GetActionField(ServiceAction action, Guid serviceId, RequestType requestType, Guid? requestId = null , Guid? PlanId = null)
 		{
 			string lang = _requestInfo.Lang;
 			var result = action.Adapt<ActionCustomDTO>();
@@ -60,11 +60,11 @@ namespace Evaluation.Services.BusinessLayer.API
 			await Task.WhenAll(hiddenFieldsTask, ActionFieldsTask, ActionFieldListsTask, requestFieldValuesTask);
 
 			var hiddenFieldIds = await hiddenFieldsTask;
-			var stepFields = await ActionFieldsTask;
-			var stepFieldsList = await ActionFieldListsTask;
+			var ActionFields = await ActionFieldsTask;
+			var ActionFieldsList = await ActionFieldListsTask;
 			var requestFieldValues = await requestFieldValuesTask ?? new List<ServiceRequestFieldsValue>();
 
-			var visibleFieldsForAction = stepFields;
+			var visibleFieldsForAction = ActionFields;
 				//.Where(f => action.ActionFields!.Any(x => x.FieldId == f.Id) && !hiddenFieldIds.Contains(f.Id))
 				//.ToList();
 
@@ -91,7 +91,7 @@ namespace Evaluation.Services.BusinessLayer.API
 
 					if (field.FormGroupListId.HasValue)
 					{
-						jsonSchemaTask = _srvField.GenerateJsonSchemaForFormGroupList(field.FormGroupListId.Value, stepFieldsList);
+						jsonSchemaTask = _srvField.GenerateJsonSchemaForFormGroupList(field.FormGroupListId.Value, ActionFieldsList);
 					}
 
 					var isEditable = action.ActionFields!
@@ -387,7 +387,7 @@ namespace Evaluation.Services.BusinessLayer.API
 								.Include(f => f.Field!.FieldViewConditions)
 								.Include(f => f.Field!.FormGroup)
 								.AsSplitQuery()
-								.Where(f => f.ServiceRequestId == request.Id &&
+								.Where(f => f.RefId == request.Id &&
 											(f.IsApproved || f.IsMissing == false) &&
 											!hiddenFields.Contains(f.FieldId))
 								.ToListAsync();
@@ -468,7 +468,7 @@ namespace Evaluation.Services.BusinessLayer.API
 				.Include(f => f.Field!.FieldViewConditions)
 				.Include(f => f.Field!.FormGroup)
 				.AsSplitQuery()
-				.Where(f => f.ServiceRequestId == request.Id && f.IsMissing == true && !hiddenFieldsIds.Contains(f.FieldId))
+				.Where(f => f.RefId == request.Id && f.IsMissing == true && !hiddenFieldsIds.Contains(f.FieldId))
 				.ToListAsync();
 
 			var fieldValueTasks = fieldValuesRaw.Select(async f => new FieldValueDTO
@@ -684,57 +684,49 @@ namespace Evaluation.Services.BusinessLayer.API
 			return await _srvActionStatusConfiguration.GetActionTemplatesByStatus(requestId);
 		}
 
-		public async Task<ServiceRequestDTO> GetActionFieldAsync(
-			Guid serviceId,
-			string actionBackendKey,
-			Guid? requestId = null,
-			Guid? PlanId = null,bool isEvaluationRequest = false)
+		public async Task<ServiceRequestDTO> GetActionFieldAsync(Guid serviceId,string actionBackendKey,Guid? requestId = null,Guid? PlanId = null)
 		{
 			string lang = _requestInfo.Lang;
-			var userId = userInfo.UserId;
+			var userId = userInfo.UserId ?? throw new BusinessException(ExceptionMessage.UserNotFound); 
 
 			var serviceTask = _srvService.GetServiceById(serviceId);
 			var actionTask = _srvAction.GetActionByBackendNameAsync(serviceId, actionBackendKey);
 			var statusIdTask = requestId is null
 				? _srvStatus.GetInitialStatusIdByServiceId(serviceId)
 				: Task.FromResult<Guid?>(null);
-			var requestObjTask = requestId is not null
-							? (isEvaluationRequest
-								? _evaluationRequestService.GetEvaluationRequestByIdAsync(requestId.Value)
-									.ContinueWith<ServiceRequest?>(t =>
-									{
-										var er = t.Result;
-										if (er == null) return null;
+			
 
-										return new ServiceRequest
-										{
-											Id = er.Id,                      
-											ServiceId = er.ServiceId,
-											StatusId = er.ServiceStatusId,   
-											OrgTreeId = er.OrgTreeId,
-											PlanId = er.PlanId,
-											RequestNumber = er.RequestNumber ?? "",
-											Sequence = er.Sequence
-										};
-									})
-								: _srvServiceRequest.GetRequestByIdAsync(requestId.Value))
-							: Task.FromResult<ServiceRequest?>(null);
-			var hasAccessTask = Task.FromResult(true);
-				//requestId is not null
-				//						? _srvServiceRequest.HasAccessToRequestAsync(requestId.Value, userId!.Value)
-				//						: Task.FromResult(true);
-
-			await Task.WhenAll(serviceTask, actionTask, statusIdTask, hasAccessTask);
+			await Task.WhenAll(serviceTask, actionTask, statusIdTask );
 
 			var service = await serviceTask ?? throw new BusinessException(ExceptionMessage.InvalidRequest);
 			var action = await actionTask
 						 ?? throw new BusinessException($"Action with key {actionBackendKey} not found for service {service.NameEn}.");
+			ServiceRequest? requestObj = null;
 
-			if (requestId is not null && !(hasAccessTask?.Result ?? false))
+			var requestType = systemModuleSrv.GetRequestType(service);
+			if (requestId is not null && requestId != Guid.Empty)
 			{
-				throw new UnauthorizedAccessException("You do not have permission to view this request.");
+				requestObj = await serviceRequestBL.GetRequestUnifiedAsync(requestId.Value, requestType)
+							?? throw new BusinessException(ExceptionMessage.lblRequestNotValid);
+
+				if (requestType == RequestType.Evaluation)
+				{
+					var moduleId = service.SystemModuleId;
+					var canAccess = await _evaluationRequestService.ValidateMinistryUserAccessAsync(userId, moduleId, requestId.Value);
+					if (!canAccess)
+						throw new UnauthorizedAccessException("You do not have permission to view this request.");
+				}
+				else
+				{
+					var canAccess = await _srvServiceRequest.HasAccessToRequestAsync(requestId.Value, userId);
+					if (!canAccess)
+						throw new UnauthorizedAccessException("You do not have permission to view this request.");
+				}
+
+				PlanId = requestObj.PlanId ?? PlanId;
 			}
 
+		
 			if (!service.Initialservice && action.IsInitialAction && PlanId == null)
 				//throw new BusinessException(ExceptionMessage.MissingPlan);
 
@@ -744,14 +736,13 @@ namespace Evaluation.Services.BusinessLayer.API
 			var isValidActionConditionsTask =
 				_srvActionStatusConfiguration.ValidateActionConditions(action.Id, requestId, PlanId);
 
-			var requestObj = await requestObjTask;
 			PlanId = requestId is not null ? requestObj!.PlanId : PlanId;
 
 			var actionCustomTask = action.ActionType!.BackendName switch
 			{
 				ActionTypeKeys.RequestDataChange => GetApprovedAndMissingFields(requestObj!, action),
 				ActionTypeKeys.SubmitMissingData => GetMissingFields(requestObj!, action),
-				_ => GetActionSteps(action, service.Id, requestId, PlanId)
+				_ => GetActionField(action, service.Id, requestType, requestId, PlanId)
 			};
 
 			var statusId = requestId is not null

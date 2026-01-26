@@ -40,7 +40,7 @@ public static class ConstantKeys
         public static readonly string StatusExistsServiceStatusPreventPartyType = "StatusExistsServiceStatusPreventPartyType";
         public static readonly string DraftPlanWithSameAcademicYearAlreadyExists = "DraftPlanWithSameAcademicYearAlreadyExists";
         public static readonly string PlanIsNotFound = "PlanIsNotFound";
-        public static readonly string InvalidApprovePlan = "InvalidApprovePlan";
+        public static readonly string InvalidPlan = "InvalidPlan";
         public static readonly string InvalidEvaluationDate = "InvalidEvaluationDate";
         public static readonly string PlanInThePastIsNotAllowed = "PlanInThePastIsNotAllowed";
         public static readonly string InvalidDraftPlan = "InvalidDraftPlan";
@@ -181,6 +181,10 @@ public static class ConstantKeys
         public static readonly string TheSelectedValueIsNotRecognized = "TheSelectedValueIsNotRecognized";
         public static readonly string FormDataIsNotValid = "FormDataIsNotValid";
         public static readonly string FormDataIsNull = "FormDataIsNull";
+        public static readonly string CompareDateException = "CompareDateException";
+        public static readonly string StartSchoolPlanDateException = "StartSchoolPlanDateException";
+        public static readonly string EndSchoolPlanDateException = "EndSchoolPlanDateException";
+
     }
 
     public static class AdminSettings
@@ -1104,13 +1108,11 @@ public static class ConstantKeys
 
 	public static class ModuleType
 	{
-		public static readonly string EvaluationPlan = "EvaluationPlan";
-		public static readonly string EvaluationPlanRequest = "EvaluationPlanRequest";
-		public static readonly string EvaluationParty = "EvaluationParty";
-		public static readonly string Forms = "Forms";
-		public static readonly string Complain = "Complain";
+		public const string EvaluationPlan = "EvaluationPlan";
+		public const string EvaluationRequest = "EvaluationRequest";
+		public const string EvaluationParty = "EvaluationParty";
 	}
-    public static class NDAStatic
+	public static class NDAStatic
     {
         public static string Pending = "PENDING";
         public static string Objection = "OBJECTION";

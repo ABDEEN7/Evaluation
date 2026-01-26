@@ -59,6 +59,12 @@ namespace Evaluation.SharedHelper.Enums
 
     }
 
+	public enum RequestType
+	{
+		Service = 1,
+		Evaluation = 2
+	}
+
     public enum ItemPropertyType
     {
         Select = 1,

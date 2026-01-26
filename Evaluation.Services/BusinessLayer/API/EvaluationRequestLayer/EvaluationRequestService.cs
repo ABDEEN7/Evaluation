@@ -167,33 +167,52 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 		});
 	}
 
-	public async Task<EvaluationRequest?> GetEvaluationRequestByIdAsync(Guid RequestId, bool UseMainUow = false)
+	public async Task<EvaluationRequest?> GetEvaluationRequestByIdAsync(Guid requestId, bool useMainUow = false)
 	{
-		UnitOfWork Scope;
-		if (UseMainUow)
+		if (useMainUow)
 		{
-			Scope = uow;
+			return await uow.GetRepository<EvaluationRequest>()
+				.GetAllActiveNonDeleted(x => x.Id == requestId)
+				.Include(c => c.Plan)
+				.Include(x => x.ServiceStatus)
+					.ThenInclude(x => x!.StatusPreventPartyTypes)
+				.Include(c => c.Service)
+				.Include(c => c.OrgTree)
+				.AsSplitQuery()
+				.AsNoTracking()
+				.FirstOrDefaultAsync(x => x.IsActive && !x.IsDeleted);
 		}
-		else
-		{
-			Scope = serviceScopeFactory.CreateScopedUow();
 
-		}
-		var Request = await Scope.GetRepository<EvaluationRequest>()
-									.GetAllActiveNonDeleted(x => x.Id == RequestId)
-									.Include(c => c.Plan)
-									.Include(x => x.ServiceStatus)
-									.ThenInclude(x => x!.StatusPreventPartyTypes)
-									.Include(c => c.Service)
-									.Include(c => c.OrgTree)
-									.AsSplitQuery()
-									.AsNoTracking()
-									.FirstOrDefaultAsync(x => x.IsActive == true && x.IsDeleted == false);
+		using var scope = serviceScopeFactory.CreateScopedUow();
 
-		return Request;
-
+		return await scope.GetRepository<EvaluationRequest>()
+			.GetAllActiveNonDeleted(x => x.Id == requestId)
+			.Include(c => c.Plan)
+			.Include(x => x.ServiceStatus)
+				.ThenInclude(x => x!.StatusPreventPartyTypes)
+			.Include(c => c.Service)
+			.Include(c => c.OrgTree)
+			.AsSplitQuery()
+			.AsNoTracking()
+			.FirstOrDefaultAsync(x => x.IsActive && !x.IsDeleted);
 	}
-
+	public  ServiceRequest MapEvaluationToServiceRequest(EvaluationRequest er)
+	{
+		return new ServiceRequest
+		{
+			Id = er.Id,
+			ServiceId = er.ServiceId,
+			StatusId = er.ServiceStatusId,
+			OrgTreeId = er.OrgTreeId,
+			PlanId = er.PlanId,
+			RequestNumber = er.RequestNumber ?? "",
+			Sequence = er.Sequence,
+			Service = er.Service,
+			Status = er.ServiceStatus, 
+			OrgTree = er.OrgTree,
+			Plan = er.Plan
+		};
+	}
 	public async Task<EvaluationRequestDTO> GetEvaluationDetailsAsync(Guid id, CancellationToken ct = default)
 	{
 		var lang = requestInfo.Lang;
@@ -277,7 +296,7 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 		};
 		return requestDetails;
 	}
-	private async Task<bool> ValidateMinistryUserAccessAsync(Guid userId, Guid? moduleId, Guid? requestId)
+	public async Task<bool> ValidateMinistryUserAccessAsync(Guid userId, Guid? moduleId, Guid? requestId)
 	{
 		if (moduleId is null)
 		{
@@ -339,11 +358,11 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 		var hiddenFieldsIds = await SrvField.GetHiddenFields(request.ServiceId);
 
 		var requestFieldsValue = await serviceScopeFactory.CreateScopedUow()
-			.GetRepository<EvaluationRequestFieldsValue>()
+			.GetRepository<ServiceRequestFieldsValue>()
 			.GetAllActiveNonDeleted()
 			.Include(x => x.Field)
 			.ThenInclude(x => x!.FieldViewConditions)
-			.Where(c => c.EvaluationRequestId == request.Id && !hiddenFieldsIds.Contains(c.FieldId))
+			.Where(c => c.RefId == request.Id && !hiddenFieldsIds.Contains(c.FieldId))
 			.Select(c => new
 			{
 				c.FieldId,
@@ -500,11 +519,11 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 	{
 		var uow = serviceScopeFactory.CreateScopedUow();
 
-		var fields = await uow.GetRepository<EvaluationRequestFieldsValue>()
+		var fields = await uow.GetRepository<ServiceRequestFieldsValue>()
 			.GetAllQueryFiltered()
 			.Include(f => f.Field)
 			.ThenInclude(f => f.FieldType)
-			.Where(f => f.EvaluationRequestId == id)
+			.Where(f => f.RefId == id)
 			.ToListAsync();
 
 		var directFileValues = fields

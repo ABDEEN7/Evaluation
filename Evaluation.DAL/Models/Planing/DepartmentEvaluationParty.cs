@@ -1,9 +1,10 @@
-﻿using Evaluation.DAL.Models.BaseModule;
+﻿using Evaluation.DAL.Models.Audit;
+using Evaluation.DAL.Models.BaseModule;
 using Evaluation.DAL.Models.DepartementEntites;
 
 namespace Evaluation.DAL.Models.Planing;
 
-public class DepartmentEvaluationParty : EntityBase
+public class DepartmentEvaluationParty : EntityBase, IAuditLogEntity
 {
     public Guid DepartmentId { get; set; }
     public Department? Department { get; set; }
