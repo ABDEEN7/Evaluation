@@ -184,18 +184,6 @@ public class PlanServiceRequestServices(
         }
     }
 
-    //private async Task ValidateUpdatePlan(UpdatePlanDto model)
-    //{
-    //    if (model is null || string.IsNullOrEmpty(model.Name))
-    //        throw new BusinessException(ConstantKeys.ExceptionMessage.InvalidDraftPlan);
-
-    //    var selectedYear = await serviceScopeFactory.CreateScopedUow().GetRepository<AcademicYear>()
-    //       .GetAllActiveNonDeleted()
-    //       .FirstOrDefaultAsync(x => x.Id == model.AcademicYearId);
-
-    //    if (selectedYear?.Year < DateTime.Now.Year)
-    //        throw new BusinessException(ConstantKeys.ExceptionMessage.PlanInThePastIsNotAllowed);
-    //}
     private async Task<Result<CreateEvaluationPlanDto>> InsertPlan(CreateEvaluationPlanDto modelDto)
     {
         return await ExecuteWithResult(async () =>
