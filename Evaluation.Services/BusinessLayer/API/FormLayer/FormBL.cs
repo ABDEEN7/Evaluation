@@ -1,15 +1,15 @@
 ﻿using AutoMapper;
 using Evaluation.DAL.Dtos.Form;
 using Evaluation.DAL.Helper;
-using Evaluation.DAL.Models.FormsModules;
 using Evaluation.DAL.Repositories;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Dtos.Form;
 using Evaluation.SharedHelper.Dtos.Shared;
+using Evaluation.SharedHelper.Enums;
+using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Models;
 using FluentResults;
 using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json.Linq;
 
 namespace Evaluation.Services.BusinessLayer.API.FormLayer;
 
@@ -50,80 +50,69 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
 
     public async Task<Result<ValidationResult>> ValidateEvaluationForm(FormEvaluationDto formEvaluationDto)
     {
-        return Validate(formEvaluationDto);
+        return await Validate(formEvaluationDto);
     }
 
-    public static ValidationResult Validate(FormEvaluationDto dto)
+
+    private async Task<ValidationResult> Validate(FormEvaluationDto dto)
     {
         var result = new ValidationResult();
 
-        if (dto == null)
+        if (dto == null || dto.Id == Guid.Empty)
+            throw new BusinessException(ConstantKeys.ExceptionMessage.InvalidJson);
+
+        foreach (var item in dto.Items)
         {
-            result.Errors.Add("FormEvaluationDto is null.");
-            return result;
-        }
+            var formItem = await formService.GetFormItem(item.Id);
+            var evalForm = await formService.GetEvalForm(dto.Id);
+            var formEvalMatrixValues = await formService.GetFormEvalMatrixValues(evalForm.FormEvalMatrixId.Value);
 
-        if (dto.Id == Guid.Empty)
-            result.Errors.Add("Id must not be empty.");
-
-        //TODO: Need to check before if required or not
-        if (string.IsNullOrWhiteSpace(dto.Strengths))
-            result.Errors.Add("Strengths is required.");
-
-        //TODO: Need to check before if required or not
-        if (string.IsNullOrWhiteSpace(dto.Improvements))
-            result.Errors.Add("Improvements is required.");
-
-        if (dto.Items == null || !dto.Items.Any())
-        {
-            result.Errors.Add("Items must contain at least one item.");
-            return result;
-        }
-
-        for (int i = 0; i < dto.Items.Count; i++)
-        {
-            var item = dto.Items[i];
-
-            if (item == null)
+            
+            if (item.ValueId != null)
             {
-                result.Errors.Add($"Items[{i}] is null.");
-                continue;
+                if(!formEvalMatrixValues.Any(x=>x.Id == item.ValueId))
+                    result.Errors.Add(new ItemError() { ItemId = item.Id, Message = ConstantKeys.ExceptionMessage.TheSelectedValueIsNotRecognized, ItemPropertyType = ItemPropertyType.Select });
+            }
+            else 
+            {
+                result.Errors.Add(new ItemError() { ItemId = item.Id, Message = ConstantKeys.ExceptionMessage.Requiredfield, ItemPropertyType = ItemPropertyType.Select });
             }
 
-            if (item.Id == Guid.Empty)
-                result.Errors.Add($"Items[{i}].Id must not be empty.");
-
-            if (!item.ValueId.HasValue)
-                result.Errors.Add($"Items[{i}].ValueId is required.");
-
-            if (item.Value < 0)
-                result.Errors.Add($"Items[{i}].Value must be greater than or equal to 0.");
-
-            if (item.SubItems == null || !item.SubItems.Any())
+            if (item.Note == null)
             {
-                result.Errors.Add($"Items[{i}].SubItems must contain at least one item.");
-                continue;
+                result.Errors.Add(new ItemError() { ItemId = item.Id, Message = ConstantKeys.ExceptionMessage.Requiredfield, ItemPropertyType = ItemPropertyType.Note });
+
+                //if (formItem.NoteRequired)
+                //{
+                //    result.Errors.Add(new ItemError() {ItemId = item.Id, Message= ConstantKeys.ExceptionMessage.Requiredfield, ItemPropertyType = ItemPropertyType.Note });
+                //}
             }
 
-            for (int j = 0; j < item.SubItems.Count; j++)
+            foreach (var sub in item.SubItems)
             {
-                var subItem = item.SubItems[j];
+                var currentSubItem = formItem.SubFormItems.Where(s => s.Id == sub.Id).FirstOrDefault();
 
-                if (subItem == null)
+                if (sub.Note == null)
                 {
-                    result.Errors.Add($"Items[{i}].SubItems[{j}] is null.");
-                    continue;
+                    result.Errors.Add(new ItemError() { ItemId = sub.Id, Message = ConstantKeys.ExceptionMessage.Requiredfield, ItemPropertyType = ItemPropertyType.Note });
+
+                    //if (currentSubItem.NoteRequired)
+                    //{
+                    //    result.Errors.Add(new ItemError() { ItemId = sub.Id, Message = ConstantKeys.ExceptionMessage.Requiredfield, ItemPropertyType = ItemPropertyType.Note });
+                    //}
                 }
 
-                if (subItem.Id == Guid.Empty)
-                    result.Errors.Add($"Items[{i}].SubItems[{j}].Id must not be empty.");
-
-                if (!subItem.ValueId.HasValue)
-                    result.Errors.Add($"Items[{i}].SubItems[{j}].ValueId is required.");
-
-                if (subItem.Value == Guid.Empty)
-                    result.Errors.Add($"Items[{i}].SubItems[{j}].Value must not be empty.");
+                if (sub.ValueId != null)
+                {
+                    if (!formEvalMatrixValues.Any(x => x.Id == sub.ValueId))
+                        result.Errors.Add(new ItemError() { ItemId = sub.Id, Message = ConstantKeys.ExceptionMessage.TheSelectedValueIsNotRecognized, ItemPropertyType = ItemPropertyType.Select });
+                }
+                else
+                {
+                    result.Errors.Add(new ItemError() { ItemId = sub.Id, Message = ConstantKeys.ExceptionMessage.Requiredfield, ItemPropertyType = ItemPropertyType.Select });
+                }
             }
+
         }
 
         return result;
@@ -131,13 +120,17 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
 
     public async Task<Result<FormEvaluationDto>> SaveEvaluationForm(FormEvaluationDto formEvaluationDto)
     {
+        var formValidation = await Validate(formEvaluationDto);
+        if (!formValidation.IsValid)
+            return Result.Fail<FormEvaluationDto>(ConstantKeys.ExceptionMessage.FormDataIsNotValid);
+
         if (formEvaluationDto == null)
-            return Result.Fail<FormEvaluationDto>("Form data is null.");
+            return Result.Fail<FormEvaluationDto>(ConstantKeys.ExceptionMessage.FormDataIsNull); 
 
         var userId = userInfo.UserId;
 
         if (userId == null)
-            return Result.Fail<FormEvaluationDto>("User ID is missing.");
+            return Result.Fail<FormEvaluationDto>(ConstantKeys.ExceptionMessage.UserNotFound);
 
         var form = mapper.Map<FormEvaluationValue>(formEvaluationDto);
 
@@ -192,12 +185,12 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
     public async Task<Result<FormEvaluationDto>> UpdateEvaluationForm(FormEvaluationDto formEvaluationDto)
     {
         if (formEvaluationDto == null)
-            return Result.Fail<FormEvaluationDto>("Form data is null.");
+            return Result.Fail<FormEvaluationDto>(ConstantKeys.ExceptionMessage.FormDataIsNull);
 
         var userId = userInfo.UserId;
 
         if (userId == null)
-            return Result.Fail<FormEvaluationDto>("User ID is missing.");
+            return Result.Fail<FormEvaluationDto>(ConstantKeys.ExceptionMessage.UserNotFound);
 
         var form = mapper.Map<FormEvaluationValue>(formEvaluationDto);
 

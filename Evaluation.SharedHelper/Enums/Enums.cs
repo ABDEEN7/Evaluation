@@ -58,4 +58,10 @@ namespace Evaluation.SharedHelper.Enums
         website = 1,
 
     }
+
+    public enum ItemPropertyType
+    {
+        Select = 1,
+        Note
+    }
 }

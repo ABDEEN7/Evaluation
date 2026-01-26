@@ -1,4 +1,4 @@
-﻿let departmentRoutePath = sharedUtility().extractDepartmentName();
+﻿let departmentPath = sharedUtility().extractDepartmentName();
 
 $(document).ready(function () {
     $("#btnSubmitForm").on("click", function (e) {
@@ -13,9 +13,7 @@ $(document).ready(function () {
         validateForm();
     });
 });
-function evaluationFormResult() {
-    const params = new URLSearchParams(window.location.search);
-    const formId = params.get('formId');  
+function evaluationFormResult(formId) { 
     const mainItems = [];
 
     // ========== LOOP MAIN ITEMS ONLY ==========
@@ -36,7 +34,8 @@ function evaluationFormResult() {
 
         const mainObj = {
             id: mainId,
-            value: selectedValue,
+            valueId: selectedValue,
+            //value: selectedValue,
             note: note,
             subItems: []
         };
@@ -59,7 +58,8 @@ function evaluationFormResult() {
 
             mainObj.subItems.push({
                 id: childId,
-                value: childValue,
+                valueId: childValue,
+                //value: selectedValue,
                 note: childnote
             });
         });
@@ -73,9 +73,7 @@ function evaluationFormResult() {
 
     const payload = {
         id: formId,
-        items: mainItems,
-        strengths: strengths,
-        improvements: improvements
+        items: mainItems
     };
 
     console.log("FINAL NESTED JSON:", payload);
@@ -83,9 +81,9 @@ function evaluationFormResult() {
     return payload;
 }
 
-function submitForm() {
-    var result = evaluationFormResult();
-    jqClient().Post(`/Form/${departmentRoutePath}/SaveEvaluationForm`, result)
+function submitForm(formId) {
+    var result = evaluationFormResult(formId);
+    jqClient().Post(`/Form/${departmentPath}/SaveEvaluationForm`, result)
         .done((res) => {
             Swal.fire({
                 icon: "success",
@@ -94,18 +92,40 @@ function submitForm() {
             });
         });
 }
-function validateForm() {
-    var result = evaluationFormResult();
-    jqClient().Post("/Form/ValidateEvaluationForm", result)
+function validateForm(formId) {
+    var result = evaluationFormResult(formId);
+    jqClient().Post(`/Form/${departmentPath}/ValidateEvaluationForm`, result)
         .done((res) => {
 
             if (res.value.isValid) {
-                saveForm();
+                saveForm(formId);
+            }
+            else {
+                clearValidation();
+                res.value.errors.forEach(error => {
+                    showValidation(error.itemId, error.message, error.itemPropertyType);
+                });
             }
         });
 }
+function saveForm(formId) {
+    return evaluationFormResult(formId);
+}
 
+function showValidation(itemId, message, itemPropertyType) {
+    const el = document.getElementById(`validation-${itemId}-${itemPropertyType}`);
+    if (!el) return;
 
-function saveForm() {
-  return evaluationFormResult();
+    el.textContent = "*" + message;
+    el.style.display = 'block';
+}
+
+function clearValidation() {
+    const els = document.getElementsByClassName(`validation-message`);
+    if (!els) return;
+
+    for (const el of els) {
+        el.style.textContent = '';
+        el.style.display = 'none';
+    }
 }
