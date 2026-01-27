@@ -94,7 +94,12 @@ window.serviceRequestForm = window.serviceRequestForm || {};
 
     // #region 🧾 render Action DropDown & actionTransactions
 
-    const fetchAndRenderActionData = (backendKey, requestId, serviceId, modalContainer = 'Action-container-fields', ctx = {}) => {
+    const fetchAndRenderActionData = (backendKey, requestId, serviceId, modalContainer = 'Action-container-fields', UseactionModal =false, ctx = {}) => {
+
+        if (UseactionModal) { 
+            modalContainer = 'Action-container-fields';
+            ctx.actionModalId = 'actionModal';
+        }
 
         const actionModalId = ctx.actionModalId || 'actionModal';
         const actionModalRoot = $('#' + actionModalId);
@@ -219,6 +224,7 @@ window.serviceRequestForm = window.serviceRequestForm || {};
                     resolvedRequestId,
                     resolvedServiceId,
                     modalContainer,
+                    true,
                     ctx 
                 );
             });
