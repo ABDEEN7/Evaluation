@@ -72,8 +72,7 @@ public class PlanServiceRequestServices(
     //Plan Type Module
     public async Task<List<PlanTypeDto>> GetPlanTypes()
     {
-        var departmentId = await departmentService.GetDepartmentIdAsync();
-        return await planRepository.GetPlanType().Where(x => x.DepartmentId == departmentId).Select(s => new PlanTypeDto
+        return await planRepository.GetPlanType().Where(x => x.DepartmentId == requestInfo.DepId).Select(s => new PlanTypeDto
         {
             Id = s.Id,
             Name = requestInfo.Lang == LanguageConst.Ar ? s.NameAr : s.NameEn,
@@ -231,10 +230,8 @@ public class PlanServiceRequestServices(
 
     private async Task FillSystemFields(CreateEvaluationPlanDto modelDto)
     {
-        Guid? departmentId = await departmentService.GetDepartmentIdAsync();
-
         modelDto.AcademicYearId =
-            await academicYearRepository.GetAcademicYearId(departmentId);
+            await academicYearRepository.GetAcademicYearId(requestInfo.DepId);
 
         modelDto.PlanStatusId =
             await unitOfWork.GetRepository<PlanStatus>()
@@ -293,10 +290,8 @@ public class PlanServiceRequestServices(
     }
     private async Task<Guid> GetDepEvaluationType()
     {
-        Guid? departmentId = await departmentService.GetDepartmentIdAsync();
-
         return await unitOfWork.GetRepository<DepEvaluationType>()
-            .GetAllActiveNonDeleted(x => x.DepartmentId == departmentId)
+            .GetAllActiveNonDeleted(x => x.DepartmentId == requestInfo.DepId)
             .Select(x => x.Id)
             .FirstAsync();
     }

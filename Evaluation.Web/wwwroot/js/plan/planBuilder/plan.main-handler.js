@@ -216,6 +216,7 @@
 
         populatePlanTypes(fieldId);
         populateSemesters(fieldId);
+        $p(fieldId, 'semesterContainer').hide();
 
         $p(fieldId, 'planTitle').val(vm.title);
         $p(fieldId, 'ddlPlanType').val(vm.planTypeId).trigger('change');
@@ -401,11 +402,6 @@
         $wrapper.off('change', pid(fieldId, 'ddlSemester'))
             .on('change', pid(fieldId, 'ddlSemester'), function () {
                 onSemesterChange(fieldId, this);
-            });
-
-        $wrapper.off('click', pid(fieldId, 'btnSavePlan'))
-            .on('click', pid(fieldId, 'btnSavePlan'), function (e) {
-                onSaveClick(fieldId, e);
             });
 
         // ✅ البحث: استدعاء API بعد 300ms من التوقف عن الكتابة
