@@ -35,12 +35,14 @@ $btnAddbutton.click(function () {
             locale: lang === "ar" ? "ar" : "en",
             disableMobile: true
         });
-        // Set up checkbox behavior
         const $checkbox = $('#DepartmentHolidayIsCronExpression');
         const $cronGroup = $('#DepartmentHolidayCronExpression').closest('.mb-3');
+
+        // 🔹 Default state: IsCron = false
         $checkbox.prop('checked', false);
         $cronGroup.hide();
-        // Handle changes
+
+        // 🔹 Handle checkbox change
         $checkbox.on('change', function () {
             if (this.checked) {
                 $cronGroup.show();
