@@ -95,7 +95,7 @@ namespace Evaluation.Services.BusinessLayer.API.Template;
                 .ThenInclude(f => f!.FormGroupList)
                 .ThenInclude(f => f!.Fields)
                 .ThenInclude(f => f.FieldType)
-                .Where(c => c.ServiceRequestId == request.Id && placeHolders.Select(p => p.FieldId).Contains(c.FieldId))
+                .Where(c => c.RefId == request.Id && placeHolders.Select(p => p.FieldId).Contains(c.FieldId))
                 .ToList();
 
             var result = new List<PlaceholderDto>();

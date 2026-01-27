@@ -1,8 +1,9 @@
-﻿using Evaluation.DAL.Models.BaseModule;
+﻿using Evaluation.DAL.Models.Audit;
+using Evaluation.DAL.Models.BaseModule;
 
 namespace Evaluation.DAL.Models.Calendars
 {
-    public class Semester : EntityBase
+    public class Semester : EntityBase, IAuditLogEntity
     {
         public string BackendName { get; set; } = null!;
 

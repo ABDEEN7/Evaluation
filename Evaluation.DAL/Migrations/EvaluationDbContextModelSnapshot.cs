@@ -6251,77 +6251,6 @@ namespace Evaluation.DAL.Migrations
                     b.ToTable("EvaluationRequestAssignment");
                 });
 
-            modelBuilder.Entity("Evaluation.DAL.Models.Planing.EvaluationRequestEntity.EvaluationRequestFieldsValue", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("CreateById")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreateDate")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("getdate()");
-
-                    b.Property<Guid?>("DeleteById")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("DeleteDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("EvaluationRequestId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("FieldId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("IsActive")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(true);
-
-                    b.Property<bool>("IsApproved")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false);
-
-                    b.Property<bool?>("IsMissing")
-                        .HasColumnType("bit");
-
-                    b.Property<Guid?>("ServiceRequestId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("UpdateById")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("UpdateDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Value")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreateById");
-
-                    b.HasIndex("DeleteById");
-
-                    b.HasIndex("EvaluationRequestId");
-
-                    b.HasIndex("FieldId");
-
-                    b.HasIndex("ServiceRequestId");
-
-                    b.HasIndex("UpdateById");
-
-                    b.ToTable("EvaluationRequestFieldsValue");
-                });
-
             modelBuilder.Entity("Evaluation.DAL.Models.Planing.EvaluationRequestEntity.EvaluationRequestHistory", b =>
                 {
                     b.Property<Guid>("Id")
@@ -7738,6 +7667,9 @@ namespace Evaluation.DAL.Migrations
                     b.Property<DateTime?>("DeleteDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<Guid?>("EvaluationRequestId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid>("FieldId")
                         .HasColumnType("uniqueidentifier");
 
@@ -7757,7 +7689,13 @@ namespace Evaluation.DAL.Migrations
                     b.Property<bool?>("IsMissing")
                         .HasColumnType("bit");
 
-                    b.Property<Guid>("ServiceRequestId")
+                    b.Property<Guid>("RefId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("RequestType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("ServiceRequestId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid?>("UpdateById")
@@ -7774,6 +7712,8 @@ namespace Evaluation.DAL.Migrations
                     b.HasIndex("CreateById");
 
                     b.HasIndex("DeleteById");
+
+                    b.HasIndex("EvaluationRequestId");
 
                     b.HasIndex("FieldId");
 
@@ -8027,10 +7967,11 @@ namespace Evaluation.DAL.Migrations
                     b.Property<string>("Remarks")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("ServiceActionId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("RequestType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("ServiceRequestId")
+                    b.Property<Guid>("ServiceActionId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid?>("SystemModuleId")
@@ -8049,8 +7990,6 @@ namespace Evaluation.DAL.Migrations
                     b.HasIndex("DeleteById");
 
                     b.HasIndex("ServiceActionId");
-
-                    b.HasIndex("ServiceRequestId");
 
                     b.HasIndex("SystemModuleId");
 
@@ -11147,7 +11086,7 @@ namespace Evaluation.DAL.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Models.DepartementEntites.Department", "Department")
-                        .WithMany()
+                        .WithMany("DepTargetOrgTrees")
                         .HasForeignKey("DepartmentId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -11505,7 +11444,7 @@ namespace Evaluation.DAL.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Models.FormBuilder.Field", "Field")
-                        .WithMany("ActionsStepsField")
+                        .WithMany("ActionField")
                         .HasForeignKey("FieldId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -13515,7 +13454,7 @@ namespace Evaluation.DAL.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Models.Planing.EvaluationRequestEntity.EvaluationRequestAssignment", "EvaluationRequestAssignment")
-                        .WithMany()
+                        .WithMany("EvalRequestAssignmentScopies")
                         .HasForeignKey("EvaluationRequestAssignmentId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -13659,52 +13598,6 @@ namespace Evaluation.DAL.Migrations
                     b.Navigation("NdaStatus");
 
                     b.Navigation("PartyType");
-
-                    b.Navigation("UpdateBy");
-                });
-
-            modelBuilder.Entity("Evaluation.DAL.Models.Planing.EvaluationRequestEntity.EvaluationRequestFieldsValue", b =>
-                {
-                    b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "CreateBy")
-                        .WithMany()
-                        .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "DeleteBy")
-                        .WithMany()
-                        .HasForeignKey("DeleteById")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Evaluation.DAL.Models.Planing.EvaluationRequestEntity.EvaluationRequest", "EvaluationRequest")
-                        .WithMany()
-                        .HasForeignKey("EvaluationRequestId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Evaluation.DAL.Models.FormBuilder.Field", "Field")
-                        .WithMany()
-                        .HasForeignKey("FieldId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Evaluation.DAL.Models.ServiceRequestEntities.ServiceRequest", null)
-                        .WithMany("ServiceRequestFieldsValues")
-                        .HasForeignKey("ServiceRequestId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "UpdateBy")
-                        .WithMany()
-                        .HasForeignKey("UpdateById")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("CreateBy");
-
-                    b.Navigation("DeleteBy");
-
-                    b.Navigation("EvaluationRequest");
-
-                    b.Navigation("Field");
 
                     b.Navigation("UpdateBy");
                 });
@@ -14151,7 +14044,7 @@ namespace Evaluation.DAL.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "User")
-                        .WithMany()
+                        .WithMany("UserTeams")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -14578,17 +14471,21 @@ namespace Evaluation.DAL.Migrations
                         .HasForeignKey("DeleteById")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("Evaluation.DAL.Models.Planing.EvaluationRequestEntity.EvaluationRequest", null)
+                        .WithMany("ServiceRequestFieldsValues")
+                        .HasForeignKey("EvaluationRequestId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("Evaluation.DAL.Models.FormBuilder.Field", "Field")
                         .WithMany()
                         .HasForeignKey("FieldId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Evaluation.DAL.Models.ServiceRequestEntities.ServiceRequest", "ServiceRequest")
-                        .WithMany()
+                    b.HasOne("Evaluation.DAL.Models.ServiceRequestEntities.ServiceRequest", null)
+                        .WithMany("ServiceRequestFieldsValues")
                         .HasForeignKey("ServiceRequestId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "UpdateBy")
                         .WithMany()
@@ -14600,8 +14497,6 @@ namespace Evaluation.DAL.Migrations
                     b.Navigation("DeleteBy");
 
                     b.Navigation("Field");
-
-                    b.Navigation("ServiceRequest");
 
                     b.Navigation("UpdateBy");
                 });
@@ -14740,12 +14635,6 @@ namespace Evaluation.DAL.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Evaluation.DAL.Models.ServiceRequestEntities.ServiceRequest", "ServiceRequest")
-                        .WithMany()
-                        .HasForeignKey("ServiceRequestId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("Evaluation.DAL.Models.DepartementEntites.SystemModule", "SystemModule")
                         .WithMany()
                         .HasForeignKey("SystemModuleId")
@@ -14761,8 +14650,6 @@ namespace Evaluation.DAL.Migrations
                     b.Navigation("DeleteBy");
 
                     b.Navigation("ServiceAction");
-
-                    b.Navigation("ServiceRequest");
 
                     b.Navigation("SystemModule");
 
@@ -15754,6 +15641,8 @@ namespace Evaluation.DAL.Migrations
                 {
                     b.Navigation("AcademicYears");
 
+                    b.Navigation("DepTargetOrgTrees");
+
                     b.Navigation("UserDepartments");
                 });
 
@@ -15769,7 +15658,7 @@ namespace Evaluation.DAL.Migrations
 
             modelBuilder.Entity("Evaluation.DAL.Models.FormBuilder.Field", b =>
                 {
-                    b.Navigation("ActionsStepsField");
+                    b.Navigation("ActionField");
 
                     b.Navigation("FieldAttributeValues");
 
@@ -15806,6 +15695,16 @@ namespace Evaluation.DAL.Migrations
                     b.Navigation("RolePermission");
 
                     b.Navigation("UserRoles");
+                });
+
+            modelBuilder.Entity("Evaluation.DAL.Models.Planing.EvaluationRequestEntity.EvaluationRequest", b =>
+                {
+                    b.Navigation("ServiceRequestFieldsValues");
+                });
+
+            modelBuilder.Entity("Evaluation.DAL.Models.Planing.EvaluationRequestEntity.EvaluationRequestAssignment", b =>
+                {
+                    b.Navigation("EvalRequestAssignmentScopies");
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.Planing.OrgType", b =>
@@ -15862,6 +15761,8 @@ namespace Evaluation.DAL.Migrations
                     b.Navigation("UserPartTypes");
 
                     b.Navigation("UserRoles");
+
+                    b.Navigation("UserTeams");
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.Org.School", b =>

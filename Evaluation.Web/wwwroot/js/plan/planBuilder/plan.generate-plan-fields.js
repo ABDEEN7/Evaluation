@@ -25,7 +25,6 @@ const planUtility = window.planUtility;
         html += generatePlanFormContainer(fieldId);
         html += generateSchoolsTableSection(fieldId);
         html += generateFilterOffcanvas(fieldId);
-        html += generateConfirmationModal(fieldId);
         return html;
     };
 
@@ -161,12 +160,6 @@ const planUtility = window.planUtility;
                     ${generateSchoolsTable(fieldId)}
 
                     <div class="row mt-3">
-                        <div class="col-md-6">
-                            <button class="btn btn-primary"
-                                    id="${pid(fieldId, 'btnSavePlan')}">
-                                <i class="la la-save"></i> حفظ الخطة
-                            </button>
-                        </div>
                         <div class="col-md-6 text-end">
                             <div id="${pid(fieldId, 'dtPagination')}"></div>
                         </div>
@@ -324,37 +317,6 @@ const planUtility = window.planUtility;
         `;
     }
 
-    // ================== MODAL ==================
-    function generateConfirmationModal(fieldId) {
-        return `
-            <div class="modal fade"
-                 id="${pid(fieldId, 'confirmationModal')}"
-                 tabindex="-1">
 
-                <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content">
-
-                        <div class="modal-body text-center">
-                            <h5 id="${pid(fieldId, 'confirmationMessage')}">
-                                هل ترغب في حفظ الخطة؟
-                            </h5>
-
-                            <div class="d-flex gap-2 justify-content-center mt-3">
-                                <button class="btn btn-primary"
-                                        id="${pid(fieldId, 'btnSubmit')}">
-                                    تأكيد
-                                </button>
-                                <button class="btn btn-outline-primary"
-                                        data-bs-dismiss="modal">
-                                    إلغاء
-                                </button>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-        `;
-    }
 
 })(planUtility);

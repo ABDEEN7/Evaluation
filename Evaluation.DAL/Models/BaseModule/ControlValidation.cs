@@ -1,8 +1,9 @@
-﻿using Evaluation.DAL.Models.PermissionEntity;
+﻿using Evaluation.DAL.Models.Audit;
+using Evaluation.DAL.Models.PermissionEntity;
 
-namespace  Evaluation.DAL.Models.BaseModule;
+namespace Evaluation.DAL.Models.BaseModule;
 
-public class ControlValidation : EntityBase
+public class ControlValidation : EntityBase, IAuditLogEntity
 {
     public Guid PermissionId { get; set; }
 

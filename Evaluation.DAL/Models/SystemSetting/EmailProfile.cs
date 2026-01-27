@@ -1,10 +1,11 @@
-﻿using Evaluation.DAL.Models.BaseModule;
+﻿using Evaluation.DAL.Models.Audit;
+using Evaluation.DAL.Models.BaseModule;
 using Microsoft.EntityFrameworkCore;
 
 namespace Evaluation.DAL.Models.SystemSetting;
 
 [Index(nameof(BackendName), IsUnique = true)]
-public class EmailProfile : EntityBase
+public class EmailProfile : EntityBase, IAuditLogEntity
 {
     public string SenderAddress { get; set; } = null!;
     public string SenderDisplayName { get; set; } = string.Empty;

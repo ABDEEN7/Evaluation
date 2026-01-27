@@ -1,14 +1,16 @@
 ﻿using AutoMapper;
 using Evaluation.DAL.Dtos.Form;
 using Evaluation.DAL.Helper;
-using Evaluation.DAL.Models.FormsModules;
 using Evaluation.DAL.Repositories;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Dtos.Form;
+using Evaluation.SharedHelper.Dtos.Shared;
+using Evaluation.SharedHelper.Enums;
+using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Models;
 using FluentResults;
 using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json.Linq;
+using ValidationResult = Evaluation.SharedHelper.Dtos.Shared.ValidationResult;
 
 namespace Evaluation.Services.BusinessLayer.API.FormLayer;
 
@@ -19,10 +21,9 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
 {
     public async Task<Result<List<FormItemDto>>> GetFormItems(Guid FormId)
     {
-        var formItems = await formService.GetFormItems();
-        var selectedFormItems = formItems.Where(s => s.EvalFormId == FormId).ToList();
-        var mappedData = mapper.Map<List<FormItemDto>>(selectedFormItems);
-        foreach (var item in selectedFormItems)
+        var formItems = await formService.GetFormItems(FormId);
+        var mappedData = mapper.Map<List<FormItemDto>>(formItems);
+        foreach (var item in formItems)
         {
             var relatedItemDtos = new List<RelatedItemDto>();
 
@@ -47,15 +48,91 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
         return mappedData;
     }
 
+    public async Task<Result<ValidationResult>> ValidateEvaluationForm(FormEvaluationDto formEvaluationDto)
+    {
+        return await Validate(formEvaluationDto);
+    }
+
+
+    private async Task<ValidationResult> Validate(FormEvaluationDto dto)
+    {
+        var result = new ValidationResult();
+
+        if (dto == null || dto.Id == Guid.Empty)
+            throw new BusinessException(ConstantKeys.ExceptionMessage.InvalidJson);
+
+        var formItems = await formService.GetFormItems(dto.Id);
+
+        foreach (var item in dto.Items)
+        {
+            var formItem = formItems.Where(f => f.Id == item.Id).FirstOrDefault();//await formService.GetFormItem(item.Id);
+            var evalForm = await formService.GetEvalForm(dto.Id);
+            var formEvalMatrixValues = await formService.GetFormEvalMatrixValues(evalForm.FormEvalMatrixId.Value);
+
+            
+            if (item.ValueId != null)
+            {
+                if(!formEvalMatrixValues.Any(x=>x.Id == item.ValueId))
+                    result.Errors.Add(new ItemError() { ItemId = item.Id, Message = ConstantKeys.ExceptionMessage.TheSelectedValueIsNotRecognized, ItemPropertyType = ItemPropertyType.Select });
+            }
+            else 
+            {
+                result.Errors.Add(new ItemError() { ItemId = item.Id, Message = ConstantKeys.ExceptionMessage.Requiredfield, ItemPropertyType = ItemPropertyType.Select });
+            }
+
+            if (item.Note == null)
+            {
+                result.Errors.Add(new ItemError() { ItemId = item.Id, Message = ConstantKeys.ExceptionMessage.Requiredfield, ItemPropertyType = ItemPropertyType.Note });
+
+                //if (formItem.NoteRequired)
+                //{
+                //    result.Errors.Add(new ItemError() {ItemId = item.Id, Message= ConstantKeys.ExceptionMessage.Requiredfield, ItemPropertyType = ItemPropertyType.Note });
+                //}
+            }
+
+            foreach (var sub in item.SubItems)
+            {
+                var currentSubItem = formItem.SubFormItems.Where(s => s.Id == sub.Id).FirstOrDefault();
+
+                if (sub.Note == null)
+                {
+                    result.Errors.Add(new ItemError() { ItemId = sub.Id, Message = ConstantKeys.ExceptionMessage.Requiredfield, ItemPropertyType = ItemPropertyType.Note });
+
+                    //if (currentSubItem.NoteRequired)
+                    //{
+                    //    result.Errors.Add(new ItemError() { ItemId = sub.Id, Message = ConstantKeys.ExceptionMessage.Requiredfield, ItemPropertyType = ItemPropertyType.Note });
+                    //}
+                }
+
+                if (sub.ValueId != null)
+                {
+                    if (!formEvalMatrixValues.Any(x => x.Id == sub.ValueId))
+                        result.Errors.Add(new ItemError() { ItemId = sub.Id, Message = ConstantKeys.ExceptionMessage.TheSelectedValueIsNotRecognized, ItemPropertyType = ItemPropertyType.Select });
+                }
+                else
+                {
+                    result.Errors.Add(new ItemError() { ItemId = sub.Id, Message = ConstantKeys.ExceptionMessage.Requiredfield, ItemPropertyType = ItemPropertyType.Select });
+                }
+            }
+
+        }
+
+        return result;
+    }
+
     public async Task<Result<FormEvaluationDto>> SaveEvaluationForm(FormEvaluationDto formEvaluationDto)
     {
+        var formValidation = await Validate(formEvaluationDto);
+        if (!formValidation.IsValid)
+            return Result.Fail<FormEvaluationDto>(ConstantKeys.ExceptionMessage.FormDataIsNotValid);
+
         if (formEvaluationDto == null)
-            return Result.Fail<FormEvaluationDto>("Form data is null.");
+            return Result.Fail<FormEvaluationDto>(ConstantKeys.ExceptionMessage.FormDataIsNull); 
 
         var userId = userInfo.UserId;
 
         if (userId == null)
-            return Result.Fail<FormEvaluationDto>("User ID is missing.");
+            return Result.Fail<FormEvaluationDto>(ConstantKeys.ExceptionMessage.UserNotFound);
 
         var form = mapper.Map<FormEvaluationValue>(formEvaluationDto);
 
@@ -110,12 +187,12 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
     public async Task<Result<FormEvaluationDto>> UpdateEvaluationForm(FormEvaluationDto formEvaluationDto)
     {
         if (formEvaluationDto == null)
-            return Result.Fail<FormEvaluationDto>("Form data is null.");
+            return Result.Fail<FormEvaluationDto>(ConstantKeys.ExceptionMessage.FormDataIsNull);
 
         var userId = userInfo.UserId;
 
         if (userId == null)
-            return Result.Fail<FormEvaluationDto>("User ID is missing.");
+            return Result.Fail<FormEvaluationDto>(ConstantKeys.ExceptionMessage.UserNotFound);
 
         var form = mapper.Map<FormEvaluationValue>(formEvaluationDto);
 
@@ -146,9 +223,9 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
 
     public async Task<Result<List<FormItemDto>>> GetForm(Guid FormId)
     {
-        var formItems = await formService.GetFormItems();
+        var formItems = await formService.GetFormItems(FormId);
 
-        return mapper.Map<List<FormItemDto>>(formItems.Where(s => s.EvalFormId == FormId).ToList());
+        return mapper.Map<List<FormItemDto>>(formItems.ToList());
     }
 
     public async Task<Result<List<FormEvalMarixValueDto>>> GetFormEvalMarixValues(Guid FormId)

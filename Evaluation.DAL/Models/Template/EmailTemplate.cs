@@ -1,10 +1,11 @@
-﻿using Evaluation.DAL.Models.BaseModule;
+﻿using Evaluation.DAL.Models.Audit;
+using Evaluation.DAL.Models.BaseModule;
 using Evaluation.DAL.Models.SystemSetting;
 using Microsoft.EntityFrameworkCore;
 
 namespace Evaluation.DAL.Models.Template;
 [Index(nameof(BackendName), IsUnique = true)]
-public class EmailTemplate: EntityBase
+public class EmailTemplate: EntityBase, IAuditLogEntity
 {
     public string TitleAr { get; set; } = null!;
     public string TitleEn { get; set; } = null!;

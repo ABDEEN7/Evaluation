@@ -1,8 +1,9 @@
-﻿using Evaluation.DAL.Models.BaseModule;
+﻿using Evaluation.DAL.Models.Audit;
+using Evaluation.DAL.Models.BaseModule;
 
 namespace Evaluation.DAL.Models.Org;
 
-public class OrgAcademicYear : EntityBase
+public class OrgAcademicYear : EntityBase, IAuditLogEntity
 {
     public Guid OrgTreeId { get; set; }
     public OrgTree? OrgTree { get; set; }

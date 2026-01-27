@@ -162,7 +162,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                 {
                     var fieldValueEntity = await uow.GetRepository<ServiceRequestFieldsValue>()
                         .GetAllQueryFiltered()
-                        .FirstOrDefaultAsync(c => c.ServiceRequestId == RequestId && c.FieldId == condition.RefID);
+                        .FirstOrDefaultAsync(c => c.RefId == RequestId && c.FieldId == condition.RefID);
 
                     if (fieldValueEntity == null)
                     {

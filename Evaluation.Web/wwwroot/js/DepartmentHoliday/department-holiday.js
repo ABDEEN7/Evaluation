@@ -30,7 +30,6 @@ $btnAddbutton.click(function () {
     sharedFn().InitialPageControls(uiControlItems);
     setTimeout(() => {
         $('.date').flatpickr({
-            mode: "range",
             dateFormat: "Y-m-d",
             allowInput: true,
             locale: lang === "ar" ? "ar" : "en",
@@ -38,16 +37,16 @@ $btnAddbutton.click(function () {
         });
         // Set up checkbox behavior
         const $checkbox = $('#DepartmentHolidayIsCronExpression');
-        const $cronInput = $('#DepartmentHolidayCronExpression');
-
-        // Initialize state
-        $cronInput.prop('disabled', !$checkbox.is(':checked'));
-
+        const $cronGroup = $('#DepartmentHolidayCronExpression').closest('.mb-3');
+        $checkbox.prop('checked', false);
+        $cronGroup.hide();
         // Handle changes
         $checkbox.on('change', function () {
-            $cronInput.prop('disabled', !$(this).is(':checked'));
-            if (!$(this).is(':checked')) {
-                $cronInput.val(''); // Clear value when disabled
+            if (this.checked) {
+                $cronGroup.show();
+            } else {
+                $cronGroup.hide();
+                $('#DepartmentHolidayCronExpression').val(''); // clear value
             }
         });
     }, 100);
@@ -124,11 +123,11 @@ $("#btn-submit").click(function (e) {
 
         let url = '';
         let id = $('#Id').val();
-
+        var deprouting = sharedUtility().extractDepartmentName();
         if (id) {
-            url = "/DepartmentHoliday/UpdateDepartmentHoliday";
+            url = `/DepartmentHoliday/${deprouting}/UpdateDepartmentHoliday`;
         } else {
-            url = "/DepartmentHoliday/AddDepartmentHoliday";
+            url = `/DepartmentHoliday/${deprouting}/AddDepartmentHoliday`;
         }
         jqClient(options).Post(url, requestdata);
     }

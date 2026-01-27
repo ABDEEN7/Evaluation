@@ -11,6 +11,7 @@ using Evaluation.Services.BusinessLayer.API.SchooLayer;
 using Evaluation.Services.Extensions;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Dtos.SchoolDto;
+using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Api.AttachmentsDTOs;
@@ -33,27 +34,26 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
              : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, _requestInfo)
 
     {
-		public async Task<ServiceRequest?> GetSrvServiceRequestByIdAsync(Guid RequestId, bool UseMainUow = false)
+		public async Task<ServiceRequest?> GetSrvServiceRequestByIdAsync(Guid requestId, bool useMainUow = false)
 		{
-			UnitOfWork Scope;
-			if (UseMainUow)
+			if (useMainUow)
 			{
-				Scope = uow;
+				return await uow.GetRepository<ServiceRequest>()
+					.GetAllQueryFiltered(x => x.Id == requestId)
+					.Include(x => x.Status)
+					.Include(x => x.Service)
+					.FirstOrDefaultAsync();
 			}
-			else
-			{
-				Scope = serviceScopeFactory.CreateScopedUow();
 
-			}
-			var Request = await Scope.GetRepository<ServiceRequest>()
-				.GetAllQueryFiltered(x => x.Id == RequestId)
+			using var scope = serviceScopeFactory.CreateScopedUow();
+
+			return await scope.GetRepository<ServiceRequest>()
+				.GetAllQueryFiltered(x => x.Id == requestId)
 				.Include(x => x.Status)
 				.Include(x => x.Service)
 				.FirstOrDefaultAsync();
-
-			return Request;
-
 		}
+		
 		public async Task<ServiceRequest?> GetRequestByIdAsync(Guid RequestId, bool UseMainUow = false)
 		{
 			UnitOfWork Scope;
@@ -556,7 +556,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 									   .GetAllQueryFiltered()
 									   .Include(c => c.Field)
 									   .ThenInclude(c => c!.FieldType)
-									   .Where(c => c.ServiceRequestId == id &&
+									   .Where(c => c.RefId == id &&
 												   (c.Field!.FieldType!.BackendName == FieldTypeConstant.file
 													|| c.Field.FieldType.BackendName == FieldTypeConstant.fileV2))
 									   .Select(c => c.Value).ToListAsync();
@@ -581,7 +581,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 				.GetAllQueryFiltered()
 				.Include(f => f.Field)
 				.ThenInclude(f => f.FieldType)
-				.Where(f => f.ServiceRequestId == id)
+				.Where(f => f.RefId == id)
 				.ToListAsync();
 
 			var directFileValues = fields
@@ -649,7 +649,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 				.GetAllActiveNonDeleted()
 				.Include(x => x.Field)
 				.ThenInclude(x => x!.FieldViewConditions)
-				.Where(c => c.ServiceRequestId == request.Id && !hiddenFieldsIds.Contains(c.FieldId))
+				.Where(c => c.RefId == request.Id && !hiddenFieldsIds.Contains(c.FieldId))
 				.Select(c => new
 				{
 					c.FieldId,
@@ -809,12 +809,11 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 										.Include(x => x.Field)
 										.Include(x => x.Field!.MappingField)
 										.Include(x => x.Field!.FieldType)
-										.Where(c => c.ServiceRequestId == requestId).ToListAsync();
+										.Where(c => c.RefId == requestId).ToListAsync();
 
 
 			return RequestFieldsValue;
 		}
-	
 		
 		private async Task<WebAppPlanRequestsDTO> FilteredPlanRequestsAsync(UnitOfWork uow, bool isMinistry, IQueryable<ServiceRequestDTO> requests, FilterRequestsDTO model)
 		{
@@ -974,7 +973,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 				.GetRepository<ServiceRequestFieldsValue>()
 				.GetAllQueryFiltered()
 				.Include(c => c.Field!.FieldType)
-				.Where(c => c.FieldId == fieldId && c.ServiceRequestId == requestId)
+				.Where(c => c.FieldId == fieldId && c.RefId == requestId)
 				.FirstOrDefaultAsync();
 
 			if (fieldValue == null) return new List<FieldTransactionDTO>();
