@@ -216,6 +216,7 @@
 
         populatePlanTypes(fieldId);
         populateSemesters(fieldId);
+        $p(fieldId, 'semesterContainer').hide();
 
         $p(fieldId, 'planTitle').val(vm.title);
         $p(fieldId, 'ddlPlanType').val(vm.planTypeId).trigger('change');
