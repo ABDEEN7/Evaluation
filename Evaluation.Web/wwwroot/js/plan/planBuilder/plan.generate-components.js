@@ -189,10 +189,10 @@
         const formGroup = $('<div>').addClass('mb-4');
         formGroup.append(label, selectElement);
 
+
         if (!readonly) {
             formGroup.append($('<div>').addClass('invalid-feedback').text(`${t('lblPleaseChooseSemester')}`));
         }
-
         container.append(formGroup);
         return container;
     };

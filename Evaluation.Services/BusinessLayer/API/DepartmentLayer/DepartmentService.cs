@@ -36,24 +36,13 @@ public class DepartmentService(IServiceScopeFactory serviceScopeFactory,
             .ToListAsync();
         return departments;
     }
-    public async Task<Guid?> GetDepartmentIdAsync()
-    {
-        var department = await unitOfWork.GetRepository<Department>()
-            .GetAllActiveNonDeleted(x =>
-                x.UserDepartments.Any(ud => ud.UserId == userInfo.UserId))
-            .OrderByDescending(x=>x.CreateDate)
-            .FirstOrDefaultAsync();
-        return department?.Id;
-    }
-
-
     public async Task<List<Department>> GetDepartmentsByWebGroupId(Guid wepGroupId)
     {
         var departments = await unitOfWork.GetRepository<DepWebGroup>()
             .GetAllActiveNonDeleted(x => x.WebGroupId == wepGroupId)
             .Include(x => x.Department)
             .ThenInclude(d => d.WebsiteAttachment)
-            .Select(x=> x.Department)
+            .Select(x => x.Department)
                 .ToListAsync();
         return departments;
     }
