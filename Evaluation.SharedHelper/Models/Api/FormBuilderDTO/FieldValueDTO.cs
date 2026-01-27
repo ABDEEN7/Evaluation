@@ -25,6 +25,7 @@ namespace Evaluation.SharedHelper.Models.Api.FormBuilderDTO
         public Guid? DropDownTypeId { get; set; }
         public Guid? DropDownParentFieldId { get; set; }
         public Guid? ReadFromFieldId { get; set; }
+        public Guid? formId { get; set; }
         public string? Label { get; set; }
         public string? FieldTypeInfo { get; set; }
         public bool?  IsApproved { get; set; }

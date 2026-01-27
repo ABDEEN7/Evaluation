@@ -27,7 +27,7 @@
 
         return { open, closed };
     };
-   
+
     function renderEvaluationParties(parties, options = {}) {
         const containerId = options.containerId || "evaluationPartiesContainer";
         const parentAccordionId = options.parentAccordionId || "customAccordionParties";
@@ -40,7 +40,8 @@
         $container.empty();
 
         if (!Array.isArray(parties) || parties.length === 0) {
-            $container.html(`<div class="text-muted">لا توجد مراحل تقييم</div>`);
+            // Rename: "طلبات" => "استمارات"
+            $container.html(`<div class="text-muted">لا توجد استمارات تقييم</div>`);
             return;
         }
 
@@ -76,49 +77,49 @@
                 }, {});
 
             const badgesHtml = `
-            <span class="badge bg-danger-light ms-auto me-2 fw-semibold br-0">
-                <i class="las la-times fs-14"></i> ${escapeHtml(openText)}: ${open}
-            </span>
-            <span class="badge bg-success-light me-2 fw-semibold br-0">
-                <i class="la la-check fs-14"></i> ${escapeHtml(closedText)}: ${closed}
-            </span>
-        `;
+                <span class="badge bg-danger-light ms-auto me-2 fw-semibold br-0">
+                    <i class="las la-times fs-14"></i> ${escapeHtml(openText)}: ${open}
+                </span>
+                <span class="badge bg-success-light me-2 fw-semibold br-0">
+                    <i class="la la-check fs-14"></i> ${escapeHtml(closedText)}: ${closed}
+                </span>
+            `;
 
             const servicesHtml = services.length
                 ? `
-              <div class="table-card rounded overflow-hidden">
-                <div class="table-responsive">
-                  <div class="table-header">الخدمات</div>
-                  <ul class="list-group list-group-flush">
-                    ${services.map(s => {
+                  <div class="table-card rounded overflow-hidden">
+                    <div class="table-responsive">
+                      <div class="table-header">الخدمات</div>
+                      <ul class="list-group list-group-flush">
+                        ${services.map(s => {
                     const sName =
                         (lang === "ar" ? s.nameAr : s.nameEn) ||
                         s.nameAr || s.nameEn || "";
 
                     return `
-                          <li class="list-group-item d-flex align-items-center justify-content-between">
-                            <span>${escapeHtml(sName)}</span>
-                            <button type="button"
-                                    class="btn btn-sm btn-primary btn-add-eval-request"
-                                    data-service-id="${escapeHtml(s.id)}">
-                              <i class="la la-plus"></i> إنشاء طلب
-                            </button>
-                          </li>
-                        `;
+                              <li class="list-group-item d-flex align-items-center justify-content-between">
+                                <span>${escapeHtml(sName)}</span>
+                                <button type="button"
+                                        class="btn btn-sm btn-primary btn-add-eval-request"
+                                        data-service-id="${escapeHtml(s.id)}">
+                                  <i class="la la-plus"></i> إنشاء استمارة
+                                </button>
+                              </li>
+                            `;
                 }).join("")}
-                  </ul>
-                </div>
-              </div>
-            `
+                      </ul>
+                    </div>
+                  </div>
+                `
                 : `<div class="text-muted">لا توجد خدمات</div>`;
 
             const cardsHtml = Object.keys(grouped).length
                 ? `
-              <div class="table-card rounded overflow-hidden mt-3">
-                <div class="table-header">الطلبات حسب الحالة</div>
+                  <div class="table-card rounded overflow-hidden mt-3">
+                    <div class="table-header">الاستمارات حسب الحالة</div>
 
-                <div class="status-cards-container p-3">
-                  ${Object.entries(grouped).map(([statusId, requests]) => {
+                    <div class="status-cards-container p-3">
+                      ${Object.entries(grouped).map(([statusId, requests]) => {
                     const count = requests.length;
                     const status = requests[0]?.status || "-";
 
@@ -130,72 +131,72 @@
                     }, new Date(requests[0]?.createDate));
 
                     return `
-                        <div class="status-card"
-                             role="button"
-                             onclick='window.loadRequestsByStatus("${gridId}", ${JSON.stringify(requests)})'>
-                          <div class="count">${count}</div>
-                          <div class="label">${escapeHtml(status)}</div>
-                          <div class="date">${formatEnglishDate(latestDate)}</div>
-                        </div>
-                      `;
+                            <div class="status-card"
+                                 role="button"
+                                 onclick='window.loadRequestsByStatus("${gridId}", ${JSON.stringify(requests)})'>
+                              <div class="count">${count}</div>
+                              <div class="label">${escapeHtml(status)}</div>
+                              <div class="date">${formatEnglishDate(latestDate)}</div>
+                            </div>
+                          `;
                 }).join("")}
-                </div>
+                    </div>
 
-                <div class="table-responsive px-3 pb-3">
-                  <table class="table table-bordered text-center align-middle m-0" id="${gridId}">
-                    <thead class="table-primary">
-                      <tr>
-                        <th>الخدمة</th>
-                        <th>الحالة</th>
-                        <th>المنشئ</th>
-                        <th>تاريخ الإنشاء</th>
-                      </tr>
-                    </thead>
-                    <tbody></tbody>
-                  </table>
-                </div>
+                    <div class="table-responsive px-3 pb-3">
+                      <table class="table table-bordered text-center align-middle m-0" id="${gridId}">
+                        <thead class="table-primary">
+                          <tr>
+                            <th>الخدمة</th>
+                            <th>الحالة</th>
+                            <th>المنشئ</th>
+                            <th>تاريخ الإنشاء</th>
+                          </tr>
+                        </thead>
+                        <tbody></tbody>
+                      </table>
+                    </div>
 
-              </div>
-            `
+                  </div>
+                `
                 : ``;
 
             const expanded = expandFirst && idx === 0;
 
             $accordion.append(`
-          <div class="accordion-item mb-3 rounded">
-            <h2 class="accordion-header" id="${headerId}" data-id="${escapeHtml(partyId)}">
-              <button class="accordion-button ${expanded ? "" : "collapsed"} d-flex align-items-center justify-content-between"
-                      type="button"
-                      data-bs-toggle="collapse"
-                      data-bs-target="#${collapseId}"
-                      aria-expanded="${expanded ? "true" : "false"}"
-                      aria-controls="${collapseId}">
-                
-                <div class="d-flex align-items-center gap-2 fs-18">
-                  <i class="las la-layer-group text-primary fs-25"></i>
-                  <span class="fw-semibold">${escapeHtml(title)}</span>
+              <div class="accordion-item mb-3 rounded">
+                <h2 class="accordion-header" id="${headerId}" data-id="${escapeHtml(partyId)}">
+                  <button class="accordion-button ${expanded ? "" : "collapsed"} d-flex align-items-center justify-content-between"
+                          type="button"
+                          data-bs-toggle="collapse"
+                          data-bs-target="#${collapseId}"
+                          aria-expanded="${expanded ? "true" : "false"}"
+                          aria-controls="${collapseId}">
+
+                    <div class="d-flex align-items-center gap-2 fs-18">
+                      <i class="las la-layer-group text-primary fs-25"></i>
+                      <span class="fw-semibold">${escapeHtml(title)}</span>
+                    </div>
+
+                    ${badgesHtml}
+
+                    <span class="toggle-icon"><i class="la la-angle-up fs-22"></i></span>
+                  </button>
+                </h2>
+
+                <div id="${collapseId}"
+                     class="accordion-collapse collapse ${expanded ? "show" : ""}"
+                     aria-labelledby="${headerId}"
+                     data-bs-parent="#${escapeHtml(parentAccordionId)}">
+                  <div class="accordion-body">
+
+                    ${servicesHtml}
+
+                    ${cardsHtml}
+
+                  </div>
                 </div>
-
-                ${badgesHtml}
-
-                <span class="toggle-icon"><i class="la la-angle-up fs-22"></i></span>
-              </button>
-            </h2>
-
-            <div id="${collapseId}"
-                 class="accordion-collapse collapse ${expanded ? "show" : ""}"
-                 aria-labelledby="${headerId}"
-                 data-bs-parent="#${escapeHtml(parentAccordionId)}">
-              <div class="accordion-body">
-
-                ${servicesHtml}
-
-                ${cardsHtml}
-
               </div>
-            </div>
-          </div>
-        `);
+            `);
         });
 
         $container.append($accordion);
@@ -204,10 +205,8 @@
     function formatEnglishDate(timestamp) {
         if (!timestamp) return "-";
 
-        // Convert to Date if it's a string
         let dateObj;
         if (typeof timestamp === "string") {
-            // Remove microseconds if present
             const cleanTimestamp = timestamp.includes(".") ? timestamp.split(".")[0] : timestamp;
             dateObj = new Date(cleanTimestamp);
         } else if (timestamp instanceof Date) {
@@ -216,14 +215,12 @@
             return "-";
         }
 
-        // Format date (English)
         const dateStr = new Intl.DateTimeFormat("en-US", {
             day: "numeric",
             month: "long",
             year: "numeric"
         }).format(dateObj);
 
-        // Format time (English 12-hour)
         const timeStr = new Intl.DateTimeFormat("en-US", {
             hour: "numeric",
             minute: "numeric",
@@ -231,15 +228,12 @@
         }).format(dateObj);
 
         return `<div>
-  <i class="las la-regular las la-calendar"></i> <!-- Calendar Icon -->
-  <span> ${dateStr} </span>
-  <i class="las la-regular las la-clock"></i> <!-- Clock Icon -->
-  <span> ${timeStr} </span>
-</div>`;
-
+          <i class="las la-regular las la-calendar"></i>
+          <span> ${dateStr} </span>
+          <i class="las la-regular las la-clock"></i>
+          <span> ${timeStr} </span>
+        </div>`;
     }
-
-
 
     window.loadRequestsByStatus = function (gridId, requests) {
         const $tbody = $("#" + gridId + " tbody");
@@ -249,13 +243,13 @@
 
         (requests || []).forEach(r => {
             rows += `
-          <tr>
-            <td>${escapeHtml(r.service)}</td>
-            <td>${escapeHtml(r.status)}</td>
-            <td>${escapeHtml(r.createBy)}</td>
-            <td>${formatDate(r.createDate)}</td>
-          </tr>
-        `;
+              <tr>
+                <td>${escapeHtml(r.service)}</td>
+                <td>${escapeHtml(r.status)}</td>
+                <td>${escapeHtml(r.createBy)}</td>
+                <td>${formatDate(r.createDate)}</td>
+              </tr>
+            `;
         });
 
         $tbody.html(rows);
@@ -263,14 +257,12 @@
 
     function formatDate(timestamp) {
         if (!timestamp) return "-";
-        // Remove microseconds if present
         const dateObj = new Date(timestamp.split(".")[0]);
         const day = String(dateObj.getDate()).padStart(2, "0");
         const month = String(dateObj.getMonth() + 1).padStart(2, "0");
         const year = dateObj.getFullYear();
         return `${day}/${month}/${year}`;
     }
-
 
     $(document)
         .off("click", ".btn-add-eval-request")
@@ -285,6 +277,7 @@
 
             try {
                 await InitializeCreateEvaluationPartRequest(serviceId);
+
                 const el = document.getElementById("CreateRequestModal");
                 const modal = bootstrap.Modal.getOrCreateInstance(el);
                 modal.show();

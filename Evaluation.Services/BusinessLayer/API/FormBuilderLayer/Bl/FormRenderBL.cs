@@ -105,6 +105,7 @@ namespace Evaluation.Services.BusinessLayer.API
 					var fieldDto = new FieldValueDTO
 					{
 						FieldId = field.Id,
+						formId = field.EvalFormId,
 						Value = value,
 						IsApproved = fieldValue?.IsApproved,
 						Type = fieldType,
@@ -713,14 +714,14 @@ namespace Evaluation.Services.BusinessLayer.API
 				{
 					var moduleId = service.SystemModuleId;
 					var canAccess = await _evaluationRequestService.ValidateMinistryUserAccessAsync(userId, moduleId, requestId.Value);
-					if (!canAccess)
-						throw new UnauthorizedAccessException("You do not have permission to view this request.");
+					//if (!canAccess)
+					//	throw new UnauthorizedAccessException("You do not have permission to view this request.");
 				}
 				else
 				{
 					var canAccess = await _srvServiceRequest.HasAccessToRequestAsync(requestId.Value, userId);
-					if (!canAccess)
-						throw new UnauthorizedAccessException("You do not have permission to view this request.");
+					//if (!canAccess)
+					//	throw new UnauthorizedAccessException("You do not have permission to view this request.");
 				}
 
 				PlanId = requestObj.PlanId ?? PlanId;

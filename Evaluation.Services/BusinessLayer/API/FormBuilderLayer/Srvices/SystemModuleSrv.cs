@@ -121,8 +121,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 		{
 			return backendName switch
 			{
-				ModuleType.EvaluationPlanRequest => RequestType.Evaluation,
-
+				ModuleType.EvaluationRequest => RequestType.Evaluation,
 				ModuleType.EvaluationPlan or
 				ModuleType.EvaluationParty => RequestType.Service,
 

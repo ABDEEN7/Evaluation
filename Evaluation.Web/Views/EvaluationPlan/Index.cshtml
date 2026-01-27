@@ -372,7 +372,7 @@
                     </div>
                 </div>
 
-            </div>
+          
 
             <div class="modal-footer border-0 pt-0">
                 <div>
@@ -382,9 +382,74 @@
                 </div>
                 <div id="Action-container-button" class="d-flex gap-2"></div>
             </div>
+        </div>
+     </div>
+</div>
+
+<div class="modal fade" id="CreateRequestModal" tabindex="-1" aria-labelledby="CreateRequestModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+
+    <div class="modal-dialog modal-fullscreen modal-dialog-scrollable">
+        <div class="modal-content">
+
+            <div class="modal-header align-items-start border-0">
+                <div>
+
+                    <h4 class="modal-title fw-semibold mb-2" id="CreateRequestModalLabel">
+                        إنشاء طلب خطة تقييم
+                    </h4>
+
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="#">الخطط</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">إنشاء طلب</li>
+                        </ol>
+                    </nav>
+                </div>
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                    <i class="la la-close mt-1"></i>
+                </button>
+
+            </div>
+
+            <div class="modal-body py-0">
+
+                <div class="card card-table mb-4">
+                    <div class="card-body">
+
+                        <form id="create-plan-form" autocomplete="off">
+
+                            <div class="row">
+                                <div class="col-12">
+
+                                    <div class="accordion mt-4" id="accordionExample" hidden>
+                                        <select id="partyTypeSelect" class="form-select mb-3"></select>
+
+                                    </div>
+
+                                    <div id="content-container"></div>
+
+                                </div>
+                            </div>
+
+                            <div class="row mt-3" id="divForCreatedRequestButtons">
+                                <div class="col-12">
+                                    <div id="Requestbtns" class="d-flex justify-content-end gap-2"></div>
+                                </div>
+                            </div>
+
+                        </form>
+
+                    </div>
+                </div>
+
+            </div>
 
         </div>
     </div>
+</div>
 
 <partial name="_PartialFileModal" />
 
@@ -393,7 +458,10 @@
    <script src="~/lib/datatable/jquery.dataTables.min.js"></script>
     <script src="~/lib/datatable/dataTables.buttons.min.js"></script>
     <script src="~/lib/datatable/buttons.html5.min.js"></script>
-
+    <!-- Date -->
+    <script src="~/plan-assets/vendor/flatpickr/js/flatpickr.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ar.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/index.js"></script>
     <script src="~/js/form-generation-util/form.api.js"></script>
 
     <!-- Evaluation Plan Modules -->
@@ -445,8 +513,13 @@
             //     ],
             //         additional_keys: []
             // });
-               
-
+              window.formUtility = window.formUtility || {};
+         $('#evaluationRequestDetailsModal').on('hidden.bs.modal', function () {
+            formUtility.removeQueryParameter(['Evlid', 'serviceId']);
+            });
+             $('#planRequestModal').on('hidden.bs.modal', function () {
+            formUtility.removeQueryParameter(['id', 'serviceId']);
+            });
             if (sharedUtility().ExistingToken()) {
                             //uiControlsSetup().UpdatPageTitle('WebAppScholarship');
                     $('body').show();
@@ -494,74 +567,7 @@
     </script>
 
 
-    <div class="modal fade" id="CreateRequestModal" tabindex="-1" aria-labelledby="CreateRequestModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
-
-        <div class="modal-dialog modal-fullscreen modal-dialog-scrollable">
-            <div class="modal-content">
-
-                <div class="modal-header align-items-start border-0">
-                    <div>
-                   
-                    <h4 class="modal-title fw-semibold mb-2" id="CreateRequestModalLabel">
-                        إنشاء طلب خطة تقييم
-                    </h4>
-
-                    <nav aria-label="breadcrumb">
-                        <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="#">الخطط</a></li>
-                            <li class="breadcrumb-item active" aria-current="page">إنشاء طلب</li>
-                        </ol>
-                        </nav>
-                    </div>
-                    <button type="button"
-                            class="btn-close"
-                            data-bs-dismiss="modal"
-                            aria-label="Close">
-                        <i class="la la-close mt-1"></i>
-                    </button>
-                   
-                </div>
-
-                <div class="modal-body py-0">
-
-                    <div class="card card-table mb-4">
-                        <div class="card-body">
-
-                            <form id="create-plan-form" autocomplete="off">
-
-                                <div class="row">
-                                    <div class="col-12">
-
-                                        <div class="accordion mt-4" id="accordionExample" hidden>
-                                            <select id="partyTypeSelect" class="form-select mb-3"></select>
-
-                                            <div id="user-wrapper">
-                                                <div id="user-tables"></div>
-                                            </div>
-                                        </div>
-
-                                        <div id="content-container"></div>
-
-                                    </div>
-                                </div>
-
-                                <div class="row mt-3" id="divForCreatedRequestButtons">
-                                    <div class="col-12">
-                                        <div id="Requestbtns" class="d-flex justify-content-end gap-2"></div>
-                                    </div>
-                                </div>
-
-                            </form>
-
-                        </div>
-                    </div>
-
-                </div>
-
-            </div>
-        </div>
-    </div>
-
+ 
 
 }
 

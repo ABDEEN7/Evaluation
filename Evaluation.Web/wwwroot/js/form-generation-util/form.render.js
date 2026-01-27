@@ -10,15 +10,32 @@ window.serviceRequestForm = window.serviceRequestForm || {};
     var DepartmentRouting = sharedUtility().extractDepartmentName();
     // #region 🧩 Helpers
 
+
+    function getUrlParam(param) {
+        const params = new URLSearchParams(window.location.search);
+        return params.get(param);
+    }
+
+    function addQueryParameter(key, value) {
+        const url = new URL(window.location.href);
+        url.searchParams.set(key, value);
+        history.pushState(null, "", url.toString());
+    }
+
+    function removeQueryParameter(keys) {
+        const url = new URL(window.location.href);
+        (keys || []).forEach(key => url.searchParams.delete(key));
+        history.pushState(null, "", url.pathname + url.search);
+    }
     const getText = (key) =>
         (window.uiControlsSetup && uiControlsSetup().GetUiControlText(key)) || "";
 
-    const getUrlParam = (key) => {
-        const params = new URLSearchParams(window.location.search);
-        return (params.get(key) || "").replace("#", "");
+  
+    const getRequestId = () => {
+        const id = getUrlParam("id");
+        return id ? id : getUrlParam("Evlid") ;
     };
-
-    const getRequestId = () => getUrlParam("id");
+    const getServiceId = () => getUrlParam("serviceId");
 
     const normalizeFormGroups = (formGroups) => {
         if (!formGroups) return [];
@@ -82,8 +99,8 @@ window.serviceRequestForm = window.serviceRequestForm || {};
         const actionModalId = ctx.actionModalId || 'actionModal';
         const actionModalRoot = $('#' + actionModalId);
 
-        serviceId = '97F03B5D-C45D-4F23-A1EA-DABE0678AE83';
-        requestId = 'C7DA6434-CA53-4F78-9D53-087E298B43C2';
+        serviceId = getServiceId();
+        requestId = getRequestId();
 
         const isEvaluationRequest = true;
 
@@ -99,7 +116,7 @@ window.serviceRequestForm = window.serviceRequestForm || {};
                 success: function (response) {
 
                     const actionDetails = response?.actionCustom || null;
-                    const stepsData = response?.actionCustom?.steps || [];
+                    const stepsData = response?.actionCustom?.formGroups || [];
                     const dropdownsData = response?.dropDownValues || [];
                     const attachments = response?.schAttachments || [];
 
@@ -358,6 +375,7 @@ window.serviceRequestForm = window.serviceRequestForm || {};
 
         const groups = normalizeFormGroups(formGroups);
         const $container = $("#" + elementId);
+        const $modal = $container.closest(".modal"); 
         $container.empty();
         $("#user-wrapper").empty();
 
@@ -441,7 +459,11 @@ window.serviceRequestForm = window.serviceRequestForm || {};
         const submitBtnOrContainer = generateSubmitButton(requestId, groups, actionDetails, false);
         $buttonsWrapper.append(submitBtnOrContainer);
 
-        const $btnContainer = $("#Action-container-button");
+        const isActionModal = $modal.attr("id") === "actionModal";
+        const $btnContainer = isActionModal
+            ? $modal.find("#Action-container-button")
+            : $modal.find("#Requestbtns");   
+
         if ($btnContainer.length) {
             $btnContainer.empty().append($buttonsWrapper);
         } else {
@@ -460,6 +482,9 @@ window.serviceRequestForm = window.serviceRequestForm || {};
     ns.renderPreviewView = renderPreviewView;
     ns.renderActionView = renderActionView;
     ns.generateSubmitButton = generateSubmitButton;
+    fu.addQueryParameter = addQueryParameter;
+    fu.getUrlParam = getUrlParam;
+    fu.removeQueryParameter = removeQueryParameter;
 
     // #endregion
 

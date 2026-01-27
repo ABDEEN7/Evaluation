@@ -276,11 +276,10 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 				Attachments = await attachmentsTask,
 				ActionTransactions = await actionTransactionsTask,
 				Actions = await actionsTask,
-
 				RequestNumber = request.RequestNumber,
 				Status = request.Status.NameEn,// SrvStatus.GetStatusDisplayName(request.StatusId, module?.Id),
+				ServiceId = request.ServiceId,
 				Service = lang == "ar" ? request.Service.NameAr : request.Service.NameEn,
-
 				CanViewFieldHistory = hasFieldHistoryPermission,
 				CanViewAllFieldHistory = hasAllFieldHistoryPermission
 			};
@@ -823,35 +822,12 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 			{
 				if (isMinistry)
 				{
-					if (!string.IsNullOrEmpty(model.Qid))
-					{
-						requests = requests.Where(x => !string.IsNullOrEmpty(x.QID) && x.QID == model.Qid);
-					}
+					
 
-					if (model.StudentUserId.HasValue)
-					{
-						requests = requests.Where(x => x.StudentUserId == model.StudentUserId);
-					}
-
-					if (!string.IsNullOrEmpty(model.Mobile))
-					{
-						requests = requests.Where(x => !string.IsNullOrEmpty(x.Mobile) && x.Mobile == model.Mobile);
-					}
-
-					if (model.StudentNationalityId != null && model.StudentNationalityId.Any())
-					{
-						requests = requests.Where(x => model.StudentNationalityId.Contains(x.StudentNationalityId!));
-					}
-
-					if (model.CountryId != null && model.CountryId.Any())
-					{
-						requests = requests.Where(x => model.CountryId.Contains(x.CountryId));
-					}
-
-					if (model.UniversityId != null && model.UniversityId.Any())
-					{
-						requests = requests.Where(x => model.UniversityId.Contains(x.UniversityId));
-					}
+					//if (model.OrgTreeId.HasValue)
+					//{
+					//	requests = requests.Where(x => x.StudentUserId == model.OrgTreeId);
+					//}
 
 					var date_Format = await cacheDataProvider.GetSystemSettingValue(SystemSettings.DateFormat);
 

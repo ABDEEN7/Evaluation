@@ -270,21 +270,21 @@ namespace Evaluation.Services.Models.API
 			int defaultMaxCountOpen = int.Parse(ServiceSettings.MaxCountOpen);
 			int maxCountOpen = defaultMaxCountOpen;
 
-			var serviceSettingsJson = serviceObj.ServiceSettings ?? "{}";
-			var serviceSettings = JsonConvert.DeserializeObject<Dictionary<string, object>>(serviceSettingsJson);
+			//var serviceSettingsJson = serviceObj.ServiceSettings ?? "{}";
+			//var serviceSettings = JsonConvert.DeserializeObject<Dictionary<string, object>>(serviceSettingsJson);
 
-			if (!TryGetSettingValue(serviceSettings!, ServiceSettings.MaxCountOpen, out maxCountOpen))
-			{
-				var systemSettingsJson = await cacheDataProvider.GetSystemSettingValue(SystemSettings.ServiceSettings);
-				if (!string.IsNullOrEmpty(systemSettingsJson))
-				{
-					var systemSettings = JsonConvert.DeserializeObject<Dictionary<string, object>>(systemSettingsJson);
-					if (systemSettings == null || !TryGetSettingValue(systemSettings, ServiceSettings.MaxCountOpen, out maxCountOpen))
-					{
-						SrvService.UpdateServiceSettingsAsync(serviceObj, ServiceSettings.MaxCountOpen, maxCountOpen);
-					}
-				}
-			}
+			//if (!TryGetSettingValue(serviceSettings!, ServiceSettings.MaxCountOpen, out maxCountOpen))
+			//{
+			//	var systemSettingsJson = await cacheDataProvider.GetSystemSettingValue(SystemSettings.ServiceSettings);
+			//	if (!string.IsNullOrEmpty(systemSettingsJson))
+			//	{
+			//		var systemSettings = JsonConvert.DeserializeObject<Dictionary<string, object>>(systemSettingsJson);
+			//		if (systemSettings == null || !TryGetSettingValue(systemSettings, ServiceSettings.MaxCountOpen, out maxCountOpen))
+			//		{
+			//			SrvService.UpdateServiceSettingsAsync(serviceObj, ServiceSettings.MaxCountOpen, maxCountOpen);
+			//		}
+			//	}
+			//}
 
 			await ValidateIfThereIsOpenedRequestForServiceAsync(planId, serviceObj, maxCountOpen);
 

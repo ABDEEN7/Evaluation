@@ -1118,10 +1118,9 @@ public static class ConstantKeys
     public static class ModuleType
     {
         public const string EvaluationPlan = "EvaluationPlan";
-        public const string EvaluationPlanRequest = "EvaluationPlanRequest";
+        public const string EvaluationRequest = "EvaluationRequest";
         public const string EvaluationParty = "EvaluationParty";
-        public const string Forms = "Forms";
-        public const string Complain = "Complain";
+   
     }
     public static class NDAStatic
     {

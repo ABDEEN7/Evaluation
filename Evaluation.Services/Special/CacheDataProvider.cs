@@ -333,7 +333,7 @@ namespace Evaluation.Services.Special
 				var list = await repo.GetAll()
 									 .Include(c => c.StatusPartyTypeDisplayNames)
 									 .ToListAsync();
-				return list.Adapt<List<ServiceStatus>>();
+				return list;
 			});
 
 			return data;
