@@ -924,6 +924,10 @@ public static class ConstantKeys
         public const string LASTUPDATEDBY = "LASTUPDATEDBY";
         public const string LASTUPDATEDDATE = "LASTUPDATEDDATE";
     }
+    public static class CreatePlan
+	{
+       
+    }
 
     public static class EvaluationPlanRequests
     {
@@ -1087,7 +1091,7 @@ public static class ConstantKeys
         public const string SaveAsDraft = "SaveAsDraft";
         public const string Close = "Close";
         public const string INFO_Override_Approve = "INFO_Override_Approve";
-        public const string CreateEvaluationPlan = "CREATE_EVALUATION_PLAN";
+        public const string CreateEvaluationPlan = "CREATE_PLAN";
         public const string UPDATE_ITEGRATION_FIELDS = "UPDATE_ITEGRATION_FIELDS";
         public const string INFO_WITH_DRAFT = "INFO_WITH_DRAFT";
     }

@@ -464,9 +464,11 @@
     <script src="~/lib/datatable/dataTables.buttons.min.js"></script>
     <script src="~/lib/datatable/buttons.html5.min.js"></script>
     <!-- Date -->
-    <script src="~/plan-assets/vendor/flatpickr/js/flatpickr.js"></script>
-  <script src="~/month_flatpicker/js/flatpicker_ar.js"></script>
-<script src="~/month_flatpicker/js/flat_picker_monthselect.js"></script>
+
+        <script src="~/plan-assets/vendor/flatpickr/js/flatpickr.js"></script>
+    <script src="~/vendor/flatpickr/js/ar.js"></script>
+    <script src="~/vendor/flatpickr/js/index.js"></script>
+
     <script src="~/js/form-generation-util/form.api.js"></script>
 
     <!-- Evaluation Plan Modules -->
@@ -491,17 +493,13 @@
        <script src="~/js/forms/get-forms.js"></script>
     <script src="~/js/forms/submit-form.js"></script>
 
- <script src="/js/form-generation-util/form.generate-field.js"></script>
+   <script src="/js/form-generation-util/form.generate-field.js"></script>
     <script src="/js/form-generation-util/form.render.js"></script>
     <script src="/js/form-generation-util/form.submit.js"></script>
     <script src="/js/form-generation-util/form.init.js"></script>
     <script src="/js/form-generation-util/form.namespace.js"></script>
     <script src="~/js/form-generation-util/evaluationparties.js"></script>
  
-    <!-- Forms -->
-    <script src="~/js/forms/get-forms.js"></script>
-    <script src="~/js/forms/submit-form.js"></script>
-
     <script src="~/js/assignments/request-assignment-const.js"></script>
     <script src="~/js/assignments/generate-request-assignment.js"></script>
     <script src="~/js/assignments/get-request-assignments.js"></script>
@@ -511,14 +509,18 @@
     <script>
         const departmentRoutePath = sharedUtility().extractDepartmentName();
         $(document).ready(async function () {
-            // await webAppConfigsSetup().Init({
-            //     pageNames: [
-            //         '@nameof(ConstantKeys.WebAppCommon)',
+
+            await webAppConfigsSetup().Init({
+                pageNames: [
+                     '@nameof(ConstantKeys.WebAppCommon)',
+                    '@nameof(ConstantKeys.CreatePlan)',
                   
-            //     ],
-            //         additional_keys: []
-            // });
-              window.formUtility = window.formUtility || {};
+                ],
+                    additional_keys: []
+            });
+
+            window.formUtility = window.formUtility || {};
+
          $('#evaluationRequestDetailsModal').on('hidden.bs.modal', function () {
             formUtility.removeQueryParameter(['Evlid', 'serviceId']);
             });
@@ -526,7 +528,7 @@
             formUtility.removeQueryParameter(['id', 'serviceId']);
             });
             if (sharedUtility().ExistingToken()) {
-                            //uiControlsSetup().UpdatPageTitle('WebAppScholarship');
+                  uiControlsSetup().UpdatPageTitle('WebAppScholarship');
                     $('body').show();
 
                 // await LoadUserDetails();

@@ -1419,7 +1419,7 @@ var formGenerateFieldUtility = window.formUtility;
 
 
     function generateEvaluationPlanField  (field, readonly) {
-        const fieldId = field.fieldId;
+        const fieldId = `fld_${field.fieldId}`;
 
         const container = $('<div>')
             .addClass('evaluation-plan-wrapper')
@@ -1434,7 +1434,7 @@ var formGenerateFieldUtility = window.formUtility;
                     container.html(`<div class="text-danger">planUtility not found on window.</div>`);
                     return;
                 }
-                    pu.generatePlanFields(fieldId);
+                pu.generatePlanFields(fieldId);
 
                     const wrapperId = `${fieldId}_wrapper`;
                     const moved = document.getElementById(wrapperId);

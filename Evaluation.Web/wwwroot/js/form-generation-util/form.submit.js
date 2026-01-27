@@ -235,8 +235,8 @@ window.serviceRequestForm = window.serviceRequestForm || {};
                 DisplayAlert("Unexpected empty response.", "danger");
                 return;
             }
-
-            if (window.requestId) {
+            let RequestId  = getRequestId();
+            if (RequestId) {
                 window.tempFileStorage = {};
                 sharedFn().DisplayAlert('Form submitted successfully!', 'success');
                 setTimeout(() => {

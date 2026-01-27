@@ -47,21 +47,30 @@ public class SchoolBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvide
 
     public async Task<List<ResponseSchools>> GetSchoolsByDepartmentId(Guid depId)
     {
+        
         var result = await schoolRepository.GetSchoolsByDepartmentId(depId);
 
         var schoolsResponse = mapper.Map<List<ResponseSchools>>(result);
 
         return schoolsResponse;
     }
+	public async Task<List<ResponseSchools>> GetSchools()
+	{
 
-    //public async Task<PaginatedResult<ResponseSchools>> GetSchools(SchoolRequest request)
-    //{
-    //    //TODO: Get Department Id by Department Routing Path
+		var result = await schoolRepository.GetSchoolsByDepartmentId(requestInfo.DepId.Value);
 
-    //    var result = await schoolRepository.GetSchoolsAsync(request);
-    //    return mapper.Map<PaginatedResult<ResponseSchools>>(result);
-    //}
-    public async Task<PaginatedResult<ResponseSchoolsPlans>> GetSchoolsPlan(SchoolRequest request)
+		var schoolsResponse = mapper.Map<List<ResponseSchools>>(result);
+
+		return schoolsResponse;
+	}
+	//public async Task<PaginatedResult<ResponseSchools>> GetSchools(SchoolRequest request)
+	//{
+	//    //TODO: Get Department Id by Department Routing Path
+
+	//    var result = await schoolRepository.GetSchoolsAsync(request);
+	//    return mapper.Map<PaginatedResult<ResponseSchools>>(result);
+	//}
+	public async Task<PaginatedResult<ResponseSchoolsPlans>> GetSchoolsPlan(SchoolRequest request)
     {
         List<DepTargetOrgTree> depTargetOrgTrees = await GetDepTargetOrgTree();
         int? academicYear = await GetCurrentAcademicYear();
