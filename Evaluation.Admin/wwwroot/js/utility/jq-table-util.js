@@ -326,7 +326,7 @@ const tableUtil = (function () {
         return headerMenu;
     }
 
-    const createTabulator = ({ id, uniqueRowId, config, sortColumn, sortDir, columns, rowMoved, rowFormatter, isShowHeaderMenu, paginationConfig, isResponsiveLayout = true }) => {
+    const createTabulator = ({ id, uniqueRowId, config, sortColumn, sortDir, columns, rowMoved, rowFormatter, rowClick,isShowHeaderMenu, paginationConfig, isResponsiveLayout = true }) => {
         //const responsiveLayout = config?.responsiveLayout ?? "collapse";
         const responsiveLayout = isResponsiveLayout ? config?.responsiveLayout ?? "collapse" : null;
         paginationConfig = paginationConfig ?? {};
@@ -380,12 +380,15 @@ const tableUtil = (function () {
             resizableRows: config?.resizableRows ?? true,
             tooltips: config?.tooltips ?? true,
             selectable: config?.selectable ?? true,
+            editable: config?.editable ?? false,
             selectableRangeMode: 'click',
+            editTriggerEvent: "dblclick",
             initialSort: [
                 { column: sortColumn ?? uniqueRowId, dir: sortDir ?? "desc" },
             ],
             columns,
             rowMoved,
+            rowClick,
             rowFormatter,
         });
         return table;

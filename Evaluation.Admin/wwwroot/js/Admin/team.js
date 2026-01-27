@@ -1,9 +1,10 @@
 ﻿const dailogId = commonUtil.CONTENT_DAILOG_ID;
-let showMore = false, table = null, tableCondition=null, dialogElem = null;
+let showMore = false, table = null, tableCondition = null, dialogElem = null, popupname="";
 let currentPage = 0;
 let isSearch = false;
 let isLoading = true;
-
+let lookupSources = {};
+let currentrowclicked;
 const btnAddContentId = 'btn-add-content',
     btnSubmitId = "btn-submit",
     $formSection = $('#form-section'),
@@ -40,8 +41,17 @@ const loadData = (isSearch) => {
 };
 const deleteData = (id) => {
     if (!id) return;
-
-    const obj = table.getData().find(f => f.id == id);
+    var obj;
+    var url = "";
+    if (popupname == "UserTeamScope") {
+        obj = tableCondition.getData().find(f => f.id == id);
+        url = "Team/DeleteUserTeamScope"; 
+    }
+    else {
+        obj = table.getData().find(f => f.id == id);
+        url = "Team/DeleteTeam";
+    }
+     
     if (!obj) return;
 
 
@@ -56,7 +66,13 @@ const deleteData = (id) => {
 
 
                     if (data.responseStatus == '3') {
-                        table.deleteRow(id);
+                        if (popupname == "UserTeamScope") {
+                            tableCondition.deleteRow(id);
+                        }
+                        else {
+                            table.deleteRow(id);
+                        }
+                        
                         notificationUtil.success(sharedFn().GetUiControlText('ADMIN_MSG_DELETE'));
                     }
 
@@ -66,46 +82,50 @@ const deleteData = (id) => {
                 }
             }
         };
-        jqClientAdvanced(options).Post("Team/DeleteTeam".concat('?Id=', id));
+        jqClientAdvanced(options).Post(url.concat('?Id=', id));
 
     });
 };
 function getlookup() {
     
-    //const options = {
-    //    success: function (data) {
-    //        if (data) {
-    //            if (data && data.length > 0) {
-    //                if (isSearch) {
-    //                    table.setData([]).then(function () {
-
-    //                    });
-    //                    currentPage = 1;
-    //                }
-    //                table.addData(data).then(function () {
-    //                    setAllColumnWidths(table, columnWidths);
-    //                });
-    //                currentPage = currentPage + 1;
-    //                isLoading = false;
-    //            }
-    //        }
-    //    }
-    //};
-    //jqClientAdvanced(options).Get("Team/GetAllTeam".concat('?page=', currentPage));
+    const options = {
+        success: function (result) {
+            if (result) {
+                const { data } = result;
+                if (data) {
+                    const { ScopeList, UserList } = data;
+                    lookupSources["ScopeList"] = ScopeList;
+                    lookupSources["UserList"] = UserList;
+                }
+            }
+        }
+    };
+    jqClientAdvanced(options).Get("Team/GetUserScope");
 }
-const lookupSources = {
-    ScopeList: [
-        { id: 1, name: "Admin Scope" },
-        { id: 2, name: "HR Scope" },
-        { id: 3, name: "Finance Scope" }
-    ],
-    UserList: [
-        { id: 10, name: "John Doe" },
-        { id: 11, name: "Sara Ahmed" },
-        { id: 12, name: "Ali Hassan" }
-    ]
-};
 
+function updateDataKeyAtPosition(position, newKey) {
+    // Get all row components
+    const rows = tableCondition.getRows();
+
+    // Get the row at that position
+    const row = rows[position];
+
+    // Get current row data
+    const rowData = row.getData();
+
+    const rowElement = row.getElement();
+
+    const section = rowElement.querySelector('.sec-center');
+
+    section.setAttribute('data-key', newKey);
+    section.id = `action__section__${newKey}`;
+
+    // Update the dataKey (or id)
+    rowData.id = newKey;
+
+    // Push the update to the table
+    row.update(rowData);
+}
 
 $(window).scroll(function () {
     if ($(window).scrollTop() >= ($(document).height() - $(window).height()) * .60) {
@@ -114,64 +134,129 @@ $(window).scroll(function () {
         }
     }
 });
+function SaveUserTeamScope(event) {
+    const cellElem = event.closest('section');
+    const id = cellElem.getAttribute('data-key');
+    const obj = tableCondition.getData().find(f => f.id == id); 
+    var formData = new FormData();
+    var data = {};
+    data.Id = id;
+    data.TeamId = $("#Id").val();
+    data.UserId = obj.user;
+    data.ScopeId = obj.scope;
+    data.IsActive = obj.isActive;
+    if (!data.TeamId && !data.UserId && !data.ScopeId) {
+        notificationUtil.error('Data Not Added');
+        return;
+    }
+    formData.append('request', JSON.stringify(data));
+    const options = {
+        success: function (data) {
+            if (data) {
+                
+                var { responseStatus,id } = data;
+                //debugger
+                switch (responseStatus) {
+                    case 2:
+                        updateDataKeyAtPosition(currentrowclicked, id);
+                        notificationUtil.success(sharedFn().GetUiControlText('ADMIN_MSG_SAVE'));
+                        
+                        break;
+                    default:
+                        notificationUtil.error(data.message);
 
+                        break;
+                }
+
+
+            }
+
+
+
+
+        }
+    };
+
+    jqClientAdvanced(options).PostFormData("Team/UpdateUserTeam", formData);
+}
 
 function ClearControlByPage() {
-    $("#UserTeamScopeRelationbutton").hide();
+    if (IsAdd_UserTeamScope) {
+        $("#UserTeamScopeRelationbutton").show();
+        $("#UserTeamScopeRelationbutton").html(sharedFn().GetUiControlText('UserTeamScopeAddButton'));
+    }
+    else {
+        $("#UserTeamScopeRelationbutton").hide();
+    }
+    
     if (IsView_UserTeamScope == "True") {
         $("#UserTeamScopeRelationdiv").show();
         $("#UserTeamScopeRelationtabulator").css("pointer-events", "");
+        var viewItem = IsAdd_UserTeamScope == "True" ?
+            `<span class="Attr pointer" title="` + sharedFn().GetUiControlText('ADMIN_TOOLTIP_SAVE_USERTEAMSCOPE') + `"><i class="Attr fa fa-save" onclick="SaveUserTeamScope(this)">
+</i></span>`
+            : '';
         IsEdit = '';
         IsDelete = IsDelete_UserTeamScope;
         IsView = '';
-        let ConditionTableColumns = sharedFn().PopulateColumn(UserTeamScopecolumnList);
+        let ConditionTableColumns = sharedFn().PopulateColumn(UserTeamScopecolumnList, viewItem,true);
         tableCondition = tableUtil.createTabulator({
             id: "UserTeamScopeRelationtabulator",
             config: {
                 textDirection: txtDir,
+                pagination: "local",
                 paginationSize: 10,
                 placeholder: sharedFn().GetUiControlText('NO_DATA_FOUND'),
                 headerFilterPlaceholder: sharedFn().GetUiControlText('FILTER_COLUMN'),
                 movableRows: true,
+                selectable: true,
+                editable: true
             },
             uniqueRowId: 'id',
             sortColumn: "updateDate",
             sortDir: "desc",
             columns: ConditionTableColumns,
-
+            rowClick: function (e, row) {
+                currentrowclicked = row.getPosition();
+            }
+            
         });
-        tableCondition.addRow({
-            id: 0,
-            scopeId: null,
-            userId: null,
-            isActive: true,
-            updateBy: "",
-            updateDate: ""
-        });
-
-        //const options = {
-        //    success: function (data) {
-        //        if (data) {
+        
+        tableCondition.setData([]);
+        const options = {
+            success: function (data) {
+                if (data) {
 
 
-        //            if (data && data.length > 0) {
-        //                tableCondition.addData(data);
+                    if (data && data.length > 0) {
+                        tableCondition.setData(data);
 
-        //            }
-        //            else {
-        //                //tableCondition.setData([]);
-        //            }
+                    }
 
-        //        }
-        //    }
-        //};
+                   
 
-        //jqClientAdvanced(options).Get("Team/GetAllUserTeamScope".concat('?reminderid=', reminderid));
+                }
+            }
+        };
+
+        jqClientAdvanced(options).Get("Team/GetAllUserTeamScope".concat('?TeamId=', $("#Id").val()));
     }
     else {
         $("#UserTeamScopeRelationdiv").hide();
     }
     $("#UserTeamScopeRelationdiv").parent().show();
+}
+$("#UserTeamScopeRelationbutton").click(function () {
+    tableCondition.addRow({
+        id: "00000000-0000-0000-0000-000000000000",
+        scope: null,
+        user: null,
+        isActive: true,
+    });
+});
+function ClearForViewMode() {
+    $("#UserTeamScopeRelationbutton").hide();
+    $("#UserTeamScopeRelationtabulator").css("pointer-events", "none");
 }
 $(document).ready(function () {
     IsEdit = IsEdit_Team;
@@ -187,7 +272,6 @@ $(document).ready(function () {
             paginationSize: 10,
             placeholder: sharedFn().GetUiControlText('NO_DATA_FOUND'),
             headerFilterPlaceholder: sharedFn().GetUiControlText('FILTER_COLUMN'),
-            movableRows: true,
         },
         isResponsiveLayout: false,
         uniqueRowId: 'id',
@@ -201,26 +285,7 @@ $(document).ready(function () {
             var columnWidth = column.getWidth();
             columnWidths[columnField] = columnWidth;
         },
-        rowMoved: function (row) {
-            var request = [];
-            table.getData().map(function (d, index) {
-
-                request.push({
-                    "Id": d.id,
-                    "OrderNo": index
-                });
-            });
-            var formData = new FormData();
-            //debugger
-            formData.append('OrderObj', JSON.stringify(request));
-            const options = {
-                success: function (data) {
-                    notificationUtil.success(sharedFn().GetUiControlText('ADMIN_MSG_UPDATE'));
-                }
-            };
-            jqClientAdvanced(options).PostFormData("Team/UpdateTeamOrder", formData);
-
-        }
+       
 
     });
 
@@ -235,9 +300,13 @@ $(document).ready(function () {
         $("#UserTeamScopeRelationdiv").parent().hide();
         $("#UserTeamScopeRelationbutton").hide();
     });
-    
+  
 
     $("#btn-submit").click(function (e) {
+        popupname = "";
+        IsEdit = IsEdit_Team;
+        IsDelete = IsDelete_Team;
+        IsView = IsView_Team;
         if (sharedFn().NewvalidateForm("form-control", sharedFn().GetUiControlText('ADMIN_CNTRL_REQUIRED'), sharedFn().GetUiControlText('ADMIN_MSG_MAX_CHAR_LENGTH'), sharedFn().GetUiControlText('ADMIN_MSG_MIN_CHAR_LENGTH'))) {
 
             commonUtil.btnProgress(btnSubmitId);

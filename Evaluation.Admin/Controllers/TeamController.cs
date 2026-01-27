@@ -41,6 +41,28 @@ public class TeamController : Controller
         var response = await masterBL.GetAdminService<SrvTeamBL>().GetTeamList(page, pageSize);
         return Ok(response);
     }
+
+    [HttpGet]
+    [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.AdminPermission.VIEW_ADMIN_USERTEAMSCOPE })]
+    public async Task<IActionResult> GetAllUserTeamScope(Guid TeamId)
+    {
+
+        var response = await masterBL.GetAdminService<SrvTeamBL>().GetAllUserTeamScopeList(TeamId);
+        return Ok(response);
+    }
+
+    [HttpGet]
+    [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.AdminPermission.VIEW_ADMIN_TEAM })]
+    public async Task<IActionResult> GetUserScope()
+    {
+
+        Dictionary<string, object> response = new Dictionary<string, object>();
+        var UserList = await masterBL.GetAdminService<SrvTeamBL>().GetUserList();
+        var ScopeList = await masterBL.GetAdminService<SrvTeamBL>().GetScopeList();
+        response.Add("UserList", UserList);
+        response.Add("ScopeList", ScopeList);
+        return Ok(new ResponseEntity(response));
+    }
     [HttpPost]
     [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.AdminPermission.ADD_ADMIN_TEAM })]
     public async Task<IActionResult> SaveTeam()
@@ -77,6 +99,30 @@ public class TeamController : Controller
         {
             result = await masterBL.GetAdminService<SrvTeamBL>().UpdateTeam(request!);
         }
+        return Ok(result);
+    }
+
+    [HttpPost]
+    [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.AdminPermission.EDIT_ADMIN_USERTEAMSCOPE })]
+    public async Task<IActionResult> UpdateUserTeam()
+    {
+        var request = Request.Form["request"][0]?.StringToObject<UserTeamScopeDTO>();
+        var result = new UserTeamScopeDTO();
+        bool validateObject = await masterBL.GetAdminService<SrvBaseBL>().ValidateObject(request!, ConstantKeys.AdminPermission.EDIT_ADMIN_USERTEAMSCOPE);
+        if (validateObject)
+        {
+            result = await masterBL.GetAdminService<SrvTeamBL>().UpdateUserTeamScope(request!);
+        }
+        return Ok(result);
+    }
+
+    [HttpPost]
+    [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.AdminPermission.DELETE_ADMIN_USERTEAMSCOPE })]
+    public async Task<IActionResult> DeleteUserTeamScope(Guid id)
+    {
+        var result = await masterBL
+            .GetAdminService<SrvTeamBL>()
+            .DeleteUserTeamScopeTeamAsync(id);
         return Ok(result);
     }
 
