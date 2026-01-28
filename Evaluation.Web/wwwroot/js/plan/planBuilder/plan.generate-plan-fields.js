@@ -305,6 +305,18 @@ const planUtility = window.planUtility;
                                 <!-- Will be populated dynamically -->
                             </select>
                         </div>
+                        <hr>
+
+                        <!-- المدرسة الأم - FIXED ID -->
+                        <div class="mb-3">
+                            <label class="form-label">${t('lblParentsSchool')}</label>
+                            <select id="${pid(fieldId, 'filterParentOrgTree')}"
+                                    name="parentOrgTree"
+                                    class="form-control">
+                                <option value="">${t('lblAll')}</option>
+                                <!-- Will be populated dynamically -->
+                            </select>
+                        </div>
 
                         <div class="d-flex gap-2 mt-4">
                             <button type="submit" class="btn btn-primary w-100">

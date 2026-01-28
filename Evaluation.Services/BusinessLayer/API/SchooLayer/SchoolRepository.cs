@@ -38,6 +38,7 @@ public class SchoolRepository(IServiceScopeFactory serviceScopeFactory,
              .CreateScopedUow()
              .GetRepository<School>()
              .GetAllNonDeleted(filter)
+             .Include(x => x.OrgParent)
              .Include(x => x.SchoolType)
              .Include(x => x.SchoolLevel!)
              .ThenInclude(x => x.EducationLevel);
@@ -93,6 +94,10 @@ public class SchoolRepository(IServiceScopeFactory serviceScopeFactory,
         {
             int year = request.EstablishmentDate.Value.Year;
             filter = filter.And(s => s.EstablishmentDate.Year == year);
+        }
+        if (request.ParentId != Guid.Empty && request.ParentId != null)
+        {
+            filter = filter.And(x => x.OrgParentId == request.ParentId);
         }
         //if(request.VisitType != null)
         //    filter = filter.And(x=>x.)

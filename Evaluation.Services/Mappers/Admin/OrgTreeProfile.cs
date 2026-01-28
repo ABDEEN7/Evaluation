@@ -5,6 +5,7 @@ using Evaluation.DAL.Models.Org;
 using Evaluation.DAL.Models.Planing;
 using Evaluation.DAL.Models.Website;
 using Evaluation.DAL.Repositories;
+using Evaluation.SharedHelper.Dtos.SchoolDto;
 using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Admin;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,6 +27,7 @@ namespace Evaluation.Services.Mappers.Admin
                  .ForMember(dest => dest.OrgClass, opt => opt.MapFrom<OrgClassResolver, Guid?>(src => src.OrgClassId))
                    .ForMember(dest => dest.OrgType, opt => opt.MapFrom<OrgTypeResolver, Guid?>(src => src.OrgTypeId));
 
+            CreateMap<OrgTree, ParentOrgTreeDto>();
         }
 
     }

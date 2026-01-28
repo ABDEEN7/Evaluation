@@ -44,7 +44,7 @@
             filters: {},
             searchTerm: '',
             selectedSchools: [],
-            allSchools: []
+            selectedSchoolsMap: null // Map to track selected schools when editing
         };
     }
 
@@ -72,7 +72,8 @@
                     loadPlanTypes(),
                     loadSemesters(),
                     loadVisitTypes(),
-                    loadVacationDays()
+                    loadVacationDays(),
+                    loadParentOrgTree()
                 ]);
             }
 
@@ -88,6 +89,7 @@
             bindEvents(fieldId);
             initializeFilterDatePickers(fieldId);
             populateFilterVisitTypes(fieldId);
+            populateFilterParentOrgTree(fieldId);
         } catch (e) {
             console.error(`[PlanHandler] Init failed for ${fieldId}`, e);
             alert('حدث خطأ أثناء التحميل');
@@ -117,6 +119,9 @@
                 isCron: x.isCronExpression,
                 cron: x.cronExpression
             })));
+    const loadParentOrgTree = () =>
+        jqClient().Get(API_ENDPOINTS.GET_PARNT_ORGTREE)
+            .then(r => ns.parentSchool = r?.result || []);
 
     const loadPlanData = async (fieldId, planId) => {
         const r = await jqClient().Get(`${API_ENDPOINTS.GET_PLAN_DETAILS}/${planId}`);
@@ -169,6 +174,12 @@
             $select.append(`<option value="${type.id}">${type.name}</option>`);
         });
     };
+    const populateFilterParentOrgTree = (fieldId) => {
+        const $select = $p(fieldId, 'filterParentOrgTree');
+        ns.parentSchool.forEach(parent => {
+            $select.append(`<option value="${parent.id}">${parent.nameEn}</option>`)
+        });
+    }
 
     const initializeFilterDatePickers = (fieldId) => {
         const dateFields = ['filterLastEvalDate', 'filterCreatedDate', 'filterNextEvalDate'];
@@ -225,24 +236,83 @@
         }
         $p(fieldId, 'parentDate').val(vm.dateRange);
 
-        // ✅ حفظ المدارس المحددة
-        state.selectedSchools = vm.schools.map(s => ({
-            ...s,
-            id: s.id || s.schoolId,
-            visitDate: s.visitDate || (s.startEvaluationDate && s.endEvaluationDate ?
-                `${s.startEvaluationDate} to ${s.endEvaluationDate}` : ''),
-            visitTypeId: s.visitTypeId
-        }));
+        // ✅ Create a Map of selected schools with their data
+        const selectedSchoolsMap = new Map();
+  
+        vm.schools.forEach(s => {
+            const schoolId = s.id || s.schoolId;
+            selectedSchoolsMap.set(schoolId, {
+                id: schoolId,
+                visitDate: s.visitDate || (s.startEvaluationDate && s.endEvaluationDate ?
+                    `${s.startEvaluationDate} to ${s.endEvaluationDate}` : ''),
+                visitTypeId: s.visitTypeId,
+                startEvaluationDate: s.startEvaluationDate,
+                endEvaluationDate: s.endEvaluationDate
+            });
+        });
 
-        // ✅ عرض المدارس الموجودة في planObject
-        const tbody = ns.renderSchoolTable(fieldId, vm.schools, state.isReadOnly);
-        $p(fieldId, 'planTable').find('tbody').replaceWith(tbody);
+        // ✅ Store selected schools map in state
+        state.selectedSchoolsMap = selectedSchoolsMap;
 
-        attachRowEvents(fieldId);
+        // ✅ Load ALL schools from backend and mark selected ones
+        loadSchoolsWithSelection(fieldId, 1, {}, selectedSchoolsMap);
+
         initializeDatePickers(fieldId, vm);
     };
 
     /* ===================== SCHOOLS (Backend Only) ===================== */
+
+
+    const loadSchoolsWithSelection = (fieldId, page = 1, filters = {}, selectedSchoolsMap = null) => {
+        const state = instances.get(fieldId);
+        state.currentPage = page;
+        state.filters = filters;
+
+        // Build query parameters
+        const params = new URLSearchParams({
+            page,
+            pageSize: state.pageSize
+        });
+
+        // Add search term
+        if (state.searchTerm) {
+            params.append('search', state.searchTerm);
+        }
+
+        // Add filters
+        Object.keys(filters).forEach(k => {
+            if (filters[k]) params.append(k, filters[k]);
+        });
+
+        showLoadingState(fieldId);
+
+        // Call API to get all schools
+        jqClient().Get(`${API_ENDPOINTS.GET_SCHOOLS}?${params}`)
+            .done(r => {
+                const schools = r.items || [];
+                state.totalRecords = r.totalCount || 0;
+
+                // Render table with selected schools map
+                const tbody = ns.renderSchoolTable(
+                    fieldId,
+                    schools,
+                    state.isReadOnly,
+                    selectedSchoolsMap || state.selectedSchoolsMap
+                );
+
+                $p(fieldId, 'planTable').find('tbody').replaceWith(tbody);
+
+                // Render pagination
+                renderPagination(fieldId);
+
+                attachRowEvents(fieldId);
+                initChildPickerForTable(fieldId);
+            })
+            .fail(err => {
+                console.error(`[PlanHandler] Failed to load schools`, err);
+                showErrorState(fieldId);
+            });
+    };
 
     const loadSchools = (fieldId, page = 1, filters = {}) => {
         const state = instances.get(fieldId);
@@ -269,12 +339,13 @@
         // ✅ استدعاء API
         jqClient().Get(`${API_ENDPOINTS.GET_SCHOOLS}?${params}`)
             .done(r => {
-                state.allSchools = r.items || [];
+                const schools = r.items || [];
                 state.totalRecords = r.totalCount || 0;
                 const tbody = ns.renderSchoolTable(
                     fieldId,
-                    state.allSchools,
-                    state.isReadOnly
+                    schools,
+                    state.isReadOnly,
+                    state.selectedSchoolsMap // Pass the selection map if it exists
                 );
 
                 $p(fieldId, 'planTable').find('tbody').replaceWith(tbody);
@@ -601,14 +672,18 @@
         state.selectedSchools = [];
 
         $p(fieldId, 'planTable').find('.selectRow:checked').each(function () {
-            const schoolId = $(this).data('school-id');
-            const school = state.allSchools.find(s => s.id === schoolId);
-            if (!school) return;
+            const $checkbox = $(this);
+            const schoolId = $checkbox.data('school-id');
+            const schoolName = $checkbox.data('name');
+
+            const visitDate = $p(fieldId, 'planTable').find(`.childDate[data-school-id="${schoolId}"]`).val();
+            const visitTypeId = $p(fieldId, 'planTable').find(`.visitTypeSelect[data-school-id="${schoolId}"]`).val();
 
             state.selectedSchools.push({
-                ...school,
-                visitDate: $p(fieldId, 'planTable').find(`.childDate[data-school-id="${schoolId}"]`).val(),
-                visitTypeId: $p(fieldId, 'planTable').find(`.visitTypeSelect[data-school-id="${schoolId}"]`).val()
+                id: schoolId,
+                name: schoolName,
+                visitDate: visitDate,
+                visitTypeId: visitTypeId
             });
         });
     };

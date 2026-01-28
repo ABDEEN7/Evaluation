@@ -25,6 +25,7 @@ function $p(selector) {
 
     /**
      * Collects and validates evaluation plan data from the form
+     * @param {string} fieldId - Field ID prefix
      * @returns {Object|null} Evaluation data object or null if validation fails
      */
     function getFormPlanJson(fieldId) {
@@ -57,9 +58,8 @@ function $p(selector) {
                 semesterId = semesterSelect.val() || null;
             }
 
-            // Get selected schools from the utility namespace
-            //const selectedSchools = getSelectedSchools();
-            const allschools = getAllSchoolsWithSelectionFlag(fieldScore);
+            // Get selected schools only
+            const selectedSchools = getSchools(fieldScore);
 
             // Return structured data object
             const evaluationData = {
@@ -67,8 +67,7 @@ function $p(selector) {
                 PlanTypeDepId,
                 startDate,
                 endDate,
-                //schools: selectedSchools
-                schools: allschools
+                schools: selectedSchools
             };
 
             if (planTypeBackendName === PLAN_TYPE_BACKEND.SEMESTER && semesterId) {
@@ -258,23 +257,19 @@ function $p(selector) {
 
     /**
      * Gets selected schools from the table with their visit details
+     * @param {string} fieldScore - Field prefix for selectors
      * @returns {Array} Array of selected school objects
      */
-    /**
- * Gets ALL schools (selected & unselected) with selection flag
- * @returns {Array} Array of school objects with isSelected flag
- */
-    function getAllSchoolsWithSelectionFlag(fieldScore) {
+    function getSchools(fieldScore) {
         const schools = [];
 
-        $('#' + fieldScore + 'planTable tbody tr').each(function () {
-            const row = $(this);
-
-            const checkbox = row.find('.selectRow');
-            const isSelected = checkbox.is(':checked');
-
-            const schoolId = checkbox.data('id');
+        // Get only selected schools
+        $('#' + fieldScore + 'planTable tbody .selectRow:checked').each(function () {
+            const checkbox = $(this);
+            const schoolId = checkbox.data('school-id');
             const schoolName = checkbox.data('name');
+            const row = checkbox.closest('tr');
+
             const dateRangeInput = row.find('.childDate');
             const dateRangeValue = dateRangeInput.val() || '';
             const parsedDates = parseDateRange(dateRangeValue);
@@ -284,7 +279,6 @@ function $p(selector) {
 
             const schoolData = {
                 id: schoolId,
-                isSelected: isSelected,              // ⭐ FLAG
                 startEvaluationDate: parsedDates.startDate || null,
                 endEvaluationDate: parsedDates.endDate || null,
                 visitTypeId: visitTypeId,
@@ -297,33 +291,6 @@ function $p(selector) {
         return schools;
     }
 
-    function getSelectedSchools() {
-        const selectedSchools = [];
-
-        $('#planTable tbody .selectRow:checked').each(function () {
-            const checkbox = $(this);
-            const schoolId = checkbox.data('id');
-            const row = checkbox.closest('tr');
-
-            const dateRangeInput = row.find('.childDate');
-            const dateRangeValue = dateRangeInput.val() || '';
-            const parsedDates = parseDateRange(dateRangeValue);
-
-            const visitTypeSelect = row.find('.visitTypeSelect');
-            const visitTypeId = visitTypeSelect.val() || '';
-
-            const schoolData = {
-                id: schoolId,
-                startEvaluationDate: parsedDates.startDate,
-                endEvaluationDate: parsedDates.endDate,
-                visitTypeId: visitTypeId
-            };
-
-            selectedSchools.push(schoolData);
-        });
-
-        return selectedSchools;
-    }
 
     /**
      * Main submit handler
@@ -332,6 +299,9 @@ function $p(selector) {
         event.preventDefault();
 
         clearErrors();
+
+        // Get fieldId from namespace
+        const fieldId = ns?.fieldId || '';
 
         const evaluationData = getFormPlanJson(fieldId);
         //const validation = validatePlan(evaluationData);
@@ -352,7 +322,10 @@ function $p(selector) {
 
         clearErrors();
 
-        const evaluationData = getFormPlanJson();
+        // Get fieldId from namespace
+        const fieldId = ns?.fieldId || '';
+
+        const evaluationData = getFormPlanJson(fieldId);
         const validation = validatePlan(evaluationData);
 
         if (!validation.isValid) {
@@ -380,8 +353,7 @@ function $p(selector) {
         getFormPlanJson,
         validatePlan,
         submitEvaluationData,
-        getAllSchoolsWithSelectionFlag
-        /*getSelectedSchools*/
+        getSchools
     };
 
 })();

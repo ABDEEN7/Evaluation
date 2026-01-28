@@ -38,7 +38,8 @@ public class EmployeeService(IServiceScopeFactory serviceScopeFactory,
     {
         var filter = BuildFilterExpression(request, targetOrgTreeIds, employees);
         var query = unitOfWork.GetRepository<Employee>()
-                    .GetAllNonDeleted(filter);
+                    .GetAllNonDeleted(filter)
+                    .Include(x=>x.OrgParent);
         return await query.GetPaginatedResult(request.PageNumber, request.PageSize);
     }
 
@@ -66,12 +67,16 @@ public class EmployeeService(IServiceScopeFactory serviceScopeFactory,
     private Expression<Func<Employee, bool>> BuildFilterExpression(SchoolRequest request, List<Guid?> targetOrgTreeIds, List<Guid> employees)
     {
         Expression<Func<Employee, bool>> filter = s => true;
-        filter = filter.And(c => targetOrgTreeIds.Contains(c.OrgParentId) && employees.Contains(c.Id));
+        filter = filter.And(c => employees.Contains(c.Id));
 
         if (!string.IsNullOrWhiteSpace(request.Name))
             filter = filter.And(s => s.NameEn.Contains(request.Name) || s.NameAr.Contains(request.Name));
         //if(request.VisitType != null)
         //    filter = filter.And(x=>x.)
+        if (request.ParentId != Guid.Empty && request.ParentId != null)
+        {
+            filter = filter.And(x => x.OrgParentId == request.ParentId);
+        }
         return filter;
     }
 

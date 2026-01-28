@@ -9,4 +9,5 @@ public class ValidationResult
     {
         Errors.Add(error);
     }
+
 }
