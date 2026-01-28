@@ -31,9 +31,6 @@ namespace Evaluation.Services.Models.Admin
 
         public async Task<List<SchoolsDTO>> GetSchoolsList(AdminSearchDTO message)
         {
-
-            
-
             var list = await uow.GetRepository<School>()
                 .GetAllNonDeleted()
                  .Include(x => x.CreateBy)

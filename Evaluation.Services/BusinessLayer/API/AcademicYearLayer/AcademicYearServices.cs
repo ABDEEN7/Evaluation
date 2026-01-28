@@ -2,7 +2,6 @@
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.Calendars;
 using Evaluation.DAL.Models.DepartementEntites;
-using Evaluation.DAL.Models.Planing;
 using Evaluation.DAL.Repositories;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Enums;
@@ -59,6 +58,18 @@ public class AcademicYearServices(IServiceScopeFactory serviceScopeFactory,
             throw new BusinessException(ConstantKeys.ExceptionMessage.CurrentAcademiUser);
 
         return academicYearId;
+    }
+    public async Task<int?> GetCurrentAcademicYear()
+    {
+        int? acc = await uow.GetRepository<AcademicYear>()
+                                    .GetAllActiveNonDeleted()
+                                    .OrderByDescending(x => x.CreateDate)
+                                    .Where(x => x.DepartmentId == requestInfo.DepId && x.IsCurrent)
+                                    .Select(x => x.Year)
+                                    .FirstOrDefaultAsync();
+        if (!acc.HasValue)
+            throw new Exception();
+        return acc;
     }
 
     //public async Task<Result<VacationDateDto>> GetVcationDateAsync()

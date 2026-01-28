@@ -36,6 +36,7 @@
     ns.planTypes = [];
     ns.semesters = [];
     ns.holidays = [];
+    ns.parentSchool = [];
     ns.currentPage = 1;
     ns.pageSize = 10;
 
@@ -249,16 +250,30 @@
         const infoDiv = $('<div>');
         const nameId = `${fieldId}_${school.id}_name`;
 
-        infoDiv.append($('<h6>').text(school.name || '-'))
+        // School name
+        infoDiv
+            .append($('<h6>').addClass('mb-1').text(school.name || '-'))
             .attr('data-name', nameId);
 
-        const levelBadge = $('<div>').addClass('square-bullet');
+        // Org parent (small label)
+        if (school.orgParent?.nameEn) {
+            infoDiv.append(
+                $('<small>')
+                    .addClass('text-muted d-block')
+                    .text(school.orgParent.nameEn)
+            );
+        }
+
+        // School levels
+        const levelBadge = $('<div>').addClass('square-bullet mt-1');
         const levelText = (school.schoolLevel && school.schoolLevel.length > 0)
             ? school.schoolLevel.map(l => l.name).join(', ')
             : '-';
+
         levelBadge.append($('<div>').text(levelText));
         infoDiv.append(levelBadge);
 
+        // Rating badge
         const ratingBadge = $('<span>')
             .addClass(`badge ${ratingClass}`)
             .text(school.rating || '');
@@ -266,6 +281,7 @@
         container.append(infoDiv, ratingBadge);
         return container;
     };
+
 
     const generateVisitDateField = (fieldId, school, readonly) => {
         let visitDateValue = '';

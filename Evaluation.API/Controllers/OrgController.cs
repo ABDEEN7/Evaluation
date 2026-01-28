@@ -1,10 +1,6 @@
-﻿using Evaluation.DAL.Dtos.Form;
-using Evaluation.DAL.Models.Org;
-using Evaluation.Services.BusinessLayer;
+﻿using Evaluation.Services.BusinessLayer;
 using Evaluation.Services.BusinessLayer.API;
-using Evaluation.Services.BusinessLayer.API.FormLayer;
 using Evaluation.SharedHelper.Dtos.OrgDto;
-using FluentResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Evaluation.API.Controllers;
@@ -24,5 +20,10 @@ public class OrgController : ControllerBase
     {
         var details = await _masterBl.GetApiService<OrgBL>().GetOrgDetails(OrgID);
         return details;
+    }
+    [HttpGet]
+    public async Task<IActionResult> GetParentOrgTree()
+    {
+        return Ok(new { result = await _masterBl.GetApiService<OrgBL>().GetParentOrgTreeAsync() });
     }
 }

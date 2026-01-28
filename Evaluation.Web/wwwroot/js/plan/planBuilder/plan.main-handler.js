@@ -72,7 +72,8 @@
                     loadPlanTypes(),
                     loadSemesters(),
                     loadVisitTypes(),
-                    loadVacationDays()
+                    loadVacationDays(),
+                    loadParentOrgTree()
                 ]);
             }
 
@@ -88,6 +89,7 @@
             bindEvents(fieldId);
             initializeFilterDatePickers(fieldId);
             populateFilterVisitTypes(fieldId);
+            populateFilterParentOrgTree(fieldId);
         } catch (e) {
             console.error(`[PlanHandler] Init failed for ${fieldId}`, e);
             alert('حدث خطأ أثناء التحميل');
@@ -117,6 +119,9 @@
                 isCron: x.isCronExpression,
                 cron: x.cronExpression
             })));
+    const loadParentOrgTree = () =>
+        jqClient().Get(API_ENDPOINTS.GET_PARNT_ORGTREE)
+            .then(r => ns.parentSchool = r?.result || []);
 
     const loadPlanData = async (fieldId, planId) => {
         const r = await jqClient().Get(`${API_ENDPOINTS.GET_PLAN_DETAILS}/${planId}`);
@@ -169,6 +174,12 @@
             $select.append(`<option value="${type.id}">${type.name}</option>`);
         });
     };
+    const populateFilterParentOrgTree = (fieldId) => {
+        const $select = $p(fieldId, 'filterParentOrgTree');
+        ns.parentSchool.forEach(parent => {
+            $select.append(`<option value="${parent.id}">${parent.nameEn}</option>`)
+        });
+    }
 
     const initializeFilterDatePickers = (fieldId) => {
         const dateFields = ['filterLastEvalDate', 'filterCreatedDate', 'filterNextEvalDate'];
