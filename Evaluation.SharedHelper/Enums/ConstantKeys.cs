@@ -341,6 +341,7 @@ public static class ConstantKeys
         public static readonly string AdminSystemSetting = "AdminSystemSetting";
         public static readonly string AdminUiControl = "AdminUiControl";
         public static readonly string AdminNDAStatus = "AdminNDAStatus";
+        public static readonly string AdminDepTargetOrgTree = "AdminDepTargetOrgTree";
     }
     public static class WebAppPages
     {
@@ -848,6 +849,15 @@ public static class ConstantKeys
         public const string EDIT_ADMIN_NDAStatus = "EDIT_ADMIN_NDASTATUS";
         public const string DELETE_ADMIN_NDAStatus = "DELETE_ADMIN_NDASTATUS";
         public const string UPDATE_ORDER_ADMIN_NDAStatus = "UPDATE_ORDER_ADMIN_NDASTATUS";
+        #endregion
+
+        #region DEPTARGETORGTREE
+
+        public const string VIEW_ADMIN_DEPTARGETORGTREE = "VIEW_ADMIN_DEPTARGETORGTREE";
+        public const string ADD_ADMIN_DEPTARGETORGTREE = "ADD_ADMIN_DEPTARGETORGTREE";
+        public const string EDIT_ADMIN_DEPTARGETORGTREE = "EDIT_ADMIN_DEPTARGETORGTREE";
+        public const string DELETE_ADMIN_DEPTARGETORGTREE = "DELETE_ADMIN_DEPTARGETORGTREE";
+
         #endregion
 
     }
