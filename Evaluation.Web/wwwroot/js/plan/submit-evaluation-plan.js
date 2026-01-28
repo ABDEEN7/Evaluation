@@ -25,9 +25,11 @@ function $p(selector) {
 
     /**
      * Collects and validates evaluation plan data from the form
+     * @param {string} fieldId - Field ID prefix
+     * @param {boolean} isReadonly - Whether the form is in readonly mode
      * @returns {Object|null} Evaluation data object or null if validation fails
      */
-    function getFormPlanJson(fieldId) {
+    function getFormPlanJson(fieldId, isReadonly = false) {
         try {
             // Get plan name from the title input
             var fieldScore = `${fieldId}_`;
@@ -57,9 +59,10 @@ function $p(selector) {
                 semesterId = semesterSelect.val() || null;
             }
 
-            // Get selected schools from the utility namespace
-            //const selectedSchools = getSelectedSchools();
-            const allschools = getAllSchoolsWithSelectionFlag(fieldScore);
+            // Get schools based on readonly status
+            // If readonly: get only selected schools
+            // If not readonly: get all schools with isSelected flag
+            const allschools = getSchools(fieldScore, isReadonly);
 
             // Return structured data object
             const evaluationData = {
@@ -257,73 +260,74 @@ function $p(selector) {
     }
 
     /**
-     * Gets selected schools from the table with their visit details
-     * @returns {Array} Array of selected school objects
+     * Gets schools from the table based on readonly status
+     * If readonly: returns only selected schools
+     * If not readonly: returns all schools with isSelected flag
+     * @param {string} fieldScore - Field prefix for selectors
+     * @param {boolean} isReadonly - Whether the form is in readonly mode
+     * @returns {Array} Array of school objects
      */
-    /**
- * Gets ALL schools (selected & unselected) with selection flag
- * @returns {Array} Array of school objects with isSelected flag
- */
-    function getAllSchoolsWithSelectionFlag(fieldScore) {
+    function getSchools(fieldScore, isReadonly = false) {
         const schools = [];
 
-        $('#' + fieldScore + 'planTable tbody tr').each(function () {
-            const row = $(this);
+        if (isReadonly) {
+            // Readonly mode: Get only selected schools
+            $('#' + fieldScore + 'planTable tbody .selectRow:checked').each(function () {
+                const checkbox = $(this);
+                const schoolId = checkbox.data('id');
+                const schoolName = checkbox.data('name');
+                const row = checkbox.closest('tr');
 
-            const checkbox = row.find('.selectRow');
-            const isSelected = checkbox.is(':checked');
+                const dateRangeInput = row.find('.childDate');
+                const dateRangeValue = dateRangeInput.val() || '';
+                const parsedDates = parseDateRange(dateRangeValue);
 
-            const schoolId = checkbox.data('id');
-            const schoolName = checkbox.data('name');
-            const dateRangeInput = row.find('.childDate');
-            const dateRangeValue = dateRangeInput.val() || '';
-            const parsedDates = parseDateRange(dateRangeValue);
+                const visitTypeSelect = row.find('.visitTypeSelect');
+                const visitTypeId = visitTypeSelect.val() || null;
 
-            const visitTypeSelect = row.find('.visitTypeSelect');
-            const visitTypeId = visitTypeSelect.val() || null;
+                const schoolData = {
+                    id: schoolId,
+                    startEvaluationDate: parsedDates.startDate || null,
+                    endEvaluationDate: parsedDates.endDate || null,
+                    visitTypeId: visitTypeId,
+                    name: schoolName
+                };
 
-            const schoolData = {
-                id: schoolId,
-                isSelected: isSelected,              // ⭐ FLAG
-                startEvaluationDate: parsedDates.startDate || null,
-                endEvaluationDate: parsedDates.endDate || null,
-                visitTypeId: visitTypeId,
-                name: schoolName
-            };
+                schools.push(schoolData);
+            });
+        } else {
+            // Editable mode: Get all schools with selection flag
+            $('#' + fieldScore + 'planTable tbody tr').each(function () {
+                const row = $(this);
 
-            schools.push(schoolData);
-        });
+                const checkbox = row.find('.selectRow');
+                const isSelected = checkbox.is(':checked');
+
+                const schoolId = checkbox.data('id');
+                const schoolName = checkbox.data('name');
+                const dateRangeInput = row.find('.childDate');
+                const dateRangeValue = dateRangeInput.val() || '';
+                const parsedDates = parseDateRange(dateRangeValue);
+
+                const visitTypeSelect = row.find('.visitTypeSelect');
+                const visitTypeId = visitTypeSelect.val() || null;
+
+                const schoolData = {
+                    id: schoolId,
+                    isSelected: isSelected,
+                    startEvaluationDate: parsedDates.startDate || null,
+                    endEvaluationDate: parsedDates.endDate || null,
+                    visitTypeId: visitTypeId,
+                    name: schoolName
+                };
+
+                schools.push(schoolData);
+            });
+        }
 
         return schools;
     }
 
-    function getSelectedSchools() {
-        const selectedSchools = [];
-
-        $('#planTable tbody .selectRow:checked').each(function () {
-            const checkbox = $(this);
-            const schoolId = checkbox.data('id');
-            const row = checkbox.closest('tr');
-
-            const dateRangeInput = row.find('.childDate');
-            const dateRangeValue = dateRangeInput.val() || '';
-            const parsedDates = parseDateRange(dateRangeValue);
-
-            const visitTypeSelect = row.find('.visitTypeSelect');
-            const visitTypeId = visitTypeSelect.val() || '';
-
-            const schoolData = {
-                id: schoolId,
-                startEvaluationDate: parsedDates.startDate,
-                endEvaluationDate: parsedDates.endDate,
-                visitTypeId: visitTypeId
-            };
-
-            selectedSchools.push(schoolData);
-        });
-
-        return selectedSchools;
-    }
 
     /**
      * Main submit handler
@@ -333,7 +337,16 @@ function $p(selector) {
 
         clearErrors();
 
-        const evaluationData = getFormPlanJson(fieldId);
+        // Get fieldId from namespace
+        const fieldId = ns?.fieldId || '';
+
+        // Determine if readonly mode - you can customize this detection logic
+        // Option 1: Check if form has readonly attribute
+        const isReadonly = $('#' + fieldId + '_planTitle').prop('readonly') || false;
+        // Option 2: Check from namespace if available
+        // const isReadonly = ns?.isReadonly || false;
+
+        const evaluationData = getFormPlanJson(fieldId, isReadonly);
         //const validation = validatePlan(evaluationData);
 
         //if (!validation.isValid) {
@@ -352,7 +365,13 @@ function $p(selector) {
 
         clearErrors();
 
-        const evaluationData = getFormPlanJson();
+        // Get fieldId from namespace
+        const fieldId = ns?.fieldId || '';
+
+        // Determine if readonly mode
+        const isReadonly = $('#' + fieldId + '_planTitle').prop('readonly') || false;
+
+        const evaluationData = getFormPlanJson(fieldId, isReadonly);
         const validation = validatePlan(evaluationData);
 
         if (!validation.isValid) {
@@ -380,8 +399,7 @@ function $p(selector) {
         getFormPlanJson,
         validatePlan,
         submitEvaluationData,
-        getAllSchoolsWithSelectionFlag
-        /*getSelectedSchools*/
+        getSchools
     };
 
 })();
