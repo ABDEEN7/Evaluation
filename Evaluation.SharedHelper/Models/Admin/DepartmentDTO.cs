@@ -17,7 +17,7 @@ namespace Evaluation.SharedHelper.Models.Admin
         public string? DescAr { get; set; }
         public string? DescEn { get; set; }
         public int OrderNo { get; set; } = 0;
-
+        public string Name { get; set; } = null!;
         public Guid? WebsiteAttachmentId { get; set; }
 
     }

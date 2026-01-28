@@ -276,6 +276,7 @@ public static class ConstantKeys
         public static readonly string SELECTALL = "SELECTALL";
         public static readonly string EXPANDALL = "EXPANDALL";
         public static readonly string COLLAPSEALL = "COLLAPSEALL";
+        public static readonly string lblDepartment = "lblDepartment";
     }
 
     public static class AdminPages
