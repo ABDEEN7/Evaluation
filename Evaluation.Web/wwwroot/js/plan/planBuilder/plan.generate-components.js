@@ -224,7 +224,7 @@
 
     // ================== SCHOOL TABLE FIELD GENERATORS ==================
 
-    const generateSelectCheckbox = (fieldId, school, readonly) => {
+    const generateSelectCheckbox = (fieldId, school, readonly, isSelected = false) => {
         const label = $('<label>').addClass('custom-checkbox');
 
         const checkbox = $('<input>')
@@ -233,6 +233,11 @@
             .attr('data-id', `${fieldId}_${school.id}_chk`)
             .attr('data-school-id', school.id)
             .attr('data-name', school.name);
+
+        // Check the checkbox if the school is selected
+        if (isSelected) {
+            checkbox.prop('checked', true);
+        }
 
         if (readonly) {
             checkbox.prop('disabled', true);
@@ -358,13 +363,13 @@
 
     // ================== TABLE ROW GENERATOR ==================
 
-    const generateSchoolRow = (fieldId, school, isReadOnly) => {
+    const generateSchoolRow = (fieldId, school, isReadOnly, isSelected = false) => {
         const readonly = isReadOnly;
         const row = $('<tr>');
 
         // Checkbox cell
         const checkboxCell = $('<td>');
-        checkboxCell.append(generateSelectCheckbox(fieldId, school, readonly));
+        checkboxCell.append(generateSelectCheckbox(fieldId, school, readonly, isSelected));
         row.append(checkboxCell);
 
         // School name cell
@@ -471,7 +476,7 @@
         return form;
     };
 
-    const renderSchoolTable = (fieldId, schools, isReadOnly) => {
+    const renderSchoolTable = (fieldId, schools, isReadOnly, selectedSchoolsMap = null) => {
         const tbody = $('<tbody>');
 
         if (!schools || schools.length === 0) {
@@ -485,7 +490,16 @@
             tbody.append(emptyRow);
         } else {
             schools.forEach(school => {
-                const row = generateSchoolRow(fieldId, school, isReadOnly);
+                // Check if this school is in the selected schools map
+                const isSelected = selectedSchoolsMap && selectedSchoolsMap.has(school.id);
+
+                // If selected, merge the selection data into the school object
+                if (isSelected) {
+                    const selectedData = selectedSchoolsMap.get(school.id);
+                    school = { ...school, ...selectedData };
+                }
+
+                const row = generateSchoolRow(fieldId, school, isReadOnly, isSelected);
                 tbody.append(row);
             });
         }
@@ -707,7 +721,7 @@
                     const apply = document.createElement('button');
                     apply.type = 'button';
                     apply.className = 'fp-apply';
-                    apply.textContent = `${t('lblConfirm')}`; 
+                    apply.textContent = `${t('lblConfirm')}`;
                     apply.onclick = (e) => {
                         e.preventDefault();
                         instance.close();

@@ -266,7 +266,7 @@ function $p(selector) {
         // Get only selected schools
         $('#' + fieldScore + 'planTable tbody .selectRow:checked').each(function () {
             const checkbox = $(this);
-            const schoolId = checkbox.data('id');
+            const schoolId = checkbox.data('school-id');
             const schoolName = checkbox.data('name');
             const row = checkbox.closest('tr');
 

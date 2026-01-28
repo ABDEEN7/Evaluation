@@ -19,7 +19,7 @@
     <script src="~/plan-assets/vendor/jquery/jquery.min.js"></script>
     <script src="~/plan-assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
     <script src="~/plan-assets/vendor/select2/js/select2.min.js"></script>
-    
+
     <!-- Date -->
     <script src="~/plan-assets/vendor/flatpickr/js/flatpickr.js"></script>
     <script src="~/vendor/flatpickr/js/ar.js"></script>
@@ -33,6 +33,22 @@
     <script src="~/js/plan/submit-evaluation-plan.js"></script>
     <!-- ENTRY POINT -->
     <script>
+        const planObjectTest=
+                  {
+            "name": "",
+            "PlanTypeDepId": "4ec6bc1a-0dae-4bec-b5a8-faa619c511fa",
+            "startDate": "2026-05-01",
+            "endDate": "2026-05-31",
+            "schools": [
+                {
+                    "id": "160c62a6-0556-4a33-b6c6-0ad687062492",
+                    "startEvaluationDate": null,
+                    "endEvaluationDate": null,
+                    "visitTypeId": "43571613-268d-49e7-9585-4d4f1fc3f7f2",
+                    "name": "Doha Modern Indian School"
+                }
+            ]
+        };
                   const planObject = {
             "name": "sbc",
             "PlanTypeDepId": "fe848400-3ef6-44cc-812f-0b9026748a26",
@@ -115,16 +131,16 @@
           };
 
         document.addEventListener('DOMContentLoaded', function () {
-        //       planUtility.generatePlanFields('aaa');
-        //       PlanHandler.init(false,
-        //           'aaa',
-        //           planObject
-        //       );
-
-              planUtility.generatePlanFields('second');
+              planUtility.generatePlanFields('aaa');
               PlanHandler.init(false,
-                  'second'
+                  'aaa',
+                  planObjectTest
               );
+
+              // planUtility.generatePlanFields('second');
+              // PlanHandler.init(false,
+              //     'second'
+              // );
           });
     </script>
 
