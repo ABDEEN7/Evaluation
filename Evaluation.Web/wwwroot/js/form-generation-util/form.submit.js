@@ -103,7 +103,15 @@ window.serviceRequestForm = window.serviceRequestForm || {};
                     }
                     break;
                 }
+                case "evaluationplan": {
+                    const fn =
+                        window.SubmitPlanHandler?.getFormPlanJson ||
+                        window.getFormPlanJson;
 
+                    value = (typeof fn === "function") ? fn(field.fieldId) : null;
+
+                    break;
+                }
                 case "datetime":
                 case "date":
                 case "phone":
