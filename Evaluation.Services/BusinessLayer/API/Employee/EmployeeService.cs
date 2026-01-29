@@ -67,7 +67,7 @@ public class EmployeeService(IServiceScopeFactory serviceScopeFactory,
     private Expression<Func<Employee, bool>> BuildFilterExpression(SchoolRequest request, List<Guid?> targetOrgTreeIds, List<Guid> employees)
     {
         Expression<Func<Employee, bool>> filter = s => true;
-        filter = filter.And(c => employees.Contains(c.Id));
+        filter = filter.And(c => targetOrgTreeIds.Contains(c.OrgParentId) && employees.Contains(c.Id));
 
         if (!string.IsNullOrWhiteSpace(request.Name))
             filter = filter.And(s => s.NameEn.Contains(request.Name) || s.NameAr.Contains(request.Name));

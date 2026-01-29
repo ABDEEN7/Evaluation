@@ -4,6 +4,7 @@ namespace Evaluation.SharedHelper.Dtos.SchoolDto;
 
 public class SchoolRequest : PaginatedQuery
 {
+    public List<Guid>? Id { get; set; }
     public string? Name { get; set; }
     public DateOnly? EstablishmentDate { get; set; }
     public DateTime? VisitDateFrom { get; set; }

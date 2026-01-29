@@ -210,6 +210,7 @@
         initCustomMode(fieldId);
     };
 
+
     const renderPlanWithData = (fieldId, plan) => {
         const state = instances.get(fieldId);
 
@@ -236,11 +237,13 @@
         }
         $p(fieldId, 'parentDate').val(vm.dateRange);
 
-        // ✅ Create a Map of selected schools with their data
+        // ✅ MODIFIED: Create a Map of selected schools with their data AND extract IDs
         const selectedSchoolsMap = new Map();
-  
+        const selectedSchoolIds = []; // NEW: Array to store school IDs
+
         vm.schools.forEach(s => {
             const schoolId = s.id || s.schoolId;
+            selectedSchoolIds.push(schoolId); // NEW: Collect school IDs
             selectedSchoolsMap.set(schoolId, {
                 id: schoolId,
                 visitDate: s.visitDate || (s.startEvaluationDate && s.endEvaluationDate ?
@@ -254,14 +257,17 @@
         // ✅ Store selected schools map in state
         state.selectedSchoolsMap = selectedSchoolsMap;
 
-        // ✅ Load ALL schools from backend and mark selected ones
-        loadSchoolsWithSelection(fieldId, 1, {}, selectedSchoolsMap);
+        // ✅ MODIFIED: If readonly, load ONLY selected schools. Otherwise, load all schools
+        if (state.isReadOnly && selectedSchoolIds.length > 0) {
+            loadSelectedSchoolsOnly(fieldId, selectedSchoolIds, selectedSchoolsMap);
+        } else {
+            loadSchoolsWithSelection(fieldId, 1, {}, selectedSchoolsMap);
+        }
 
         initializeDatePickers(fieldId, vm);
     };
 
     /* ===================== SCHOOLS (Backend Only) ===================== */
-
 
     const loadSchoolsWithSelection = (fieldId, page = 1, filters = {}, selectedSchoolsMap = null) => {
         const state = instances.get(fieldId);
@@ -310,6 +316,48 @@
             })
             .fail(err => {
                 console.error(`[PlanHandler] Failed to load schools`, err);
+                showErrorState(fieldId);
+            });
+    };
+
+    // ✅ NEW FUNCTION: Load only selected schools by IDs (for readonly mode)
+    const loadSelectedSchoolsOnly = (fieldId, schoolIds, selectedSchoolsMap) => {
+        const state = instances.get(fieldId);
+
+        // Build query parameters with school IDs
+        const params = new URLSearchParams({
+            schoolIds: schoolIds.join(','), // Send comma-separated IDs
+            page: 1,
+            pageSize: schoolIds.length // Set page size to number of schools to get all in one request
+        });
+
+        showLoadingState(fieldId);
+
+        // Call API to get only selected schools
+        jqClient().Get(`${API_ENDPOINTS.GET_SCHOOLS}?${params}`)
+            .done(r => {
+                const schools = r.items || [];
+                state.totalRecords = schools.length; // Set total to the number of selected schools
+                state.currentPage = 1;
+
+                // Render table with all schools pre-selected
+                const tbody = ns.renderSchoolTable(
+                    fieldId,
+                    schools,
+                    state.isReadOnly,
+                    selectedSchoolsMap
+                );
+
+                $p(fieldId, 'planTable').find('tbody').replaceWith(tbody);
+
+                // Render pagination (will show 1 page with all selected schools)
+                renderPagination(fieldId);
+
+                attachRowEvents(fieldId);
+                initChildPickerForTable(fieldId);
+            })
+            .fail(err => {
+                console.error(`[PlanHandler] Failed to load selected schools`, err);
                 showErrorState(fieldId);
             });
     };

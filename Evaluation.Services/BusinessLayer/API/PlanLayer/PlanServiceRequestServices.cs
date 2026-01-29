@@ -126,8 +126,8 @@ public class PlanServiceRequestServices(
             {
                 ValidateSchool(
                     dto.Schools[i],
-                    dto.StartDate,
-                    dto.EndDate,
+                    DateOnly.FromDateTime(dto.StartDate),
+                    DateOnly.FromDateTime(dto.EndDate),
                     result,
                     i);
             }
