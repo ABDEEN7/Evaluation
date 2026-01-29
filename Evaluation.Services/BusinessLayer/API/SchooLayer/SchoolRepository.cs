@@ -87,7 +87,7 @@ public class SchoolRepository(IServiceScopeFactory serviceScopeFactory,
 
         Expression<Func<School, bool>> filter = s => true;
         filter = filter.And(c => targetOrgTreeIds.Contains(c.OrgParentId) && currentSchools.Contains(c.Id));
-        if (request.Id.Count > 0)
+        if (request.Id != null && request.Id.Count > 0)
             filter = filter.And(c => request.Id.Contains(c.Id));
         if (!string.IsNullOrWhiteSpace(request.Name))
             filter = filter.And(s => s.NameEn.Contains(request.Name) || s.NameAr.Contains(request.Name));
