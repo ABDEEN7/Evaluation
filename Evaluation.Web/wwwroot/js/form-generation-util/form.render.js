@@ -247,10 +247,7 @@ window.serviceRequestForm = window.serviceRequestForm || {};
         if (!Array.isArray(actionTransactions)) actionTransactions = [actionTransactions];
 
         if (actionTransactions.length > 0) {
-
-            if (typeof createActionTransactionsTable === "function") {
-                createActionTransactionsTable(actionTransactions, logSelector, ctx);
-            }
+            createActionTransactionsTable(actionTransactions, logSelector, ctx);
 
             const lastRemark = actionTransactions[actionTransactions.length - 1]?.remarks || "";
             const $notes = root.find(notesSelector);
@@ -273,7 +270,7 @@ window.serviceRequestForm = window.serviceRequestForm || {};
         const tableId = `History-table-${(ctx.requestId || 'x').toString().replaceAll('-', '')}`;
 
         const wrapperDiv = $('<div>').addClass('tabulator-wrapper');
-        const tableDiv = $('<div>').attr('id', tableId).addClass('tabulator-dark');
+        const tableDiv = $('<div>').attr('id', tableId).addClass('table table-bordered table-hover align-middle w-100 dataTable no-footer');
 
         wrapperDiv.append(tableDiv);
         $logWrap.html(wrapperDiv);
@@ -281,28 +278,29 @@ window.serviceRequestForm = window.serviceRequestForm || {};
      
         let columns = [];
 
-        if (userProfileDetailsInfo.UserType === "") {
-            columns = [
-                { title: uiControlsSetup().GetUiControlText('lblTranslogActionName'), field: "action", tooltip: true },
-                { title: uiControlsSetup().GetUiControlText('lblTranslogNote'), field: "remarks", tooltip: true },
-                { title: uiControlsSetup().GetUiControlText('lblTranslogDate'), cssClass: 'dateClazz', field: "formattedCreatedDate" },
-                {
-                    title: uiControlsSetup().GetUiControlText('lblViewDetails'),
-                    field: "",
-                    formatter: function (cell) {
-                        const { id } = cell.getRow().getData();
-                        return getActionTransactionsTemplate(id);
-                    },
-                    cellClick: actionTransactionsCellClick
-                },
-            ];
-        } else if (userProfileDetailsInfo.UserType === "Ministry") {
+        //if (userProfileDetailsInfo.UserType === "") {
+        //    columns = [
+        //        { title: uiControlsSetup().GetUiControlText('lblTranslogActionName'), field: "action", tooltip: true },
+        //        { title: uiControlsSetup().GetUiControlText('lblTranslogNote'), field: "remarks", tooltip: true },
+        //        { title: uiControlsSetup().GetUiControlText('lblTranslogDate'), cssClass: 'dateClazz', field: "formattedCreatedDate" },
+        //        {
+        //            title: uiControlsSetup().GetUiControlText('lblViewDetails'),
+        //            field: "",
+        //            formatter: function (cell) {
+        //                const { id } = cell.getRow().getData();
+        //                return getActionTransactionsTemplate(id);
+        //            },
+        //            cellClick: actionTransactionsCellClick
+        //        },
+        //    ];
+        //} else if (userProfileDetailsInfo.UserType === "Ministry") {
             columns = [
                 { title: uiControlsSetup().GetUiControlText('lblTranslogActionName'), field: "action", tooltip: true },
                 { title: uiControlsSetup().GetUiControlText('lblTranslogUserName'), field: "actor", tooltip: true },
                 { title: uiControlsSetup().GetUiControlText('lblTranslogFrom'), field: "previousStatus", tooltip: true },
                 { title: uiControlsSetup().GetUiControlText('lblTranslogTo'), field: "nextStatus", tooltip: true },
                 { title: uiControlsSetup().GetUiControlText('lblTranslogDate'), cssClass: 'dateClazz', field: "formattedCreatedDate" },
+                { title: uiControlsSetup().GetUiControlText('lblRemarks'),  field: "remarks" },
                 {
                     title: uiControlsSetup().GetUiControlText('lblViewDetails'),
                     field: "",
@@ -313,7 +311,7 @@ window.serviceRequestForm = window.serviceRequestForm || {};
                     cellClick: actionTransactionsCellClick
                 },
             ];
-        }
+        //}
 
         new Tabulator(`#${tableId}`, {
             data,
@@ -322,7 +320,52 @@ window.serviceRequestForm = window.serviceRequestForm || {};
         });
     }
 
+    const actionTransactionsCellClick = (e, cell) => {
+        const rowData = cell.getRow().getData();
+        showDetailsModal(rowData.remarks, rowData.actionTransactionAttachments, rowData.action);
+    };
 
+    function showDetailsModal(remarks, attachments, action) {
+
+        $('#testRemarks').text(remarks);
+        $('#testRemarks').prop('disabled', true);
+        $('#actionTransactionsdetailsLabel').text(action);
+        const attachmentsSection = $('#attachmentsSection');
+        attachmentsSection.empty();
+        if (attachments && attachments.length) {
+
+            const attacNameFormatter = (cell, formatterParams, onRendered) => {
+                let cellValue = cell.getValue();
+                let rowData = cell.getRow().getData();
+
+                return `<a href="javascript:void(0);" class="view-attachment" data-id="${rowData.id}" data-name="${cellValue}">${cellValue}</a>`;
+            };
+            let table = new Tabulator("#attachmentsSection", {
+                data: attachments,
+                layout: "fitColumns",
+                columns: [
+                    {
+                        title: uiControlsSetup().GetUiControlText('lblTranslogfilename'), field: "uiFileName", formatter: attacNameFormatter
+                    },
+                    {
+                        title: uiControlsSetup().GetUiControlText('lblActions'), field: "id", formatter: function (cell, formatterParams, onRendered) {
+                            return `<button class='btn btn-primary btn-sm' onclick='downloadAttach("${cell.getValue()}", "${cell.getRow().getData().uiFileName}")'>Download</button>`;
+                        }
+                    }
+                ],
+            });
+
+
+            table.setData(attachments);
+        } else {
+            const noAttachmentsLabel = $('<label>')
+                .text(uiControlsSetup().GetUiControlText('lblNoAttachmentsAvailable')).addClass('no-file-label');
+
+            attachmentsSection.append(noAttachmentsLabel);
+        }
+
+        $('#actionTransactionsdetailsModal').modal('show');
+    }
     // #endregion
 
     // #region 👁️‍🗨️ renderPreviewView ()
@@ -365,9 +408,9 @@ window.serviceRequestForm = window.serviceRequestForm || {};
         fu.initializeFieldsAndConditions &&
             fu.initializeFieldsAndConditions(groups, elementId, RENDER_TYPE.PREVIEW, null);
 
-        if (typeof window.renderTransactionsSection === "function") {
-            window.renderTransactionsSection(actionTransactions, ctx);
-        }
+     
+            renderTransactionsSection(actionTransactions, ctx);
+        
     }
 
 

@@ -270,7 +270,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
 			await Task.WhenAll(attachmentsTask, actionTransactionsTask, actionsTask);
 
-			return new ServiceRequestDTO
+			var ServiceRequest= new ServiceRequestDTO
 			{
 				formGroups = formGroups,
 				Attachments = await attachmentsTask,
@@ -283,6 +283,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 				CanViewFieldHistory = hasFieldHistoryPermission,
 				CanViewAllFieldHistory = hasAllFieldHistoryPermission
 			};
+			return ServiceRequest;
 		}
 
 		public async Task<bool> HasAccessToRequestAsync(Guid requestId, Guid userId)

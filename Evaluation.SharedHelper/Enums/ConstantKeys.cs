@@ -351,7 +351,16 @@ public static class ConstantKeys
         public static readonly string WebDepartmentHoliday = "WebDepartmentHoliday";
 
     }
-    public static class AdminPermission
+	public static class WebAppRequest
+	{
+		public const string actionTransactionsdetailsLabel = "actionTransactionsdetailsLabel";//ToDo Insert
+		public static readonly string lblSaveChanges = "lblSaveChanges";//ToDo Insert
+		public static readonly string lblCloseModal = "lblCloseModal";//ToDo Insert
+		public static readonly string lblRemarks = "lblRemarks";//ToDo Insert
+
+	}
+	
+	public static class AdminPermission
     {
         public const string VIEW_ADMIN_HOME = "VIEW_ADMIN_HOME";
 

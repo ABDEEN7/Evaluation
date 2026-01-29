@@ -1449,7 +1449,7 @@ var formGenerateFieldUtility = window.formUtility;
                     
                     readonly,
                     fieldId,
-                    field.value
+                    JSON.parse(field.value)
                 );
                 if (readonly) {
                     container

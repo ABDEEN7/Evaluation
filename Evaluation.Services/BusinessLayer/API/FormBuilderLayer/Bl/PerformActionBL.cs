@@ -24,12 +24,13 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System.Globalization;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using static Evaluation.DAL.ConstantKeys;
 using static Evaluation.SharedHelper.Enums.ConstantKeys;
-using Newtonsoft.Json;
 
 namespace Evaluation.Services.Models.API
 {
@@ -170,11 +171,16 @@ namespace Evaluation.Services.Models.API
 							break;
 
 
-						var dto = Newtonsoft.Json.JsonConvert.DeserializeObject<CreateEvaluationPlanDto>(planField.Value.ToString());
+						//var dto = Newtonsoft.Json.JsonConvert.DeserializeObject<CreateEvaluationPlanDto>(planField.Value.ToString());
+						var dto = JObject.Parse(planField.Value.ToString());
+						var dto2 = JsonConvert.DeserializeObject<CreateEvaluationPlanDto>(planField.Value);
 
+						//						var dto = JsonConvert.DeserializeObject<CreateEvaluationPlanDto>(
+						//	planField.Value.ToString()
+						//);
 						if (dto == null) throw new BusinessException("Invalid Evaluation Plan data");
 
-						await planServiceRequestServices.InsertOrUpdatePlan(dto);
+						await planServiceRequestServices.InsertOrUpdatePlan(dto2);
 
 						break;
 					}

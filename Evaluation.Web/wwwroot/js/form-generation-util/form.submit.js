@@ -104,12 +104,9 @@ window.serviceRequestForm = window.serviceRequestForm || {};
                     break;
                 }
                 case "evaluationplan": {
-                    const fn =
-                        window.SubmitPlanHandler?.getFormPlanJson ||
-                        window.getFormPlanJson;
-
-                    value = (typeof fn === "function") ? fn(field.fieldId) : null;
-
+                    const fieldId = `fld_${field.fieldId}`;
+                    const planObj = window.SubmitPlanHandler?.getFormPlanJson(fieldId);
+                    value = planObj ? JSON.stringify(planObj) : null;
                     break;
                 }
                 case "datetime":
@@ -246,7 +243,7 @@ window.serviceRequestForm = window.serviceRequestForm || {};
             let RequestId  = getRequestId();
             if (RequestId) {
                 window.tempFileStorage = {};
-                sharedFn().DisplayAlert('Form submitted successfully!', 'success');
+               DisplayAlert('Form submitted successfully!', 'success');
                 setTimeout(() => {
                     sharedUtility().RedirectToModuleOrDefault();
                 }, 1000);
