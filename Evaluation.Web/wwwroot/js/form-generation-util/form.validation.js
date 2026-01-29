@@ -638,7 +638,8 @@ window.formUtility = window.formUtility || {};
         date: validateDate,
         datetime: validateDate,
         textarea: validateTextareaLength,
-        list: validateList
+        list: validateList,
+        //'evaluationPlan': validateEvaluationPlanField,
     };
     // #endregion
 

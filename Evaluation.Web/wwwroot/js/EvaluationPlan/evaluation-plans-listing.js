@@ -55,7 +55,7 @@
      * ========================= */
     const plansListing = evaluationListing.createListing({
         tableId: 'evaluationPlansTable',
-        ajaxUrl: '/Plan/GetPlans',
+        ajaxUrl: `/Plan/${departmentRoutePath}/GetPlans`,
         getFilterInput: getPlansFilter,
         filterFormId: 'plan-filter-form-id',
         filterBtnId: 'filterPlanBtnId',
@@ -63,8 +63,8 @@
         tabLabelSelector: '#tabPlansAnchorTag',
         tabLabelKey: 'lblEvaluationPlans',
         enableCardView: false,
-        cardViewBtnId: 'cardViewPlan',
-        tableViewBtnId: 'tblViewPlan',
+        cardViewBtnId: 'cardViewEvaluationPlans',
+        tableViewBtnId: 'tblViewEvaluationPlans',
         rowClass: 'plan-row',
 
         onAjaxSuccess: function (response) {

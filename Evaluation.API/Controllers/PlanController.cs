@@ -46,8 +46,8 @@ public class PlanController(MasterBL masterBL) : ControllerBase
         return Ok(new { result = plan });
     }
 
-    [HttpPost]
-    public async Task<IActionResult> GetPlans(PlanDetailsRequestDto request)
+	[HttpPost]
+	public async Task<IActionResult> GetPlans(PlanDetailsRequestDto request)
     {
         return Ok(await masterBL
             .GetApiService<PlanServiceRequestServices>()

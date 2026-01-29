@@ -17,20 +17,47 @@
         function applyViewMode() {
             if (!config.enableCardView) return;
 
-            const wrapperSelector = '#' + config.tableId + '_wrapper';
+            const $table = $("#" + config.tableId);
+            if (!$table.length) return;
+
+            const $dtWrapper = $("#" + config.tableId + "_wrapper");
+
+            let $responsive = $table.closest(".table-responsive");
+            if (!$responsive.length) {
+                $table.wrap('<div class="table-responsive"></div>');
+                $responsive = $table.closest(".table-responsive");
+            }
+
+            const $thead = $table.find("thead");
 
             if (isCardView) {
-                $table.addClass('card');
-                $table.find('tr').addClass('card');
-                $cardBtn.addClass('active');
-                $tblBtn.removeClass('active');
-                $(wrapperSelector).removeClass('table-responsive');
+                $table
+                    .removeClass("table table-bordered table-hover align-middle w-100")
+                    .addClass("card");
+
+                $table.find("tr").addClass("card");
+
+                $thead.hide();
+
+                $cardBtn.addClass("active");
+                $tblBtn.removeClass("active");
+
+                $responsive.removeClass("table-responsive");
             } else {
-                $table.removeClass('card');
-                $table.find('tr').removeClass('card');
-                $tblBtn.addClass('active');
-                $cardBtn.removeClass('active');
-                $(wrapperSelector).addClass('table-responsive');
+                $table
+                    .removeClass("card")
+                    .addClass("table table-bordered table-hover align-middle w-100");
+
+                $table.find("tr").removeClass("card");
+
+                $thead.show().addClass("table-light");
+
+                $tblBtn.addClass("active");
+                $cardBtn.removeClass("active");
+
+                $responsive.addClass("table-responsive");
+
+                $dtWrapper.removeClass("table-responsive");
             }
         }
 

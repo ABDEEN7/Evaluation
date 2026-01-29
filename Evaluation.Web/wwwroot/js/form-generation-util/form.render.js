@@ -405,11 +405,8 @@ window.serviceRequestForm = window.serviceRequestForm || {};
 
         $container.append(formGroupsContainer);
 
-        fu.initializeFieldsAndConditions &&
-            fu.initializeFieldsAndConditions(groups, elementId, RENDER_TYPE.PREVIEW, null);
-
-     
-            renderTransactionsSection(actionTransactions, ctx);
+          fu.initializeFormFieldsAndConditions(groups, elementId, RENDER_TYPE.PREVIEW, null);
+      renderTransactionsSection(actionTransactions, ctx);
         
     }
 
@@ -519,8 +516,8 @@ window.serviceRequestForm = window.serviceRequestForm || {};
             $container.append($buttonsWrapper);
         }
 
-        fu.initializeFieldsAndConditions &&
-            fu.initializeFieldsAndConditions(groups, elementId, RENDER_TYPE.ACTION, actionTypeName);
+        
+        fu.initializeFormFieldsAndConditions(groups, elementId, RENDER_TYPE.ACTION, actionTypeName);
     }
 
 

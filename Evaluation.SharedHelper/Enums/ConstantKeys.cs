@@ -1103,6 +1103,8 @@ public static class ConstantKeys
         public const string CreateEvaluationPlan = "CREATE_PLAN";
         public const string UPDATE_ITEGRATION_FIELDS = "UPDATE_ITEGRATION_FIELDS";
         public const string INFO_WITH_DRAFT = "INFO_WITH_DRAFT";
+        public const string CLOSE_AND_DELETE_PLAN = "CLOSE_AND_DELETE_PLAN";
+        public const string CLOSE_AND_UPDATE_PLAN = "CLOSE_AND_UPDATE_PLAN";
     }
 
     public static class ServiceSettings
@@ -1135,7 +1137,15 @@ public static class ConstantKeys
         public const string EvaluationParty = "EvaluationParty";
    
     }
-    public static class NDAStatic
+	public static class ModuleTypeIds
+	{
+		public static readonly Guid EvaluationPlan =Guid.Parse("FFFBF420-AED3-4A73-B25E-B7B9E67337A7");
+
+		public static readonly Guid EvaluationRequest =Guid.Parse("6677F0C5-2531-4123-98F8-8E0A7C5B0ADA");
+
+		public static readonly Guid EvaluationParty =Guid.Parse("281E98ED-9ED5-4AF3-8C08-4A659BE99DC8");
+	}
+	public static class NDAStatic
     {
         public static string Pending = "PENDING";
         public static string Objection = "OBJECTION";

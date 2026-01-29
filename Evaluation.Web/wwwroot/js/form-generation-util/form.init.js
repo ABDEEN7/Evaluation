@@ -423,6 +423,25 @@ window.formUtility = window.formUtility || {};
                     });
                     break;
                 }
+                case 'evaluationplan':
+                    {
+                    const fieldId = `fld_${field.fieldId}`;
+                    const PH = window.PlanHandler;
+                   
+                        let readonly = field.isEditable === false;
+                        const isReadonly =
+                            renderType === RENDER_TYPE.PREVIEW ||
+                            (field.isApproved === true && actionType !== ACTION_TYPE.INFO_Override_Approve) ||
+                            (field.isEditable != null && !field.isEditable && actionType !== ACTION_TYPE.SubmitMissingData)
+                            //||
+                            //(ReadOnly_ACTION_TYPES || []).includes(actionType) 
+                            ;
+                        PH.init(isReadonly,
+                        fieldId,
+                        JSON.parse(field.value), elementId
+                    );
+                    break;
+                }
 
                 default: {
                     const calcAgeAttr = field.attributes?.find(attr => attr.name.trim().toLowerCase() === 'calcage');

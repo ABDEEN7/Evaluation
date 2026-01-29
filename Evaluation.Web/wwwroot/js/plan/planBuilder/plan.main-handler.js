@@ -56,7 +56,7 @@
 
     /* ===================== INIT ===================== */
 
-    const init = async (isReadOnly, fieldId = null, planObject = null) => {
+    const init = async (isReadOnly, fieldId = null, planObject = null,element) => {
         if (!fieldId) {
             console.error('[PlanHandler] fieldId is required!');
             return;
@@ -77,14 +77,14 @@
                 ]);
             }
 
-            populatePlanTypes(fieldId);
-            populateSemesters(fieldId);
-
             if (planObject) {
                 renderPlanWithData(fieldId, planObject);
             } else {
                 renderNewPlan(fieldId);
             }
+
+            populatePlanTypes(fieldId,element);
+            populateSemesters(fieldId);
 
             bindEvents(fieldId);
             initializeFilterDatePickers(fieldId);
@@ -130,20 +130,53 @@
 
     /* ===================== POPULATE ===================== */
 
-    const populatePlanTypes = (fieldId) => {
-        const $s = $p(fieldId, 'ddlPlanType');
+    //const populatePlanTypes = (fieldId) => {
+    //    const $s = $p(fieldId, 'ddlPlanType');
 
-        if ($s.hasClass("select2-hidden-accessible")) {
-            $s.select2('destroy');
+    //    if ($s.hasClass("select2-hidden-accessible")) {
+    //        $s.select2('destroy');
+    //    }
+    //    $s.empty().append(`<option value="">${t('lblChoosePlanType')}</option>`);
+
+    //    ns.planTypes.forEach(t =>
+    //        $s.append(`<option value="${t.id}" data-backendname="${t.backendName}">${t.name}</option>`)
+    //    );
+
+    //    $s.select2({ width: '100%', allowClear: true });
+    //};
+    const populatePlanTypes = (fieldId, elementId = null) => {
+        const parentElement = elementId ? $(`#${elementId}`) : null;
+        const idPrefix = fieldId ? `${fieldId}_` : '';
+        const $s = $(`#${idPrefix}ddlPlanType`);
+
+        if (!$s.length) {
+            console.warn('ddlPlanType not found:', `#${idPrefix}ddlPlanType`);
+            return;
         }
+
+        if ($s.data('select2')) {
+            try { $s.select2('destroy'); } catch { }
+        }
+
         $s.empty().append(`<option value="">${t('lblChoosePlanType')}</option>`);
 
-        ns.planTypes.forEach(t =>
-            $s.append(`<option value="${t.id}" data-backendname="${t.backendName}">${t.name}</option>`)
-        );
+        (ns.planTypes || []).forEach(pt => {
+            $s.append(`<option value="${pt.id}" data-backendname="${pt.backendName}">${pt.name}</option>`);
+        });
 
-        $s.select2({ width: '100%', allowClear: true });
+        const $modal = $s.closest('.modal');
+
+        const dropdownParent =
+            (parentElement && parentElement.length) ? parentElement :
+                ($modal.length ? $modal : $(document.body));
+
+        $s.select2({
+            width: '100%',
+            allowClear: true,
+            dropdownParent: dropdownParent
+        });
     };
+
 
     const populateSemesters = (fieldId) => {
         const $s = $p(fieldId, 'ddlSemester');

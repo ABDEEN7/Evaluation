@@ -3,6 +3,7 @@ using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.Attachments;
 using Evaluation.DAL.Models.DepartementEntites;
 using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
+using Evaluation.DAL.Models.ServiceEnities;
 using Evaluation.DAL.Models.ServiceRequestEntities;
 using Evaluation.DAL.Models.SystemLog;
 using Evaluation.DAL.Models.UserEntiy;
@@ -17,6 +18,7 @@ using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Api.AttachmentsDTOs;
 using Evaluation.SharedHelper.Models.Api.FormBuilderDTO;
 using Evaluation.SharedHelper.Models.Api.PartyTypeDTOs;
+using Evaluation.SharedHelper.Models.Api.ServiceDTOs;
 using Evaluation.SharedHelper.Models.Api.ServiceRequestEntitiesDTO;
 using Evaluation.SharedHelper.Models.Api.ServiceRequestEntitiesDTO;
 using FluentResults;
@@ -1025,9 +1027,70 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 			return transactions;
 		}
 
-	
 
-	
+
+		public async Task<Dictionary<Guid, List<ServiceDTO>>> GetServicesByStatusesAsync(List<Guid> statusIds, Guid moduleId, string lang)
+		{
+			var result = new Dictionary<Guid, List<ServiceDTO>>();
+			var today = DateTime.Today;
+
+			var distinctStatusIds = statusIds.Distinct().ToList();
+			if (!distinctStatusIds.Any())
+				return result;
+
+			using var scopedUow = serviceScopeFactory.CreateScopedUow();
+
+			var statusConfig = (await cacheDataProvider.GetServiceStatusConfiguration())
+				.Where(c => distinctStatusIds.Contains(c.CurrentStatusId)
+						 && c.Service!.SystemModuleId == moduleId)
+				.Select(c => new { c.CurrentStatusId, c.ServiceId })
+				.ToList();
+
+			var initiators = (await cacheDataProvider.GetServiceIntiator())
+				.Where(c => userInfo.PartyTypes.Contains(c.PartyTypeId))
+				.Select(c => c.serviceId)
+				.ToHashSet();
+
+			var allowedServiceIds = statusConfig
+				.Where(c => initiators.Contains(c.ServiceId))
+				.Select(c => c.ServiceId)
+				.Distinct()
+				.ToList();
+
+			var services = await scopedUow
+				.GetRepository<Service>()
+				.GetAllQueryFiltered()
+				.Where(s =>
+					allowedServiceIds.Contains(s.Id) &&
+					s.Initialservice != true &&
+					s.SystemModuleId == moduleId &&
+					s.StartDate.HasValue &&
+					today >= s.StartDate.Value &&
+					(!s.EndDate.HasValue || s.EndDate.Value.AddDays(1) >= today))
+				.Select(s => new ServiceDTO
+				{
+					Id = s.Id,
+					BackendName = s.BackendName,
+					Icon = s.Icon,
+					NameAr = lang == "ar" ? s.NameAr : s.NameEn
+				})
+				.ToListAsync();
+
+			foreach (var statusId in distinctStatusIds)
+			{
+				var serviceIdsForStatus = statusConfig
+					.Where(c => c.CurrentStatusId == statusId)
+					.Select(c => c.ServiceId)
+					.ToHashSet();
+
+				result[statusId] = services
+					.Where(s => serviceIdsForStatus.Contains(s.Id.Value))
+					.ToList();
+			}
+
+			return result;
+		}
+
 
 	}
 }

@@ -172,15 +172,78 @@ namespace Evaluation.Services.Models.API
 
 
 						//var dto = Newtonsoft.Json.JsonConvert.DeserializeObject<CreateEvaluationPlanDto>(planField.Value.ToString());
-						var dto = JObject.Parse(planField.Value.ToString());
-						var dto2 = JsonConvert.DeserializeObject<CreateEvaluationPlanDto>(planField.Value);
+						var dto = JsonConvert.DeserializeObject<CreateEvaluationPlanDto>(planField.Value);
 
 						//						var dto = JsonConvert.DeserializeObject<CreateEvaluationPlanDto>(
 						//	planField.Value.ToString()
 						//);
 						if (dto == null) throw new BusinessException("Invalid Evaluation Plan data");
 
-						await planServiceRequestServices.InsertOrUpdatePlan(dto2);
+						await planServiceRequestServices.InsertOrUpdatePlan(dto);
+
+						break;
+					}
+				case ActionTypeKeys.CLOSE_AND_UPDATE_PLAN:
+					{
+						if (FieldsToUpdates.Count > 0)
+						{
+							var updatedFields = await PrepareAndUpdateFields(application.ServiceId,RequestType,application.Id,FieldsToUpdates,existingFields,lang,actiondb.Id);
+
+							existingFields.AddRange(updatedFields);
+						}
+
+						var planField = existingFields
+							.Where(x => x.IsApproved)
+							.FirstOrDefault(x =>
+								x.Field?.FieldType?.BackendName == FieldTypeConstant.EvaluationPlan &&
+								!string.IsNullOrWhiteSpace(x.Value)
+							);
+
+						if (planField == null)
+							break;
+
+
+						//var dto = Newtonsoft.Json.JsonConvert.DeserializeObject<CreateEvaluationPlanDto>(planField.Value.ToString());
+						var dto = JsonConvert.DeserializeObject<CreateEvaluationPlanDto>(planField.Value);
+
+						//						var dto = JsonConvert.DeserializeObject<CreateEvaluationPlanDto>(
+						//	planField.Value.ToString()
+						//);
+						if (dto == null) throw new BusinessException("Invalid Evaluation Plan data");
+
+						await planServiceRequestServices.InsertOrUpdatePlan(dto);
+
+						break;
+					}
+				case ActionTypeKeys.CLOSE_AND_DELETE_PLAN:
+					{
+						if (FieldsToUpdates.Count > 0)
+						{
+							var updatedFields = await PrepareAndUpdateFields(application.ServiceId,RequestType,application.Id,FieldsToUpdates,existingFields,lang,actiondb.Id);
+
+							existingFields.AddRange(updatedFields);
+						}
+
+						var planField = existingFields
+							.Where(x => x.IsApproved)
+							.FirstOrDefault(x =>
+								x.Field?.FieldType?.BackendName == FieldTypeConstant.EvaluationPlan &&
+								!string.IsNullOrWhiteSpace(x.Value)
+							);
+
+						if (planField == null)
+							break;
+
+
+						//var dto = Newtonsoft.Json.JsonConvert.DeserializeObject<CreateEvaluationPlanDto>(planField.Value.ToString());
+						var dto = JsonConvert.DeserializeObject<CreateEvaluationPlanDto>(planField.Value);
+
+						//						var dto = JsonConvert.DeserializeObject<CreateEvaluationPlanDto>(
+						//	planField.Value.ToString()
+						//);
+						if (dto == null) throw new BusinessException("Invalid Evaluation Plan data");
+
+						await planServiceRequestServices.InsertOrUpdatePlan(dto);
 
 						break;
 					}

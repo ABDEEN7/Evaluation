@@ -302,6 +302,25 @@ public class PlanServiceRequestServices(
             .Select(x => x.Id)
             .FirstAsync();
     }
+	public async Task<Result<string>> GetPlanJsonById(Guid planId)
+	{
+		return await ExecuteWithResult(async () =>
+		{
+			using var scope = serviceScopeFactory.CreateScope();
+
+			var scopedUow = scope.ServiceProvider.GetRequiredService<UnitOfWork>();
+
+			var json = await scopedUow.GetRepository<Plan>()
+				.GetAllActiveNonDeleted(x => x.Id == planId)
+				.Select(x => x.PlanJsonValue)
+				.FirstOrDefaultAsync();
+
+			if (string.IsNullOrWhiteSpace(json))
+				throw new BusinessException("Plan not found");
+
+			return json;
+		});
+	}
 
 
 }

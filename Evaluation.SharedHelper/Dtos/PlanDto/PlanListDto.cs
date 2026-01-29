@@ -1,4 +1,6 @@
-﻿namespace Evaluation.SharedHelper.Dtos.PlanDto;
+﻿using Evaluation.SharedHelper.Models.Api.ServiceDTOs;
+
+namespace Evaluation.SharedHelper.Dtos.PlanDto;
 
 public class PlanListDto
 {
@@ -8,4 +10,7 @@ public class PlanListDto
     public DateOnly EndDate { get; set; }
     public string? StatusCode { get; set; }
     public int? CountSchools { get; set; }
+    public Guid PlanStatusId { get; set; }
+
+	public IList<ServiceDTO>? Services { get; set; }
 }

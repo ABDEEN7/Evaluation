@@ -9,6 +9,7 @@ using Evaluation.DAL.Models.ServiceRequestEntities;
 using Evaluation.DAL.Repositories;
 using Evaluation.Services.BusinessLayer.API;
 using Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices;
+using Evaluation.Services.BusinessLayer.API.PlanLayer;
 using Evaluation.Services.Extensions;
 using Evaluation.Services.Models.API;
 using Evaluation.Services.Special;
@@ -40,7 +41,7 @@ namespace Evaluation.Services.BusinessLayer.API
     public class  FormRenderBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, SrvUser _srvUser, UnitOfWork uow, LoggingServices loggingServices, SrvAction _srvAction,
 				  IMapper mapper,UserInfo userInfo,   RequestInfo _requestInfo, SrvServiceRequest _srvServiceRequest, EvaluationRequestService _evaluationRequestService, SrvService _srvService, SrvActionStatusConfiguration _srvActionStatusConfiguration
 			, SrvAttachments _srvAttachments, SrvDropdown _srvDropdown, SystemModuleSrv systemModuleSrv, SrvStatus _srvStatus, SrvAssignment _srvAssignment,
-				SrvField _srvField, IServiceProvider serviceProvider , ServiceRequestBL serviceRequestBL)
+				SrvField _srvField, IServiceProvider serviceProvider , ServiceRequestBL serviceRequestBL, PlanServiceRequestServices planServiceRequestServices)
             : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, _requestInfo)
         {
 
@@ -195,84 +196,43 @@ namespace Evaluation.Services.BusinessLayer.API
 			return result;
 		}
 
-
 		private async Task<List<string>> HandleFieldsWithReadFromFieldIdAsync(List<FieldValueDTO> fields, Guid? requestId, Guid? PlanId)
 		{
-			List<string> attachmentList = new List<string>();
-			//if (fields == null || !fields.Any())
-			//	return attachmentList;
+			var attachmentList = new List<string>();
 
+			if (fields == null || fields.Count == 0)
+				return attachmentList;
 
-			//var fieldsWithReadFrom = fields.Where(f => f.ReadFromFieldId.HasValue && string.IsNullOrWhiteSpace(f.Value)).ToList();
+			var fieldsWithReadFrom = fields
+				.Where(f =>f != null && f.ReadFromFieldId.HasValue && string.IsNullOrWhiteSpace(f.Value))
+				.ToList();
 
-			//if (!fieldsWithReadFrom.Any())
-			//	return attachmentList;
+			if (fieldsWithReadFrom.Count == 0)
+				return attachmentList;
 
-			//var readFromFieldIds = fieldsWithReadFrom
-			//						.Select(f => f.ReadFromFieldId!.Value)
-			//						.Distinct()
-			//						.ToList();
+			foreach (var field in fieldsWithReadFrom)
+			{
+				if (!field.ReadFromFieldId.HasValue)
+					continue;
 
-			//// 2. Get SystemFields
-			//var systemFields = await SrvSystemField.GetSystemFieldsByIds(readFromFieldIds);
+				var sourceField = await _srvField.GetFieldsByIdsAsync(field.ReadFromFieldId.Value);
+				if (sourceField?.FieldType?.BackendName == null)
+					continue;
 
-			//if (systemFields == null || !systemFields.Any())
-			//	return attachmentList;
-			//Guid? userId = requestId != null
-			//				? await SrvServiceRequest.GetUserIdByRequestIdAsync(requestId.Value)
-			//				: userInfo.UserId;
+				if (sourceField.FieldType.BackendName==FieldTypeConstant.EvaluationPlan)
+				{
+					if (!PlanId.HasValue || PlanId.Value == Guid.Empty)
+						return attachmentList;
 
-			//if (userId == null)
-			//	return attachmentList;
+					var planJsonResult =
+						await planServiceRequestServices.GetPlanJsonById(PlanId!.Value);
 
-			//var userProfile = await SrvUser.GetStudentByIdAsync(userId.Value);
+					if (!planJsonResult.IsSuccess || string.IsNullOrWhiteSpace(planJsonResult.Value))
+						continue;
 
-			//var schFieldValues = (PlanId != Guid.Empty && PlanId != null)
-			//	? await SrvScholarship.GetSchFieldValues(PlanId.Value)
-			//	: new List<SchFieldValue>();
-
-			//// 3. Process each field
-			//foreach (var field in fieldsWithReadFrom)
-			//{
-			//	var sysField = systemFields.FirstOrDefault(sf => sf.Id == field.ReadFromFieldId);
-			//	if (sysField == null)
-			//		continue;
-
-			//	if (sysField.SystemTable?.BackendName?.ToLower() == "scholarship")
-			//	{
-			//		var FieldValue = schFieldValues?.FirstOrDefault(x => x.SystemFieldId == sysField.Id);
-			//		if (FieldValue != null)
-			//		{
-			//			if (sysField.FieldType.BackendName == "file" || sysField.FieldType.BackendName == "fileV2")
-			//			{
-			//				attachmentList.Add(FieldValue.Value!);
-			//			}
-			//			if (sysField.FieldType.BackendName == "list")
-			//			{
-			//				var fieldList = await srvField.GetFieldListByFieldId(field.FieldId!.Value);
-			//				var (extractedJson, attachments) = ExtractFieldValues(fieldList, FieldValue.Value!);
-			//				field.Value = extractedJson;
-			//				attachmentList.AddRange(attachments);
-
-			//			}
-
-			//			else
-			//			{
-			//				field.Value = FieldValue.Value;
-			//			}
-
-			//		}
-			//	}
-			//	else if (sysField.SystemTable?.BackendName?.ToLower() == "studentprofile" && userProfile != null)
-			//	{
-			//		var userProfileValue = await GetStudentProfileFieldValue(userProfile, sysField.BackendName);
-			//		if (!string.IsNullOrWhiteSpace(userProfileValue))
-			//		{
-			//			field.Value = userProfileValue;
-			//			field.IsApproved = true;
-			//		}
-			//	}
-			//}
+					field.Value = planJsonResult.Value;
+				}
+			}
 			return attachmentList;
 		}
 		public (string extractedJson, List<string> attachmentList) ExtractFieldValues(List<Field> fieldList, string jsonData)

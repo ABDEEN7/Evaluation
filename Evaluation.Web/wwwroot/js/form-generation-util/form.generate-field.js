@@ -1445,12 +1445,12 @@ var formGenerateFieldUtility = window.formUtility;
                         container.html(`<div class="text-danger">Failed to render plan wrapper (${wrapperId}).</div>`);
                         return;
                     }
-                PH.init(
+                //PH.init(
                     
-                    readonly,
-                    fieldId,
-                    JSON.parse(field.value)
-                );
+                //    readonly,
+                //    fieldId,
+                //    JSON.parse(field.value)
+                //);
                 if (readonly) {
                     container
                         .find('input, select, textarea, button')
