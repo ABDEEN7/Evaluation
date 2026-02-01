@@ -2,6 +2,8 @@
 using Evaluation.DAL.Models.Calendars;
 using Evaluation.DAL.Models.Org;
 using Evaluation.DAL.Models.Planing;
+using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
+using Evaluation.DAL.Models.StatusEntities;
 using Evaluation.DAL.Repositories;
 using Evaluation.SharedHelper;
 using Evaluation.SharedHelper.Consts;
@@ -16,6 +18,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Spire.Doc;
 using Spire.Doc.AI.Model;
 using static Evaluation.SharedHelper.Enums.ConstantKeys;
 namespace Evaluation.Services.BusinessLayer.API.PlanLayer;
@@ -48,7 +51,7 @@ public class PlanRequestRepository(IServiceScopeFactory serviceScopeFactory,
             .GetAllActiveNonDeleted();
 
         var plan = await planQuery
-            .Select(p=> new PlanEditDto
+            .Select(p => new PlanEditDto
             {
                 Id = p.Id,
                 PlanName = p.PlanName,
@@ -180,6 +183,20 @@ public class PlanRequestRepository(IServiceScopeFactory serviceScopeFactory,
         if (evaluationPlan is null)
             throw new BusinessException(ConstantKeys.ExceptionMessage.PlanIsNotFound);
         unitOfWork.GetRepository<PlanServiceRequest>().Delete(evaluationPlan);
+        await unitOfWork.CommitAsync();
+        return true;
+    }
+    public async Task<bool> DeletePlan(Guid? id)
+    {
+        if (id is null)
+            throw new BusinessException(ConstantKeys.ExceptionMessage.InvalidRequest);
+        var model = await unitOfWork.GetRepository<Plan>().GetByIdAsync(id);
+        if (model == null)
+            throw new BusinessException(ConstantKeys.ExceptionMessage.UserPartyTypeSignatureHeightError);
+        if (model.EvaluationRequests.Any(x => x.ServiceStatus.BackendName == StatusBackEnds.Closed))
+            throw new BusinessException(ConstantKeys.ExceptionMessage.UserPartyTypeSignatureHeightError);
+        unitOfWork.GetRepository<Plan>().Delete(model);
+        unitOfWork.GetRepository<EvaluationRequest>().DeleteRange(model.EvaluationRequests);
         await unitOfWork.CommitAsync();
         return true;
     }
