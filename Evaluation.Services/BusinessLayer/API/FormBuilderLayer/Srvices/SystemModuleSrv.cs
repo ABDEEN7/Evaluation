@@ -21,13 +21,14 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
     {
 
 
-        public async Task<SystemModule> GetSystemModuleByRoutingAsync(string routing)
+        public async Task<SystemModule> GetSystemModuleByRoutingAsync(string BackendName)
         {
             var scopedUow = serviceScopeFactory.CreateScopedUow();
 
             var SystemModule = await scopedUow.GetRepository<SystemModule>()
                 .GetAllQueryFiltered()
-                .FirstOrDefaultAsync(c => c.Routing == routing);
+                .Include(x=>x.SystemModuleType)
+                .FirstOrDefaultAsync(c => c.SystemModuleType.BackendName == BackendName);
 
             return SystemModule!;
         }

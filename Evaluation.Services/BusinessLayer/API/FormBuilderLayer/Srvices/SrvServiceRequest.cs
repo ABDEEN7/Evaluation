@@ -73,7 +73,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 										.Include(c => c.Plan)
 										.Include(c => c.EvaluationRequest)
 										.Include(x => x.Status)
-										.ThenInclude(x => x!.StatusPreventPartyTypes)
+										.ThenInclude(x => x!.StatusPreventPartyTypes!.Where(p => p.IsActive && !p.IsDeleted))
 										.Include(c => c.Service)
 										.Include(c => c.OrgTree)
 										.AsSplitQuery()
@@ -105,12 +105,12 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 		public async Task<WebAppPlanRequestsDTO> GetPlanRequestsAsync(Guid userId, FilterRequestsDTO model)
 		{
 			string lang = _requestInfo!.Lang;
-			model.ModuleName = "/evaluation-plan";
+			//model.ModuleName = "/evaluation-plan";
 
 			using var uow = serviceScopeFactory.CreateScopedUow();
 			using var uow2 = serviceScopeFactory.CreateScopedUow();
 
-			var moduleTask = SrvSystemModule.GetSystemModuleByRoutingAsync(model.ModuleName);
+			var moduleTask = SrvSystemModule.GetSystemModuleByRoutingAsync(ModuleType.EvaluationPlan);
 			var userTask = srvUser.GetByIDActiveNonDeleted(userId);
 			var timeFormatTask = cacheDataProvider.GetSystemSettingValue(SystemSettings.ShortTimeFormat);
 			var dateFormatTask = cacheDataProvider.GetSystemSettingValue(SystemSettings.DateFormat);
