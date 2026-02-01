@@ -250,12 +250,13 @@ public class PlanServiceRequestServices(
 
         Guid serviceId = await uow.GetRepository<Service>()
             .GetAllActiveNonDeleted(x =>
-                x.BackendName == BackendServices.EvaluationPlan_P_CreatePlan)
+                x.SystemModule.SystemModuleType.BackendName == ModuleType.EvaluationRequest
+                && x.Initialservice==true)
             .Select(x => x.Id)
             .FirstAsync();
 
         Guid depEvaluationType = await GetDepEvaluationType(); // i dont see this
-        Guid serviceStatusId = await GetServiceStatus(); // also i don't see this
+        Guid serviceStatusId = await GetServiceStatus(serviceId); // also i don't see this
 
         var requests = modelDto.Schools.Select(school => new EvaluationRequest
         {
@@ -296,10 +297,10 @@ public class PlanServiceRequestServices(
             .Select(x => x.Id)
             .FirstAsync();
     }
-    private async Task<Guid> GetServiceStatus()
+    private async Task<Guid> GetServiceStatus(Guid serviceId)
     {
         return await unitOfWork.GetRepository<ServiceStatus>()
-            .GetAllActiveNonDeleted(x => x.BackendName == StatusBackEnds.New)
+            .GetAllActiveNonDeleted(x => x.ServiceId== serviceId && x.IsInitial)
             .Select(x => x.Id)
             .FirstAsync();
     }
