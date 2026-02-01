@@ -1,7 +1,7 @@
 ﻿(function (w, $) {
 
     const fu = w.formUtility || {};
-    const fapi = w.FormApi; // ✅ بدل w.formUtility
+    const fapi = w.FormApi; 
 
     const ActionTypes = (w.FormConstants && w.FormConstants.ACTION_TYPE) || {};
     w.dropdowns = w.dropdowns || [];
@@ -26,6 +26,7 @@
     }
 
     async function InitializeCreatePlanRequest() {
+
         const createPlanService = await fapi.fetchJSON(`/FormRender/${departmentRoutePath}/GetCreatePlanService`);
         if (!createPlanService) {
             redirectToDefault();
@@ -88,6 +89,7 @@
             fillActionDropDown(actions);
         }
     }
+  
 
     const fillActionDropDown = (actions) => {
         if (!actions || actions.length < 2) {

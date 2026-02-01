@@ -5,6 +5,7 @@ using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.ActionEntities;
 using Evaluation.DAL.Models.FormBuilder;
 using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
+using Evaluation.DAL.Models.ServiceEnities;
 using Evaluation.DAL.Models.ServiceRequestEntities;
 using Evaluation.DAL.Repositories;
 using Evaluation.Services.BusinessLayer.API;
@@ -542,12 +543,14 @@ namespace Evaluation.Services.BusinessLayer.API
 
 			return service;
 		}
-		public async Task<ServiceDTO> GetCreatePlanService(Guid DepartementId)
+		public async Task<ServiceDTO> GetCreatePlanService()
 		{
 			var lang = _requestInfo.Lang;
 			var userId = userInfo.UserId ?? Guid.Parse("C2536611-576B-4EB8-84F4-747F4ECE9A23");
-			DepartementId = Guid.Parse("1B8F5ADE-37D0-4D77-A780-CA3FF3EC0F43");
-			var service = await _srvService.GetCreatePlanServiceDetailsAsync(DepartementId, lang);
+			var DepartementId = requestInfo.DepId!.Value;// Guid.Parse("1B8F5ADE-37D0-4D77-A780-CA3FF3EC0F43");
+			//var service = await _srvService.GetCreatePlanServiceDetailsAsync(DepartementId, lang);
+			var service = await _srvService.GetServiceDetailsByModuleTypeAsync(DepartementId, ModuleType.EvaluationPlan, lang, initialService: true);
+
 
 			if (service.Actions != null &&service.Actions.Any() &&service.Actions.Count == 1)
 			{
@@ -557,12 +560,26 @@ namespace Evaluation.Services.BusinessLayer.API
 
 			return service;
 		}
-		public async Task<ServiceDTO> GetCreateEvaluationPartyService(Guid DepartementId, Guid serviceId)
+		public async Task<ServiceDTO> GetPlanService( Guid serviceId,Guid planId)
 		{
 			var lang = _requestInfo.Lang;
 			var userId = userInfo.UserId ?? Guid.Parse("C2536611-576B-4EB8-84F4-747F4ECE9A23");
-			DepartementId = Guid.Parse("1B8F5ADE-37D0-4D77-A780-CA3FF3EC0F43");
-			var service = await _srvService.GetEvaluationPartyServiceDetailsAsync(DepartementId, serviceId, lang);
+			var DepartementId = requestInfo.DepId!.Value;// Guid.Parse("1B8F5ADE-37D0-4D77-A780-CA3FF3EC0F43");
+			var service = await _srvService.GetServiceDetailsByModuleTypeAsync(DepartementId, ModuleType.EvaluationPlan, lang, serviceId: serviceId, initialService: false, planId);
+			if (service.Actions != null && service.Actions.Any() && service.Actions.Count == 1)
+			{
+				var action = service.Actions.First();
+				service.ServiceRequestDTO = await GetActionFieldAsync(service.Id!.Value, action.BakendName, null, planId);
+			}
+
+			return service;
+		}
+		public async Task<ServiceDTO> GetCreateEvaluationPartyService( Guid serviceId)
+		{
+			var lang = _requestInfo.Lang;
+			var userId = userInfo.UserId ?? Guid.Parse("C2536611-576B-4EB8-84F4-747F4ECE9A23");
+			var DepartementId = requestInfo.DepId!.Value;// Guid.Parse("1B8F5ADE-37D0-4D77-A780-CA3FF3EC0F43");
+			var service = await _srvService.GetServiceDetailsByModuleTypeAsync(DepartementId, ModuleType.EvaluationParty, lang, serviceId: serviceId);
 
 			if (service.Actions != null && service.Actions.Any() && service.Actions.Count == 1)
 			{
