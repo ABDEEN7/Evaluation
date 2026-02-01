@@ -61,6 +61,9 @@
             console.error('[PlanHandler] fieldId is required!');
             return;
         }
+        if (planObject) {
+            planObject = toCamelCaseKeys(planObject);
+        }
         const state = createInstanceState(fieldId);
         state.isReadOnly = isReadOnly;
 
@@ -801,5 +804,21 @@
         collect,
         getInstance: (fieldId) => instances.get(fieldId)
     });
+    /*=================== Convert to small letters ===================*/
+    const toCamelCaseKeys = (obj) => {
+        if (Array.isArray(obj)) {
+            return obj.map(toCamelCaseKeys);
+        }
+
+        if (obj !== null && typeof obj === "object") {
+            return Object.keys(obj).reduce((acc, key) => {
+                const camelKey = key.charAt(0).toLowerCase() + key.slice(1);
+                acc[camelKey] = toCamelCaseKeys(obj[key]);
+                return acc;
+            }, {});
+        }
+
+        return obj;
+    };
 
 })(window);
