@@ -30,7 +30,7 @@ public class PlanController(MasterBL masterBL) : ControllerBase
         return Ok(new { result = semester });
         //return semester.ToActionResult();
     }
-    [HttpGet("{planId:guid}")]
+    [HttpGet]
     //[CheckRolePermisionFilter(true, ConstantKeys.WebPermission.GET_WEB_PLAN_DETAILS_REQUEST)]
     public async Task<IActionResult> GetPlanDetails(Guid planId)
     {
@@ -46,10 +46,10 @@ public class PlanController(MasterBL masterBL) : ControllerBase
         return Ok(new { result = plan });
     }
 
-	[HttpPost]
-	public async Task<IActionResult> GetPlans(PlanDetailsRequestDto request)
+    [HttpPost]
+    public async Task<IActionResult> GetPlans(PlanDetailsRequestDto request)
     {
-        var result= Ok(await masterBL
+        var result = Ok(await masterBL
             .GetApiService<PlanServiceRequestServices>()
             .GetPlansAsync(request));
         return result;

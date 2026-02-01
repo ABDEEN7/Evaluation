@@ -1,10 +1,10 @@
 ﻿using Evaluation.Services.BusinessLayer;
-using Evaluation.Services.BusinessLayer.API.PlanLayer;
 using Evaluation.Services.Models.Admin;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Evaluation.API.Controllers;
-[Route("api/[controller]/[action]")]
+
+[Route("api/[controller]/{depRouting}/[action]")]
 
 public class AcademicYearController(MasterBL masterBl) : ControllerBase
 {

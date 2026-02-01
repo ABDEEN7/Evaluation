@@ -20,7 +20,7 @@ using Evaluation.SharedHelper.Models;
 using FluentResults;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json;
+using System.Text.Json;
 using static Evaluation.SharedHelper.Enums.ConstantKeys;
 using ValidationResult = Evaluation.SharedHelper.Models.ValidationResult;
 
@@ -193,7 +193,7 @@ public class PlanServiceRequestServices(
             modelDto.Id = planId;
             Plan plan = modelDto.ToPlan();
             plan.Id = planId;
-            plan.PlanJsonValue = JsonConvert.SerializeObject(modelDto);
+            plan.PlanJsonValue = JsonSerializer.Serialize(modelDto);
 
             await unitOfWork.GetRepository<Plan>().InsertAsync(plan);
 
@@ -218,7 +218,7 @@ public class PlanServiceRequestServices(
 
             mapper.Map(modelDto, plan);
 
-            plan.PlanJsonValue = JsonConvert.SerializeObject(modelDto);
+            plan.PlanJsonValue = JsonSerializer.Serialize(modelDto);
             plan.UpdateDate = DateTime.UtcNow;
 
             unitOfWork.GetRepository<Plan>().Update(plan);
