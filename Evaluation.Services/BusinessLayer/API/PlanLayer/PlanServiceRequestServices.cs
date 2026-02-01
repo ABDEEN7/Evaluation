@@ -86,8 +86,9 @@ public class PlanServiceRequestServices(
     }
     public async Task<PaginatedResult<PlanListDto>> GetPlansAsync(PlanDetailsRequestDto request)
     {
-        PaginatedResult<PlanListDto> result = await planRepository.GetPlans(request);
-        return mapper.Map<PaginatedResult<PlanListDto>>(result);
+        PaginatedResult<PlanListDto> Plans = await planRepository.GetPlans(request);
+        var result = mapper.Map<PaginatedResult<PlanListDto>>(Plans);
+        return result;
     }
     public async Task<Result<ValidationResult>> ValidateEvaluationPlan(CreateEvaluationPlanDto model)
     {

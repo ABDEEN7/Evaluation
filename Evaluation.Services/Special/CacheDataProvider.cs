@@ -300,7 +300,7 @@ namespace Evaluation.Services.Special
 				using var scopedUow = serviceScopeFactory.CreateScopedUow();
 				var repo = scopedUow.GetRepository<ServiceInitiatorPartyType>();
 				var list = await repo.GetAllActiveNonDeleted().ToListAsync();
-				return list.Adapt<List<ServiceInitiatorPartyType>>();
+				return list;
 			});
 		}
 		
