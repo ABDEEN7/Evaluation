@@ -153,7 +153,6 @@ namespace Evaluation.Services.Models.API
 					break;
 				case ActionTypeKeys.CreateEvaluationPlan:
 					{
-						if (FieldsToUpdates.Count > 0)
 						{
 							var updatedFields = await PrepareAndUpdateFields(application.ServiceId,RequestType,application.Id,FieldsToUpdates,existingFields,lang,actiondb.Id);
 
@@ -170,17 +169,26 @@ namespace Evaluation.Services.Models.API
 						if (planField == null)
 							break;
 
+						try
+						{
+							var dto = JsonConvert.DeserializeObject<CreateEvaluationPlanDto>(planField.Value);
+							if (dto == null) throw new BusinessException("Invalid Evaluation Plan data");
 
+							await planServiceRequestServices.InsertOrUpdatePlan(dto);
+
+						}
+
+						catch (Exception ex)
+						{
+
+						}
 						//var dto = Newtonsoft.Json.JsonConvert.DeserializeObject<CreateEvaluationPlanDto>(planField.Value.ToString());
-						var dto = JsonConvert.DeserializeObject<CreateEvaluationPlanDto>(planField.Value);
+						
 
 						//						var dto = JsonConvert.DeserializeObject<CreateEvaluationPlanDto>(
 						//	planField.Value.ToString()
 						//);
-						if (dto == null) throw new BusinessException("Invalid Evaluation Plan data");
-
-						await planServiceRequestServices.InsertOrUpdatePlan(dto);
-
+						
 						break;
 					}
 				case ActionTypeKeys.CLOSE_AND_UPDATE_PLAN:
@@ -243,7 +251,7 @@ namespace Evaluation.Services.Models.API
 						//);
 						if (dto == null) throw new BusinessException("Invalid Evaluation Plan data");
 
-						await planServiceRequestServices.InsertOrUpdatePlan(dto);
+						await planServiceRequestServices.DeletePlanDraft(dto.Id);
 
 						break;
 					}

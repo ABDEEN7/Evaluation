@@ -69,11 +69,10 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 	public async Task<WebAppEvaluationRequestsDTO> GetEvaluationRequestsAsync(Guid userId, FilterRequestsDTO model)
 	{
 		string lang = requestInfo!.Lang;
-		model.ModuleName = "/evaluation-plan-request";
 
 		using var uow = serviceScopeFactory.CreateScopedUow();
 
-		var moduleTask = SrvSystemModule.GetSystemModuleByRoutingAsync(model.ModuleName);
+		var moduleTask = SrvSystemModule.GetSystemModuleByRoutingAsync(ModuleType.EvaluationRequest);
 		var userTask = srvUser.GetByIDActiveNonDeleted(userId);
 		var timeFormatTask = cacheDataProvider.GetSystemSettingValue(SystemSettings.ShortTimeFormat);
 		var dateFormatTask = cacheDataProvider.GetSystemSettingValue(SystemSettings.DateFormat);
@@ -117,14 +116,15 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 			.GetRepository<EvaluationRequest>()
 			.GetAllActiveNonDeleted()
 			.Include(x => x.Service)
+			.ThenInclude(x => x.SystemModule)
 			.Include(x => x.ServiceStatus)
 			.Include(x => x.OrgTree)
 			.Include(x => x.DepEvaluationType)
 			.Include(x => x.Plan)
 				.ThenInclude(p => p!.PlanStatus);
 
-		baseQuery = baseQuery.AsSplitQuery()
-			.Where(x => x.Service!.SystemModuleId == module.Id);
+		//baseQuery = baseQuery.AsSplitQuery()
+		//	.Where(x => x.Service!.SystemModuleId == module.Id);
 
 		var permissions = new
 		{
