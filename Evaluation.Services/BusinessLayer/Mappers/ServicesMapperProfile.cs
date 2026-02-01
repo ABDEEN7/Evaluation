@@ -23,7 +23,7 @@ namespace Evaluation.Services.BusinessLayer.Mappers
 		{
 			CreateMap<DAL.Models.ActionEntities.ServiceAction, SharedHelper.Models.Api.ActionEntitiesDTOs.ActionDTO>().ReverseMap();
 			CreateMap<ServiceStatus, StatusDTO>().ReverseMap();
-			CreateMap<Service, ServiceDTO>().ReverseMap();
+			//CreateMap<Service, ServiceDTO>().ReverseMap();
 			CreateMap<ActionField, ActionFieldDTO>().ReverseMap();
 			CreateMap<ActionType, SharedHelper.Models.Api.ActionEntitiesDTOs.ActionTypeDTO>().ReverseMap();
 			CreateMap<ActionPartyType, ActionPartyTypeDTO>().ReverseMap();
