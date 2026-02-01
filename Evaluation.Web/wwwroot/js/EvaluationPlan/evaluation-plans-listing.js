@@ -109,7 +109,75 @@
                         </button>
                     `;
                 }
+            },
+            {
+                data: 'services',
+                className: "td-full p-0 process",
+                title: uiControlsSetup().GetUiControlText('lblActions'),
+                orderable: false,
+                render: function (data, type, row, meta) {
+
+                    const services = Array.isArray(data) ? data : [];
+
+                    const dropdownId = `dropdownMenuButton_${row?.id || meta?.row || Math.random().toString(36).slice(2)}`;
+
+                    let actionsHtml = `<div class="dropdown d-block w-100">`;
+
+                    actionsHtml += `
+                        <button
+                            class="btn mb-0 dropdown-toggle w-100 btn-draft"
+                            type="button"
+                            id="${dropdownId}"
+                            data-bs-toggle="dropdown"
+                            aria-haspopup="true"
+                            aria-expanded="false"
+                            onclick="event.stopPropagation();"
+                        >
+                            <span>${uiControlsSetup().GetUiControlText('lblProcedures')}</span>
+                        </button>
+                    `;
+
+                    actionsHtml += `<div class="dropdown-menu w-100" aria-labelledby="${dropdownId}" onclick="event.stopPropagation();">`;
+
+                    
+                    const baseAppUrl = sharedUtility().GetCookie("webAppBaseURL") || "";
+                    services.forEach(function (service) {
+
+                        const serviceId = service?.id || service?.Id || "";
+                        const planId = row?.id || "";
+
+                        const serviceName =
+                            service?.nameAr ||
+                            service?.NameAr ||
+                            service?.nameEn ||
+                            service?.NameEn ||
+                            service?.name ||
+                            service?.Name ||
+                            "";
+
+                        const serviceIcon = service?.icon || service?.Icon || "fa-solid fa-file";
+
+                        const url = decodeURIComponent(
+                            baseAppUrl.concat(`/Scholarship//NewRequest?serviceId=${serviceId}&scholarshipId=${scholarshipId}`)
+                        );
+
+                        actionsHtml += `
+                <a class="dropdown-item"
+                   type="button"
+                   href="${url}"
+                   onclick="event.stopPropagation();"
+                >
+                    <i class="${serviceIcon} mx-1"></i>
+                    ${serviceName}
+                </a>
+            `;
+                    });
+
+                    actionsHtml += `</div></div>`;
+                    return actionsHtml;
+                }
             }
+
         ],
 
         onRowClick: function (rowData) {

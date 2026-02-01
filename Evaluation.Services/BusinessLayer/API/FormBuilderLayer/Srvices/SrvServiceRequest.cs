@@ -1040,33 +1040,37 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
 			using var scopedUow = serviceScopeFactory.CreateScopedUow();
 
-			var statusConfig = (await cacheDataProvider.GetServiceStatusConfiguration())
-				.Where(c => distinctStatusIds.Contains(c.CurrentStatusId)
-						 && c.Service!.SystemModuleId == moduleId)
-				.Select(c => new { c.CurrentStatusId, c.ServiceId })
-				.ToList();
+			
 
 			var initiators = (await cacheDataProvider.GetServiceIntiator())
 				.Where(c => userInfo.PartyTypes.Contains(c.PartyTypeId))
 				.Select(c => c.serviceId)
 				.ToHashSet();
 
-			var allowedServiceIds = statusConfig
-				.Where(c => initiators.Contains(c.ServiceId))
-				.Select(c => c.ServiceId)
-				.Distinct()
-				.ToList();
+			//var statusConfig = (await cacheDataProvider.GetServiceStatusConfiguration())
+			//	.Where(c => distinctStatusIds.Contains(c.CurrentStatusId)
+			//			 && c.Service!.SystemModuleId == moduleId)
+			//	.Select(c => new { c.CurrentStatusId, c.ServiceId })
+			//	.ToList();
+
+			//var allowedServiceIds = statusConfig
+			//	.Where(c => initiators.Contains(c.ServiceId))
+			//	.Select(c => c.ServiceId)
+			//	.Distinct()
+			//	.ToList();
 
 			var services = await scopedUow
 				.GetRepository<Service>()
 				.GetAllQueryFiltered()
+				.Include(x=>x.SystemModule)
 				.Where(s =>
-					allowedServiceIds.Contains(s.Id) &&
+					//allowedServiceIds.Contains(s.Id) &&
 					s.Initialservice != true &&
-					s.SystemModuleId == moduleId &&
-					s.StartDate.HasValue &&
-					today >= s.StartDate.Value &&
-					(!s.EndDate.HasValue || s.EndDate.Value.AddDays(1) >= today))
+					s.SystemModule.SystemModuleTypeId == moduleId)
+				//&&
+					//s.StartDate.HasValue &&
+					//today >= s.StartDate.Value &&
+					//(!s.EndDate.HasValue || s.EndDate.Value.AddDays(1) >= today))
 				.Select(s => new ServiceDTO
 				{
 					Id = s.Id,
@@ -1078,13 +1082,13 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
 			foreach (var statusId in distinctStatusIds)
 			{
-				var serviceIdsForStatus = statusConfig
-					.Where(c => c.CurrentStatusId == statusId)
-					.Select(c => c.ServiceId)
-					.ToHashSet();
+				//var serviceIdsForStatus = statusConfig
+				//	.Where(c => c.CurrentStatusId == statusId)
+				//	.Select(c => c.ServiceId)
+				//	.ToHashSet();
 
 				result[statusId] = services
-					.Where(s => serviceIdsForStatus.Contains(s.Id.Value))
+					//.Where(s => serviceIdsForStatus.Contains(s.Id.Value))
 					.ToList();
 			}
 

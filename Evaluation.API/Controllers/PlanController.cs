@@ -49,9 +49,10 @@ public class PlanController(MasterBL masterBL) : ControllerBase
 	[HttpPost]
 	public async Task<IActionResult> GetPlans(PlanDetailsRequestDto request)
     {
-        return Ok(await masterBL
+        var result= Ok(await masterBL
             .GetApiService<PlanServiceRequestServices>()
             .GetPlansAsync(request));
+        return result;
     }
     [HttpPost]
     public async Task<Result<ValidationResult>> ValidateEvaluationPlan([FromBody] CreateEvaluationPlanDto planDtoRequest)
