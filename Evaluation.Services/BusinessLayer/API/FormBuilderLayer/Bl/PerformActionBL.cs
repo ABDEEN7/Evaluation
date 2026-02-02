@@ -142,7 +142,7 @@ namespace Evaluation.Services.Models.API
 					break;
 				case ActionTypeKeys.ASSIGNT_TEAM:
 					await _assignmentBL.AddedRequestAssignment(
-						application.EvaluationRequestId!.Value,
+						application.Id,
 						teamUsers
 					);
 					break;

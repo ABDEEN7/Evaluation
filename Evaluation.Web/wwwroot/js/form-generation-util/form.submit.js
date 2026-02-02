@@ -34,7 +34,10 @@ window.serviceRequestForm = window.serviceRequestForm || {};
             }
         }
     }
-    const getRequestId = () => getUrlParam("id");
+    const getRequestId = () => {
+        const id = getUrlParam("id");
+        return id ? id : getUrlParam("Evlid");
+    };
     const getPlanId = () => getUrlParam("PlanId") || getUrlParam("PlanId");
 
     const normalizeFormGroups = (formGroups) => {
@@ -183,7 +186,7 @@ window.serviceRequestForm = window.serviceRequestForm || {};
         formData.append("fieldValues", JSON.stringify(payloadFields));
 
         if (actionTypeName === ACTION_TYPE.ASSIGNT_TEAM) {
-            const teamData = assignmentsUtility.getValidatedTeamData('assign');
+            const teamData = getAssignmentsDataByFieldId('assign');
             if (!teamData) return { formData, ok: false };
             formData.append("teamUsers", JSON.stringify(teamData));
 
