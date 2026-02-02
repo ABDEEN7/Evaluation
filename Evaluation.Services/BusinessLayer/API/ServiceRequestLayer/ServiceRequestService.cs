@@ -4,6 +4,8 @@ using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
 using Evaluation.DAL.Models.ServiceRequestEntities;
 using Evaluation.DAL.Repositories;
 using Evaluation.Services.Special;
+using Evaluation.SharedHelper.Enums;
+using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -40,6 +42,15 @@ public class ServiceRequestService(IServiceScopeFactory serviceScopeFactory,
     {
         return await unitOfWork.GetRepository<ServiceRequest>()
                     .GetByIDActiveNonDeleted(Id);
+    }
+    public async Task<ServiceRequest> DeleteEvaluationEvaluationRequestById(Guid id)
+    {
+        var evaluationRequest = await GetEvaluationServiceRequestById(id);
+        if (evaluationRequest == null)
+            throw new BusinessException(ConstantKeys.ExceptionMessage.RequestEvaluationNotExist);
+
+        unitOfWork.GetRepository<ServiceRequest>().Delete(evaluationRequest);
+        return evaluationRequest;
     }
 
 }

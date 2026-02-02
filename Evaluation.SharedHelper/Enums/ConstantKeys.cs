@@ -191,6 +191,8 @@ public static class ConstantKeys
         public static readonly string EvalRequestNotExsit = "EvalRequestNotExsit";
         public static readonly string OneOfUserNotExsit = "OneOfUserNotExsit";
         public static readonly string UserNotExist = "UserNotExist";
+        public static readonly string RequestEvaluationNotExist = "RequestEvaluationNotExist";
+
     }
 
     public static class AdminSettings

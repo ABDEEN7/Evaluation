@@ -84,11 +84,9 @@
                 renderPlanWithData(fieldId, planObject);
             } else {
                 renderNewPlan(fieldId);
+                populatePlanTypes(fieldId, element);
+                populateSemesters(fieldId);
             }
-
-            //populatePlanTypes(fieldId, element);
-            populateSemesters(fieldId);
-
             bindEvents(fieldId);
             initializeFilterDatePickers(fieldId);
             populateFilterVisitTypes(fieldId);
@@ -735,7 +733,7 @@
             fieldId: fieldId,
             title: $p(fieldId, 'planTitle').val(),
             planTypeId: $p(fieldId, 'ddlPlanType').val(),
-            planTypeDepId: $planType.val(), 
+            planTypeDepId: $planType.val(),
             semesterId: $p(fieldId, 'ddlSemester').val(),
             dateRange: $p(fieldId, 'parentDate').val(),
             schools: state.selectedSchools.map(s => ({
