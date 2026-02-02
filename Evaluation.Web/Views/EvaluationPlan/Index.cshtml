@@ -194,7 +194,30 @@
     </div>
 </div>
 
+<!-- Plan Details Modal - Minimal Container -->
+<div class="modal fade" id="PlanDetailsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen modal-dialog-scrollable">
+        <div class="modal-content">
 
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="PlanDetailsModalLabel">تفاصيل الخطة</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Modal Body - Content will be rendered by planUtility.generatePlanFields() -->
+            <div class="modal-body">
+                <!-- The plan form and details will be injected here by generatePlanFields('view') -->
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+            </div>
+
+        </div>
+    </div>
+</div>
 <div class="modal fade" id="planRequestModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-fullscreen modal-dialog-scrollable">
         <div class="modal-content">

@@ -1,12 +1,14 @@
 ﻿$(document).ready(function () {
     const fu = window.formUtility || {};
-    const fapi = window.FormApi; 
+    const fapi = window.FormApi;
 
     /* =========================
      * API ENDPOINTS
      * ========================= */
+    var deprouting = sharedUtility().extractDepartmentName();
+
     const API_ENDPOINTS = {
-        GET_ACADEMIC_YEARS: '/AcademicYear/GetAcademicYearByDepartment'
+        GET_ACADEMIC_YEARS: `/AcademicYear/${deprouting}/GetAcademicYearByDepartment`
     };
 
     /* =========================
@@ -106,10 +108,14 @@
                 className: "td-center",
                 render: function (data, type, row) {
                     return `
-                        <button class="btn btn-sm btn-primary view-plan" data-id="${row.id}">
-                            عرض
-                        </button>
-                    `;
+                <button
+                    type="button"
+                    class="btn btn-sm btn-primary view-plan"
+                    data-plan-id="${row.id}"
+                    onclick="InitializePlanDetails('${row.id}'); return false;">
+                    عرض
+                </button>
+            `;
                 }
             },
             {
@@ -206,35 +212,97 @@
             const el = document.getElementById("CreateRequestModal");
             const modal = bootstrap.Modal.getOrCreateInstance(el);
             modal.show();
-
-            const serviceName = createPlanRequestService.name;
-
-            const headerEl = document.getElementById("CreateRequestModalLabel");
-            if (headerEl) headerEl.textContent = serviceName ? " - " + serviceName : "";
-
-            const actions = createPlanRequestService.actions || [];
-
-            const initialActions = actions.filter(a => a.isInitialAction === true);
-
-            if (initialActions.length === 1) {
-                const firstAction = initialActions[0];
-                initialAction = firstAction?.bakendName || initialAction;
-
-                $("#ActionsDropDown").hide();
-                $("label[for='ActionsDropDown']").hide();
-
-                await RenderActionFields(createPlanRequestService.serviceRequestDTO);
-            } else {
-                $("#ActionsDropDown").show();
-                $("label[for='ActionsDropDown']").show();
-                fillActionDropDown(actions);
-            }
-
         } catch (err) {
             console.error("InitializeCreatePlanRequestService error:", err);
         }
     };
+    /* =========================
+   * VIEW PLAN DETAILS - MINIMAL VERSION
+   * ========================= */
+    /* =========================
+   * VIEW PLAN DETAILS - MINIMAL VERSION
+   * ========================= */
+    window.InitializePlanDetails = async function (planId) {
+        try {
+            if (!planId) {
+                console.error("Missing planId", { planId });
+                return;
+            }
 
+            // Fetch plan details
+            const response = await fapi.fetchJSON(
+                `/Plan/${departmentRoutePath}/GetPlanDetails?planId=${encodeURIComponent(planId)}`
+            );
+
+            if (!response || !response.result) {
+                console.error("No plan details received");
+                return;
+            }
+
+            // Extract the actual plan data from the result property
+            const planDetails = response.result;
+
+            // Show the modal
+            const el = document.getElementById("PlanDetailsModal");
+            const modal = bootstrap.Modal.getOrCreateInstance(el);
+            modal.show();
+
+            // Clear any previous content in modal body
+            const modalBody = el.querySelector('.modal-body');
+            if (modalBody) {
+                modalBody.innerHTML = '';
+            }
+
+            // Generate the plan fields HTML
+            const html = planUtility.generatePlanFieldsHTML('view');
+
+            // Insert the HTML into the modal body instead of main content
+            if (modalBody) {
+                modalBody.innerHTML = html;
+            }
+
+            // Initialize the plan handler with the fetched data
+            PlanHandler.init(true, 'view', planDetails);
+
+        } catch (err) {
+            console.error("InitializePlanDetails error:", err);
+        }
+    };
+    // Helper function to render actions if needed
+    function renderPlanActions(actions, planId) {
+        const actionsContainer = document.getElementById("plan-actions-container");
+        if (!actionsContainer) return;
+
+        let actionsHtml = `
+        <div class="dropdown">
+            <button class="btn btn-primary dropdown-toggle" 
+                    type="button" 
+                    id="planActionsDropdown" 
+                    data-bs-toggle="dropdown" 
+                    aria-expanded="false">
+                الإجراءات
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="planActionsDropdown">
+    `;
+
+        actions.forEach(function (action) {
+            const actionName = action.nameAr || action.name || "";
+            const actionIcon = action.icon || "fa-solid fa-file";
+
+            actionsHtml += `
+            <li>
+                <a class="dropdown-item" href="#" 
+                   onclick="handlePlanAction('${action.id}', '${planId}'); return false;">
+                    <i class="${actionIcon} mx-1"></i>
+                    ${actionName}
+                </a>
+            </li>
+        `;
+        });
+
+        actionsHtml += `</ul></div>`;
+        actionsContainer.innerHTML = actionsHtml;
+    }
 
     // Reload plans when year changes
     $('#planYearFilter').on('change', function () {
@@ -245,16 +313,6 @@
         plansListing.reload();
     });
     // View plan details
-    function openPlanDetails(planId) {
-        //jqClient({
-        //    success: function (response) {
-        //        $('#planDetailsModalLabel').text(response.name);
-        //        $('#planDetailsModalBody').html(response.htmlContent || '');
-        //        $('#planDetailsModal').modal('show');
-        //    }
-        //}).Get(`/Plan/Details?planId=${planId}`);
-        window.location.href = `/Plan/Details?planId=${planId}`;
-    }
 
     $('#addPlanBtn').on('click', function () {
         window.location.href = '/Plan/Create';
