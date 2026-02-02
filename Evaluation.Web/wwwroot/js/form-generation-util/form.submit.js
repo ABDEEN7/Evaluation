@@ -104,7 +104,7 @@ window.serviceRequestForm = window.serviceRequestForm || {};
                     break;
                 }
                 case "evaluationplan": {
-                    const fieldId = `fld_${field.fieldId}`;
+                    const fieldId = `field_${field.fieldId}`;
                     const planObj = window.SubmitPlanHandler?.getFormPlanJson(fieldId);
                     value = planObj ? JSON.stringify(planObj) : null;
                     break;

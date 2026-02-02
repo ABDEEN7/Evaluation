@@ -211,15 +211,27 @@ namespace Evaluation.Services.Models.API
 							break;
 
 
-						//var dto = Newtonsoft.Json.JsonConvert.DeserializeObject<CreateEvaluationPlanDto>(planField.Value.ToString());
-						var dto = JsonConvert.DeserializeObject<CreateEvaluationPlanDto>(planField.Value);
+						try
+						{
+							var dto = JsonConvert.DeserializeObject<CreateEvaluationPlanDto>(planField.Value);
+							if (dto == null) throw new BusinessException("Invalid Evaluation Plan data");
 
+							await planServiceRequestServices.InsertOrUpdatePlan(dto);
+
+							if (dto == null) throw new BusinessException("Invalid Evaluation Plan data");
+
+							await planServiceRequestServices.InsertOrUpdatePlan(dto);
+
+						}
+
+						catch (Exception ex)
+						{
+
+						}
 						//						var dto = JsonConvert.DeserializeObject<CreateEvaluationPlanDto>(
 						//	planField.Value.ToString()
 						//);
-						if (dto == null) throw new BusinessException("Invalid Evaluation Plan data");
-
-						await planServiceRequestServices.InsertOrUpdatePlan(dto);
+						
 
 						break;
 					}
