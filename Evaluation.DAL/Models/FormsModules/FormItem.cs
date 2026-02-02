@@ -17,13 +17,14 @@ public class FormItem : EntityBase, IAuditLogEntity
     
     public Guid ScopeId { get; set; }
     public Scope? Scope { get; set; }
-    //public Guid Type { get; set; }
     public Guid? DropDownTypeId { get; set; } // if activate Min Max or not and if mkae questioning or not
     public DropDownType? DropDownType { get; set; } // if activate Min Max or not and if mkae questioning or not
     public Guid CalcMethodId { get; set; }
     public CalcMethod? CalcMethod { get; set; }
-    //public int OrderNo { get; set; } = 0;
-    public bool HasNote { get; set; } = false;
+    public bool HasNote { get; set; } 
+    public bool NoteRequired { get; set; }
+    public int OrderNo { get; set; } = 0;
+
     public virtual ICollection<SubFormItem>? SubFormItems { get; set; }
     public ICollection<FormItemRelated>? RelatedFrom { get; set; }
     public ICollection<FormItemRelated>? RelatedTo { get; set; }
