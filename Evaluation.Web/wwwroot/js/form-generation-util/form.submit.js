@@ -112,6 +112,13 @@ window.serviceRequestForm = window.serviceRequestForm || {};
                     value = planObj ? JSON.stringify(planObj) : null;
                     break;
                 }
+
+                case "evl_form": {
+                    
+                    const formObj = evaluationFormResult(field.formId);
+                    value = formObj ? JSON.stringify(formObj) : null;
+                    break;
+                }
                 case "datetime":
                 case "date":
                 case "phone":
