@@ -26,7 +26,7 @@ using static Evaluation.SharedHelper.Enums.ConstantKeys;
 namespace Evaluation.Services.BusinessLayer.API.PlanLayer;
 
 public class PlanRequestRepository(IServiceScopeFactory serviceScopeFactory, SrvServiceRequest _srvServiceRequest,
-	UnitOfWork unitOfWork,
+    UnitOfWork unitOfWork,
     RequestInfo requestInfo
     ) : ApiServiceBase
 {
@@ -192,10 +192,13 @@ public class PlanRequestRepository(IServiceScopeFactory serviceScopeFactory, Srv
     {
         if (id is null)
             throw new BusinessException(ConstantKeys.ExceptionMessage.InvalidRequest);
-        var model = await unitOfWork.GetRepository<Plan>().GetByIdAsync(id);
+        var model = await unitOfWork.GetRepository<Plan>()
+            .GetAllActiveNonDeleted(x => x.Id == id)
+            .Include(x => x.EvaluationRequests)
+            .FirstOrDefaultAsync();
         if (model == null)
             throw new BusinessException(ConstantKeys.ExceptionMessage.UserPartyTypeSignatureHeightError);
-        if (model.EvaluationRequests.Any(x => x.ServiceStatus.BackendName == StatusBackEnds.Closed))
+        if (false)
             throw new BusinessException(ConstantKeys.ExceptionMessage.UserPartyTypeSignatureHeightError);
         unitOfWork.GetRepository<Plan>().Delete(model);
         unitOfWork.GetRepository<EvaluationRequest>().DeleteRange(model.EvaluationRequests);
@@ -218,63 +221,63 @@ public class PlanRequestRepository(IServiceScopeFactory serviceScopeFactory, Srv
             .GetRepository<PlanTypeDep>()
             .GetAllActiveNonDeleted();
     }
-	public async Task<PaginatedResult<PlanListDto>> GetPlans(PlanDetailsRequestDto request)
-	{
-		IQueryable<Plan> plans = unitOfWork.GetRepository<Plan>()
-			.GetAllActiveNonDeleted(x => x.PlanStatus.BackendName == StatusBackEnds.ApprovedPlans);
+    public async Task<PaginatedResult<PlanListDto>> GetPlans(PlanDetailsRequestDto request)
+    {
+        IQueryable<Plan> plans = unitOfWork.GetRepository<Plan>()
+            .GetAllActiveNonDeleted(x => x.PlanStatus.BackendName == StatusBackEnds.ApprovedPlans);
 
-		if (request.YearId != null)
-			plans = plans.Where(x => x.AcademicYearId == request.YearId);
+        if (request.YearId != null)
+            plans = plans.Where(x => x.AcademicYearId == request.YearId);
 
-		if (!string.IsNullOrEmpty(request.SchoolName))
-			plans = plans.Where(x => x.EvaluationRequests.Any(er => er.OrgTree.NameAr.Contains(request.SchoolName)));
+        if (!string.IsNullOrEmpty(request.SchoolName))
+            plans = plans.Where(x => x.EvaluationRequests.Any(er => er.OrgTree.NameAr.Contains(request.SchoolName)));
 
-		var query = plans
-			.Select(x => new PlanListDto
-			{
-				Id = x.Id,
-				Name = x.PlanName,
-				StartDate = x.StartDate,
-				EndDate = x.EndDate,
+        var query = plans
+            .Select(x => new PlanListDto
+            {
+                Id = x.Id,
+                Name = x.PlanName,
+                StartDate = x.StartDate,
+                EndDate = x.EndDate,
 
-				PlanStatusId = x.PlanStatusId.Value,      
-				StatusCode = x.PlanStatus.BackendName,
+                PlanStatusId = x.PlanStatusId.Value,
+                StatusCode = x.PlanStatus.BackendName,
 
-				CountSchools = x.EvaluationRequests
-					.Select(er => er.OrgTreeId)
-					.Distinct()
-					.Count()
-			})
-			.OrderByDescending(x => x.Id);
+                CountSchools = x.EvaluationRequests
+                    .Select(er => er.OrgTreeId)
+                    .Distinct()
+                    .Count()
+            })
+            .OrderByDescending(x => x.Id);
 
-		var finalResult = await query.GetPaginatedResult(request.PageNumber, request.PageSize = 10);
+        var finalResult = await query.GetPaginatedResult(request.PageNumber, request.PageSize = 10);
 
-		if (finalResult.Items.Any())
-		{
-			var statusIds = finalResult.Items
-				.Select(x => x.PlanStatusId)
-				.Distinct()
-				.ToList();
+        if (finalResult.Items.Any())
+        {
+            var statusIds = finalResult.Items
+                .Select(x => x.PlanStatusId)
+                .Distinct()
+                .ToList();
 
-			var servicesByStatusTask =  _srvServiceRequest.GetServicesByStatusesAsync(statusIds, ConstantKeys.ModuleTypeIds.EvaluationPlan, requestInfo.Lang);
+            var servicesByStatusTask = _srvServiceRequest.GetServicesByStatusesAsync(statusIds, ConstantKeys.ModuleTypeIds.EvaluationPlan, requestInfo.Lang);
 
-			await Task.WhenAll(servicesByStatusTask);
+            await Task.WhenAll(servicesByStatusTask);
 
-			var servicesByStatus = servicesByStatusTask.Result;
+            var servicesByStatus = servicesByStatusTask.Result;
 
-			foreach (var item in finalResult.Items)
-			{
-				if (servicesByStatus.TryGetValue(item.PlanStatusId, out var services))
-				{
-					item.Services = services; 
-				}
-			}
-		}
+            foreach (var item in finalResult.Items)
+            {
+                if (servicesByStatus.TryGetValue(item.PlanStatusId, out var services))
+                {
+                    item.Services = services;
+                }
+            }
+        }
 
-		return finalResult;
-	}
+        return finalResult;
+    }
 
-	private async Task<bool> IsThereExistingDraftPlanForSameAcadmicYear(PlanServiceRequest model)
+    private async Task<bool> IsThereExistingDraftPlanForSameAcadmicYear(PlanServiceRequest model)
     {
         return await
             serviceScopeFactory
