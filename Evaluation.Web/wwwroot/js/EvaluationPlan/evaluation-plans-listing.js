@@ -64,7 +64,7 @@
         clearFilterBtnId: 'clearFilterPlanBtnId',
         tabLabelSelector: '#tabPlansAnchorTag',
         tabLabelKey: 'lblEvaluationPlans',
-        enableCardView: false,
+        enableCardView: true,
         cardViewBtnId: 'cardViewEvaluationPlans',
         tableViewBtnId: 'tblViewEvaluationPlans',
         rowClass: 'plan-row',
@@ -128,7 +128,7 @@
 
                     actionsHtml += `
             <button
-                class="btn mb-0 dropdown-toggle w-100 btn-draft"
+                class="btn mb-0 dropdown-toggle w-100 btn-primary mt-3"
                 type="button"
                 id="${dropdownId}"
                 data-bs-toggle="dropdown"

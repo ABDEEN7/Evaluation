@@ -301,15 +301,15 @@ window.serviceRequestForm = window.serviceRequestForm || {};
                 { title: uiControlsSetup().GetUiControlText('lblTranslogTo'), field: "nextStatus", tooltip: true },
                 { title: uiControlsSetup().GetUiControlText('lblTranslogDate'), cssClass: 'dateClazz', field: "formattedCreatedDate" },
                 { title: uiControlsSetup().GetUiControlText('lblRemarks'),  field: "remarks" },
-                {
-                    title: uiControlsSetup().GetUiControlText('lblViewDetails'),
-                    field: "",
-                    formatter: function (cell) {
-                        const { id } = cell.getRow().getData();
-                        return getActionTransactionsTemplate(id);
-                    },
-                    cellClick: actionTransactionsCellClick
-                },
+                //{
+                //    title: uiControlsSetup().GetUiControlText('lblViewDetails'),
+                //    field: "",
+                //    formatter: function (cell) {
+                //        const { id } = cell.getRow().getData();
+                //        return getActionTransactionsTemplate(id);
+                //    },
+                //    cellClick: actionTransactionsCellClick
+                //},
             ];
         //}
 
