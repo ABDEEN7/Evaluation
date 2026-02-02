@@ -169,7 +169,7 @@ window.serviceRequestForm = window.serviceRequestForm || {};
     // ================================
     function buildFormData(actionDetails, formGroups, renderType) {
         const formData = new FormData();
-
+        let actionTypeName = actionDetails.actionType.backEndName;
         const { fields, valuesMap } = collectFieldValues(formGroups, renderType);
 
         const payloadFields = fields.map(f => ({
@@ -182,7 +182,13 @@ window.serviceRequestForm = window.serviceRequestForm || {};
 
         formData.append("fieldValues", JSON.stringify(payloadFields));
 
-        // formData.append("users", JSON.stringify(assignUsers));
+        if (actionTypeName === ACTION_TYPE.ASSIGNT_TEAM) {
+            const teamData = assignmentsUtility.getValidatedTeamData('assign');
+            if (!teamData) return { formData, ok: false };
+            formData.append("teamUsers", JSON.stringify(teamData));
+
+        }
+        
 
          //formData.append("ActionRemarks", remarksValue);
 

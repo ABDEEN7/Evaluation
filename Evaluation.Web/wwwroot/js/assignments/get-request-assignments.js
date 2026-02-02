@@ -26,7 +26,8 @@
         isNDA: false,
         teamLeaderId: null,
         ndaStatus: {},
-        existingAssignments: []
+        existingAssignments: [],
+        $root: null
     };
 
     // ================== ID HELPER ==================
@@ -412,84 +413,164 @@
     }
 
     // ================== SELECT2 INITIALIZATION ==================
-
     function initializeSelect2() {
-        // Destroy existing Select2 instances
-        if ($(".multiCheckSelect-dynamic").hasClass("select2-hidden-accessible")) {
-            $(".multiCheckSelect-dynamic").select2('destroy');
-        }
+        const $root = state.$root && state.$root.length ? state.$root : $(document);
+
+        const $selects = $root.find(".multiCheckSelect-dynamic");
+
+        // Destroy only inside this root
+        $selects.each(function () {
+            const $s = $(this);
+            if ($s.hasClass("select2-hidden-accessible")) {
+                $s.select2("destroy");
+            }
+        });
 
         function formatCheckbox(option) {
             if (!option.id) return option.text;
-
             return $(`
-                <div class="checkbox-item">
-                    <input type="checkbox" class="chk" data-id="${option.id}">
-                    <label>${option.text}</label>
-                </div>
-            `);
+      <div class="checkbox-item">
+        <input type="checkbox" class="chk" data-id="${option.id}">
+        <label>${option.text}</label>
+      </div>
+    `);
         }
 
-        $(".multiCheckSelect-dynamic").select2({
-            closeOnSelect: false,
-            templateResult: formatCheckbox,
-            templateSelection: (item) => item.text,
-            width: '100%',
-            placeholder: 'اختر المجالات',
-            dir: 'rtl'
-        });
+        $selects.each(function () {
+            const $s = $(this);
 
-        // Handle Select2 opening and pre-selecting checkboxes
-        $(".multiCheckSelect-dynamic").on("select2:open", function () {
-            const memberId = $(this).data('member-id');
-            const member = state.selectedAssignments.find(m => m.id === memberId);
-            const selected = member?.scopes || [];
+            // ✅ dropdownParent مهم لو داخل modal
+            const $dropdownParent = $s.closest(".modal").length ? $s.closest(".modal") : $root;
 
-            setTimeout(() => {
-                // Pre-check the checkboxes based on member's scopes
-                $(".chk").each(function () {
-                    const scopeId = $(this).data("id");
-                    const isSelected = selected.includes(scopeId);
-                    $(this).prop("checked", isSelected);
-                });
+            $s.select2({
+                closeOnSelect: false,
+                templateResult: formatCheckbox,
+                templateSelection: (item) => item.text,
+                width: "100%",
+                placeholder: "اختر المجالات",
+                dir: "rtl",
+                dropdownParent: $dropdownParent
+            });
 
-                // Handle checkbox change
-                $(".chk").off("change").on("change", function () {
-                    const scopeId = $(this).data("id");
-                    const selectElement = $(`.multiCheckSelect-dynamic[data-member-id='${memberId}']`);
-                    let current = selectElement.val() || [];
+            // ✅ حدث open لكل select لوحده (بدون .chk global)
+            $s.off("select2:open.assignScopes").on("select2:open.assignScopes", function () {
+                const memberId = $s.data("member-id");
+                const member = state.selectedAssignments.find(m => m.id === memberId);
+                const selected = (member?.scopes || []).map(String);
 
-                    // Convert to proper type (string IDs)
-                    current = current.map(v => String(v));
+                setTimeout(() => {
+                    // ✅ خُد نتائج الـ dropdown الخاصة بالـ select ده فقط
+                    const $results = $dropdownParent.find(".select2-results");
 
-                    if (this.checked) {
-                        if (!current.includes(String(scopeId))) {
-                            current.push(String(scopeId));
+                    $results.find(".chk").each(function () {
+                        const scopeId = String($(this).data("id"));
+                        $(this).prop("checked", selected.includes(scopeId));
+                    });
+
+                    $results.find(".chk").off("change.assignScopes").on("change.assignScopes", function () {
+                        const scopeId = String($(this).data("id"));
+                        let current = ($s.val() || []).map(String);
+
+                        if (this.checked) {
+                            if (!current.includes(scopeId)) current.push(scopeId);
+                        } else {
+                            current = current.filter(v => v !== scopeId);
                         }
-                    } else {
-                        current = current.filter(v => v !== String(scopeId));
-                    }
 
-                    selectElement.val(current).trigger("change");
+                        $s.val(current).trigger("change");
 
-                    // Update state
-                    if (member) {
-                        member.scopes = current.map(id => String(id));
-                    }
-                });
-            }, 50);
+                        if (member) member.scopes = current;
+                    });
+                }, 0);
+            });
         });
 
         // Pre-select values for loaded data
         state.selectedAssignments.forEach(member => {
-            if (member.scopes && member.scopes.length > 0) {
-                const $select = $(`.multiCheckSelect-dynamic[data-member-id='${member.id}']`);
-                if ($select.length) {
-                    $select.val(member.scopes.map(String)).trigger('change');
-                }
+            if (member.scopes?.length) {
+                const $s = $root.find(`.multiCheckSelect-dynamic[data-member-id='${member.id}']`);
+                if ($s.length) $s.val(member.scopes.map(String)).trigger("change");
             }
         });
     }
+
+    //function initializeSelect2() {
+    //    // Destroy existing Select2 instances
+    //    if ($(".multiCheckSelect-dynamic").hasClass("select2-hidden-accessible")) {
+    //        $(".multiCheckSelect-dynamic").select2('destroy');
+    //    }
+
+    //    function formatCheckbox(option) {
+    //        if (!option.id) return option.text;
+
+    //        return $(`
+    //            <div class="checkbox-item">
+    //                <input type="checkbox" class="chk" data-id="${option.id}">
+    //                <label>${option.text}</label>
+    //            </div>
+    //        `);
+    //    }
+
+    //    $(".multiCheckSelect-dynamic").select2({
+    //        closeOnSelect: false,
+    //        templateResult: formatCheckbox,
+    //        templateSelection: (item) => item.text,
+    //        width: '100%',
+    //        placeholder: 'اختر المجالات',
+    //        dir: 'rtl'
+    //    });
+
+    //    // Handle Select2 opening and pre-selecting checkboxes
+    //    $(".multiCheckSelect-dynamic").on("select2:open", function () {
+    //        const memberId = $(this).data('member-id');
+    //        const member = state.selectedAssignments.find(m => m.id === memberId);
+    //        const selected = member?.scopes || [];
+
+    //        setTimeout(() => {
+    //            // Pre-check the checkboxes based on member's scopes
+    //            $(".chk").each(function () {
+    //                const scopeId = $(this).data("id");
+    //                const isSelected = selected.includes(scopeId);
+    //                $(this).prop("checked", isSelected);
+    //            });
+
+    //            // Handle checkbox change
+    //            $(".chk").off("change").on("change", function () {
+    //                const scopeId = $(this).data("id");
+    //                const selectElement = $(`.multiCheckSelect-dynamic[data-member-id='${memberId}']`);
+    //                let current = selectElement.val() || [];
+
+    //                // Convert to proper type (string IDs)
+    //                current = current.map(v => String(v));
+
+    //                if (this.checked) {
+    //                    if (!current.includes(String(scopeId))) {
+    //                        current.push(String(scopeId));
+    //                    }
+    //                } else {
+    //                    current = current.filter(v => v !== String(scopeId));
+    //                }
+
+    //                selectElement.val(current).trigger("change");
+
+    //                // Update state
+    //                if (member) {
+    //                    member.scopes = current.map(id => String(id));
+    //                }
+    //            });
+    //        }, 50);
+    //    });
+
+    //    // Pre-select values for loaded data
+    //    state.selectedAssignments.forEach(member => {
+    //        if (member.scopes && member.scopes.length > 0) {
+    //            const $select = $(`.multiCheckSelect-dynamic[data-member-id='${member.id}']`);
+    //            if ($select.length) {
+    //                $select.val(member.scopes.map(String)).trigger('change');
+    //            }
+    //        }
+    //    });
+    //}
 
     // ================== UPDATE CHECKBOXES ==================
 
@@ -763,9 +844,13 @@
 
     // ================== INIT ==================
 
-    ns.init = async function (fieldId, evaluationRequestId = null) {
+    ns.init = async function (fieldId, evaluationRequestId = null, elementId=null) {
         state.fieldId = fieldId;
         state.evaluationRequestId = evaluationRequestId;
+
+        state.$root = elementId
+            ? (elementId instanceof jQuery ? elementId : $(elementId))
+            : $(document);
 
         const $teamFilter = $(id('teamFilter'));
         const $userTable = $(id('userTable'));
