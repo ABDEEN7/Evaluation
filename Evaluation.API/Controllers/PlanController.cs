@@ -59,6 +59,7 @@ public class PlanController(MasterBL masterBL) : ControllerBase
     {
         return await masterBL.GetApiService<PlanServiceRequestServices>().ValidateEvaluationPlan(planDtoRequest);
     }
+    [HttpPost]
     public async Task<IActionResult> DeletePlan(Guid id)
     {
         await masterBL.GetApiService<PlanServiceRequestServices>().DeletePlanById(id);
