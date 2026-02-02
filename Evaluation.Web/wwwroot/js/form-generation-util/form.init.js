@@ -425,7 +425,7 @@ window.formUtility = window.formUtility || {};
                 }
                 case 'evaluationplan':
                     {
-                    const fieldId = `fld_${field.fieldId}`;
+                        const fieldId = `${prefield}${field.fieldId}`;
                     const PH = window.PlanHandler;
                    
                         let readonly = field.isEditable === false;

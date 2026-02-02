@@ -832,7 +832,7 @@ var formGenerateFieldUtility = window.formUtility;
             lockThisFieldBecauseOld;
 
         const generator = fieldElementGenerators[field.type] || generateDefaultField;
-        return field.type === 'list'
+        return field.type === 'list' || field.type === 'evaluationPlan'
             ? generator(field, isReadonly, renderType)
             : generator(field, isReadonly);
     };
@@ -1418,8 +1418,9 @@ var formGenerateFieldUtility = window.formUtility;
     };
 
 
-    function generateEvaluationPlanField  (field, readonly) {
-        const fieldId = `fld_${field.fieldId}`;
+    function generateEvaluationPlanField(field, readonly, renderType) {
+        let prefield = renderType === RENDER_TYPE.PREVIEW ? "field_view_" : "field_";
+        const fieldId = `${prefield}${field.fieldId}`;
 
         const container = $('<div>')
             .addClass('evaluation-plan-wrapper')
