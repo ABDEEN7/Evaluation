@@ -56,7 +56,7 @@
 
     /* ===================== INIT ===================== */
 
-    const init = async (isReadOnly, fieldId = null, planObject = null,element) => {
+    const init = async (isReadOnly, fieldId = null, planObject = null, element) => {
         if (!fieldId) {
             console.error('[PlanHandler] fieldId is required!');
             return;
@@ -86,7 +86,7 @@
                 renderNewPlan(fieldId);
             }
 
-            populatePlanTypes(fieldId,element);
+            //populatePlanTypes(fieldId, element);
             populateSemesters(fieldId);
 
             bindEvents(fieldId);
@@ -729,11 +729,13 @@
 
     const collect = (fieldId) => {
         const state = instances.get(fieldId);
+        const $planType = $p(fieldId, 'ddlPlanType');
 
         return {
             fieldId: fieldId,
             title: $p(fieldId, 'planTitle').val(),
             planTypeId: $p(fieldId, 'ddlPlanType').val(),
+            planTypeDepId: $planType.val(), 
             semesterId: $p(fieldId, 'ddlSemester').val(),
             dateRange: $p(fieldId, 'parentDate').val(),
             schools: state.selectedSchools.map(s => ({
