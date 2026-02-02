@@ -135,6 +135,10 @@ public class PlanServiceRequestServices(
         }
         return result;
     }
+    public async Task DeletePlanById(Guid id)
+    {
+        var request = await planRepository.DeletePlan(id);
+    }
     private static void ValidateSchool(SelectedSchool school,
     DateOnly planStartDate,
     DateOnly planEndDate,
