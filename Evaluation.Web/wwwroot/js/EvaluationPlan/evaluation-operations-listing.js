@@ -152,7 +152,7 @@
                     }
                 );
                 formUtility.addQueryParameter('Evlid', requestId)
-                formUtility.addQueryParameter('serviceId', response.serviceId)
+                //formUtility.addQueryParameter('serviceId', response.serviceId)
                 if(response.isNdaApprovalPending)
                 {
                     const container =

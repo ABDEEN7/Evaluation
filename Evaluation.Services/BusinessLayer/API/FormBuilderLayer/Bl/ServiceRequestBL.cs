@@ -61,7 +61,7 @@ namespace Evaluation.Services.Models.API
 		{
 			return await _evaluationRequestService.GetEvaluationDetailsAsync(requestId);
 		}
-		public async Task<ServiceRequestDTO> HandleServiceRequestAsync(ActionFormDTO? actionFormDTO, Guid? planId,
+		public async Task<ServiceRequestDTO> HandleServiceRequestAsync(ActionFormDTO? actionFormDTO, Guid? planId,Guid? EvaluationRequestId,
 			Guid serviceId, string actionName, string fieldValuesJson, List<AssignUserDTO?> assignUsers, List<EvalTeamRequestDto> teamUsers,
 			IFormFileCollection files, string remarks, bool saveAsDraft = false)
 		{
@@ -124,7 +124,7 @@ namespace Evaluation.Services.Models.API
 					StatusId = status.Id,
 					ServiceId = serviceId,
 					//OrgTreeId = OrgTreeId,
-					//EvaluationRequestId  = EvaluationRequestId ,
+					EvaluationRequestId  = EvaluationRequestId ,
 					//InitialHistoryId = InitialHistoryId,
 					
 

@@ -56,6 +56,9 @@ window.serviceRequestForm = window.serviceRequestForm || {};
             .addClass('btn btn-primary mw-200')
             .attr('type', 'button')
             .attr('id', 'submitButton')
+            .attr('data-service-id', actionDetails?.serviceId || "")     
+            .attr('data-request-id', requestId || "")   
+             .attr('data-action-name', actionDetails?.bakendName || "") 
             .text(btnText)
             .on('click', (e) => {
                 e.preventDefault();

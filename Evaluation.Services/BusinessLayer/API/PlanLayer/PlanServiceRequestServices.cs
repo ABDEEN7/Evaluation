@@ -252,14 +252,18 @@ public class PlanServiceRequestServices(
         if (modelDto.Schools?.Any() != true)
             return;
 
-        Guid serviceId = await uow.GetRepository<Service>()
-            .GetAllActiveNonDeleted(x =>
-                x.SystemModule.SystemModuleType.BackendName == ModuleType.EvaluationRequest
-                && x.Initialservice == true)
-            .Select(x => x.Id)
-            .FirstAsync();
+        Guid serviceId =  await uow.GetRepository<Service>()
+	                    .GetAllActiveNonDeleted(x =>
+		                    x.Initialservice == true
+		                    && x.SystemModule.DepartmentId == requestInfo.DepId
+		                    && x.SystemModule.SystemModuleType.BackendName == ModuleType.EvaluationRequest
+	                    )
+	                    .Include(x => x.SystemModule)
+		                    .ThenInclude(sm => sm.SystemModuleType)
+	                    .Select(x => x.Id)
+	                    .FirstAsync();
 
-        Guid depEvaluationType = await GetDepEvaluationType();
+		Guid depEvaluationType = await GetDepEvaluationType();
         Guid serviceStatusId = await GetServiceStatus(serviceId);
 
         var requests = modelDto.Schools.Select(school => new EvaluationRequest

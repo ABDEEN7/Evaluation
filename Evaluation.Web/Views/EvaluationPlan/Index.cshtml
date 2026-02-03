@@ -310,6 +310,121 @@
         </div>
     </div>
 </div>
+<div class="modal fade" id="RequestModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen modal-dialog-scrollable">
+        <div class="modal-content">
+
+            <div class="modal-header align-items-start border-0 justify-content-between">
+                <div>
+                    <h4 class="modal-title fw-semibold mb-2">
+                        <span id="RequestModalLabel"></span>
+                        <span class="text-muted"> - </span>
+                        <span class="text-primary">
+                            <i class="fas fa-file-alt me-1"></i>
+                            <span id="RequestNoText"></span>
+                        </span>
+                    </h4>
+
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item">
+                                <a href="#">الخطط</a>
+                            </li>
+                            <li class="breadcrumb-item active" aria-current="page">
+                                تفاصيل الطلب
+                            </li>
+                        </ol>
+                    </nav>
+                </div>
+                <div class="d-flex justify-content-end align-items-center gap-3">
+                    <h5 class="fw-semibold m-0" id="RequestModalSubTitle"></h5>
+
+                    <div class="dropdown" id="Request-actions-container"></div>
+
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                        <i class="la la-close mt-1"></i>
+                    </button>
+                </div>
+                
+            </div>
+
+            <div class="modal-body py-0">
+
+                <div class="card card-table mb-4">
+                    <div class="card-body">
+
+                        <div class="mb-4">
+                            <div class="divNotes" id="divNotes"></div>
+                            <div class="divTemplates" id="Request-divTemplates"></div>
+                        </div>
+
+                        <div class="accordion" id="RequestViewAccordion">
+
+                            <div class="accordion-item mb-3 rounded">
+                                <h2 class="accordion-header" id="RequestRequestHeadingDetails">
+                                    <button class="accordion-button d-flex align-items-center justify-content-between"
+                                            type="button"
+                                            data-bs-toggle="collapse"
+                                            data-bs-target="#RequestCollapseDetails"
+                                            aria-expanded="true">
+
+                                        <div class="d-flex align-items-center gap-2 fs-18">
+                                            <i class="la la-file-alt text-primary fs-25"></i>
+                                            <span class="fw-semibold">تفاصيل الطلب</span>
+                                        </div>
+
+                                        <span class="toggle-icon">
+                                            <i class="la la-angle-up fs-22"></i>
+                                        </span>
+                                    </button>
+                                </h2>
+
+                                <div id="RequestCollapseDetails"
+                                     class="accordion-collapse collapse show">
+                                    <div class="accordion-body">
+                                        <div id="request-details-container"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="accordion-item mb-3 rounded">
+                                <h2 class="accordion-header" id="RequestHeadingLogs">
+                                    <button class="accordion-button collapsed d-flex align-items-center justify-content-between"
+                                            type="button"
+                                            data-bs-toggle="collapse"
+                                            data-bs-target="#RequestCollapseLogs"
+                                            aria-expanded="false">
+
+                                        <div class="d-flex align-items-center gap-2 fs-18">
+                                            <i class="la la-history text-primary fs-25"></i>
+                                            <span class="fw-semibold">سجل الإجراءات</span>
+                                        </div>
+
+                                        <span class="toggle-icon">
+                                            <i class="la la-angle-up fs-22"></i>
+                                        </span>
+                                    </button>
+                                </h2>
+
+                                <!-- ✅ remove show -->
+                                <div id="RequestCollapseLogs"
+                                     class="accordion-collapse collapse">
+                                    <div class="accordion-body">
+                                        <div id="logTableContainer" class="table-responsive"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
 
 <div class="modal fade" id="actionModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
     <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
@@ -545,6 +660,10 @@
             formUtility.removeQueryParameter(['Evlid', 'serviceId']);
             });
              $('#planRequestModal').on('hidden.bs.modal', function () {
+            formUtility.removeQueryParameter(['id', 'serviceId']);
+            });
+
+                $('#RequestModal').on('hidden.bs.modal', function () {
             formUtility.removeQueryParameter(['id', 'serviceId']);
             });
             if (sharedUtility().ExistingToken()) {

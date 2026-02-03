@@ -243,7 +243,7 @@
 
         (requests || []).forEach(r => {
             rows += `
-              <tr>
+                <tr class="cursor-pointer" onclick="openRequestDetails('${r.id}')">
                 <td>${escapeHtml(r.service)}</td>
                 <td>${escapeHtml(r.status)}</td>
                 <td>${escapeHtml(r.createBy)}</td>
@@ -255,6 +255,49 @@
         $tbody.html(rows);
     };
 
+    window.openRequestDetails = function (requestId) {
+        const options = {
+            success: function (response) {
+
+                window.formUtility = window.formUtility || {};
+                formUtility.attachments = response.attachments || [];
+                formUtility.renderPreviewView(
+                    'request-details-container',
+                    response.formGroups,
+                    response.actions,
+                    response.actionTransactions,
+                    response.attachments,
+                    {
+                        actionsContainerId: 'Request-actions-container',
+                        templateContainerId: 'Request-divTemplates',
+                        modalContainerId: 'Request-Action-container-fields',
+                        requestId: requestId,
+                        serviceId: response.serviceId,
+                        ctx: { root: '#RequestModal' }
+                    }
+                );
+
+                formUtility.addQueryParameter('id', requestId)
+                formUtility.addQueryParameter('serviceId', response.serviceId)
+
+                $('#RequestModalLabel').text(response.status || '');
+                $('#RequestNoText').text(response.requestNumber || '');
+
+                $('#RequestModal').modal('show');
+
+                $('#RequestModal')
+                    .off('shown.bs.modal.redraw')
+                    .on('shown.bs.modal.redraw', function () {
+                        if (window.Tabulator?.findTable) {
+                            Tabulator.findTable("#RequestModal .tabulator")
+                                .forEach(t => t.redraw(true));
+                        }
+                    });
+            }
+        };
+
+        jqClient(options).Get(`/ServiceRequest/${departmentRoutePath}/GetApplicationDetails?requestId=${requestId}`);
+    }
     function formatDate(timestamp) {
         if (!timestamp) return "-";
         const dateObj = new Date(timestamp.split(".")[0]);

@@ -28,7 +28,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             var SystemModule = await scopedUow.GetRepository<SystemModule>()
                 .GetAllQueryFiltered()
                 .Include(x=>x.SystemModuleType)
-                .FirstOrDefaultAsync(c => c.SystemModuleType.BackendName == BackendName);
+                .FirstOrDefaultAsync(c => c.SystemModuleType.BackendName == BackendName && c.DepartmentId==requestInfo.DepId);
 
             return SystemModule!;
         }

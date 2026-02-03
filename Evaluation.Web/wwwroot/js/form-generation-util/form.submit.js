@@ -38,6 +38,10 @@ window.serviceRequestForm = window.serviceRequestForm || {};
         const id = getUrlParam("id");
         return id ? id : getUrlParam("Evlid");
     };
+    const getEvlRequestId = () => {
+        const id = getUrlParam("Evlid");
+        return id;
+    };
     const getPlanId = () => getUrlParam("PlanId") || getUrlParam("PlanId");
 
     const normalizeFormGroups = (formGroups) => {
@@ -189,6 +193,7 @@ window.serviceRequestForm = window.serviceRequestForm || {};
         }));
 
         formData.append("requestId", getRequestId());
+        formData.append("evaluationRequestId", getEvlRequestId());
 
         formData.append("fieldValues", JSON.stringify(payloadFields));
 

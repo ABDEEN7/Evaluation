@@ -65,6 +65,7 @@ namespace Evaluation.API.Controllers
 			var assignUsersJson = Request?.Form!["users"].FirstOrDefault();
 			var teamUsersJson = Request?.Form!["teamUsers"].FirstOrDefault();
 			Guid requestId = Guid.TryParse(Request?.Form!["requestId"], out var tempId) ? tempId : Guid.Empty;
+			Guid evaluationRequestId = Guid.TryParse(Request?.Form!["evaluationRequestId"], out var EvlId) ? EvlId : Guid.Empty;
 
 			var assignUsers = !string.IsNullOrEmpty(assignUsersJson)
 				? JsonConvert.DeserializeObject<List<AssignUserDTO?>>(assignUsersJson)!
@@ -83,7 +84,7 @@ namespace Evaluation.API.Controllers
 
 			dto.RequestId = requestId;
 
-			return await _serviceRequestBL.HandleServiceRequestAsync(dto, planId, serviceId,actionName,fieldValuesJson,assignUsers, teamUsers, files, dto.ActionRemarks!, saveAsDraft);
+			return await _serviceRequestBL.HandleServiceRequestAsync(dto, planId, evaluationRequestId , serviceId,actionName,fieldValuesJson,assignUsers, teamUsers, files, dto.ActionRemarks!, saveAsDraft);
 		}
 
 		[HttpGet]
