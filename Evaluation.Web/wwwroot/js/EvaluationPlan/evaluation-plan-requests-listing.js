@@ -99,7 +99,7 @@
                 );
 
                 formUtility.addQueryParameter('id', requestId)
-                //formUtility.addQueryParameter('serviceId', response.serviceId)
+                formUtility.addQueryParameter('serviceId', response.serviceId)
 
                 $('#planRequestModalLabel').text(response.status || '');
                 $('#planRequestNoText').text(response.requestNumber || '');

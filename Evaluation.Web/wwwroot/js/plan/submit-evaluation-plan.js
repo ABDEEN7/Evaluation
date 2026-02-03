@@ -75,8 +75,9 @@ function $p(selector) {
             }
 
             // Add plan ID if editing an existing plan
-            if (ns.currentPlanId) {
-                evaluationData.id = ns.currentPlanId;
+            const instance = window.PlanHandler?.getInstance(fieldId);
+            if (instance?.planId) {
+                evaluationData.id = instance.planId;
             }
 
             return evaluationData;

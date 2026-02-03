@@ -193,14 +193,12 @@ public class PlanServiceRequestServices(
         return await ExecuteWithResult(async () =>
         {
             await FillSystemFields(modelDto);
-            var planId = Guid.NewGuid();
-            modelDto.Id = planId;
             Plan plan = modelDto.ToPlan();
-            plan.Id = planId;
-            plan.PlanJsonValue = JsonSerializer.Serialize(modelDto);
 
             await unitOfWork.GetRepository<Plan>().InsertAsync(plan);
-
+            await unitOfWork.CommitAsync();
+            modelDto.Id = plan.Id;
+            plan.PlanJsonValue = JsonSerializer.Serialize(modelDto);
             await InsertEvaluationRequests(plan.Id, modelDto);
             return modelDto;
         });
@@ -246,22 +244,21 @@ public class PlanServiceRequestServices(
                 .FirstAsync();
     }
     private async Task InsertEvaluationRequests(
-    Guid planId,
-    CreateEvaluationPlanDto modelDto)
+    Guid planId, CreateEvaluationPlanDto modelDto)
     {
         if (modelDto.Schools?.Any() != true)
             return;
 
-        Guid serviceId =  await uow.GetRepository<Service>()
-	                    .GetAllActiveNonDeleted(x =>
-		                    x.Initialservice == true
-		                    && x.SystemModule.DepartmentId == requestInfo.DepId
-		                    && x.SystemModule.SystemModuleType.BackendName == ModuleType.EvaluationRequest
-	                    )
-	                    .Include(x => x.SystemModule)
-		                    .ThenInclude(sm => sm.SystemModuleType)
-	                    .Select(x => x.Id)
-	                    .FirstAsync();
+        Guid serviceId = await uow.GetRepository<Service>()
+                        .GetAllActiveNonDeleted(x =>
+                            x.Initialservice == true
+                            && x.SystemModule.DepartmentId == requestInfo.DepId
+                            && x.SystemModule.SystemModuleType.BackendName == ModuleType.EvaluationRequest
+                        )
+                        .Include(x => x.SystemModule)
+                            .ThenInclude(sm => sm.SystemModuleType)
+                        .Select(x => x.Id)
+                        .FirstAsync();
 
         Guid serviceStatusId = await GetServiceStatus(serviceId);
 

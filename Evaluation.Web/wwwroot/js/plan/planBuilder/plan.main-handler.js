@@ -37,6 +37,7 @@
     function createInstanceState(fieldId) {
         return {
             fieldId: fieldId,
+            planId: null,
             isReadOnly: false,
             pageSize: TABLE_CONFIG.pageSize || 10,
             currentPage: 1,
@@ -66,7 +67,10 @@
         }
         const state = createInstanceState(fieldId);
         state.isReadOnly = isReadOnly;
-
+        //Store plan Id
+        if (planObject && planObject.id) {
+            state.planId = planObject.id;
+        }
         instances.set(fieldId, state);
 
         try {
@@ -247,6 +251,10 @@
 
     const renderPlanWithData = (fieldId, plan) => {
         const state = instances.get(fieldId);
+
+        if (plan && plan.id) {
+            state.planId = plan.id;
+        }
 
         const vm = {
             title: plan.name || '',
@@ -729,7 +737,7 @@
         const state = instances.get(fieldId);
         const $planType = $p(fieldId, 'ddlPlanType');
 
-        return {
+        const evaluationData = {
             fieldId: fieldId,
             title: $p(fieldId, 'planTitle').val(),
             planTypeId: $p(fieldId, 'ddlPlanType').val(),
@@ -742,6 +750,10 @@
                 visitTypeId: s.visitTypeId
             }))
         };
+        if (state.planId) {
+            evaluationData.id = state.planId;
+        }
+        return evaluationData;
     };
 
     const onSaveClick = (fieldId, e) => {
