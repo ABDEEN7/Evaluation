@@ -135,6 +135,10 @@ public class PlanServiceRequestServices(
         }
         return result;
     }
+    public async Task DeletePlanById(Guid id)
+    {
+        var request = await planRepository.DeletePlan(id);
+    }
     private static void ValidateSchool(SelectedSchool school,
     DateOnly planStartDate,
     DateOnly planEndDate,
@@ -206,7 +210,7 @@ public class PlanServiceRequestServices(
     {
         return await ExecuteWithResult(async () =>
         {
-            Plan plan = await unitOfWork.GetRepository<Plan>()
+            Plan? plan = await unitOfWork.GetRepository<Plan>()
                 .GetAllActiveNonDeleted(x => x.Id == modelDto.Id)
                 .FirstOrDefaultAsync();
 
@@ -223,7 +227,7 @@ public class PlanServiceRequestServices(
 
             unitOfWork.GetRepository<Plan>().Update(plan);
 
-            await ReplaceEvaluationRequests(plan.Id, modelDto);
+            await SyncEvaluationRequests(plan.Id, modelDto);
             return modelDto;
         });
     }
@@ -251,12 +255,12 @@ public class PlanServiceRequestServices(
         Guid serviceId = await uow.GetRepository<Service>()
             .GetAllActiveNonDeleted(x =>
                 x.SystemModule.SystemModuleType.BackendName == ModuleType.EvaluationRequest
-                && x.Initialservice==true)
+                && x.Initialservice == true)
             .Select(x => x.Id)
             .FirstAsync();
 
-        Guid depEvaluationType = await GetDepEvaluationType(); // i dont see this
-        Guid serviceStatusId = await GetServiceStatus(serviceId); // also i don't see this
+        Guid depEvaluationType = await GetDepEvaluationType();
+        Guid serviceStatusId = await GetServiceStatus(serviceId);
 
         var requests = modelDto.Schools.Select(school => new EvaluationRequest
         {
@@ -300,29 +304,101 @@ public class PlanServiceRequestServices(
     private async Task<Guid> GetServiceStatus(Guid serviceId)
     {
         return await unitOfWork.GetRepository<ServiceStatus>()
-            .GetAllActiveNonDeleted(x => x.ServiceId== serviceId && x.IsInitial)
+            .GetAllActiveNonDeleted(x => x.ServiceId == serviceId && x.IsInitial)
             .Select(x => x.Id)
             .FirstAsync();
     }
-	public async Task<Result<string>> GetPlanJsonById(Guid planId)
-	{
-		return await ExecuteWithResult(async () =>
-		{
-			using var scope = serviceScopeFactory.CreateScope();
+    public async Task<Result<string>> GetPlanJsonById(Guid planId)
+    {
+        return await ExecuteWithResult(async () =>
+        {
+            using var scope = serviceScopeFactory.CreateScope();
 
-			var scopedUow = scope.ServiceProvider.GetRequiredService<UnitOfWork>();
+            var scopedUow = scope.ServiceProvider.GetRequiredService<UnitOfWork>();
 
-			var json = await scopedUow.GetRepository<Plan>()
-				.GetAllActiveNonDeleted(x => x.Id == planId)
-				.Select(x => x.PlanJsonValue)
-				.FirstOrDefaultAsync();
+            var json = await scopedUow.GetRepository<Plan>()
+                .GetAllActiveNonDeleted(x => x.Id == planId)
+                .Select(x => x.PlanJsonValue)
+                .FirstOrDefaultAsync();
 
-			if (string.IsNullOrWhiteSpace(json))
-				throw new BusinessException("Plan not found");
+            if (string.IsNullOrWhiteSpace(json))
+                throw new BusinessException("Plan not found");
 
-			return json;
-		});
-	}
+            return json;
+        });
+    }
+    private async Task SyncEvaluationRequests(
+      Guid planId,
+      CreateEvaluationPlanDto modelDto)
+    {
+        var repo = unitOfWork.GetRepository<EvaluationRequest>();
+
+        var existing = await repo
+            .GetAllActiveNonDeleted(x => x.PlanId == planId)
+            .ToListAsync();
+
+      
+        if (!existing.Any())
+            return;
+
+        var incomingSchools = modelDto.Schools ?? new List<SelectedSchool>();
+
+        var existingByOrg = existing.ToDictionary(x => x.OrgTreeId);
+
+        Guid serviceId = existing.First().ServiceId; // reuse
+        Guid depEvaluationType = existing.First().DepEvaluationTypeId;
+        Guid serviceStatusId = existing.First().ServiceStatusId;
+
+        //--------------------------------------------
+        // UPDATE + INSERT
+        //--------------------------------------------
+
+        foreach (var school in incomingSchools)
+        {
+            if (existingByOrg.TryGetValue(school.Id, out var request))
+            {
+                // UPDATE ONLY IF CHANGED
+                if (request.FromDate != school.StartEvaluationDate ||
+                    request.ToDate != school.EndEvaluationDate)
+                {
+                    request.FromDate = school.StartEvaluationDate;
+                    request.ToDate = school.EndEvaluationDate;
+                    request.UpdateDate = DateTime.UtcNow;
+
+                    repo.Update(request);
+                }
+
+                // remove from dictionary so remaining = deleted
+                existingByOrg.Remove(school.Id);
+            }
+            else
+            {
+                // INSERT NEW
+                await repo.InsertAsync(new EvaluationRequest
+                {
+                    Id = Guid.NewGuid(),
+                    PlanId = planId,
+                    ServiceId = serviceId,
+                    OrgTreeId = school.Id,
+                    DepEvaluationTypeId = depEvaluationType,
+                    FromDate = school.StartEvaluationDate,
+                    ToDate = school.EndEvaluationDate,
+                    ServiceStatusId = serviceStatusId,
+                    CreateDate = DateTime.UtcNow,
+                    IsDeleted = false
+                });
+            }
+        }
+
+        //--------------------------------------------
+        // DELETE MISSING
+        //--------------------------------------------
+
+        if (existingByOrg.Any())
+        {
+            repo.DeleteRange(existingByOrg.Values);
+        }
+    }
 
 
 }

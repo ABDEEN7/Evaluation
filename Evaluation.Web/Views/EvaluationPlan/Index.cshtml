@@ -194,7 +194,30 @@
     </div>
 </div>
 
+<!-- Plan Details Modal - Minimal Container -->
+<div class="modal fade" id="PlanDetailsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen modal-dialog-scrollable">
+        <div class="modal-content">
 
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="PlanDetailsModalLabel">تفاصيل الخطة</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Modal Body - Content will be rendered by planUtility.generatePlanFields() -->
+            <div class="modal-body">
+                <!-- The plan form and details will be injected here by generatePlanFields('view') -->
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+            </div>
+
+        </div>
+    </div>
+</div>
 <div class="modal fade" id="planRequestModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-fullscreen modal-dialog-scrollable">
         <div class="modal-content">
@@ -485,7 +508,6 @@
     <script src="~/lib/datatable/buttons.html5.min.js"></script>
     <!-- Date -->
     <script src="~/plan-assets/vendor/select2/js/select2.min.js"></script>
-
         <script src="~/plan-assets/vendor/flatpickr/js/flatpickr.js"></script>
     <script src="~/vendor/flatpickr/js/ar.js"></script>
     <script src="~/vendor/flatpickr/js/index.js"></script>
@@ -520,7 +542,7 @@
     <script src="/js/form-generation-util/form.init.js"></script>
     <script src="/js/form-generation-util/form.namespace.js"></script>
     <script src="~/js/form-generation-util/evaluationparties.js"></script>
- 
+
     <script src="~/js/assignments/request-assignment-const.js"></script>
     <script src="~/js/assignments/generate-request-assignment.js"></script>
     <script src="~/js/assignments/get-request-assignments.js"></script>

@@ -53,7 +53,7 @@ window.serviceRequestForm = window.serviceRequestForm || {};
         const btnText = lang === "ar" ? actionDetails.nameAr : actionDetails.nameEn;
 
         const $btn = $('<button>')
-            .addClass('btn btn-success ms-2 btn-sm min-w-auto')
+            .addClass('btn btn-primary mw-200')
             .attr('type', 'button')
             .attr('id', 'submitButton')
             .text(btnText)
@@ -301,15 +301,15 @@ window.serviceRequestForm = window.serviceRequestForm || {};
                 { title: uiControlsSetup().GetUiControlText('lblTranslogTo'), field: "nextStatus", tooltip: true },
                 { title: uiControlsSetup().GetUiControlText('lblTranslogDate'), cssClass: 'dateClazz', field: "formattedCreatedDate" },
                 { title: uiControlsSetup().GetUiControlText('lblRemarks'),  field: "remarks" },
-                {
-                    title: uiControlsSetup().GetUiControlText('lblViewDetails'),
-                    field: "",
-                    formatter: function (cell) {
-                        const { id } = cell.getRow().getData();
-                        return getActionTransactionsTemplate(id);
-                    },
-                    cellClick: actionTransactionsCellClick
-                },
+                //{
+                //    title: uiControlsSetup().GetUiControlText('lblViewDetails'),
+                //    field: "",
+                //    formatter: function (cell) {
+                //        const { id } = cell.getRow().getData();
+                //        return getActionTransactionsTemplate(id);
+                //    },
+                //    cellClick: actionTransactionsCellClick
+                //},
             ];
         //}
 
@@ -440,21 +440,6 @@ window.serviceRequestForm = window.serviceRequestForm || {};
 
             assignmentsUtility.generateAssignments('assign');
 
-            const moveAndInit = () => {
-                const $wrapper = $('#assign_wrapper');
-                if (!$wrapper.length) return false;
-
-                $container.empty().append($wrapper);
-
-                assignmentsLogic.init('assign', requestId);
-                return true;
-            };
-
-            if (!moveAndInit()) {
-                setTimeout(() => moveAndInit(), 100);
-            }
-
-           // return; 
         }
         // ==========================================
 
@@ -490,7 +475,7 @@ window.serviceRequestForm = window.serviceRequestForm || {};
         if (showDraft) {
             const draftText = getText('lblSaveAsDraft') || 'Save as Draft';
             const $draftBtn = $('<button>')
-                .addClass('btn btn-warning btn-sm min-w-auto')
+                .addClass('btn btn-warning btn-sm min-w-auto mw-200')
                 .attr('type', 'button')
                 .text(draftText)
                 .on('click', (e) => {
@@ -518,6 +503,26 @@ window.serviceRequestForm = window.serviceRequestForm || {};
 
         
         fu.initializeFormFieldsAndConditions(groups, elementId, RENDER_TYPE.ACTION, actionTypeName);
+
+        if (actionTypeName === ACTION_TYPE.ASSIGNT_TEAM) {
+
+           
+            const moveAndInit = () => {
+                const $wrapper = $('#assign_wrapper');
+                if (!$wrapper.length) return false;
+
+                $container.empty().append($wrapper);
+
+                assignmentsLogic.init('assign', requestId, elementId);
+                return true;
+            };
+
+            if (!moveAndInit()) {
+                setTimeout(() => moveAndInit(), 100);
+            }
+
+            // return; 
+        }
     }
 
 

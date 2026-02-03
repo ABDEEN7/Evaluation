@@ -10,9 +10,11 @@ using Evaluation.DAL.Repositories;
 using Evaluation.Services.BusinessLayer.API;
 using Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices;
 using Evaluation.Services.BusinessLayer.API.PlanLayer;
+using Evaluation.Services.BusinessLayer.API.TeamMemberBL;
 using Evaluation.Services.Extensions;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Dtos.PlanDto;
+using Evaluation.SharedHelper.Dtos.TeamMemberDto;
 using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Helper;
@@ -39,11 +41,11 @@ namespace Evaluation.Services.Models.API
         IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow, SrvNotification SrvNotification, SrvUser SrvUser, 
         LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, SrvField SrvField, SrvAction SrvAction, 
         SrvStatus SrvStatus, SrvAssignment SrvAssignment, SrvDropdown SrvDropdown, SrvActionTransactionsLog SrvActionTransactionsLog, 
-        SrvService SrvService, SrvServiceRequest SrvServiceRequest, PlanServiceRequestServices planServiceRequestServices, SrvAttachments SrvAttachments, IServiceProvider serviceProvider,RequestInfo _requestInfo)
+        SrvService SrvService, AssignmentBL _assignmentBL, SrvServiceRequest SrvServiceRequest, PlanServiceRequestServices planServiceRequestServices, SrvAttachments SrvAttachments, IServiceProvider serviceProvider,RequestInfo _requestInfo)
             : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, _requestInfo)
     {
 
-		public async Task<PerforActionResponseDTO> PerformAction(ServiceRequest application, RequestType RequestType, Service serviceObj, IList<FieldValueDTO> Fields, string actionname, List<AssignUserDTO> users, string Remarks, bool saveAsDraft = false)
+		public async Task<PerforActionResponseDTO> PerformAction(ServiceRequest application, RequestType RequestType, Service serviceObj, IList<FieldValueDTO> Fields, string actionname, List<AssignUserDTO> users, List<EvalTeamRequestDto> teamUsers, string Remarks, bool saveAsDraft = false)
 		{
 			string lang = _requestInfo.Lang;
 			var result = new PerforActionResponseDTO();
@@ -138,7 +140,12 @@ namespace Evaluation.Services.Models.API
 					await SrvAssignment.PerformAssignAction(application.Id, users!);
 					await AddOrUpdateFields(Fields, RequestType, existingFields, application.Id, lang, actiondb.Id);
 					break;
-
+				case ActionTypeKeys.ASSIGNT_TEAM:
+					await _assignmentBL.AddedRequestAssignment(
+						application.Id,
+						teamUsers
+					);
+					break;
 				case ActionTypeKeys.Approve_And_Assign:
 					await SrvAssignment.PerformAssignAction(application.Id, users!);
 					await ApproveUneditedFieldsAsync(application.ServiceId, RequestType, application.Id, FieldsToUpdates, existingFields, Fields, lang, actiondb.Id);

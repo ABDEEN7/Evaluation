@@ -5,6 +5,7 @@ using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Dtos.PlanDto;
 using Evaluation.SharedHelper.Models;
 using FluentResults;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Evaluation.Services.BusinessLayer.API;
@@ -21,12 +22,16 @@ public class EvaluationServiceRequestBL(IServiceScopeFactory serviceScopeFactory
 
         var evaluationServiceRequest = await serviceRequestService.GetEvaluationServiceRequestById(evaluationRequestCalenderDto.Id);
 
-        evaluationServiceRequest.VisitDateFrom= DateTime.Parse(evaluationRequestCalenderDto.Start);
+        evaluationServiceRequest.VisitDateFrom = DateTime.Parse(evaluationRequestCalenderDto.Start);
         evaluationServiceRequest.VisitDateTo = DateTime.Parse(evaluationRequestCalenderDto.End);
 
         await serviceRequestService.UpdateEvaluationServiceRequest(evaluationServiceRequest);
 
         return evaluationRequestCalenderDto;
     }
-
+    public async Task<bool> DeleteEvaluationRequest(Guid evaluationRequest)
+    {
+        var evalRequest = await serviceRequestService.DeleteEvaluationEvaluationRequestById(evaluationRequest);
+        return true;
+    }
 }

@@ -12,6 +12,7 @@ using Evaluation.Services.BusinessLayer.API;
 using Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices;
 using Evaluation.Services.Extensions;
 using Evaluation.Services.Special;
+using Evaluation.SharedHelper.Dtos.TeamMemberDto;
 using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Helper;
@@ -61,7 +62,7 @@ namespace Evaluation.Services.Models.API
 			return await _evaluationRequestService.GetEvaluationDetailsAsync(requestId);
 		}
 		public async Task<ServiceRequestDTO> HandleServiceRequestAsync(ActionFormDTO? actionFormDTO, Guid? planId,
-			Guid serviceId, string actionName, string fieldValuesJson, List<AssignUserDTO?> assignUsers,
+			Guid serviceId, string actionName, string fieldValuesJson, List<AssignUserDTO?> assignUsers, List<EvalTeamRequestDto> teamUsers,
 			IFormFileCollection files, string remarks, bool saveAsDraft = false)
 		{
 			string lang = _requestInfo.Lang;
@@ -145,7 +146,7 @@ namespace Evaluation.Services.Models.API
 
 				resultRequest!.Id = request.Id;
 
-				var actionResult = await _performActionBL.PerformAction(request, requestType, serviceObj, actionFormDTO!.FieldValues!, action.BackendName, assignUsers.Where(c => c!.IsSelected).ToList()!, remarks, saveAsDraft);
+				var actionResult = await _performActionBL.PerformAction(request, requestType, serviceObj, actionFormDTO!.FieldValues!, action.BackendName, assignUsers.Where(c => c!.IsSelected).ToList()!,null, remarks, saveAsDraft);
 
 				var otherAttachmentsTask = _srvAttachments.UploadAndInsertOtherAttachments(othersAttachement, actionResult.actionlog,requestType,requestId, request.EvaluationRequestId);
 				var sequence = request.Sequence;
@@ -205,7 +206,7 @@ namespace Evaluation.Services.Models.API
 
 				actionFormDTO!.FieldValues = (await _srvAttachments.UploadAndInsertAttachments(validatedFields.ToList(),requestType, requestId, application.EvaluationRequestId, fileFields, filesWithFieldId)).Cast<FieldValueDTO?>().ToList();
 
-				var actionResult = await _performActionBL.PerformAction(application, requestType,serviceObj, actionFormDTO.FieldValues!, actionName, assignUsers.Where(c => c!.IsSelected).ToList()!, remarks, saveAsDraft);
+				var actionResult = await _performActionBL.PerformAction(application, requestType,serviceObj, actionFormDTO.FieldValues!, actionName, assignUsers.Where(c => c!.IsSelected).ToList()!, teamUsers, remarks, saveAsDraft);
 
 				var otherAttachments = await _srvAttachments.UploadAndInsertOtherAttachments(othersAttachement, actionResult.actionlog,requestType, application.Id, application.EvaluationRequestId);
 

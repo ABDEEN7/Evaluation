@@ -34,7 +34,10 @@ window.serviceRequestForm = window.serviceRequestForm || {};
             }
         }
     }
-    const getRequestId = () => getUrlParam("id");
+    const getRequestId = () => {
+        const id = getUrlParam("id");
+        return id ? id : getUrlParam("Evlid");
+    };
     const getPlanId = () => getUrlParam("PlanId") || getUrlParam("PlanId");
 
     const normalizeFormGroups = (formGroups) => {
@@ -109,6 +112,13 @@ window.serviceRequestForm = window.serviceRequestForm || {};
                     value = planObj ? JSON.stringify(planObj) : null;
                     break;
                 }
+
+                case "evl_form": {
+                    
+                    const formObj = evaluationFormResult(field.formId);
+                    value = formObj ? JSON.stringify(formObj) : null;
+                    break;
+                }
                 case "datetime":
                 case "date":
                 case "phone":
@@ -169,7 +179,7 @@ window.serviceRequestForm = window.serviceRequestForm || {};
     // ================================
     function buildFormData(actionDetails, formGroups, renderType) {
         const formData = new FormData();
-
+        let actionTypeName = actionDetails.actionType.backEndName;
         const { fields, valuesMap } = collectFieldValues(formGroups, renderType);
 
         const payloadFields = fields.map(f => ({
@@ -182,7 +192,13 @@ window.serviceRequestForm = window.serviceRequestForm || {};
 
         formData.append("fieldValues", JSON.stringify(payloadFields));
 
-        // formData.append("users", JSON.stringify(assignUsers));
+        if (actionTypeName === ACTION_TYPE.ASSIGNT_TEAM) {
+            const teamData = getAssignmentsDataByFieldId('assign');
+            if (!teamData) return { formData, ok: false };
+            formData.append("teamUsers", JSON.stringify(teamData));
+
+        }
+        
 
          //formData.append("ActionRemarks", remarksValue);
 
