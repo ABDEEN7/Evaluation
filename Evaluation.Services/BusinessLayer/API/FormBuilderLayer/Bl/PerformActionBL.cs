@@ -8,11 +8,13 @@ using Evaluation.DAL.Models.SystemLog;
 using Evaluation.DAL.Models.UserEntiy;
 using Evaluation.DAL.Repositories;
 using Evaluation.Services.BusinessLayer.API;
+using Evaluation.Services.BusinessLayer.API.EvaluationForm;
 using Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices;
 using Evaluation.Services.BusinessLayer.API.PlanLayer;
 using Evaluation.Services.BusinessLayer.API.TeamMemberBL;
 using Evaluation.Services.Extensions;
 using Evaluation.Services.Special;
+using Evaluation.SharedHelper.Dtos.EvalFormDto;
 using Evaluation.SharedHelper.Dtos.PlanDto;
 using Evaluation.SharedHelper.Dtos.TeamMemberDto;
 using Evaluation.SharedHelper.Enums;
@@ -41,7 +43,7 @@ namespace Evaluation.Services.Models.API
         IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow, SrvNotification SrvNotification, SrvUser SrvUser, 
         LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, SrvField SrvField, SrvAction SrvAction, 
         SrvStatus SrvStatus, SrvAssignment SrvAssignment, SrvDropdown SrvDropdown, SrvActionTransactionsLog SrvActionTransactionsLog, 
-        SrvService SrvService, AssignmentBL _assignmentBL, SrvServiceRequest SrvServiceRequest, PlanServiceRequestServices planServiceRequestServices, SrvAttachments SrvAttachments, IServiceProvider serviceProvider,RequestInfo _requestInfo)
+        SrvService SrvService, AssignmentBL _assignmentBL, EvaluationFormBL _EvaluationFormBL ,SrvServiceRequest SrvServiceRequest, PlanServiceRequestServices planServiceRequestServices, SrvAttachments SrvAttachments, IServiceProvider serviceProvider,RequestInfo _requestInfo)
             : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, _requestInfo)
     {
 
@@ -189,12 +191,6 @@ namespace Evaluation.Services.Models.API
 						{
 
 						}
-						//var dto = Newtonsoft.Json.JsonConvert.DeserializeObject<CreateEvaluationPlanDto>(planField.Value.ToString());
-						
-
-						//						var dto = JsonConvert.DeserializeObject<CreateEvaluationPlanDto>(
-						//	planField.Value.ToString()
-						//);
 						
 						break;
 					}
@@ -242,6 +238,34 @@ namespace Evaluation.Services.Models.API
 
 						break;
 					}
+				case ActionTypeKeys.CLOSE_AND_UPDATE_FORM:
+					{
+						if (FieldsToUpdates.Count > 0)
+						{
+							var updatedFields = await PrepareAndUpdateFields(application.ServiceId,RequestType,application.Id,FieldsToUpdates,existingFields,lang,actiondb.Id);
+
+							existingFields.AddRange(updatedFields);
+						}
+
+						var FormField = existingFields
+							.Where(x => x.IsApproved)
+							.FirstOrDefault(x =>
+								x.Field?.FieldType?.BackendName == FieldTypeConstant.Evl_Form &&
+								!string.IsNullOrWhiteSpace(x.Value)
+							);
+
+						if (FormField == null)
+							break;
+
+
+						var dto = JsonConvert.DeserializeObject<EvaluationFormDto>(FormField.Value);
+
+						if (dto == null) throw new BusinessException("Invalid Evaluation Plan data");
+
+						await _EvaluationFormBL.SaveEvaluationForm(dto);
+
+						break;
+					}
 				case ActionTypeKeys.CLOSE_AND_DELETE_PLAN:
 					{
 						if (FieldsToUpdates.Count > 0)
@@ -274,6 +298,7 @@ namespace Evaluation.Services.Models.API
 
 						break;
 					}
+
 				//case ActionTypeKeys.CloseAndUpdate:
 				//	if (FieldsToUpdates.Count > 0)
 				//	{
