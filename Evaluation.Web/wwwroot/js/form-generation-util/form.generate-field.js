@@ -174,7 +174,7 @@ var formGenerateFieldUtility = window.formUtility;
 
                 const controlValues = (typeof field.value === 'object' && field.value?.items) ? field.value : null;
 
-                await initializeControls(formId, field.fieldId, controlValues);
+                await initializeControls(formId, fieldId, controlValues);
 
             } catch (err) {
                 console.error('evl_Form render failed:', err);

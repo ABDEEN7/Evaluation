@@ -4,7 +4,7 @@
 const params = new URLSearchParams(window.location.search);
 let depRoutePath = sharedUtility().extractDepartmentName();
 
-let matrixValues = [];
+//let matrixValues = [];
 let itemsResult = [];
 
 const SELECTORS = {
@@ -84,7 +84,7 @@ const buildNote = ({ id }, fieldId, readOnly) => `
 // Row Builders
 // ==============================
 const createToggleButton = (collapseId) => `
-<button class="btn btn-sm"
+<button type="button" class="btn btn-sm"
         data-bs-toggle="collapse"
         data-bs-target="#${collapseId}">
     <i class="la la-plus"></i>
@@ -288,7 +288,7 @@ const relatedItemPopup = (rowsHtml) => `<div class="modal fade" id="RealatedItem
 // Initialize Controls
 // ==============================
 async function initializeControls(formId, fieldId, controlValues) {
-    var formId = 'b8fb67a9-b09a-4e0c-a466-d0625d92521d'
+    //var formId = 'b8fb67a9-b09a-4e0c-a466-d0625d92521d'
     const matrixResponse = await jqClient().Get(`/Form/${depRoutePath}/GetFormEvalMarixValues?formId=${formId}`);
 
     const items = itemsResult?.value ?? [];
@@ -346,9 +346,11 @@ async function initializeControls(formId, fieldId, controlValues) {
         );
     });
 
+    const table = buildHorizontalTable(matrixValues);
 
-    document.getElementById("index-table")
-        .appendChild(buildHorizontalTable(matrixValues));
+    const container = document.getElementById("index-table");
+
+    container.appendChild(table);
 }
 
 
