@@ -9,4 +9,5 @@ public class SelectedSchool : BaseDto
     public Guid VisitTypeId { get; set; }
     public string? Name { get; set; }
     public string Rating { get; set; }
+    public bool IsSelected { get; set; } = true;
 }
