@@ -212,10 +212,35 @@
             const el = document.getElementById("CreateRequestModal");
             const modal = bootstrap.Modal.getOrCreateInstance(el);
             modal.show();
+
+            const serviceName = createPlanRequestService.name;
+
+            const headerEl = document.getElementById("CreateRequestModalLabel");
+            if (headerEl) headerEl.textContent = serviceName ? " - " + serviceName : "";
+
+            const actions = createPlanRequestService.actions || [];
+
+            const initialActions = actions.filter(a => a.isInitialAction === true);
+
+            if (initialActions.length === 1) {
+                const firstAction = initialActions[0];
+                initialAction = firstAction?.bakendName || initialAction;
+
+                $("#ActionsDropDown").hide();
+                $("label[for='ActionsDropDown']").hide();
+
+                await RenderActionFields(createPlanRequestService.serviceRequestDTO);
+            } else {
+                $("#ActionsDropDown").show();
+                $("label[for='ActionsDropDown']").show();
+                fillActionDropDown(actions);
+            }
+
         } catch (err) {
             console.error("InitializeCreatePlanRequestService error:", err);
         }
     };
+
     /* =========================
    * VIEW PLAN DETAILS - MINIMAL VERSION
    * ========================= */
