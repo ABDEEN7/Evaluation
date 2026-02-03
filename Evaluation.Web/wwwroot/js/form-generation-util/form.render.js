@@ -107,7 +107,7 @@ window.serviceRequestForm = window.serviceRequestForm || {};
         const actionModalId = ctx.actionModalId || 'actionModal';
         const actionModalRoot = $('#' + actionModalId);
 
-        serviceId = getServiceId();
+        //serviceId = getServiceId();
         requestId = getRequestId();
 
         const isEvaluationRequest = true;
@@ -174,7 +174,7 @@ window.serviceRequestForm = window.serviceRequestForm || {};
     };
 
 
-    const renderActionsDropDown = (actions, containerId, templateContainerId, modalContainer, requestIdOverride, serviceIdOverride, ctx = {}) => {
+    const renderActionsDropDown = (serviceId,actions, containerId, templateContainerId, modalContainer, requestIdOverride, serviceIdOverride, ctx = {}) => {
 
         const root = ctx.root ? $(ctx.root) : $(document);
 
@@ -187,7 +187,7 @@ window.serviceRequestForm = window.serviceRequestForm || {};
         if (!actions?.length) return;
 
         const resolvedRequestId = requestIdOverride || null;
-        const resolvedServiceId = serviceIdOverride || null;
+        const resolvedServiceId = serviceId || null;
 
         const renderDropdownUI = () => {
             const dropdownWrapper = $('<div>').addClass('dropdown');
@@ -375,6 +375,7 @@ window.serviceRequestForm = window.serviceRequestForm || {};
     function renderPreviewView(elementId, formGroups, actions, actionTransactions, attachments, ctx = {}) {
 
         const root = ctx.root ? $(ctx.root) : $(document);
+        const serviceId = ctx.serviceId ;
 
         const groups = normalizeFormGroups(formGroups);
         const $container = root.find("#" + elementId);
@@ -396,7 +397,7 @@ window.serviceRequestForm = window.serviceRequestForm || {};
         const modalContainerId = ctx.modalContainerId || 'Action-container-fields';
 
         if (actions.length > 0 ) {
-            renderActionsDropDown( actions,actionsContainerId,templateContainerId,modalContainerId,ctx.requestId,ctx.serviceId, ctx );
+            renderActionsDropDown(serviceId,actions,actionsContainerId,templateContainerId,modalContainerId,ctx.requestId,ctx.serviceId, ctx );
         } else {
             root.find(`#${actionsContainerId}`).empty();
             root.find(`#${templateContainerId}`).empty();

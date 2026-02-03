@@ -36,7 +36,7 @@ window.serviceRequestForm = window.serviceRequestForm || {};
     }
     const getRequestId = () => {
         const id = getUrlParam("id");
-        return id ? id : getUrlParam("Evlid");
+        return id ? id : getUrlParam("1Evlid");
     };
     const getEvlRequestId = () => {
         const id = getUrlParam("Evlid");
