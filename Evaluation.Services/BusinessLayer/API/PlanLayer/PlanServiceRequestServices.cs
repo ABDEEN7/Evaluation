@@ -263,7 +263,6 @@ public class PlanServiceRequestServices(
 	                    .Select(x => x.Id)
 	                    .FirstAsync();
 
-		Guid depEvaluationType = await GetDepEvaluationType();
         Guid serviceStatusId = await GetServiceStatus(serviceId);
 
         var requests = modelDto.Schools.Select(school => new EvaluationRequest
@@ -272,7 +271,7 @@ public class PlanServiceRequestServices(
             PlanId = planId,
             ServiceId = serviceId,
             OrgTreeId = school.Id,
-            DepEvaluationTypeId = depEvaluationType,
+            DepEvaluationTypeId = school.VisitTypeId,
             FromDate = school.StartEvaluationDate,
             ToDate = school.EndEvaluationDate,
             ServiceStatusId = serviceStatusId,
@@ -297,13 +296,6 @@ public class PlanServiceRequestServices(
             repo.DeleteRange(existing);
 
         await InsertEvaluationRequests(planId, modelDto);
-    }
-    private async Task<Guid> GetDepEvaluationType()
-    {
-        return await unitOfWork.GetRepository<DepEvaluationType>()
-            .GetAllActiveNonDeleted(x => x.DepartmentId == requestInfo.DepId)
-            .Select(x => x.Id)
-            .FirstAsync();
     }
     private async Task<Guid> GetServiceStatus(Guid serviceId)
     {
@@ -341,7 +333,7 @@ public class PlanServiceRequestServices(
             .GetAllActiveNonDeleted(x => x.PlanId == planId)
             .ToListAsync();
 
-      
+
         if (!existing.Any())
             return;
 
@@ -350,7 +342,6 @@ public class PlanServiceRequestServices(
         var existingByOrg = existing.ToDictionary(x => x.OrgTreeId);
 
         Guid serviceId = existing.First().ServiceId; // reuse
-        Guid depEvaluationType = existing.First().DepEvaluationTypeId;
         Guid serviceStatusId = existing.First().ServiceStatusId;
 
         //--------------------------------------------
@@ -363,12 +354,12 @@ public class PlanServiceRequestServices(
             {
                 // UPDATE ONLY IF CHANGED
                 if (request.FromDate != school.StartEvaluationDate ||
-                    request.ToDate != school.EndEvaluationDate)
+                    request.ToDate != school.EndEvaluationDate || request.DepEvaluationTypeId != school.VisitTypeId)
                 {
                     request.FromDate = school.StartEvaluationDate;
                     request.ToDate = school.EndEvaluationDate;
                     request.UpdateDate = DateTime.UtcNow;
-
+                    request.DepEvaluationTypeId = school.VisitTypeId;
                     repo.Update(request);
                 }
 
@@ -384,7 +375,7 @@ public class PlanServiceRequestServices(
                     PlanId = planId,
                     ServiceId = serviceId,
                     OrgTreeId = school.Id,
-                    DepEvaluationTypeId = depEvaluationType,
+                    DepEvaluationTypeId = school.VisitTypeId,
                     FromDate = school.StartEvaluationDate,
                     ToDate = school.EndEvaluationDate,
                     ServiceStatusId = serviceStatusId,
