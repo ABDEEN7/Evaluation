@@ -2,7 +2,7 @@
 // Globals & Constants
 // ==============================
 const params = new URLSearchParams(window.location.search);
-//let departmentRoutePath = sharedUtility().extractDepartmentName();
+let depRoutePath = sharedUtility().extractDepartmentName();
 
 let matrixValues = [];
 let itemsResult = [];
@@ -40,9 +40,9 @@ const generateFormAccordionItem = (rowsHtml, hasAnyNote) => `
 <div class="accordion-item mb-3 rounded">
     <div id="item3" class="accordion-collapse collapse show">
         <div class="accordion-body">
-        <div id="index-table" class="table table-bordered text-center align-middle"></div>
-            <table class="table table-bordered text-center align-middle">
-                <thead class="table-grey">
+        <div id="index-table" class=""></div>
+            <table class="table table-bordered table-hover align-middle w-100 dataTable no-footer">
+                <thead class="table-light">
                     <tr>
                         <th></th>
                         <th>#</th>
@@ -191,6 +191,10 @@ function buildHorizontalTable(data) {
     const table = document.createElement("table");
     table.border = "1";
     table.style.borderCollapse = "collapse";
+    table.className = "table table-bordered table-hover align-middle w-100 dataTable no-footer";
+
+    const tHeadnameRow = document.createElement("thead");
+    tHeadnameRow.className = 'table-light';
 
     const nameRow = document.createElement("tr");
     const rangeRow = document.createElement("tr");
@@ -198,9 +202,9 @@ function buildHorizontalTable(data) {
     // Row 1: Names
     const nameCell = document.createElement("th");
     nameCell.textContent = "Name";
-    nameCell.className = 'table-grey';
+    //nameCell.className = 'table-grey';
     nameRow.appendChild(nameCell);
-
+    tHeadnameRow.appendChild(nameRow);
     // Row 2: Range
     const rangeCell = document.createElement("td");
     rangeCell.textContent = `Range`;
@@ -210,8 +214,9 @@ function buildHorizontalTable(data) {
         // Row 1: Names
         const nameCell = document.createElement("th");
         nameCell.textContent = item.name;
-        nameCell.className = 'table-grey';
+        //nameCell.className = 'table-grey';
         nameRow.appendChild(nameCell);
+        tHeadnameRow.appendChild(nameRow);
 
         // Row 2: Min - Max
         const rangeCell = document.createElement("td");
@@ -219,7 +224,7 @@ function buildHorizontalTable(data) {
         rangeRow.appendChild(rangeCell);
     });
 
-    table.appendChild(nameRow);
+    table.appendChild(tHeadnameRow);
     table.appendChild(rangeRow);
 
     return table;
@@ -229,7 +234,7 @@ function buildHorizontalTable(data) {
 // Page Generator 
 // ==============================
 const generateFullFormPageHtml = async ({ formId, fieldId, readOnly }) => {
-    itemsResult = await jqClient().Get(`/Form/${departmentRoutePath}/GetItems?formId=${formId}`);
+    itemsResult = await jqClient().Get(`/Form/${depRoutePath}/GetItems?formId=${formId}`);
     const items = itemsResult?.value ?? [];
 
     const hasAnyNote = items.some(i => i.hasNote);
@@ -284,7 +289,7 @@ const relatedItemPopup = (rowsHtml) => `<div class="modal fade" id="RealatedItem
 // ==============================
 async function initializeControls(formId, fieldId, controlValues) {
     var formId = 'b8fb67a9-b09a-4e0c-a466-d0625d92521d'
-    const matrixResponse = await jqClient().Get(`/Form/${departmentRoutePath}/GetFormEvalMarixValues?formId=${formId}`);
+    const matrixResponse = await jqClient().Get(`/Form/${depRoutePath}/GetFormEvalMarixValues?formId=${formId}`);
 
     const items = itemsResult?.value ?? [];
     const matrixValues = matrixResponse?.value ?? matrixResponse ?? [];
