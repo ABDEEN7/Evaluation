@@ -248,7 +248,7 @@ public class PlanRequestRepository(IServiceScopeFactory serviceScopeFactory, Srv
                     .Distinct()
                     .Count()
             })
-            .OrderByDescending(x => x.Id);
+            .OrderByDescending(x => x.StartDate);
 
         var finalResult = await query.GetPaginatedResult(request.PageNumber, request.PageSize = 10);
 
