@@ -21,6 +21,7 @@ public class PlanController(MasterBL masterBL) : ControllerBase
         return Ok(new { success = true });
     }
 
+
     [HttpGet]
     //[CheckRolePermisionFilter(true, ConstantKeys.WebPermission.GET_SEMESTERS_REQUEST)]
     public async Task<IActionResult> GetSemesters()
@@ -46,8 +47,8 @@ public class PlanController(MasterBL masterBL) : ControllerBase
         return Ok(new { result = plan });
     }
 
-    [HttpPost]
-    public async Task<IActionResult> GetPlans(PlanDetailsRequestDto request)
+    [HttpGet]
+    public async Task<IActionResult> GetPlans([FromQuery] PlanDetailsRequestDto request)
     {
         var result = Ok(await masterBL
             .GetApiService<PlanServiceRequestServices>()

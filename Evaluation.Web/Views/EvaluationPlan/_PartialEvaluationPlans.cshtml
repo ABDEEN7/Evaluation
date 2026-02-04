@@ -12,18 +12,21 @@
 				<option value="">الكل</option>
 			</select>
 		</div>
-
 		<div class="col-md-4">
 			<label>اسم المدرسة</label>
 			<input type="text" id="schoolName" class="form-control" />
 		</div>
-
 		<div class="col-md-4 d-flex align-items-end justify-content-end">
-			<button id="searchPlansBtn" class="btn btn-primary">بحث</button>
+			<button id="filterPlanBtnId" class="btn btn-primary">بحث</button>
+			<button id="clearFilterPlanBtnId" class="btn btn-outline-secondary">
+				مسح
+			</button>
 		</div>
+
 	</div>
 </div>
-<div class="btn-group" role="group" aria-label="View mode">
+
+<div class="btn-group mb-3" role="group" aria-label="View mode">
 	<button id="cardViewEvaluationPlans" type="button" class="btn btn-outline-primary active">
 		<i class="la la-th-large"></i> عرض كبطاقات
 	</button>
@@ -31,26 +34,21 @@
 		<i class="la la-list"></i> عرض كجدول
 	</button>
 </div>
+
 <div class="row">
-	<div id="card-container"></div>
-
-	<div  class="table-responsive col-md-12">
-<div class="table-responsive">
-			<table class="table table-striped table-bordered w-100 application-request car" id="evaluationPlansTable">
-		<thead>
-			<tr>
-				@* <th>رقم الخطة</th> *@
-				<th>اسم الخطة</th>
-				<th>عدد المدارس</th>
-				<th>الفترة</th>
-				<th>الحالة</th>
-				<th>عرض</th>
-				<th>إجراءات</th>
-			</tr>
-		</thead>
-				<tbody class="requeststableBody"></tbody>
-	</table>
-
-</div>
-</div>
+	<div class="col-md-12">
+		<table class="table table-striped table-bordered w-100 application-request card" id="evaluationPlansTable">
+			<thead>
+				<tr>
+					<th>اسم الخطة</th>
+					<th>عدد المدارس</th>
+					<th>الفترة</th>
+					<th>الحالة</th>
+					<th>عرض</th>
+					<th>إجراءات</th>
+				</tr>
+			</thead>
+			<tbody class="requeststableBody"></tbody>
+		</table>
+	</div>
 </div>

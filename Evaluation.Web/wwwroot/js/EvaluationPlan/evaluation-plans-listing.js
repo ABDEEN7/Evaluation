@@ -48,16 +48,23 @@
      * FILTER OBJECT
      * ========================= */
     function getPlansFilter() {
-        return {
-            YearId: $('#planYearFilter').val(),
-            schoolName: $('#schoolName').val()
-        };
+
+        const yearId = $('#planYearFilter').val();
+        const schoolName = $('#schoolName').val();
+
+        const filters = {};
+
+        if (yearId) filters.yearId = yearId;
+        if (schoolName) filters.schoolName = schoolName;
+
+        return filters;
     }
+
 
     /* =========================
      * INITIALIZE LISTING
      * ========================= */
-    const plansListing = evaluationListing.createListing({
+    const plansListing = getevaluationListing.createListing({
         tableId: 'evaluationPlansTable',
         ajaxUrl: `/Plan/${departmentRoutePath}/GetPlans`,
         getFilterInput: getPlansFilter,
@@ -71,11 +78,13 @@
         tableViewBtnId: 'tblViewEvaluationPlans',
         rowClass: 'plan-row',
 
-        onAjaxSuccess: function (response) {
+        // Transform API response to match expected format
+        transformResponse: function (response) {
+            // API returns { items: [...], totalCount: 24 }
+            // Common listing expects { data: [...], totalDataCount: ... }
             return {
-                data: response.items || response.data || [],
-                totalDataCount: response.totalCount || response.totalDataCount || 0,
-                TotalDataCount: response.totalCount || response.TotalDataCount || 0
+                data: response.items || [],
+                totalDataCount: response.totalCount || 0
             };
         },
 
