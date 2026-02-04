@@ -1165,6 +1165,7 @@ public static class ConstantKeys
         public const string INFO_WITH_DRAFT = "INFO_WITH_DRAFT";
         public const string CLOSE_AND_DELETE_PLAN = "CLOSE_AND_DELETE_PLAN";
         public const string CLOSE_AND_UPDATE_PLAN = "CLOSE_AND_UPDATE_PLAN";
+        public const string CLOSE_AND_UPDATE_FORM = "CLOSE_AND_UPDATE_FORM";
     }
 
     public static class ServiceSettings
