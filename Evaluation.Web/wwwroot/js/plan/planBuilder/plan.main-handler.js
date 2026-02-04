@@ -260,8 +260,8 @@
             title: plan.name || '',
             planTypeId: plan.planTypeDepId || plan.PlanTypeDepId,
             semesterId: plan.semesterId,
-            dateRange: plan.startDate && plan.endDate ?
-                `${plan.startDate} to ${plan.endDate}` : '',
+            dateRange: toDateOnly(plan.startDate) && (plan.endDate) ?
+                `${toDateOnly(plan.startDate)} to ${toDateOnly(plan.endDate)}` : '',
             schools: plan.schools || []
         };
 
@@ -832,5 +832,10 @@
 
         return obj;
     };
+    function toDateOnly(dateString) {
+        if (!dateString) return null;
+
+        return new Date(dateString).toISOString().split('T')[0];
+    }
 
 })(window);
