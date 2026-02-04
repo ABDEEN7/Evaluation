@@ -153,11 +153,7 @@ var formGenerateFieldUtility = window.formUtility;
 
         (async () => {
             try {
-                const formId =
-                    field.formId ||
-                    field.attributes?.find(a => (a.name || '').toLowerCase() === 'formid')?.value ||
-                    field.value?.formId ||
-                    field.value || null;
+                const formId =field.formId ;
 
                 //if (!formId) {
                 //    container.html(`<div class="text-danger">Missing formId for evl_Form.</div>`);
@@ -172,7 +168,7 @@ var formGenerateFieldUtility = window.formUtility;
 
                 container.html(html);
 
-                const controlValues = (typeof field.value === 'object' && field.value?.items) ? field.value : null;
+                const controlValues = JSON.parse(field.value);
 
                 await initializeControls(formId, fieldId, controlValues);
 

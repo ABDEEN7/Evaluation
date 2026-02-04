@@ -118,8 +118,8 @@ window.serviceRequestForm = window.serviceRequestForm || {};
                 }
 
                 case "evl_form": {
-                    
-                    const formObj = evaluationFormResult(field.formId);
+
+                    const formObj = saveForm(field.formId);
                     value = formObj ? JSON.stringify(formObj) : null;
                     break;
                 }

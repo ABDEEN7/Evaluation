@@ -443,24 +443,11 @@ window.formUtility = window.formUtility || {};
                     break;
                 }
 
-                //case 'evl_form': {
+                case 'evl_form': {
 
 
-                //    (async () => {
-                //        try {
-                //            const fieldId = `${prefield}${field.fieldId}`;
-                //            const controlValues = (typeof field.value === 'object' && field.value?.items) ? field.value : null;
-
-                //          await initializeControls(field.formId, fieldId, controlValues);
-                //        } catch (err) {
-                //            console.error('evl_Form render failed:', err);
-                //            container.html(`<div class="text-danger">Failed to load evaluation form.</div>`);
-                //        }
-                //    })();
-
-                   
-                //    break;
-                //}
+                    break;
+                }
                 default: {
                     const calcAgeAttr = field.attributes?.find(attr => attr.name.trim().toLowerCase() === 'calcage');
                     if (calcAgeAttr) {

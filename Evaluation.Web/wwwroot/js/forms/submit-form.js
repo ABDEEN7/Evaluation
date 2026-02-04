@@ -1,4 +1,4 @@
-﻿//let departmentRoutePath = sharedUtility().extractDepartmentName();
+﻿let departmentPath = sharedUtility().extractDepartmentName();
 
 $(document).ready(function () {
     $("#btnSubmitForm").on("click", function (e) {
@@ -98,13 +98,14 @@ function validateForm(formId) {
         .done((res) => {
 
             if (res.value.isValid) {
-                saveForm(formId);
+                return res.value.isValid;
             }
             else {
                 clearValidation();
                 res.value.errors.forEach(error => {
                     showValidation(error.itemId, error.message, error.itemPropertyType);
                 });
+                return res.value.isValid;
             }
         });
 }

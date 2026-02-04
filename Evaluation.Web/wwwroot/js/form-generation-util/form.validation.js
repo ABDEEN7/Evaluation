@@ -325,6 +325,12 @@ window.formUtility = window.formUtility || {};
         }
         return errors;
     };
+
+
+    const validateForm = (field, fieldValue) => {
+        validateForm(field.formId)
+        return errors;
+    };
     // #endregion
 
     // #region ===============  Date Attribute Validation
@@ -640,6 +646,8 @@ window.formUtility = window.formUtility || {};
         textarea: validateTextareaLength,
         list: validateList,
         //'evaluationPlan': validateEvaluationPlanField,
+        evl_form: validateForm,
+}
     };
     // #endregion
 

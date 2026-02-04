@@ -655,6 +655,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 				.Select(c => new
 				{
 					c.FieldId,
+					c.Field.EvalFormId,
 					c.Value,
 					Type = c.Field!.DropDownTypeId != null ? "text" : c.Field!.FieldType!.NameEn, // Convert type to "text" if dropdown
 					c.Field.FormGroupId,
@@ -769,6 +770,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 				return new FieldValueDTO
 				{
 					FieldId = c.FieldId,
+					formId = c.EvalFormId,
 					Value = fieldValue,
 					Type = c.Type,
 					FormGroupId = c.FormGroupId,

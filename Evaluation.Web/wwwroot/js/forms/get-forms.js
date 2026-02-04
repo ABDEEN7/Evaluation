@@ -333,7 +333,7 @@ async function initializeControls(formId, fieldId, controlValues) {
             : itemValueMap.get(itemId);
 
         if (valueSource) {
-            select.value = valueSource.value ?? "";
+            select.value = valueSource.valueId ?? "";
             if (note) note.value = valueSource.note ?? "";
         }
     }
