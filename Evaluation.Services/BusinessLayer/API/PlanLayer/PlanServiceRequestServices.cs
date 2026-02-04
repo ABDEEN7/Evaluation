@@ -194,9 +194,7 @@ public class PlanServiceRequestServices(
         {
             await FillSystemFields(modelDto);
             Plan plan = modelDto.ToPlan();
-
-            await unitOfWork.GetRepository<Plan>().InsertAsync(plan);
-            await unitOfWork.CommitAsync();
+            await unitOfWork.GetRepository<Plan>().InsertAsync(plan, false);
             modelDto.Id = plan.Id;
             plan.PlanJsonValue = JsonSerializer.Serialize(modelDto);
             await InsertEvaluationRequests(plan.Id, modelDto);
