@@ -19,7 +19,7 @@ public class CreateEvaluationPlanDto
     {
         return new Plan
         {
-            Id = Id,
+            Id = Guid.NewGuid(),
             PlanName = Name,
             StartDate = DateOnly.FromDateTime(StartDate),
             EndDate = DateOnly.FromDateTime(EndDate),
