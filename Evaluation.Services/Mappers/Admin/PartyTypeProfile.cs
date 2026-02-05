@@ -18,7 +18,7 @@ namespace Evaluation.Services.Mappers.Admin
                 .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => src.IsDeleted))
                  .ForMember(dest => dest.UpdateBy, opt => opt.MapFrom<UserProfileResolver, Guid?>(src => src.UpdateById.HasValue ? src.UpdateById : src.CreateById))
                 .ForMember(dest => dest.UpdateDate, opt => opt.MapFrom(src => src.UpdateDate.HasValue ? src.UpdateDate.Value.ToString("yyyy-MM-dd hh:mm:ss tt") : src.CreateDate.ToString("yyyy-MM-dd hh:mm:ss tt")))
-                .ForMember(dest => dest.SystemModule, opt => opt.MapFrom<PartyTypeSystemModuleResolver, Guid?>(src => src.SystemModuleId))
+                .ForMember(dest => dest.Department, opt => opt.MapFrom<PartyTypeSystemModuleResolver, Guid?>(src => src.DepartmentId))
                 .ForMember(dest => dest.UserPartyType,
            opt => opt.MapFrom<UserPartyTypeResolver>());
 
@@ -40,11 +40,11 @@ namespace Evaluation.Services.Mappers.Admin
         public string? Resolve(object source, object destination, Guid? sourceMember, string? destMember, ResolutionContext context)
         {
             if (!sourceMember.HasValue) return "";
-            var status = _uow.GetRepository<SystemModule>()
+            var department = _uow.GetRepository<Department>()
                          .GetAllNonDeleted()
                          .FirstOrDefault(x => x.Id == sourceMember);
 
-            return _requestInfo.Lang == "ar" ? status?.NameAr ?? string.Empty : status?.NameEn ?? string.Empty;
+            return _requestInfo.Lang == "ar" ? department?.NameAr ?? string.Empty : department?.NameEn ?? string.Empty;
         }
     }
 

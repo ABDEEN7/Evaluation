@@ -14,13 +14,13 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 {
-    public class SrvPartyType( IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow, LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, IServiceProvider serviceProvider, RequestInfo _requestInfo)
+    public class SrvPartyType(IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow, LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, IServiceProvider serviceProvider, RequestInfo _requestInfo)
            : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, _requestInfo)
-        {
+    {
 
         public async Task<List<PartyType>?> GetUserPartyTypeAsync()
         {
-            var UserPartyType= await serviceScopeFactory.CreateScopedUow().GetRepository<PartyType>()
+            var UserPartyType = await serviceScopeFactory.CreateScopedUow().GetRepository<PartyType>()
                 .GetAllActiveNonDeleted()
                 .AsNoTracking()
                 .Where(pt => userInfo.PartyTypes.Contains(pt.Id)).ToListAsync();
@@ -28,23 +28,23 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             return UserPartyType;
         }
 
-        public async Task<List<SelectListItemDTO>> GetPartyTypesByModuleAsync(Guid moduleId)
+        public async Task<List<SelectListItemDTO>> GetPartyTypesByModuleAsync()
         {
             string lang = _requestInfo.Lang;
 
-            var userPartyTypesTask =  GetUserPartyTypeAsync();
+            var userPartyTypesTask = GetUserPartyTypeAsync();
 
             var partyTypeRepo = serviceScopeFactory.CreateScopedUow().GetRepository<PartyType>();
 
-          
+
             var partyTypes = await partyTypeRepo
-                .GetAllQueryFiltered(x => x.IsEmployeePartyType && !x.CanViewAllRequests && x.SystemModuleId == moduleId)
+                .GetAllQueryFiltered(x => x.IsEmployeePartyType && !x.CanViewAllRequests && x.DepartmentId == requestInfo.DepId)
                 .AsNoTracking()
                 .ToListAsync();
 
             var result = new List<SelectListItemDTO>();
             var userPartyTypes = await userPartyTypesTask;
-            var canViewAll = userPartyTypes!.Any(x => x.CanViewAllRequests );
+            var canViewAll = userPartyTypes!.Any(x => x.CanViewAllRequests);
             if (canViewAll)
             {
                 result = partyTypes
@@ -59,31 +59,13 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                 return result;
             }
 
-          
+
 
             return result;
         }
 
-		public async Task<bool> IsAllowedToViewAllRequestsAsync(Guid userId, Guid? ModuleId)
+        public async Task<bool> IsAllowedToViewAllRequestsAsync(Guid userId, Guid? ModuleId)
 
-		{
-			if (ModuleId is null)
-			{
-				return false;
-			}
-
-			var result = await serviceScopeFactory.CreateScopedUow()
-									   .GetRepository<UserPartyType>()
-										.GetAllQueryFiltered()
-										.Include(x => x.PartyType)
-										.Where(x => x.UserId == userId)
-										.Where(x => x.PartyType!.SystemModuleId == ModuleId)
-										.AnyAsync(x => x.PartyType!.CanViewAllRequests);
-
-			return result;
-		}
-
-		public async Task<bool> IsAllowedToViewAllRequestsWitoutFilterationAsync(Guid? userId, Guid? ModuleId)
         {
             if (ModuleId is null)
             {
@@ -95,12 +77,13 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                                         .GetAllQueryFiltered()
                                         .Include(x => x.PartyType)
                                         .Where(x => x.UserId == userId)
-                                        .Where(x => x.PartyType!.SystemModuleId == ModuleId)
+                                        .Where(x => x.PartyType!.DepartmentId == ModuleId)
                                         .AnyAsync(x => x.PartyType!.CanViewAllRequests);
 
             return result;
         }
-        public async Task<bool> IsAllowedToViewAllPlansWitoutFilterationAsync(Guid? userId, Guid? ModuleId)
+
+        public async Task<bool> IsAllowedToViewAllRequestsWitoutFilterationAsync(Guid? userId, Guid? ModuleId)
         {
             if (ModuleId is null)
             {
@@ -112,21 +95,33 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                                         .GetAllQueryFiltered()
                                         .Include(x => x.PartyType)
                                         .Where(x => x.UserId == userId)
-                                        .Where(x => x.PartyType!.SystemModuleId == ModuleId)
+                                        .Where(x => x.PartyType!.DepartmentId == ModuleId)
+                                        .AnyAsync(x => x.PartyType!.CanViewAllRequests);
+
+            return result;
+        }
+        public async Task<bool> IsAllowedToViewAllPlansWitoutFilterationAsync(Guid? userId)
+        {
+            var result = await serviceScopeFactory.CreateScopedUow()
+                                       .GetRepository<UserPartyType>()
+                                        .GetAllQueryFiltered()
+                                        .Include(x => x.PartyType)
+                                        .Where(x => x.UserId == userId)
+                                        .Where(x => x.PartyType!.DepartmentId == requestInfo.DepId)
                                         .AnyAsync(x => x.PartyType!.CanViewAllEvaluations);
 
             return result;
         }
-        public async Task<List<UserPartyTypeDTO>> GetUserPartyTypeData(Guid? userId, Guid? moduleId)
+        public async Task<List<UserPartyTypeDTO>> GetUserPartyTypeData(Guid? userId)
         {
             return await serviceScopeFactory.CreateScopedUow().GetRepository<UserPartyType>()
                 .GetAllQueryFiltered()
-                .Where(x => x.UserId == userId && x.PartyType!.SystemModuleId == moduleId)
+                .Where(x => x.UserId == userId && x.PartyType!.DepartmentId == requestInfo.DepId)
                 .Select(x => new UserPartyTypeDTO
                 {
                     PartyTypeId = x.PartyTypeId,
                     CanViewAllRequests = x.PartyType!.CanViewAllRequests,
-					CanViewAllEvaluations = x.PartyType.CanViewAllEvaluations,
+                    CanViewAllEvaluations = x.PartyType.CanViewAllEvaluations,
                 })
                 .ToListAsync();
         }

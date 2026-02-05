@@ -65,7 +65,7 @@ namespace Evaluation.Services.BusinessLayer.API.Template;
             var userPartyTypesIdsList = await scopedUow.GetRepository<UserPartyType>()
                 .GetAllQueryFiltered()
                 .Include(x => x.PartyType)
-                .Where(x => x.SignaturePlaceHolder != null && x.PartyType!.SystemModuleId == template.SystemModuletId)
+                .Where(x => x.SignaturePlaceHolder != null && x.PartyType!.DepartmentId == template.DepartmentId)
                 .Select(x => x.Id)
                 .Distinct()
                 .ToListAsync();
@@ -394,7 +394,7 @@ namespace Evaluation.Services.BusinessLayer.API.Template;
             var userPartyTypesIdsList = await serviceProvider.CreateScopedUow().GetRepository<UserPartyType>()
                 .GetAllQueryFiltered()
                 .Include(x => x.PartyType)
-                .Where(x => x.SignaturePlaceHolder != null && x.PartyType.SystemModuleId == template.SystemModuletId)
+                .Where(x => x.SignaturePlaceHolder != null && x.PartyType.DepartmentId == template.DepartmentId)
                 .Select(x => x.Id)
                 .Distinct()
                 .ToListAsync();
