@@ -10,6 +10,10 @@
 <link href="~/vendor/flatpickr/css/style.css" rel="stylesheet" />
 <!-- Custom CSS -->
 <link href="~/plan-assets/css/style.css" rel="stylesheet">
+
+<link href="~/lib/tabulator/css/tabulator.min.css" rel="stylesheet" />
+<link href="~/lib/tabulator/css/tabulator.css" rel="stylesheet" />
+<link href="~/assets/css/tabulator-styling.css.css" rel="stylesheet" />
 <!-- Page Title
 <div class="page-title light-background">
     <div class="container">
@@ -629,6 +633,8 @@
 
     <script src="~/js/form-generation-util/form.api.js"></script>
 
+    <script src="~/lib/tabulator/js/tabulator.js" asp-append-version="true"></script>
+
     <!-- Evaluation Plan Modules -->
     <script src="~/js/evaluationplan/get-evaluation-common-listing.js"></script>
     <script src="~/js/evaluationplan/evaluation-common-listing.js"></script>
@@ -640,7 +646,7 @@
 
     <!-- Form Generation -->
     <script src="/js/form-generation-util/form.constants.js"></script>
-    <script src="/js/form-generation-util/form.api.js"></script>
+  
 @*     <script src="~/js/form-generation-util/form.evaluationplanfield.js"></script>
 
  *@   <script src="~/js/plan/planBuilder/plan.constants.js"></script>
@@ -654,7 +660,9 @@
 
    <script src="/js/form-generation-util/form.generate-field.js"></script>
     <script src="/js/form-generation-util/form.render.js"></script>
+    <script src="~/js/form-generation-util/form.validation.js"></script>
     <script src="/js/form-generation-util/form.submit.js"></script>
+
     <script src="/js/form-generation-util/form.init.js"></script>
     <script src="/js/form-generation-util/form.namespace.js"></script>
     <script src="~/js/form-generation-util/evaluationparties.js"></script>
@@ -665,6 +673,8 @@
     <script src="~/js/assignments/submit-request-assignments.js"></script>
 
     <script src="~/js/evaluationplan/createrequest.js"></script>
+    <script src="~/lib/uuid/uuid.min.js"></script>
+
     <script>
         const departmentRoutePath = sharedUtility().extractDepartmentName();
         $(document).ready(async function () {

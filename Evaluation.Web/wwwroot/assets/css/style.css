@@ -1528,3 +1528,11 @@ main {
 .toast-info {
     background-color: #2563eb;
 }
+.action-items {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    justify-content: center;
+    color: #333;
+    font-size: 16px;
+}

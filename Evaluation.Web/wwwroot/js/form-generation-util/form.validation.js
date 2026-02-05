@@ -648,7 +648,7 @@ window.formUtility = window.formUtility || {};
         //'evaluationPlan': validateEvaluationPlanField,
         evl_form: validateForm,
 }
-    };
+    
     // #endregion
 
     // #region ===============  Core validateField / validateFields / validateInput
@@ -735,6 +735,6 @@ window.formUtility = window.formUtility || {};
 
     ns.validateNotEqualFields = validateNotEqualFields;
     ns.validateDateFields = validateDateFields; // dategroup + dategroupindex
-    ns.validateDateGroups = validateDateGroups; // from/to style
+    //ns.validateDateGroups = validateDateGroups; // from/to style
 
 })(window.formUtility);

@@ -91,12 +91,28 @@ window.serviceRequestForm = window.serviceRequestForm || {};
 
                 case "list": {
                     const tableId = getListDomId(field, renderType);
+
+                    let tableData = [];
                     if (window.Tabulator) {
                         const tables = Tabulator.findTable("#" + tableId);
-                        value = (tables && tables.length) ? tables[0].getData() : [];
-                    } else {
-                        value = [];
+                        tableData = (tables && tables.length) ? (tables[0].getData() || []) : [];
                     }
+
+                    value = (tableData || []).map(row => {
+                        const r = { ...(row || {}) };
+
+                        if (r.file != null && r.file !== "") {
+                            r.file = Array.isArray(r.file) ? r.file : [r.file];
+                        }
+
+                        if (r.IsOld === undefined || r.IsOld === null || r.IsOld === "") {
+                            r.IsOld = false;
+                        }
+
+                        return r;
+                    });
+
+                    value = JSON.stringify(value);
                     break;
                 }
 

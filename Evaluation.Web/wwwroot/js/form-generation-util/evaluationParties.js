@@ -32,7 +32,7 @@
         const containerId = options.containerId || "evaluationPartiesContainer";
         const parentAccordionId = options.parentAccordionId || "customAccordionParties";
         const expandFirst = options.expandFirst === true;
-        const lang = options.lang || ns.lang || window.currentLang || "ar";
+        const lang = options.lang ||  window.currentLang || "ar";
 
         const $container = $("#" + containerId);
         if (!$container.length) return;
