@@ -10,5 +10,6 @@ namespace Evaluation.DAL.Models.Planing.TeamsModule
         public Team? Team { get; set; }
         public Guid UserId { get; set; }
         public MinistryUser? User { get; set; }
+        public ICollection<UserTeamScope> UserTeamScope { get; set; }
     }
 }
