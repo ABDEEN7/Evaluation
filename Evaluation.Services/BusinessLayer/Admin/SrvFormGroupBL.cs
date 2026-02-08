@@ -394,14 +394,14 @@ namespace Evaluation.Services.Models.Admin
 
 
         }
-        public async Task<List<PartyTypeDTO>> GetAllPartyType(Guid systemmoduleid)
+        public async Task<List<PartyTypeDTO>> GetAllPartyType(Guid departmentId)
         {
             var mapper = await CreateMapperForAdmin<PartyType, PartyTypeDTO>();
 
 
             var rslt = await uow.GetRepository<PartyType>()
                     .GetAllNonDeleted()
-                    .Where(x=>x.SystemModuleId==systemmoduleid)
+                    .Where(x=>x.DepartmentId==departmentId)
                     .OrderByDescending(x => x.CreateDate)
                     .ToListAsync();
             var result = mapper.Map<List<PartyTypeDTO>>(rslt);

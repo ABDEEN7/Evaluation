@@ -143,14 +143,14 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             return MapToStatusPartyTypeDisplayNameDTO(displayName, lang);
         }
 
-        public string GetStatusDisplayName(Guid? statusId, Guid? ModuleId)
+        public string GetStatusDisplayName(Guid? statusId, Guid? departmentId)
         {
             var scopedUow = serviceScopeFactory.CreateScopedUow();
 
             string lang =requestInfo.Lang;
             var PartyTypes = userInfo.PartyTypes.ToList();
             var DepartementUserId = scopedUow.GetRepository<PartyType>()
-                                    .GetAllActiveNonDeleted(x => x.SystemModuleId == ModuleId)
+                                    .GetAllActiveNonDeleted(x => x.DepartmentId == departmentId)
                                     .Select(x => x.Id)
                                     .ToList();
 
