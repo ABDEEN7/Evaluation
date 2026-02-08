@@ -98,6 +98,7 @@ namespace Evaluation.Services.Models.Admin
             Service obj = new Service();
 
             obj.SystemModuleId = message.SystemModuleId;
+            obj.EvaluationPartyId = message.EvaluationPartyId;
             obj.NameAr = message.NameAr;
             obj.NameEn = message.NameEn;
             obj.BackendName = PartyTypeBackendName;
@@ -322,6 +323,7 @@ namespace Evaluation.Services.Models.Admin
                     }
 
                     obj.SystemModuleId = message.SystemModuleId;
+                    obj.EvaluationPartyId = message.EvaluationPartyId;
                     obj.NameAr = message.NameAr;
                     obj.NameEn = message.NameEn;
                     obj.BackendName = obj.BackendName;

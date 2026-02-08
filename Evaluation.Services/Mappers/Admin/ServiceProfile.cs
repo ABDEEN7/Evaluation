@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
 using Evaluation.DAL.Models.DepartementEntites;
+using Evaluation.DAL.Models.FormsModules;
 using Evaluation.DAL.Models.ServiceEnities;
 using Evaluation.DAL.Models.UserEntiy;
 using Evaluation.DAL.Repositories;
+using Evaluation.Services.MappingProfiles;
 using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Admin;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,6 +23,7 @@ namespace Evaluation.Services.Mappers.Admin
                 .ForMember(dest => dest.UpdateBy, opt => opt.MapFrom<UserProfileResolver, Guid?>(src => src.UpdateById.HasValue ? src.UpdateById : src.CreateById))
                .ForMember(dest => dest.UpdateDate, opt => opt.MapFrom(src => src.UpdateDate.HasValue ? src.UpdateDate.Value.ToString("yyyy-MM-dd hh:mm:ss tt") : src.CreateDate.ToString("yyyy-MM-dd hh:mm:ss tt")))
                 .ForMember(dest => dest.SystemModule, opt => opt.MapFrom<SystemModuleResolver, Guid?>(src => src.SystemModuleId))
+                .ForMember(dest => dest.EvaluationParty, opt => opt.MapFrom<EvaluationPartyResolver, Guid?>(src => src.EvaluationPartyId))
                 .ForMember(dest => dest.ServiceInitiatorPartyType,
            opt => opt.MapFrom<ServiceInitiatorPartyTypesResolver>())
                 .ForMember(dest => dest.ServiceRequestShowPartyType,
