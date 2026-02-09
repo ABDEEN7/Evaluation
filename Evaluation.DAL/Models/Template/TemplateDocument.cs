@@ -13,8 +13,8 @@ public class TemplateDocument : EntityBase, IAuditLogEntity
 	public string? TemplateEn { get; set; }
 	public Guid? AttachmentId { get; set; }
 	public bool? IsAttachment { get; set; }
-	public Guid SystemModuletId { get; set; }
-	public SystemModule? SystemModule { get; set; }
+	public Guid DepartmentId { get; set; }
+	public Department? Department { get; set; }
 	public Guid ServiceId { get; set; }
 	public Service? Service { get; set; }
 	public Guid TemplateGenrationTypeId { get; set; }

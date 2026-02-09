@@ -110,7 +110,7 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 				SrvPartyType.IsAllowedToViewAllRequestsWitoutFilterationAsync(userId, module.Id),
 
 			UserPartyTypeData =
-				SrvPartyType.GetUserPartyTypeData(userInfo.UserId!, module.Id)
+				SrvPartyType.GetUserPartyTypeData(userInfo.UserId!)
 		};
 
 		IQueryable<EvaluationRequest> baseQuery = uow
@@ -305,7 +305,7 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 
 		var uow = serviceScopeFactory.CreateScopedUow();
 
-		var userPartyDataTask = SrvPartyType.GetUserPartyTypeData(userInfo.UserId!, moduleId);
+		var userPartyDataTask = SrvPartyType.GetUserPartyTypeData(userInfo.UserId!);
 
 
 

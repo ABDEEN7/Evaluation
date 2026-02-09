@@ -1,6 +1,5 @@
 ﻿
 
-
 namespace Evaluation.SharedHelper.Models.Admin
 {
     public class ServiceDTO : EntityBaseDTO
@@ -32,6 +31,8 @@ namespace Evaluation.SharedHelper.Models.Admin
         public string? Description { get; set; }
         public Guid[]? ServiceInitiatorPartyType { get; set; }
         public Guid[]? ServiceRequestShowPartyType { get; set; }
+        public Guid? EvaluationPartyId { get; set; }
+        public string? EvaluationParty { get; set; }
 
     }
 }

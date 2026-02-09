@@ -22,7 +22,7 @@ namespace Evaluation.Services.Mappers.Admin
         opt => opt.MapFrom<UserPartyTypeUserProfileResolver, Guid?>(src => src.UserId))
                   .ForMember(dest => dest.PartyType,
         opt => opt.MapFrom<UserPartyTypePartyTypeResolver, Guid?>(src => src.PartyTypeId))
-                 .ForMember(dest => dest.SystemModuleId, opt => opt.MapFrom(src => src.PartyType!.SystemModuleId));
+                 .ForMember(dest => dest.DepartmentId, opt => opt.MapFrom(src => src.PartyType!.DepartmentId));
 
         }
 

@@ -103,7 +103,7 @@ namespace Evaluation.Services.Models.Admin
                 obj.TemplateEn = message.TemplateEn;
                 obj.AttachmentId = message.AttachmentId;
                 obj.IsAttachment = message.IsAttachment;
-                obj.SystemModuletId = message.SystemModuletId!.Value;
+                obj.DepartmentId = message.SystemModuletId!.Value;
                 obj.ServiceId = message.ServiceId!.Value;
                 obj.TemplateGenrationTypeId = message.TemplateGenrationTypeId;
                 obj.IsActive = message.IsActive;
@@ -174,7 +174,7 @@ namespace Evaluation.Services.Models.Admin
                 obj.TemplateEn = message.TemplateEn;
                 obj.AttachmentId = (message.IsAttachment == true ? ((attachmentinserted == 1) ? message.AttachmentId : obj.AttachmentId) : null);
                 obj.IsAttachment = message.IsAttachment;
-                obj.SystemModuletId = message.SystemModuletId!.Value;
+                obj.DepartmentId = message.SystemModuletId!.Value;
                 obj.ServiceId = message.ServiceId!.Value;
                 obj.TemplateGenrationTypeId = message.TemplateGenrationTypeId;
                 obj.IsActive = message.IsActive;
