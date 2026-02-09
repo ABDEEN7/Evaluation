@@ -15,6 +15,7 @@ public class NSISService
     private readonly string password = "UgBNL%Pxukl4g8f";
     private readonly string grant_type = "client_credentials";
     private readonly string nsis_schools_api = "ims/oneroster/v1p1/schools";
+    private readonly string nsis_classes_api = "ims/oneroster/v1p1/schools/{0}/classes?offset=0&limit=100&filter=status='active'";
     private readonly int limit = 1000;
     private readonly string? status = "active";
 
@@ -61,7 +62,7 @@ public class NSISService
             return default;
         }
     }
-
+    
     private async Task<T?> SendRequestAsync<T>(string endpoint)
     {
         try
@@ -102,7 +103,10 @@ public class NSISService
     public async Task<SchoolDto> GetSchoolbyIdAsync(Guid Id)
     {
         var endpoint = $"{nsis_schools_api}/{Id}";
+        var classesEndpoint = string.Format(nsis_classes_api,Id);
         var result = await SendRequestAsync<NSISSchoolResponse>(endpoint);
+        var classesResult = await SendRequestAsync<NSISClassResponse>(classesEndpoint);
+        result.Org.Classes = classesResult.Classes;
         return result.Org;
     }
 

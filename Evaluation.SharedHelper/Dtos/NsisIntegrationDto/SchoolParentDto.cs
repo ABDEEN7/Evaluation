@@ -4,11 +4,11 @@ using System.Text.Json.Serialization;
 
 namespace Evaluation.SharedHelper.Dtos.NsisIntegrationDto;
 
-public abstract class NSISBaseDto
+public class SchoolParentDto
 {
     [JsonPropertyName("$id")]
     public string? Id { get; set; }
-    public Guid sourcedId { get; set; }
-    public string? Status { get; set; }
-    public string? DateLastModified { get; set; }
+    public Guid SourcedId { get; set; }
+    public string? Type { get; set; }
+    public string? Href { get; set; }
 }

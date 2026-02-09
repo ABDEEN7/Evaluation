@@ -11,5 +11,7 @@ public class SchoolDto : NSISBaseDto
     public string? Name { get; set; }
     public string? Identifier { get; set; }
     public SchoolMetaData? MetaData { get; set; }
-    //TODO:Need To Add > Parent
+    public SchoolParentDto Parent { get; set; }
+    public List<Class> Classes { get; set; }
+
 }
