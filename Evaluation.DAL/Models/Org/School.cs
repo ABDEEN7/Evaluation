@@ -21,5 +21,6 @@ public class School : OrgTree , IAuditLogEntity
     public DateOnly? SupportIdentityDate { get; set; }
 
     public virtual ICollection<SchoolLevel>? SchoolLevel { get; set; }
+    public virtual ICollection<SchoolClass>? Classes { get; set; }
     
 }
