@@ -277,6 +277,7 @@ public static class ConstantKeys
         public static readonly string SELECTALL = "SELECTALL";
         public static readonly string EXPANDALL = "EXPANDALL";
         public static readonly string COLLAPSEALL = "COLLAPSEALL";
+        public static readonly string lblDepartment = "lblDepartment";
     }
 
     public static class AdminPages
@@ -344,6 +345,7 @@ public static class ConstantKeys
         public static readonly string AdminUiControl = "AdminUiControl";
         public static readonly string AdminNDAStatus = "AdminNDAStatus";
         public static readonly string AdminUserTeamScope = "AdminUserTeamScope";
+        public static readonly string AdminDepTargetOrgTree = "AdminDepTargetOrgTree";
     }
     public static class WebAppPages
     {
@@ -867,6 +869,15 @@ public static class ConstantKeys
         public const string ADD_ADMIN_USERTEAMSCOPE = "ADD_ADMIN_USERTEAMSCOPE";
         public const string EDIT_ADMIN_USERTEAMSCOPE = "EDIT_ADMIN_USERTEAMSCOPE";
         public const string DELETE_ADMIN_USERTEAMSCOPE = "DELETE_ADMIN_USERTEAMSCOPE";
+
+        #endregion
+
+        #region DEPTARGETORGTREE
+
+        public const string VIEW_ADMIN_DEPTARGETORGTREE = "VIEW_ADMIN_DEPTARGETORGTREE";
+        public const string ADD_ADMIN_DEPTARGETORGTREE = "ADD_ADMIN_DEPTARGETORGTREE";
+        public const string EDIT_ADMIN_DEPTARGETORGTREE = "EDIT_ADMIN_DEPTARGETORGTREE";
+        public const string DELETE_ADMIN_DEPTARGETORGTREE = "DELETE_ADMIN_DEPTARGETORGTREE";
 
         #endregion
 

@@ -10,19 +10,26 @@
 }
 
 
-const systemmodule_select2 = SystemModuleList.map(item => (
+
+
+const department_select2 = DepartmentList.map(item => (
     {
         id: item.id,
         text: item.name
     }
 ));
+$("#DepartmentId").select2({
+    width: '100%',
+    allowClear: true,
+    data: department_select2,
+    dropdownCssClass: "manageselect2zindex",
+    placeholder: selectPlaceHolder
 
-
+});
 
 $("#SystemModuleId").select2({
     width: '100%',
     allowClear: true,
-    data: systemmodule_select2,
     dropdownCssClass: "manageselect2zindex",
     placeholder: selectPlaceHolder
 
@@ -30,9 +37,29 @@ $("#SystemModuleId").select2({
 
 const services_div_select2 = $("#ServiceId");
 const systemmodule_div_select2 = $("#SystemModuleId");
-if (systemmodule_select2.length > 1) {
-    systemmodule_div_select2.val('').trigger('change');
+const department_div_select2 = $("#DepartmentId");
+if (department_select2.length > 1) {
+    department_div_select2.val('').trigger('change');
 }
+$('#DepartmentId').on('change', function () {
+
+    var systemmodule_select2 = $.map(SystemModuleList, function (item, index) {
+
+        const departmentId = $("#DepartmentId").val();
+        if (item.departmentId == departmentId) {
+            return {
+                id: item.id,
+                text: item.name
+            };
+        }
+    });
+
+    systemmodule_div_select2.empty();
+    systemmodule_div_select2.select2({
+        data: systemmodule_select2,
+    });
+    systemmodule_div_select2.val('').trigger('change');
+});
 $('#SystemModuleId').on('change', function () {
 
     var services_select2 = $.map(ServiceList, function (item, index) {
@@ -50,6 +77,7 @@ $('#SystemModuleId').on('change', function () {
     services_div_select2.select2({
         data: services_select2,
     });
+    services_div_select2.val('').trigger('change');
     if (`@Html.Raw(ShowServiceDefault)` == "False") {
         $('#ServiceId').val('').trigger('change');
     }
@@ -75,6 +103,7 @@ services_div_select2.select2({
 
 });
 
+$('#DepartmentId').trigger('change');
 $('#SystemModuleId').trigger('change');
 $('#ServiceId').trigger('change');
 
