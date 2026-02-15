@@ -3,6 +3,7 @@ using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.Attachments;
 using Evaluation.DAL.Models.DepartementEntites;
 using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
+using Evaluation.DAL.Models.ServiceEnities;
 using Evaluation.DAL.Models.ServiceRequestEntities;
 using Evaluation.DAL.Models.SystemLog;
 using Evaluation.DAL.Models.UserEntiy;
@@ -17,6 +18,7 @@ using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Api.AttachmentsDTOs;
 using Evaluation.SharedHelper.Models.Api.FormBuilderDTO;
 using Evaluation.SharedHelper.Models.Api.PartyTypeDTOs;
+using Evaluation.SharedHelper.Models.Api.ServiceDTOs;
 using Evaluation.SharedHelper.Models.Api.ServiceRequestEntitiesDTO;
 using Evaluation.SharedHelper.Models.Api.ServiceRequestEntitiesDTO;
 using FluentResults;
@@ -65,53 +67,53 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             {
                 Scope = serviceScopeFactory.CreateScopedUow();
 
-            }
-            var Request = await Scope.GetRepository<ServiceRequest>()
-                                        .GetAllActiveNonDeleted(x => x.Id == RequestId)
-                                        .Include(c => c.Plan)
-                                        .Include(c => c.EvaluationRequest)
-                                        .Include(x => x.Status)
-                                        .ThenInclude(x => x!.StatusPreventPartyTypes)
-                                        .Include(c => c.Service)
-                                        .Include(c => c.OrgTree)
-                                        .AsSplitQuery()
-                                        .AsNoTracking()
-                                        .FirstOrDefaultAsync(x => x.IsActive == true && x.IsDeleted == false);
+			}
+			var Request = await Scope.GetRepository<ServiceRequest>()
+										.GetAllActiveNonDeleted(x => x.Id == RequestId)
+										.Include(c => c.Plan)
+										.Include(c => c.EvaluationRequest)
+										.Include(x => x.Status)
+										.ThenInclude(x => x!.StatusPreventPartyTypes!.Where(p => p.IsActive && !p.IsDeleted))
+										.Include(c => c.Service)
+										.Include(c => c.OrgTree)
+										.AsSplitQuery()
+										.AsNoTracking()
+										.FirstOrDefaultAsync(x => x.IsActive == true && x.IsDeleted == false);
 
             return Request;
 
-        }
-        public async Task<Guid?> GetOrgTreeIdByRequestIdAsync(Guid reqId)
-        {
-            var request = await serviceScopeFactory.CreateScopedUow()
-                                       .GetRepository<ServiceRequest>()
-                                        .GetAllActiveNonDeleted(x => x.Id == reqId).FirstOrDefaultAsync();
-            return request?.OrgTreeId;
-        }
-        public Guid? GetOrgTreeRequestId(ServiceRequest? request)
-        {
-            if (request != null)
-            {
-                return request.OrgTreeId;
-            }
-            return null;
-        }
-        public ServiceRequest InsertRequest(ServiceRequest request)
-        {
-            return uow.GetRepository<ServiceRequest>().Insert(request, false);
-        }
-        public async Task<WebAppPlanRequestsDTO> GetPlanRequestsAsync(Guid userId, FilterRequestsDTO model)
-        {
-            string lang = _requestInfo!.Lang;
-            model.ModuleName = "/evaluation-plan";
+		}
+     	public async Task<Guid?> GetOrgTreeIdByRequestIdAsync(Guid reqId)
+		{
+			var request = await serviceScopeFactory.CreateScopedUow()
+									   .GetRepository<ServiceRequest>()
+										.GetAllActiveNonDeleted(x => x.Id == reqId).FirstOrDefaultAsync();
+			return request?.OrgTreeId;
+		}
+		public Guid? GetOrgTreeRequestId(ServiceRequest? request)
+		{
+			if (request != null)
+			{
+				return request.OrgTreeId;
+			}
+			return null;
+		}
+		public ServiceRequest InsertRequest(ServiceRequest request)
+		{
+			return uow.GetRepository<ServiceRequest>().Insert(request, false);
+		}
+		public async Task<WebAppPlanRequestsDTO> GetPlanRequestsAsync(Guid userId, FilterRequestsDTO model)
+		{
+			string lang = _requestInfo!.Lang;
+			//model.ModuleName = "/evaluation-plan";
 
             using var uow = serviceScopeFactory.CreateScopedUow();
             using var uow2 = serviceScopeFactory.CreateScopedUow();
 
-            var moduleTask = SrvSystemModule.GetSystemModuleByRoutingAsync(model.ModuleName);
-            var userTask = srvUser.GetByIDActiveNonDeleted(userId);
-            var timeFormatTask = cacheDataProvider.GetSystemSettingValue(SystemSettings.ShortTimeFormat);
-            var dateFormatTask = cacheDataProvider.GetSystemSettingValue(SystemSettings.DateFormat);
+			var moduleTask = SrvSystemModule.GetSystemModuleByRoutingAsync(ModuleType.EvaluationPlan);
+			var userTask = srvUser.GetByIDActiveNonDeleted(userId);
+			var timeFormatTask = cacheDataProvider.GetSystemSettingValue(SystemSettings.ShortTimeFormat);
+			var dateFormatTask = cacheDataProvider.GetSystemSettingValue(SystemSettings.DateFormat);
 
             await Task.WhenAll(moduleTask, userTask, timeFormatTask, dateFormatTask);
 
@@ -270,21 +272,21 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
             await Task.WhenAll(attachmentsTask, actionTransactionsTask, actionsTask);
 
-            return new ServiceRequestDTO
-            {
-                formGroups = formGroups,
-                Attachments = await attachmentsTask,
-                ActionTransactions = await actionTransactionsTask,
-                Actions = await actionsTask,
-
-                RequestNumber = request.RequestNumber,
-                Status = request.Status.NameEn,// SrvStatus.GetStatusDisplayName(request.StatusId, module?.Id),
-                Service = lang == "ar" ? request.Service.NameAr : request.Service.NameEn,
-
-                CanViewFieldHistory = hasFieldHistoryPermission,
-                CanViewAllFieldHistory = hasAllFieldHistoryPermission
-            };
-        }
+			var ServiceRequest= new ServiceRequestDTO
+			{
+				formGroups = formGroups,
+				Attachments = await attachmentsTask,
+				ActionTransactions = await actionTransactionsTask,
+				Actions = await actionsTask,
+				RequestNumber = request.RequestNumber,
+				Status = request.Status.NameEn,// SrvStatus.GetStatusDisplayName(request.StatusId, module?.Id),
+				ServiceId = request.ServiceId,
+				Service = lang == "ar" ? request.Service.NameAr : request.Service.NameEn,
+				CanViewFieldHistory = hasFieldHistoryPermission,
+				CanViewAllFieldHistory = hasAllFieldHistoryPermission
+			};
+			return ServiceRequest;
+		}
 
         public async Task<bool> HasAccessToRequestAsync(Guid requestId, Guid userId)
         {
@@ -640,47 +642,48 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             var stepFieldsListTask = SrvField.GetFieldsListByActionIdAsync(request.ServiceId);
             var hiddenFieldsIds = await SrvField.GetHiddenFields(request.ServiceId);
 
-            var requestFieldsValue = await serviceScopeFactory.CreateScopedUow()
-                .GetRepository<ServiceRequestFieldsValue>()
-                .GetAllActiveNonDeleted()
-                .Include(x => x.Field)
-                .ThenInclude(x => x!.FieldViewConditions)
-                .Where(c => c.RefId == request.Id && !hiddenFieldsIds.Contains(c.FieldId))
-                .Select(c => new
-                {
-                    c.FieldId,
-                    c.Value,
-                    Type = c.Field!.DropDownTypeId != null ? "text" : c.Field!.FieldType!.NameEn, // Convert type to "text" if dropdown
-                    c.Field.FormGroupId,
-                    FormGroupName = lang == "ar" ? c.Field!.FormGroup!.TitleAr : c.Field!.FormGroup!.TitleEn,
-                    FormGroupOrderNo = c.Field.FormGroup.Order,
-                    c.Field.Row,
-                    c.Field.Column,
-                    FieldName = lang == "ar" ? c.Field.TitleAr : c.Field.TitleEn,
-                    FieldTooltip = lang == "ar" ? c.Field.InfoAr : c.Field.InfoEn,
-                    c.Field.BackendName,
-                    c.Field.ClassName,
-                    c.Field.DropDownTypeId,
-                    Attributes = c.Field!.FieldAttributeValues!
-                        .Where(x => x.IsDeleted == false && x.IsActive == true)
-                        .Select(m => new AttributeDTO
-                        {
-                            Name = m.AttributeKey,
-                            Value = m.AttributeValue,
-                            Message = lang == "ar" ? m.MessageAr : m.MessageEn,
-                        }).ToList(),
-                    Conditions = c.Field!.FieldViewConditions!
-                             .Where(x => x.IsDeleted == false && x.IsActive == true)
-                             .Select(cond => new FieldViewConditionDTO
-                             {
-                                 operators = cond.operators,
-                                 FieldValue = cond.FieldValue,
-                                 IsSufficient = cond.IsSufficient,
-                                 ParentFieldId = cond.ParentFieldId
-                             }).ToList(),
-                    c.Field.FormGroupListId
-                })
-                .ToListAsync();
+			var requestFieldsValue = await serviceScopeFactory.CreateScopedUow()
+				.GetRepository<ServiceRequestFieldsValue>()
+				.GetAllActiveNonDeleted()
+				.Include(x => x.Field)
+				.ThenInclude(x => x!.FieldViewConditions)
+				.Where(c => c.RefId == request.Id && !hiddenFieldsIds.Contains(c.FieldId))
+				.Select(c => new
+				{
+					c.FieldId,
+					c.Field.EvalFormId,
+					c.Value,
+					Type = c.Field!.DropDownTypeId != null ? "text" : c.Field!.FieldType!.NameEn, // Convert type to "text" if dropdown
+					c.Field.FormGroupId,
+					FormGroupName = lang == "ar" ? c.Field!.FormGroup!.TitleAr : c.Field!.FormGroup!.TitleEn,
+					FormGroupOrderNo = c.Field.FormGroup.Order,
+					c.Field.Row,
+					c.Field.Column,
+					FieldName = lang == "ar" ? c.Field.TitleAr : c.Field.TitleEn,
+					FieldTooltip = lang == "ar" ? c.Field.InfoAr : c.Field.InfoEn,
+					c.Field.BackendName,
+					c.Field.ClassName,
+					c.Field.DropDownTypeId,
+					Attributes = c.Field!.FieldAttributeValues!
+						.Where(x => x.IsDeleted == false && x.IsActive == true)
+						.Select(m => new AttributeDTO
+						{
+							Name = m.AttributeKey,
+							Value = m.AttributeValue,
+							Message = lang == "ar" ? m.MessageAr : m.MessageEn,
+						}).ToList(),
+					Conditions = c.Field!.FieldViewConditions!
+							 .Where(x => x.IsDeleted == false && x.IsActive == true)
+							 .Select(cond => new FieldViewConditionDTO
+							 {
+								 operators = cond.operators,
+								 FieldValue = cond.FieldValue,
+								 IsSufficient = cond.IsSufficient,
+								 ParentFieldId = cond.ParentFieldId
+							 }).ToList(),
+					c.Field.FormGroupListId
+				})
+				.ToListAsync();
 
 
             var stepFieldsList = await stepFieldsListTask;
@@ -760,27 +763,28 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
                 }
 
-                return new FieldValueDTO
-                {
-                    FieldId = c.FieldId,
-                    Value = fieldValue,
-                    Type = c.Type,
-                    FormGroupId = c.FormGroupId,
-                    FormGroupName = c.FormGroupName,
-                    FormGroupOrderNo = c.FormGroupOrderNo,
-                    Row = c.Row,
-                    Column = c.Column,
-                    FieldName = c.FieldName,
-                    FieldTooltip = c.FieldTooltip,
-                    BackendName = c.BackendName,
-                    ClassName = c.ClassName,
-                    DropDownTypeId = c.DropDownTypeId,
-                    Attributes = c.Attributes!,
-                    JsonSchema = c.FormGroupListId is not null
-                        ? await SrvField.GenerateJsonSchemaForFormGroupList(c.FormGroupListId, stepFieldsList, "Preview")
-                        : null
-                };
-            }).ToList();
+				return new FieldValueDTO
+				{
+					FieldId = c.FieldId,
+					formId = c.EvalFormId,
+					Value = fieldValue,
+					Type = c.Type,
+					FormGroupId = c.FormGroupId,
+					FormGroupName = c.FormGroupName,
+					FormGroupOrderNo = c.FormGroupOrderNo,
+					Row = c.Row,
+					Column = c.Column,
+					FieldName = c.FieldName,
+					FieldTooltip = c.FieldTooltip,
+					BackendName = c.BackendName,
+					ClassName = c.ClassName,
+					DropDownTypeId = c.DropDownTypeId,
+					Attributes = c.Attributes!,
+					JsonSchema = c.FormGroupListId is not null
+						? await SrvField.GenerateJsonSchemaForFormGroupList(c.FormGroupListId, stepFieldsList, "Preview")
+						: null
+				};
+			}).ToList();
 
             var fields = (await Task.WhenAll(fieldTasks)).Where(x => x != null).ToList();
 
@@ -1046,6 +1050,71 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
 
 
+		public async Task<Dictionary<Guid, List<ServiceDTO>>> GetServicesByStatusesAsync(List<Guid> statusIds, Guid moduleId, string lang)
+		{
+			var result = new Dictionary<Guid, List<ServiceDTO>>();
+			var today = DateTime.Today;
+
+			var distinctStatusIds = statusIds.Distinct().ToList();
+			if (!distinctStatusIds.Any())
+				return result;
+
+			using var scopedUow = serviceScopeFactory.CreateScopedUow();
+
+			
+
+			var initiators = (await cacheDataProvider.GetServiceIntiator())
+				.Where(c => userInfo.PartyTypes.Contains(c.PartyTypeId))
+				.Select(c => c.serviceId)
+				.ToHashSet();
+
+			//var statusConfig = (await cacheDataProvider.GetServiceStatusConfiguration())
+			//	.Where(c => distinctStatusIds.Contains(c.CurrentStatusId)
+			//			 && c.Service!.SystemModuleId == moduleId)
+			//	.Select(c => new { c.CurrentStatusId, c.ServiceId })
+			//	.ToList();
+
+			//var allowedServiceIds = statusConfig
+			//	.Where(c => initiators.Contains(c.ServiceId))
+			//	.Select(c => c.ServiceId)
+			//	.Distinct()
+			//	.ToList();
+
+			var services = await scopedUow
+				.GetRepository<Service>()
+				.GetAllQueryFiltered()
+				.Include(x=>x.SystemModule)
+				.Where(s =>
+					//allowedServiceIds.Contains(s.Id) &&
+					s.Initialservice != true &&
+					s.SystemModule.SystemModuleTypeId == moduleId)
+				//&&
+					//s.StartDate.HasValue &&
+					//today >= s.StartDate.Value &&
+					//(!s.EndDate.HasValue || s.EndDate.Value.AddDays(1) >= today))
+				.Select(s => new ServiceDTO
+				{
+					Id = s.Id,
+					BackendName = s.BackendName,
+					Icon = s.Icon,
+					NameAr = lang == "ar" ? s.NameAr : s.NameEn
+				})
+				.ToListAsync();
+
+			foreach (var statusId in distinctStatusIds)
+			{
+				//var serviceIdsForStatus = statusConfig
+				//	.Where(c => c.CurrentStatusId == statusId)
+				//	.Select(c => c.ServiceId)
+				//	.ToHashSet();
+
+				result[statusId] = services
+					//.Where(s => serviceIdsForStatus.Contains(s.Id.Value))
+					.ToList();
+			}
+
+			return result;
+		}
 
 
     }

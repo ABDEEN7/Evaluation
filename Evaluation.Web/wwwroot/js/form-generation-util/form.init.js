@@ -7,7 +7,7 @@ window.formUtility = window.formUtility || {};
 
     const { RENDER_TYPE, ACTION_TYPE } = window.FormConstants || {};
     const lang = window.currentLang || "en";
-
+    const uniqueIndexId = 'IndexForTabulator';
     // #region ========== Helpers ==========
 
     function getUiText(key, fallback = '') {
@@ -341,8 +341,7 @@ window.formUtility = window.formUtility || {};
                     if (maxCountAttr) maxCount = parseInt(maxCountAttr.value);
                     if (minCountAttr) minCount = parseInt(minCountAttr.value);
 
-                    const columns = ns.GetTabulatorColumns
-                        ? ns.GetTabulatorColumns(
+                    const columns = GetTabulatorColumns(
                             jsonSchema,
                             modalId,
                             modalBodyId,
@@ -360,8 +359,7 @@ window.formUtility = window.formUtility || {};
                             preventEditOld,
                             maxCountNew,
                             minCountNew
-                        )
-                        : [];
+                        );
 
                     const tableConfig = {
                         id: tabelId,
@@ -423,7 +421,31 @@ window.formUtility = window.formUtility || {};
                     });
                     break;
                 }
+                case 'evaluationplan':
+                    {
+                        const fieldId = `${prefield}${field.fieldId}`;
+                    const PH = window.PlanHandler;
+                   
+                        let readonly = field.isEditable === false;
+                        const isReadonly =
+                            renderType === RENDER_TYPE.PREVIEW ||
+                            (field.isApproved === true && actionType !== ACTION_TYPE.INFO_Override_Approve) ||
+                            (field.isEditable != null && !field.isEditable && actionType !== ACTION_TYPE.SubmitMissingData)
+                            //||
+                            //(ReadOnly_ACTION_TYPES || []).includes(actionType) 
+                            ;
+                        PH.init(isReadonly,
+                        fieldId,
+                        JSON.parse(field.value), elementId
+                    );
+                    break;
+                }
 
+                case 'evl_form': {
+
+
+                    break;
+                }
                 default: {
                     const calcAgeAttr = field.attributes?.find(attr => attr.name.trim().toLowerCase() === 'calcage');
                     if (calcAgeAttr) {
@@ -456,7 +478,757 @@ window.formUtility = window.formUtility || {};
             ns.InitializeTooltip();
         }
     }
+    function GetTabulatorColumns  (jsonSchema, modalId, modalBodyId, addObjectBtnId, modalTitleId, modalTitleTextForEdit, showActionsColumn = false, tabelId, renderType, preventDelete, preventEdit, maxCount, minCount, preventDeleteOld, preventEditOld, maxCountNew, minCountNew)  {
+        let columns = [];
+        let preventDeleteForOld = false;
+        let preventEditForOld = false;
+        columns.push({
+            title: "Index",
+            field: "Index",
+            formatter: "rownum",
+            align: "center",
+            width: 50,
+            visible: false
+        });
 
+        // Actions Column
+        columns.push({
+            title: uiControlsSetup().GetUiControlText('lblActions'),
+            formatter: (cell) => {
+                const rowData = cell.getData();
+                const pkId = rowData.id || rowData.pkId || rowData.ID || ''; // fallback logic if needed
+                const isOld = !!rowData.IsOld;
+
+                let editTmpl = '';
+                let deleteTmpl = '';
+                let viewTmpl = '';
+
+                preventDeleteForOld = isOld && preventDeleteOld === true;
+                preventEditForOld = isOld && preventEditOld === true;
+
+                if (!preventEdit & showActionsColumn && !preventEditForOld) {
+                    editTmpl = `<span class="edit-object-btn pointer" title="${uiControlsSetup().GetUiControlText('ADMIN_TOOLTIP_EDIT')}"><i class="edit las la-edit"></i></span>`;
+                }
+
+
+                if (!preventDelete && showActionsColumn && !preventDeleteForOld) {
+                    deleteTmpl = `<span class="delete-object-btn pointer" title="${uiControlsSetup().GetUiControlText('ADMIN_TOOLTIP_DELETE')}"><i class="delete la la-trash"></i></span>`;
+                }
+                viewTmpl = `<span class="view-object-btn pointer" title="${uiControlsSetup().GetUiControlText('ADMIN_TOOLTIP_VIEW')}"><i class="view la la-eye"></i></span>`;
+
+                const sectionTmpl = `
+            <section class="sec-center" id="action__section__${pkId}" data-key="${pkId}">
+                <div class="action-items justify-content-start">
+                    ${editTmpl}
+                    ${viewTmpl}
+                    ${deleteTmpl}
+                </div>
+            </section>
+        `;
+
+                return sectionTmpl;
+            },
+            cellClick: function (e, cell) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                let row = cell.getRow();
+                let rowData = row.getData();
+                const isOld = !!rowData.IsOld;
+                if (e.target.closest('.delete-object-btn') && !preventDelete && !preventDeleteForOld) {
+                    let index = rowData.Index;
+                    if (index !== -1) {
+                        notificationUtil.confirmation({
+                            title: uiControlsSetup().GetUiControlText('lblAreYouSureWantToDeleteThisRecord'),
+                            body: '',
+                            okText: uiControlsSetup().GetUiControlText('lblYes'),
+                            cancelText: uiControlsSetup().GetUiControlText('lblNo')
+                        }, function () {
+                            row.delete();
+                            toggleAddButtonVisibility(tabelId, `${tabelId}_addBtn`, maxCount, maxCountNew, minCountNew);
+                        });
+                    }
+                }
+
+                if (e.target.closest('.edit-object-btn') && !preventEdit && !preventEditForOld) {
+                    ShowModalForEditModel(rowData, jsonSchema, modalId, modalBodyId, addObjectBtnId, modalTitleId, modalTitleTextForEdit, tabelId, isOld, maxCount, maxCountNew, minCountNew);
+                }
+
+                if (e.target.closest('.view-object-btn')) {
+                    ShowModalForViewModel(rowData, jsonSchema, modalId, modalBodyId, addObjectBtnId, modalTitleId, modalTitleTextForEdit, tabelId, maxCount, maxCountNew, minCountNew);
+                }
+            },
+            //visible: showActionsColumn
+            width: 200,
+        });
+
+
+
+        jsonSchema.fields
+            .filter(field => field.type !== 'buttonLabel')
+            .sort((a, b) => {
+                if (a.row !== b.row) return a.row - b.row;
+                return a.column - b.column;
+            })
+            .forEach((field) => {
+                let isHiddenField = field.Attributes?.some(attr => attr.name === "hideInList");
+
+                let column = {
+                    title: field.fieldName,
+                    field: field.fieldId,
+                    sorter: "string",
+                    width: isHiddenField,
+                    visible: !isHiddenField//renderType === RENDER_TYPE.PREVIEW ||
+                };
+
+                switch (field.type) {
+                    case "checkbox":
+                        column.formatter = (cell) => {
+                            const v = cell.getValue();
+                            const isTrue = v === true || (typeof v === "string" && v.trim().toLowerCase() === "true");
+                            return isTrue
+                                ? '<i class="fas fa-check" style="color:green"></i>'
+                                : '<i class="fas fa-times" style="color:red"></i>';
+                        };
+                        break;
+
+                    case "select2":
+                    case "select":
+                        column.formatter = (cell) => {
+                            let value = cell.getValue();
+                            if (!value) return "";
+
+                            if (typeof value === "string") {
+                                try {
+                                    if (value.startsWith("[") && value.endsWith("]")) {
+                                        value = JSON.parse(value);
+                                    } else if (value.includes(",")) {
+                                        value = value.split(",").map(v => v.trim());
+                                    }
+                                } catch { }
+                            }
+
+                            if (!Array.isArray(value)) value = [value];
+
+                            const options = GetDropdownOptionsForTabulator(field) || [];
+                            const map = new Map(options.map(o => [String(o.id), o.value]));
+
+                            const labels = value.map(v => map.get(String(v)) || v);
+
+                            return labels.join(", ");
+                        };
+                        break;
+                    case "file":
+                    case "fileV2":
+                        column.formatter = (cell) => {
+                            let fileValue = cell.getValue();
+
+                            if (fileValue) {
+                                let attachment = formUtility.attachments.find(at => at.id === fileValue);
+                                if (attachment || (fileValue && fileValue.name)) {
+                                    let fileName = attachment ? attachment.uiFileName : fileValue.name;
+                                    let fileId = attachment ? attachment.id : fileValue.file;
+
+                                    return `<a href="#" class="view-attachment pdf-attachment" data-id="${fileId}" data-name="${fileName}" title="${fileName}">${fileName}</a>`;
+                                }
+                            }
+
+                            return '';
+                        };
+
+                        break;
+                }
+
+                columns.push(column);
+            });
+
+
+        setTimeout(() => {
+            const addButtonId = `${tabelId}_addBtn`;
+            const addButton = $('#' + addButtonId);
+
+            if (addButton.length && (maxCount !== null || maxCountNew != null || minCountNew != null)) {
+                addButton.off('click.checkMaxCount').on('click.checkMaxCount', function () {
+                    toggleAddButtonVisibility(tabelId, addButtonId, maxCount, maxCountNew, minCountNew);
+                });
+            }
+        }, 300);
+        return columns;
+    };
+    function toggleAddButtonVisibility(tableId, addButtonId, maxCount, maxCountNew, minCountNew) {
+        const addButton = $('#' + addButtonId);
+        if (!addButton.length) return;
+
+        const checkTableReady = setInterval(() => {
+            const table = Tabulator.findTable(`#${tableId}`)[0];
+            if (!table) return;
+
+            clearInterval(checkTableReady);
+
+            const data = table.getData();
+            const totalCount = data.length;
+            const newCount = data.filter(d => !d.IsOld).length;
+
+            const hasMaxCountNew = maxCountNew !== null && maxCountNew !== undefined;
+            const hasMaxCount = maxCount !== null && maxCount !== undefined;
+            const hasMinCountNew = minCountNew !== null && minCountNew !== undefined;
+
+            const reachedMaxNew = hasMaxCountNew && newCount >= maxCountNew;
+            const reachedMaxTotal = hasMaxCount && totalCount >= maxCount;
+            const belowMinNew = hasMinCountNew && newCount < minCountNew;
+
+            if (reachedMaxNew || reachedMaxTotal) {
+                addButton.hide().removeClass('need-more-new-rows');
+                return;
+            }
+
+            //if (belowMinNew) {
+            //    addButton.show().addClass('need-more-new-rows').attr('title', `Add at least ${minCountNew} new row(s). Currently: ${newCount}.`);
+            //    return;
+            //}
+
+            addButton.show().removeClass('need-more-new-rows').removeAttr('title');
+        }, 200);
+    }
+    const ShowModalForEditModel = (data, jsonSchema, modalId, modalBodyId, addObjectBtnId, modalTitleId, modalTitleTextForEdit, table, isOld = false, maxCount, maxCountNew, minCountNew) => {
+        const json_schema_copy = JSON.parse(JSON.stringify(jsonSchema));
+
+        json_schema_copy.fields.forEach(field => {
+            const fieldName = field.fieldId;
+            if (fieldName in data) {
+                field.value = data[fieldName];
+            }
+        });
+
+        modalHtmlTemplate(modalId, modalTitleTextForEdit, modalBodyId, addObjectBtnId);
+
+        GenerateFormFieldsFromJsonSchema(json_schema_copy, modalBodyId, { isOld });
+
+        $('#' + modalTitleId).html(modalTitleTextForEdit);
+        $('#' + addObjectBtnId).html(uiControlsSetup().GetUiControlText('lblSave'));
+        $('#' + addObjectBtnId).addClass('edit-object-btn');
+
+        if (data.Index) {
+            $('#' + uniqueIndexId).val(data.Index);
+        }
+
+        $('#' + modalId).modal('show');
+        initializeFields(json_schema_copy.fields, modalId, RENDER_TYPE.ACTION);
+        //InitializeCascadingDropdown(json_schema_copy);
+        //evaluateConditionsAfterLoadForList(json_schema_copy);
+        //handleListFieldConditionalFields(json_schema_copy);
+
+        bindModalButtons(modalId, addObjectBtnId, 'cancelModalBtnId', modalBodyId, jsonSchema, table, maxCount, maxCountNew, minCountNew);
+    };
+    const modalHtmlTemplate = (modalId = "sharedListModal", modalTitleText = "", modalBodyId = "sharedModalBody", addObjectBtnId = "sharedAddObjectBtn") => {
+        // ✅ Remove existing modal if it exists
+        const existingModal = document.getElementById(modalId);
+        if (existingModal) {
+            existingModal.remove();
+        }
+
+        const modalHtml = `
+        <div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="${modalId}Label" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-scrollable  modal-lg" role="document">
+                              <div class="modal-content">
+                                <div class="modal-header">
+                                  <h5 class="modal-title" id="${modalId}Label">${modalTitleText}</h5>
+                                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body" id="${modalBodyId}">
+                                  <!-- Form fields will be dynamically injected here -->
+                                </div>
+                                <div class="modal-footer">
+                                  <button type="button" class="btn btn-secondary lblCancel" id="cancelSharedModalBtnId" data-bs-dismiss="modal">Close</button>
+                                  <button type="button" class="btn btn-primary" id="${addObjectBtnId}">Save</button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>`;
+
+        $('body').append(modalHtml);
+
+        return `#${modalId}`;
+    };
+
+    const modalViewHtmlTemplate = (modalId = "sharedListViewModal", modalTitleText = "", modalBodyId = "sharedViewModalBody") => {
+        const existingModal = document.getElementById(modalId);
+        if (existingModal) {
+            existingModal.remove(); // ✅ Remove existing modal DOM element
+        }
+
+        const modalHtml = `
+        <div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="${modalId}Label" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-scrollable  modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="${modalId}Label">${modalTitleText}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body" id="${modalBodyId}">
+                        <!-- Form fields will be dynamically injected here -->
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+        $('body').append(modalHtml);
+
+        return `#${modalId}`;
+    };
+    let isAddingRow = false;
+    const bindModalButtons = (modalId, addObjectBtnId, cancelModalBtnId, modalBodyId, jsonSchema, tableId, maxCount, maxCountNew, minCountNew) => {
+        $('#' + cancelModalBtnId).click(function () {
+            $('#' + modalId).modal('hide');
+        });
+
+        $('#' + addObjectBtnId).off('click').on('click', function (e) {
+            e.preventDefault();
+
+            const $button = $(this);
+            if ($button.prop('disabled') || isAddingRow) return;
+
+            $button.prop('disabled', true); // prevent multiple clicks
+
+            isAddingRow = true;
+            $button.prop('disabled', true);
+            setTimeout(() => { isAddingRow = false; }, 1000);
+            let data = GetDataWithinDiv(modalBodyId);
+
+            if (!$button.hasClass('edit-object-btn')) {
+                data.Index = uuid.v4();
+            }
+
+            jsonSchema = FillAttributeMessages(jsonSchema);
+            const dataForValidateFields = GetDataForValidateFields(data);
+
+            let validationErrors = window.formUtility?.validateFields(
+                jsonSchema.fields.filter(field => field.type !== 'buttonLabel'),
+                dataForValidateFields,
+                'INFO'
+            );
+
+            const errorMessages = validationErrors.flatMap(validationError => {
+                if (Array.isArray(validationError.errors)) {
+                    $button.prop('disabled', false);
+                    return validationError.errors.map(error => {
+                        return typeof error === 'string'
+                            ? { fieldId: validationError.fieldId, error }
+                            : error;
+                    });
+                } else if (typeof validationError.error === 'string') {
+                    $button.prop('disabled', false);
+                    return [{
+                        fieldId: validationError.fieldId,
+                        error: validationError.error
+                    }];
+                } else {
+                    $button.prop('disabled', false);
+                    return [];
+                }
+            });
+
+
+            // 🚫 Check QIDs must not match the Scholarship Student QID
+            const notScholarshipField = jsonSchema.fields.find(field =>
+                field.attributes?.some(attr => attr.name === "NotScholarshipStudentQID")
+            );
+            const notScholarshipAttr = jsonSchema.fields
+                .flatMap(field => field.attributes || [])
+                .find(attr => attr.name === "NotScholarshipStudentQID");
+
+            const message = notScholarshipAttr?.message || "QIDs must not match the Scholarship Student QID";
+            if (notScholarshipField) {
+                const notScholarshipQid = data[notScholarshipField.fieldId];
+                const result = validateNotSameStudentQID(notScholarshipQid, message);
+
+                if (typeof result === 'string') {
+                    errorMessages.push({ fieldId: notScholarshipField.fieldId, error: result });
+                } else if (Array.isArray(result)) {
+                    result.forEach(err =>
+                        errorMessages.push({ fieldId: notScholarshipField.fieldId, error: err })
+                    );
+                }
+            }
+
+            // 🚫 Check QID in MOI
+            if (errorMessages.length === 0) {
+                const qidField = jsonSchema.fields.find(field =>
+                    field.attributes?.some(attr => attr.name === "CheckQIDMOI")
+                );
+                const qidExpiryField = jsonSchema.fields.find(field =>
+                    field.attributes?.some(attr => attr.name === "CheckQIDExpiryMOI")
+                );
+
+                if (qidField && qidExpiryField) {
+                    const qid = data[qidField.fieldId];
+                    const qidExpiryDate = data[qidExpiryField.fieldId];
+
+                    if (!qid || !qidExpiryDate) {
+                        errorMessages.push({
+                            fieldId: qidField.fieldId,
+                            error: "QID or QID Expiry Date is missing."
+                        });
+                    } else {
+                        const exists = checkCompanionInMOI(qid, qidExpiryDate);
+                        if (!exists) {
+                            errorMessages.push({
+                                fieldId: qidField.fieldId,
+                                error: "QID does not exist in MOI records."
+                            });
+                        }
+                    }
+                }
+            }
+
+            // Handle errors
+            if (errorMessages.length > 0) {
+                DisplayAlert(errorMessages[0].error);
+                showErrors(errorMessages);
+                $button.prop('disabled', false);
+                return;
+            }
+
+            const table = Tabulator.findTable(`#${tableId}`)[0];
+            if (!table) {
+                console.error(`Table with ID ${tableId} not found.`);
+                $button.prop('disabled', false);
+                return;
+            }
+
+            // 🚫 Check max row limit before adding
+            const allRows = table.getData();
+            const currentTotalCount = allRows.length;
+            const newRowsCount = allRows.filter(r => !r.IsOld).length;
+
+            // 1️ Check limit for new (non-old) rows first
+            if (!$button.hasClass('edit-object-btn') && maxCountNew !== null && newRowsCount >= maxCountNew) {
+                DisplayAlert(`Maximum number of new rows (${maxCountNew}) reached.`);
+                $button.prop('disabled', false);
+                return;
+            }
+            //// 2️ Check minimum count for new rows
+            //if (minCountNew !== null && newRowsCount < minCountNew) {
+            //    DisplayAlert(`You must add at least ${minCountNew} new row(s) before continuing.`);
+            //    $button.prop('disabled', false);
+            //    return;
+            //}
+
+            // 3 Then check total limit if defined
+            if (!$button.hasClass('edit-object-btn') && maxCount !== null && currentTotalCount >= maxCount) {
+                DisplayAlert(`Maximum number of rows (${maxCount}) reached.`);
+                $button.prop('disabled', false);
+                return;
+            }
+
+
+            // ✅ Update or Add data
+            if ($button.hasClass('edit-object-btn')) {
+                let arrayTabulator = table.getData();
+                let indexToUpdate = arrayTabulator.findIndex(item => item.Index === data.Index);
+
+                if (indexToUpdate !== -1) {
+                    for (let key in data) {
+                        if (data.hasOwnProperty(key)) {
+                            arrayTabulator[indexToUpdate][key] = data[key];
+                        }
+                    }
+                    table.setData(arrayTabulator);
+                }
+            } else {
+                table.addData([data]);
+            }
+
+            $('#' + modalId).modal('hide');
+            $button.prop('disabled', false); // re-enable after success
+
+            // ✅ Re-check row count after adding
+            const addButtonId = `${tableId}_addBtn`;
+            toggleAddButtonVisibility(tableId, addButtonId, maxCount, maxCountNew, minCountNew);
+        });
+    };
+    const GetDataWithinDiv = (divId) => {
+        var data = {};
+        var employeeIndex = $('#' + uniqueIndexId).val();
+        if (divId) {
+            $('#' + divId + ' input, #' + divId + ' select, #' + divId + ' textarea').each(function () {
+
+                var id = $(this).attr('id');
+                var type = $(this).attr('type');
+                if (!id && (type != 'fileV2' && type != 'file')) { return; }
+                var value;
+
+                if (value === undefined) {
+                    switch ($(this).attr('type')) {
+                        case 'checkbox':
+                            value = $(this).is(':checked');
+                            break;
+
+                        case 'file':
+                        case 'fileV2': {
+                            const nativeFileInput = this;
+                            const parentId = $(this).parent().attr('id');
+                            const uniqueTimestamp = new Date().getTime();
+                            id = $(this).parent().attr('id');
+                            let fileId = id.replace('field_view_', '') + '_' + new Date().getTime();
+
+                            if (nativeFileInput.files.length > 0) {
+                                const file = nativeFileInput.files[0];
+
+                                tempFileStorage[fileId] = {
+                                    file: file,
+                                    name: file.name,
+                                    size: file.size,
+                                    type: file.type
+                                };
+
+                                value = {
+                                    name: file.name,
+                                    size: file.size,
+                                    type: file.type,
+                                    file: fileId,
+                                    isfile: true
+                                };
+
+                            }
+                            break;
+                        }
+
+
+                        default:
+                            value = $(this).val();
+                            break;
+                    }
+                }
+
+                id = id.replace('field_', '');
+                data[id] = value;
+            });
+
+            $('#' + divId + ' .file-field-container').each(function () {
+                const containerId = $(this).attr('id');
+
+                //if (!containerId) { return; }
+                let value;
+                const fileInput = $(this).find('input[type="file"]');
+                if (fileInput.length === 0 || fileInput[0].files.length === 0) {
+                    const attachmentId = $(this).data('attachment-id');
+
+                    if (attachmentId) {
+                        let attachment = formUtility.attachments.find(a => a.id.toLowerCase() === attachmentId.toLowerCase());
+
+                        if (attachment) {
+                            value = attachmentId;
+                        }
+                        else if (!attachment && tempFileStorage[attachmentId]) {
+                            attachment = {
+                                name: tempFileStorage[attachmentId].name,
+                                size: tempFileStorage[attachmentId].size,
+                                type: tempFileStorage[attachmentId].type,
+                                file: attachmentId
+                            };
+                            value = attachment;
+                        }
+
+                    }
+
+                    if ($(this).parent().find('.value').length > 0) {
+                        value = $(this).parent().find('.value').data();
+                    }
+                }
+                if (value) {
+                    data[containerId.replace('field_', '')] = value;
+                }
+            });
+
+            data['Index'] = $('#' + uniqueIndexId).val();
+        }
+
+        return data;
+    }
+
+    const FillAttributeMessages = (jsonSchema) => {
+        var lang = currentLang;
+
+        if (jsonSchema) {
+            jsonSchema.fields.filter(field => field.type !== 'buttonLabel').forEach(function (item) {
+
+                item.name = item.fieldName;
+
+            });
+        }
+
+        return jsonSchema;
+    }
+
+    const GetDataForValidateFields = (data) => {
+        const fieldIdValueMap = Object.entries(data)
+            .filter(([key]) => key !== "Index")
+            .map(([key, Value]) => {
+                const fieldId = key.replace("field_", "");
+                return { fieldId: fieldId, value: Value };
+            });
+
+        return fieldIdValueMap;
+    }
+    const ShowModalForViewModel = (data, jsonSchema, modalId, modalBodyId, addObjectBtnId, modalTitleId, modalTitleTextForEdit, table, maxCount, maxCountNew, minCountNew) => {
+        const json_schema_copy = JSON.parse(JSON.stringify(jsonSchema));
+
+        json_schema_copy.fields.forEach(field => {
+            const fieldName = field.fieldId;
+            if (fieldName in data) {
+                field.value = data[fieldName];
+            }
+        });
+
+        modalViewHtmlTemplate(modalId, modalTitleTextForEdit, modalBodyId);
+
+        GenerateFormFieldsViewFromJsonSchema(json_schema_copy, modalBodyId, uniqueIndexId);
+
+        $('#' + modalTitleId).html(modalTitleTextForEdit);
+
+
+        if (data.Index) {
+            $('#' + uniqueIndexId).val(data.Index);
+        }
+
+        $('#' + modalId).modal('show');
+        initializeFields(json_schema_copy.fields, modalId, RENDER_TYPE.PREVIEW);
+        // InitializeCascadingDropdown(json_schema_copy);
+       // handleListFieldConditionalFields(json_schema_copy);
+        //evaluateConditionsAfterLoadForList(json_schema_copy);
+        bindModalButtons(modalId, addObjectBtnId, 'cancelModalBtnId', modalBodyId, jsonSchema, table, maxCount, maxCountNew, minCountNew);
+    };
+    function ShowModalForAddModel  (modalId, modalTitleId, addObjectBtnId, jsonSchema, modalBodyId, modalTitleText, tableId, maxCount, maxCountNew, minCountNew)  {
+        const modalHtml = modalHtmlTemplate(modalId, modalTitleText, modalBodyId, addObjectBtnId);
+
+        GenerateFormFieldsFromJsonSchema(jsonSchema, modalBodyId);
+
+        $('#' + modalTitleId).html(modalTitleText);
+        $('#' + addObjectBtnId).html(uiControlsSetup().GetUiControlText('lblAdd'));
+        $('#cancelSharedModalBtnId').text(uiControlsSetup().GetUiControlText('lblCancel'));
+        $('#' + modalId).modal('show');
+        $('#' + addObjectBtnId).removeClass('edit-object-btn');
+
+        initializeFields(jsonSchema.fields, modalId, RENDER_TYPE.ACTION);
+        //InitializeCascadingDropdown(jsonSchema);
+        //evaluateConditionsAfterLoadForList(jsonSchema);
+        //handleListFieldConditionalFields(jsonSchema);
+
+        bindModalButtons(modalId, addObjectBtnId, 'cancelModalBtnId', modalBodyId, jsonSchema, tableId, maxCount, maxCountNew, minCountNew);
+
+    };
+    const GenerateFormFieldsFromJsonSchema = (jsonSchema, elementId, options = {}) => {
+        if (elementId) {
+            $('#' + elementId).empty();
+
+            let sharedListModalLabel = jsonSchema.fields.find(item => item.type === 'buttonLabel');
+            let buttonText = sharedListModalLabel ? sharedListModalLabel.fieldName : uiControlsSetup().GetUiControlText('lblAddNewList');
+
+            $('#sharedListModalLabel').text(buttonText);
+            if (jsonSchema.fields) {
+                jsonSchema.fields = jsonSchema.fields
+                    .map(field => ({ ...field, fieldId: field.fieldId.replaceAll('view_', '') }))
+                    .filter(field => field.type !== 'buttonLabel');
+            }
+
+            jsonSchema.fields.forEach(x => {
+                x.fieldId = x.fieldId.replaceAll('view_', '');
+            });
+
+
+            const formGroupsContainer = window.formUtility?.renderFormGroups(jsonSchema, RENDER_TYPE.ACTION, undefined, options);
+
+            $('#' + elementId).append(formGroupsContainer);
+
+            if ($('#' + uniqueIndexId).length === 0) {
+                let hiddenInput = $('<input>').attr({
+                    type: 'hidden',
+                    name: 'Index',
+                    id: uniqueIndexId,
+                    value: ''
+                });
+
+                $('body').append(hiddenInput);
+            }
+
+        }
+
+    }
+
+    const GenerateFormFieldsViewFromJsonSchema = (jsonSchema, elementId) => {
+        if (elementId) {
+            $('#' + elementId).empty();
+
+            if (jsonSchema.fields) {
+                jsonSchema.fields = jsonSchema.fields
+                    .map(field => ({
+                        ...field,
+                        fieldId: field.fieldId ? field.fieldId.replaceAll('view_', '') : null
+                    }))
+                    .filter(field => field.type !== 'buttonLabel');
+            }
+
+            jsonSchema.fields.forEach(x => {
+                x.fieldId = x.fieldId ? x.fieldId.replaceAll('view_', '') : null;
+                x.attributes = [];
+            });
+
+
+            const formGroupsContainer = window.formUtility?.renderFormGroups(jsonSchema, RENDER_TYPE.PREVIEW);
+
+            $('#' + elementId).append(formGroupsContainer);
+
+            if ($('#' + uniqueIndexId).length === 0) {
+                let hiddenInput = $('<input>').attr({
+                    type: 'hidden',
+                    name: 'Index',
+                    id: uniqueIndexId,
+                    value: ''
+                });
+
+                $('body').append(hiddenInput);
+            }
+
+        }
+
+    }
+
+    function openSharedModal(field) {
+        $('#sharedModalTitleId').text(`Add ${field.name}`);
+
+        $('#sharedModalBodyId').html(generateDynamicForm(field));
+
+        $('#cancelSharedModalBtnId').text(uiControlsSetup().GetUiControlText('lblCancel'));
+        $('#addSharedModalBtnId').text(uiControlsSetup().GetUiControlText('lblAdd'));
+
+        $('#sharedModal').modal('show');
+    }
+
+    function generateDynamicForm(field) {
+        let formHtml = '';
+
+        field.jsonSchema.fields.forEach(schema => {
+            if (schema.type === 'text') {
+                formHtml += `<div class="form-group">
+                            <label for="${schema.fieldId}">${schema.label}</label>
+                            <input type="text" class="form-control" id="${schema.fieldId}" value="${schema.value || ''}">
+                          </div>`;
+            }
+        });
+
+        return formHtml;
+    }
+
+    $('body').on('click', '.add-list-btn', function () {
+        let fieldId = $(this).data('fieldId');
+        let field = fields.find(f => f.fieldId === fieldId);
+        openSharedModal(field);
+    });
     function calculate(birthDateValue) {
         if (!birthDateValue) return;
 
@@ -521,8 +1293,8 @@ window.formUtility = window.formUtility || {};
             if (button) {
                 button.on('click', function (e) {
                     e.preventDefault();
-                    if (typeof ns.ShowModalForAddModel === "function") {
-                        ns.ShowModalForAddModel(
+                  
+                        ShowModalForAddModel(
                             modalId,
                             modalTitleId,
                             addObjectBtnId,
@@ -534,7 +1306,7 @@ window.formUtility = window.formUtility || {};
                             maxCountNew,
                             minCountNew
                         );
-                    }
+                    
                 });
             }
         });
@@ -917,7 +1689,7 @@ window.formUtility = window.formUtility || {};
         initializeFields(fields, elementId, renderType, actionType);
 
         if (renderType === RENDER_TYPE.ACTION && typeof ns.InitializeCascadingDropdown === "function") {
-            ns.InitializeCascadingDropdown(formGroups);
+          //  ns.InitializeCascadingDropdown(formGroups);
         }
 
         if (typeof ns.evaluateConditionsAfterLoad === "function") ns.evaluateConditionsAfterLoad();

@@ -191,6 +191,8 @@ public static class ConstantKeys
         public static readonly string EvalRequestNotExsit = "EvalRequestNotExsit";
         public static readonly string OneOfUserNotExsit = "OneOfUserNotExsit";
         public static readonly string UserNotExist = "UserNotExist";
+        public static readonly string RequestEvaluationNotExist = "RequestEvaluationNotExist";
+
         public static readonly string TeamExistsUserTeam = "TeamExistsUserTeam";
     }
 
@@ -356,6 +358,15 @@ public static class ConstantKeys
         public static readonly string WebDepartmentHoliday = "WebDepartmentHoliday";
 
     }
+    public static class WebAppRequest
+    {
+        public const string actionTransactionsdetailsLabel = "actionTransactionsdetailsLabel";//ToDo Insert
+        public static readonly string lblSaveChanges = "lblSaveChanges";//ToDo Insert
+        public static readonly string lblCloseModal = "lblCloseModal";//ToDo Insert
+        public static readonly string lblRemarks = "lblRemarks";//ToDo Insert
+
+    }
+
     public static class AdminPermission
     {
         public const string VIEW_ADMIN_HOME = "VIEW_ADMIN_HOME";
@@ -966,6 +977,68 @@ public static class ConstantKeys
         public const string LASTUPDATEDBY = "LASTUPDATEDBY";
         public const string LASTUPDATEDDATE = "LASTUPDATEDDATE";
     }
+    public static class CreatePlan
+    {
+        public const string lblAddPlan = "lblAddPlan";
+        public const string lblChoosePlanType = "lblChoosePlanType";
+        public const string lblCreateNewPlan = "lblCreateNewPlan";
+        public const string lblDeletePlanConfirm = "lblDeletePlanConfirm";
+        public const string lblEvaluationPlan = "lblEvaluationPlan";
+        public const string lblEvaluationPlanRequests = "lblEvaluationPlanRequests";
+        public const string lblInsertPlan = "lblInsertPlan";
+        public const string lblPlanCreatedOn = "lblPlanCreatedOn";
+        public const string lblPlanEndDate = "lblPlanEndDate";
+        public const string lblPlanName = "lblPlanName";
+        public const string lblPlanRequests = "lblPlanRequests";
+        public const string lblPlanSchoolsCount = "lblPlanSchoolsCount";
+        public const string lblPlansListTitle = "lblPlansListTitle";
+        public const string lblPlanStartDate = "lblPlanStartDate";
+        public const string lblPlanStatus = "lblPlanStatus";
+        public const string lblPlanType = "lblPlanType";
+        public const string lblPleaseChoosePlanType = "lblPleaseChoosePlanType";
+        public const string lblPleaseEnterPlanTitle = "lblPleaseEnterPlanTitle";
+        public const string lblSearchPlan = "lblSearchPlan";
+
+        public const string PlanStatusesIsActive = "PlanStatusesIsActive";
+        public const string PlanStatusesNameAr = "PlanStatusesNameAr";
+        public const string PlanStatusesNameEn = "PlanStatusesNameEn";
+        public const string PlanStatusExistsPlan = "PlanStatusExistsPlan";
+        public const string PlanStatusExistsPlanHistory = "PlanStatusExistsPlanHistory";
+
+        public const string PlanTypeDepDepartmentId = "PlanTypeDepDepartmentId";
+        public const string PlanTypeDepExistsPlan = "PlanTypeDepExistsPlan";
+        public const string PlanTypeDepIsActive = "PlanTypeDepIsActive";
+        public const string PlanTypeDepNameAr = "PlanTypeDepNameAr";
+        public const string PlanTypeDepNameEn = "PlanTypeDepNameEn";
+        public const string PlanTypeDepPlanTypeId = "PlanTypeDepPlanTypeId";
+        public const string lblSelectSchools = "lblSelectSchools";
+        public const string lblVisitDate = "lblVisitDate";
+        public const string lblLastEvaluation = "lblLastEvaluation";
+        public const string lblVisitType = "lblVisitType";
+        public const string lblAcademicYear = "lblAcademicYear";
+    }
+    public static class Assignment
+    {
+        public const string lblNoSelectedMembers = "lblNoSelectedMembers";
+        public const string lblAllTeams = "lblAllTeams";
+        public const string msgMembersAddedSuccessfully = "msgMembersAddedSuccessfully";
+        public const string lblTeamLeader = "lblTeamLeader";
+        public const string phSearchHere = "phSearchHere";
+        public const string lblSelectedVisitTeam = "lblSelectedVisitTeam";
+        public const string lblJobTitle = "lblJobTitle";
+        public const string lblMembers = "lblMembers";
+        public const string lblMemberName = "lblMemberName";
+        public const string btnFilter = "btnFilter";
+        public const string lblDomain = "lblDomain";
+        public const string btnSaveTeam = "btnSaveTeam";
+        public const string btnDeleteSelected = "btnDeleteSelected";
+        public const string lblNDA = "lblNDA";
+        public const string lblNoMembers = "lblNoMembers";
+        public const string lblLoading = "lblLoading";
+        public const string lblPartyType = "lblPartyType";
+    }
+
+
 
     public static class EvaluationPlanRequests
     {
@@ -1099,6 +1172,8 @@ public static class ConstantKeys
         public const string dropzone = "dropzone";
         public const string table = "table";
         public const string list = "list";
+        public const string EvaluationPlan = "EvaluationPlan";
+        public const string Evl_Form = "Evl_Form";
     }
 
     public static class Module
@@ -1127,9 +1202,12 @@ public static class ConstantKeys
         public const string SaveAsDraft = "SaveAsDraft";
         public const string Close = "Close";
         public const string INFO_Override_Approve = "INFO_Override_Approve";
-        public const string CreateEvaluationPlan = "CREATE_EVALUATION_PLAN";
+        public const string CreateEvaluationPlan = "CREATE_PLAN";
         public const string UPDATE_ITEGRATION_FIELDS = "UPDATE_ITEGRATION_FIELDS";
         public const string INFO_WITH_DRAFT = "INFO_WITH_DRAFT";
+        public const string CLOSE_AND_DELETE_PLAN = "CLOSE_AND_DELETE_PLAN";
+        public const string CLOSE_AND_UPDATE_PLAN = "CLOSE_AND_UPDATE_PLAN";
+        public const string CLOSE_AND_UPDATE_FORM = "CLOSE_AND_UPDATE_FORM";
     }
 
     public static class ServiceSettings
@@ -1158,10 +1236,17 @@ public static class ConstantKeys
     public static class ModuleType
     {
         public const string EvaluationPlan = "EvaluationPlan";
-        public const string EvaluationPlanRequest = "EvaluationPlanRequest";
+        public const string EvaluationRequest = "EvaluationRequest";
         public const string EvaluationParty = "EvaluationParty";
-        public const string Forms = "Forms";
-        public const string Complain = "Complain";
+
+    }
+    public static class ModuleTypeIds
+    {
+        public static readonly Guid EvaluationPlan = Guid.Parse("FFFBF420-AED3-4A73-B25E-B7B9E67337A7");
+
+        public static readonly Guid EvaluationRequest = Guid.Parse("6677F0C5-2531-4123-98F8-8E0A7C5B0ADA");
+
+        public static readonly Guid EvaluationParty = Guid.Parse("281E98ED-9ED5-4AF3-8C08-4A659BE99DC8");
     }
     public static class NDAStatic
     {

@@ -94,7 +94,8 @@ namespace Evaluation.API.Middlewares
             "School",
              "Plan",
             "PlanType",
-            "DepartmentHoliday"
+            "DepartmentHoliday",
+            "AcademicYear"
         };
 		private bool EndpointRequiresDepRouting(HttpContext context)
 		{

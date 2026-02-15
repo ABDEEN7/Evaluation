@@ -6,6 +6,7 @@ using Evaluation.Services.BusinessLayer;
 using Evaluation.Services.BusinessLayer.API;
 using Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices;
 using Evaluation.Services.Models.API;
+using Evaluation.SharedHelper.Dtos.TeamMemberDto;
 using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Api.ActionEntitiesDTOs;
@@ -62,11 +63,17 @@ namespace Evaluation.API.Controllers
 		{
 			var files = Request.Form?.Files;
 			var assignUsersJson = Request?.Form!["users"].FirstOrDefault();
+			var teamUsersJson = Request?.Form!["teamUsers"].FirstOrDefault();
 			Guid requestId = Guid.TryParse(Request?.Form!["requestId"], out var tempId) ? tempId : Guid.Empty;
+			Guid evaluationRequestId = Guid.TryParse(Request?.Form!["evaluationRequestId"], out var EvlId) ? EvlId : Guid.Empty;
 
 			var assignUsers = !string.IsNullOrEmpty(assignUsersJson)
 				? JsonConvert.DeserializeObject<List<AssignUserDTO?>>(assignUsersJson)!
 				: new List<AssignUserDTO?>();
+
+			var teamUsers = !string.IsNullOrEmpty(teamUsersJson)
+				? JsonConvert.DeserializeObject<List<EvalTeamRequestDto>>(teamUsersJson)!
+				: new List<EvalTeamRequestDto>();
 
 			string fieldValuesJson = Request?.Form!["fieldValues"]!;
 
@@ -77,7 +84,7 @@ namespace Evaluation.API.Controllers
 
 			dto.RequestId = requestId;
 
-			return await _serviceRequestBL.HandleServiceRequestAsync(dto, planId, serviceId,actionName,fieldValuesJson,assignUsers,files, dto.ActionRemarks!, saveAsDraft);
+			return await _serviceRequestBL.HandleServiceRequestAsync(dto, planId, evaluationRequestId , serviceId,actionName,fieldValuesJson,assignUsers, teamUsers, files, dto.ActionRemarks!, saveAsDraft);
 		}
 
 		[HttpGet]

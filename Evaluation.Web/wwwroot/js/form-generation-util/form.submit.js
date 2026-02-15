@@ -34,7 +34,14 @@ window.serviceRequestForm = window.serviceRequestForm || {};
             }
         }
     }
-    const getRequestId = () => getUrlParam("id");
+    const getRequestId = () => {
+        const id = getUrlParam("id");
+        return id ? id : getUrlParam("1Evlid");
+    };
+    const getEvlRequestId = () => {
+        const id = getUrlParam("Evlid");
+        return id;
+    };
     const getPlanId = () => getUrlParam("PlanId") || getUrlParam("PlanId");
 
     const normalizeFormGroups = (formGroups) => {
@@ -84,12 +91,28 @@ window.serviceRequestForm = window.serviceRequestForm || {};
 
                 case "list": {
                     const tableId = getListDomId(field, renderType);
+
+                    let tableData = [];
                     if (window.Tabulator) {
                         const tables = Tabulator.findTable("#" + tableId);
-                        value = (tables && tables.length) ? tables[0].getData() : [];
-                    } else {
-                        value = [];
+                        tableData = (tables && tables.length) ? (tables[0].getData() || []) : [];
                     }
+
+                    value = (tableData || []).map(row => {
+                        const r = { ...(row || {}) };
+
+                        if (r.file != null && r.file !== "") {
+                            r.file = Array.isArray(r.file) ? r.file : [r.file];
+                        }
+
+                        if (r.IsOld === undefined || r.IsOld === null || r.IsOld === "") {
+                            r.IsOld = false;
+                        }
+
+                        return r;
+                    });
+
+                    value = JSON.stringify(value);
                     break;
                 }
 
@@ -103,7 +126,19 @@ window.serviceRequestForm = window.serviceRequestForm || {};
                     }
                     break;
                 }
+                case "evaluationplan": {
+                    const fieldId = `field_${field.fieldId}`;
+                    const planObj = window.SubmitPlanHandler?.getFormPlanJson(fieldId);
+                    value = planObj ? JSON.stringify(planObj) : null;
+                    break;
+                }
 
+                case "evl_form": {
+
+                    const formObj = saveForm(field.formId);
+                    value = formObj ? JSON.stringify(formObj) : null;
+                    break;
+                }
                 case "datetime":
                 case "date":
                 case "phone":
@@ -164,7 +199,7 @@ window.serviceRequestForm = window.serviceRequestForm || {};
     // ================================
     function buildFormData(actionDetails, formGroups, renderType) {
         const formData = new FormData();
-
+        let actionTypeName = actionDetails.actionType.backEndName;
         const { fields, valuesMap } = collectFieldValues(formGroups, renderType);
 
         const payloadFields = fields.map(f => ({
@@ -174,10 +209,17 @@ window.serviceRequestForm = window.serviceRequestForm || {};
         }));
 
         formData.append("requestId", getRequestId());
+        formData.append("evaluationRequestId", getEvlRequestId());
 
         formData.append("fieldValues", JSON.stringify(payloadFields));
 
-        // formData.append("users", JSON.stringify(assignUsers));
+        if (actionTypeName === ACTION_TYPE.ASSIGNT_TEAM) {
+            const teamData = getAssignmentsDataByFieldId('assign');
+            if (!teamData) return { formData, ok: false };
+            formData.append("teamUsers", JSON.stringify(teamData));
+
+        }
+        
 
          //formData.append("ActionRemarks", remarksValue);
 
@@ -235,10 +277,10 @@ window.serviceRequestForm = window.serviceRequestForm || {};
                 DisplayAlert("Unexpected empty response.", "danger");
                 return;
             }
-
-            if (window.requestId) {
+            let RequestId  = getRequestId();
+            if (RequestId) {
                 window.tempFileStorage = {};
-                sharedFn().DisplayAlert('Form submitted successfully!', 'success');
+               DisplayAlert('Form submitted successfully!', 'success');
                 setTimeout(() => {
                     sharedUtility().RedirectToModuleOrDefault();
                 }, 1000);

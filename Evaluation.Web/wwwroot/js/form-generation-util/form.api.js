@@ -73,22 +73,6 @@
         }
     }
 
-    function getUrlParam(param) {
-        const params = new URLSearchParams(global.location.search);
-        return params.get(param);
-    }
-
-    function addQueryParameter(key, value) {
-        const url = new URL(global.location.href);
-        url.searchParams.set(key, value);
-        history.pushState(null, "", url.toString());
-    }
-
-    function removeQueryParameter(keys) {
-        const url = new URL(global.location.href);
-        (keys || []).forEach(key => url.searchParams.delete(key));
-        history.pushState(null, "", url.pathname + url.search);
-    }
 
     function loadAllCssClasses() {
        
@@ -116,9 +100,6 @@
         fetchJSONWithoutLoader,
         fetchBlob,
         fetchJSONHandelError,
-        getUrlParam,
-        addQueryParameter,
-        removeQueryParameter,
         loadAllCssClasses
     };
 

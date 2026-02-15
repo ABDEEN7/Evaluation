@@ -5,10 +5,12 @@ using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.ActionEntities;
 using Evaluation.DAL.Models.FormBuilder;
 using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
+using Evaluation.DAL.Models.ServiceEnities;
 using Evaluation.DAL.Models.ServiceRequestEntities;
 using Evaluation.DAL.Repositories;
 using Evaluation.Services.BusinessLayer.API;
 using Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices;
+using Evaluation.Services.BusinessLayer.API.PlanLayer;
 using Evaluation.Services.Extensions;
 using Evaluation.Services.Models.API;
 using Evaluation.Services.Special;
@@ -40,14 +42,14 @@ namespace Evaluation.Services.BusinessLayer.API
     public class  FormRenderBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, SrvUser _srvUser, UnitOfWork uow, LoggingServices loggingServices, SrvAction _srvAction,
 				  IMapper mapper,UserInfo userInfo,   RequestInfo _requestInfo, SrvServiceRequest _srvServiceRequest, EvaluationRequestService _evaluationRequestService, SrvService _srvService, SrvActionStatusConfiguration _srvActionStatusConfiguration
 			, SrvAttachments _srvAttachments, SrvDropdown _srvDropdown, SystemModuleSrv systemModuleSrv, SrvStatus _srvStatus, SrvAssignment _srvAssignment,
-				SrvField _srvField, IServiceProvider serviceProvider , ServiceRequestBL serviceRequestBL)
+				SrvField _srvField, IServiceProvider serviceProvider , ServiceRequestBL serviceRequestBL, PlanServiceRequestServices planServiceRequestServices)
             : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, _requestInfo)
         {
 
 		public async Task<ActionCustomDTO> GetActionField(ServiceAction action, Guid serviceId, RequestType requestType, Guid? requestId = null , Guid? PlanId = null)
 		{
 			string lang = _requestInfo.Lang;
-			var result = action.Adapt<ActionCustomDTO>();
+			var result = mapper.Map<ActionCustomDTO>(action);
 
 			var integrationFieldsToProcess = new ConcurrentBag<FieldValueDTO>();
 			var schAttachmentIds = new ConcurrentBag<string>();
@@ -105,6 +107,7 @@ namespace Evaluation.Services.BusinessLayer.API
 					var fieldDto = new FieldValueDTO
 					{
 						FieldId = field.Id,
+						formId = field.EvalFormId,
 						Value = value,
 						IsApproved = fieldValue?.IsApproved,
 						Type = fieldType,
@@ -194,84 +197,43 @@ namespace Evaluation.Services.BusinessLayer.API
 			return result;
 		}
 
-
 		private async Task<List<string>> HandleFieldsWithReadFromFieldIdAsync(List<FieldValueDTO> fields, Guid? requestId, Guid? PlanId)
 		{
-			List<string> attachmentList = new List<string>();
-			//if (fields == null || !fields.Any())
-			//	return attachmentList;
+			var attachmentList = new List<string>();
 
+			if (fields == null || fields.Count == 0)
+				return attachmentList;
 
-			//var fieldsWithReadFrom = fields.Where(f => f.ReadFromFieldId.HasValue && string.IsNullOrWhiteSpace(f.Value)).ToList();
+			var fieldsWithReadFrom = fields
+				.Where(f =>f != null && f.ReadFromFieldId.HasValue && string.IsNullOrWhiteSpace(f.Value))
+				.ToList();
 
-			//if (!fieldsWithReadFrom.Any())
-			//	return attachmentList;
+			if (fieldsWithReadFrom.Count == 0)
+				return attachmentList;
 
-			//var readFromFieldIds = fieldsWithReadFrom
-			//						.Select(f => f.ReadFromFieldId!.Value)
-			//						.Distinct()
-			//						.ToList();
+			foreach (var field in fieldsWithReadFrom)
+			{
+				if (!field.ReadFromFieldId.HasValue)
+					continue;
 
-			//// 2. Get SystemFields
-			//var systemFields = await SrvSystemField.GetSystemFieldsByIds(readFromFieldIds);
+				var sourceField = await _srvField.GetFieldsByIdsAsync(field.ReadFromFieldId.Value);
+				if (sourceField?.FieldType?.BackendName == null)
+					continue;
 
-			//if (systemFields == null || !systemFields.Any())
-			//	return attachmentList;
-			//Guid? userId = requestId != null
-			//				? await SrvServiceRequest.GetUserIdByRequestIdAsync(requestId.Value)
-			//				: userInfo.UserId;
+				if (sourceField.FieldType.BackendName==FieldTypeConstant.EvaluationPlan)
+				{
+					if (!PlanId.HasValue || PlanId.Value == Guid.Empty)
+						return attachmentList;
 
-			//if (userId == null)
-			//	return attachmentList;
+					var planJsonResult =
+						await planServiceRequestServices.GetPlanJsonById(PlanId!.Value);
 
-			//var userProfile = await SrvUser.GetStudentByIdAsync(userId.Value);
+					if (!planJsonResult.IsSuccess || string.IsNullOrWhiteSpace(planJsonResult.Value))
+						continue;
 
-			//var schFieldValues = (PlanId != Guid.Empty && PlanId != null)
-			//	? await SrvScholarship.GetSchFieldValues(PlanId.Value)
-			//	: new List<SchFieldValue>();
-
-			//// 3. Process each field
-			//foreach (var field in fieldsWithReadFrom)
-			//{
-			//	var sysField = systemFields.FirstOrDefault(sf => sf.Id == field.ReadFromFieldId);
-			//	if (sysField == null)
-			//		continue;
-
-			//	if (sysField.SystemTable?.BackendName?.ToLower() == "scholarship")
-			//	{
-			//		var FieldValue = schFieldValues?.FirstOrDefault(x => x.SystemFieldId == sysField.Id);
-			//		if (FieldValue != null)
-			//		{
-			//			if (sysField.FieldType.BackendName == "file" || sysField.FieldType.BackendName == "fileV2")
-			//			{
-			//				attachmentList.Add(FieldValue.Value!);
-			//			}
-			//			if (sysField.FieldType.BackendName == "list")
-			//			{
-			//				var fieldList = await srvField.GetFieldListByFieldId(field.FieldId!.Value);
-			//				var (extractedJson, attachments) = ExtractFieldValues(fieldList, FieldValue.Value!);
-			//				field.Value = extractedJson;
-			//				attachmentList.AddRange(attachments);
-
-			//			}
-
-			//			else
-			//			{
-			//				field.Value = FieldValue.Value;
-			//			}
-
-			//		}
-			//	}
-			//	else if (sysField.SystemTable?.BackendName?.ToLower() == "studentprofile" && userProfile != null)
-			//	{
-			//		var userProfileValue = await GetStudentProfileFieldValue(userProfile, sysField.BackendName);
-			//		if (!string.IsNullOrWhiteSpace(userProfileValue))
-			//		{
-			//			field.Value = userProfileValue;
-			//			field.IsApproved = true;
-			//		}
-			//	}
-			//}
+					field.Value = planJsonResult.Value;
+				}
+			}
 			return attachmentList;
 		}
 		public (string extractedJson, List<string> attachmentList) ExtractFieldValues(List<Field> fieldList, string jsonData)
@@ -581,12 +543,14 @@ namespace Evaluation.Services.BusinessLayer.API
 
 			return service;
 		}
-		public async Task<ServiceDTO> GetCreatePlanService(Guid DepartementId)
+		public async Task<ServiceDTO> GetCreatePlanService()
 		{
 			var lang = _requestInfo.Lang;
 			var userId = userInfo.UserId ?? Guid.Parse("C2536611-576B-4EB8-84F4-747F4ECE9A23");
-			DepartementId = Guid.Parse("1B8F5ADE-37D0-4D77-A780-CA3FF3EC0F43");
-			var service = await _srvService.GetCreatePlanServiceDetailsAsync(DepartementId, lang);
+			var DepartementId = requestInfo.DepId!.Value;// Guid.Parse("1B8F5ADE-37D0-4D77-A780-CA3FF3EC0F43");
+			//var service = await _srvService.GetCreatePlanServiceDetailsAsync(DepartementId, lang);
+			var service = await _srvService.GetServiceDetailsByModuleTypeAsync(DepartementId, ModuleType.EvaluationPlan, lang, initialService: true);
+
 
 			if (service.Actions != null &&service.Actions.Any() &&service.Actions.Count == 1)
 			{
@@ -596,12 +560,26 @@ namespace Evaluation.Services.BusinessLayer.API
 
 			return service;
 		}
-		public async Task<ServiceDTO> GetCreateEvaluationPartyService(Guid DepartementId, Guid serviceId)
+		public async Task<ServiceDTO> GetPlanService( Guid serviceId,Guid planId)
 		{
 			var lang = _requestInfo.Lang;
 			var userId = userInfo.UserId ?? Guid.Parse("C2536611-576B-4EB8-84F4-747F4ECE9A23");
-			DepartementId = Guid.Parse("1B8F5ADE-37D0-4D77-A780-CA3FF3EC0F43");
-			var service = await _srvService.GetEvaluationPartyServiceDetailsAsync(DepartementId, serviceId, lang);
+			var DepartementId = requestInfo.DepId!.Value;// Guid.Parse("1B8F5ADE-37D0-4D77-A780-CA3FF3EC0F43");
+			var service = await _srvService.GetServiceDetailsByModuleTypeAsync(DepartementId, ModuleType.EvaluationPlan, lang, serviceId: serviceId, initialService: false, planId);
+			if (service.Actions != null && service.Actions.Any() && service.Actions.Count == 1)
+			{
+				var action = service.Actions.First();
+				service.ServiceRequestDTO = await GetActionFieldAsync(service.Id!.Value, action.BakendName, null, planId);
+			}
+
+			return service;
+		}
+		public async Task<ServiceDTO> GetCreateEvaluationPartyService( Guid serviceId)
+		{
+			var lang = _requestInfo.Lang;
+			var userId = userInfo.UserId ?? Guid.Parse("C2536611-576B-4EB8-84F4-747F4ECE9A23");
+			var DepartementId = requestInfo.DepId!.Value;// Guid.Parse("1B8F5ADE-37D0-4D77-A780-CA3FF3EC0F43");
+			var service = await _srvService.GetServiceDetailsByModuleTypeAsync(DepartementId, ModuleType.EvaluationParty, lang, serviceId: serviceId);
 
 			if (service.Actions != null && service.Actions.Any() && service.Actions.Count == 1)
 			{
@@ -713,14 +691,14 @@ namespace Evaluation.Services.BusinessLayer.API
 				{
 					var moduleId = service.SystemModuleId;
 					var canAccess = await _evaluationRequestService.ValidateMinistryUserAccessAsync(userId, moduleId, requestId.Value);
-					if (!canAccess)
-						throw new UnauthorizedAccessException("You do not have permission to view this request.");
+					//if (!canAccess)
+					//	throw new UnauthorizedAccessException("You do not have permission to view this request.");
 				}
 				else
 				{
 					var canAccess = await _srvServiceRequest.HasAccessToRequestAsync(requestId.Value, userId);
-					if (!canAccess)
-						throw new UnauthorizedAccessException("You do not have permission to view this request.");
+					//if (!canAccess)
+					//	throw new UnauthorizedAccessException("You do not have permission to view this request.");
 				}
 
 				PlanId = requestObj.PlanId ?? PlanId;

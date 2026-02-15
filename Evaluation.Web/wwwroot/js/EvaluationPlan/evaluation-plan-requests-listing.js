@@ -82,7 +82,6 @@
 
                 window.formUtility = window.formUtility || {};
                 formUtility.attachments = response.attachments || [];
-
                 formUtility.renderPreviewView(
                     'plan-request-details-container',
                     response.formGroups,
@@ -98,6 +97,9 @@
                         ctx: { root: '#planRequestModal' }
                     }
                 );
+
+                formUtility.addQueryParameter('id', requestId)
+                formUtility.addQueryParameter('serviceId', response.serviceId)
 
                 $('#planRequestModalLabel').text(response.status || '');
                 $('#planRequestNoText').text(response.requestNumber || '');

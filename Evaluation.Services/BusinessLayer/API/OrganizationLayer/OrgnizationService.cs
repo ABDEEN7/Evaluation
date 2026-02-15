@@ -9,6 +9,7 @@ using Evaluation.SharedHelper.Dtos.SchoolDto;
 using Evaluation.SharedHelper.Extensions;
 using Evaluation.SharedHelper.Helper;
 using Evaluation.SharedHelper.Models;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System.Linq.Expressions;
 
@@ -24,11 +25,12 @@ public class OrgnizationService(IServiceScopeFactory serviceScopeFactory,
     RequestInfo requestInfo
     ) : ApiBase(serviceScopeFactory, cacheDataProvider, unitOfWork, loggingServices, mapper, userInfo, serviceProvider, requestInfo)
 {
-    public async Task<PaginatedResult<Employee>> GetOrgnizationAsync(SchoolRequest request, List<Guid?> targetOrgTreeIds, List<Guid> currentOrganizations)
+    public async Task<PaginatedResult<OrgTree>> GetOrgnizationAsync(SchoolRequest request, List<Guid?> targetOrgTreeIds, List<Guid> currentOrganizations)
     {
         var filter = BuildFilterExpression(request, targetOrgTreeIds, currentOrganizations);
-        var query = unitOfWork.GetRepository<Employee>()
-                    .GetAllNonDeleted(filter);
+        var query = unitOfWork.GetRepository<OrgTree>()
+                    .GetAllNonDeleted(filter)
+                    .Include(x=>x.OrgParent);
         return await query.GetPaginatedResult(request.PageNumber, request.PageSize);
     }
     public async Task<PaginatedResult<OrgTree>> GetMultipleOrgAsync(SchoolRequest request, List<Guid?> targetOrgTreeIds, List<Guid> currentOrganizations)
@@ -47,11 +49,11 @@ public class OrgnizationService(IServiceScopeFactory serviceScopeFactory,
             filter = filter.And(s => s.NameEn.Contains(request.Name) || s.NameAr.Contains(request.Name));
         return filter;
     }
-    private Expression<Func<Employee, bool>> BuildFilterExpression(SchoolRequest request, List<Guid?> targetOrgTreeIds, List<Guid> currentOrganizations)
+    private Expression<Func<OrgTree, bool>> BuildFilterExpression(SchoolRequest request, List<Guid?> targetOrgTreeIds, List<Guid> currentOrganizations)
     {
 
-        Expression<Func<Employee, bool>> filter = s => true;
-        filter = filter.And(c => targetOrgTreeIds.Contains(c.OrgParentId) && currentOrganizations.Contains(c.Id));
+        Expression<Func<OrgTree, bool>> filter = s => true;
+        filter = filter.And(c => currentOrganizations.Contains(c.Id));
 
         if (!string.IsNullOrWhiteSpace(request.Name))
             filter = filter.And(s => s.NameEn.Contains(request.Name) || s.NameAr.Contains(request.Name));

@@ -21,13 +21,14 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
     {
 
 
-        public async Task<SystemModule> GetSystemModuleByRoutingAsync(string routing)
+        public async Task<SystemModule> GetSystemModuleByRoutingAsync(string BackendName)
         {
             var scopedUow = serviceScopeFactory.CreateScopedUow();
 
             var SystemModule = await scopedUow.GetRepository<SystemModule>()
                 .GetAllQueryFiltered()
-                .FirstOrDefaultAsync(c => c.Routing == routing);
+                .Include(x=>x.SystemModuleType)
+                .FirstOrDefaultAsync(c => c.SystemModuleType.BackendName == BackendName && c.DepartmentId==requestInfo.DepId);
 
             return SystemModule!;
         }
@@ -121,8 +122,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 		{
 			return backendName switch
 			{
-				ModuleType.EvaluationPlanRequest => RequestType.Evaluation,
-
+				ModuleType.EvaluationRequest => RequestType.Evaluation,
 				ModuleType.EvaluationPlan or
 				ModuleType.EvaluationParty => RequestType.Service,
 

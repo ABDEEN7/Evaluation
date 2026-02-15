@@ -10,15 +10,32 @@ window.serviceRequestForm = window.serviceRequestForm || {};
     var DepartmentRouting = sharedUtility().extractDepartmentName();
     // #region 🧩 Helpers
 
+
+    function getUrlParam(param) {
+        const params = new URLSearchParams(window.location.search);
+        return params.get(param);
+    }
+
+    function addQueryParameter(key, value) {
+        const url = new URL(window.location.href);
+        url.searchParams.set(key, value);
+        history.pushState(null, "", url.toString());
+    }
+
+    function removeQueryParameter(keys) {
+        const url = new URL(window.location.href);
+        (keys || []).forEach(key => url.searchParams.delete(key));
+        history.pushState(null, "", url.pathname + url.search);
+    }
     const getText = (key) =>
         (window.uiControlsSetup && uiControlsSetup().GetUiControlText(key)) || "";
 
-    const getUrlParam = (key) => {
-        const params = new URLSearchParams(window.location.search);
-        return (params.get(key) || "").replace("#", "");
+  
+    const getRequestId = () => {
+        const id = getUrlParam("id");
+        return id ? id : getUrlParam("Evlid") ;
     };
-
-    const getRequestId = () => getUrlParam("id");
+    const getServiceId = () => getUrlParam("serviceId");
 
     const normalizeFormGroups = (formGroups) => {
         if (!formGroups) return [];
@@ -36,9 +53,12 @@ window.serviceRequestForm = window.serviceRequestForm || {};
         const btnText = lang === "ar" ? actionDetails.nameAr : actionDetails.nameEn;
 
         const $btn = $('<button>')
-            .addClass('btn btn-success ms-2 btn-sm min-w-auto')
+            .addClass('btn btn-primary mw-200')
             .attr('type', 'button')
             .attr('id', 'submitButton')
+            .attr('data-service-id', actionDetails?.serviceId || "")     
+            .attr('data-request-id', requestId || "")   
+             .attr('data-action-name', actionDetails?.bakendName || "") 
             .text(btnText)
             .on('click', (e) => {
                 e.preventDefault();
@@ -77,13 +97,18 @@ window.serviceRequestForm = window.serviceRequestForm || {};
 
     // #region 🧾 render Action DropDown & actionTransactions
 
-    const fetchAndRenderActionData = (backendKey, requestId, serviceId, modalContainer = 'Action-container-fields', ctx = {}) => {
+    const fetchAndRenderActionData = (backendKey, requestId, serviceId, modalContainer = 'Action-container-fields', UseactionModal =false, ctx = {}) => {
+
+        if (UseactionModal) { 
+            modalContainer = 'Action-container-fields';
+            ctx.actionModalId = 'actionModal';
+        }
 
         const actionModalId = ctx.actionModalId || 'actionModal';
         const actionModalRoot = $('#' + actionModalId);
 
-        serviceId = '97F03B5D-C45D-4F23-A1EA-DABE0678AE83';
-        requestId = 'C7DA6434-CA53-4F78-9D53-087E298B43C2';
+        //serviceId = getServiceId();
+        requestId = getRequestId();
 
         const isEvaluationRequest = true;
 
@@ -99,7 +124,7 @@ window.serviceRequestForm = window.serviceRequestForm || {};
                 success: function (response) {
 
                     const actionDetails = response?.actionCustom || null;
-                    const stepsData = response?.actionCustom?.steps || [];
+                    const stepsData = response?.actionCustom?.formGroups || [];
                     const dropdownsData = response?.dropDownValues || [];
                     const attachments = response?.schAttachments || [];
 
@@ -149,7 +174,7 @@ window.serviceRequestForm = window.serviceRequestForm || {};
     };
 
 
-    const renderActionsDropDown = (actions, containerId, templateContainerId, modalContainer, requestIdOverride, serviceIdOverride, ctx = {}) => {
+    const renderActionsDropDown = (serviceId,actions, containerId, templateContainerId, modalContainer, requestIdOverride, serviceIdOverride, ctx = {}) => {
 
         const root = ctx.root ? $(ctx.root) : $(document);
 
@@ -162,7 +187,7 @@ window.serviceRequestForm = window.serviceRequestForm || {};
         if (!actions?.length) return;
 
         const resolvedRequestId = requestIdOverride || null;
-        const resolvedServiceId = serviceIdOverride || null;
+        const resolvedServiceId = serviceId || null;
 
         const renderDropdownUI = () => {
             const dropdownWrapper = $('<div>').addClass('dropdown');
@@ -202,6 +227,7 @@ window.serviceRequestForm = window.serviceRequestForm || {};
                     resolvedRequestId,
                     resolvedServiceId,
                     modalContainer,
+                    true,
                     ctx 
                 );
             });
@@ -224,10 +250,7 @@ window.serviceRequestForm = window.serviceRequestForm || {};
         if (!Array.isArray(actionTransactions)) actionTransactions = [actionTransactions];
 
         if (actionTransactions.length > 0) {
-
-            if (typeof createActionTransactionsTable === "function") {
-                createActionTransactionsTable(actionTransactions, logSelector, ctx);
-            }
+            createActionTransactionsTable(actionTransactions, logSelector, ctx);
 
             const lastRemark = actionTransactions[actionTransactions.length - 1]?.remarks || "";
             const $notes = root.find(notesSelector);
@@ -250,7 +273,7 @@ window.serviceRequestForm = window.serviceRequestForm || {};
         const tableId = `History-table-${(ctx.requestId || 'x').toString().replaceAll('-', '')}`;
 
         const wrapperDiv = $('<div>').addClass('tabulator-wrapper');
-        const tableDiv = $('<div>').attr('id', tableId).addClass('tabulator-dark');
+        const tableDiv = $('<div>').attr('id', tableId).addClass('table table-bordered table-hover align-middle w-100 dataTable no-footer');
 
         wrapperDiv.append(tableDiv);
         $logWrap.html(wrapperDiv);
@@ -258,39 +281,40 @@ window.serviceRequestForm = window.serviceRequestForm || {};
      
         let columns = [];
 
-        if (userProfileDetailsInfo.UserType === "") {
-            columns = [
-                { title: uiControlsSetup().GetUiControlText('lblTranslogActionName'), field: "action", tooltip: true },
-                { title: uiControlsSetup().GetUiControlText('lblTranslogNote'), field: "remarks", tooltip: true },
-                { title: uiControlsSetup().GetUiControlText('lblTranslogDate'), cssClass: 'dateClazz', field: "formattedCreatedDate" },
-                {
-                    title: uiControlsSetup().GetUiControlText('lblViewDetails'),
-                    field: "",
-                    formatter: function (cell) {
-                        const { id } = cell.getRow().getData();
-                        return getActionTransactionsTemplate(id);
-                    },
-                    cellClick: actionTransactionsCellClick
-                },
-            ];
-        } else if (userProfileDetailsInfo.UserType === "Ministry") {
+        //if (userProfileDetailsInfo.UserType === "") {
+        //    columns = [
+        //        { title: uiControlsSetup().GetUiControlText('lblTranslogActionName'), field: "action", tooltip: true },
+        //        { title: uiControlsSetup().GetUiControlText('lblTranslogNote'), field: "remarks", tooltip: true },
+        //        { title: uiControlsSetup().GetUiControlText('lblTranslogDate'), cssClass: 'dateClazz', field: "formattedCreatedDate" },
+        //        {
+        //            title: uiControlsSetup().GetUiControlText('lblViewDetails'),
+        //            field: "",
+        //            formatter: function (cell) {
+        //                const { id } = cell.getRow().getData();
+        //                return getActionTransactionsTemplate(id);
+        //            },
+        //            cellClick: actionTransactionsCellClick
+        //        },
+        //    ];
+        //} else if (userProfileDetailsInfo.UserType === "Ministry") {
             columns = [
                 { title: uiControlsSetup().GetUiControlText('lblTranslogActionName'), field: "action", tooltip: true },
                 { title: uiControlsSetup().GetUiControlText('lblTranslogUserName'), field: "actor", tooltip: true },
                 { title: uiControlsSetup().GetUiControlText('lblTranslogFrom'), field: "previousStatus", tooltip: true },
                 { title: uiControlsSetup().GetUiControlText('lblTranslogTo'), field: "nextStatus", tooltip: true },
                 { title: uiControlsSetup().GetUiControlText('lblTranslogDate'), cssClass: 'dateClazz', field: "formattedCreatedDate" },
-                {
-                    title: uiControlsSetup().GetUiControlText('lblViewDetails'),
-                    field: "",
-                    formatter: function (cell) {
-                        const { id } = cell.getRow().getData();
-                        return getActionTransactionsTemplate(id);
-                    },
-                    cellClick: actionTransactionsCellClick
-                },
+                { title: uiControlsSetup().GetUiControlText('lblRemarks'),  field: "remarks" },
+                //{
+                //    title: uiControlsSetup().GetUiControlText('lblViewDetails'),
+                //    field: "",
+                //    formatter: function (cell) {
+                //        const { id } = cell.getRow().getData();
+                //        return getActionTransactionsTemplate(id);
+                //    },
+                //    cellClick: actionTransactionsCellClick
+                //},
             ];
-        }
+        //}
 
         new Tabulator(`#${tableId}`, {
             data,
@@ -299,13 +323,59 @@ window.serviceRequestForm = window.serviceRequestForm || {};
         });
     }
 
+    const actionTransactionsCellClick = (e, cell) => {
+        const rowData = cell.getRow().getData();
+        showDetailsModal(rowData.remarks, rowData.actionTransactionAttachments, rowData.action);
+    };
 
+    function showDetailsModal(remarks, attachments, action) {
+
+        $('#testRemarks').text(remarks);
+        $('#testRemarks').prop('disabled', true);
+        $('#actionTransactionsdetailsLabel').text(action);
+        const attachmentsSection = $('#attachmentsSection');
+        attachmentsSection.empty();
+        if (attachments && attachments.length) {
+
+            const attacNameFormatter = (cell, formatterParams, onRendered) => {
+                let cellValue = cell.getValue();
+                let rowData = cell.getRow().getData();
+
+                return `<a href="javascript:void(0);" class="view-attachment" data-id="${rowData.id}" data-name="${cellValue}">${cellValue}</a>`;
+            };
+            let table = new Tabulator("#attachmentsSection", {
+                data: attachments,
+                layout: "fitColumns",
+                columns: [
+                    {
+                        title: uiControlsSetup().GetUiControlText('lblTranslogfilename'), field: "uiFileName", formatter: attacNameFormatter
+                    },
+                    {
+                        title: uiControlsSetup().GetUiControlText('lblActions'), field: "id", formatter: function (cell, formatterParams, onRendered) {
+                            return `<button class='btn btn-primary btn-sm' onclick='downloadAttach("${cell.getValue()}", "${cell.getRow().getData().uiFileName}")'>Download</button>`;
+                        }
+                    }
+                ],
+            });
+
+
+            table.setData(attachments);
+        } else {
+            const noAttachmentsLabel = $('<label>')
+                .text(uiControlsSetup().GetUiControlText('lblNoAttachmentsAvailable')).addClass('no-file-label');
+
+            attachmentsSection.append(noAttachmentsLabel);
+        }
+
+        $('#actionTransactionsdetailsModal').modal('show');
+    }
     // #endregion
 
     // #region 👁️‍🗨️ renderPreviewView ()
     function renderPreviewView(elementId, formGroups, actions, actionTransactions, attachments, ctx = {}) {
 
         const root = ctx.root ? $(ctx.root) : $(document);
+        const serviceId = ctx.serviceId ;
 
         const groups = normalizeFormGroups(formGroups);
         const $container = root.find("#" + elementId);
@@ -327,7 +397,7 @@ window.serviceRequestForm = window.serviceRequestForm || {};
         const modalContainerId = ctx.modalContainerId || 'Action-container-fields';
 
         if (actions.length > 0 ) {
-            renderActionsDropDown( actions,actionsContainerId,templateContainerId,modalContainerId,ctx.requestId,ctx.serviceId, ctx );
+            renderActionsDropDown(serviceId,actions,actionsContainerId,templateContainerId,modalContainerId,ctx.requestId,ctx.serviceId, ctx );
         } else {
             root.find(`#${actionsContainerId}`).empty();
             root.find(`#${templateContainerId}`).empty();
@@ -339,12 +409,9 @@ window.serviceRequestForm = window.serviceRequestForm || {};
 
         $container.append(formGroupsContainer);
 
-        fu.initializeFieldsAndConditions &&
-            fu.initializeFieldsAndConditions(groups, elementId, RENDER_TYPE.PREVIEW, null);
-
-        if (typeof window.renderTransactionsSection === "function") {
-            window.renderTransactionsSection(actionTransactions, ctx);
-        }
+          fu.initializeFormFieldsAndConditions(groups, elementId, RENDER_TYPE.PREVIEW, null);
+      renderTransactionsSection(actionTransactions, ctx);
+        
     }
 
 
@@ -358,6 +425,7 @@ window.serviceRequestForm = window.serviceRequestForm || {};
 
         const groups = normalizeFormGroups(formGroups);
         const $container = $("#" + elementId);
+        const $modal = $container.closest(".modal"); 
         $container.empty();
         $("#user-wrapper").empty();
 
@@ -376,21 +444,6 @@ window.serviceRequestForm = window.serviceRequestForm || {};
 
             assignmentsUtility.generateAssignments('assign');
 
-            const moveAndInit = () => {
-                const $wrapper = $('#assign_wrapper');
-                if (!$wrapper.length) return false;
-
-                $container.empty().append($wrapper);
-
-                assignmentsLogic.init('assign', requestId);
-                return true;
-            };
-
-            if (!moveAndInit()) {
-                setTimeout(() => moveAndInit(), 100);
-            }
-
-           // return; 
         }
         // ==========================================
 
@@ -426,7 +479,7 @@ window.serviceRequestForm = window.serviceRequestForm || {};
         if (showDraft) {
             const draftText = getText('lblSaveAsDraft') || 'Save as Draft';
             const $draftBtn = $('<button>')
-                .addClass('btn btn-warning btn-sm min-w-auto')
+                .addClass('btn btn-warning btn-sm min-w-auto mw-200')
                 .attr('type', 'button')
                 .text(draftText)
                 .on('click', (e) => {
@@ -441,15 +494,39 @@ window.serviceRequestForm = window.serviceRequestForm || {};
         const submitBtnOrContainer = generateSubmitButton(requestId, groups, actionDetails, false);
         $buttonsWrapper.append(submitBtnOrContainer);
 
-        const $btnContainer = $("#Action-container-button");
+        const isActionModal = $modal.attr("id") === "actionModal";
+        const $btnContainer = isActionModal
+            ? $modal.find("#Action-container-button")
+            : $modal.find("#Requestbtns");   
+
         if ($btnContainer.length) {
             $btnContainer.empty().append($buttonsWrapper);
         } else {
             $container.append($buttonsWrapper);
         }
 
-        fu.initializeFieldsAndConditions &&
-            fu.initializeFieldsAndConditions(groups, elementId, RENDER_TYPE.ACTION, actionTypeName);
+        
+        fu.initializeFormFieldsAndConditions(groups, elementId, RENDER_TYPE.ACTION, actionTypeName);
+
+        if (actionTypeName === ACTION_TYPE.ASSIGNT_TEAM) {
+
+           
+            const moveAndInit = () => {
+                const $wrapper = $('#assign_wrapper');
+                if (!$wrapper.length) return false;
+
+                $container.empty().append($wrapper);
+
+                assignmentsLogic.init('assign', requestId, elementId);
+                return true;
+            };
+
+            if (!moveAndInit()) {
+                setTimeout(() => moveAndInit(), 100);
+            }
+
+            // return; 
+        }
     }
 
 
@@ -460,6 +537,9 @@ window.serviceRequestForm = window.serviceRequestForm || {};
     ns.renderPreviewView = renderPreviewView;
     ns.renderActionView = renderActionView;
     ns.generateSubmitButton = generateSubmitButton;
+    fu.addQueryParameter = addQueryParameter;
+    fu.getUrlParam = getUrlParam;
+    fu.removeQueryParameter = removeQueryParameter;
 
     // #endregion
 

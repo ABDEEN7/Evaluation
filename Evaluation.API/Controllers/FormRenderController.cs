@@ -35,14 +35,19 @@ namespace Evaluation.API.Controllers
 			return await _formRenderBL.GetServiceAsync(serviceId);
 		}
 		[HttpGet]
-		public async Task<ServiceDTO> GetCreatePlanService(Guid serviceId)
+		public async Task<ServiceDTO> GetCreatePlanService()
 		{
-			return await _formRenderBL.GetCreatePlanService(serviceId);
+			return await _formRenderBL.GetCreatePlanService();
 		}
 		[HttpGet]
-		public async Task<ServiceDTO> GetCreateEvaluationPartyService(Guid DepartementId, Guid serviceId)
+		public async Task<ServiceDTO> GetCreatePlanRequestService(Guid serviceId, Guid planId)
 		{
-			return await _formRenderBL.GetCreateEvaluationPartyService(DepartementId, serviceId);
+			return await _formRenderBL.GetPlanService(serviceId, planId);
+		}
+		[HttpGet]
+		public async Task<ServiceDTO> GetCreateEvaluationPartyService( Guid serviceId)
+		{
+			return await _formRenderBL.GetCreateEvaluationPartyService( serviceId);
 		}
 		[HttpGet]
 		public async Task<List<ServiceDTO>> GetServicesWebApp(string? moduelName)

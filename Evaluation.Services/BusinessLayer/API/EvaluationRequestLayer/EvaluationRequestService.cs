@@ -69,11 +69,10 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 	public async Task<WebAppEvaluationRequestsDTO> GetEvaluationRequestsAsync(Guid userId, FilterRequestsDTO model)
 	{
 		string lang = requestInfo!.Lang;
-		model.ModuleName = "/evaluation-plan-request";
 
 		using var uow = serviceScopeFactory.CreateScopedUow();
 
-		var moduleTask = SrvSystemModule.GetSystemModuleByRoutingAsync(model.ModuleName);
+		var moduleTask = SrvSystemModule.GetSystemModuleByRoutingAsync(ModuleType.EvaluationRequest);
 		var userTask = srvUser.GetByIDActiveNonDeleted(userId);
 		var timeFormatTask = cacheDataProvider.GetSystemSettingValue(SystemSettings.ShortTimeFormat);
 		var dateFormatTask = cacheDataProvider.GetSystemSettingValue(SystemSettings.DateFormat);
@@ -117,14 +116,15 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 			.GetRepository<EvaluationRequest>()
 			.GetAllActiveNonDeleted()
 			.Include(x => x.Service)
+			.ThenInclude(x => x.SystemModule)
 			.Include(x => x.ServiceStatus)
 			.Include(x => x.OrgTree)
 			.Include(x => x.DepEvaluationType)
 			.Include(x => x.Plan)
 				.ThenInclude(p => p!.PlanStatus);
 
-		baseQuery = baseQuery.AsSplitQuery()
-			.Where(x => x.Service!.SystemModuleId == module.Id);
+		//baseQuery = baseQuery.AsSplitQuery()
+		//	.Where(x => x.Service!.SystemModuleId == module.Id);
 
 		var permissions = new
 		{
@@ -146,7 +146,7 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 		return baseQuery.Select(x => new EvaluationRequestDTO
 		{
 			Id = x.Id,
-			ServiceId = x.ServiceId,
+			ServiceId = x.Service!.Id,
 			Service = lang == "ar" ? x.Service!.NameAr : x.Service!.NameEn,
 			icon = x.Service!.Icon,
 			RequestNumber = "1234",
@@ -289,6 +289,7 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 
 			Status = Status,
 			Service = lang == "ar" ? request.Service.NameAr : request.Service.NameEn,
+			ServiceId =  request.ServiceId,
 			EvaluationParties=await evaluationPartiesTask,
 			//CanViewFieldHistory = hasFieldHistoryPermission,
 			//CanViewAllFieldHistory = hasAllFieldHistoryPermission
@@ -589,35 +590,12 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 		{
 			if (isMinistry)
 			{
-				if (!string.IsNullOrEmpty(model.Qid))
-				{
-					requests = requests.Where(x => !string.IsNullOrEmpty(x.QID) && x.QID == model.Qid);
-				}
+				
+				//if (model.OrgTreeId.HasValue)
+				//{
+				//	requests = requests.Where(x => x.StudentUserId == model.OrgTreeId);
+				//}
 
-				if (model.StudentUserId.HasValue)
-				{
-					requests = requests.Where(x => x.StudentUserId == model.StudentUserId);
-				}
-
-				if (!string.IsNullOrEmpty(model.Mobile))
-				{
-					requests = requests.Where(x => !string.IsNullOrEmpty(x.Mobile) && x.Mobile == model.Mobile);
-				}
-
-				if (model.StudentNationalityId != null && model.StudentNationalityId.Any())
-				{
-					requests = requests.Where(x => model.StudentNationalityId.Contains(x.StudentNationalityId!));
-				}
-
-				if (model.CountryId != null && model.CountryId.Any())
-				{
-					requests = requests.Where(x => model.CountryId.Contains(x.CountryId));
-				}
-
-				if (model.UniversityId != null && model.UniversityId.Any())
-				{
-					requests = requests.Where(x => model.UniversityId.Contains(x.UniversityId));
-				}
 
 				var date_Format = await cacheDataProvider.GetSystemSettingValue(SystemSettings.DateFormat);
 
