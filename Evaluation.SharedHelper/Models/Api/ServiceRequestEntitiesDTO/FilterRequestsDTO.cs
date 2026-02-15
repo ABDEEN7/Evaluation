@@ -14,7 +14,9 @@ namespace Evaluation.SharedHelper.Models.Api.ServiceRequestEntitiesDTO
             AssignedToIdForRequestsFilter = new List<string>();
             DynamicDictionary = new Dictionary<string, string>();
             ServiceId = new List<Guid>();
-            
+            CountryId = new List<Guid?>();
+            UniversityId = new List<Guid?>();
+            StudentNationalityId = new List<string>();
         }
 
         public string? RequestDateFrom { get; set; }
@@ -25,15 +27,22 @@ namespace Evaluation.SharedHelper.Models.Api.ServiceRequestEntitiesDTO
         public List<Guid>? ServiceId { get; set; }
         public List<Guid?>? StatusesList { get; set; }
         public List<string>? AssignedToIdForRequestsFilter { get; set; }
+
         public string? ModuleName { get; set; }
         public string? ModuelName { get; set; } // optional, depending on usage
+
+        public string? Qid { get; set; }
+        public string? Mobile { get; set; }
         public int? PageNumber { get; set; }
         public bool? OderByAction { get; set; }
 
         public Dictionary<string, string>? DynamicDictionary { get; set; }
         public string? StatusTypeId { get; set; }
-        public string? OrgTreeId { get; set; }
-      
+
+        public List<string>? StudentNationalityId { get; set; }
+        public Guid? StudentUserId { get; set; }
+        public List<Guid?>? CountryId { get; set; }
+        public List<Guid?>? UniversityId { get; set; }
     }
 
 }
