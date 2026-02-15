@@ -79,8 +79,8 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
             var routingList = await Uow.GetRepository<UserPartyType>()
                                        .GetAll(x => x.UserId == userIdClaim && x.PartyType!.IsEmployeePartyType)
-                                       .Include(x => x.PartyType!.SystemModule)
-                                       .Select(x => x.PartyType!.SystemModule!.Routing.ToLower())
+                                       .Include(x => x.PartyType!.Department)
+                                       .Select(x => x.PartyType!.Department!.RoutingPath.ToLower())
                                        .Distinct()
                                        .ToListAsync();
 

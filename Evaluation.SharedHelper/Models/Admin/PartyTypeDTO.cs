@@ -10,8 +10,8 @@ public class PartyTypeDTO : EntityBaseDTO
     public bool IsEmployeePartyType { get; set; }
     public bool CanViewAllRequests { get; set; }
     public bool CanViewAllEvaluations { get; set; }
-    public Guid SystemModuleId { get; set; }
-    public string? SystemModule { get; set; }
+    public Guid DepartmentId { get; set; }
+    public string? Department { get; set; }
     public Guid[]? UserPartyType { get; set; }
 
 }

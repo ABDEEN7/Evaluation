@@ -261,8 +261,8 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
                     var employeeUserPartyTypes = await Scoped.GetRepository<UserPartyType>()
                                                    .GetAllQueryFiltered(x => x.UserId == userProfileId)
-                                                   .Include(x => x.PartyType!.SystemModule)
-                                                   .Where(x => x.PartyType!.SystemModule.Id == Module.Id && x.PartyType.IsEmployeePartyType)
+                                                   .Include(x => x.PartyType!.Department)
+                                                   .Where(x => x.PartyType!.DepartmentId == Module.DepartmentId && x.PartyType.IsEmployeePartyType)
                                                    .Select(x => x.PartyType!.Id)
                                                    .Distinct()
                                                    .ToListAsync();

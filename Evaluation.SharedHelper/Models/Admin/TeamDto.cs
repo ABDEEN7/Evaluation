@@ -1,11 +1,11 @@
 ﻿namespace Evaluation.SharedHelper.Models.Admin;
 
-public class JobTitleDto : EntityBaseDTO
+public class TeamDto : EntityBaseDTO
 {
     public string NameAr { get; set; } = null!;
     public string NameEn { get; set; } = null!;
     public int OrderNo { get; set; } = 0;
-    public string? HrCode { get; set; }
-    public bool IsOrgManager { get; set; }
-    public bool IsActive { get; set; }
+    public Guid DepartmentId { get; set; }
+    public string? Department { get; set; }
+
 }
