@@ -55,7 +55,7 @@ namespace Evaluation.API.Controllers
             return await _serviceRequestBL.GetScopesList(partyId);
         }
         [HttpGet]
-        public async Task<List<string>> GetSupportedFiles(Guid requestId)
+        public async Task<List<SupportedFileDto>> GetSupportedFiles(Guid requestId)
         {
             return await _serviceRequestBL.GetSupportedFiles(requestId);
         }

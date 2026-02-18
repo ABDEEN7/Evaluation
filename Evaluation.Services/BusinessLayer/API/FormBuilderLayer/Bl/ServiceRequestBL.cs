@@ -63,7 +63,7 @@ namespace Evaluation.Services.Models.API
         {
             return await _srvServiceRequest.GetScopeList(partyId);
         }
-        public async Task<List<string>> GetSupportedFiles(Guid requestId)
+        public async Task<List<SupportedFileDto>> GetSupportedFiles(Guid requestId)
         {
             return await _srvServiceRequest.GetSupportedFiles(requestId);
         }

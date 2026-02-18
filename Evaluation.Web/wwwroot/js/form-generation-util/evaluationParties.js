@@ -103,6 +103,7 @@
                     notificationUtil.success("Uploaded successfully");
                     $("#EvaluationfileModal").modal('hide');
                     self.removeAllFiles(true);
+                    GetSupportedFiles($("#EvaluationfileSectionRequestId").val());
                 });
 
                 this.on("error", function () {
@@ -114,20 +115,61 @@
         });
 
     };
-    function GetSupportedFiles(filedivid, requestId) {
+    function getFileIcon(fileName) {
+        if (!fileName) return 'las la-file';
+
+        const extension = fileName.split('.').pop().toLowerCase();
+
+        const imageExtensions = ['png', 'jpg', 'jpeg', 'gif', 'bmp', 'webp'];
+        const pdfExtensions = ['pdf'];
+        const wordExtensions = ['doc', 'docx'];
+        const excelExtensions = ['xls', 'xlsx'];
+
+        if (imageExtensions.includes(extension))
+            return 'las la-file-image text-warning';
+
+        if (pdfExtensions.includes(extension))
+            return 'las la-file-pdf text-danger';
+
+        if (wordExtensions.includes(extension))
+            return 'las la-file-word text-primary';
+
+        if (excelExtensions.includes(extension))
+            return 'las la-file-excel text-success';
+
+        return 'las la-file';
+    }
+
+
+    function GetSupportedFiles(requestId) {
         const options = {
             success: function (response) {
-                if (response) {
-                  
+                if (!response || response.length === 0) return;
 
-                }
+                const container = $('#filedivid');
+                container.empty();
+
+                response.forEach(file => {
+                    const iconClass = getFileIcon(file.uiFileName);
+
+                    const fileBox = `
+                    <div class="file-box text-center p-2 border rounded">
+                        <a href="${file.fileUrl}" target="_blank">
+                            <i class="${iconClass} fa-3x mb-2"></i>
+                            <div class="file-name">${file.uiFileName}</div>
+                        </a>
+                    </div>
+                `;
+
+                    container.append(fileBox);
+                });
             }
         };
 
-
-
-        jqClient(options).Get(`/ServiceRequest/${departmentRoutePath}/GetSupportedFiles?requestId=${requestId}`);
+        jqClient(options)
+            .Get(`/ServiceRequest/${departmentRoutePath}/GetSupportedFiles?requestId=${requestId}`);
     }
+
     function renderEvaluationParties(parties, requestId, options = {}) {
         const containerId = options.containerId || "evaluationPartiesContainer";
         const parentAccordionId = options.parentAccordionId || "customAccordionParties";
@@ -276,7 +318,7 @@
                       <ul class="list-group list-group-flush">
                         <li class="list-group-item d-flex align-items-center justify-content-between">
                               
-                                <div id="">
+                                <div id="filedivid" class="file-container d-flex flex-wrap gap-3">
                               </li>
                       </ul>
                     </div>
@@ -284,7 +326,7 @@
                 `;
           
             if (party.isSupportFiles) {
-                GetSupportedFiles(filedivid, requestId);
+                GetSupportedFiles(requestId);
                 $accordion.append(`
               <div class="accordion-item mb-3 rounded">
                 <h2 class="accordion-header" id="${headerId}" data-id="${escapeHtml(partyId)}">

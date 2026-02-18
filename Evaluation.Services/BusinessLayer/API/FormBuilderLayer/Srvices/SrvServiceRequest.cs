@@ -324,23 +324,27 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
         }
 
-        public async Task<List<string>> GetSupportedFiles(Guid requestId)
+        public async Task<List<SupportedFileDto>> GetSupportedFiles(Guid requestId)
         {
-            var uow = serviceScopeFactory.CreateScopedUow();
-
+            using var uow = serviceScopeFactory.CreateScopedUow();
 
             var attachments = await uow.GetRepository<EvalAttachment>()
-    .GetAllNonDeleted()
-    .Where(x => x.EvaluationRequestId == requestId)
-    .Select(x => StorageService.GenerateSasToken(
-        x.FileName,
-        2,
-        x.UiFileName,false,StorageContainerType.evaluation))
-    .ToListAsync();
-
+                .GetAllNonDeleted()
+                .Where(x => x.EvaluationRequestId == requestId)
+                .Select(x => new SupportedFileDto
+                {
+                    UiFileName = x.UiFileName,
+                    FileUrl = StorageService.GenerateSasToken(
+                        x.FileName,
+                        2,
+                        x.UiFileName,
+                        false,
+                        StorageContainerType.evaluation
+                    )
+                }).ToListAsync();
             return attachments;
-
         }
+
         public async Task<bool> HasAccessToRequestAsync(Guid requestId, Guid userId)
         {
             var requestTask = GetRequestByIdAsync(requestId);
@@ -409,6 +413,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                     };
 
                     uow.GetRepository<EvalAttachment>().Insert(attachment);
+                    await uow.CommitAsync();
                 }
                 else
                 {
