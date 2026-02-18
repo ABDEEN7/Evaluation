@@ -9,6 +9,7 @@ using Evaluation.Services.Models.API;
 using Evaluation.SharedHelper.Dtos.TeamMemberDto;
 using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Models;
+using Evaluation.SharedHelper.Models.Api;
 using Evaluation.SharedHelper.Models.Api.ActionEntitiesDTOs;
 using Evaluation.SharedHelper.Models.Api.AttachmentsDTOs;
 using Evaluation.SharedHelper.Models.Api.EvaluationRequestEntities;
@@ -48,7 +49,25 @@ namespace Evaluation.API.Controllers
 		{
 			return await _serviceRequestBL.GetApplicationDetailsAsync(requestId);
 		}
-		[HttpGet]
+        [HttpGet]
+        public async Task<List<JsTreeNodeDto>> GetScopes(Guid partyId)
+        {
+            return await _serviceRequestBL.GetScopesList(partyId);
+        }
+        [HttpGet]
+        public async Task<List<string>> GetSupportedFiles(Guid requestId)
+        {
+            return await _serviceRequestBL.GetSupportedFiles(requestId);
+        }
+        [HttpPost]
+        public async Task<bool> SaveSupportFiles()
+        {
+            var file = Request.Form.Files[0];
+            Guid EvaluationRequestId = Guid.Parse(Request?.Form!["EvaluationRequestId"].FirstOrDefault());
+            Guid ScopeId = Guid.Parse(Request?.Form!["ScopeId"].FirstOrDefault());
+            return await _serviceRequestBL.SaveSupportFiles(file, EvaluationRequestId, ScopeId);
+        }
+        [HttpGet]
 		public async Task<EvaluationRequestDTO> GetEvaluationDetails(Guid requestId)
 		{
 			return await _serviceRequestBL.GetEvaluationDetailsAsync(requestId);

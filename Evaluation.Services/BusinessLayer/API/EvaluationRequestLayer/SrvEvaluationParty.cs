@@ -81,7 +81,8 @@ namespace Evaluation.Services.BusinessLayer.API.EvaluationRequestLayer
 					NameAr = p.NameAr,
 					NameEn = p.NameEn,
 					OrderNo = p.OrderNo,
-					Services = new List<EvaluationPartyServiceDTO>()
+                    IsSupportFiles = p.IsSupportFiles,
+                    Services = new List<EvaluationPartyServiceDTO>()
 				}).ToListAsync();
 
 			if (!parties.Any())

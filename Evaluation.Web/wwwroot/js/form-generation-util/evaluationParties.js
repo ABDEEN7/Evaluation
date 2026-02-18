@@ -27,8 +27,108 @@
 
         return { open, closed };
     };
+    Dropzone.autoDiscover = false;
+    window.AddFileClick = function (partyId, requestId) {
+        $("#EvaluationfileModal").modal('show');
+        $("#EvaluationfileSectionRequestId").val(requestId);
+      
 
-    function renderEvaluationParties(parties, options = {}) {
+        const options = {
+            success: function (response) {
+                if (response) {
+                    $('#EvaluationFileScopetree').jstree({
+                        core: {
+                            data: response
+                        },
+                        themes: {
+                            dots: true,
+                            icons: true
+                        },
+                        plugins: ["wholerow"]
+                    });
+
+                }
+            }
+        };
+
+
+
+        jqClient(options).Get(`/ServiceRequest/${departmentRoutePath}/GetScopes?partyId=${partyId}`);
+        const element = document.querySelector("#EvaluationfileSection");
+
+        if (element.dropzone) {
+            element.dropzone.destroy();
+        }
+        Dropzone.autoDiscover = false;
+
+        const myDropzone = new Dropzone("#EvaluationfileSection", {
+            url: decodeURIComponent(sharedUtility().BaseApiUrl()) + `/ServiceRequest/${departmentRoutePath}/SaveSupportFiles`,
+            autoProcessQueue: false,
+            maxFiles: 1,
+            maxFilesize: 5,
+            addRemoveLinks: true,
+
+            init: function () {
+                var self = this;
+
+                document.getElementById("btnSaveEvaluationFileScope")
+                    .addEventListener("click", function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+
+                        if (self.getQueuedFiles().length === 0) {
+                            notificationUtil.error("Please upload file");
+                            $("#EvaluationfileModal").modal('show');
+                            return;
+                        }
+
+                        if ($('#EvaluationFileScopetree').jstree('get_selected').length === 0) {
+                            notificationUtil.error("Please Select Scope");
+                            $("#EvaluationfileModal").modal('show');
+                            return;
+                        }
+
+                        self.processQueue();
+                    });
+
+                this.on("sending", function (file, xhr, formData) {
+                    formData.append("EvaluationRequestId",
+                        $("#EvaluationfileSectionRequestId").val());
+
+                    formData.append("ScopeId",
+                        $('#EvaluationFileScopetree').jstree('get_selected')[0]);
+                });
+
+                this.on("success", function () {
+                    notificationUtil.success("Uploaded successfully");
+                    $("#EvaluationfileModal").modal('hide');
+                    self.removeAllFiles(true);
+                });
+
+                this.on("error", function () {
+                    notificationUtil.error("Upload failed");
+                    $("#EvaluationfileModal").modal('show');
+                    self.removeAllFiles(true);
+                });
+            }
+        });
+
+    };
+    function GetSupportedFiles(filedivid, requestId) {
+        const options = {
+            success: function (response) {
+                if (response) {
+                  
+
+                }
+            }
+        };
+
+
+
+        jqClient(options).Get(`/ServiceRequest/${departmentRoutePath}/GetSupportedFiles?requestId=${requestId}`);
+    }
+    function renderEvaluationParties(parties, requestId, options = {}) {
         const containerId = options.containerId || "evaluationPartiesContainer";
         const parentAccordionId = options.parentAccordionId || "customAccordionParties";
         const expandFirst = options.expandFirst === true;
@@ -161,8 +261,67 @@
                 : ``;
 
             const expanded = expandFirst && idx === 0;
+            var filedivid = "Filediv_" + partyId;
+            const filesHTML = `
+           <div class="mb-3">
+            <button type="button"
+                                        class="btn btn-sm btn-primary btn-add-eval-request"
+                                        data-party-id="${escapeHtml(partyId)}" onclick="AddFileClick('${partyId}','${requestId}')">
+                                  <i class="la la-plus"></i> Add Files
+                                </button>
+                           </div>    
+                  <div class="table-card rounded overflow-hidden">
+                    <div class="table-responsive">
+                      <div class="table-header">All Files</div>
+                      <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex align-items-center justify-content-between">
+                              
+                                <div id="">
+                              </li>
+                      </ul>
+                    </div>
+                  </div>
+                `;
+          
+            if (party.isSupportFiles) {
+                GetSupportedFiles(filedivid, requestId);
+                $accordion.append(`
+              <div class="accordion-item mb-3 rounded">
+                <h2 class="accordion-header" id="${headerId}" data-id="${escapeHtml(partyId)}">
+                  <button class="accordion-button ${expanded ? "" : "collapsed"} d-flex align-items-center justify-content-between"
+                          type="button"
+                          data-bs-toggle="collapse"
+                          data-bs-target="#${collapseId}"
+                          aria-expanded="${expanded ? "true" : "false"}"
+                          aria-controls="${collapseId}">
 
-            $accordion.append(`
+                    <div class="d-flex align-items-center gap-2 fs-18">
+                      <i class="las la-layer-group text-primary fs-25"></i>
+                      <span class="fw-semibold">${escapeHtml(title)}</span>
+                    </div>
+
+                    ${badgesHtml}
+
+                    <span class="toggle-icon"><i class="la la-angle-up fs-22"></i></span>
+                  </button>
+                </h2>
+
+                <div id="${collapseId}"
+                     class="accordion-collapse collapse ${expanded ? "show" : ""}"
+                     aria-labelledby="${headerId}"
+                     data-bs-parent="#${escapeHtml(parentAccordionId)}">
+                  <div class="accordion-body">
+
+                     ${filesHTML}
+
+                  </div>
+                </div>
+              </div>
+            `);
+               
+            }
+            else {
+                $accordion.append(`
               <div class="accordion-item mb-3 rounded">
                 <h2 class="accordion-header" id="${headerId}" data-id="${escapeHtml(partyId)}">
                   <button class="accordion-button ${expanded ? "" : "collapsed"} d-flex align-items-center justify-content-between"
@@ -197,6 +356,7 @@
                 </div>
               </div>
             `);
+            }
         });
 
         $container.append($accordion);

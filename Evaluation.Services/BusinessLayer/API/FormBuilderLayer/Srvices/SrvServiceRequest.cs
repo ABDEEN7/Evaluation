@@ -2,6 +2,7 @@
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.Attachments;
 using Evaluation.DAL.Models.DepartementEntites;
+using Evaluation.DAL.Models.FormsModules;
 using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
 using Evaluation.DAL.Models.ServiceEnities;
 using Evaluation.DAL.Models.ServiceRequestEntities;
@@ -15,6 +16,7 @@ using Evaluation.SharedHelper.Dtos.SchoolDto;
 using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Models;
+using Evaluation.SharedHelper.Models.Api;
 using Evaluation.SharedHelper.Models.Api.AttachmentsDTOs;
 using Evaluation.SharedHelper.Models.Api.FormBuilderDTO;
 using Evaluation.SharedHelper.Models.Api.PartyTypeDTOs;
@@ -22,17 +24,20 @@ using Evaluation.SharedHelper.Models.Api.ServiceDTOs;
 using Evaluation.SharedHelper.Models.Api.ServiceRequestEntitiesDTO;
 using Evaluation.SharedHelper.Models.Api.ServiceRequestEntitiesDTO;
 using FluentResults;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System.Diagnostics.Metrics;
 using System.Globalization;
+using System.IO;
 using static Evaluation.SharedHelper.Enums.ConstantKeys;
 
 
 namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 {
-    public class SrvServiceRequest(SystemModuleSrv SrvSystemModule, SrvAction SrvAction, SchoolRepository schoolRepository, SrvActionTransactionsLog SrvActionTransactionsLog, SrvField SrvField, SrvAttachments SrvAttachments, SrvPartyType SrvPartyType, SrvDropdown SrvDropdown, SrvActionStatusConfiguration SrvActionStatusConfiguration, SrvStatus SrvStatus, SrvUser srvUser, IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow, LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, IServiceProvider serviceProvider, RequestInfo _requestInfo)
+    public class SrvServiceRequest(SystemModuleSrv SrvSystemModule, SrvAction SrvAction, SchoolRepository schoolRepository, SrvActionTransactionsLog SrvActionTransactionsLog, SrvField SrvField, SrvAttachments SrvAttachments, SrvPartyType SrvPartyType, SrvDropdown SrvDropdown, SrvActionStatusConfiguration SrvActionStatusConfiguration, SrvStatus SrvStatus, SrvUser srvUser, IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow, LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, IServiceProvider serviceProvider, RequestInfo _requestInfo, AzureBlobStorageService StorageService)
              : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, _requestInfo)
 
     {
@@ -287,7 +292,55 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 			};
 			return ServiceRequest;
 		}
+        public async Task<List<JsTreeNodeDto>> GetScopeList(Guid partyId)
+        {
+            var uow = serviceScopeFactory.CreateScopedUow();
+            var departmentid=await uow.GetRepository<EvaluationParty>().GetAllNonDeleted().Where(x=>x.Id==partyId).Select(x=>x.DepartmentId).FirstOrDefaultAsync();
 
+            var scopes = await uow.GetRepository<Scope>()
+    .GetAllNonDeleted()
+    .Include(x => x.ScopeType)
+    .Where(x => x.DepartmentId == departmentid)
+    .ToListAsync();
+            var treeData = new List<JsTreeNodeDto>();
+
+            foreach (var scope in scopes)
+            {
+                var parentScopeTypeId = scope.ScopeType.ParentId;
+
+                // find a parent scope whose ScopeType == parent ScopeType
+                var parentScope = scopes
+        .FirstOrDefault(x => x.ScopeTypeId == parentScopeTypeId);
+
+                treeData.Add(new JsTreeNodeDto
+                {
+                    id = scope.Id.ToString(),
+                    text = (_requestInfo.Lang == "ar" ? scope.NameAr : scope.NameEn),
+                    parent = parentScope != null ? parentScope.Id.ToString() : "#"
+                });
+            }
+
+            return treeData;
+
+        }
+
+        public async Task<List<string>> GetSupportedFiles(Guid requestId)
+        {
+            var uow = serviceScopeFactory.CreateScopedUow();
+
+
+            var attachments = await uow.GetRepository<EvalAttachment>()
+    .GetAllNonDeleted()
+    .Where(x => x.EvaluationRequestId == requestId)
+    .Select(x => StorageService.GenerateSasToken(
+        x.FileName,
+        2,
+        x.UiFileName,false,StorageContainerType.evaluation))
+    .ToListAsync();
+
+            return attachments;
+
+        }
         public async Task<bool> HasAccessToRequestAsync(Guid requestId, Guid userId)
         {
             var requestTask = GetRequestByIdAsync(requestId);
@@ -328,6 +381,45 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
                 return false;
             }
+        }
+
+        public async Task<bool> SaveSupportFiles(IFormFile file,
+    Guid EvaluationRequestId,
+    Guid ScopeId)
+        {
+            if (file!=null)
+            {
+                var uploadedFile = await StorageService.UploadFormFileAsync(file);
+
+                if (uploadedFile != null)
+                {
+                    var orgtreeid=await uow.GetRepository<EvaluationRequest>().GetAllNonDeleted().Where(x=>x.Id==EvaluationRequestId).Select(x=>x.OrgTreeId).FirstOrDefaultAsync();
+
+
+                    var attachment = new EvalAttachment
+                    {
+                        OrgTreeId = orgtreeid,
+                        EvaluationRequestId = EvaluationRequestId,
+                        ScopeId = ScopeId,
+                        FileName = uploadedFile.CustomFileName,
+                        UiFileName = uploadedFile.FileName,
+                        FileExtension = Path.GetExtension(uploadedFile.FileName),
+                        FileSize = uploadedFile.FileLength!.Value,
+
+                    };
+
+                    uow.GetRepository<EvalAttachment>().Insert(attachment);
+                }
+                else
+                {
+                    throw new BusinessException(ConstantKeys.ExceptionMessage.IncompleteRequest);
+                }
+            }
+            else
+            {
+                throw new BusinessException(ConstantKeys.ExceptionMessage.IncompleteRequest);
+            }
+            return true;
         }
         private async Task UpdateRequestStatusesAsync(List<ServiceRequestDTO> requests, Guid? moduleId)
         {

@@ -364,7 +364,8 @@ public static class ConstantKeys
         public static readonly string lblSaveChanges = "lblSaveChanges";//ToDo Insert
         public static readonly string lblCloseModal = "lblCloseModal";//ToDo Insert
         public static readonly string lblRemarks = "lblRemarks";//ToDo Insert
-
+        public static readonly string lblEvaluationFileScope = "lblEvaluationFileScope";//ToDo Insert
+        public static readonly string lblEvaluationFileHeader = "lblEvaluationFileHeader";//ToDo Insert
     }
 
     public static class AdminPermission
