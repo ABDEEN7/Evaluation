@@ -33,9 +33,9 @@ namespace Evaluation.Services.Models.Admin
             .Include(x => x.CreateBy)
                 .OrderByDescending(x=>x.CreateDate)
                 .ToListAsync();
-            if (message.SystemModuleId!=null)
+            if (message.DepartmentId != null)
             {
-                list = list.Where(c => c.PartyType!.DepartmentId == message.SystemModuleId).ToList();
+                list = list.Where(c => c.PartyType!.DepartmentId == message.DepartmentId).ToList();
             }
             if (!string.IsNullOrEmpty(message.UserName))
             {
@@ -96,16 +96,21 @@ namespace Evaluation.Services.Models.Admin
             return result;
 
         }
-        public async Task<List<SystemModule>> GetSystemModule()
+        public async Task<List<DropdownItem>> GetDepartment()
         {
 
 
 
-            var result = await uow.GetRepository<SystemModule>()
+            var result = await uow.GetRepository<Department>()
                .GetAllNonDeleted()
                .Include(x => x.CreateBy)
                .OrderByDescending(x => x.CreateDate)
                .Distinct()
+               .Select(x=>new DropdownItem
+               {
+                   Id=x.Id,
+                   Text=(_requestInfo.Lang=="ar"?x.NameAr:x.NameEn)
+               })
                .ToListAsync();
 
             return result;
