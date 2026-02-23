@@ -224,7 +224,7 @@ public class PlanRequestRepository(IServiceScopeFactory serviceScopeFactory, Srv
     public async Task<PaginatedResult<PlanListDto>> GetPlans(PlanDetailsRequestDto request)
     {
         IQueryable<Plan> plans = unitOfWork.GetRepository<Plan>()
-            .GetAllActiveNonDeleted(x => x.PlanStatus.BackendName == StatusBackEnds.ApprovedPlans);
+            .GetAllActiveNonDeleted(x => x.PlanStatus.BackendName == StatusBackEnds.ApprovedPlans && x.PlanTypeDep.DepartmentId == requestInfo.DepId);
 
         if (request.YearId != null)
             plans = plans.Where(x => x.AcademicYearId == request.YearId);
