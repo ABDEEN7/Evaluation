@@ -102,11 +102,13 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 		{
 			return uow.GetRepository<ServiceRequest>().Insert(request, false);
 		}
-		public async Task<WebAppPlanRequestsDTO> GetPlanRequestsAsync(Guid userId, FilterRequestsDTO model)
-		{
-			string lang = _requestInfo!.Lang;
-			//model.ModuleName = "/evaluation-plan";
-
+        public async Task<WebAppPlanRequestsDTO> GetPlanRequestsAsync(FilterRequestsDTO model)
+        {
+            string lang = _requestInfo!.Lang;
+            //model.ModuleName = "/evaluation-plan";
+            if (userInfo.UserId is null)
+                throw new UnauthorizedAccessException("UnAuthorized Data");
+            Guid userId = userInfo.UserId.Value;
             using var uow = serviceScopeFactory.CreateScopedUow();
             using var uow2 = serviceScopeFactory.CreateScopedUow();
 
@@ -135,7 +137,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             else
             {
                 var RequestsTask = await GetRequestsForMinistryUserAsync(uow, userId, module, lang, time_Format, date_Format);
-                filteredResult = await FilteredPlanRequestsAsync(uow, isMinistry, RequestsTask, model);
+                filteredResult = await FilteredPlanRequestsAsync(isMinistry, RequestsTask, model);
             }
 
             //await UpdateRequestStatusesAsync(filteredResult.Data, module?.Id);
@@ -815,7 +817,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             return RequestFieldsValue;
         }
 
-        private async Task<WebAppPlanRequestsDTO> FilteredPlanRequestsAsync(UnitOfWork uow, bool isMinistry, IQueryable<ServiceRequestDTO> requests, FilterRequestsDTO model)
+        private async Task<WebAppPlanRequestsDTO> FilteredPlanRequestsAsync(bool isMinistry, IQueryable<ServiceRequestDTO> requests, FilterRequestsDTO model)
         {
             var result = new WebAppPlanRequestsDTO();
 
@@ -855,20 +857,14 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
                     var date_Format = await cacheDataProvider.GetSystemSettingValue(SystemSettings.DateFormat);
 
-                    if (!string.IsNullOrEmpty(model.RequestDateFrom))
+                    if (model.RequestDateFrom.HasValue)
                     {
-                        if (DateTime.TryParseExact(model.RequestDateFrom, date_Format, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime requestDateFromDate))
-                        {
-                            requests = requests.Where(x => x.CreateDate != null && x.CreateDate.Value.Date >= requestDateFromDate.Date);
-                        }
+                        requests = requests.Where(x => x.CreateDate != null && x.CreateDate >= model.RequestDateFrom);
                     }
 
-                    if (!string.IsNullOrEmpty(model.RequestDateTo))
+                    if (model.RequestDateTo.HasValue)
                     {
-                        if (DateTime.TryParseExact(model.RequestDateTo, date_Format, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime requestDateToDate))
-                        {
-                            requests = requests.Where(x => x.CreateDate != null && x.CreateDate.Value.Date <= requestDateToDate.Date);
-                        }
+                        requests = requests.Where(x => x.CreateDate != null && x.CreateDate <= model.RequestDateTo);
                     }
 
                     if (model.StatusesList != null && model.StatusesList.Any())
@@ -899,6 +895,12 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                 if (!string.IsNullOrEmpty(model.StatusTypeId))
                 {
                     requests = requests.Where(c => model.StatusTypeId == "0" ? c.StatusISOPen == false : c.StatusISOPen == true);
+                }
+                if (model.PlanId.HasValue)
+                {
+                    var resa = requests.ToList();
+                    var res = requests.Where(s => s.planId == model.PlanId).ToList();
+                    requests = requests.Where(x => x.planId == model.PlanId);
                 }
 
                 result.TotalDataCount = await requests.CountAsync();

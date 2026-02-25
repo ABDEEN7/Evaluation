@@ -1,24 +1,11 @@
-﻿using Azure.Core;
-using Evaluation.DAL.Helper;
-using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
-using Evaluation.DAL.Models.ServiceRequestEntities;
-using Evaluation.Services.BusinessLayer;
-using Evaluation.Services.BusinessLayer.API;
-using Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices;
-using Evaluation.Services.Models.API;
+﻿using Evaluation.Services.Models.API;
 using Evaluation.SharedHelper.Dtos.TeamMemberDto;
-using Evaluation.SharedHelper.Exceptions;
-using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Api.ActionEntitiesDTOs;
-using Evaluation.SharedHelper.Models.Api.AttachmentsDTOs;
 using Evaluation.SharedHelper.Models.Api.EvaluationRequestEntities;
 using Evaluation.SharedHelper.Models.Api.FormBuilderDTO;
 using Evaluation.SharedHelper.Models.Api.ServiceRequestEntitiesDTO;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
-using System.Net.Mail;
-using static Evaluation.SharedHelper.Enums.ConstantKeys;
 
 namespace Evaluation.API.Controllers
 {
@@ -38,7 +25,12 @@ namespace Evaluation.API.Controllers
 		{
 			return await _serviceRequestBL.GetPlanRequestsAsync(data);
 		}
-		[HttpPost]
+        [HttpGet]
+        public async Task<IActionResult> GetServiceStatus()
+        {
+            return Ok(await _serviceRequestBL.GetServiceStatus());
+        }
+        [HttpPost]
 		public async Task<WebAppEvaluationRequestsDTO> GetEvaluationRequests([FromBody] FilterRequestsDTO data)
 		{
 			return await _serviceRequestBL.GetEvaluationRequestsAsync(data);
