@@ -1,9 +1,7 @@
-﻿using Evaluation.DAL.Dtos;
-using Evaluation.DAL.Models.Calendars;
+﻿using Evaluation.DAL.Models.Calendars;
 using Evaluation.DAL.Models.Org;
 using Evaluation.DAL.Models.Planing;
 using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
-using Evaluation.DAL.Models.StatusEntities;
 using Evaluation.DAL.Repositories;
 using Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices;
 using Evaluation.SharedHelper;
@@ -18,11 +16,6 @@ using Mapster;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using Spire.Doc;
-using Spire.Doc.AI.Model;
-using System.Reflection;
-using static Evaluation.SharedHelper.Enums.ConstantKeys;
 namespace Evaluation.Services.BusinessLayer.API.PlanLayer;
 
 public class PlanRequestRepository(IServiceScopeFactory serviceScopeFactory, SrvServiceRequest _srvServiceRequest,
@@ -276,7 +269,17 @@ public class PlanRequestRepository(IServiceScopeFactory serviceScopeFactory, Srv
 
         return finalResult;
     }
-
+    public async Task<List<GetPlansPR>> GetPlans()
+    {
+        var result = await unitOfWork.GetRepository<Plan>()
+              .GetAllActiveNonDeleted(x => x.PlanTypeDep!.DepartmentId == requestInfo.DepId)
+              .Select(x => new GetPlansPR
+              {
+                  Id = x.Id,
+                  PlanName = x.PlanName
+              }).ToListAsync();
+        return result;
+    }
     private async Task<bool> IsThereExistingDraftPlanForSameAcadmicYear(PlanServiceRequest model)
     {
         return await

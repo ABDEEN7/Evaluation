@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using Aspose.Words.Lists;
+using AutoMapper;
 using Evaluation.DAL.Dtos;
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.DepartementEntites;
@@ -317,6 +318,10 @@ public class PlanServiceRequestServices(
 
             return json;
         });
+    }
+    public async Task<List<GetPlansPR>> GetPlans()
+    {
+        return await planRepository.GetPlans();
     }
     private async Task SyncEvaluationRequests(
       Guid planId,

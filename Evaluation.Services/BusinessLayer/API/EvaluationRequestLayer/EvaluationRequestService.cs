@@ -21,6 +21,7 @@ using Evaluation.SharedHelper.Models.Api.FormBuilderDTO;
 using Evaluation.SharedHelper.Models.Api.ServiceRequestEntitiesDTO;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using System.Globalization;
 using static Evaluation.SharedHelper.Enums.ConstantKeys;
@@ -159,7 +160,7 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 			CreateOn = x.CreateDate.ToString(dateFormat),
 			CreateOnTime = x.CreateDate.ToString(timeFormat),
 
-			planId = x.PlanId,
+			PlanId = x.PlanId,
 			PlanName = x.Plan != null ? x.Plan.PlanName : "",
 			EvaluationType = x.DepEvaluationType != null ? (lang == "ar" ? x.DepEvaluationType.NameAr : x.DepEvaluationType.NameAr) : "",
 			OrgTreeId = x.OrgTreeId,
@@ -285,7 +286,7 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 			Actions =  actions,
 
 			planNo = request.Plan?.PlanName,
-			planId = request.Plan?.Id,
+			PlanId = request.Plan?.Id,
 
 			Status = Status,
 			Service = lang == "ar" ? request.Service.NameAr : request.Service.NameEn,
@@ -599,20 +600,14 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 
 				var date_Format = await cacheDataProvider.GetSystemSettingValue(SystemSettings.DateFormat);
 
-				if (!string.IsNullOrEmpty(model.RequestDateFrom))
+				if (model.RequestDateFrom.HasValue && model.RequestDateTo != null)
 				{
-					if (DateTime.TryParseExact(model.RequestDateFrom, date_Format, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime requestDateFromDate))
-					{
-						requests = requests.Where(x => x.CreateDate != null && x.CreateDate.Value.Date >= requestDateFromDate.Date);
-					}
+						requests = requests.Where(x => x.CreateDate != null && x.CreateDate.Value.Date >= model.RequestDateFrom);
 				}
 
-				if (!string.IsNullOrEmpty(model.RequestDateTo))
+				if (model.RequestDateTo.HasValue && model.RequestDateTo != null)
 				{
-					if (DateTime.TryParseExact(model.RequestDateTo, date_Format, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime requestDateToDate))
-					{
-						requests = requests.Where(x => x.CreateDate != null && x.CreateDate.Value.Date <= requestDateToDate.Date);
-					}
+						requests = requests.Where(x => x.CreateDate != null && x.CreateDate <= model.RequestDateTo);
 				}
 
 				if (model.StatusesList != null && model.StatusesList.Any())
@@ -643,6 +638,10 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 			if (!string.IsNullOrEmpty(model.StatusTypeId))
 			{
 				requests = requests.Where(c => model.StatusTypeId == "0" ? c.StatusISOPen == false : c.StatusISOPen == true);
+			}
+			if (model.PlanId.HasValue)
+			{
+				requests = requests.Where(c => model.PlanId == c.PlanId);
 			}
 
 			result.TotalDataCount = await requests.CountAsync();

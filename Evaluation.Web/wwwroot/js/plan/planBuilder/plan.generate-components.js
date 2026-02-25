@@ -567,7 +567,7 @@
 
         // Destroy previous instance for this specific fieldId
         if ($input.data('flatpickr')) {
-            $input.data('flatpickr').destroy();
+                $input.data('flatpickr').destroy();
         }
 
         const config = {

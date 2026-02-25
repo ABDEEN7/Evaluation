@@ -1,7 +1,27 @@
 ﻿@using Evaluation.SharedHelper.Enums
 <link href="~/assets/css/application-requests.css" rel="stylesheet" asp-append-version="true" />
 
+<div class="filter-section mb-3">
+	<div class="row">
+        <div class="col-md-4">
+            <label class="form-label">رقم الطلب</label>
+            <input id="planRequestNoFilter" class="form-control filter-enter" />
+        </div>
+        <div class="col-md-4">
+            <label class="form-label">الحالة</label>
+            <select id="planRequestStatusFilter" class="form-select filter-enter">
+            </select>
+        </div>
+        <div class="col-md-"></div>
+        <div class="col-md-4 d-flex align-items-end justify-content-end ms-auto">
+			<button id="filterPlanBtnId" class="btn btn-primary">بحث</button>
+			<button id="clearFilterPlanBtnId" class="btn btn-outline-secondary">
+				مسح
+			</button>
+		</div>
 
+	</div>
+</div>
 <div class="card mb-4">
 
     <div class="card-header">
@@ -65,11 +85,6 @@
                                 <th class="@ConstantKeys.EvaluationPlanRequests.lblScholarships"></th>
                                 <th class="@ConstantKeys.EvaluationPlanRequests.lblRequestCreatedDate"></th>
                                 <th class="@ConstantKeys.EvaluationPlanRequests.lblRequestCreatedTime"></th>
-                                <th></th>
-                                <th></th>
-                                <th></th>
-
-
                                 <th></th>
                             </tr>
                         </thead>

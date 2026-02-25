@@ -19,10 +19,11 @@ namespace Evaluation.SharedHelper.Models.Api.ServiceRequestEntitiesDTO
             StudentNationalityId = new List<string>();
         }
 
-        public string? RequestDateFrom { get; set; }
-        public string? RequestDateTo { get; set; }
+        public DateTime? RequestDateFrom { get; set; }
+        public DateTime? RequestDateTo { get; set; }
         public string? RequestNo { get; set; }
         public string? planNo { get; set; }
+        public Guid? PlanId { get; set; }
 
         public List<Guid>? ServiceId { get; set; }
         public List<Guid?>? StatusesList { get; set; }

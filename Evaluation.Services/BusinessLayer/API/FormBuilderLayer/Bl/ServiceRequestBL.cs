@@ -20,6 +20,7 @@ using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Api.ActionEntitiesDTOs;
 using Evaluation.SharedHelper.Models.Api.EvaluationRequestEntities;
 using Evaluation.SharedHelper.Models.Api.FormBuilderDTO;
+using Evaluation.SharedHelper.Models.Api.ServiceDTOs;
 using Evaluation.SharedHelper.Models.Api.ServiceRequestEntitiesDTO;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -44,8 +45,8 @@ namespace Evaluation.Services.Models.API
 
 		public async Task<WebAppPlanRequestsDTO> GetPlanRequestsAsync(FilterRequestsDTO filter)
 		{
-			var userId = userInfo.UserId ?? Guid.Parse("C2536611-576B-4EB8-84F4-747F4ECE9A23") ;
-			return await _srvServiceRequest.GetPlanRequestsAsync(userId, filter);
+			
+			return await _srvServiceRequest.GetPlanRequestsAsync(filter);
 		}
 		public async Task<WebAppEvaluationRequestsDTO> GetEvaluationRequestsAsync(FilterRequestsDTO filter)
 		{
@@ -358,5 +359,10 @@ namespace Evaluation.Services.Models.API
 		{
 			return  await _srvEvaluationRequestAssignment.ApproveNda(dto);
 		}
-	}
+		public async Task<List<GetServiceStatusDR>> GetServiceStatus()
+		{
+			return await _srvEvaluationRequestAssignment.GetServiceStatus();
+		}
+
+    }
 }

@@ -55,7 +55,7 @@ namespace Evaluation.SharedHelper.Models.Api.ServiceRequestEntitiesDTO
 		public string? OwnerName { get; set; }
 		public bool? StudentIsSpecial { get; set; }
 		public string? planNo { get; set; }
-		public Guid? planId { get; set; }
+		public Guid? PlanId { get; set; }
 		public string? StudentNationalityId { get; set; }
 		public Guid? CountryId { get; set; }
 		public Guid? UniversityId { get; set; }
