@@ -337,17 +337,10 @@
         actionsHtml += `</ul></div>`;
         actionsContainer.innerHTML = actionsHtml;
     }
-
-    // Reload plans when year changes
-    $('#planYearFilter').on('change', function () {
+    $('#filterPlanBtnsId').on('click', function () {
         plansListing.reload();
     });
-    $('#searchPlansBtn').on('click', function (e) {
-        e.preventDefault();
-        plansListing.reload();
-    });
-    // View plan details
-
+  
     $('#addPlanBtn').on('click', function () {
         window.location.href = '/Plan/Create';
     });
