@@ -6,6 +6,7 @@ using Evaluation.SharedHelper.Dtos.PlanDto;
 using Evaluation.SharedHelper.Models;
 using FluentResults;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace Evaluation.API.Controllers;
 
@@ -65,6 +66,11 @@ public class PlanController(MasterBL masterBL) : ControllerBase
     {
         await masterBL.GetApiService<PlanServiceRequestServices>().DeletePlanById(id);
         return Ok();
+    }
+    [HttpGet]
+    public async Task<IActionResult> GetPlansDDL()
+    {
+        return Ok(await masterBL.GetApiService<PlanServiceRequestServices>().GetPlans());
     }
 
 }
