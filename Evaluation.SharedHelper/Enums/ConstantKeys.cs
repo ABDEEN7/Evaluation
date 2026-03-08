@@ -976,6 +976,7 @@ public static class ConstantKeys
         public const string ACTION = "ACTION";
         public const string LASTUPDATEDBY = "LASTUPDATEDBY";
         public const string LASTUPDATEDDATE = "LASTUPDATEDDATE";
+        public const string lblDisplayAsCards = "lblDisplayAsCards";
     }
     public static class CreatePlan
     {

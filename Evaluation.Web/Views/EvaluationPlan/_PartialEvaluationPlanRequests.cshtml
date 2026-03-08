@@ -16,7 +16,7 @@
         <div class="col-md-4 d-flex align-items-end justify-content-end ms-auto">
 			<button id="filterPlanBtnsId" class="btn btn-primary">بحث</button>
 			<button id="clearFilterPlanBtnId" class="btn btn-outline-secondary">
-				مسح
+                @ConstantKeys.EvaluationPlanRequests.lblClear
 			</button>
 		</div>
 
@@ -27,7 +27,7 @@
     <div class="card-header">
         <div class="row align-items-center">
               <div class="col-md-6">
-                <h4 class="m-0 @ConstantKeys.EvaluationPlanRequests.lblPlanRequests">طلبات خطة التقييم</h4>
+                <h4 class="m-0">@ConstantKeys.EvaluationPlanRequests.lblPlanRequests</h4>
               </div>
               <div class="col-md-6">
                 <div class=" d-flex justify-content-end align-items-center gap-3">
@@ -40,8 +40,8 @@
                         </button>
                     </div>
                     <button id="btnAddEvaluationPlanRequest"
-                            class="add-request-btn @ConstantKeys.EvaluationPlanRequests.lblAddPlan">
-                        + إضافة طلب خطة تقييم
+                            class="add-request-btn">
+                        + @ConstantKeys.EvaluationPlanRequests.lblAddPlan
                     </button>
                 </div>
               </div>
