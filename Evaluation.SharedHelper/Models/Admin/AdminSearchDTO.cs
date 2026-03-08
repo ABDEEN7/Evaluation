@@ -18,7 +18,7 @@
         public Guid? serviceActionId { get; set; }
         public Guid? currentStatusId { get; set; }
         public Guid? nextStatusId { get; set; }
-        public Guid? SystemModuleId { get; set; }
+        public Guid? DepartmentId { get; set; }
         public Guid? ParentId { get; set; }
         public Guid? AcademicYearId { get; set; }
         public Guid? CountryId { get; set; }

@@ -198,6 +198,33 @@ namespace Evaluation.Services.Models.Admin
             return $"{SystemModule.BackendName}";
 
         }
+        private async Task<string> GetDepartmentPrefix(Guid DepartmentId)
+        {
+
+            var Department = await uow.GetRepository<Department>()
+                    .GetAll(x => x.Id == DepartmentId)
+                    .FirstOrDefaultAsync();
+            if (Department == null)
+            {
+                throw new ArgumentException("Department not found with the provided ID.");
+            }
+            return $"{Department.BackendName}";
+
+        }
+        public async Task<string> GenerateBackendNameByDepartment(string titleEn, Guid DepartmentId, string Type)
+        {
+            string cleanText = Regex.Replace(titleEn, "[^a-zA-Z]", "");
+            bool isOnlyAlphabets = Regex.IsMatch(cleanText, @"^[A-Za-z]+$");
+            if (isOnlyAlphabets)
+            {
+                var servicePrefix = await GetDepartmentPrefix(DepartmentId);
+                return $"{servicePrefix}_{Type}_{cleanText}";
+            }
+            else
+            {
+                throw new BusinessException(ConstantKeys.ExceptionMessage.TITLE_CANNOT_BE_UNICODE);
+            }
+        }
 
         private async Task<string> GetServicePrefix(Guid serviceId)
         {
