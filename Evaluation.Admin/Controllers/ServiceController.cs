@@ -16,7 +16,7 @@ namespace Evaluation.Admin.Controllers
     [Authorize]
     public class ServiceController : Controller
     {
-        
+
         private readonly UserInfo userInfoSession;
         private readonly MasterBL masterBL;
         private readonly IHttpContextAccessor httpContextAccessor;
@@ -27,7 +27,7 @@ namespace Evaluation.Admin.Controllers
             this.userInfoSession = userInfoSession;
             this.masterBL = masterBL;
             this.httpContextAccessor = httpContextAccessor;
-           
+
         }
         [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.AdminPermission.VIEW_ADMIN_SERVICE })]
         public async Task<IActionResult> Index()
@@ -44,53 +44,53 @@ namespace Evaluation.Admin.Controllers
                  ConstantKeys.AdminSettings.ADMIN_FILE_SIZE,
                  ConstantKeys.AdminSettings.ADMIN_FILE_COUNT
             });
-            
+
             var property = typeof(Service).GetProperty("OrderNo");
             model.containsOrderNo = property != null ? true : false;
             return View(model);
         }
         [HttpGet]
         [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.AdminPermission.VIEW_ADMIN_SERVICE })]
-        public async Task<IActionResult> GetAllService(Guid SystemModuleId, int Page = 1)
+        public async Task<IActionResult> GetAllService(SearchServiceDto searchService, int Page = 1)
         {
-            var PageSize =  Convert.ToInt32(masterBL.GetAdminService<SrvSystemSettingBL>().GetSetting(ConstantKeys.AdminSettings.ADMIN_PAGE_SIZE));
-            var response = await masterBL.GetAdminService<SrvServiceBL>().GetServiceList(Page, PageSize,SystemModuleId);
+            var PageSize = Convert.ToInt32(masterBL.GetAdminService<SrvSystemSettingBL>().GetSetting(ConstantKeys.AdminSettings.ADMIN_PAGE_SIZE));
+            var response = await masterBL.GetAdminService<SrvServiceBL>().GetServiceList(Page, PageSize, searchService);
             return Ok(response);
         }
-        
+
 
         [HttpPost]
         [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.AdminPermission.ADD_ADMIN_SERVICE })]
         public async Task<IActionResult> SaveService()
         {
-            
-                var request = Request.Form["request"][0]?.StringToObject<ServiceDTO>();
-            
+
+            var request = Request.Form["request"][0]?.StringToObject<ServiceDTO>();
+
             var result = new ServiceDTO();
-                bool validateObject = await masterBL.GetAdminService<SrvBaseBL>().ValidateObject(request!, ConstantKeys.AdminPermission.ADD_ADMIN_SERVICE);
-                if (validateObject)
-                {
-                     result = await masterBL.GetAdminService<SrvServiceBL>().SaveService(request!);
-                    
-                }
-                return Ok(new ResponseEntity(result));
-            
+            bool validateObject = await masterBL.GetAdminService<SrvBaseBL>().ValidateObject(request!, ConstantKeys.AdminPermission.ADD_ADMIN_SERVICE);
+            if (validateObject)
+            {
+                result = await masterBL.GetAdminService<SrvServiceBL>().SaveService(request!);
+
+            }
+            return Ok(new ResponseEntity(result));
+
         }
         [HttpPost]
         [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.AdminPermission.EDIT_ADMIN_SERVICE })]
         public async Task<IActionResult> UpdateService()
         {
-            
-                var request = Request.Form["request"][0]?.StringToObject<ServiceDTO>();
-           
+
+            var request = Request.Form["request"][0]?.StringToObject<ServiceDTO>();
+
             var result = new ServiceDTO();
-                bool validateObject = await masterBL.GetAdminService<SrvBaseBL>().ValidateObject(request!, ConstantKeys.AdminPermission.ADD_ADMIN_SERVICE);
-                if (validateObject)
-                {
-                     result = await masterBL.GetAdminService<SrvServiceBL>().UpdateService(request!);
-                }
-                return Ok(new ResponseEntity(result));
-           
+            bool validateObject = await masterBL.GetAdminService<SrvBaseBL>().ValidateObject(request!, ConstantKeys.AdminPermission.ADD_ADMIN_SERVICE);
+            if (validateObject)
+            {
+                result = await masterBL.GetAdminService<SrvServiceBL>().UpdateService(request!);
+            }
+            return Ok(new ResponseEntity(result));
+
         }
         [HttpPost]
         [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.AdminPermission.EDIT_ADMIN_SERVICE })]
@@ -117,10 +117,10 @@ namespace Evaluation.Admin.Controllers
         [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.AdminPermission.DELETE_ADMIN_SERVICE })]
         public async Task<IActionResult> DeleteService(Guid Id)
         {
-            
-                var result = await masterBL.GetAdminService<SrvServiceBL>().DeleteService(Id);
-                return Ok(result);
-            
+
+            var result = await masterBL.GetAdminService<SrvServiceBL>().DeleteService(Id);
+            return Ok(result);
+
         }
 
         [HttpGet]

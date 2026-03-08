@@ -35,7 +35,7 @@ function CreateEditForFormGroup(pkId) {
         $tblContentContainer.show();
         $formSection.hide();
     }
-    
+
     const obj = table.getData().find(f => f.id == pkId);
     if (Placeholdercontrolvalidationlist.length > 0) {
         Placeholdercontrolvalidationlist.forEach(item => {
@@ -78,7 +78,7 @@ function CreateEditForFormGroup(pkId) {
         else {
             $("#PlaceHolderFieldId").val('').trigger('change');
         }
-        
+
         if (fieldvalueselectedlist) {
             $('#PlaceHolderChildFieldIds').val(fieldvalueselectedlist).trigger('change');
         }
@@ -89,49 +89,46 @@ function CreateEditForFormGroup(pkId) {
 }
 function ClearControlByPage() {
     sharedFn().SetValueToDropdown();
-    
+
 }
 
 
 
 const loadData = (isSearch) => {
     if (popupname == "") {
-        var SystemModuleId = $("#ServiceParentSystemModuleId").val();
-        if (SystemModuleId) {
-            SystemModuleId = SystemModuleId;
-        }
-        else {
-            SystemModuleId = "-1";
-        }
+
+        var SystemModuleId = $("#ServiceParentSystemModuleId").val() || "-1";
+        var DepartmentId = $("#ServiceDepartmentId").val() || "-1";
+
         isLoading = true;
+
         const options = {
             success: function (data) {
-                if (data) {
+                if (data && data.length > 0) {
 
-
-                    if (data && data.length > 0) {
-                        if (isSearch) {
-                            table.setData([]).then(function () {
-                                setAllColumnWidths(table, columnWidths);
-                            });
-                            currentPage = 1;
-                        }
-
-                        table.addData(data).then(function () {
+                    if (isSearch) {
+                        table.setData([]).then(function () {
                             setAllColumnWidths(table, columnWidths);
                         });
-                        currentPage = currentPage + 1;
-                        isLoading = false;
-
+                        currentPage = 1;
                     }
 
+                    table.addData(data).then(function () {
+                        setAllColumnWidths(table, columnWidths);
+                    });
+
+                    currentPage++;
+                    isLoading = false;
                 }
             }
-        }
+        };
 
-    
-    jqClientAdvanced(options).Get("Service/GetAllService".concat('?SystemModuleId=', SystemModuleId).concat('&page=', currentPage));
-}
+        jqClientAdvanced(options)
+            .Get("Service/GetAllService"
+                .concat('?SystemModuleId=', SystemModuleId)
+                .concat('&DepartmentId=', DepartmentId)
+                .concat('&page=', currentPage));
+    }
 };
 
 
@@ -158,7 +155,7 @@ const deleteData = (id, urlname = null) => {
                         notificationUtil.success(sharedFn().GetUiControlText('ADMIN_MSG_DELETE'));
                         if (popupname == "PlaceHolder") {
                             sharedFn().ResetVisibleControls("PopupForm");
-                            
+
                         }
                     }
                     else {
@@ -194,7 +191,7 @@ function Loadtabledata() {
 
         jqClientAdvanced(options).Get("Service/GetAllPlaceHolder".concat('?serviceid=', serviceid));
     }
-    
+
 }
 
 function PlaceHolderClick(event) {
@@ -214,7 +211,7 @@ function PlaceHolderClick(event) {
     $("#serviceid").val(serviceid);
     $("#systemmoduleid").val(obj.systemModuleId);
     popupname = "PlaceHolder";
-    
+
 }
 function LoadChildFields() {
     var FieldId = $("#PlaceHolderFieldId").val();
@@ -245,7 +242,7 @@ function LoadChildFields() {
                 else {
                     $("#PlaceHolderChildFieldIds").val('').trigger("change");
                 }
-               
+
             }
         }
     }
@@ -253,7 +250,7 @@ function LoadChildFields() {
 
     jqClientAdvanced(options).Get("Service/GetAllChildFields".concat('?FieldId=', FieldId));
 }
-function SetDropDown (){
+function SetDropDown() {
 
     if (Placeholdercontrolvalidationlist) {
 
@@ -261,15 +258,15 @@ function SetDropDown (){
         if (dropdownlist.length > 0) {
             dropdownlist.forEach(item => {
                 var constrain = item.constraint;
-               if (constrain.controlName == "FieldId") {
+                if (constrain.controlName == "FieldId") {
                     const options = {
                         success: function (result) {
                             if (result) {
-                              
+
                                 const { RequestField, EvaluationField } = result;
-                                    RequestFieldList = RequestField;
+                                RequestFieldList = RequestField;
                                 EvaluationFieldList = EvaluationField;
-                                var $dropdownTarget = $('#' + constrain.uibackendName); 
+                                var $dropdownTarget = $('#' + constrain.uibackendName);
                                 $dropdownTarget.select2({
                                     width: 'resolve',
                                     allowClear: true,
@@ -278,7 +275,7 @@ function SetDropDown (){
                                     dropdownCssClass: "manageselect2zindex",
                                     dropdownParent: $("#ModalPopup"),
                                 })
-                                
+
                             }
                         }
                     };
@@ -339,14 +336,14 @@ function SetDropDown (){
                 else {
                     $("#PlaceHolderFieldId").val('').trigger('change');
                 }
-             
+
                 if (fieldvalueselectedlist) {
                     $('#PlaceHolderChildFieldIds').val(fieldvalueselectedlist).trigger('change');
                 }
                 else {
                     $("#PlaceHolderChildFieldIds").val('').trigger("change");
                 }
-                
+
             }
             else {
                 $("#PlaceHolderChildFieldIds").empty();
@@ -370,16 +367,16 @@ function SetDropDown (){
                         var type = EvaluationFieldList.find(x => x.id == data);
                         if (type) {
                             $('#PlaceHolderType').val(type.type);
-                            
+
                         }
                         else {
                             $('#PlaceHolderType').val('');
-                           
+
                         }
                     }
                     else {
                         $('#PlaceHolderType').val('');
-                       
+
                     }
                 });
                 var PlaceHolderFieldId = $('#PlaceHolderFieldId').data("value");
@@ -389,14 +386,14 @@ function SetDropDown (){
                 else {
                     $("#PlaceHolderFieldId").val('').trigger('change');
                 }
-               
+
                 if (fieldvalueselectedlist) {
                     $('#PlaceHolderChildFieldIds').val(fieldvalueselectedlist).trigger('change');
                 }
                 else {
                     $("#PlaceHolderChildFieldIds").val('').trigger("change");
                 }
-                
+
             }
 
         }
@@ -492,7 +489,7 @@ $('#btn-submit_popup').click(function () {
             };
 
             jqClientAdvanced(options).PostFormData("Service/UpdateServiceIsFreeze", formData);
-         
+
 
         }
         else {
@@ -548,14 +545,14 @@ $('#btn-submit_popup').click(function () {
 
             }
             jqClientAdvanced(options).PostFormData(url, requestdata);
-           
+
         }
-         
-       
-        
+
+
+
     }
 
-   
+
 });
 $(window).scroll(function () {
     if ($(window).scrollTop() >= ($(document).height() - $(window).height()) * .60) {
@@ -564,11 +561,21 @@ $(window).scroll(function () {
         }
     }
 });
+$("#ServiceDepartmentId").on("change", function () {
+    currentPage = 0;
+    isLoading = false;
+
+    if (table && popupname == '') {
+        table.setData([]);
+    }
+
+    loadData();
+});
 $("#ServiceParentSystemModuleId").on("change", function () {
     currentPage = 0;
     isLoading = false;
-   
-    if (table && popupname=='') {
+
+    if (table && popupname == '') {
         table.setData([]);
 
     }
@@ -600,7 +607,7 @@ $(document).ready(function () {
         sortColumn: "updateDate",
         sortDir: "desc",
         columns: TableColumns,
-         rowMoved: function (row) {
+        rowMoved: function (row) {
             var request = [];
             table.getData().map(function (d, index) {
 
@@ -617,7 +624,7 @@ $(document).ready(function () {
                     notificationUtil.success(sharedFn().GetUiControlText('ADMIN_MSG_UPDATE'));
                 }
             };
-             jqClientAdvanced(options).PostFormData("Service/UpdateServiceOrder", formData);
+            jqClientAdvanced(options).PostFormData("Service/UpdateServiceOrder", formData);
 
         },
         rowFormatter: function (row) {
@@ -628,14 +635,14 @@ $(document).ready(function () {
                     iconElement.classList.add("freezedclass");
 
                 }
-            else {
+                else {
                     iconElement.classList.remove("freezedclass");
+                }
             }
         }
-        }
     });
-  
-   
+
+
     dialogElem = commonUtil.createDailog({ dailogId: dailogId });
     if (controlvalidationlist) {
 
@@ -658,9 +665,9 @@ $(document).ready(function () {
             });
         }
     }
-   
-   
-    
+
+
+
     $(`#${btnAddContentId}`).click(function (e) {
         table = Tabulator.prototype.findTable("#" + gridContainerId)[0];
         sharedFn().ClearForm();
@@ -670,7 +677,7 @@ $(document).ready(function () {
         sharedFn().SetValueToDropdown();
 
     });
-   
+
 
     $("#btn-submit").click(function (e) {
 
@@ -680,7 +687,7 @@ $(document).ready(function () {
 
             commonUtil.btnProgress(btnSubmitId);
             var requestdata = sharedFn().GetSaveObject(controlvalidationlist, $('#Id').val());
-            
+
             const options = {
                 success: function (response) {
                     commonUtil.btnProgress(btnSubmitId, true);
@@ -752,13 +759,13 @@ $(document).ready(function () {
 
             }
             jqClientAdvanced(options).PostFormData(url, requestdata);
-         
+
 
 
         }
     });
 
-   
+
 
 });
 
