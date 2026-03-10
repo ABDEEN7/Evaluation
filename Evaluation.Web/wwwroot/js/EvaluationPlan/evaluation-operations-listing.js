@@ -52,8 +52,8 @@
     function getEvaluationRequestFilter() {
         return {
             RequestNo: $('#evaluationRequestNoFilter').val(),
-            PlanId: $('#evaluationPlanIdFilter').val(),
-            OrgTreeId: $('#evaluationOrgTreeFilter').val(),
+            PlanId: $('#evaluationPlanIdFilter').val() || null,
+            OrgTree: $('#evaluationOrgTreeFilter').val(),
             StatusesList: $('#evaluationRequestStatusFilter').val() || null,
             RequestDateFrom: $('#evaluationRequestDateFrom').val() || null,
             RequestDateTo: $('#evaluationRequestDateTo').val() || null
