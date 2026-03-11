@@ -9,5 +9,6 @@ public class NdaStatusProfile : Profile
     public NdaStatusProfile()
     {
         CreateMap<NdaStatus, NdaStatusDto>();
+        CreateMap<NdaStatusDepartment, NdaStatusDepartmentDto>();
     }
 }
