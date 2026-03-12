@@ -390,7 +390,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 			}
 		}
 
-		public async Task<List<FieldValueDTO>> ProcessIntegrationFieldsAsync(List<FieldValueDTO> integrationFieldsToProcess, string studentQID, Guid? RequestId, bool isDownload = false)
+		public async Task<List<FieldValueDTO>> ProcessIntegrationFieldsAsync(List<FieldValueDTO> integrationFieldsToProcess,string studentQID,Guid? RequestId,bool isDownload = false)
 		{
 			if (integrationFieldsToProcess == null || integrationFieldsToProcess.Count == 0)
 				return integrationFieldsToProcess!;
@@ -399,12 +399,17 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
 			foreach (var field in integrationFieldsToProcess)
 			{
-				foreach (var attr in field.Attributes!)
+				if (field.Attributes == null) continue;
+
+				foreach (var attr in field.Attributes)
 				{
-					if (attr!.Name!.StartsWith("Integration_"))
+					if (attr?.Name?.StartsWith("Integration_") == true)
 					{
 						string integrationName = attr.Name.Substring("Integration_".Length);
 						string responseProperty = attr.Value!;
+
+						if (string.IsNullOrWhiteSpace(responseProperty))
+							continue;
 
 						if (!fieldsByIntegration.ContainsKey(integrationName))
 							fieldsByIntegration[integrationName] = new List<(FieldValueDTO, string)>();
@@ -425,195 +430,195 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 				object? integrationResult = null;
 				string? jsonResponse = null;
 
-				if (config.IsInternal)
+				try
 				{
-					switch (integrationName)
+					if (config.IsInternal)
 					{
-						//case "NSISServices":
-						//	integrationResult = await INSISServices.GetSchoolEnrollmentAsync(studentQID);
-						//	break;
-						//case "NSISAcademicCertificate":
-						//	integrationResult = await INSISServices.GetStudentDetails(studentQID, isDownload);
-						//	break;
-						//case "NSISFullStudentDetails":
-						//	integrationResult = await INSISServices.GetFullStudentDetails(studentQID, isDownload);
-						//	break;
-						//default:
-						//	continue;
-					}
-
-					jsonResponse = integrationResult != null
-						? JsonConvert.SerializeObject(integrationResult)
-						: null;
-				}
-				else
-				{
-					string url = config.EndPoint!;
-					if (!string.IsNullOrEmpty(config.URLParameter))
-					{
-						string paramName = config.URLParameter;
-						string paramValue = studentQID; // likely, if dynamic QID-based
-						url += url.Contains("?")
-							? $"&{paramName}={paramValue}"
-							: $"?{paramName}={paramValue}";
-					}
-
-					var response = await httpClient.GetAsync(url);
-					if (!response.IsSuccessStatusCode)
-						continue;
-
-					jsonResponse = await response.Content.ReadAsStringAsync();
-				}
-
-				if (string.IsNullOrEmpty(jsonResponse))
-					continue;
-
-				var jToken = JObject.Parse(jsonResponse);
-
-				foreach (var (field, responseProperty) in fieldsByIntegration[integrationName])
-				{
-					try
-					{
-						string arrayPath = responseProperty;
-						string? innerPath = null;
-
-						if (responseProperty.Contains('.'))
+						switch (integrationName)
 						{
-							var dotIndex = responseProperty.IndexOf('.');
-							arrayPath = responseProperty.Substring(0, dotIndex);
-							innerPath = responseProperty.Substring(dotIndex + 1);
+							// case "NSISServices":
+							//     integrationResult = await INSISServices.GetSchoolEnrollmentAsync(studentQID);
+							//     break;
+							// case "NSISAcademicCertificate":
+							//     integrationResult = await INSISServices.GetStudentDetails(studentQID, isDownload);
+							//     break;
+							// case "NSISFullStudentDetails":
+							//     integrationResult = await INSISServices.GetFullStudentDetails(studentQID, isDownload);
+							//     break;
+							default:
+								break;
 						}
 
-						var sampleArray = jToken.SelectToken(arrayPath) as JArray;
+						jsonResponse = integrationResult != null
+							? JsonConvert.SerializeObject(integrationResult)
+							: null;
+					}
+					else
+					{
+						string url = config.EndPoint!;
 
-						if (field.FormGroupListId != null && field.FormGroupListId != Guid.Empty)
+						if (!string.IsNullOrEmpty(config.URLParameter))
 						{
-							var fieldList = await GetFieldListByFieldId(field.FieldId!.Value);
-							if (fieldList.Any() && sampleArray != null && sampleArray.Count > 0)
+							string paramName = config.URLParameter;
+							string paramValue = studentQID;
+
+							url += url.Contains("?")
+								? $"&{paramName}={Uri.EscapeDataString(paramValue)}"
+								: $"?{paramName}={Uri.EscapeDataString(paramValue)}";
+						}
+
+						var response = await httpClient.GetAsync(url);
+						if (!response.IsSuccessStatusCode)
+							continue;
+
+						jsonResponse = await response.Content.ReadAsStringAsync();
+					}
+
+					if (string.IsNullOrWhiteSpace(jsonResponse))
+						continue;
+
+					var jToken = JToken.Parse(jsonResponse);
+
+					foreach (var (field, responseProperty) in fieldsByIntegration[integrationName])
+					{
+						try
+						{
+							
+							if (field.FormGroupListId != null && field.FormGroupListId != Guid.Empty)
 							{
-								var resultList = new List<Dictionary<string, object>>();
+								var arrayToken = jToken.SelectToken(responseProperty, false) as JArray;
+								var fieldList = await GetFieldListByFieldId(field.FieldId!.Value);
 
-								foreach (var item in sampleArray)
+								if (fieldList.Any() && arrayToken != null && arrayToken.Count > 0)
 								{
-									var row = new Dictionary<string, object>();
-									JToken? innerObj = string.IsNullOrEmpty(innerPath)
-										? item
-										: item.SelectToken(innerPath, errorWhenNoMatch: false);
+									var resultList = new List<Dictionary<string, object>>();
 
-									var Index = Guid.NewGuid();
-									foreach (var subField in fieldList)
+									foreach (var item in arrayToken)
 									{
-										var integrationAttr = subField.FieldAttributeValues?
-											.FirstOrDefault(attr => attr.AttributeKey.StartsWith("Integration_"));
+										var row = new Dictionary<string, object>();
+										var index = Guid.NewGuid();
 
-										if (integrationAttr == null)
-											continue;
-
-										var subFieldPath = integrationAttr.AttributeValue;
-										var subValue = innerObj?.SelectToken(subFieldPath!, errorWhenNoMatch: false);
-										if ((subField.FieldType?.BackendName == FieldTypeConstant.file || subField.FieldType?.BackendName == FieldTypeConstant.fileV2) && isDownload)
+										foreach (var subField in fieldList)
 										{
-											var base64String = subValue?.ToString();
+											var integrationAttr = subField.FieldAttributeValues?
+												.FirstOrDefault(attr => attr.AttributeKey.StartsWith("Integration_"));
 
-											if (!string.IsNullOrWhiteSpace(base64String))
+											if (integrationAttr == null || string.IsNullOrWhiteSpace(integrationAttr.AttributeValue))
+												continue;
+
+											var subValue = item.SelectToken(integrationAttr.AttributeValue, false);
+
+											if ((subField.FieldType?.BackendName == FieldTypeConstant.file ||
+												 subField.FieldType?.BackendName == FieldTypeConstant.fileV2) && isDownload)
 											{
-												try
+												var base64String = subValue?.ToString();
+
+												if (!string.IsNullOrWhiteSpace(base64String))
 												{
-													byte[] fileBytes = Convert.FromBase64String(base64String);
-
-													var obj = new JObject
+													try
 													{
-														["DocumentBase64"] = base64String,
-														["DocumentPath"] = "Document.pdf", // يمكنك استخراج الاسم من الرابط لو أردت
-														["ContentType"] = "application/pdf" // أو اجعله ديناميكًا لو متوفر
-													};
+														_ = Convert.FromBase64String(base64String);
 
-													var attachmentId = await SrvAttachments.UploadIntegrationFileAsync(
-														field.FieldId, subField.Id, Index, obj, RequestId);
+														var obj = new JObject
+														{
+															["DocumentBase64"] = base64String,
+															["DocumentPath"] = "Document.pdf",
+															["ContentType"] = "application/pdf"
+														};
 
-													row[subField.Id.ToString()] = attachmentId!;
+														var attachmentId = await SrvAttachments.UploadIntegrationFileAsync(
+															field.FieldId, subField.Id, index, obj, RequestId);
+
+														row[subField.Id.ToString()] = attachmentId!;
+													}
+													catch
+													{
+														row[subField.Id.ToString()] = null!;
+													}
 												}
-												catch
+												else
 												{
 													row[subField.Id.ToString()] = null!;
 												}
 											}
 											else
 											{
-												row[subField.Id.ToString()] = null!;
+												row[subField.Id.ToString()] = subValue?.ToString()!;
 											}
 										}
-										else
-										{
-											row[subField.Id.ToString()] = subValue?.ToString()!;
-										}
 
+										row["Index"] = index.ToString();
+										resultList.Add(row);
 									}
 
-
-
-									row["Index"] = Index.ToString();
-									resultList.Add(row);
+									var serialized = JsonConvert.SerializeObject(resultList);
+									field.Value = serialized;
+									field.IsApproved = resultList.Any();
 								}
-
-								var serialized = JsonConvert.SerializeObject(resultList);
-								field.Value = serialized;
-								field.IsApproved = !string.IsNullOrEmpty(serialized) && serialized != "[]";
+								else
+								{
+									field.Value = "[]";
+									field.IsApproved = false;
+								}
 							}
 							else
 							{
-								field.IsApproved = false;
-							}
-						}
-						else if (sampleArray != null)
-						{
-							var serialized = sampleArray.ToString(Formatting.None);
-							field.Value = serialized;
-							field.IsApproved = !string.IsNullOrEmpty(serialized) && serialized != "[]";
-						}
-						else
-						{
-							// 👇 Integration file upload if field type == file and isDownload
-							if ((field.Type == FieldTypeConstant.file || field.Type == FieldTypeConstant.fileV2) && isDownload)
-							{
-								var fieldvalie = jToken.SelectToken(responseProperty, errorWhenNoMatch: false);
-								var base64String = fieldvalie!.ToString();
+							
+								var scalarToken = jToken.SelectToken(responseProperty, false);
 
-								if (!string.IsNullOrWhiteSpace(base64String))
+								if ((field.Type == FieldTypeConstant.file || field.Type == FieldTypeConstant.fileV2) && isDownload)
 								{
-									try
+									var base64String = scalarToken?.ToString();
+
+									if (!string.IsNullOrWhiteSpace(base64String))
 									{
-										byte[] fileBytes = Convert.FromBase64String(base64String);
-
-										var obj = new JObject
+										try
 										{
-											["DocumentBase64"] = base64String,
-											["DocumentPath"] = "Document.pdf", // يمكنك استخراج الاسم من الرابط لو أردت
-											["ContentType"] = "application/pdf" // أو اجعله ديناميكًا لو متوفر
-										};
+											_ = Convert.FromBase64String(base64String);
 
-										var attachmentId = await SrvAttachments.UploadIntegrationFileAsync(field.FieldId, null, null, obj, RequestId);
-										field.Value = attachmentId;
-										field.IsApproved = !string.IsNullOrEmpty(attachmentId);
+											var obj = new JObject
+											{
+												["DocumentBase64"] = base64String,
+												["DocumentPath"] = "Document.pdf",
+												["ContentType"] = "application/pdf"
+											};
+
+											var attachmentId = await SrvAttachments.UploadIntegrationFileAsync(
+												field.FieldId, null, null, obj, RequestId);
+
+											field.Value = attachmentId;
+											field.IsApproved = !string.IsNullOrWhiteSpace(attachmentId);
+										}
+										catch
+										{
+											field.Value = null;
+											field.IsApproved = false;
+										}
 									}
-									catch
+									else
 									{
 										field.Value = null;
+										field.IsApproved = false;
 									}
 								}
-
-							}
-							else
-							{
-								var scalarToken = jToken.SelectToken(responseProperty, errorWhenNoMatch: false);
-								field.Value = scalarToken?.ToString();
-								field.IsApproved = !string.IsNullOrEmpty(field.Value);
+								else
+								{
+									field.Value = scalarToken?.ToString();
+									field.IsApproved = !string.IsNullOrWhiteSpace(field.Value);
+								}
 							}
 						}
+						catch
+						{
+							field.IsApproved = false;
+						}
 					}
-					catch
+				}
+				catch
+				{
+					foreach (var item in fieldsByIntegration[integrationName])
 					{
-						field.IsApproved = false;
+						item.field.IsApproved = false;
 					}
 				}
 			}
