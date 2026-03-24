@@ -13,5 +13,8 @@ public class SchoolDto : NSISBaseDto
     public SchoolMetaData? MetaData { get; set; }
     public SchoolParentDto Parent { get; set; }
     public List<Class> Classes { get; set; }
+    public List<Teacher> Teachers { get; set; }
+    public List<StaffDto> Staff { get; set; }
+    public List<EnrollmentDto> Enrollments { get; set; }
 
 }
