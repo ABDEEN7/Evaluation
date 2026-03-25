@@ -26,7 +26,7 @@ public class PlanRequestRepository(IServiceScopeFactory serviceScopeFactory, Srv
     public async Task<Plan?> GetPlanAsync(Guid id)
         => await unitOfWork.GetRepository<Plan>().GetByIDActiveNonDeleted(id);
     public async Task<Plan?> GetPlanDetailsAsync(Guid id)
-        => await unitOfWork.GetRepository<Plan>().GetAllActiveNonDeleted()
+        => await unitOfWork.GetRepository<Plan>().GetAllQueryFiltered()
         .Include(x => x.EvaluationRequests)
         .ThenInclude(x => x.OrgTree)
         .FirstOrDefaultAsync(x => x.Id == id);
@@ -217,7 +217,7 @@ public class PlanRequestRepository(IServiceScopeFactory serviceScopeFactory, Srv
     public async Task<PaginatedResult<PlanListDto>> GetPlans(PlanDetailsRequestDto request)
     {
         IQueryable<Plan> plans = unitOfWork.GetRepository<Plan>()
-            .GetAllActiveNonDeleted(x => x.PlanStatus.BackendName == StatusBackEnds.ApprovedPlans && x.PlanTypeDep.DepartmentId == requestInfo.DepId);
+            .GetAllQueryFiltered(x => x.PlanStatus.BackendName == StatusBackEnds.ApprovedPlans && x.PlanTypeDep.DepartmentId == requestInfo.DepId);
 
         if (request.YearId != null)
             plans = plans.Where(x => x.AcademicYearId == request.YearId);
