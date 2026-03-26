@@ -225,7 +225,7 @@ namespace Evaluation.Services.Models.API
                             break;
 
 
-						var dto = JsonConvert.DeserializeObject<FormEvaluationDto>(FormField.Value!);
+						var dto = JsonConvert.DeserializeObject<EvaluationFormDto>(FormField.Value!);
 
 						if (dto == null) throw new BusinessException(ExceptionMessage.msgInvalidEvaluationForm);
 

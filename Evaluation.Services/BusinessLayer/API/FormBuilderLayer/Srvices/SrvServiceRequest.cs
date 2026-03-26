@@ -37,7 +37,7 @@ using static Evaluation.SharedHelper.Enums.ConstantKeys;
 
 namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 {
-    public class SrvServiceRequest(SystemModuleSrv SrvSystemModule, SrvAction SrvAction, SrvActionTransactionsLog SrvActionTransactionsLog, SrvField SrvField, SrvAttachments SrvAttachments, SrvPartyType SrvPartyType, SrvDropdown SrvDropdown, SrvActionStatusConfiguration SrvActionStatusConfiguration, SrvStatus SrvStatus, SrvUser srvUser, IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow, LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, IServiceProvider serviceProvider, RequestInfo _requestInfo)
+    public class SrvServiceRequest(AzureBlobStorageService StorageService,SystemModuleSrv SrvSystemModule, SrvAction SrvAction, SrvActionTransactionsLog SrvActionTransactionsLog, SrvField SrvField, SrvAttachments SrvAttachments, SrvPartyType SrvPartyType, SrvDropdown SrvDropdown, SrvActionStatusConfiguration SrvActionStatusConfiguration, SrvStatus SrvStatus, SrvUser srvUser, IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow, LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, IServiceProvider serviceProvider, RequestInfo _requestInfo)
              : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, _requestInfo)
 
     {
@@ -108,12 +108,14 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
         {
             return uow.GetRepository<ServiceRequest>().Insert(request, false);
         }
-        public async Task<WebAppPlanRequestsDTO?> GetPlanRequestsAsync(Guid userId, FilterRequestsDTO model)
+        public async Task<WebAppPlanRequestsDTO?> GetPlanRequestsAsync( FilterRequestsDTO model)
         {
             string lang = _requestInfo!.Lang;
             //model.ModuleName = "/evaluation-plan";
             if (userInfo.UserId is null)
+            {
                 throw new UnauthorizedAccessException("UnAuthorized Data");
+            }
             Guid userId = userInfo.UserId.Value;
             using var uow = serviceScopeFactory.CreateScopedUow();
             using var uow2 = serviceScopeFactory.CreateScopedUow();
@@ -138,7 +140,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             if (isMinistry)
             {
 				var RequestsTask = await GetRequestsForMinistryUserAsync(uow, userId, module, lang, time_Format, date_Format);
-				filteredResult = await FilteredPlanRequestsAsync(uow, isMinistry, RequestsTask, model);
+				filteredResult = await FilteredPlanRequestsAsync( isMinistry, RequestsTask, model);
 
 				//await UpdateRequestStatusesAsync(filteredResult.Data, module?.Id);
 				return filteredResult;
@@ -914,7 +916,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             return RequestFieldsValue;
         }
 
-        private async Task<WebAppPlanRequestsDTO> FilteredPlanRequestsAsync(bool isMinistry, IQueryable<ServiceRequestDTO> requests, FilterRequestsDTO model)
+        private async Task<WebAppPlanRequestsDTO> FilteredPlanRequestsAsync( bool isMinistry, IQueryable<ServiceRequestDTO> requests, FilterRequestsDTO model)
         {
             var result = new WebAppPlanRequestsDTO();
 
