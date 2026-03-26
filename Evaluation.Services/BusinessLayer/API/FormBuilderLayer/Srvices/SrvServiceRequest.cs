@@ -546,7 +546,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                 Status = lang == "ar" ? c.Status!.NameAr : c.Status!.NameEn,
                 StatusColor = c.Status!.ColorCode,
                 StatusId = c.StatusId,
-                StatusISOPen = c.Status.IsOpen,
+                StatusISOPen = c.Status.ServiceStatusType!.IsOpen,
                 ServiceId = c.Service!.Id,
                 Service = lang == "ar" ? c.Service.NameAr : c.Service.NameEn,
                 CreateOn = c.CreateDate.ToString(dateFormat),

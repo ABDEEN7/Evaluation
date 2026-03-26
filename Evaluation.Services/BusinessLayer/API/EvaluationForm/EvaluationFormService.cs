@@ -144,7 +144,6 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
         obj.FormEvalMatrixId = message.FormEvalMatrixId;
         obj.NameAr = message.NameAr;
         obj.NameEn = message.NameEn;
-        obj.IsRopric = message.IsRopric;
         obj.HasOneValue = message.HasOneValue;
         obj.EvaluationPartyId = message.EvaluationPartyId;
         obj.HasEvaluation = message.HasEvaluation;
@@ -176,7 +175,6 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
             obj.FormEvalMatrixId = message.FormEvalMatrixId;
             obj.NameAr = message.NameAr;
             obj.NameEn = message.NameEn;
-            obj.IsRopric = message.IsRopric;
             obj.HasOneValue = message.HasOneValue;
             obj.EvaluationPartyId = message.EvaluationPartyId;
             obj.HasEvaluation = message.HasEvaluation;

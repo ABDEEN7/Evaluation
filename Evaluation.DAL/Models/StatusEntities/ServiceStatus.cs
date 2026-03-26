@@ -17,7 +17,8 @@ namespace Evaluation.DAL.Models.StatusEntities
         public string NameEn { get; set; } = null!;
         public string BackendName { get; set; } = null!;
         public bool IsInitial { get; set; }
-        public bool IsOpen { get; set; }
+        public Guid ServiceStatusTypeId { get; set; }
+        public ServiceStatusType? ServiceStatusType { get; set; }
         public string? ColorCode { get; set; }
         public int? OrderNo { get; set; }
      

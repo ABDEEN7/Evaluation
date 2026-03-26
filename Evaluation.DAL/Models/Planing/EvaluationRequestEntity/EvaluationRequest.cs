@@ -1,6 +1,7 @@
 ﻿using Evaluation.DAL.Models.Audit;
 using Evaluation.DAL.Models.BaseModule;
 using Evaluation.DAL.Models.DepartementEntites;
+using Evaluation.DAL.Models.FormsModules;
 using Evaluation.DAL.Models.Master;
 using Evaluation.DAL.Models.Org;
 using Evaluation.DAL.Models.Planing;
@@ -27,7 +28,13 @@ public class EvaluationRequest : EntityBase, IAuditLogEntity
 	public ServiceStatus? ServiceStatus { get; set; }
     public string? RequestNumber  { get; set; }
     public long Sequence { get; set; }
-	public virtual ICollection<ServiceRequestFieldsValue>? ServiceRequestFieldsValues { get; set; }
+    public Guid? FormEvalMatrixValueId { get; set; }
+    public FormEvalMatrixValue? FormEvalMatrixValue { get; set; }
+
+    public int? EvalDays { get; set; }  // Copy
+    public DateOnly? EvaluationDate { get; set; }
+    public DateOnly? NextEvaluationDate { get; set; }
+    public virtual ICollection<ServiceRequestFieldsValue>? ServiceRequestFieldsValues { get; set; }
 
 
 

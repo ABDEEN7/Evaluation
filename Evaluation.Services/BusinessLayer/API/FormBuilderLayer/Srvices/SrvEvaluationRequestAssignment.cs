@@ -180,7 +180,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                 .ThenInclude(sr => sr.ServiceStatus)
                 .Where(a => a.IsActive == true &&
                             eligibleUsers.Contains(a.MinistryUserId) &&
-                            a.EvaluationRequest.ServiceStatus!.IsOpen == false)
+                            a.EvaluationRequest.ServiceStatus!.ServiceStatusType!.IsOpen == false)
                 .GroupBy(a => a.MinistryUserId)
                 .Select(g => new { UserId = g.Key, Count = g.Count() })
                 .ToListAsync();

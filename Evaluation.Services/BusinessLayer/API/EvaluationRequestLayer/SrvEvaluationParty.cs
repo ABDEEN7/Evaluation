@@ -141,7 +141,7 @@ namespace Evaluation.Services.BusinessLayer.API.EvaluationRequestLayer
 					r.Id,
 					r.RequestNumber,
 					r.StatusId,
-					r.Status!.IsOpen,
+					r.Status!.ServiceStatusType!.IsOpen,
 					StatusNameAr = r.Status!.NameAr,
 					StatusNameEn = r.Status!.NameEn,
 					r.ServiceId,

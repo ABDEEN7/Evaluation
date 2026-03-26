@@ -162,7 +162,7 @@ namespace Evaluation.Services.Models.Admin
             entity.NameAr = model.status.NameAr;
             entity.NameEn = model.status.NameEn;
             entity.IsInitial = model.status.IsInitial;
-            entity.IsOpen = model.status.IsOpen;
+            //entity.IsOpen = model.status.IsOpen;
             entity.IsActive = model.status.IsActive;
             entity.StatusGroupId = model.status.StatusGroupId;
             entity.ColorCode = model.status.ColorCode;

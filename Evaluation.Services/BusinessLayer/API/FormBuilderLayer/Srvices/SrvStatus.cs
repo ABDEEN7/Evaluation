@@ -83,7 +83,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
         {
             var scopedUow = serviceScopeFactory.CreateScopedUow();
             var status = await scopedUow.GetRepository<ServiceStatus>()
-                .GetAllQueryFiltered(x => x.ServiceId == serviceId && !x.IsOpen)
+                .GetAllQueryFiltered(x => x.ServiceId == serviceId && !x.ServiceStatusType!.IsOpen).Include(c=>c.ServiceStatusType)
                 .AsNoTracking()
                 .FirstOrDefaultAsync();
 
@@ -94,7 +94,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
         {
             var scopedUow = serviceScopeFactory.CreateScopedUow();
             var status = await scopedUow.GetRepository<ServiceStatus>()
-                .GetAllQueryFiltered(x => x.ServiceId == serviceId && x.IsOpen)
+                .GetAllQueryFiltered(x => x.ServiceId == serviceId && x.ServiceStatusType!.IsOpen).Include (c=>c.ServiceStatusType)
                 .AsNoTracking()
                 .FirstOrDefaultAsync();
 
@@ -108,7 +108,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
             result = await serviceScopeFactory.CreateScopedUow().GetRepository<ServiceStatus>()
                 .GetAll(x => x.ServiceId == serviceId)
-                .Where(x => string.IsNullOrEmpty(statusType) ? true : statusType == "0" ? x.IsOpen == false : x.IsOpen == true)
+                .Where(x => string.IsNullOrEmpty(statusType) ? true : statusType == "0" ? x.ServiceStatusType!.IsOpen == false : x.ServiceStatusType!.IsOpen == true)
                   .OrderBy(x => x.OrderNo)
                 .ThenByDescending(x => x.CreateDate)
                 .Select(x => new SelectListItemDTO
