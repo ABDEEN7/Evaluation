@@ -1,5 +1,8 @@
 ﻿using Evaluation.Services.Models.API;
 using Evaluation.SharedHelper.Dtos.TeamMemberDto;
+using Evaluation.SharedHelper.Exceptions;
+using Evaluation.SharedHelper.Models;
+using Evaluation.SharedHelper.Models.Api;
 using Evaluation.SharedHelper.Models.Api.ActionEntitiesDTOs;
 using Evaluation.SharedHelper.Models.Api.EvaluationRequestEntities;
 using Evaluation.SharedHelper.Models.Api.FormBuilderDTO;
@@ -20,57 +23,57 @@ namespace Evaluation.API.Controllers
             _serviceRequestBL = serviceRequestBL;
         }
 
-        [HttpPost]
-        public async Task<WebAppPlanRequestsDTO> GetPlanRequests([FromBody] FilterRequestsDTO data)
-        {
-            return await _serviceRequestBL.GetPlanRequestsAsync(data);
-        }
-
+		[HttpPost]
+		public async Task<WebAppPlanRequestsDTO> GetPlanRequests([FromBody] FilterRequestsDTO data)
+		{
+			return await _serviceRequestBL.GetPlanRequestsAsync(data);
+		}
+		[HttpPost]
+		public async Task<WebAppEvaluationRequestsDTO> GetEvaluationRequests([FromBody] FilterRequestsDTO data)
+		{
+			return await _serviceRequestBL.GetEvaluationRequestsAsync(data);
+		}
+		[HttpGet]
+		public async Task<ServiceRequestDTO> GetApplicationDetails(Guid requestId)
+		{
+			return await _serviceRequestBL.GetApplicationDetailsAsync(requestId);
+		}
         [HttpGet]
-        public async Task<IActionResult> GetServiceStatus()
+        public async Task<List<JsTreeNodeDto>> GetScopes(Guid partyId)
         {
-            var result = await _serviceRequestBL.GetServiceStatus();
-            return Ok(result);
+            return await _serviceRequestBL.GetScopesList(partyId);
         }
-
-        [HttpPost]
-        public async Task<WebAppEvaluationRequestsDTO> GetEvaluationRequests([FromBody] FilterRequestsDTO data)
-        {
-            return await _serviceRequestBL.GetEvaluationRequestsAsync(data);
-        }
-
         [HttpGet]
-        public async Task<ServiceRequestDTO> GetApplicationDetails(Guid requestId)
+        public async Task<List<SupportedFileDto>> GetSupportedFiles(Guid requestId)
         {
-            return await _serviceRequestBL.GetApplicationDetailsAsync(requestId);
+            return await _serviceRequestBL.GetSupportedFiles(requestId);
         }
-
-        [HttpGet]
-        public async Task<EvaluationRequestDTO> GetEvaluationDetails(Guid requestId)
-        {
-            return await _serviceRequestBL.GetEvaluationDetailsAsync(requestId);
-        }
-
         [HttpPost]
-        public async Task<ServiceRequestDTO> HandleRequest(
-            [FromForm] ActionFormDTO dto,
-            [FromQuery] string actionName,
-            [FromForm] Guid serviceId,
-            [FromQuery] Guid? planId,
-            [FromForm] bool saveAsDraft)
+        public async Task<bool> SaveSupportFiles()
         {
-            var files = Request.Form?.Files;
-
-            var assignUsersJson = Request.Form["users"].FirstOrDefault();
-            var teamUsersJson = Request.Form["teamUsers"].FirstOrDefault();
-
-            Guid requestId = Guid.TryParse(Request.Form["requestId"], out var tempId)
-                ? tempId
-                : Guid.Empty;
-
-            Guid? evaluationRequestId = Guid.TryParse(Request.Form["evaluationRequestId"], out var evalId)
-                ? evalId
-                : null;
+            var file = Request.Form.Files[0];
+            Guid EvaluationRequestId = Guid.Parse(Request?.Form!["EvaluationRequestId"].FirstOrDefault());
+            Guid ScopeId = Guid.Parse(Request?.Form!["ScopeId"].FirstOrDefault());
+            return await _serviceRequestBL.SaveSupportFiles(file, EvaluationRequestId, ScopeId);
+        }
+        [HttpGet]
+		public async Task<EvaluationRequestDTO> GetEvaluationDetails(Guid requestId)
+		{
+			return await _serviceRequestBL.GetEvaluationDetailsAsync(requestId);
+		}
+		[HttpPost]
+		public async Task<ServiceRequestDTO> HandleRequest(
+			[FromForm] ActionFormDTO dto,
+			[FromQuery] string actionName,
+			[FromForm] Guid serviceId,
+			[FromQuery] Guid? planId,
+			[FromForm] bool saveAsDraft)
+		{
+			var files = Request.Form?.Files;
+			var assignUsersJson = Request?.Form!["users"].FirstOrDefault();
+			var teamUsersJson = Request?.Form!["teamUsers"].FirstOrDefault();
+			Guid requestId = Guid.TryParse(Request?.Form!["requestId"], out var tempId) ? tempId : Guid.Empty;
+			Guid evaluationRequestId = Guid.TryParse(Request?.Form!["evaluationRequestId"], out var EvlId) ? EvlId : Guid.Empty;
 
             var assignUsers = !string.IsNullOrEmpty(assignUsersJson)
                 ? JsonConvert.DeserializeObject<List<AssignUserDTO?>>(assignUsersJson)!

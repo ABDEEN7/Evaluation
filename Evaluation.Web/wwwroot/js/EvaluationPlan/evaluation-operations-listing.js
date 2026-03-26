@@ -190,8 +190,9 @@
                     container.insertAdjacentHTML('afterbegin', generateNdaApprovalDiv());
                     NdaSubmit(response);
                 }
-                else {
-                    renderEvaluationPartiesSection(response);
+                else
+                {
+                    renderEvaluationPartiesSection(response, requestId);
                 }
 
                 bindSchoolDetails(response);
@@ -248,7 +249,7 @@
         );
     }
 
-    function renderEvaluationPartiesSection(response) {
+    function renderEvaluationPartiesSection(response, requestId) {
         const parties = response?.evaluationParties || [];
 
         if (!window.formUtility || typeof formUtility.renderEvaluationParties !== "function") {
@@ -256,7 +257,7 @@
             return;
         }
 
-        formUtility.renderEvaluationParties(parties, {
+        formUtility.renderEvaluationParties(parties, requestId, {
             containerId: "evaluationPartiesContainer",
             parentAccordionId: "evaluationRootAccordion",
             expandFirst: true

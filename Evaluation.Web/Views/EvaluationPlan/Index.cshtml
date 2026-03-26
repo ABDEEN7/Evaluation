@@ -4,16 +4,15 @@
 <link href="~/assets/css/application-requests.css" rel="stylesheet" />
 <link href="~/form-assets/css/istemara-styles.css" rel="stylesheet">
 <link href="~/plan-assets/css/style.css" rel="stylesheet">
-
+<link href="~/lib/dropzone/dist/dropzone.css" rel="stylesheet" />
 <link href="~/vendor/flatpickr/css/flatpickr.min.css" rel="stylesheet" />
 <!-- Month Select Plugin CSS -->
 <link href="~/vendor/flatpickr/css/style.css" rel="stylesheet" />
 <!-- Custom CSS -->
 <link href="~/plan-assets/css/style.css" rel="stylesheet">
-
 <link href="~/lib/tabulator/css/tabulator.min.css" rel="stylesheet" />
 <link href="~/lib/tabulator/css/tabulator.css" rel="stylesheet" />
-<link href="~/assets/css/tabulator-styling.css.css" rel="stylesheet" />
+<link href="~/lib/jstree/3.3.12/themes/default/style.min.css" rel="stylesheet" />
 <!-- Page Title
 <div class="page-title light-background">
     <div class="container">
@@ -618,14 +617,42 @@
         </div>
     </div>
 </div>
-
+<div class="modal fade" id="EvaluationfileModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg modal-body-tall">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title @ConstantKeys.WebAppRequest.lblEvaluationFileHeader"
+                    id="EvaluationfileLabel">
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row mb-2">
+                    <input type="text" hidden id="EvaluationfileSectionRequestId" />
+                </div>
+                <div class="row mb-2">
+                <label class="@ConstantKeys.WebAppRequest.lblEvaluationFileScope"></label>
+                    <div id="EvaluationFileScopetree"></div>
+                </div>
+                <div class="row mb-2">
+                    <form id="EvaluationfileSection" enctype="multipart/form-data" class="dropzone"></form>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="btnSaveEvaluationFileScope" class="btn btn-secondary @ConstantKeys.WebAppRequest.lblSaveChanges">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
 <partial name="_PartialFileModal" />
 
 @section Scripts {
     <!-- Tables -->
+    <script src="~/lib/dropzone/dist/dropzone.js" asp-append-version="true"></script>
    <script src="~/lib/datatable/jquery.dataTables.min.js"></script>
     <script src="~/lib/datatable/dataTables.buttons.min.js"></script>
     <script src="~/lib/datatable/buttons.html5.min.js"></script>
+
     <!-- Date -->
     <script src="~/plan-assets/vendor/select2/js/select2.min.js"></script>
         <script src="~/plan-assets/vendor/flatpickr/js/flatpickr.js"></script>
@@ -677,6 +704,8 @@
 
     <script src="~/js/evaluationplan/createrequest.js"></script>
     <script src="~/lib/uuid/uuid.min.js"></script>
+    <script src="~/lib/jstree/3.3.12/jstree.min.js"></script>
+
 
     <script>
         const departmentRoutePath = sharedUtility().extractDepartmentName();
@@ -713,7 +742,7 @@
             if (sharedUtility().ExistingToken()) {
                   uiControlsSetup().UpdatPageTitle('WebAppScholarship');
                     $('body').show();
-
+                    GetScopes();
                 // await LoadUserDetails();
                 // InitNavbarSection();
 

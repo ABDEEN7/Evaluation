@@ -17,12 +17,14 @@ using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Helper;
 using Evaluation.SharedHelper.Models;
+using Evaluation.SharedHelper.Models.Api;
 using Evaluation.SharedHelper.Models.Api.ActionEntitiesDTOs;
 using Evaluation.SharedHelper.Models.Api.EvaluationRequestEntities;
 using Evaluation.SharedHelper.Models.Api.FormBuilderDTO;
 using Evaluation.SharedHelper.Models.Api.ServiceDTOs;
 using Evaluation.SharedHelper.Models.Api.ServiceRequestEntitiesDTO;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
@@ -58,7 +60,22 @@ namespace Evaluation.Services.Models.API
 		{
 			return await _srvServiceRequest.GetRequestDetailsAsync(requestId);
 		}
-		public async Task<EvaluationRequestDTO> GetEvaluationDetailsAsync(Guid requestId)
+        public async Task<List<JsTreeNodeDto>> GetScopesList(Guid partyId)
+        {
+            return await _srvServiceRequest.GetScopeList(partyId);
+        }
+        public async Task<List<SupportedFileDto>> GetSupportedFiles(Guid requestId)
+        {
+            return await _srvServiceRequest.GetSupportedFiles(requestId);
+        }
+        public async Task<bool> SaveSupportFiles(
+    IFormFile file,
+    Guid EvaluationRequestId,
+    Guid ScopeId)
+        {
+            return await _srvServiceRequest.SaveSupportFiles(file, EvaluationRequestId, ScopeId);
+        }
+        public async Task<EvaluationRequestDTO> GetEvaluationDetailsAsync(Guid requestId)
 		{
 			return await _evaluationRequestService.GetEvaluationDetailsAsync(requestId);
 		}
