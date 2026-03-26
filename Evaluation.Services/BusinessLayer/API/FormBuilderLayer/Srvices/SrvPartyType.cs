@@ -20,7 +20,9 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
         public async Task<List<PartyType>?> GetUserPartyTypeAsync()
         {
-            var UserPartyType = await serviceScopeFactory.CreateScopedUow().GetRepository<PartyType>()
+			using var scopedUow = serviceScopeFactory.CreateScopedUow();
+
+			var UserPartyType = await scopedUow.GetRepository<PartyType>()
                 .GetAllActiveNonDeleted()
                 .AsNoTracking()
                 .Where(pt => userInfo.PartyTypes.Contains(pt.Id)).ToListAsync();
@@ -31,10 +33,11 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
         public async Task<List<SelectListItemDTO>> GetPartyTypesByModuleAsync()
         {
             string lang = _requestInfo.Lang;
+			using var scopedUow = serviceScopeFactory.CreateScopedUow();
 
-            var userPartyTypesTask = GetUserPartyTypeAsync();
+			var userPartyTypesTask = GetUserPartyTypeAsync();
 
-            var partyTypeRepo = serviceScopeFactory.CreateScopedUow().GetRepository<PartyType>();
+            var partyTypeRepo = scopedUow.GetRepository<PartyType>();
 
 
             var partyTypes = await partyTypeRepo
@@ -71,9 +74,9 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             {
                 return false;
             }
+			using var scopedUow = serviceScopeFactory.CreateScopedUow();
 
-            var result = await serviceScopeFactory.CreateScopedUow()
-                                       .GetRepository<UserPartyType>()
+			var result = await scopedUow.GetRepository<UserPartyType>()
                                         .GetAllQueryFiltered()
                                         .Include(x => x.PartyType)
                                         .Where(x => x.UserId == userId)
@@ -89,9 +92,9 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             {
                 return false;
             }
+			using var scopedUow = serviceScopeFactory.CreateScopedUow();
 
-            var result = await serviceScopeFactory.CreateScopedUow()
-                                       .GetRepository<UserPartyType>()
+			var result = await scopedUow.GetRepository<UserPartyType>()
                                         .GetAllQueryFiltered()
                                         .Include(x => x.PartyType)
                                         .Where(x => x.UserId == userId)
@@ -102,8 +105,9 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
         }
         public async Task<bool> IsAllowedToViewAllPlansWitoutFilterationAsync(Guid? userId)
         {
-            var result = await serviceScopeFactory.CreateScopedUow()
-                                       .GetRepository<UserPartyType>()
+			using var scopedUow = serviceScopeFactory.CreateScopedUow();
+
+			var result = await scopedUow.GetRepository<UserPartyType>()
                                         .GetAllQueryFiltered()
                                         .Include(x => x.PartyType)
                                         .Where(x => x.UserId == userId)
@@ -114,7 +118,9 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
         }
         public async Task<List<UserPartyTypeDTO>> GetUserPartyTypeData(Guid? userId)
         {
-            return await serviceScopeFactory.CreateScopedUow().GetRepository<UserPartyType>()
+			using var scopedUow = serviceScopeFactory.CreateScopedUow();
+
+			return await scopedUow.GetRepository<UserPartyType>()
                 .GetAllQueryFiltered()
                 .Where(x => x.UserId == userId && x.PartyType!.DepartmentId == requestInfo.DepId)
                 .Select(x => new UserPartyTypeDTO

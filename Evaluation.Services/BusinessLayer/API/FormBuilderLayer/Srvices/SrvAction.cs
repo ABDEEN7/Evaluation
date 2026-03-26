@@ -32,7 +32,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 {
 #pragma warning disable CS8620
 
-    public class SrvAction (SrvDropdown SrvDropdown, SrvUser SrvUser, SrvField SrvField, IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow, LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, IServiceProvider serviceProvider, RequestInfo requestInfo)
+    public class SrvAction (SrvField SrvField, IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow, LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, IServiceProvider serviceProvider, RequestInfo requestInfo)
             : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, requestInfo)
     {
 
@@ -70,7 +70,8 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 		}
 		public async Task<ServiceAction?> GetInitialActionAsync(Guid serviceId, string actionBackendName)
 		{
-			var action = await serviceScopeFactory.CreateScopedUow()
+			using var scope = serviceScopeFactory.CreateScopedUow();
+			var action = await scope
 				.GetRepository<ServiceAction>()
 				.GetAllQueryFiltered()
 				.Include(x => x.ActionType)
@@ -83,7 +84,9 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 		}
 		public async Task<List<ActionField>> GetActionFieldsAsync(Guid actionId)
 		{
-			var fields = await serviceScopeFactory.CreateScopedUow()
+			using var scope = serviceScopeFactory.CreateScopedUow();
+
+			var fields = await scope
 				.GetRepository<ActionField>()
 				.GetAllQueryFiltered(x => x.ServiceActionId == actionId)
 				.Include(x => x.Field)
@@ -94,7 +97,8 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 		}
 		public async Task<List<ActionTemplateDoc>> GetActionDocumentsAsync(Guid actionId)
 		{
-			var documents = await serviceScopeFactory.CreateScopedUow()
+			using var scope = serviceScopeFactory.CreateScopedUow();
+			var documents = await scope
 				.GetRepository<ActionTemplateDoc>()
 				.GetAllQueryFiltered(x => x.ServiceActionId == actionId)
 				.AsNoTracking()
@@ -104,7 +108,10 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 		}
 		public async Task<List<Evaluation.SharedHelper.Models.Api.PartyTypeDTOs.PartyTypeDTO>> GetActionPartyTypesAsync(Guid actionId)
 		{
-			var partyTypes = await serviceScopeFactory.CreateScopedUow()
+
+			using var scope = serviceScopeFactory.CreateScopedUow();
+
+			var partyTypes = await scope
 				.GetRepository<ActionPartyType>()
 				.GetAllQueryFiltered(x => x.ServiceActionId == actionId)
 				.Include(x => x.PartyType)
@@ -126,8 +133,10 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 			//var studentTask = SrvUser.GetByStudentIDActiveNonDeleted(StudentId);
 
 			var actionTask = GetActionByBackendNameAsync(serviceObj!.Id, actionObj.BackendName);
+			using var scope = serviceScopeFactory.CreateScopedUow();
+			using var scope1 = serviceScopeFactory.CreateScopedUow();
 
-			var attributesTask = serviceScopeFactory.CreateScopedUow()
+			var attributesTask = scope
 													.GetRepository<FieldAttributeValue>()
 													.GetAllQueryFiltered()
 													.Include(c => c.Field!.FieldType)
@@ -136,11 +145,11 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 													.Where(c => allFields.Select(f => f.FieldId).ToList().Contains(c.FieldId)).AsNoTracking()
 													.ToListAsync();
 
-			var ActionFieldAttributesTask = serviceScopeFactory.CreateScopedUow()
+			var ActionFieldAttributesTask = scope1
 												.GetRepository<ActionField>()
 												.GetAllQueryFiltered()
 												.Where(c => allFields.Select(f => f.FieldId).Contains(c.FieldId) && c.ServiceActionId == actionObj.Id)
-												.SelectMany(c => c.ActionFieldAttribute)
+												.SelectMany(c => c.ActionFieldAttribute!)
 												.ToListAsync();
 
 			var actionStatusConfigTask = GetActionConfigurationAsync(actionObj.Id, applicationStatusId);
@@ -212,7 +221,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 						.ToList();
 
 					//var student = await studentTask;
-					var validationErrorsTask = ValidateFieldsAttributesAsync(filledFields, allFields, fileFields, fieldAttributesToValidate, application?.OrgTreeId, Lang, application.PlanId);
+					var validationErrorsTask = ValidateFieldsAttributesAsync(filledFields, allFields, fileFields, fieldAttributesToValidate, application?.OrgTreeId, Lang, application?.PlanId);
 
 					await Task.WhenAll(validationErrorsTask, validateRemarksTask);
 
@@ -281,7 +290,9 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 		}
 		public async Task<ActionStatusConfiguration?> GetActionConfigurationAsync(Guid actionId, Guid currentStatusId)
 		{
-			var ActionConfiguration = await serviceScopeFactory.CreateScopedUow()
+			using var scope = serviceScopeFactory.CreateScopedUow();
+
+			var ActionConfiguration = await scope
 				  .GetRepository<ActionStatusConfiguration>().GetAllQueryFiltered().Include(x => x.Notifications)
 				  .FirstOrDefaultAsync(c => c.ServiceActionId == actionId && c.CurrentStatusId == currentStatusId);
 
@@ -292,21 +303,23 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 			if (ActionTypeId ==ActionTypeIds.RequestDataChange || ActionTypeId == ActionTypeIds.SubmitMissingData) { return false; }
 			else
 			{
-				var MissingField = serviceScopeFactory.CreateScopedUow()
-															  .GetRepository<ServiceRequestFieldsValue>()
-															  .GetAllQueryFiltered()
-															  .AsNoTracking()
-															  .Where(x => x.RefId == applicationId && x.IsMissing == false)
-															  .Select(c => c.FieldId).ToList();
+				using var scope = serviceScopeFactory.CreateScopedUow();
+
+				using var scope1 = serviceScopeFactory.CreateScopedUow();
+
+				var MissingField =await scope.GetRepository<ServiceRequestFieldsValue>()
+										.GetAllQueryFiltered()
+										.AsNoTracking()
+										.Where(x => x.RefId == applicationId && x.IsMissing == false)
+										.Select(c => c.FieldId).ToListAsync();
 
 
 
-				var actionFieldIdsList = serviceScopeFactory.CreateScopedUow()
-															.GetRepository<ActionField>()
-															.GetAllQueryFiltered()
-															.AsNoTracking()
-															.Where(c => c.ServiceActionId == actionId)
-															.Select(c => c.FieldId);
+				var actionFieldIdsList = scope1.GetRepository<ActionField>()
+										.GetAllQueryFiltered()
+										.AsNoTracking()
+										.Where(c => c.ServiceActionId == actionId)
+										.Select(c => c.FieldId);
 
 				var invalidFieldsList = fields.Where(c => !actionFieldIdsList.Contains(c.FieldId!.Value) && !MissingField.Contains(c.FieldId.Value)).ToList();
 
@@ -315,9 +328,9 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 		}
 		public async Task<List<Field?>> GetActionMappedFieldsAsync(Guid actionId, string RelatedFieldsGroupBackendName)
 		{
+			using var scope = serviceScopeFactory.CreateScopedUow();
 
-			var actionMappedFieldIdsList = await serviceScopeFactory
-											.CreateScopedUow()
+			var actionMappedFieldIdsList = await scope
 											.GetRepository<ActionField>()
 											.GetAllQueryFiltered()
 											.Include(c => c.Field)
@@ -355,8 +368,9 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 			var validator = new FieldValidatorBL(cacheDataProvider);
 			var errors = new List<SharedHelper.Models.Api.FormBuilderDTO.FieldErrorDTO>();
 			var fieldsIds = fields.Select(x => x.FieldId).ToList();
+			using var scope = serviceScopeFactory.CreateScopedUow();
 
-			var FieldwithJasonSchema = await serviceScopeFactory.CreateScopedUow()
+			var FieldwithJasonSchema = await scope
 				.GetRepository<Field>()
 				.GetAllQueryFiltered(c => fieldsIds.Contains(c.Id))
 				.Include(c => c.FieldAttributeValues)
@@ -530,98 +544,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 			return messages.Select(msg => new SharedHelper.Models.Api.FormBuilderDTO.FieldErrorDTO { fieldId = fieldId, error = msg }).ToList();
 		}
 	
-		private async Task<List<string>> ValidateUniqueQidAsync<TEntity>(List<TEntity> entities, string lang) where TEntity : EntityBase, new()
-		{
-			var errors = new List<string>();
-			var qidSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-			foreach (var entity in entities)
-			{
-				var qidProperty = entity.GetType().GetProperty("QID");
-				if (qidProperty == null) continue;
-
-				var qid = qidProperty.GetValue(entity) as string;
-				qid = qid?.Trim();
-
-				if (string.IsNullOrEmpty(qid)) continue;
-
-				if (!qidSet.Add(qid))
-				{
-					var errorMsg = lang == "ar"
-						? $"رقم البطاقة الشخصية مكرر: {qid}"
-						: $"Duplicate QID found: {qid}";
-
-					errors.Add(errorMsg);
-				}
-			}
-
-			return errors;
-		}
-		//public async Task<bool> CheckQIDInMOIAsync(string qid, DateOnly qidExpiryDate)
-		//{
-		//	if (string.IsNullOrEmpty(qid)) return false;
-
-		//	var moiMessageRequest = new MOIMessageRequest
-		//	{
-		//		QID = qid,
-		//		QIDExpiryDate = qidExpiryDate,
-		//	};
-
-		//	var moiData = await mOIServices._GetPersonalInfo(moiMessageRequest);
-
-		//	if (moiData == null) return false;
-
-		//	return true;
-		//}
-	
-		private static HashSet<Guid> ExtractIncomingIdsFromJson(string? json, string idKey = "Index")
-		{
-			var ids = new HashSet<Guid>();
-			if (string.IsNullOrWhiteSpace(json)) return ids;
-
-
-			var list = Newtonsoft.Json.JsonConvert
-				.DeserializeObject<List<Dictionary<string, object>>>(json) ?? new();
-
-			foreach (var dic in list)
-			{
-				if (dic.TryGetValue(idKey, out var idObj))
-				{
-					var g = ToGuid(idObj);
-					if (g.HasValue && g.Value != Guid.Empty)
-						ids.Add(g.Value);
-				}
-			}
-
-
-			return ids;
-		}
-
-		private static Guid? ToGuid(object? v)
-		{
-			if (v is null) return null;
-			if (v is Guid g) return g;
-			var s = v.ToString();
-			return Guid.TryParse(s, out var parsed) ? parsed : (Guid?)null;
-		}
-
-		
-		private void UpdateField(JObject jsonEntry, Dictionary<string, Guid> fieldMapping, string backendName, string newValue)
-		{
-			if (fieldMapping.TryGetValue(backendName, out var fieldId) && !string.IsNullOrEmpty(newValue))
-			{
-				string key = fieldId.ToString();
-
-				if (jsonEntry.ContainsKey(key))
-				{
-					jsonEntry[key] = JToken.FromObject(newValue);
-				}
-				else
-				{
-					jsonEntry.Add(new JProperty(key, newValue));
-				}
-			}
-		}
 		public async Task<bool> ValidatedConditionAsync(object? fieldValue, string operatorType, string comparisonValue)
 		{
 			switch (operatorType.ToLowerInvariant())

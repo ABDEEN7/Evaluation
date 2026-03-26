@@ -17,82 +17,34 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 {
-    public class SrvUser(SrvDropdown SrvDropdown, IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow, LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, IServiceProvider serviceProvider, RequestInfo requestInfo)
+    public class SrvUser( IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow, LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, IServiceProvider serviceProvider, RequestInfo requestInfo)
            : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, requestInfo)
     {
 
-        public async Task<UserProfileCustomDTO?> GetApplicantStudent(ServiceRequest request)
+      
+        public async Task<MinistryUser?> GetByIDActiveNonDeleted(Guid userId)
         {
-            //string lang = requestInfo.Lang;
+            using var scope = serviceScopeFactory.CreateScopedUow();
 
-            //if (request != null)
-            //{
-
-
-            //	if (request.Student != null)
-            //	{
-            //		var Nationality = await SrvAccreditedUniversity.GetCountryBycode(request.Student.NationalityCode);
-            //		return new UserProfileCustomDTO()
-            //		{
-            //			Email = request.Student.Email,
-            //			Name = lang == "ar"
-            //								? (string.IsNullOrEmpty(request.Student.FullNameAr) ? "" : request.Student.FullNameAr)
-            //								: (string.IsNullOrEmpty(request.Student.FullNameEn) ? "" : request.Student.FullNameEn),
-            //			Mobile = request.Student.Mobile,
-            //			SecondMobile = request.Student.SecondMobile,
-            //			QID = request.Student.QID,
-            //			Nationality = Nationality != null
-            //						? (lang == "ar"
-            //							? (string.IsNullOrEmpty(Nationality.NameAr) ? "" : Nationality.NameAr)
-            //							: (string.IsNullOrEmpty(Nationality.NameEn) ? "" : Nationality.NameEn))
-            //						: "",
-            //			QIDExpiry = request.Student.QIDExpiryDate.ToString("yyyy-MM-dd"),  // Ensure full date format
-            //			DOB = request.Student.DOB.HasValue ? request.Student.DOB.Value.ToString("yyyy-MM-dd") : "", // Handle nullable DOB
-            //			Gender = lang == "ar"
-            //				? (string.IsNullOrEmpty(request.Student.UserGender.TitleAr) ? "" : request.Student.UserGender.TitleAr)
-            //				: (string.IsNullOrEmpty(request.Student.UserGender.TitleEn) ? "" : request.Student.UserGender.TitleEn),
-            //		};
-
-            //	}
-            //	else
-            //		return null;
-            //}
-            //else
-            return null;
-
-        }
-
-        public async Task<MinistryUser> GetByIDActiveNonDeleted(Guid userId)
-        {
-
-            var UserProfile = await serviceScopeFactory.CreateScopedUow()
-                            .GetRepository<MinistryUser>().GetByIDActiveNonDeleted(userId);
+			var UserProfile = await scope.GetRepository<MinistryUser>().GetByIDActiveNonDeleted(userId);
 
             return UserProfile;
         }
 
-        public async Task<MinistryUser> GetByStudentIDActiveNonDeleted(Guid userId)
+        public async Task<MinistryUser?> GetByStudentIDActiveNonDeleted(Guid userId)
         {
+			using var scope = serviceScopeFactory.CreateScopedUow();
 
-            var UserProfile = await serviceScopeFactory.CreateScopedUow()
-                            .GetRepository<MinistryUser>().GetByIDActiveNonDeleted(userId);
+			var UserProfile = await scope.GetRepository<MinistryUser>().GetByIDActiveNonDeleted(userId);
 
             return UserProfile;
         }
-
-        //public async Task<Guid> GetUserGenderByuserId(Guid userId)
-        //{
-        //	var UserProfile = await serviceScopeFactory.CreateScopedUow()
-        //					.GetRepository<MinistryUser>().GetByIDActiveNonDeleted(userId);
-        //	if (UserProfile == null)
-        //		throw new BusinessException(ConstantKeys.ExceptionMessage.UserInfoNotFound);
-        //	return UserProfile.UserGenderId;
-        //}
 
         public async Task<bool> HasPermission(Guid userId, string permissionName)
         {
-            return await serviceScopeFactory.CreateScopedUow()
-                            .GetRepository<UserRole>()
+			using var scope = serviceScopeFactory.CreateScopedUow();
+
+			return await scope.GetRepository<UserRole>()
                             .GetAllQueryFiltered()
                             .Include(ur => ur.Role!.RolePermission)
                             .AnyAsync(ur => ur.UserId == userId &&
@@ -101,7 +53,9 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
         public async Task<MinistryUser?> GetStudentByIdAsync(Guid userId)
         {
-            return await serviceScopeFactory.CreateScopedUow().GetRepository<MinistryUser>()
+			using var scope = serviceScopeFactory.CreateScopedUow();
+
+			return await scope.GetRepository<MinistryUser>()
                 .GetByIDActiveNonDeleted(userId);
         }
 
@@ -109,7 +63,9 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
         public async Task<PartyType?> GetFirstUserPartyTypeAsync()
         {
-            return await serviceScopeFactory.CreateScopedUow().GetRepository<PartyType>()
+			using var scope = serviceScopeFactory.CreateScopedUow();
+
+			return await scope.GetRepository<PartyType>()
                 .GetAllActiveNonDeleted()
                 .AsNoTracking()
                 .FirstOrDefaultAsync(pt => userInfo.PartyTypes.Contains(pt.Id));
@@ -119,6 +75,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
         //{
         //	string lang = requestInfo.Lang;
         //	var result = new List<SelectListItemDTO>();
+          //  using var scope = serviceScopeFactory.CreateScopedUow();
 
         //	if (moduleId != Guid.Empty && partyTypesIdsList != null && partyTypesIdsList.Any())
         //	{
@@ -224,9 +181,9 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
         public async Task<List<Guid>> GetEmployeeUserPartyTypeIdsAsync(Guid userProfileId, Guid departementId)
         {
-            var employeeUserPartyTypes = await serviceScopeFactory
-                .CreateScopedUow()
-                .GetRepository<UserPartyType>()
+			using var scope = serviceScopeFactory.CreateScopedUow();
+
+			var employeeUserPartyTypes = await scope.GetRepository<UserPartyType>()
                 .GetAllQueryFiltered(x => x.UserId == userProfileId)
                 .Where(x => x.PartyType!.DepartmentId == departementId
                             && x.PartyType.IsEmployeePartyType)

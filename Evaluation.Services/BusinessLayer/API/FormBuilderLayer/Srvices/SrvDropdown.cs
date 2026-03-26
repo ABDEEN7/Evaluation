@@ -46,9 +46,9 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             {
                 processedIds.Add(id);
             }
+			using var scopedUow = serviceScopeFactory.CreateScopedUow();
 
-            var dropDownsFields = await serviceScopeFactory.CreateScopedUow()
-                .GetRepository<Field>()
+			var dropDownsFields = await scopedUow.GetRepository<Field>()
                 .GetAllQueryFiltered()
                 .Where(x => unprocessedIds.Contains(x.Id)
                             || unprocessedIds.Contains(x.DropDownParentFieldId!.Value))  // Fetch both current fields and their parents
@@ -280,8 +280,10 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
         public async Task<FieldDropDownValue?> GetDropDownValuesById(Guid Id)
         {
-            var dropdownValue = await serviceScopeFactory.CreateScopedUow()
-                                    .GetRepository<FieldDropDownValue>()
+			using var scopedUow = serviceScopeFactory.CreateScopedUow();
+
+			var dropdownValue = await scopedUow
+									.GetRepository<FieldDropDownValue>()
                                     .GetByIDNonDeleted(Id);
 
             return dropdownValue;
@@ -318,8 +320,10 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
         }
         private async Task<List<ActionFieldInfo>> GetActionFieldsAsync(Guid actionId)
         {
-            return await serviceScopeFactory.CreateScopedUow()
-                .GetRepository<ActionField>()
+			using var scopedUow = serviceScopeFactory.CreateScopedUow();
+
+			return await scopedUow
+				.GetRepository<ActionField>()
                 .GetAllQueryFiltered()
                 .Include(x => x.Field)
                 .Include(x => x.Field!.FieldAttributeValues)

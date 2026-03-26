@@ -18,14 +18,14 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 {
-    public class SrvEvaluationRequestAssignment(SrvServiceRequest SrvEvaluationRequest, IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow, SrvUser SrvUser, LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, IServiceProvider serviceProvider, RequestInfo _requestInfo)
+    public class SrvEvaluationRequestAssignment(IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow, SrvUser SrvUser, LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, IServiceProvider serviceProvider, RequestInfo _requestInfo)
             : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, _requestInfo)
 
     {
 
         public async Task PerformAssignAction(Guid requestId, List<SharedHelper.Models.Api.ActionEntitiesDTOs.AssignUserDTO?> users)
         {
-            var _Uow = serviceScopeFactory.CreateScopedUow();
+           using  var _Uow = serviceScopeFactory.CreateScopedUow();
 
             var userEmails = users.Select(c => c!.Email).Distinct().ToList();
 
@@ -197,9 +197,9 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
         private async Task<List<Guid>> GetAllowedPartyTypeIds(Guid actionId)
         {
-            using var uow = serviceScopeFactory.CreateScopedUow();
+            using var scope = serviceScopeFactory.CreateScopedUow();
 
-            var assignablePartyTypes = await uow.GetRepository<ActionAssignPartyType>()
+            var assignablePartyTypes = await scope.GetRepository<ActionAssignPartyType>()
                 .GetAllQueryFiltered(c => c.EvaluationActionId == actionId)
                 .Include(x => x.PartyType)
                 .AsNoTracking()
@@ -227,9 +227,10 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             {
                 return new List<AssignUserDTO>();
             }
+			using var scopedUow = serviceScopeFactory.CreateScopedUow();
 
-            var users = await serviceScopeFactory.CreateScopedUow()
-                            .GetRepository<MinistryUser>()
+			var users = await scopedUow
+							.GetRepository<MinistryUser>()
                             .GetAllQueryFiltered()
                             .Include(u => u.UserPartTypes!)
                                 .ThenInclude(pt => pt.PartyType)
@@ -281,9 +282,10 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
         //}
         public async Task<List<EvaluationRequestAssignment>> GetRequestAssignet(Guid requestId)
         {
+			using var scope = serviceScopeFactory.CreateScopedUow();
 
-            var assignmentUserIds = await serviceScopeFactory.CreateScopedUow()
-                                                 .GetRepository<EvaluationRequestAssignment>()
+			var assignmentUserIds = await scope
+												 .GetRepository<EvaluationRequestAssignment>()
                                                  .GetAllQueryFiltered()
                                                  .Where(c => c.EvaluationRequestId == requestId)
                                                  .ToListAsync();

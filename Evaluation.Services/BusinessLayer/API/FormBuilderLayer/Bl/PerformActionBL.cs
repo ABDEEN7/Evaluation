@@ -26,15 +26,9 @@ using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Api.ActionEntitiesDTOs;
 using Evaluation.SharedHelper.Models.Api.FormBuilderDTO;
 using Evaluation.SharedHelper.Models.Api.ServiceRequestEntitiesDTO;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System.Globalization;
-using System.Text.Json;
-using System.Text.RegularExpressions;
 using static Evaluation.DAL.ConstantKeys;
 using static Evaluation.SharedHelper.Enums.ConstantKeys;
 
@@ -180,20 +174,11 @@ namespace Evaluation.Services.Models.API
 						if (planField == null)
 							break;
 
-						try
-						{
-							var dto = JsonConvert.DeserializeObject<CreateEvaluationPlanDto>(planField.Value);
+							var dto = JsonConvert.DeserializeObject<CreateEvaluationPlanDto>(planField.Value!);
 							if (dto == null) throw new BusinessException("Invalid Evaluation Plan data");
 
 							await planServiceRequestServices.InsertOrUpdatePlan(dto);
 
-						}
-
-						catch (Exception ex)
-						{
-
-						}
-						
 						break;
 					}
 				case ActionTypeKeys.CLOSE_AND_UPDATE_PLAN:
@@ -215,28 +200,10 @@ namespace Evaluation.Services.Models.API
 						if (planField == null)
 							break;
 
-
-						try
-						{
-							var dto = JsonConvert.DeserializeObject<CreateEvaluationPlanDto>(planField.Value);
+							var dto = JsonConvert.DeserializeObject<CreateEvaluationPlanDto>(planField.Value!);
 							if (dto == null) throw new BusinessException("Invalid Evaluation Plan data");
 
 							await planServiceRequestServices.InsertOrUpdatePlan(dto);
-
-							if (dto == null) throw new BusinessException("Invalid Evaluation Plan data");
-
-							await planServiceRequestServices.InsertOrUpdatePlan(dto);
-
-						}
-
-						catch (Exception ex)
-						{
-
-						}
-						//						var dto = JsonConvert.DeserializeObject<CreateEvaluationPlanDto>(
-						//	planField.Value.ToString()
-						//);
-						
 
 						break;
 					}
@@ -260,7 +227,7 @@ namespace Evaluation.Services.Models.API
 							break;
 
 
-						var dto = JsonConvert.DeserializeObject<FormEvaluationDto>(FormField.Value);
+						var dto = JsonConvert.DeserializeObject<FormEvaluationDto>(FormField.Value!);
 
 						if (dto == null) throw new BusinessException("Invalid Evaluation Plan data");
 
@@ -287,13 +254,8 @@ namespace Evaluation.Services.Models.API
 						if (planField == null)
 							break;
 
-
-						//var dto = Newtonsoft.Json.JsonConvert.DeserializeObject<CreateEvaluationPlanDto>(planField.Value.ToString());
 						var dto = JsonConvert.DeserializeObject<CreateEvaluationPlanDto>(planField.Value);
 
-						//						var dto = JsonConvert.DeserializeObject<CreateEvaluationPlanDto>(
-						//	planField.Value.ToString()
-						//);
 						if (dto == null) throw new BusinessException("Invalid Evaluation Plan data");
 
 						await planServiceRequestServices.DeletePlanDraft(dto.Id);
@@ -332,8 +294,8 @@ namespace Evaluation.Services.Models.API
 
 			if (serviceObj.IsAutoAssignEnabled == true && !saveAsDraft)
 			{
-
-				var Assignaction = await serviceScopeFactory.CreateScopedUow()
+				using var scope = serviceScopeFactory.CreateScopedUow();
+				var Assignaction = await scope
 					.GetRepository<ActionStatusConfiguration>()
 					.GetAllQueryFiltered()
 					.Include(c => c.ServiceAction)
@@ -589,8 +551,9 @@ namespace Evaluation.Services.Models.API
 		{
 
 			var fieldIdsList = fields.Select(x => x.FieldId).Distinct().ToList();
+			using var scope = serviceScopeFactory.CreateScopedUow();
 
-			var list = await serviceScopeFactory.CreateScopedUow()
+			var list = await scope
 												.GetRepository<ServiceRequestFieldsValue>()
 												.GetAllQueryFiltered(x => x.RefId == requestId && fieldIdsList.Contains(x.FieldId))
 												.Include(x => x.Field).AsNoTracking()

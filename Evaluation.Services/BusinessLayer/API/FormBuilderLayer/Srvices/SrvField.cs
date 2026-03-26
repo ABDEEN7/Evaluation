@@ -10,6 +10,7 @@ using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Api.FormBuilderDTO;
+using Microsoft.AspNetCore.Razor.Language.Intermediate;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualBasic.FileIO;
@@ -25,9 +26,11 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
     public class SrvField(SrvAttachments SrvAttachments,  IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow, LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, IServiceProvider serviceProvider, RequestInfo _requestInfo)
             : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, _requestInfo)
     {
+	
 		public async Task<Field?> GetFieldsByIdsAsync(Guid fieldId)
 		{
-			var fields = await serviceScopeFactory.CreateScopedUow()
+			using var scope = serviceScopeFactory.CreateScopedUow();
+		var fields = await scope
 				.GetRepository<Field>()
 				.GetAllActiveNonDeleted(x => x.Id == fieldId)
 				.Include(x => x.FieldType)
@@ -43,7 +46,9 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
 		public async Task<Field?> GetFieldsByBackendNameAsync(string BackendName)
 		{
-			var fields = await serviceScopeFactory.CreateScopedUow()
+			using var scope = serviceScopeFactory.CreateScopedUow();
+
+			var fields = await scope
 				.GetRepository<Field>()
 				.GetAllActiveNonDeleted(x => x.BackendName == BackendName)
 				.Include(x => x.FieldType)
@@ -55,7 +60,9 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 		}
 		public async Task<Field?> GetSysFieldsByIdsAsync(Guid SysfieldId)
 		{
-			var fields = await serviceScopeFactory.CreateScopedUow()
+			using var scope = serviceScopeFactory.CreateScopedUow();
+
+			var fields = await scope
 				.GetRepository<Field>()
 				.GetAllActiveNonDeleted(x => x.Id == SysfieldId)
 				.Include(x => x.FieldType)
@@ -66,7 +73,9 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 		}
 		public async Task<IList<CssClassesDTO>> GetCssClasses()
 		{
-			var result = await serviceScopeFactory.CreateScopedUow().GetRepository<CssClass>().GetAllQueryFiltered().Include(c => c.ApplyType).Select(c => new CssClassesDTO()
+			using var scope = serviceScopeFactory.CreateScopedUow();
+
+			var result = await scope.GetRepository<CssClass>().GetAllQueryFiltered().Include(c => c.ApplyType).Select(c => new CssClassesDTO()
 			{
 				ClassName = c.ClassName,
 				Styles = c.Styles,
@@ -76,6 +85,8 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 		}
 		public async Task<List<Guid>> GetHiddenFields(Guid serviceId)
 		{
+			using var scope = serviceScopeFactory.CreateScopedUow();
+
 			userInfo.UserId = Guid.Parse("C2536611-576B-4EB8-84F4-747F4ECE9A23");
 			if (userInfo.UserId == null)
 			{
@@ -85,7 +96,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 			{ 
 			var userPartyTypeIds = new List<Guid>(userInfo.PartyTypes);
 
-			var hiddenFieldsIds = await serviceScopeFactory.CreateScopedUow()
+			var hiddenFieldsIds = await scope
 				.GetRepository<Field>()
 				.GetAllActiveNonDeleted()
 				.Include(f => f.FieldPartyTypes)
@@ -163,8 +174,8 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 				await cacheDataProvider.SetToCache(WebAppCacheTableName.CACHE_FIELDS, data);
 			}
 			var FieldsList = data
-				 .Where(f => f.ServiceId == serviceId || f.Service.SystemModuleId == SystemModuleId)
-				 .Where(f => f.FormGroup.FormGroupTypeId == FormGroupTypeKeyIds.List)
+				 .Where(f => f.ServiceId == serviceId || f.Service!.SystemModuleId == SystemModuleId)
+				 .Where(f => f.FormGroup!.FormGroupTypeId == FormGroupTypeKeyIds.List)
 				 .ToList();
 			return FieldsList;
 		}
@@ -230,14 +241,14 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 		}
 		public async Task<List<Field>> GetFieldListByFieldId(Guid FieldId)
 		{
-			using var uow = serviceScopeFactory.CreateScopedUow();
+			using var _uow = serviceScopeFactory.CreateScopedUow();
 
-			var field = await uow.GetRepository<Field>()
+			var field = await _uow.GetRepository<Field>()
 								 .GetByIDActiveNonDeleted(FieldId);
 
 			if (field == null) return new List<Field>();
 
-			var fieldList = await uow.GetRepository<Field>()
+			var fieldList = await _uow.GetRepository<Field>()
 									 .GetAllQueryFiltered(x => x.FormGroupId == field.FormGroupListId)
 									 .Include(x => x.FieldType)
 									 .Include(x => x.FieldAttributeValues)
@@ -627,7 +638,9 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 		}
 		private async Task<IntegrationPoint?> GetIntegrationPointByNameAsync(string integrationName)
 		{
-			return await serviceScopeFactory.CreateScopedUow()
+			using var scope = serviceScopeFactory.CreateScopedUow();
+
+			return await scope
 				.GetRepository<IntegrationPoint>()
 				.GetAllActiveNonDeleted(x => x.BackendName == integrationName)
 				.FirstOrDefaultAsync();

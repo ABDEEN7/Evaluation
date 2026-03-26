@@ -39,7 +39,7 @@ using static Evaluation.SharedHelper.Enums.ConstantKeys;
 
 namespace Evaluation.Services.BusinessLayer.API
 {
-    public class  FormRenderBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, SrvUser _srvUser, UnitOfWork uow, LoggingServices loggingServices, SrvAction _srvAction,
+    public class  FormRenderBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow, LoggingServices loggingServices, SrvAction _srvAction,
 				  IMapper mapper,UserInfo userInfo,   RequestInfo _requestInfo, SrvServiceRequest _srvServiceRequest, EvaluationRequestService _evaluationRequestService, SrvService _srvService, SrvActionStatusConfiguration _srvActionStatusConfiguration
 			, SrvAttachments _srvAttachments, SrvDropdown _srvDropdown, SystemModuleSrv systemModuleSrv, SrvStatus _srvStatus, SrvAssignment _srvAssignment,
 				SrvField _srvField, IServiceProvider serviceProvider , ServiceRequestBL serviceRequestBL, PlanServiceRequestServices planServiceRequestServices)
@@ -122,7 +122,7 @@ namespace Evaluation.Services.BusinessLayer.API
 						DropDownParentFieldId = field.DropDownParentFieldId,
 						ClassName = field.ClassName,
 						IsEditable = isEditable,
-						Attributes = attributes,
+						Attributes = attributes!,
 						Conditions = (field.FieldViewConditions?.Select(c => new FieldViewConditionDTO
 						{
 							operators = c.operators,
@@ -332,9 +332,9 @@ namespace Evaluation.Services.BusinessLayer.API
 
 			var hiddenFields = hiddenFieldsTask.Result ?? new List<Guid>();
 			var stepFieldsList = ActionFieldsListTask.Result;
-
+			using var scope = serviceScopeFactory.CreateScopedUow();
 			// Fetch approved and non-missing fields in a single query
-			var fieldValuesRaw = await serviceScopeFactory.CreateScopedUow()
+			var fieldValuesRaw = await scope
 								.GetRepository<ServiceRequestFieldsValue>()
 								.GetAllQueryFiltered()
 								.Include(f => f.Field)
@@ -414,8 +414,9 @@ namespace Evaluation.Services.BusinessLayer.API
 
 			var hiddenFieldsIds = hiddenFieldsTask.Result ?? new List<Guid>();
 			var ActionFieldsList = ActionFieldsListTask.Result;
+			using var scope = serviceScopeFactory.CreateScopedUow();
 
-			var fieldValuesRaw = await serviceScopeFactory.CreateScopedUow()
+			var fieldValuesRaw = await scope
 				.GetRepository<ServiceRequestFieldsValue>()
 				.GetAllQueryFiltered()
 				.Include(f => f.Field)

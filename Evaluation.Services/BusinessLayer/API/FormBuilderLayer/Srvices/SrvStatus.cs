@@ -21,12 +21,11 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
         ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, requestInfo)
     {
         
-
         #region Status
 
         public async Task<StatusDTO?> GetStatusById(Guid statusId, string lang)
         {
-            var scopedUow = serviceScopeFactory.CreateScopedUow();
+            using var scopedUow = serviceScopeFactory.CreateScopedUow();
             var status = await scopedUow.GetRepository<ServiceStatus>()
                 .GetAllQueryFiltered(x => x.Id == statusId)
                 .AsNoTracking()
@@ -39,7 +38,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
         }
         public async Task<ServiceStatus?> GetStatusById(Guid statusId)
         {
-            var scopedUow = serviceScopeFactory.CreateScopedUow();
+            using var scopedUow = serviceScopeFactory.CreateScopedUow();
             var status = await scopedUow.GetRepository<ServiceStatus>()
                 .GetAllQueryFiltered(x => x.Id == statusId)
                 .AsNoTracking()
@@ -49,7 +48,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
         }
         public async Task<List<StatusDTO>> GetAllStatusesByServiceId(Guid serviceId, string lang)
         {
-            var scopedUow = serviceScopeFactory.CreateScopedUow();
+            using var scopedUow = serviceScopeFactory.CreateScopedUow();
             var statuses = await scopedUow.GetRepository<ServiceStatus>()
                 .GetAllQueryFiltered(x => x.ServiceId == serviceId)
                 .AsNoTracking()
@@ -60,7 +59,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
         public async Task<ServiceStatus> GetInitialStatusByServiceId(Guid serviceId)
         {
-            var scopedUow = serviceScopeFactory.CreateScopedUow();
+             using var scopedUow = serviceScopeFactory.CreateScopedUow();
             var status = await scopedUow.GetRepository<ServiceStatus>()
                 .GetAllQueryFiltered(x => x.ServiceId == serviceId && x.IsInitial)
                 .AsNoTracking()
@@ -70,7 +69,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
         }  
         public async Task<Guid?> GetInitialStatusIdByServiceId(Guid serviceId)
         {
-            var scopedUow = serviceScopeFactory.CreateScopedUow();
+            using var scopedUow = serviceScopeFactory.CreateScopedUow();
             var status = await scopedUow.GetRepository<ServiceStatus>()
                 .GetAllQueryFiltered(x => x.ServiceId == serviceId && x.IsInitial)
                 .Select(x=>x.Id)
@@ -81,7 +80,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
         public async Task<StatusDTO?> GetClosedStatusByServiceId(Guid serviceId, string lang)
         {
-            var scopedUow = serviceScopeFactory.CreateScopedUow();
+            using var scopedUow = serviceScopeFactory.CreateScopedUow();
             var status = await scopedUow.GetRepository<ServiceStatus>()
                 .GetAllQueryFiltered(x => x.ServiceId == serviceId && !x.IsOpen)
                 .AsNoTracking()
@@ -92,7 +91,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
         public async Task<StatusDTO?> GetOpenStatusByServiceId(Guid serviceId, string lang)
         {
-            var scopedUow = serviceScopeFactory.CreateScopedUow();
+            using var scopedUow = serviceScopeFactory.CreateScopedUow();
             var status = await scopedUow.GetRepository<ServiceStatus>()
                 .GetAllQueryFiltered(x => x.ServiceId == serviceId && x.IsOpen)
                 .AsNoTracking()
@@ -105,8 +104,9 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
         {
             string lang = requestInfo.Lang;
             var result = new List<SelectListItemDTO>();
+			using var scopedUow = serviceScopeFactory.CreateScopedUow();
 
-            result = await serviceScopeFactory.CreateScopedUow().GetRepository<ServiceStatus>()
+			result = await scopedUow.GetRepository<ServiceStatus>()
                 .GetAll(x => x.ServiceId == serviceId)
                 .Where(x => string.IsNullOrEmpty(statusType) ? true : statusType == "0" ? x.IsOpen == false : x.IsOpen == true)
                   .OrderBy(x => x.OrderNo)
@@ -125,13 +125,11 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
         }
         #endregion
 
-        
-
         #region StatusDisplayName
 
         public async Task<StatusPartyTypeDisplayNameDTO?> GetStatusDisplayNameByPartyType(Guid statusId, Guid partyTypeId, string lang)
         {
-            var scopedUow = serviceScopeFactory.CreateScopedUow();
+            using var scopedUow = serviceScopeFactory.CreateScopedUow();
             var displayName = await scopedUow.GetRepository<ServiceStatusPartyTypeDisplayName>()
                 .GetAllQueryFiltered(x => x.StatusId == statusId && x.PartyTypeId == partyTypeId)
                 .AsNoTracking()
@@ -145,7 +143,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
         public string GetStatusDisplayName(Guid? statusId, Guid? departmentId)
         {
-            var scopedUow = serviceScopeFactory.CreateScopedUow();
+            using var scopedUow = serviceScopeFactory.CreateScopedUow();
 
             string lang =requestInfo.Lang;
             var PartyTypes = userInfo.PartyTypes.ToList();
@@ -168,7 +166,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
         public async Task<bool> CheckStatusPreventionByPartyType(Guid statusId, Guid partyTypeId)
         {
-            var scopedUow = serviceScopeFactory.CreateScopedUow();
+            using var scopedUow = serviceScopeFactory.CreateScopedUow();
             var prevention = await scopedUow.GetRepository<ServiceStatusPreventPartyType>()
                 .GetAllQueryFiltered(x => x.StatusId == statusId && x.PartyTypeId == partyTypeId)
                 .AsNoTracking()
@@ -206,7 +204,6 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             };
         }
         #endregion
-
 
     }
 

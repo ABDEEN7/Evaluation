@@ -111,12 +111,7 @@ namespace Evaluation.Services.Models.API
 				{
 					throw new BusinessException(ExceptionMessage.IncompleteRequest);
 				}
-				Guid studentId;
-				Guid? CountryId;
-				Guid? UniversityId;
-				Guid? InitialHistoryId = null;
-
-				
+			
 
 				var request = new ServiceRequest
 				{
@@ -175,7 +170,8 @@ namespace Evaluation.Services.Models.API
 
 					if (shouldAutoAssign)
 					{
-						var assignAction = await serviceScopeFactory.CreateScopedUow()
+						using var scope = serviceScopeFactory.CreateScopedUow();
+						var assignAction = await scope
 							.GetRepository<ActionStatusConfiguration>()
 							.GetAllQueryFiltered()
 							.Include(x => x.Notifications)
@@ -203,7 +199,7 @@ namespace Evaluation.Services.Models.API
 				var application = await GetRequestUnifiedAsync(requestId!.Value,requestType, true);
 
 				var allFields = JsonConvert.DeserializeObject<List<FieldValueDTO?>>(fieldValuesJson);
-				var validatedFields = await SrvAction.ValidateActionAndActionFieldAsync(application, allFields!, remarks, othersAttachement, serviceObj, application.StatusId, action, fileFields, saveAsDraft);
+				var validatedFields = await SrvAction.ValidateActionAndActionFieldAsync(application, allFields!, remarks, othersAttachement, serviceObj, application!.StatusId, action, fileFields, saveAsDraft);
 
 
 				actionFormDTO!.FieldValues = (await _srvAttachments.UploadAndInsertAttachments(validatedFields.ToList(),requestType, requestId, application.EvaluationRequestId??EvaluationRequestId, fileFields, filesWithFieldId)).Cast<FieldValueDTO?>().ToList();
@@ -314,9 +310,9 @@ namespace Evaluation.Services.Models.API
 
 			var isMinistry = user is MinistryUser;
 
+			using var scope = serviceScopeFactory.CreateScopedUow();
 
-			var openRequests = await serviceScopeFactory.CreateScopedUow()
-									.GetRepository<ServiceRequest>()
+			var openRequests = await scope.GetRepository<ServiceRequest>()
 										.GetAllQueryFiltered()
 										.Include(c => c.Status)
 										.Where(c => c.PlanId == PlanId || serviceObj.Initialservice)

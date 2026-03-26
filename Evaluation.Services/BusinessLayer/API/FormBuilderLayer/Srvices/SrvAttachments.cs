@@ -29,8 +29,9 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
            
         public async Task<string?> GetAttachmentById(Guid attachmentId, Guid requestId)
         {
-            var attachment = await serviceScopeFactory.CreateScopedUow()
-                                    .GetRepository<EvalAttachment>()
+			using var _uow = serviceScopeFactory.CreateScopedUow();
+
+			var attachment = await _uow.GetRepository<EvalAttachment>()
                                     .GetAllQueryFiltered(x => x.Id == attachmentId ).FirstOrDefaultAsync();
             if (null == attachment)
             {
@@ -42,8 +43,9 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
         } 
         public async Task<EvalAttachment?> GetRequestAttachmentsByfieldId(Guid fieldId, Guid requestId)
         {
-            var attachment = await serviceScopeFactory.CreateScopedUow()
-                                    .GetRepository<EvalAttachment>()
+			using var _uow = serviceScopeFactory.CreateScopedUow();
+
+			var attachment = await _uow.GetRepository<EvalAttachment>()
                                     .GetAllQueryFiltered(x => x.FieldId == fieldId && x.ServiceRequestId == requestId).FirstOrDefaultAsync();
             
                 return attachment;
@@ -220,12 +222,13 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
         }
         public async Task<Field?> GetFieldsByIdsAsync(Guid fieldId)
         {
-            var fields = await serviceScopeFactory.CreateScopedUow()
-                .GetRepository<Field>()
-                .GetAllActiveNonDeleted(x => x.Id == fieldId)
-                .Include(x => x.FieldType)
-                .AsNoTracking()
-                .FirstOrDefaultAsync();
+			using var _uow = serviceScopeFactory.CreateScopedUow();
+
+			var fields = await _uow.GetRepository<Field>()
+                                .GetAllActiveNonDeleted(x => x.Id == fieldId)
+                                .Include(x => x.FieldType)
+                                .AsNoTracking()
+                                .FirstOrDefaultAsync();
 
             return fields;
         }
@@ -287,7 +290,9 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
         }
         public async Task<List<AttachementDTO?>> GetAttachmentsByIdsAsync(List<string> attachmentIds)
         {
-            if (attachmentIds == null || !attachmentIds.Any())
+			using var _uow = serviceScopeFactory.CreateScopedUow();
+
+			if (attachmentIds == null || !attachmentIds.Any())
                 return new List<AttachementDTO?>();
 
             var attachmentGuids = attachmentIds
@@ -295,24 +300,25 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                 .Select(Guid.Parse)
                 .ToList();
 
-            var attachments = await serviceScopeFactory.CreateScopedUow()
-                .GetRepository<EvalAttachment>()
-                .GetAllQueryFiltered()
-                .Where(c => attachmentGuids.Contains(c.Id))
-                .Select(m => new AttachementDTO
-                {
-                    Id = m.Id,
-                    UiFileName = m.UiFileName
-                }).ToListAsync();
+            var attachments = await _uow.GetRepository<EvalAttachment>()
+                                .GetAllQueryFiltered()
+                                .Where(c => attachmentGuids.Contains(c.Id))
+                                .Select(m => new AttachementDTO
+                                {
+                                    Id = m.Id,
+                                    UiFileName = m.UiFileName
+                                }).ToListAsync();
 
             return attachments!;
         }
         public async Task<byte[]> GetBytesByAttachmentIdAsync(string attachmentId)
         {
-            if (!Guid.TryParse(attachmentId, out var id))
+			using var _uow = serviceScopeFactory.CreateScopedUow();
+
+			if (!Guid.TryParse(attachmentId, out var id))
                 throw new BusinessException("Invalid attachment id.");
 
-            var repo = serviceScopeFactory.CreateScopedUow().GetRepository<EvalAttachment>();
+            var repo = _uow.GetRepository<EvalAttachment>();
             var attachment = await repo.GetAllQueryFiltered(x => x.Id == id).FirstOrDefaultAsync();
 
             if (attachment == null)

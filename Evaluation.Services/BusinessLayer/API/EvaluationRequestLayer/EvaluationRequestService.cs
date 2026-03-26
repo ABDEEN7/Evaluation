@@ -236,9 +236,9 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 			throw new BusinessException(ExceptionMessage.UserNotFound);
 
 		var module = await moduleTask;
-		//var assignment = await assignmentTask;
+		var assignment = await assignmentTask;
 		bool departmentRequiresNda =  module?.Department?.IsNDA == true;
-		bool userAssignmentRequiresNda = false; //departmentRequiresNda && assignment.Any(x=>x.MinistryUserId== userId && x.IsNDA == true && (x.NdaDate == null || x.NdaStatusId == null));
+		bool userAssignmentRequiresNda = departmentRequiresNda && assignment.Any(x=>x.MinistryUserId== userId && x.IsNDA == true && (x.NdaDate == null || x.NdaStatusId == null));
 
 		var formGroups = await fieldsTask;
 
