@@ -17,11 +17,14 @@ using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Helper;
 using Evaluation.SharedHelper.Models;
+using Evaluation.SharedHelper.Models.Api;
 using Evaluation.SharedHelper.Models.Api.ActionEntitiesDTOs;
 using Evaluation.SharedHelper.Models.Api.EvaluationRequestEntities;
 using Evaluation.SharedHelper.Models.Api.FormBuilderDTO;
+using Evaluation.SharedHelper.Models.Api.ServiceDTOs;
 using Evaluation.SharedHelper.Models.Api.ServiceRequestEntitiesDTO;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
@@ -44,8 +47,8 @@ namespace Evaluation.Services.Models.API
 
 		public async Task<WebAppPlanRequestsDTO> GetPlanRequestsAsync(FilterRequestsDTO filter)
 		{
-			var userId = userInfo.UserId ?? Guid.Parse("C2536611-576B-4EB8-84F4-747F4ECE9A23") ;
-			return await _srvServiceRequest.GetPlanRequestsAsync(userId, filter);
+			
+			return await _srvServiceRequest.GetPlanRequestsAsync(filter);
 		}
 		public async Task<WebAppEvaluationRequestsDTO> GetEvaluationRequestsAsync(FilterRequestsDTO filter)
 		{
@@ -57,7 +60,22 @@ namespace Evaluation.Services.Models.API
 		{
 			return await _srvServiceRequest.GetRequestDetailsAsync(requestId);
 		}
-		public async Task<EvaluationRequestDTO> GetEvaluationDetailsAsync(Guid requestId)
+        public async Task<List<JsTreeNodeDto>> GetScopesList(Guid partyId)
+        {
+            return await _srvServiceRequest.GetScopeList(partyId);
+        }
+        public async Task<List<SupportedFileDto>> GetSupportedFiles(Guid requestId)
+        {
+            return await _srvServiceRequest.GetSupportedFiles(requestId);
+        }
+        public async Task<bool> SaveSupportFiles(
+    IFormFile file,
+    Guid EvaluationRequestId,
+    Guid ScopeId)
+        {
+            return await _srvServiceRequest.SaveSupportFiles(file, EvaluationRequestId, ScopeId);
+        }
+        public async Task<EvaluationRequestDTO> GetEvaluationDetailsAsync(Guid requestId)
 		{
 			return await _evaluationRequestService.GetEvaluationDetailsAsync(requestId);
 		}
@@ -356,5 +374,10 @@ namespace Evaluation.Services.Models.API
 		{
 			return  await _srvEvaluationRequestAssignment.ApproveNda(dto);
 		}
-	}
+		public async Task<List<GetServiceStatusDR>> GetServiceStatus()
+		{
+			return await _srvEvaluationRequestAssignment.GetServiceStatus();
+		}
+
+    }
 }

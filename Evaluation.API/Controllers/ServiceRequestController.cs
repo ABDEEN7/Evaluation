@@ -1,24 +1,14 @@
-﻿using Azure.Core;
-using Evaluation.DAL.Helper;
-using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
-using Evaluation.DAL.Models.ServiceRequestEntities;
-using Evaluation.Services.BusinessLayer;
-using Evaluation.Services.BusinessLayer.API;
-using Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices;
-using Evaluation.Services.Models.API;
+﻿using Evaluation.Services.Models.API;
 using Evaluation.SharedHelper.Dtos.TeamMemberDto;
 using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Models;
+using Evaluation.SharedHelper.Models.Api;
 using Evaluation.SharedHelper.Models.Api.ActionEntitiesDTOs;
-using Evaluation.SharedHelper.Models.Api.AttachmentsDTOs;
 using Evaluation.SharedHelper.Models.Api.EvaluationRequestEntities;
 using Evaluation.SharedHelper.Models.Api.FormBuilderDTO;
 using Evaluation.SharedHelper.Models.Api.ServiceRequestEntitiesDTO;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
-using System.Net.Mail;
-using static Evaluation.SharedHelper.Enums.ConstantKeys;
 
 namespace Evaluation.API.Controllers
 {
@@ -33,39 +23,57 @@ namespace Evaluation.API.Controllers
             _serviceRequestBL = serviceRequestBL;
         }
 
-        [HttpPost]
-        public async Task<WebAppPlanRequestsDTO> GetPlanRequests([FromBody] FilterRequestsDTO data)
+		[HttpPost]
+		public async Task<WebAppPlanRequestsDTO> GetPlanRequests([FromBody] FilterRequestsDTO data)
+		{
+			return await _serviceRequestBL.GetPlanRequestsAsync(data);
+		}
+		[HttpPost]
+		public async Task<WebAppEvaluationRequestsDTO> GetEvaluationRequests([FromBody] FilterRequestsDTO data)
+		{
+			return await _serviceRequestBL.GetEvaluationRequestsAsync(data);
+		}
+		[HttpGet]
+		public async Task<ServiceRequestDTO> GetApplicationDetails(Guid requestId)
+		{
+			return await _serviceRequestBL.GetApplicationDetailsAsync(requestId);
+		}
+        [HttpGet]
+        public async Task<List<JsTreeNodeDto>> GetScopes(Guid partyId)
         {
-            return await _serviceRequestBL.GetPlanRequestsAsync(data);
-        }
-        [HttpPost]
-        public async Task<WebAppEvaluationRequestsDTO> GetEvaluationRequests([FromBody] FilterRequestsDTO data)
-        {
-            return await _serviceRequestBL.GetEvaluationRequestsAsync(data);
+            return await _serviceRequestBL.GetScopesList(partyId);
         }
         [HttpGet]
-        public async Task<ServiceRequestDTO> GetApplicationDetails(Guid requestId)
+        public async Task<List<SupportedFileDto>> GetSupportedFiles(Guid requestId)
         {
-            return await _serviceRequestBL.GetApplicationDetailsAsync(requestId);
-        }
-        [HttpGet]
-        public async Task<EvaluationRequestDTO> GetEvaluationDetails(Guid requestId)
-        {
-            return await _serviceRequestBL.GetEvaluationDetailsAsync(requestId);
+            return await _serviceRequestBL.GetSupportedFiles(requestId);
         }
         [HttpPost]
-        public async Task<ServiceRequestDTO> HandleRequest(
-            [FromForm] ActionFormDTO dto,
-            [FromQuery] string actionName,
-            [FromForm] Guid serviceId,
-            [FromQuery] Guid? planId,
-            [FromForm] bool saveAsDraft)
+        public async Task<bool> SaveSupportFiles()
         {
-            var files = Request.Form?.Files;
-            var assignUsersJson = Request?.Form!["teamUsers"].FirstOrDefault();
-            var teamUsersJson = Request?.Form!["teamUsers"].FirstOrDefault();
-            Guid requestId = Guid.TryParse(Request?.Form!["requestId"], out var tempId) ? tempId : Guid.Empty;
-            Guid? evaluationRequestId = Guid.TryParse(Request?.Form!["evaluationRequestId"], out var EvlId) ? EvlId : null;
+            var file = Request.Form.Files[0];
+            Guid EvaluationRequestId = Guid.Parse(Request?.Form!["EvaluationRequestId"].FirstOrDefault());
+            Guid ScopeId = Guid.Parse(Request?.Form!["ScopeId"].FirstOrDefault());
+            return await _serviceRequestBL.SaveSupportFiles(file, EvaluationRequestId, ScopeId);
+        }
+        [HttpGet]
+		public async Task<EvaluationRequestDTO> GetEvaluationDetails(Guid requestId)
+		{
+			return await _serviceRequestBL.GetEvaluationDetailsAsync(requestId);
+		}
+		[HttpPost]
+		public async Task<ServiceRequestDTO> HandleRequest(
+			[FromForm] ActionFormDTO dto,
+			[FromQuery] string actionName,
+			[FromForm] Guid serviceId,
+			[FromQuery] Guid? planId,
+			[FromForm] bool saveAsDraft)
+		{
+			var files = Request.Form?.Files;
+			var assignUsersJson = Request?.Form!["teamUsers"].FirstOrDefault();
+			var teamUsersJson = Request?.Form!["teamUsers"].FirstOrDefault();
+			Guid requestId = Guid.TryParse(Request?.Form!["requestId"], out var tempId) ? tempId : Guid.Empty;
+			Guid evaluationRequestId = Guid.TryParse(Request?.Form!["evaluationRequestId"], out var EvlId) ? EvlId : Guid.Empty;
 
             var assignUsers = !string.IsNullOrEmpty(assignUsersJson)
                 ? JsonConvert.DeserializeObject<List<AssignUserDTO?>>(assignUsersJson)!
@@ -75,7 +83,7 @@ namespace Evaluation.API.Controllers
                 ? JsonConvert.DeserializeObject<List<EvalTeamRequestDto>>(teamUsersJson)!
                 : new List<EvalTeamRequestDto>();
 
-            string fieldValuesJson = Request?.Form!["fieldValues"]!;
+            string fieldValuesJson = Request.Form["fieldValues"];
 
             if (!string.IsNullOrEmpty(fieldValuesJson))
             {
@@ -84,9 +92,20 @@ namespace Evaluation.API.Controllers
 
             dto.RequestId = requestId;
 
-            var response = await _serviceRequestBL.HandleServiceRequestAsync(dto, planId, evaluationRequestId, serviceId, actionName, fieldValuesJson, assignUsers, teamUsers, files, dto.ActionRemarks!, saveAsDraft);
-            return response;
+            var response = await _serviceRequestBL.HandleServiceRequestAsync(
+                dto,
+                planId,
+                evaluationRequestId,
+                serviceId,
+                actionName,
+                fieldValuesJson,
+                assignUsers,
+                teamUsers,
+                files,
+                dto.ActionRemarks!,
+                saveAsDraft);
 
+            return response;
         }
 
         [HttpGet]
@@ -94,6 +113,7 @@ namespace Evaluation.API.Controllers
         {
             return await _serviceRequestBL.GetAttachmentUrlAsync(attachmentId, requestId, schId);
         }
+
         [HttpPost]
         public async Task<IActionResult> ApproveNda([FromBody] NdaApproveRequest dto)
         {
@@ -101,5 +121,4 @@ namespace Evaluation.API.Controllers
             return Ok(result);
         }
     }
-
 }

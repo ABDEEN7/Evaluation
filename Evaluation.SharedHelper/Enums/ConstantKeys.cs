@@ -339,7 +339,6 @@ public static class ConstantKeys
         public static readonly string AdminEducationLevel = "AdminEducationLevel";
         public static readonly string AdminEmployees = "AdminEmployees";
         public static readonly string AdminEvaluationParties = "AdminEvaluationParties";
-        public static readonly string AdminDepartmentEvaluationParty = "AdminDepartmentEvaluationParty";
         public static readonly string AdminEvaluationType = "AdminEvaluationType";
         public static readonly string AdminFormEvalMarixValue = "AdminFormEvalMarixValue";
         public static readonly string AdminCssClass = "AdminCssClass";
@@ -349,6 +348,7 @@ public static class ConstantKeys
         public static readonly string AdminSystemSetting = "AdminSystemSetting";
         public static readonly string AdminUiControl = "AdminUiControl";
         public static readonly string AdminNDAStatus = "AdminNDAStatus";
+        public static readonly string AdminNDAStatusDepartment = "AdminNDAStatusDepartment";
         public static readonly string AdminUserTeamScope = "AdminUserTeamScope";
         public static readonly string AdminDepTargetOrgTree = "AdminDepTargetOrgTree";
     }
@@ -409,6 +409,8 @@ public static class ConstantKeys
 		public static readonly string lblUnnamedFile = "lblUnnamedFile";
 		public static readonly string lblInvalidFileExtension = "lblInvalidFileExtension";
 		public static readonly string lblCloseModal = "lblCloseModal";
+		public static readonly string lblEvaluationFileScope = "lblEvaluationFileScope";
+		public static readonly string lblEvaluationFileHeader = "lblEvaluationFileHeader";
 	}
 
 	public static class AdminPermission
@@ -430,7 +432,7 @@ public static class ConstantKeys
         public const string VIEW_ADMIN_SERVICE_PLACEHOLDER = "VIEW_ADMIN_SERVICE_PLACEHOLDER";
         #endregion
 
-        #region ACTIONSTATUSCONFIGURATION
+        #region actionstatusconfiguration
 
         public const string VIEW_ADMIN_ACTIONSTATUSCONFIGURATION = "VIEW_ADMIN_ACTIONSTATUSCONFIGURATION";
         public const string ADD_ADMIN_ACTIONSTATUSCONFIGURATION = "ADD_ADMIN_ACTIONSTATUSCONFIGURATION";
@@ -903,19 +905,19 @@ public static class ConstantKeys
         public const string EDIT_ADMIN_UICONTROL = "EDIT_ADMIN_UICONTROL";
 
         #endregion
-
-        #region DepartmentEvaluationPartyVM
-        public const string VIEW_ADMIN_DEPARTMENTEVALUATIONPARTY = "VIEW_ADMIN_DEPARTMENTEVALUATIONPARTY";
-        public const string ADD_ADMIN_DEPARTMENTEVALUATIONPARTY = "ADD_ADMIN_DEPARTMENTEVALUATIONPARTY";
-        public const string EDIT_ADMIN_DEPARTMENTEVALUATIONPARTY = "EDIT_ADMIN_DEPARTMENTEVALUATIONPARTY";
-        public const string DELETE_ADMIN_DEPARTMENTEVALUATIONPARTY = "DELETE_ADMIN_DEPARTMENTEVALUATIONPARTY";
-        #endregion
         #region NDAStatus
         public const string VIEW_ADMIN_NDAStatus = "VIEW_ADMIN_NDASTATUS";
         public const string ADD_ADMIN_NDAStatus = "ADD_ADMIN_NDASTATUS";
         public const string EDIT_ADMIN_NDAStatus = "EDIT_ADMIN_NDASTATUS";
         public const string DELETE_ADMIN_NDAStatus = "DELETE_ADMIN_NDASTATUS";
         public const string UPDATE_ORDER_ADMIN_NDAStatus = "UPDATE_ORDER_ADMIN_NDASTATUS";
+        #endregion
+        #region NDAStatusDepartment
+        public const string VIEW_ADMIN_NDA_STATUS_DEPARTMENT = "VIEW_ADMIN_NDA_STATUS_DEPARTMENT";
+        public const string ADD_ADMIN_NDA_STATUS_DEPARTMENT = "ADD_ADMIN_NDA_STATUS_DEPARTMENT";
+        public const string EDIT_ADMIN_NDA_STATUS_DEPARTMENT = "EDIT_ADMIN_NDA_STATUS_DEPARTMENT";
+        public const string DELETE_ADMIN_NDA_STATUS_DEPARTMENT = "DELETE_ADMIN_NDA_STATUS_DEPARTMENT";
+        public const string UPDATE_ORDER_ADMIN_NDAStatus_Department = "EDIT_ADMIN_NDA_STATUS_DEPARTMENT";
         #endregion
 
         #region USERTEAMSCOPE
@@ -927,7 +929,7 @@ public static class ConstantKeys
 
         #endregion
 
-        #region DEPTARGETORGTREE
+        #region deptargetorgtree
 
         public const string VIEW_ADMIN_DEPTARGETORGTREE = "VIEW_ADMIN_DEPTARGETORGTREE";
         public const string ADD_ADMIN_DEPTARGETORGTREE = "ADD_ADMIN_DEPTARGETORGTREE";
@@ -1020,6 +1022,7 @@ public static class ConstantKeys
         public const string ACTION = "ACTION";
         public const string LASTUPDATEDBY = "LASTUPDATEDBY";
         public const string LASTUPDATEDDATE = "LASTUPDATEDDATE";
+        public const string lblDisplayAsCards = "lblDisplayAsCards";
     }
     public static class CreatePlan
     {

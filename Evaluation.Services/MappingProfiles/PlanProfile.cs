@@ -18,6 +18,12 @@ public class PlanProfile : Profile
             .ReverseMap();
         CreateMap<CreateEvaluationPlanDto, Plan>()
             .ForMember(d => d.PlanName, opt => opt.MapFrom(src => src.Name))
+            .ForMember(d => d.StartDate,
+            opt => opt.MapFrom(src => DateOnly.FromDateTime(src.StartDate)))
+
+            .ForMember(d => d.EndDate,
+            opt => opt.MapFrom(src => DateOnly.FromDateTime(src.EndDate)))
+
             .ForMember(d => d.Id, o => o.Ignore())
             .ForMember(d => d.CreateDate, o => o.Ignore())
             .ForMember(d => d.CreateById, o => o.Ignore())

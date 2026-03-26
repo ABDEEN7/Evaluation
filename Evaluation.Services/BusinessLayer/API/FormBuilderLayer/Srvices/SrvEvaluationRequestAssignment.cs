@@ -3,6 +3,7 @@ using AutoMapper;
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.ActionEntities;
 using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
+using Evaluation.DAL.Models.StatusEntities;
 using Evaluation.DAL.Models.UserEntiy;
 using Evaluation.DAL.Repositories;
 using Evaluation.Services.Special;
@@ -12,8 +13,11 @@ using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Api.ActionEntitiesDTOs;
 using Evaluation.SharedHelper.Models.Api.EvaluationRequestEntities;
+using Evaluation.SharedHelper.Models.Api.ServiceDTOs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using System.Net.NetworkInformation;
+using System.Threading.Tasks;
 
 
 namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
@@ -76,7 +80,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                     MinistryUserId = u.Id,
                     EvaluationRequestId = requestId,
                     PartyTypeId = u.PartyTypeId!.Value,
-					IsLeader = u.IsDefault
+                    IsLeader = u.IsDefault
                 })
                 .ToList();
 
@@ -92,7 +96,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
         //        ? GetSchAssignetEmployee(request.ScholarshipId.Value)
         //        : Task.FromResult<List<SchAssignment>>(null!);
 
-         
+
         //    var allowedPartyTypeIds = await allowedPartyTypeIdsTask;
         //    var creatorUser = await creatorUserTask;
         //    var assignedUsers = await assignedUsersTask;
@@ -162,7 +166,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             var eligibleUsers = await uow.GetRepository<MinistryUser>()
                 .GetAllQueryFiltered()
                 .Include(u => u.UserPartTypes)
-                .Where(u => u.UserPartTypes!.Any(pt => allowedPartyTypeIds.Contains(pt.PartyTypeId) && pt.IsActive==true))
+                .Where(u => u.UserPartTypes!.Any(pt => allowedPartyTypeIds.Contains(pt.PartyTypeId) && pt.IsActive == true))
                 .Select(u => u.Id)
                 .ToListAsync();
 
@@ -170,7 +174,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                 return null;
 
             // Step 2: Get count of closed (non-open) assignments per user
-            var assignmentCounts = await uow.GetRepository<EvaluationRequestAssignment>()  
+            var assignmentCounts = await uow.GetRepository<EvaluationRequestAssignment>()
                 .GetAllQueryFiltered()
                 .Include(x => x.EvaluationRequest)
                 .ThenInclude(sr => sr.ServiceStatus)
@@ -207,7 +211,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
             if (!assignablePartyTypes.Any()) return new List<Guid>();
 
-            return assignablePartyTypes.Select(x=>x.PartyTypeId).ToList();
+            return assignablePartyTypes.Select(x => x.PartyTypeId).ToList();
         }
 
         public async Task<List<AssignUserDTO>> GetAssignedUsers(EvaluationRequest request, Guid? actionId, bool showIsDefault)
@@ -219,8 +223,8 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                 throw new BusinessException(ConstantKeys.ExceptionMessage.lblActionNotFound);
             }
 
-            var allowedPartyTypeIdsTask =  GetAllowedPartyTypeIds( actionId.Value);
-            var assignedUsersTask =  GetRequestAssignet(request.Id);
+            var allowedPartyTypeIdsTask = GetAllowedPartyTypeIds(actionId.Value);
+            var assignedUsersTask = GetRequestAssignet(request.Id);
 
             var allowedPartyTypeIds = await allowedPartyTypeIdsTask;
             if (!allowedPartyTypeIds.Any())
@@ -257,7 +261,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                             PartyTypeTitle = lang == "ar" ? pt.PartyType?.NameAr : pt.PartyType?.NameEn,
                             IsSelected = assignedUser != null,
                             ShowIsDefaultAssigner = showIsDefault,
-							IsLeader = assignedUser?.IsLeader ?? false
+                            IsLeader = assignedUser?.IsLeader ?? false
                         };
                     }))
                 .Distinct()
@@ -266,7 +270,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             return result;
         }
 
-     
+
 
         //public async Task<List<SchAssignment>> GetSchAssignetEmployee(Guid schId)
         //{
@@ -295,44 +299,56 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
         }
         public async Task<NdaApproveResponse> ApproveNda(NdaApproveRequest dto)
         {
-			var userId = userInfo.UserId!.Value;
-			using var scope = serviceScopeFactory.CreateScopedUow();
+            var userId = userInfo.UserId!.Value;
+            using var scope = serviceScopeFactory.CreateScopedUow();
 
-			if (dto.EvaluationRequestId == Guid.Empty)
-				return new NdaApproveResponse { IsSuccess = false, IsNdaApprovalPending = true, Message = "Invalid request id." };
+            if (dto.EvaluationRequestId == Guid.Empty)
+                return new NdaApproveResponse { IsSuccess = false, IsNdaApprovalPending = true, Message = "Invalid request id." };
 
-			if (string.IsNullOrWhiteSpace(dto.ConflictReason))
-				return new NdaApproveResponse { IsSuccess = false, IsNdaApprovalPending = true, Message = "Conflict reason is required." };
+            if (string.IsNullOrWhiteSpace(dto.ConflictReason))
+                return new NdaApproveResponse { IsSuccess = false, IsNdaApprovalPending = true, Message = "Conflict reason is required." };
 
-			var assignment = await scope.GetRepository<EvaluationRequestAssignment>()
-				.GetAllActiveNonDeleted(x =>
-					x.EvaluationRequestId == dto.EvaluationRequestId &&
-					x.MinistryUserId == userId)
-				.FirstOrDefaultAsync();
+            var assignment = await scope.GetRepository<EvaluationRequestAssignment>()
+                .GetAllActiveNonDeleted(x =>
+                    x.EvaluationRequestId == dto.EvaluationRequestId &&
+                    x.MinistryUserId == userId)
+                .FirstOrDefaultAsync();
 
-			if (assignment == null)
-			{
-				return new NdaApproveResponse
-				{
-					IsSuccess = false,
-					IsNdaApprovalPending = true,
-					Message = "Assignment not found."
-				};
-			}
+            if (assignment == null)
+            {
+                return new NdaApproveResponse
+                {
+                    IsSuccess = false,
+                    IsNdaApprovalPending = true,
+                    Message = "Assignment not found."
+                };
+            }
 
-			assignment.Note = dto.ConflictReason;
-			assignment.NdaDate = DateTime.UtcNow;
-			assignment.NdaStatusId = dto.NDAStatusId;
+            assignment.Note = dto.ConflictReason;
+            assignment.NdaDate = DateTime.UtcNow;
+            assignment.NdaStatusId = dto.NDAStatusId;
 
-			await scope.CommitAsync();
+            await scope.CommitAsync();
 
-			return new NdaApproveResponse
-			{
-				IsSuccess = true,
-				IsNdaApprovalPending = false,
-				Message = "Saved successfully."
-			};
-		}
-
+            return new NdaApproveResponse
+            {
+                IsSuccess = true,
+                IsNdaApprovalPending = false,
+                Message = "Saved successfully."
+            };
+        }
+        public async Task<List<GetServiceStatusDR>> GetServiceStatus()
+        {
+            return await uow
+                .GetRepository<ServiceStatus>()
+                .GetAllActiveNonDeleted()
+                .Select(x => new GetServiceStatusDR
+                {
+                    Id = x.Id,
+                    NameAr = x.NameAr,
+                    NameEn = x.NameEn
+                })
+                .ToListAsync();
+        }
     }
 }

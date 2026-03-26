@@ -36,7 +36,7 @@ const loadData = (isSearch) => {
             }
         }
     };
-    jqClientAdvanced(options).Get("DepartmentEvaluationParty/GetAllDepartmentEvaluationParty".concat('?page=', currentPage));
+    jqClientAdvanced(options).Get("NdaStatusDepartment/GetAllNdaStatusDepartment".concat('?page=', currentPage));
 };
 const deleteData = (id) => {
     if (!id) return;
@@ -66,7 +66,7 @@ const deleteData = (id) => {
                 }
             }
         };
-        jqClientAdvanced(options).Post("DepartmentEvaluationParty/DeleteDepartmentEvaluationParty".concat('?Id=', id));
+        jqClientAdvanced(options).Post("NdaStatusDepartment/DeleteNdaStatusDepartment".concat('?Id=', id));
 
     });
 };
@@ -123,7 +123,7 @@ $(document).ready(function () {
                     notificationUtil.success(sharedFn().GetUiControlText('ADMIN_MSG_UPDATE'));
                 }
             };
-            jqClientAdvanced(options).PostFormData("DepartmentEvaluationParty/UpdateDepartmentEvaluationPartyOrder", formData);
+            jqClientAdvanced(options).PostFormData("NdaStatusDepartment/UpdateNdaStatusDepartmentOrder", formData);
 
         }
 
@@ -206,9 +206,9 @@ $(document).ready(function () {
             let id = $('#Id').val();
 
             if (id) {
-                url = "DepartmentEvaluationParty/UpdateDepartmentEvaluationParty";
+                url = "NdaStatusDepartment/UpdateNdaStatusDepartment";
             } else {
-                url = "DepartmentEvaluationParty/SaveDepartmentEvaluationParty";
+                url = "NdaStatusDepartment/SaveNdaStatusDepartment";
 
             }
 
