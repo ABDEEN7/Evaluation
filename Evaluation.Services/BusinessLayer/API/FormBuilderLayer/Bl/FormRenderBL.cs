@@ -540,7 +540,6 @@ namespace Evaluation.Services.BusinessLayer.API
 		public async Task<ServiceDTO> GetCreatePlanService()
 		{
 			var lang = _requestInfo.Lang;
-			var userId = userInfo.UserId ?? Guid.Parse("C2536611-576B-4EB8-84F4-747F4ECE9A23");
 			var DepartementId = requestInfo.DepId!.Value;// Guid.Parse("1B8F5ADE-37D0-4D77-A780-CA3FF3EC0F43");
 			//var service = await _srvService.GetCreatePlanServiceDetailsAsync(DepartementId, lang);
 			var service = await _srvService.GetServiceDetailsByModuleTypeAsync(DepartementId, ModuleType.EvaluationPlan, lang, initialService: true);

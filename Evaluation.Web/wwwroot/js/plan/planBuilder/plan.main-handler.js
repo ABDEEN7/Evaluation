@@ -288,7 +288,7 @@
         const selectedSchoolIds = []; // NEW: Array to store school IDs
 
         vm.schools.forEach(s => {
-            const schoolId = s.id || s.schoolId;
+            const schoolId = s.id || s.schoolId || s.id;
             selectedSchoolIds.push(schoolId); // NEW: Collect school IDs
             selectedSchoolsMap.set(schoolId, {
                 id: schoolId,

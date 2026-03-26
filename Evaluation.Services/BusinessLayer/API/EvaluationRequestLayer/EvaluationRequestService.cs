@@ -643,8 +643,13 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 			{
 				requests = requests.Where(c => model.PlanId == c.PlanId);
 			}
+            if (!string.IsNullOrEmpty(model.OrgTree))
+            {
+                requests = requests.Where(x =>x.OrgTreeName.ToLower().Contains(model.OrgTree.ToLower()));
+            }
 
-			result.TotalDataCount = await requests.CountAsync();
+
+            result.TotalDataCount = await requests.CountAsync();
 
 			if (model.PageNumber != null)
 			{

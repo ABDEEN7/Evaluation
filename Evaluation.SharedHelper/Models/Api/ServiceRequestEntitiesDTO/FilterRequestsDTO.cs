@@ -44,6 +44,7 @@ namespace Evaluation.SharedHelper.Models.Api.ServiceRequestEntitiesDTO
         public Guid? StudentUserId { get; set; }
         public List<Guid?>? CountryId { get; set; }
         public List<Guid?>? UniversityId { get; set; }
+        public string? OrgTree { get; set; }
     }
 
 }
