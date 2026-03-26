@@ -346,6 +346,7 @@ public static class ConstantKeys
         public static readonly string AdminSystemSetting = "AdminSystemSetting";
         public static readonly string AdminUiControl = "AdminUiControl";
         public static readonly string AdminNDAStatus = "AdminNDAStatus";
+        public static readonly string AdminNDAStatusDepartment = "AdminNDAStatusDepartment";
         public static readonly string AdminUserTeamScope = "AdminUserTeamScope";
         public static readonly string AdminDepTargetOrgTree = "AdminDepTargetOrgTree";
     }
@@ -356,19 +357,59 @@ public static class ConstantKeys
         public static readonly string WebEvaluationSubFormItem = "WebEvaluationSubFormItem";
         public static readonly string WebEvaluationFormScopes = "WebEvaluationFormScopes";
         public static readonly string WebDepartmentHoliday = "WebDepartmentHoliday";
+        public static readonly string WebAppRequest = "WebAppRequest";
+        public static readonly string WebAppCommon = "WebAppCommon";
 
     }
-    public static class WebAppRequest
-    {
-        public const string actionTransactionsdetailsLabel = "actionTransactionsdetailsLabel";//ToDo Insert
-        public static readonly string lblSaveChanges = "lblSaveChanges";//ToDo Insert
-        public static readonly string lblCloseModal = "lblCloseModal";//ToDo Insert
-        public static readonly string lblRemarks = "lblRemarks";//ToDo Insert
-        public static readonly string lblEvaluationFileScope = "lblEvaluationFileScope";//ToDo Insert
-        public static readonly string lblEvaluationFileHeader = "lblEvaluationFileHeader";//ToDo Insert
-    }
+	public static class WebAppRequest
+	{
+		public static readonly string lblDownload = "lblDownload";
+		public static readonly string lblMinLengthNotReached = "lblMinLengthNotReached";
+		public static readonly string lblMissingFormIdForEvaluationForm = "lblMissingFormIdForEvaluationForm";
+		public static readonly string lblLoadingEvaluationForm = "lblLoadingEvaluationForm";
+		public static readonly string lblMaximumRowsExceeded = "lblMaximumRowsExceeded";
+		public static readonly string lblValueMustBeGreaterOrEqual = "lblValueMustBeGreaterOrEqual";
+		public static readonly string lblMaxLengthExceeded = "lblMaxLengthExceeded";
+		public const string actionTransactionsdetailsLabel = "actionTransactionsdetailsLabel";
+		public static readonly string lblFileSizeExceeded = "lblFileSizeExceeded";
+		public static readonly string lblMaximumNewRowsExceeded = "lblMaximumNewRowsExceeded";
+		public static readonly string lblLoadingEvaluationPlan = "lblLoadingEvaluationPlan";
+		public static readonly string lblRenderFormGroupsNotDefined = "lblRenderFormGroupsNotDefined";
+		public static readonly string lblNotEqualValidation = "lblNotEqualValidation";
+		public static readonly string lblFailedToLoadEvaluationPlan = "lblFailedToLoadEvaluationPlan";
+		public static readonly string lblRemarkISRequired = "lblRemarkISRequired";
+		public static readonly string lblPlanUtilityNotFound = "lblPlanUtilityNotFound";
+		public static readonly string lblFileTypeNotAllowed = "lblFileTypeNotAllowed";
+		public static readonly string lblFormSubmittedSuccessfully = "lblFormSubmittedSuccessfully";
+		public static readonly string lblDefaultValidationMessage = "lblDefaultValidationMessage";
+		public static readonly string lblUnexpectedErrorOccurred = "lblUnexpectedErrorOccurred";
+		public static readonly string lblInvalidNumberFormat = "lblInvalidNumberFormat";
+		public static readonly string lblValueMustBeLessOrEqual = "lblValueMustBeLessOrEqual";
+		public static readonly string lblMinimumNewRowsRequired = "lblMinimumNewRowsRequired";
+		public static readonly string lblMinimumRowsRequired = "lblMinimumRowsRequired";
+		public static readonly string lblFailedToLoadEvaluationForm = "lblFailedToLoadEvaluationForm";
+		public static readonly string lblInvalidBase64Content = "lblInvalidBase64Content";
+		public static readonly string lblRequestCreatedSuccessfully = "lblRequestCreatedSuccessfully";
+		public static readonly string lblSaveChanges = "lblSaveChanges";
+		public static readonly string lblSaveAsDraft = "lblSaveAsDraft";
+		public static readonly string lblFailedToLoadFile = "lblFailedToLoadFile";
+		public static readonly string lblRequestSavedAsDraftSuccessfully = "lblRequestSavedAsDraftSuccessfully";
+		public static readonly string lblFailedToRenderPlanWrapper = "lblFailedToRenderPlanWrapper";
+		public static readonly string lblUnnamedGroup = "lblUnnamedGroup";
+		public static readonly string lblBase64PdfFileName = "lblBase64PdfFileName";
+		public static readonly string lblUnexpectedEmptyResponse = "lblUnexpectedEmptyResponse";
+		public static readonly string lblInvalidFormat = "lblInvalidFormat";
+		public static readonly string lblViewHistory = "lblViewHistory";
+		public static readonly string lblProcedures = "lblProcedures";
+		public static readonly string lblDateRangeInvalid = "lblDateRangeInvalid";
+		public static readonly string lblRemarks = "lblRemarks";
+		public static readonly string lblRequiredField = "lblRequiredField";
+		public static readonly string lblUnnamedFile = "lblUnnamedFile";
+		public static readonly string lblInvalidFileExtension = "lblInvalidFileExtension";
+		public static readonly string lblCloseModal = "lblCloseModal";
+	}
 
-    public static class AdminPermission
+	public static class AdminPermission
     {
         public const string VIEW_ADMIN_HOME = "VIEW_ADMIN_HOME";
 
@@ -874,6 +915,13 @@ public static class ConstantKeys
         public const string DELETE_ADMIN_NDAStatus = "DELETE_ADMIN_NDASTATUS";
         public const string UPDATE_ORDER_ADMIN_NDAStatus = "UPDATE_ORDER_ADMIN_NDASTATUS";
         #endregion
+        #region NDAStatusDepartment
+        public const string VIEW_ADMIN_NDA_STATUS_DEPARTMENT = "VIEW_ADMIN_NDA_STATUS_DEPARTMENT";
+        public const string ADD_ADMIN_NDA_STATUS_DEPARTMENT = "ADD_ADMIN_NDA_STATUS_DEPARTMENT";
+        public const string EDIT_ADMIN_NDA_STATUS_DEPARTMENT = "EDIT_ADMIN_NDA_STATUS_DEPARTMENT";
+        public const string DELETE_ADMIN_NDA_STATUS_DEPARTMENT = "DELETE_ADMIN_NDA_STATUS_DEPARTMENT";
+        public const string UPDATE_ORDER_ADMIN_NDAStatus_Department = "EDIT_ADMIN_NDA_STATUS_DEPARTMENT";
+        #endregion
 
         #region USERTEAMSCOPE
 
@@ -977,6 +1025,7 @@ public static class ConstantKeys
         public const string ACTION = "ACTION";
         public const string LASTUPDATEDBY = "LASTUPDATEDBY";
         public const string LASTUPDATEDDATE = "LASTUPDATEDDATE";
+        public const string lblDisplayAsCards = "lblDisplayAsCards";
     }
     public static class CreatePlan
     {

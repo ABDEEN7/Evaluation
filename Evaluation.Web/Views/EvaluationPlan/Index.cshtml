@@ -171,7 +171,7 @@
                                             data-bs-target="#itemForm">
                                         <div class="d-flex align-items-center gap-2 fs-18">
                                             <i class="las la-clipboard text-primary fs-25"></i>
-                                            <span class="fw-semibold">بيانات النموذج</span>
+                                            <span class="fw-semibold">بيانات المدرسة</span>
                                         </div>
                                         <span class="toggle-icon"><i class="la la-angle-up fs-22"></i></span>
                                     </button>
@@ -429,6 +429,7 @@
                                         <span class="toggle-icon">
                                             <i class="la la-angle-up fs-22"></i>
                                         </span>
+
                                     </button>
                                 </h2>
 
@@ -664,7 +665,9 @@
 
     <!-- Evaluation Plan Modules -->
     <script src="~/js/evaluationplan/get-evaluation-common-listing.js"></script>
+    <!-- loading data -->
     <script src="~/js/evaluationplan/evaluation-common-listing.js"></script>
+    <script src="~/js/evaluationplan/evaluation-loading-data.js"></script>
     <script src="~/js/evaluationplan/evaluation-plans-listing.js"></script>
     <script src="~/js/evaluationplan/evaluation-schools-listing.js"></script>
     <script src="~/js/evaluationplan/evaluation-operations-listing.js"></script>
@@ -712,7 +715,14 @@
                 pageNames: [
                      '@nameof(ConstantKeys.WebAppCommon)',
                     '@nameof(ConstantKeys.CreatePlan)',
+                    '@nameof(ConstantKeys.EvaluationPlanRequests)'
+                    
                   
+                ],
+                 pages: [
+                     '@nameof(ConstantKeys.WebAppCommon)',
+                    '@nameof(ConstantKeys.CreatePlan)',
+
                 ],
                     additional_keys: []
             });

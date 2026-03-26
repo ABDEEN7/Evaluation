@@ -2,6 +2,7 @@ using Evaluation.Admin.ActionFilter;
 using Evaluation.Admin.Extensions;
 using Evaluation.Admin.Models;
 using Evaluation.DAL.Helper;
+using Evaluation.DAL.Models.DepartementEntites;
 using Evaluation.DAL.Models.UserEntiy;
 using Evaluation.Services.BusinessLayer;
 using Evaluation.Services.Models.Admin;
@@ -82,11 +83,11 @@ namespace Evaluation.Admin.Controllers
         }
         [HttpGet]
         [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.AdminPermission.VIEW_ADMIN_USERPARTYTYPE })]
-        public async Task<IActionResult> GetSystemModule()
+        public async Task<IActionResult> GetDepartment()
         {
             Dictionary<string, object> response = new Dictionary<string, object>();
-            var SystemModule = await masterBL.GetAdminService<SrvUserPartyTypeBL>().GetSystemModule();
-            response.Add("SystemModule", SystemModule);
+            var Department = await masterBL.GetAdminService<SrvUserPartyTypeBL>().GetDepartment();
+            response.Add("Department", Department);
             return Ok(new ResponseEntity(response));
         }
 

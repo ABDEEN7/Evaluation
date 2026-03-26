@@ -21,6 +21,7 @@ using Evaluation.SharedHelper.Models.Api;
 using Evaluation.SharedHelper.Models.Api.ActionEntitiesDTOs;
 using Evaluation.SharedHelper.Models.Api.EvaluationRequestEntities;
 using Evaluation.SharedHelper.Models.Api.FormBuilderDTO;
+using Evaluation.SharedHelper.Models.Api.ServiceDTOs;
 using Evaluation.SharedHelper.Models.Api.ServiceRequestEntitiesDTO;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -46,8 +47,8 @@ namespace Evaluation.Services.Models.API
 
 		public async Task<WebAppPlanRequestsDTO> GetPlanRequestsAsync(FilterRequestsDTO filter)
 		{
-			var userId = userInfo.UserId ?? Guid.Parse("C2536611-576B-4EB8-84F4-747F4ECE9A23") ;
-			return await _srvServiceRequest.GetPlanRequestsAsync(userId, filter);
+			
+			return await _srvServiceRequest.GetPlanRequestsAsync(filter);
 		}
 		public async Task<WebAppEvaluationRequestsDTO> GetEvaluationRequestsAsync(FilterRequestsDTO filter)
 		{
@@ -92,7 +93,7 @@ namespace Evaluation.Services.Models.API
 				throw new BusinessException(ExceptionMessage.IncompleteRequest);
 			}
 			var requestType = systemModuleSrv.GetRequestType(serviceObj);
-			if (requestType == RequestType.Evaluation && (requestId == null || requestId == Guid.Empty))
+			if (requestType == RequestType.Evaluation && (EvaluationRequestId == null || EvaluationRequestId == Guid.Empty))
 			{
 				throw new BusinessException("EvaluationRequest cannot be created from web app.");
 			}
@@ -121,7 +122,7 @@ namespace Evaluation.Services.Models.API
 
 			// Step 3: Create or update the request
 			ServiceRequestDTO resultRequest = new ServiceRequestDTO();
-			if (requestId == null || requestId == Guid.Empty)
+			if ((requestId == null || requestId == Guid.Empty) && requestType != RequestType.Evaluation)
 			{
 				var status = await SrvStatus.GetInitialStatusByServiceId(serviceId);
 				if (status == null)
@@ -215,13 +216,15 @@ namespace Evaluation.Services.Models.API
 			}
 			else
 			{
+				if (requestType == RequestType.Evaluation)
+					requestId = EvaluationRequestId;
 				var application = await GetRequestUnifiedAsync(requestId!.Value,requestType, true);
 
 				var allFields = JsonConvert.DeserializeObject<List<FieldValueDTO?>>(fieldValuesJson);
 				var validatedFields = await SrvAction.ValidateActionAndActionFieldAsync(application, allFields!, remarks, othersAttachement, serviceObj, application.StatusId, action, fileFields, saveAsDraft);
 
 
-				actionFormDTO!.FieldValues = (await _srvAttachments.UploadAndInsertAttachments(validatedFields.ToList(),requestType, requestId, application.EvaluationRequestId, fileFields, filesWithFieldId)).Cast<FieldValueDTO?>().ToList();
+				actionFormDTO!.FieldValues = (await _srvAttachments.UploadAndInsertAttachments(validatedFields.ToList(),requestType, requestId, application.EvaluationRequestId??EvaluationRequestId, fileFields, filesWithFieldId)).Cast<FieldValueDTO?>().ToList();
 
 				var actionResult = await _performActionBL.PerformAction(application, requestType,serviceObj, actionFormDTO.FieldValues!, actionName, assignUsers.Where(c => c!.IsSelected).ToList()!, teamUsers, remarks, saveAsDraft);
 
@@ -375,5 +378,10 @@ namespace Evaluation.Services.Models.API
 		{
 			return  await _srvEvaluationRequestAssignment.ApproveNda(dto);
 		}
-	}
+		public async Task<List<GetServiceStatusDR>> GetServiceStatus()
+		{
+			return await _srvEvaluationRequestAssignment.GetServiceStatus();
+		}
+
+    }
 }
