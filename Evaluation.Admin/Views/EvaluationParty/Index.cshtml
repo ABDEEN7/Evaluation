@@ -1,6 +1,6 @@
 ﻿@using Evaluation.Admin.Extensions
 @using static Evaluation.SharedHelper.Enums.ConstantKeys
-@model DepartmentEvaluationPartyVM
+@model EvaluationPartyVM
 @{
 	string Lang = Model.CurrentLanguage;
 	var uiControlItems = Model.UiControlItems.Where(x => x.RowOrder > 0).ToList();
@@ -15,7 +15,7 @@
 <section id="tbl-template-container" class="section-container">
 	<div class="card app-card">
 		<div class="card-header justify-content-end d-flex align-items-center bg-light">
-			@if (permissionsList.IsPermissionAvailabe(AdminPermission.ADD_ADMIN_DEPARTMENTEVALUATIONPARTY))
+			@if (permissionsList.IsPermissionAvailabe(AdminPermission.ADD_ADMIN_EVALUATIONPARTIES))
 			{
 				<button id="btn-add-content" type="button" class="btn btn-primary">
 					<i class="fa fa-plus-circle"></i> &nbsp;@controlsList.GetUiControlText(AdminBackendUI.ADD_RECORD)
@@ -61,12 +61,12 @@
 		let txtDir = '@textDir';
 		let containsOrderNo='@containsOrderNo';
 		  const controlvalidationlist = @Html.Raw(Json.Serialize(uiControlItems));
-		let IsEdit='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.EDIT_ADMIN_DEPARTMENTEVALUATIONPARTY))';
-		let IsDelete='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.DELETE_ADMIN_DEPARTMENTEVALUATIONPARTY))';
-		let IsView='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.VIEW_ADMIN_DEPARTMENTEVALUATIONPARTY))';
+		let IsEdit='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.EDIT_ADMIN_EVALUATIONPARTIES))';
+		let IsDelete='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.DELETE_ADMIN_EVALUATIONPARTIES))';
+		let IsView='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.VIEW_ADMIN_EVALUATIONPARTIES))';
 		let TableColumns = sharedFn().PopulateColumn(columnList);
 		sharedFn
 		().InitializeControl(controlvalidationlist, settingList);
 	</script>
-	<script src="~/js/admin/department-evaluation-party.js" asp-append-version="true"></script>
+	<script src="~/js/admin/evaluation-party.js" asp-append-version="true"></script>
 }

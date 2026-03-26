@@ -336,7 +336,6 @@ public static class ConstantKeys
         public static readonly string AdminEducationLevel = "AdminEducationLevel";
         public static readonly string AdminEmployees = "AdminEmployees";
         public static readonly string AdminEvaluationParties = "AdminEvaluationParties";
-        public static readonly string AdminDepartmentEvaluationParty = "AdminDepartmentEvaluationParty";
         public static readonly string AdminEvaluationType = "AdminEvaluationType";
         public static readonly string AdminFormEvalMarixValue = "AdminFormEvalMarixValue";
         public static readonly string AdminCssClass = "AdminCssClass";
@@ -428,7 +427,7 @@ public static class ConstantKeys
         public const string VIEW_ADMIN_SERVICE_PLACEHOLDER = "VIEW_ADMIN_SERVICE_PLACEHOLDER";
         #endregion
 
-        #region ACTIONSTATUSCONFIGURATION
+        #region actionstatusconfiguration
 
         public const string VIEW_ADMIN_ACTIONSTATUSCONFIGURATION = "VIEW_ADMIN_ACTIONSTATUSCONFIGURATION";
         public const string ADD_ADMIN_ACTIONSTATUSCONFIGURATION = "ADD_ADMIN_ACTIONSTATUSCONFIGURATION";
@@ -901,13 +900,6 @@ public static class ConstantKeys
         public const string EDIT_ADMIN_UICONTROL = "EDIT_ADMIN_UICONTROL";
 
         #endregion
-
-        #region DepartmentEvaluationPartyVM
-        public const string VIEW_ADMIN_DEPARTMENTEVALUATIONPARTY = "VIEW_ADMIN_DEPARTMENTEVALUATIONPARTY";
-        public const string ADD_ADMIN_DEPARTMENTEVALUATIONPARTY = "ADD_ADMIN_DEPARTMENTEVALUATIONPARTY";
-        public const string EDIT_ADMIN_DEPARTMENTEVALUATIONPARTY = "EDIT_ADMIN_DEPARTMENTEVALUATIONPARTY";
-        public const string DELETE_ADMIN_DEPARTMENTEVALUATIONPARTY = "DELETE_ADMIN_DEPARTMENTEVALUATIONPARTY";
-        #endregion
         #region NDAStatus
         public const string VIEW_ADMIN_NDAStatus = "VIEW_ADMIN_NDASTATUS";
         public const string ADD_ADMIN_NDAStatus = "ADD_ADMIN_NDASTATUS";
@@ -932,7 +924,7 @@ public static class ConstantKeys
 
         #endregion
 
-        #region DEPTARGETORGTREE
+        #region deptargetorgtree
 
         public const string VIEW_ADMIN_DEPTARGETORGTREE = "VIEW_ADMIN_DEPTARGETORGTREE";
         public const string ADD_ADMIN_DEPTARGETORGTREE = "ADD_ADMIN_DEPTARGETORGTREE";
