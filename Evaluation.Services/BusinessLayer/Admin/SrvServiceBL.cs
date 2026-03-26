@@ -27,30 +27,31 @@ namespace Evaluation.Services.Models.Admin
         }
 
         #region Service
-        public async Task<List<ServiceDTO>> GetServiceList(int Page, int PageSize, Guid? SystemModuleId)
+        public async Task<List<ServiceDTO>> GetServiceList(int Page, int PageSize, SearchServiceDto searchService)
         {
-
-            Guid specialGuid = new Guid("00000000-0000-0000-0000-000000000000");
-            if (SystemModuleId.Equals(specialGuid))
-            {
-                SystemModuleId = null;
-            }
-
-            var list = await uow.GetRepository<Service>()
+            var list = uow.GetRepository<Service>()
                 .GetAllNonDeleted()
                 .Include(x => x.SystemModule)
                 .Include(x => x.CreateBy)
-               .Where(x => x.SystemModuleId == (SystemModuleId ?? x.SystemModuleId))
-                 .OrderBy(x => x.OrderNo)
+                .AsQueryable();
+
+            if (searchService.DepartmentId.HasValue)
+                list = list.Where(x => x.SystemModule!.DepartmentId == searchService.DepartmentId);
+
+            if (searchService.SystemModuleId.HasValue)
+                list = list.Where(x => x.SystemModuleId == searchService.SystemModuleId);
+
+            var resultOfList = await list
+                .OrderBy(x => x.OrderNo)
                 .ThenByDescending(x => x.CreateDate)
-                 .Skip(Page * PageSize)
+                .Skip(Page * PageSize)
                 .Take(PageSize)
                 .ToListAsync();
 
-            var result = mapper.Map<List<ServiceDTO>>(list, opts => opts.Items["Language"] = _requestInfo.Lang);
+            var result = mapper.Map<List<ServiceDTO>>(resultOfList,
+                opts => opts.Items["Language"] = _requestInfo.Lang);
 
             return result;
-
         }
 
         public async Task<ServiceDTO> SaveService(ServiceDTO message)
@@ -98,6 +99,7 @@ namespace Evaluation.Services.Models.Admin
             Service obj = new Service();
 
             obj.SystemModuleId = message.SystemModuleId;
+            obj.EvaluationPartyId = message.EvaluationPartyId;
             obj.NameAr = message.NameAr;
             obj.NameEn = message.NameEn;
             obj.BackendName = PartyTypeBackendName;
@@ -322,6 +324,7 @@ namespace Evaluation.Services.Models.Admin
                     }
 
                     obj.SystemModuleId = message.SystemModuleId;
+                    obj.EvaluationPartyId = message.EvaluationPartyId;
                     obj.NameAr = message.NameAr;
                     obj.NameEn = message.NameEn;
                     obj.BackendName = obj.BackendName;
@@ -686,17 +689,17 @@ namespace Evaluation.Services.Models.Admin
                 .Include(x => x.CreateBy)
                 .Include(x => x.FormGroup)
                 .Include(x => x.FormGroup!.FormGroupType)
-               .Where(x=>x.ServiceId==initialServiceId && x.FormGroup!.FormGroupType!.BackendName=="FormGroup")
+               .Where(x => x.ServiceId == initialServiceId && x.FormGroup!.FormGroupType!.BackendName == "FormGroup")
                 .OrderByDescending(x => x.CreateDate)
-                .Select(x=>new DropdownItem
+                .Select(x => new DropdownItem
                 {
-                    Id=x.Id,
-                    Title=_requestInfo.Lang=="ar"?x.FormGroup!.TitleAr+"_"+x.TitleAr:x.FormGroup!.TitleEn+"_"+x.TitleEn,
-                    Type="EvaluationField",
-                    FieldType=x.FieldType!.BackendName
+                    Id = x.Id,
+                    Title = _requestInfo.Lang == "ar" ? x.FormGroup!.TitleAr + "_" + x.TitleAr : x.FormGroup!.TitleEn + "_" + x.TitleEn,
+                    Type = "EvaluationField",
+                    FieldType = x.FieldType!.BackendName
                 })
                 .ToListAsync();
-            var rslt1 =  await uow.GetRepository<SystemSetting>()
+            var rslt1 = await uow.GetRepository<SystemSetting>()
                         .GetAllActiveNonDeleted(x => x.SettingKey == ConstantKeys.AdminSettings.EvaluationColumn)
                         .Select(x => x.SettingValue)
                         .FirstOrDefaultAsync();
@@ -766,7 +769,7 @@ namespace Evaluation.Services.Models.Admin
             obj.PlaceHolderName = message.PlaceHolderName;
             obj.TypeDisplay = message.TypeDisplay;
             obj.Type = message.Type;
-            if (message.Type== ConstantKeys.AdminSettings.RequestColumn || message.Type == ConstantKeys.AdminSettings.EvaluationColumn)
+            if (message.Type == ConstantKeys.AdminSettings.RequestColumn || message.Type == ConstantKeys.AdminSettings.EvaluationColumn)
             {
                 obj.ColumnName = message.FieldId;
             }

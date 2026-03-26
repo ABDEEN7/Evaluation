@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using Aspose.Words.Lists;
+using AutoMapper;
 using Evaluation.DAL.Dtos;
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.DepartementEntites;
@@ -20,7 +21,7 @@ using Evaluation.SharedHelper.Models;
 using FluentResults;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json;
+using System.Text.Json;
 using static Evaluation.SharedHelper.Enums.ConstantKeys;
 using ValidationResult = Evaluation.SharedHelper.Models.ValidationResult;
 
@@ -86,8 +87,9 @@ public class PlanServiceRequestServices(
     }
     public async Task<PaginatedResult<PlanListDto>> GetPlansAsync(PlanDetailsRequestDto request)
     {
-        PaginatedResult<PlanListDto> result = await planRepository.GetPlans(request);
-        return mapper.Map<PaginatedResult<PlanListDto>>(result);
+        PaginatedResult<PlanListDto> Plans = await planRepository.GetPlans(request);
+        var result = mapper.Map<PaginatedResult<PlanListDto>>(Plans);
+        return result;
     }
     public async Task<Result<ValidationResult>> ValidateEvaluationPlan(CreateEvaluationPlanDto model)
     {
@@ -126,13 +128,17 @@ public class PlanServiceRequestServices(
             {
                 ValidateSchool(
                     dto.Schools[i],
-                    dto.StartDate,
-                    dto.EndDate,
+                    DateOnly.FromDateTime(dto.StartDate),
+                    DateOnly.FromDateTime(dto.EndDate),
                     result,
                     i);
             }
         }
         return result;
+    }
+    public async Task DeletePlanById(Guid id)
+    {
+        var request = await planRepository.DeletePlan(id);
     }
     private static void ValidateSchool(SelectedSchool school,
     DateOnly planStartDate,
@@ -188,14 +194,10 @@ public class PlanServiceRequestServices(
         return await ExecuteWithResult(async () =>
         {
             await FillSystemFields(modelDto);
-            var planId = Guid.NewGuid();
-            modelDto.Id = planId;
             Plan plan = modelDto.ToPlan();
-            plan.Id = planId;
-            plan.PlanJsonValue = JsonConvert.SerializeObject(modelDto);
-
-            await unitOfWork.GetRepository<Plan>().InsertAsync(plan);
-
+            await unitOfWork.GetRepository<Plan>().InsertAsync(plan, false);
+            modelDto.Id = plan.Id;
+            plan.PlanJsonValue = JsonSerializer.Serialize(modelDto);
             await InsertEvaluationRequests(plan.Id, modelDto);
             return modelDto;
         });
@@ -205,7 +207,7 @@ public class PlanServiceRequestServices(
     {
         return await ExecuteWithResult(async () =>
         {
-            Plan plan = await unitOfWork.GetRepository<Plan>()
+            Plan? plan = await unitOfWork.GetRepository<Plan>()
                 .GetAllActiveNonDeleted(x => x.Id == modelDto.Id)
                 .FirstOrDefaultAsync();
 
@@ -217,12 +219,12 @@ public class PlanServiceRequestServices(
 
             mapper.Map(modelDto, plan);
 
-            plan.PlanJsonValue = JsonConvert.SerializeObject(modelDto);
+            plan.PlanJsonValue = JsonSerializer.Serialize(modelDto);
             plan.UpdateDate = DateTime.UtcNow;
 
             unitOfWork.GetRepository<Plan>().Update(plan);
 
-            await ReplaceEvaluationRequests(plan.Id, modelDto);
+            await SyncEvaluationRequests(plan.Id, modelDto);
             return modelDto;
         });
     }
@@ -241,20 +243,23 @@ public class PlanServiceRequestServices(
                 .FirstAsync();
     }
     private async Task InsertEvaluationRequests(
-    Guid planId,
-    CreateEvaluationPlanDto modelDto)
+    Guid planId, CreateEvaluationPlanDto modelDto)
     {
         if (modelDto.Schools?.Any() != true)
             return;
 
         Guid serviceId = await uow.GetRepository<Service>()
-            .GetAllActiveNonDeleted(x =>
-                x.BackendName == BackendServices.EvaluationPlan_P_CreatePlan)
-            .Select(x => x.Id)
-            .FirstAsync();
+                        .GetAllActiveNonDeleted(x =>
+                            x.Initialservice == true
+                            && x.SystemModule.DepartmentId == requestInfo.DepId
+                            && x.SystemModule.SystemModuleType.BackendName == ModuleType.EvaluationRequest
+                        )
+                        .Include(x => x.SystemModule)
+                            .ThenInclude(sm => sm.SystemModuleType)
+                        .Select(x => x.Id)
+                        .FirstAsync();
 
-        Guid depEvaluationType = await GetDepEvaluationType(); // i dont see this
-        Guid serviceStatusId = await GetServiceStatus(); // also i don't see this
+        Guid serviceStatusId = await GetServiceStatus(serviceId);
 
         var requests = modelDto.Schools.Select(school => new EvaluationRequest
         {
@@ -262,7 +267,7 @@ public class PlanServiceRequestServices(
             PlanId = planId,
             ServiceId = serviceId,
             OrgTreeId = school.Id,
-            DepEvaluationTypeId = depEvaluationType,
+            DepEvaluationTypeId = school.VisitTypeId,
             FromDate = school.StartEvaluationDate,
             ToDate = school.EndEvaluationDate,
             ServiceStatusId = serviceStatusId,
@@ -288,19 +293,106 @@ public class PlanServiceRequestServices(
 
         await InsertEvaluationRequests(planId, modelDto);
     }
-    private async Task<Guid> GetDepEvaluationType()
+    private async Task<Guid> GetServiceStatus(Guid serviceId)
     {
-        return await unitOfWork.GetRepository<DepEvaluationType>()
-            .GetAllActiveNonDeleted(x => x.DepartmentId == requestInfo.DepId)
+        return await unitOfWork.GetRepository<ServiceStatus>()
+            .GetAllActiveNonDeleted(x => x.ServiceId == serviceId && x.IsInitial)
             .Select(x => x.Id)
             .FirstAsync();
     }
-    private async Task<Guid> GetServiceStatus()
+    public async Task<Result<string>> GetPlanJsonById(Guid planId)
     {
-        return await unitOfWork.GetRepository<ServiceStatus>()
-            .GetAllActiveNonDeleted(x => x.BackendName == StatusBackEnds.New)
-            .Select(x => x.Id)
-            .FirstAsync();
+        return await ExecuteWithResult(async () =>
+        {
+            using var scope = serviceScopeFactory.CreateScope();
+
+            var scopedUow = scope.ServiceProvider.GetRequiredService<UnitOfWork>();
+
+            var json = await scopedUow.GetRepository<Plan>()
+                .GetAllActiveNonDeleted(x => x.Id == planId)
+                .Select(x => x.PlanJsonValue)
+                .FirstOrDefaultAsync();
+
+            if (string.IsNullOrWhiteSpace(json))
+                throw new BusinessException("Plan not found");
+
+            return json;
+        });
+    }
+    public async Task<List<GetPlansPR>> GetPlans()
+    {
+        return await planRepository.GetPlans();
+    }
+    private async Task SyncEvaluationRequests(
+      Guid planId,
+      CreateEvaluationPlanDto modelDto)
+    {
+        var repo = unitOfWork.GetRepository<EvaluationRequest>();
+
+        var existing = await repo
+            .GetAllActiveNonDeleted(x => x.PlanId == planId)
+            .ToListAsync();
+
+
+        if (!existing.Any())
+            return;
+
+        var incomingSchools = modelDto.Schools ?? new List<SelectedSchool>();
+
+        var existingByOrg = existing.ToDictionary(x => x.OrgTreeId);
+
+        Guid serviceId = existing.First().ServiceId; // reuse
+        Guid serviceStatusId = existing.First().ServiceStatusId;
+
+        //--------------------------------------------
+        // UPDATE + INSERT
+        //--------------------------------------------
+
+        foreach (var school in incomingSchools)
+        {
+            if (existingByOrg.TryGetValue(school.Id, out var request))
+            {
+                // UPDATE ONLY IF CHANGED
+                if (request.FromDate != school.StartEvaluationDate ||
+                    request.ToDate != school.EndEvaluationDate || request.DepEvaluationTypeId != school.VisitTypeId)
+                {
+                    request.FromDate = school.StartEvaluationDate;
+                    request.ToDate = school.EndEvaluationDate;
+                    request.UpdateDate = DateTime.UtcNow;
+                    request.DepEvaluationTypeId = school.VisitTypeId;
+                    repo.Update(request);
+                }
+
+                // remove from dictionary so remaining = deleted
+                existingByOrg.Remove(school.Id);
+            }
+            else
+            {
+                // INSERT NEW
+                await repo.InsertAsync(new EvaluationRequest
+                {
+                    Id = Guid.NewGuid(),
+                    PlanId = planId,
+                    ServiceId = serviceId,
+                    OrgTreeId = school.Id,
+                    DepEvaluationTypeId = school.VisitTypeId,
+                    FromDate = school.StartEvaluationDate,
+                    ToDate = school.EndEvaluationDate,
+                    ServiceStatusId = serviceStatusId,
+                    CreateDate = DateTime.UtcNow,
+                    IsDeleted = false
+                });
+            }
+        }
+
+        //--------------------------------------------
+        // DELETE MISSING
+        //--------------------------------------------
+
+        if (existingByOrg.Any())
+        {
+            repo.DeleteRange(existingByOrg.Values);
+        }
     }
 
 

@@ -1,8 +1,9 @@
-﻿using Evaluation.DAL.Dtos;
-using Evaluation.DAL.Models.Calendars;
+﻿using Evaluation.DAL.Models.Calendars;
 using Evaluation.DAL.Models.Org;
 using Evaluation.DAL.Models.Planing;
+using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
 using Evaluation.DAL.Repositories;
+using Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices;
 using Evaluation.SharedHelper;
 using Evaluation.SharedHelper.Consts;
 using Evaluation.SharedHelper.Dtos.PlanDto;
@@ -15,12 +16,9 @@ using Mapster;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using Spire.Doc.AI.Model;
-using static Evaluation.SharedHelper.Enums.ConstantKeys;
 namespace Evaluation.Services.BusinessLayer.API.PlanLayer;
 
-public class PlanRequestRepository(IServiceScopeFactory serviceScopeFactory,
+public class PlanRequestRepository(IServiceScopeFactory serviceScopeFactory, SrvServiceRequest _srvServiceRequest,
     UnitOfWork unitOfWork,
     RequestInfo requestInfo
     ) : ApiServiceBase
@@ -28,7 +26,7 @@ public class PlanRequestRepository(IServiceScopeFactory serviceScopeFactory,
     public async Task<Plan?> GetPlanAsync(Guid id)
         => await unitOfWork.GetRepository<Plan>().GetByIDActiveNonDeleted(id);
     public async Task<Plan?> GetPlanDetailsAsync(Guid id)
-        => await unitOfWork.GetRepository<Plan>().GetAllActiveNonDeleted()
+        => await unitOfWork.GetRepository<Plan>().GetAllQueryFiltered()
         .Include(x => x.EvaluationRequests)
         .ThenInclude(x => x.OrgTree)
         .FirstOrDefaultAsync(x => x.Id == id);
@@ -48,7 +46,7 @@ public class PlanRequestRepository(IServiceScopeFactory serviceScopeFactory,
             .GetAllActiveNonDeleted();
 
         var plan = await planQuery
-            .Select(p=> new PlanEditDto
+            .Select(p => new PlanEditDto
             {
                 Id = p.Id,
                 PlanName = p.PlanName,
@@ -183,6 +181,23 @@ public class PlanRequestRepository(IServiceScopeFactory serviceScopeFactory,
         await unitOfWork.CommitAsync();
         return true;
     }
+    public async Task<bool> DeletePlan(Guid? id)
+    {
+        if (id is null)
+            throw new BusinessException(ConstantKeys.ExceptionMessage.InvalidRequest);
+        var model = await unitOfWork.GetRepository<Plan>()
+            .GetAllActiveNonDeleted(x => x.Id == id)
+            .Include(x => x.EvaluationRequests)
+            .FirstOrDefaultAsync();
+        if (model == null)
+            throw new BusinessException(ConstantKeys.ExceptionMessage.UserPartyTypeSignatureHeightError);
+        if (false)
+            throw new BusinessException(ConstantKeys.ExceptionMessage.UserPartyTypeSignatureHeightError);
+        unitOfWork.GetRepository<Plan>().Delete(model);
+        unitOfWork.GetRepository<EvaluationRequest>().DeleteRange(model.EvaluationRequests);
+        await unitOfWork.CommitAsync();
+        return true;
+    }
 
     //public async Task<bool> DeleteSchoolFromPlan(Guid requestId, Guid schoolId)
     //{
@@ -202,19 +217,14 @@ public class PlanRequestRepository(IServiceScopeFactory serviceScopeFactory,
     public async Task<PaginatedResult<PlanListDto>> GetPlans(PlanDetailsRequestDto request)
     {
         IQueryable<Plan> plans = unitOfWork.GetRepository<Plan>()
-            .GetAllActiveNonDeleted(x => x.PlanStatus.BackendName == StatusBackEnds.ApprovedPlans);
-        //if (request.StatusId != null)
-        //{
-        //    plans = plans.Where(x => x.PlanStatusId == request.StatusId);
-        //}
+            .GetAllQueryFiltered(x => x.PlanStatus.BackendName == StatusBackEnds.ApprovedPlans && x.PlanTypeDep.DepartmentId == requestInfo.DepId);
+
         if (request.YearId != null)
-        {
             plans = plans.Where(x => x.AcademicYearId == request.YearId);
-        }
+
         if (!string.IsNullOrEmpty(request.SchoolName))
-        {
             plans = plans.Where(x => x.EvaluationRequests.Any(er => er.OrgTree.NameAr.Contains(request.SchoolName)));
-        }
+
         var query = plans
             .Select(x => new PlanListDto
             {
@@ -222,13 +232,53 @@ public class PlanRequestRepository(IServiceScopeFactory serviceScopeFactory,
                 Name = x.PlanName,
                 StartDate = x.StartDate,
                 EndDate = x.EndDate,
+
+                PlanStatusId = x.PlanStatusId.Value,
                 StatusCode = x.PlanStatus.BackendName,
+
                 CountSchools = x.EvaluationRequests
-                .Select(er => er.OrgTreeId)
+                    .Select(er => er.OrgTreeId)
+                    .Distinct()
+                    .Count()
+            })
+            .OrderByDescending(x => x.StartDate);
+
+        var finalResult = await query.GetPaginatedResult(request.PageNumber, request.PageSize = 10);
+
+        if (finalResult.Items.Any())
+        {
+            var statusIds = finalResult.Items
+                .Select(x => x.PlanStatusId)
                 .Distinct()
-                .Count()
-            }).OrderByDescending(x => x.Id);
-        return await query.GetPaginatedResult(request.PageNumber, request.PageSize = 10);
+                .ToList();
+
+            var servicesByStatusTask = _srvServiceRequest.GetServicesByStatusesAsync(statusIds, ConstantKeys.ModuleTypeIds.EvaluationPlan, requestInfo.Lang);
+
+            await Task.WhenAll(servicesByStatusTask);
+
+            var servicesByStatus = servicesByStatusTask.Result;
+
+            foreach (var item in finalResult.Items)
+            {
+                if (servicesByStatus.TryGetValue(item.PlanStatusId, out var services))
+                {
+                    item.Services = services;
+                }
+            }
+        }
+
+        return finalResult;
+    }
+    public async Task<List<GetPlansPR>> GetPlans()
+    {
+        var result = await unitOfWork.GetRepository<Plan>()
+              .GetAllActiveNonDeleted(x => x.PlanTypeDep!.DepartmentId == requestInfo.DepId)
+              .Select(x => new GetPlansPR
+              {
+                  Id = x.Id,
+                  PlanName = x.PlanName
+              }).ToListAsync();
+        return result;
     }
     private async Task<bool> IsThereExistingDraftPlanForSameAcadmicYear(PlanServiceRequest model)
     {

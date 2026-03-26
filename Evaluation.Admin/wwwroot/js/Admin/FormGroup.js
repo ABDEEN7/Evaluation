@@ -1077,7 +1077,7 @@ const getlookup = () => {
                 const { data } = result;
                 if (data) {
                     const { SystemField } = data;
-                    SystemFieldList = SystemField;
+                    SystemFieldList = SystemField.filter(x => x.serviceId != serviceid);
                     
                 }
             }

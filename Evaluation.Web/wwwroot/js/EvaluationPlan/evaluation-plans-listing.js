@@ -1,10 +1,14 @@
 ﻿$(document).ready(function () {
+    const fu = window.formUtility || {};
+    const fapi = window.FormApi;
 
     /* =========================
      * API ENDPOINTS
      * ========================= */
+    var deprouting = sharedUtility().extractDepartmentName();
+
     const API_ENDPOINTS = {
-        GET_ACADEMIC_YEARS: '/AcademicYear/GetAcademicYearByDepartment'
+        GET_ACADEMIC_YEARS: `/AcademicYear/${deprouting}/GetAcademicYearByDepartment`
     };
 
     /* =========================
@@ -44,34 +48,43 @@
      * FILTER OBJECT
      * ========================= */
     function getPlansFilter() {
-        return {
-            YearId: $('#planYearFilter').val(),
-            schoolName: $('#schoolName').val()
-        };
+
+        const yearId = $('#planYearFilter').val();
+        const schoolName = $('#schoolName').val();
+
+        const filters = {};
+
+        if (yearId) filters.yearId = yearId;
+        if (schoolName) filters.schoolName = schoolName;
+
+        return filters;
     }
+
 
     /* =========================
      * INITIALIZE LISTING
      * ========================= */
-    const plansListing = evaluationListing.createListing({
+    const plansListing = getevaluationListing.createListing({
         tableId: 'evaluationPlansTable',
-        ajaxUrl: '/Plan/GetPlans',
+        ajaxUrl: `/Plan/${departmentRoutePath}/GetPlans`,
         getFilterInput: getPlansFilter,
         filterFormId: 'plan-filter-form-id',
         filterBtnId: 'filterPlanBtnId',
         clearFilterBtnId: 'clearFilterPlanBtnId',
         tabLabelSelector: '#tabPlansAnchorTag',
         tabLabelKey: 'lblEvaluationPlans',
-        enableCardView: false,
-        cardViewBtnId: 'cardViewPlan',
-        tableViewBtnId: 'tblViewPlan',
+        enableCardView: true,
+        cardViewBtnId: 'cardViewEvaluationPlans',
+        tableViewBtnId: 'tblViewEvaluationPlans',
         rowClass: 'plan-row',
 
-        onAjaxSuccess: function (response) {
+        // Transform API response to match expected format
+        transformResponse: function (response) {
+            // API returns { items: [...], totalCount: 24 }
+            // Common listing expects { data: [...], totalDataCount: ... }
             return {
-                data: response.items || response.data || [],
-                totalDataCount: response.totalCount || response.totalDataCount || 0,
-                TotalDataCount: response.totalCount || response.TotalDataCount || 0
+                data: response.items || [],
+                totalDataCount: response.totalCount || 0
             };
         },
 
@@ -104,43 +117,230 @@
                 className: "td-center",
                 render: function (data, type, row) {
                     return `
-                        <button class="btn btn-sm btn-primary view-plan" data-id="${row.id}">
-                            عرض
-                        </button>
-                    `;
+                <button
+                    type="button"
+                    class="btn btn-sm btn-primary view-plan"
+                    data-plan-id="${row.id}"
+                    onclick="InitializePlanDetails('${row.id}'); return false;">
+                    عرض
+                </button>
+            `;
+                }
+            },
+            {
+                data: 'services',
+                className: "td-full p-0 process",
+                title: uiControlsSetup().GetUiControlText('lblActions'),
+                orderable: false,
+                render: function (data, type, row, meta) {
+
+                    const services = Array.isArray(data) ? data : [];
+                    if (services.length === 0) return '';
+
+                    const dropdownId = `dropdownMenuButton_${row?.id || meta?.row || Math.random().toString(36).slice(2)}`;
+
+                    let actionsHtml = `<div class="dropdown d-block w-100">`;
+
+                    actionsHtml += `
+            <button
+                class="btn mb-0 dropdown-toggle w-100 btn-primary mt-3"
+                type="button"
+                id="${dropdownId}"
+                data-bs-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="false"
+                onclick="event.stopPropagation();"
+            >
+                <span>${uiControlsSetup().GetUiControlText('lblProcedures')}</span>
+            </button>
+        `;
+
+                    actionsHtml += `<div class="dropdown-menu w-100" aria-labelledby="${dropdownId}" onclick="event.stopPropagation();">`;
+
+                    const planId = row?.id || "";
+
+                    services.forEach(function (service) {
+
+                        const serviceId = service?.id || service?.Id || "";
+                        if (!serviceId) return;
+
+                        const lang = window.currentLang || "ar";
+
+                        const serviceName =
+                            (lang === "ar"
+                                ? (service?.nameAr || service?.NameAr)
+                                : (service?.nameEn || service?.NameEn)
+                            ) ||
+                            service?.name || service?.Name || "";
+
+                        const serviceIcon = service?.icon || service?.Icon || "fa-solid fa-file";
+
+                        actionsHtml += `
+                                        <a class="dropdown-item"
+                                           href="#"
+                                           onclick="InitializeCreatePlanRequestService('${serviceId}','${planId}'); return false;">
+                                            <i class="${serviceIcon} mx-1"></i>
+                                            ${serviceName}
+                                        </a>
+                                    `;
+                    });
+
+                    actionsHtml += `</div></div>`;
+                    return actionsHtml;
                 }
             }
+
+
         ],
 
-        onRowClick: function (rowData) {
-            openPlanDetails(rowData.id);
-        }
+        //onRowClick: function (rowData, e) {
+        //    if (e && $(e.target).closest('.dropdown, .dropdown-menu, .create-plan-request').length) return;
+        //    openPlanDetails(rowData.id);
+        //}
     });
 
     /* =========================
      * EVENTS
      * ========================= */
+    window.InitializeCreatePlanRequestService = async function (serviceId, planId) {
+        try {
+            if (!serviceId || !planId) {
+                console.error("Missing serviceId or planId", { serviceId, planId });
+                return;
+            }
 
-    // Reload plans when year changes
-    $('#planYearFilter').on('change', function () {
-        plansListing.reload();
-    });
-    $('#searchPlansBtn').on('click', function (e) {
-        e.preventDefault();
-        plansListing.reload();
-    });
-    // View plan details
-    function openPlanDetails(planId) {
-        //jqClient({
-        //    success: function (response) {
-        //        $('#planDetailsModalLabel').text(response.name);
-        //        $('#planDetailsModalBody').html(response.htmlContent || '');
-        //        $('#planDetailsModal').modal('show');
-        //    }
-        //}).Get(`/Plan/Details?planId=${planId}`);
-        window.location.href = `/Plan/Details?planId=${planId}`;
+            const createPlanRequestService = await fapi.fetchJSON(
+                `/FormRender/${departmentRoutePath}/GetCreatePlanRequestService` +
+                `?serviceId=${encodeURIComponent(serviceId)}` +
+                `&planId=${encodeURIComponent(planId)}`
+            );
+
+            if (!createPlanRequestService) return;
+
+
+            const el = document.getElementById("CreateRequestModal");
+            const modal = bootstrap.Modal.getOrCreateInstance(el);
+            modal.show();
+
+            const serviceName = createPlanRequestService.name;
+
+            const headerEl = document.getElementById("CreateRequestModalLabel");
+            if (headerEl) headerEl.textContent = serviceName ? " - " + serviceName : "";
+
+            const actions = createPlanRequestService.actions || [];
+
+            const initialActions = actions.filter(a => a.isInitialAction === true);
+
+            if (initialActions.length === 1) {
+                const firstAction = initialActions[0];
+                initialAction = firstAction?.bakendName || initialAction;
+
+                $("#ActionsDropDown").hide();
+                $("label[for='ActionsDropDown']").hide();
+
+                await RenderActionFields(createPlanRequestService.serviceRequestDTO);
+            } else {
+                $("#ActionsDropDown").show();
+                $("label[for='ActionsDropDown']").show();
+                fillActionDropDown(actions);
+            }
+
+        } catch (err) {
+            console.error("InitializeCreatePlanRequestService error:", err);
+        }
+    };
+
+    /* =========================
+   * VIEW PLAN DETAILS - MINIMAL VERSION
+   * ========================= */
+    /* =========================
+   * VIEW PLAN DETAILS - MINIMAL VERSION
+   * ========================= */
+    window.InitializePlanDetails = async function (planId) {
+        try {
+            if (!planId) {
+                console.error("Missing planId", { planId });
+                return;
+            }
+
+            // Fetch plan details
+            const response = await fapi.fetchJSON(
+                `/Plan/${departmentRoutePath}/GetPlanDetails?planId=${encodeURIComponent(planId)}`
+            );
+
+            if (!response || !response.result) {
+                console.error("No plan details received");
+                return;
+            }
+
+            // Extract the actual plan data from the result property
+            const planDetails = response.result;
+
+            // Show the modal
+            const el = document.getElementById("PlanDetailsModal");
+            const modal = bootstrap.Modal.getOrCreateInstance(el);
+            modal.show();
+
+            // Clear any previous content in modal body
+            const modalBody = el.querySelector('.modal-body');
+            if (modalBody) {
+                modalBody.innerHTML = '';
+            }
+
+            // Generate the plan fields HTML
+            const html = planUtility.generatePlanFieldsHTML('view');
+
+            // Insert the HTML into the modal body instead of main content
+            if (modalBody) {
+                modalBody.innerHTML = html;
+            }
+
+            // Initialize the plan handler with the fetched data
+            PlanHandler.init(true, 'view', planDetails);
+
+        } catch (err) {
+            console.error("InitializePlanDetails error:", err);
+        }
+    };
+    // Helper function to render actions if needed
+    function renderPlanActions(actions, planId) {
+        const actionsContainer = document.getElementById("plan-actions-container");
+        if (!actionsContainer) return;
+
+        let actionsHtml = `
+        <div class="dropdown">
+            <button class="btn btn-primary dropdown-toggle" 
+                    type="button" 
+                    id="planActionsDropdown" 
+                    data-bs-toggle="dropdown" 
+                    aria-expanded="false">
+                الإجراءات
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="planActionsDropdown">
+    `;
+
+        actions.forEach(function (action) {
+            const actionName = action.nameAr || action.name || "";
+            const actionIcon = action.icon || "fa-solid fa-file";
+
+            actionsHtml += `
+            <li>
+                <a class="dropdown-item" href="#" 
+                   onclick="handlePlanAction('${action.id}', '${planId}'); return false;">
+                    <i class="${actionIcon} mx-1"></i>
+                    ${actionName}
+                </a>
+            </li>
+        `;
+        });
+
+        actionsHtml += `</ul></div>`;
+        actionsContainer.innerHTML = actionsHtml;
     }
-
+    $('#filterPlanBtnsId').on('click', function () {
+        plansListing.reload();
+    });
+  
     $('#addPlanBtn').on('click', function () {
         window.location.href = '/Plan/Create';
     });

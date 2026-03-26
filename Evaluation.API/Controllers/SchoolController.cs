@@ -1,5 +1,4 @@
 ﻿using Evaluation.DAL.DTOs;
-using Evaluation.DAL.Models.Org;
 using Evaluation.Services.BusinessLayer;
 using Evaluation.Services.BusinessLayer.API;
 using Evaluation.Services.Integration;
@@ -70,7 +69,13 @@ public class SchoolController : ControllerBase
         var result = await _masterBl.GetApiService<SchoolBL>().GetSchoolsByDepartmentId(depId);
         return Ok(result);
     }
-    [HttpGet]
+	[HttpPost]
+	public async Task<IActionResult> GetSchools()
+	{
+		var result = await _masterBl.GetApiService<SchoolBL>().GetSchools();
+		return Ok(result);
+	}
+	[HttpGet]
     public async Task<IActionResult> GetSchoolsPlan([FromQuery] SchoolRequest request)
     {
         var result = await _masterBl.GetApiService<SchoolBL>().GetSchoolsPlan(request);

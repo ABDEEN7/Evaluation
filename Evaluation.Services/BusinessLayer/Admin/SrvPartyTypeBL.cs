@@ -33,9 +33,9 @@ namespace Evaluation.Services.Models.Admin
                  .Include(x => x.CreateBy)
                 .OrderByDescending(x=>x.CreateDate)
                 .ToListAsync();
-            if (message.SystemModuleId != null)
+            if (message.DepartmentId != null)
             {
-                list = list.Where(c => c.SystemModuleId == message.SystemModuleId).ToList();
+                list = list.Where(c => c.DepartmentId == message.DepartmentId).ToList();
             }
 
             if (!string.IsNullOrEmpty(message.Title))
@@ -61,7 +61,7 @@ namespace Evaluation.Services.Models.Admin
 
            
 
-            var PartyTypeBackendName = await GenerateBackendNameBySystemModule(message.NameEn, message.SystemModuleId, "P");
+            var PartyTypeBackendName = await GenerateBackendNameByDepartment(message.NameEn, message.DepartmentId, "P");
             var existBackendName = await uow
              .GetRepository<PartyType>()
                   .GetAllNonDeleted(x => x.BackendName == PartyTypeBackendName)
@@ -80,7 +80,7 @@ namespace Evaluation.Services.Models.Admin
             obj.IsEmployeePartyType = message.IsEmployeePartyType;
             obj.CanViewAllRequests = message.CanViewAllRequests;
             obj.CanViewAllEvaluations = message.CanViewAllEvaluations;
-            obj.SystemModuleId = message.SystemModuleId;
+            obj.DepartmentId = message.DepartmentId;
             obj.IsActive = message.IsActive;
 
             uow.GetRepository<PartyType>().Insert(obj);
@@ -136,7 +136,7 @@ namespace Evaluation.Services.Models.Admin
                 obj.IsEmployeePartyType = message.IsEmployeePartyType;
                 obj.CanViewAllRequests = message.CanViewAllRequests;
                 obj.CanViewAllEvaluations = message.CanViewAllEvaluations;
-                obj.SystemModuleId = message.SystemModuleId;
+                obj.DepartmentId = message.DepartmentId;
                 obj.IsActive = message.IsActive;
 
                 uow.GetRepository<PartyType>().Update(obj);

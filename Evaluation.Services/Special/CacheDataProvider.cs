@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Evaluation.DAL.Models.ActionEntities;
 using Evaluation.DAL.Models.ServiceEnities;
+using Evaluation.DAL.Models.ServiceRequestEntities;
 using Evaluation.DAL.Models.StatusEntities;
 using Evaluation.DAL.Models.SystemSetting;
 using Evaluation.DAL.Models.Template;
@@ -11,6 +12,7 @@ using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Api;
 using Evaluation.SharedHelper.Models.Api.ActionEntitiesDTOs;
 using Evaluation.SharedHelper.Models.Api.ProfileDTO;
+using Evaluation.SharedHelper.Models.Api.ServiceDTOs;
 using Evaluation.SharedHelper.Models.Api.TemplatesDTO;
 using Mapster;
 using MapsterMapper;
@@ -269,19 +271,23 @@ namespace Evaluation.Services.Special
 		//-------------------------------------------------------------------
 		//⚙️ SERVICE STATUS CONFIGURATION
 		//-------------------------------------------------------------------
-		//public async Task<List<SchServiceStatusConfiguration>> GetServiceStatusConfiguration()
-		//{
-		//    var key = ConstantKeys.WebAppCacheTableName.SchServiceStatusConfiguration;
-		//    return await GetOrSetCacheAsync(key, async () =>
-		//    {
-		//        using var scopedUow = serviceScopeFactory.CreateScopedUow();
-		//        var repo = scopedUow.GetRepository<SchServiceStatusConfiguration>();
-		//        var list = await repo.GetAllQueryFiltered()
-		//                             .Include(c => c.Service)
-		//                             .ToListAsync();
-		//        return list;
-		//    });
-		//}
+		public async Task<List<ServiceStatusConfigurationDTO>> GetServiceStatusConfiguration()
+		{
+			var key = ConstantKeys.WebAppCacheTableName.SchServiceStatusConfiguration;
+
+			return await GetOrSetCacheAsync(key, async () =>
+			{
+				using var scopedUow = serviceScopeFactory.CreateScopedUow();
+				var repo = scopedUow.GetRepository<ServiceStatusConfiguration>();
+
+				var list = await repo.GetAllQueryFiltered()
+									 .Include(c => c.Service)
+									 .ToListAsync();
+
+				return list.Adapt<List<ServiceStatusConfigurationDTO>>();
+			});
+		}
+
 
 		//-------------------------------------------------------------------
 		//🚀 SERVICE INITIATOR PARTY TYPES
@@ -294,11 +300,10 @@ namespace Evaluation.Services.Special
 				using var scopedUow = serviceScopeFactory.CreateScopedUow();
 				var repo = scopedUow.GetRepository<ServiceInitiatorPartyType>();
 				var list = await repo.GetAllActiveNonDeleted().ToListAsync();
-				return list.Adapt<List<ServiceInitiatorPartyType>>();
+				return list;
 			});
 		}
-
-
+		
 		//-------------------------------------------------------------------
 		//🧩 ACTION PARTY TYPES
 		//-------------------------------------------------------------------
@@ -310,7 +315,12 @@ namespace Evaluation.Services.Special
 				using var scopedUow = serviceScopeFactory.CreateScopedUow();
 				var repo = scopedUow.GetRepository<ActionPartyType>();
 				var list = await repo.GetAllActiveNonDeleted().ToListAsync();
-				return list.Adapt<List<ActionPartyTypeDTO>>();
+				return list.Select(x => new ActionPartyTypeDTO
+				{
+					Id = x.Id,
+					ServiceActionId = x.ServiceActionId,
+					PartyTypeId = x.PartyTypeId
+				}).ToList();
 			});
 		}
 
@@ -328,7 +338,7 @@ namespace Evaluation.Services.Special
 				var list = await repo.GetAll()
 									 .Include(c => c.StatusPartyTypeDisplayNames)
 									 .ToListAsync();
-				return list.Adapt<List<ServiceStatus>>();
+				return list;
 			});
 
 			return data;

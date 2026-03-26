@@ -11,8 +11,10 @@ namespace Evaluation.Admin.Models
         {
 
         }
+        public string DepartmentId { get; set; } = null!;
         public string SystemModuleId { get; set; } = null!;
         public string ServiceId { get; set; } = null!;
+        public List<DepartmentDTO> Departments { get; set; } = new();
         public List<SystemModuleDTO> SystemModules { get; set; } = new();
         public List<ServiceDTO> Services { get; set; } = new();
         public bool ShowServiceDefault { get; set; } = true;

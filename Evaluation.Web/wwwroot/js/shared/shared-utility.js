@@ -58,7 +58,7 @@ const sharedUtility = () => {
 
         //    }
         //}
-        let depName = "/Scholarship";//GetLocalStorageValue(LocalStorageKeys.ModuleName);
+        let depName = "/EvaluationPlan";//GetLocalStorageValue(LocalStorageKeys.ModuleName);
         if (depName) {
             url = url.concat(depName)
         }

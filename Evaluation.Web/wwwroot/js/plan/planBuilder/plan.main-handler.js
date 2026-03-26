@@ -37,6 +37,7 @@
     function createInstanceState(fieldId) {
         return {
             fieldId: fieldId,
+            planId: null,
             isReadOnly: false,
             pageSize: TABLE_CONFIG.pageSize || 10,
             currentPage: 1,
@@ -44,7 +45,7 @@
             filters: {},
             searchTerm: '',
             selectedSchools: [],
-            allSchools: []
+            selectedSchoolsMap: null // Map to track selected schools when editing
         };
     }
 
@@ -56,14 +57,20 @@
 
     /* ===================== INIT ===================== */
 
-    const init = async (isReadOnly, fieldId = null, planObject = null) => {
+    const init = async (isReadOnly, fieldId = null, planObject = null, element) => {
         if (!fieldId) {
             console.error('[PlanHandler] fieldId is required!');
             return;
         }
+        if (planObject) {
+            planObject = toCamelCaseKeys(planObject);
+        }
         const state = createInstanceState(fieldId);
         state.isReadOnly = isReadOnly;
-
+        //Store plan Id
+        if (planObject && planObject.id) {
+            state.planId = planObject.id;
+        }
         instances.set(fieldId, state);
 
         try {
@@ -72,22 +79,22 @@
                     loadPlanTypes(),
                     loadSemesters(),
                     loadVisitTypes(),
-                    loadVacationDays()
+                    loadVacationDays(),
+                    loadParentOrgTree()
                 ]);
             }
 
-            populatePlanTypes(fieldId);
-            populateSemesters(fieldId);
-
             if (planObject) {
-                renderPlanWithData(fieldId, planObject);
+                renderPlanWithData(fieldId, planObject, element);
             } else {
                 renderNewPlan(fieldId);
+                populatePlanTypes(fieldId, element);
+                populateSemesters(fieldId, element);
             }
-
             bindEvents(fieldId);
             initializeFilterDatePickers(fieldId);
             populateFilterVisitTypes(fieldId);
+            populateFilterParentOrgTree(fieldId);
         } catch (e) {
             console.error(`[PlanHandler] Init failed for ${fieldId}`, e);
             alert('حدث خطأ أثناء التحميل');
@@ -117,6 +124,9 @@
                 isCron: x.isCronExpression,
                 cron: x.cronExpression
             })));
+    const loadParentOrgTree = () =>
+        jqClient().Get(API_ENDPOINTS.GET_PARNT_ORGTREE)
+            .then(r => ns.parentSchool = r?.result || []);
 
     const loadPlanData = async (fieldId, planId) => {
         const r = await jqClient().Get(`${API_ENDPOINTS.GET_PLAN_DETAILS}/${planId}`);
@@ -125,22 +135,57 @@
 
     /* ===================== POPULATE ===================== */
 
-    const populatePlanTypes = (fieldId) => {
-        const $s = $p(fieldId, 'ddlPlanType');
+    //const populatePlanTypes = (fieldId) => {
+    //    const $s = $p(fieldId, 'ddlPlanType');
 
-        if ($s.hasClass("select2-hidden-accessible")) {
-            $s.select2('destroy');
+    //    if ($s.hasClass("select2-hidden-accessible")) {
+    //        $s.select2('destroy');
+    //    }
+    //    $s.empty().append(`<option value="">${t('lblChoosePlanType')}</option>`);
+
+    //    ns.planTypes.forEach(t =>
+    //        $s.append(`<option value="${t.id}" data-backendname="${t.backendName}">${t.name}</option>`)
+    //    );
+
+    //    $s.select2({ width: '100%', allowClear: true });
+    //};
+    const populatePlanTypes = (fieldId, elementId = null) => {
+        const parentElement = elementId ? $(`#${elementId}`) : null;
+        const idPrefix = fieldId ? `${fieldId}_` : '';
+        const $s = $(`#${idPrefix}ddlPlanType`);
+
+        if (!$s.length) {
+            console.warn('ddlPlanType not found:', `#${idPrefix}ddlPlanType`);
+            return;
         }
+
+        if ($s.data('select2')) {
+            try { $s.select2('destroy'); } catch { }
+        }
+
         $s.empty().append(`<option value="">${t('lblChoosePlanType')}</option>`);
 
-        ns.planTypes.forEach(t =>
-            $s.append(`<option value="${t.id}" data-backendname="${t.backendName}">${t.name}</option>`)
-        );
+        (ns.planTypes || []).forEach(pt => {
+            $s.append(`<option value="${pt.id}" data-backendname="${pt.backendName}">${pt.name}</option>`);
+        });
 
-        $s.select2({ width: '100%', allowClear: true });
+        const $modal = $s.closest('.modal');
+
+        const dropdownParent =
+            (parentElement && parentElement.length) ? parentElement :
+                ($modal.length ? $modal : $(document.body));
+
+        $s.select2({
+            width: '100%',
+            allowClear: true,
+            dropdownParent: dropdownParent
+        });
     };
 
-    const populateSemesters = (fieldId) => {
+
+    const populateSemesters = (fieldId, elementId = null) => {
+        const parentElement = elementId ? $(`#${elementId}`) : null;
+
         const $s = $p(fieldId, 'ddlSemester');
 
         if ($s.hasClass("select2-hidden-accessible")) {
@@ -158,8 +203,10 @@
                  </option>`
             )
         );
-
-        $s.select2({ width: '100%', allowClear: true });
+        const dropdownParent =
+            (parentElement && parentElement.length) ? parentElement :
+                ($modal.length ? $modal : $(document.body));
+        $s.select2({ width: '100%', allowClear: true, dropdownParent: dropdownParent });
     };
 
     const populateFilterVisitTypes = (fieldId) => {
@@ -169,6 +216,12 @@
             $select.append(`<option value="${type.id}">${type.name}</option>`);
         });
     };
+    const populateFilterParentOrgTree = (fieldId) => {
+        const $select = $p(fieldId, 'filterParentOrgTree');
+        ns.parentSchool.forEach(parent => {
+            $select.append(`<option value="${parent.id}">${parent.nameEn}</option>`)
+        });
+    }
 
     const initializeFilterDatePickers = (fieldId) => {
         const dateFields = ['filterLastEvalDate', 'filterCreatedDate', 'filterNextEvalDate'];
@@ -199,23 +252,28 @@
         initCustomMode(fieldId);
     };
 
-    const renderPlanWithData = (fieldId, plan) => {
+
+    const renderPlanWithData = (fieldId, plan, element) => {
         const state = instances.get(fieldId);
+
+        if (plan && plan.id) {
+            state.planId = plan.id;
+        }
 
         const vm = {
             title: plan.name || '',
             planTypeId: plan.planTypeDepId || plan.PlanTypeDepId,
             semesterId: plan.semesterId,
-            dateRange: plan.startDate && plan.endDate ?
-                `${plan.startDate} to ${plan.endDate}` : '',
+            dateRange: toDateOnly(plan.startDate) && (plan.endDate) ?
+                `${toDateOnly(plan.startDate)} to ${toDateOnly(plan.endDate)}` : '',
             schools: plan.schools || []
         };
 
         const form = ns.renderPlanForm(fieldId, vm, state.isReadOnly);
         $p(fieldId, 'planFormContainer').find('.form-container').html(form);
 
-        populatePlanTypes(fieldId);
-        populateSemesters(fieldId);
+        populatePlanTypes(fieldId, element);
+        populateSemesters(fieldId, element);
         $p(fieldId, 'semesterContainer').hide();
 
         $p(fieldId, 'planTitle').val(vm.title);
@@ -225,24 +283,130 @@
         }
         $p(fieldId, 'parentDate').val(vm.dateRange);
 
-        // ✅ حفظ المدارس المحددة
-        state.selectedSchools = vm.schools.map(s => ({
-            ...s,
-            id: s.id || s.schoolId,
-            visitDate: s.visitDate || (s.startEvaluationDate && s.endEvaluationDate ?
-                `${s.startEvaluationDate} to ${s.endEvaluationDate}` : ''),
-            visitTypeId: s.visitTypeId
-        }));
+        // ✅ MODIFIED: Create a Map of selected schools with their data AND extract IDs
+        const selectedSchoolsMap = new Map();
+        const selectedSchoolIds = []; // NEW: Array to store school IDs
 
-        // ✅ عرض المدارس الموجودة في planObject
-        const tbody = ns.renderSchoolTable(fieldId, vm.schools, state.isReadOnly);
-        $p(fieldId, 'planTable').find('tbody').replaceWith(tbody);
+        vm.schools.forEach(s => {
+            const schoolId = s.id || s.schoolId || s.id;
+            selectedSchoolIds.push(schoolId); // NEW: Collect school IDs
+            selectedSchoolsMap.set(schoolId, {
+                id: schoolId,
+                visitDate: s.visitDate || (s.startEvaluationDate && s.endEvaluationDate ?
+                    `${s.startEvaluationDate} to ${s.endEvaluationDate}` : ''),
+                visitTypeId: s.visitTypeId,
+                startEvaluationDate: s.startEvaluationDate,
+                endEvaluationDate: s.endEvaluationDate
+            });
+        });
 
-        attachRowEvents(fieldId);
+        // ✅ Store selected schools map in state
+        state.selectedSchoolsMap = selectedSchoolsMap;
+
+        // ✅ MODIFIED: If readonly, load ONLY selected schools. Otherwise, load all schools
+        if (state.isReadOnly && selectedSchoolIds.length > 0) {
+            loadSelectedSchoolsOnly(fieldId, selectedSchoolIds, selectedSchoolsMap);
+        } else {
+            loadSchoolsWithSelection(fieldId, 1, {}, selectedSchoolsMap);
+        }
+
         initializeDatePickers(fieldId, vm);
     };
 
     /* ===================== SCHOOLS (Backend Only) ===================== */
+
+    const loadSchoolsWithSelection = (fieldId, page = 1, filters = {}, selectedSchoolsMap = null) => {
+        const state = instances.get(fieldId);
+        state.currentPage = page;
+        state.filters = filters;
+
+        // Build query parameters
+        const params = new URLSearchParams({
+            page,
+            pageSize: state.pageSize
+        });
+
+        // Add search term
+        if (state.searchTerm) {
+            params.append('search', state.searchTerm);
+        }
+
+        // Add filters
+        Object.keys(filters).forEach(k => {
+            if (filters[k]) params.append(k, filters[k]);
+        });
+
+        showLoadingState(fieldId);
+
+        // Call API to get all schools
+        jqClient().Get(`${API_ENDPOINTS.GET_SCHOOLS}?${params}`)
+            .done(r => {
+                const schools = r.items || [];
+                state.totalRecords = r.totalCount || 0;
+
+                // Render table with selected schools map
+                const tbody = ns.renderSchoolTable(
+                    fieldId,
+                    schools,
+                    state.isReadOnly,
+                    selectedSchoolsMap || state.selectedSchoolsMap
+                );
+
+                $p(fieldId, 'planTable').find('tbody').replaceWith(tbody);
+
+                // Render pagination
+                renderPagination(fieldId);
+
+                attachRowEvents(fieldId);
+                initChildPickerForTable(fieldId);
+            })
+            .fail(err => {
+                console.error(`[PlanHandler] Failed to load schools`, err);
+                showErrorState(fieldId);
+            });
+    };
+
+    // ✅ NEW FUNCTION: Load only selected schools by IDs (for readonly mode)
+    const loadSelectedSchoolsOnly = (fieldId, schoolIds, selectedSchoolsMap) => {
+        const state = instances.get(fieldId);
+
+        // Build query parameters with school IDs
+        const params = new URLSearchParams({
+            schoolIds: schoolIds.join(','), // Send comma-separated IDs
+            page: 1,
+            pageSize: schoolIds.length // Set page size to number of schools to get all in one request
+        });
+
+        showLoadingState(fieldId);
+
+        // Call API to get only selected schools
+        jqClient().Get(`${API_ENDPOINTS.GET_SCHOOLS}?${params}`)
+            .done(r => {
+                const schools = r.items || [];
+                state.totalRecords = schools.length; // Set total to the number of selected schools
+                state.currentPage = 1;
+
+                // Render table with all schools pre-selected
+                const tbody = ns.renderSchoolTable(
+                    fieldId,
+                    schools,
+                    state.isReadOnly,
+                    selectedSchoolsMap
+                );
+
+                $p(fieldId, 'planTable').find('tbody').replaceWith(tbody);
+
+                // Render pagination (will show 1 page with all selected schools)
+                renderPagination(fieldId);
+
+                attachRowEvents(fieldId);
+                initChildPickerForTable(fieldId);
+            })
+            .fail(err => {
+                console.error(`[PlanHandler] Failed to load selected schools`, err);
+                showErrorState(fieldId);
+            });
+    };
 
     const loadSchools = (fieldId, page = 1, filters = {}) => {
         const state = instances.get(fieldId);
@@ -269,12 +433,13 @@
         // ✅ استدعاء API
         jqClient().Get(`${API_ENDPOINTS.GET_SCHOOLS}?${params}`)
             .done(r => {
-                state.allSchools = r.items || [];
+                const schools = r.items || [];
                 state.totalRecords = r.totalCount || 0;
                 const tbody = ns.renderSchoolTable(
                     fieldId,
-                    state.allSchools,
-                    state.isReadOnly
+                    schools,
+                    state.isReadOnly,
+                    state.selectedSchoolsMap // Pass the selection map if it exists
                 );
 
                 $p(fieldId, 'planTable').find('tbody').replaceWith(tbody);
@@ -574,11 +739,13 @@
 
     const collect = (fieldId) => {
         const state = instances.get(fieldId);
+        const $planType = $p(fieldId, 'ddlPlanType');
 
-        return {
+        const evaluationData = {
             fieldId: fieldId,
             title: $p(fieldId, 'planTitle').val(),
             planTypeId: $p(fieldId, 'ddlPlanType').val(),
+            planTypeDepId: $planType.val(),
             semesterId: $p(fieldId, 'ddlSemester').val(),
             dateRange: $p(fieldId, 'parentDate').val(),
             schools: state.selectedSchools.map(s => ({
@@ -587,6 +754,10 @@
                 visitTypeId: s.visitTypeId
             }))
         };
+        if (state.planId) {
+            evaluationData.id = state.planId;
+        }
+        return evaluationData;
     };
 
     const onSaveClick = (fieldId, e) => {
@@ -601,14 +772,18 @@
         state.selectedSchools = [];
 
         $p(fieldId, 'planTable').find('.selectRow:checked').each(function () {
-            const schoolId = $(this).data('school-id');
-            const school = state.allSchools.find(s => s.id === schoolId);
-            if (!school) return;
+            const $checkbox = $(this);
+            const schoolId = $checkbox.data('school-id');
+            const schoolName = $checkbox.data('name');
+
+            const visitDate = $p(fieldId, 'planTable').find(`.childDate[data-school-id="${schoolId}"]`).val();
+            const visitTypeId = $p(fieldId, 'planTable').find(`.visitTypeSelect[data-school-id="${schoolId}"]`).val();
 
             state.selectedSchools.push({
-                ...school,
-                visitDate: $p(fieldId, 'planTable').find(`.childDate[data-school-id="${schoolId}"]`).val(),
-                visitTypeId: $p(fieldId, 'planTable').find(`.visitTypeSelect[data-school-id="${schoolId}"]`).val()
+                id: schoolId,
+                name: schoolName,
+                visitDate: visitDate,
+                visitTypeId: visitTypeId
             });
         });
     };
@@ -645,5 +820,26 @@
         collect,
         getInstance: (fieldId) => instances.get(fieldId)
     });
+    /*=================== Convert to small letters ===================*/
+    const toCamelCaseKeys = (obj) => {
+        if (Array.isArray(obj)) {
+            return obj.map(toCamelCaseKeys);
+        }
+
+        if (obj !== null && typeof obj === "object") {
+            return Object.keys(obj).reduce((acc, key) => {
+                const camelKey = key.charAt(0).toLowerCase() + key.slice(1);
+                acc[camelKey] = toCamelCaseKeys(obj[key]);
+                return acc;
+            }, {});
+        }
+
+        return obj;
+    };
+    function toDateOnly(dateString) {
+        if (!dateString) return null;
+
+        return new Date(dateString).toISOString().split('T')[0];
+    }
 
 })(window);

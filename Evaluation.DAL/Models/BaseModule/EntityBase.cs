@@ -5,7 +5,7 @@ namespace Evaluation.DAL.Models.BaseModule;
 
 public abstract class EntityBase : IEntity
 {
-    public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid Id { get; set; }
     public bool IsActive { get; set; } = true;
     public Guid CreateById { get; set; }
     public MinistryUser CreateBy { get; set; }

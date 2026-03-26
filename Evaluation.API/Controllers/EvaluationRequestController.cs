@@ -38,4 +38,10 @@ public class EvaluationRequestController : ControllerBase
     {
         return await _masterBl.GetApiService<EvaluationServiceRequestBL>().UpdateEvaluationServiceRequestRequest(evaluationRequestCalender);
     }
+    //[HttpPost]
+    //public IActionResult DeleteEvaluationRequest(Guid id)
+    //{
+    //    return await _masterBl.GetApiService<EvaluationServiceRequestBL>().DeleteEvaluationRequest(id);
+
+    //}
 }

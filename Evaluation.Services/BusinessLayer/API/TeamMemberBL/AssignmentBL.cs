@@ -143,6 +143,7 @@ public class AssignmentBL(IServiceScopeFactory serviceScopeFactory,
             EvalRequestAssignmentScopies = dto.Scopes?.Select(scope =>
                 new EvalRequestAssignmentScope
                 {
+                    CreateById = userInfo.UserId.Value,
                     ScopeId = scope.Id
                 }).ToList()
         }).ToList();

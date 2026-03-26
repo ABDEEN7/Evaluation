@@ -172,113 +172,58 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
             return dto;
         }
-
-		public async Task<ServiceDTO> GetCreatePlanServiceDetailsAsync(Guid DepartementId, string lang)
+		public async Task<ServiceDTO> GetServiceDetailsByModuleTypeAsync(
+		Guid departmentId,
+		string moduleTypeBackendName,
+		string lang,
+		Guid? serviceId = null,
+		bool? initialService = null,
+		Guid? planId = null,
+		bool checkActionCondition = true)
 		{
 			var userId = userInfo.UserId ?? Guid.Parse("C2536611-576B-4EB8-84F4-747F4ECE9A23");
 
-			if (DepartementId == Guid.Empty)
-				throw new ArgumentException("DepartementId ID cannot be null or empty.", nameof(DepartementId));
+			if (departmentId == Guid.Empty)
+				throw new ArgumentException("departmentId cannot be empty.", nameof(departmentId));
 
-			//if (userInfo.UserId is null)
-			//	throw new BusinessException(ExceptionMessage.UserInfoNotFound);
-
-			//var userId = userInfo.UserId.Value;
-			var today = DateTime.Now.Date;
+			using var scopedUow = serviceScopeFactory.CreateScopedUow();
 
 			var employeeUserPartyTypes =
-				await srvUser.GetEmployeeUserPartyTypeIdsAsync(userId, DepartementId);
-
-            //if (!employeeUserPartyTypes.Any())
-            //	throw new BusinessException(ExceptionMessage.ServiceNotFound);
-
-            var serviceQuery = serviceScopeFactory.CreateScopedUow()
-                .GetRepository<Service>()
-                .GetAllQueryFiltered()
-                .AsNoTracking()
-                .Include(x => x.ServiceInitiatorPartyType)
-                .Include(x => x.SystemModule)
-                .Include(x => x.SystemModule!.Department)
-                .Include(x => x.SystemModule!.SystemModuleType)
-                .Where(c => c.Initialservice == true && c.SystemModule!.DepartmentId == DepartementId && c.SystemModule.SystemModuleType!.BackendName == ModuleType.EvaluationPlan);
-				//.Where(c => c.ServiceInitiatorPartyType!
-				//			   .Any(x => employeeUserPartyTypes.Contains(x.PartyTypeId)))
-				//.Where(c => today >= c.StartDate &&
-				//			(c.EndDate == null || c.EndDate.Value.AddDays(1) >= today));
-
-			var service = await serviceQuery.FirstOrDefaultAsync();
-
-			if (service == null)
-				throw new BusinessException(ExceptionMessage.ServiceNotFound);
-
-            var dto = new ServiceDTO();//   service.Adapt<ServiceDTO>();
-            dto.Id = service.Id;
-            dto.Name = service.NameAr;
-            //dto.Id = service.;
-            //dto.Id = service.Id;
-			Guid? planId = null;
-			var CheckActionCondition = true;
-
-			var actions = await SrvActionStatusConfiguration.GetActionsByStatus(
-				service.Id,
-				statusId: null,
-				requestId: null,
-				planId: planId,
-				lang: lang,
-				CheckActionCondition
-			);
-
-			dto.Actions = actions;
-			dto.Routing = service.SystemModule?.Routing;
-
-			return dto;
-			
-		}
-		public async Task<ServiceDTO> GetEvaluationPartyServiceDetailsAsync(Guid DepartementId,Guid serviceId ,string lang)
-		{
-			var userId = userInfo.UserId ?? Guid.Parse("C2536611-576B-4EB8-84F4-747F4ECE9A23");
-
-			if (DepartementId == Guid.Empty)
-				throw new ArgumentException("DepartementId ID cannot be null or empty.", nameof(DepartementId));
-
-			//if (userInfo.UserId is null)
-			//	throw new BusinessException(ExceptionMessage.UserInfoNotFound);
-
-			//var userId = userInfo.UserId.Value;
-			var today = DateTime.Now.Date;
-
-			var employeeUserPartyTypes =
-				await srvUser.GetEmployeeUserPartyTypeIdsAsync(userId, DepartementId);
+				await srvUser.GetEmployeeUserPartyTypeIdsAsync(userId, departmentId);
 
 			//if (!employeeUserPartyTypes.Any())
 			//	throw new BusinessException(ExceptionMessage.ServiceNotFound);
 
-			var serviceQuery = serviceScopeFactory.CreateScopedUow()
-				.GetRepository<Service>()
+			var q = scopedUow.GetRepository<Service>()
 				.GetAllQueryFiltered()
 				.AsNoTracking()
 				.Include(x => x.ServiceInitiatorPartyType)
 				.Include(x => x.SystemModule)
 				.Include(x => x.SystemModule!.Department)
 				.Include(x => x.SystemModule!.SystemModuleType)
-				.Where(c => c.Id == serviceId && c.SystemModule!.DepartmentId == DepartementId && c.SystemModule.SystemModuleType!.BackendName == ModuleType.EvaluationParty);
+				.Where(s => s.SystemModule!.DepartmentId == departmentId &&
+							s.SystemModule.SystemModuleType!.BackendName == moduleTypeBackendName);
 			//.Where(c => c.ServiceInitiatorPartyType!
 			//			   .Any(x => employeeUserPartyTypes.Contains(x.PartyTypeId)))
 			//.Where(c => today >= c.StartDate &&
 			//			(c.EndDate == null || c.EndDate.Value.AddDays(1) >= today));
+			if (serviceId.HasValue)
+				q = q.Where(s => s.Id == serviceId.Value);
 
-			var service = await serviceQuery.FirstOrDefaultAsync();
+			if (initialService.HasValue)
+				q = q.Where(s => s.Initialservice == initialService.Value);
+
+			var service = await q.FirstOrDefaultAsync();
 
 			if (service == null)
 				throw new BusinessException(ExceptionMessage.ServiceNotFound);
 
-			var dto = new ServiceDTO();//   service.Adapt<ServiceDTO>();
-			dto.Id = service.Id;
-			dto.Name = service.NameAr;
-			//dto.Id = service.;
-			//dto.Id = service.Id;
-			Guid? planId = null;
-			var CheckActionCondition = true;
+			var dto = new ServiceDTO
+			{
+				Id = service.Id,
+				Name = lang == "en" ? service.NameEn : service.NameAr,
+				Routing = service.SystemModule?.Routing
+			};
 
 			var actions = await SrvActionStatusConfiguration.GetActionsByStatus(
 				service.Id,
@@ -286,15 +231,14 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 				requestId: null,
 				planId: planId,
 				lang: lang,
-				CheckActionCondition
+				CheckActionCondition: checkActionCondition
 			);
 
 			dto.Actions = actions;
-			dto.Routing = service.SystemModule?.Routing;
-
 			return dto;
-
 		}
+
+
 		public async Task<List<ServiceDTO>> GetServicesbyDepartementAndPartyType(string? departmentRoute, Guid? userProfileId)
         {
             List<Guid>? serviceList = null;
@@ -317,8 +261,8 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
                     var employeeUserPartyTypes = await Scoped.GetRepository<UserPartyType>()
                                                    .GetAllQueryFiltered(x => x.UserId == userProfileId)
-                                                   .Include(x => x.PartyType!.SystemModule)
-                                                   .Where(x => x.PartyType!.SystemModule.Id == Module.Id && x.PartyType.IsEmployeePartyType)
+                                                   .Include(x => x.PartyType!.Department)
+                                                   .Where(x => x.PartyType!.DepartmentId == Module.DepartmentId && x.PartyType.IsEmployeePartyType)
                                                    .Select(x => x.PartyType!.Id)
                                                    .Distinct()
                                                    .ToListAsync();

@@ -6,6 +6,7 @@ using Evaluation.SharedHelper.Dtos.PlanDto;
 using Evaluation.SharedHelper.Models;
 using FluentResults;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace Evaluation.API.Controllers;
 
@@ -21,6 +22,7 @@ public class PlanController(MasterBL masterBL) : ControllerBase
         return Ok(new { success = true });
     }
 
+
     [HttpGet]
     //[CheckRolePermisionFilter(true, ConstantKeys.WebPermission.GET_SEMESTERS_REQUEST)]
     public async Task<IActionResult> GetSemesters()
@@ -30,7 +32,7 @@ public class PlanController(MasterBL masterBL) : ControllerBase
         return Ok(new { result = semester });
         //return semester.ToActionResult();
     }
-    [HttpGet("{planId:guid}")]
+    [HttpGet]
     //[CheckRolePermisionFilter(true, ConstantKeys.WebPermission.GET_WEB_PLAN_DETAILS_REQUEST)]
     public async Task<IActionResult> GetPlanDetails(Guid planId)
     {
@@ -46,17 +48,29 @@ public class PlanController(MasterBL masterBL) : ControllerBase
         return Ok(new { result = plan });
     }
 
-    [HttpPost]
-    public async Task<IActionResult> GetPlans(PlanDetailsRequestDto request)
+    [HttpGet]
+    public async Task<IActionResult> GetPlans([FromQuery] PlanDetailsRequestDto request)
     {
-        return Ok(await masterBL
+        var result = Ok(await masterBL
             .GetApiService<PlanServiceRequestServices>()
             .GetPlansAsync(request));
+        return result;
     }
     [HttpPost]
     public async Task<Result<ValidationResult>> ValidateEvaluationPlan([FromBody] CreateEvaluationPlanDto planDtoRequest)
     {
         return await masterBL.GetApiService<PlanServiceRequestServices>().ValidateEvaluationPlan(planDtoRequest);
+    }
+    [HttpPost]
+    public async Task<IActionResult> DeletePlan(Guid id)
+    {
+        await masterBL.GetApiService<PlanServiceRequestServices>().DeletePlanById(id);
+        return Ok();
+    }
+    [HttpGet]
+    public async Task<IActionResult> GetPlansDDL()
+    {
+        return Ok(await masterBL.GetApiService<PlanServiceRequestServices>().GetPlans());
     }
 
 }

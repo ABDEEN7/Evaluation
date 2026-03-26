@@ -4,6 +4,16 @@
 <link href="~/assets/css/application-requests.css" rel="stylesheet" />
 <link href="~/form-assets/css/istemara-styles.css" rel="stylesheet">
 <link href="~/plan-assets/css/style.css" rel="stylesheet">
+
+<link href="~/vendor/flatpickr/css/flatpickr.min.css" rel="stylesheet" />
+<!-- Month Select Plugin CSS -->
+<link href="~/vendor/flatpickr/css/style.css" rel="stylesheet" />
+<!-- Custom CSS -->
+<link href="~/plan-assets/css/style.css" rel="stylesheet">
+
+<link href="~/lib/tabulator/css/tabulator.min.css" rel="stylesheet" />
+<link href="~/lib/tabulator/css/tabulator.css" rel="stylesheet" />
+<link href="~/assets/css/tabulator-styling.css.css" rel="stylesheet" />
 <!-- Page Title
 <div class="page-title light-background">
     <div class="container">
@@ -162,7 +172,7 @@
                                             data-bs-target="#itemForm">
                                         <div class="d-flex align-items-center gap-2 fs-18">
                                             <i class="las la-clipboard text-primary fs-25"></i>
-                                            <span class="fw-semibold">بيانات النموذج</span>
+                                            <span class="fw-semibold">بيانات المدرسة</span>
                                         </div>
                                         <span class="toggle-icon"><i class="la la-angle-up fs-22"></i></span>
                                     </button>
@@ -188,7 +198,30 @@
     </div>
 </div>
 
+<!-- Plan Details Modal - Minimal Container -->
+<div class="modal fade" id="PlanDetailsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen modal-dialog-scrollable">
+        <div class="modal-content">
 
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="PlanDetailsModalLabel">تفاصيل الخطة</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Modal Body - Content will be rendered by planUtility.generatePlanFields() -->
+            <div class="modal-body">
+                <!-- The plan form and details will be injected here by generatePlanFields('view') -->
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+            </div>
+
+        </div>
+    </div>
+</div>
 <div class="modal fade" id="planRequestModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-fullscreen modal-dialog-scrollable">
         <div class="modal-content">
@@ -259,8 +292,7 @@
                                 </h2>
 
                                 <div id="planRequestCollapseDetails"
-                                     class="accordion-collapse collapse show"
-                                     data-bs-parent="#planRequestViewAccordion">
+                                     class="accordion-collapse collapse show">
                                     <div class="accordion-body">
                                         <div id="plan-request-details-container"></div>
                                     </div>
@@ -269,11 +301,11 @@
 
                             <div class="accordion-item mb-3 rounded">
                                 <h2 class="accordion-header" id="planRequestHeadingLogs">
-                                    <button class="accordion-button d-flex align-items-center justify-content-between"
+                                    <button class="accordion-button collapsed d-flex align-items-center justify-content-between"
                                             type="button"
                                             data-bs-toggle="collapse"
                                             data-bs-target="#planRequestCollapseLogs"
-                                            aria-expanded="true">
+                                            aria-expanded="false">
 
                                         <div class="d-flex align-items-center gap-2 fs-18">
                                             <i class="la la-history text-primary fs-25"></i>
@@ -286,9 +318,9 @@
                                     </button>
                                 </h2>
 
+                                <!-- ✅ remove show -->
                                 <div id="planRequestCollapseLogs"
-                                     class="accordion-collapse collapse show"
-                                     data-bs-parent="#planRequestViewAccordion">
+                                     class="accordion-collapse collapse">
                                     <div class="accordion-body">
                                         <div id="logTableContainer" class="table-responsive"></div>
                                     </div>
@@ -296,6 +328,123 @@
                             </div>
 
                         </div>
+
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="RequestModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen modal-dialog-scrollable">
+        <div class="modal-content">
+
+            <div class="modal-header align-items-start border-0 justify-content-between">
+                <div>
+                    <h4 class="modal-title fw-semibold mb-2">
+                        <span id="RequestModalLabel"></span>
+                        <span class="text-muted"> - </span>
+                        <span class="text-primary">
+                            <i class="fas fa-file-alt me-1"></i>
+                            <span id="RequestNoText"></span>
+                        </span>
+                    </h4>
+
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item">
+                                <a href="#">الخطط</a>
+                            </li>
+                            <li class="breadcrumb-item active" aria-current="page">
+                                تفاصيل الطلب
+                            </li>
+                        </ol>
+                    </nav>
+                </div>
+                <div class="d-flex justify-content-end align-items-center gap-3">
+                    <h5 class="fw-semibold m-0" id="RequestModalSubTitle"></h5>
+
+                    <div class="dropdown" id="Request-actions-container"></div>
+
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                        <i class="la la-close mt-1"></i>
+                    </button>
+                </div>
+                
+            </div>
+
+            <div class="modal-body py-0">
+
+                <div class="card card-table mb-4">
+                    <div class="card-body">
+
+                        <div class="mb-4">
+                            <div class="divNotes" id="divNotes"></div>
+                            <div class="divTemplates" id="Request-divTemplates"></div>
+                        </div>
+
+                        <div class="accordion" id="RequestViewAccordion">
+
+                            <div class="accordion-item mb-3 rounded">
+                                <h2 class="accordion-header" id="RequestRequestHeadingDetails">
+                                    <button class="accordion-button d-flex align-items-center justify-content-between"
+                                            type="button"
+                                            data-bs-toggle="collapse"
+                                            data-bs-target="#RequestCollapseDetails"
+                                            aria-expanded="true">
+
+                                        <div class="d-flex align-items-center gap-2 fs-18">
+                                            <i class="la la-file-alt text-primary fs-25"></i>
+                                            <span class="fw-semibold">تفاصيل الطلب</span>
+                                        </div>
+
+                                        <span class="toggle-icon">
+                                            <i class="la la-angle-up fs-22"></i>
+                                        </span>
+                                    </button>
+                                </h2>
+
+                                <div id="RequestCollapseDetails"
+                                     class="accordion-collapse collapse show">
+                                    <div class="accordion-body">
+                                        <div id="request-details-container"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="accordion-item mb-3 rounded">
+                                <h2 class="accordion-header" id="RequestHeadingLogs">
+                                    <button class="accordion-button collapsed d-flex align-items-center justify-content-between"
+                                            type="button"
+                                            data-bs-toggle="collapse"
+                                            data-bs-target="#RequestCollapseLogs"
+                                            aria-expanded="false">
+
+                                        <div class="d-flex align-items-center gap-2 fs-18">
+                                            <i class="la la-history text-primary fs-25"></i>
+                                            <span class="fw-semibold">سجل الإجراءات</span>
+                                        </div>
+
+                                        <span class="toggle-icon">
+                                            <i class="la la-angle-up fs-22"></i>
+                                        </span>
+
+                                    </button>
+                                </h2>
+
+                                <!-- ✅ remove show -->
+                                <div id="RequestCollapseLogs"
+                                     class="accordion-collapse collapse">
+                                    <div class="accordion-body">
+                                        <div id="logTableContainer" class="table-responsive"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
 
                     </div>
                 </div>
@@ -372,7 +521,7 @@
                     </div>
                 </div>
 
-            </div>
+          
 
             <div class="modal-footer border-0 pt-0">
                 <div>
@@ -382,9 +531,93 @@
                 </div>
                 <div id="Action-container-button" class="d-flex gap-2"></div>
             </div>
+        </div>
+     </div>
+</div>
+
+<div class="modal fade" id="CreateRequestModal" tabindex="-1" aria-labelledby="CreateRequestModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+
+    <div class="modal-dialog modal-fullscreen modal-dialog-scrollable">
+        <div class="modal-content">
+
+            <div class="modal-header align-items-start border-0">
+                <div>
+
+                    <h4 class="modal-title fw-semibold mb-2" id="CreateRequestModalLabel">
+                        إنشاء طلب خطة تقييم
+                    </h4>
+
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="#">الخطط</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">إنشاء طلب</li>
+                        </ol>
+                    </nav>
+                </div>
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                    <i class="la la-close mt-1"></i>
+                </button>
+
+            </div>
+
+            <div class="modal-body py-0">
+
+                <div class="card card-table mb-4">
+                    <div class="card-body">
+
+                        <form id="create-plan-form" autocomplete="off">
+
+                            <div class="row">
+                                <div class="col-12">
+
+                                    <div class="accordion mt-4" id="accordionExample" hidden>
+                                        <select id="partyTypeSelect" class="form-select mb-3"></select>
+
+                                    </div>
+
+                                    <div id="content-container"></div>
+
+                                </div>
+                            </div>
+
+                            <div class="row mt-3" id="divForCreatedRequestButtons">
+                                <div class="col-12">
+                                    <div id="Requestbtns" class="d-flex justify-content-end gap-2"></div>
+                                </div>
+                            </div>
+
+                        </form>
+
+                    </div>
+                </div>
+
+            </div>
 
         </div>
     </div>
+</div>
+<div class="modal fade" id="actionTransactionsdetailsModal" tabindex="-1" aria-labelledby="actionTransactionsdetailsLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg modal-body-tall">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title @ConstantKeys.WebAppRequest.actionTransactionsdetailsLabel" id="actionTransactionsdetailsLabel"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+
+                <label class="@ConstantKeys.WebAppRequest.lblRemarks"></label>
+                <textarea id="testRemarks" class="form-control" rows="4" wrap="soft" readonly></textarea>
+                <div id="attachmentsSection"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary @ConstantKeys.WebAppRequest.lblCloseModal" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <partial name="_PartialFileModal" />
 
@@ -393,18 +626,30 @@
    <script src="~/lib/datatable/jquery.dataTables.min.js"></script>
     <script src="~/lib/datatable/dataTables.buttons.min.js"></script>
     <script src="~/lib/datatable/buttons.html5.min.js"></script>
+    <!-- Date -->
+    <script src="~/plan-assets/vendor/select2/js/select2.min.js"></script>
+        <script src="~/plan-assets/vendor/flatpickr/js/flatpickr.js"></script>
+    <script src="~/vendor/flatpickr/js/ar.js"></script>
+    <script src="~/vendor/flatpickr/js/index.js"></script>
+
+    <script src="~/js/form-generation-util/form.api.js"></script>
+
+    <script src="~/lib/tabulator/js/tabulator.js" asp-append-version="true"></script>
 
     <!-- Evaluation Plan Modules -->
+    <script src="~/js/evaluationplan/get-evaluation-common-listing.js"></script>
+    <!-- loading data -->
     <script src="~/js/evaluationplan/evaluation-common-listing.js"></script>
+    <script src="~/js/evaluationplan/evaluation-loading-data.js"></script>
     <script src="~/js/evaluationplan/evaluation-plans-listing.js"></script>
     <script src="~/js/evaluationplan/evaluation-schools-listing.js"></script>
     <script src="~/js/evaluationplan/evaluation-operations-listing.js"></script>
     <script src="~/js/evaluationplan/evaluation-plan-requests-listing.js"></script>
-    <script src="~/js/evaluationplan/createrequest.js"></script>
+   
 
     <!-- Form Generation -->
     <script src="/js/form-generation-util/form.constants.js"></script>
-    <script src="/js/form-generation-util/form.api.js"></script>
+  
 @*     <script src="~/js/form-generation-util/form.evaluationplanfield.js"></script>
 
  *@   <script src="~/js/plan/planBuilder/plan.constants.js"></script>
@@ -416,34 +661,57 @@
        <script src="~/js/forms/get-forms.js"></script>
     <script src="~/js/forms/submit-form.js"></script>
 
- <script src="/js/form-generation-util/form.generate-field.js"></script>
+   <script src="/js/form-generation-util/form.generate-field.js"></script>
     <script src="/js/form-generation-util/form.render.js"></script>
+    <script src="~/js/form-generation-util/form.validation.js"></script>
     <script src="/js/form-generation-util/form.submit.js"></script>
+
     <script src="/js/form-generation-util/form.init.js"></script>
     <script src="/js/form-generation-util/form.namespace.js"></script>
     <script src="~/js/form-generation-util/evaluationparties.js"></script>
-
-    <!-- Forms -->
-    <script src="~/js/forms/get-forms.js"></script>
-    <script src="~/js/forms/submit-form.js"></script>
 
     <script src="~/js/assignments/request-assignment-const.js"></script>
     <script src="~/js/assignments/generate-request-assignment.js"></script>
     <script src="~/js/assignments/get-request-assignments.js"></script>
     <script src="~/js/assignments/submit-request-assignments.js"></script>
-    <script>
-        $(document).ready(async function () {
-            // await webAppConfigsSetup().Init({
-            //     pageNames: [
-            //         '@nameof(ConstantKeys.WebAppCommon)',
-                  
-            //     ],
-            //         additional_keys: []
-            // });
-               
 
+    <script src="~/js/evaluationplan/createrequest.js"></script>
+    <script src="~/lib/uuid/uuid.min.js"></script>
+
+    <script>
+        const departmentRoutePath = sharedUtility().extractDepartmentName();
+        $(document).ready(async function () {
+
+            await webAppConfigsSetup().Init({
+                pageNames: [
+                     '@nameof(ConstantKeys.WebAppCommon)',
+                    '@nameof(ConstantKeys.CreatePlan)',
+                    '@nameof(ConstantKeys.EvaluationPlanRequests)'
+                    
+                  
+                ],
+                 pages: [
+                     '@nameof(ConstantKeys.WebAppCommon)',
+                    '@nameof(ConstantKeys.CreatePlan)',
+
+                ],
+                    additional_keys: []
+            });
+
+            window.formUtility = window.formUtility || {};
+
+         $('#evaluationRequestDetailsModal').on('hidden.bs.modal', function () {
+            formUtility.removeQueryParameter(['Evlid', 'serviceId']);
+            });
+             $('#planRequestModal').on('hidden.bs.modal', function () {
+            formUtility.removeQueryParameter(['id', 'serviceId']);
+            });
+
+                $('#RequestModal').on('hidden.bs.modal', function () {
+            formUtility.removeQueryParameter(['id', 'serviceId']);
+            });
             if (sharedUtility().ExistingToken()) {
-                            //uiControlsSetup().UpdatPageTitle('WebAppScholarship');
+                  uiControlsSetup().UpdatPageTitle('WebAppScholarship');
                     $('body').show();
 
                 // await LoadUserDetails();
@@ -489,74 +757,7 @@
     </script>
 
 
-    <div class="modal fade" id="CreateRequestModal" tabindex="-1" aria-labelledby="CreateRequestModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
-
-        <div class="modal-dialog modal-fullscreen modal-dialog-scrollable">
-            <div class="modal-content">
-
-                <div class="modal-header align-items-start border-0">
-                    <div>
-                   
-                    <h4 class="modal-title fw-semibold mb-2" id="CreateRequestModalLabel">
-                        إنشاء طلب خطة تقييم
-                    </h4>
-
-                    <nav aria-label="breadcrumb">
-                        <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="#">الخطط</a></li>
-                            <li class="breadcrumb-item active" aria-current="page">إنشاء طلب</li>
-                        </ol>
-                        </nav>
-                    </div>
-                    <button type="button"
-                            class="btn-close"
-                            data-bs-dismiss="modal"
-                            aria-label="Close">
-                        <i class="la la-close mt-1"></i>
-                    </button>
-                   
-                </div>
-
-                <div class="modal-body py-0">
-
-                    <div class="card card-table mb-4">
-                        <div class="card-body">
-
-                            <form id="create-plan-form" autocomplete="off">
-
-                                <div class="row">
-                                    <div class="col-12">
-
-                                        <div class="accordion mt-4" id="accordionExample" hidden>
-                                            <select id="partyTypeSelect" class="form-select mb-3"></select>
-
-                                            <div id="user-wrapper">
-                                                <div id="user-tables"></div>
-                                            </div>
-                                        </div>
-
-                                        <div id="content-container"></div>
-
-                                    </div>
-                                </div>
-
-                                <div class="row mt-3" id="divForCreatedRequestButtons">
-                                    <div class="col-12">
-                                        <div id="Requestbtns" class="d-flex justify-content-end gap-2"></div>
-                                    </div>
-                                </div>
-
-                            </form>
-
-                        </div>
-                    </div>
-
-                </div>
-
-            </div>
-        </div>
-    </div>
-
+ 
 
 }
 

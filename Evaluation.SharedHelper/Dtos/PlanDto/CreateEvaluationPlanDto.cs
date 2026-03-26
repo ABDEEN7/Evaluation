@@ -7,8 +7,8 @@ public class CreateEvaluationPlanDto
 {
     public Guid Id { get; set; }
     public string Name { get; set; } = null!;
-    public DateOnly StartDate { get; set; }
-    public DateOnly EndDate { get; set; }
+    public DateTime StartDate { get; set; }
+    public DateTime EndDate { get; set; }
     public Guid PlanTypeDepId { get; set; }
     public List<SelectedSchool>? Schools { get; set; }
     public Guid? AcademicYearId { get; set; }
@@ -19,10 +19,10 @@ public class CreateEvaluationPlanDto
     {
         return new Plan
         {
-            Id = Id,
+            Id = Guid.NewGuid(),
             PlanName = Name,
-            StartDate = StartDate,
-            EndDate = EndDate,
+            StartDate = DateOnly.FromDateTime(StartDate),
+            EndDate = DateOnly.FromDateTime(EndDate),
             //PlanTypeDepartmentId = PlanTypeId,
             PlanTypeDepId = PlanTypeDepId,
             AcademicYearId = AcademicYearId,
@@ -39,8 +39,8 @@ public class CreateEvaluationPlanDto
         {
             Id = request.Id,
             Name = request.Name,
-            StartDate = request.StartDate,
-            EndDate = request.EndDate,
+            StartDate = DateOnly.FromDateTime(request.StartDate),
+            EndDate = DateOnly.FromDateTime(request.EndDate),
             PlanTypeDepId = request.PlanTypeDepId,
             Schools = request.Schools,
             AcademicYearId = request.AcademicYearId,

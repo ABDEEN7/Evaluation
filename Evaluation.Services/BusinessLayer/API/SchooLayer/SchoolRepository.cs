@@ -38,6 +38,7 @@ public class SchoolRepository(IServiceScopeFactory serviceScopeFactory,
              .CreateScopedUow()
              .GetRepository<School>()
              .GetAllNonDeleted(filter)
+             .Include(x => x.OrgParent)
              .Include(x => x.SchoolType)
              .Include(x => x.SchoolLevel!)
              .ThenInclude(x => x.EducationLevel);
@@ -86,13 +87,19 @@ public class SchoolRepository(IServiceScopeFactory serviceScopeFactory,
 
         Expression<Func<School, bool>> filter = s => true;
         filter = filter.And(c => targetOrgTreeIds.Contains(c.OrgParentId) && currentSchools.Contains(c.Id));
-
+        //filter = filter.And(c=> c.) we will added here filter by ServiceStatus.IsOPEN
+        if (request.Id != null && request.Id.Count > 0)
+            filter = filter.And(c => request.Id.Contains(c.Id));
         if (!string.IsNullOrWhiteSpace(request.Name))
             filter = filter.And(s => s.NameEn.Contains(request.Name) || s.NameAr.Contains(request.Name));
         if (request.EstablishmentDate != null)
         {
             int year = request.EstablishmentDate.Value.Year;
             filter = filter.And(s => s.EstablishmentDate.Year == year);
+        }
+        if (request.ParentId != Guid.Empty && request.ParentId != null)
+        {
+            filter = filter.And(x => x.OrgParentId == request.ParentId);
         }
         //if(request.VisitType != null)
         //    filter = filter.And(x=>x.)

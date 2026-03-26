@@ -5,11 +5,13 @@
     const success = (data) => {
         //alertify.success(data);
         toastr["success"](data);
+ 
     };
 
     const error = (data) => {
         //alertify.error(data);
         toastr["error"](data);
+
     };
 
     const warning = (data) => {

@@ -33,9 +33,9 @@ namespace Evaluation.Services.Models.Admin
             .Include(x => x.CreateBy)
                 .OrderByDescending(x=>x.CreateDate)
                 .ToListAsync();
-            if (message.SystemModuleId!=null)
+            if (message.DepartmentId != null)
             {
-                list = list.Where(c => c.PartyType!.SystemModuleId == message.SystemModuleId).ToList();
+                list = list.Where(c => c.PartyType!.DepartmentId == message.DepartmentId).ToList();
             }
             if (!string.IsNullOrEmpty(message.UserName))
             {
@@ -96,16 +96,21 @@ namespace Evaluation.Services.Models.Admin
             return result;
 
         }
-        public async Task<List<SystemModule>> GetSystemModule()
+        public async Task<List<DropdownItem>> GetDepartment()
         {
 
 
 
-            var result = await uow.GetRepository<SystemModule>()
+            var result = await uow.GetRepository<Department>()
                .GetAllNonDeleted()
                .Include(x => x.CreateBy)
                .OrderByDescending(x => x.CreateDate)
                .Distinct()
+               .Select(x=>new DropdownItem
+               {
+                   Id=x.Id,
+                   Text=(_requestInfo.Lang=="ar"?x.NameAr:x.NameEn)
+               })
                .ToListAsync();
 
             return result;
@@ -131,10 +136,10 @@ namespace Evaluation.Services.Models.Admin
 
             await uow.CommitAsync();
             var result = mapper.Map<UserPartyTypeDTO>(obj, opts => opts.Items["Language"] = _requestInfo.Lang);
-            result.SystemModuleId = await uow.GetRepository<PartyType>()
+            result.DepartmentId = await uow.GetRepository<PartyType>()
                                       .GetAllNonDeleted()
                                       .Where(x => x.Id == obj.PartyTypeId)
-                                      .Select(x => x.SystemModuleId)
+                                      .Select(x => x.DepartmentId)
                                       .FirstAsync();
            
             result.ResponseStatus = DBResult.Inserted;
@@ -219,10 +224,10 @@ namespace Evaluation.Services.Models.Admin
                 
                 await uow.CommitAsync();
                 result = mapper.Map<UserPartyTypeDTO>(obj, opts => opts.Items["Language"] = _requestInfo.Lang);
-                result.SystemModuleId= await uow.GetRepository<PartyType>()
+                result.DepartmentId= await uow.GetRepository<PartyType>()
                                       .GetAllNonDeleted()
                                       .Where(x => x.Id == obj.PartyTypeId)
-                                      .Select(x=>x.SystemModuleId)
+                                      .Select(x=>x.DepartmentId)
                                       .FirstAsync();
                
                 result.ResponseStatus = DBResult.Updated;

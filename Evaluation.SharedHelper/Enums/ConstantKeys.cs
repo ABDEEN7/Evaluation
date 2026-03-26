@@ -191,6 +191,9 @@ public static class ConstantKeys
         public static readonly string EvalRequestNotExsit = "EvalRequestNotExsit";
         public static readonly string OneOfUserNotExsit = "OneOfUserNotExsit";
         public static readonly string UserNotExist = "UserNotExist";
+        public static readonly string RequestEvaluationNotExist = "RequestEvaluationNotExist";
+
+        public static readonly string TeamExistsUserTeam = "TeamExistsUserTeam";
     }
 
     public static class AdminSettings
@@ -276,6 +279,7 @@ public static class ConstantKeys
         public static readonly string SELECTALL = "SELECTALL";
         public static readonly string EXPANDALL = "EXPANDALL";
         public static readonly string COLLAPSEALL = "COLLAPSEALL";
+        public static readonly string lblDepartment = "lblDepartment";
     }
 
     public static class AdminPages
@@ -332,15 +336,18 @@ public static class ConstantKeys
         public static readonly string AdminEducationLevel = "AdminEducationLevel";
         public static readonly string AdminEmployees = "AdminEmployees";
         public static readonly string AdminEvaluationParties = "AdminEvaluationParties";
-        public static readonly string AdminDepartmentEvaluationParty = "AdminDepartmentEvaluationParty";
         public static readonly string AdminEvaluationType = "AdminEvaluationType";
         public static readonly string AdminFormEvalMarixValue = "AdminFormEvalMarixValue";
         public static readonly string AdminCssClass = "AdminCssClass";
         public static readonly string AdminDropDownType = "AdminDropDownType";
+        public static readonly string AdminTeam = "AdminTeam";
         public static readonly string AdminSchoolLevel = "AdminSchoolLevel";
         public static readonly string AdminSystemSetting = "AdminSystemSetting";
         public static readonly string AdminUiControl = "AdminUiControl";
         public static readonly string AdminNDAStatus = "AdminNDAStatus";
+        public static readonly string AdminNDAStatusDepartment = "AdminNDAStatusDepartment";
+        public static readonly string AdminUserTeamScope = "AdminUserTeamScope";
+        public static readonly string AdminDepTargetOrgTree = "AdminDepTargetOrgTree";
     }
     public static class WebAppPages
     {
@@ -349,9 +356,59 @@ public static class ConstantKeys
         public static readonly string WebEvaluationSubFormItem = "WebEvaluationSubFormItem";
         public static readonly string WebEvaluationFormScopes = "WebEvaluationFormScopes";
         public static readonly string WebDepartmentHoliday = "WebDepartmentHoliday";
+        public static readonly string WebAppRequest = "WebAppRequest";
+        public static readonly string WebAppCommon = "WebAppCommon";
 
     }
-    public static class AdminPermission
+	public static class WebAppRequest
+	{
+		public static readonly string lblDownload = "lblDownload";
+		public static readonly string lblMinLengthNotReached = "lblMinLengthNotReached";
+		public static readonly string lblMissingFormIdForEvaluationForm = "lblMissingFormIdForEvaluationForm";
+		public static readonly string lblLoadingEvaluationForm = "lblLoadingEvaluationForm";
+		public static readonly string lblMaximumRowsExceeded = "lblMaximumRowsExceeded";
+		public static readonly string lblValueMustBeGreaterOrEqual = "lblValueMustBeGreaterOrEqual";
+		public static readonly string lblMaxLengthExceeded = "lblMaxLengthExceeded";
+		public const string actionTransactionsdetailsLabel = "actionTransactionsdetailsLabel";
+		public static readonly string lblFileSizeExceeded = "lblFileSizeExceeded";
+		public static readonly string lblMaximumNewRowsExceeded = "lblMaximumNewRowsExceeded";
+		public static readonly string lblLoadingEvaluationPlan = "lblLoadingEvaluationPlan";
+		public static readonly string lblRenderFormGroupsNotDefined = "lblRenderFormGroupsNotDefined";
+		public static readonly string lblNotEqualValidation = "lblNotEqualValidation";
+		public static readonly string lblFailedToLoadEvaluationPlan = "lblFailedToLoadEvaluationPlan";
+		public static readonly string lblRemarkISRequired = "lblRemarkISRequired";
+		public static readonly string lblPlanUtilityNotFound = "lblPlanUtilityNotFound";
+		public static readonly string lblFileTypeNotAllowed = "lblFileTypeNotAllowed";
+		public static readonly string lblFormSubmittedSuccessfully = "lblFormSubmittedSuccessfully";
+		public static readonly string lblDefaultValidationMessage = "lblDefaultValidationMessage";
+		public static readonly string lblUnexpectedErrorOccurred = "lblUnexpectedErrorOccurred";
+		public static readonly string lblInvalidNumberFormat = "lblInvalidNumberFormat";
+		public static readonly string lblValueMustBeLessOrEqual = "lblValueMustBeLessOrEqual";
+		public static readonly string lblMinimumNewRowsRequired = "lblMinimumNewRowsRequired";
+		public static readonly string lblMinimumRowsRequired = "lblMinimumRowsRequired";
+		public static readonly string lblFailedToLoadEvaluationForm = "lblFailedToLoadEvaluationForm";
+		public static readonly string lblInvalidBase64Content = "lblInvalidBase64Content";
+		public static readonly string lblRequestCreatedSuccessfully = "lblRequestCreatedSuccessfully";
+		public static readonly string lblSaveChanges = "lblSaveChanges";
+		public static readonly string lblSaveAsDraft = "lblSaveAsDraft";
+		public static readonly string lblFailedToLoadFile = "lblFailedToLoadFile";
+		public static readonly string lblRequestSavedAsDraftSuccessfully = "lblRequestSavedAsDraftSuccessfully";
+		public static readonly string lblFailedToRenderPlanWrapper = "lblFailedToRenderPlanWrapper";
+		public static readonly string lblUnnamedGroup = "lblUnnamedGroup";
+		public static readonly string lblBase64PdfFileName = "lblBase64PdfFileName";
+		public static readonly string lblUnexpectedEmptyResponse = "lblUnexpectedEmptyResponse";
+		public static readonly string lblInvalidFormat = "lblInvalidFormat";
+		public static readonly string lblViewHistory = "lblViewHistory";
+		public static readonly string lblProcedures = "lblProcedures";
+		public static readonly string lblDateRangeInvalid = "lblDateRangeInvalid";
+		public static readonly string lblRemarks = "lblRemarks";
+		public static readonly string lblRequiredField = "lblRequiredField";
+		public static readonly string lblUnnamedFile = "lblUnnamedFile";
+		public static readonly string lblInvalidFileExtension = "lblInvalidFileExtension";
+		public static readonly string lblCloseModal = "lblCloseModal";
+	}
+
+	public static class AdminPermission
     {
         public const string VIEW_ADMIN_HOME = "VIEW_ADMIN_HOME";
 
@@ -370,7 +427,7 @@ public static class ConstantKeys
         public const string VIEW_ADMIN_SERVICE_PLACEHOLDER = "VIEW_ADMIN_SERVICE_PLACEHOLDER";
         #endregion
 
-        #region ACTIONSTATUSCONFIGURATION
+        #region actionstatusconfiguration
 
         public const string VIEW_ADMIN_ACTIONSTATUSCONFIGURATION = "VIEW_ADMIN_ACTIONSTATUSCONFIGURATION";
         public const string ADD_ADMIN_ACTIONSTATUSCONFIGURATION = "ADD_ADMIN_ACTIONSTATUSCONFIGURATION";
@@ -823,6 +880,14 @@ public static class ConstantKeys
         public const string DELETE_ADMIN_SCHOOLLEVEL = "DELETE_ADMIN_SCHOOLLEVEL";
 
         #endregion
+        #region TEAM
+
+        public const string VIEW_ADMIN_TEAM = "VIEW_ADMIN_TEAM";
+        public const string ADD_ADMIN_TEAM = "ADD_ADMIN_TEAM";
+        public const string EDIT_ADMIN_TEAM = "EDIT_ADMIN_TEAM";
+        public const string DELETE_ADMIN_TEAM = "DELETE_ADMIN_TEAM";
+
+        #endregion
         #region SYSTEMSETTING
 
         public const string VIEW_ADMIN_SYSTEMSETTING = "VIEW_ADMIN_SYSTEMSETTING";
@@ -835,19 +900,37 @@ public static class ConstantKeys
         public const string EDIT_ADMIN_UICONTROL = "EDIT_ADMIN_UICONTROL";
 
         #endregion
-
-        #region DepartmentEvaluationPartyVM
-        public const string VIEW_ADMIN_DEPARTMENTEVALUATIONPARTY = "VIEW_ADMIN_DEPARTMENTEVALUATIONPARTY";
-        public const string ADD_ADMIN_DEPARTMENTEVALUATIONPARTY = "ADD_ADMIN_DEPARTMENTEVALUATIONPARTY";
-        public const string EDIT_ADMIN_DEPARTMENTEVALUATIONPARTY = "EDIT_ADMIN_DEPARTMENTEVALUATIONPARTY";
-        public const string DELETE_ADMIN_DEPARTMENTEVALUATIONPARTY = "DELETE_ADMIN_DEPARTMENTEVALUATIONPARTY";
-        #endregion
         #region NDAStatus
         public const string VIEW_ADMIN_NDAStatus = "VIEW_ADMIN_NDASTATUS";
         public const string ADD_ADMIN_NDAStatus = "ADD_ADMIN_NDASTATUS";
         public const string EDIT_ADMIN_NDAStatus = "EDIT_ADMIN_NDASTATUS";
         public const string DELETE_ADMIN_NDAStatus = "DELETE_ADMIN_NDASTATUS";
         public const string UPDATE_ORDER_ADMIN_NDAStatus = "UPDATE_ORDER_ADMIN_NDASTATUS";
+        #endregion
+        #region NDAStatusDepartment
+        public const string VIEW_ADMIN_NDA_STATUS_DEPARTMENT = "VIEW_ADMIN_NDA_STATUS_DEPARTMENT";
+        public const string ADD_ADMIN_NDA_STATUS_DEPARTMENT = "ADD_ADMIN_NDA_STATUS_DEPARTMENT";
+        public const string EDIT_ADMIN_NDA_STATUS_DEPARTMENT = "EDIT_ADMIN_NDA_STATUS_DEPARTMENT";
+        public const string DELETE_ADMIN_NDA_STATUS_DEPARTMENT = "DELETE_ADMIN_NDA_STATUS_DEPARTMENT";
+        public const string UPDATE_ORDER_ADMIN_NDAStatus_Department = "EDIT_ADMIN_NDA_STATUS_DEPARTMENT";
+        #endregion
+
+        #region USERTEAMSCOPE
+
+        public const string VIEW_ADMIN_USERTEAMSCOPE = "VIEW_ADMIN_USERTEAMSCOPE";
+        public const string ADD_ADMIN_USERTEAMSCOPE = "ADD_ADMIN_USERTEAMSCOPE";
+        public const string EDIT_ADMIN_USERTEAMSCOPE = "EDIT_ADMIN_USERTEAMSCOPE";
+        public const string DELETE_ADMIN_USERTEAMSCOPE = "DELETE_ADMIN_USERTEAMSCOPE";
+
+        #endregion
+
+        #region deptargetorgtree
+
+        public const string VIEW_ADMIN_DEPTARGETORGTREE = "VIEW_ADMIN_DEPTARGETORGTREE";
+        public const string ADD_ADMIN_DEPTARGETORGTREE = "ADD_ADMIN_DEPTARGETORGTREE";
+        public const string EDIT_ADMIN_DEPTARGETORGTREE = "EDIT_ADMIN_DEPTARGETORGTREE";
+        public const string DELETE_ADMIN_DEPTARGETORGTREE = "DELETE_ADMIN_DEPTARGETORGTREE";
+
         #endregion
 
     }
@@ -896,6 +979,17 @@ public static class ConstantKeys
         public const string DELETE_WEB_SUBFORMITEMS = "DELETE_WEB_SUBFORMITEMS";
 
         #endregion
+        
+        #region TEAM
+
+        public const string VIEW_WEB_TEAM = "VIEW_WEB_TEAM";
+        public const string ADD_WEB_TEAM = "ADD_WEB_TEAM";
+        public const string EDIT_WEB_TEAM = "EDIT_WEB_TEAM";
+        public const string DELETE_WEB_TEAM = "DELETE_WEB_TEAM";
+
+        #endregion
+
+   
 
         #region FORMSCOPES
 
@@ -923,7 +1017,70 @@ public static class ConstantKeys
         public const string ACTION = "ACTION";
         public const string LASTUPDATEDBY = "LASTUPDATEDBY";
         public const string LASTUPDATEDDATE = "LASTUPDATEDDATE";
+        public const string lblDisplayAsCards = "lblDisplayAsCards";
     }
+    public static class CreatePlan
+    {
+        public const string lblAddPlan = "lblAddPlan";
+        public const string lblChoosePlanType = "lblChoosePlanType";
+        public const string lblCreateNewPlan = "lblCreateNewPlan";
+        public const string lblDeletePlanConfirm = "lblDeletePlanConfirm";
+        public const string lblEvaluationPlan = "lblEvaluationPlan";
+        public const string lblEvaluationPlanRequests = "lblEvaluationPlanRequests";
+        public const string lblInsertPlan = "lblInsertPlan";
+        public const string lblPlanCreatedOn = "lblPlanCreatedOn";
+        public const string lblPlanEndDate = "lblPlanEndDate";
+        public const string lblPlanName = "lblPlanName";
+        public const string lblPlanRequests = "lblPlanRequests";
+        public const string lblPlanSchoolsCount = "lblPlanSchoolsCount";
+        public const string lblPlansListTitle = "lblPlansListTitle";
+        public const string lblPlanStartDate = "lblPlanStartDate";
+        public const string lblPlanStatus = "lblPlanStatus";
+        public const string lblPlanType = "lblPlanType";
+        public const string lblPleaseChoosePlanType = "lblPleaseChoosePlanType";
+        public const string lblPleaseEnterPlanTitle = "lblPleaseEnterPlanTitle";
+        public const string lblSearchPlan = "lblSearchPlan";
+
+        public const string PlanStatusesIsActive = "PlanStatusesIsActive";
+        public const string PlanStatusesNameAr = "PlanStatusesNameAr";
+        public const string PlanStatusesNameEn = "PlanStatusesNameEn";
+        public const string PlanStatusExistsPlan = "PlanStatusExistsPlan";
+        public const string PlanStatusExistsPlanHistory = "PlanStatusExistsPlanHistory";
+
+        public const string PlanTypeDepDepartmentId = "PlanTypeDepDepartmentId";
+        public const string PlanTypeDepExistsPlan = "PlanTypeDepExistsPlan";
+        public const string PlanTypeDepIsActive = "PlanTypeDepIsActive";
+        public const string PlanTypeDepNameAr = "PlanTypeDepNameAr";
+        public const string PlanTypeDepNameEn = "PlanTypeDepNameEn";
+        public const string PlanTypeDepPlanTypeId = "PlanTypeDepPlanTypeId";
+        public const string lblSelectSchools = "lblSelectSchools";
+        public const string lblVisitDate = "lblVisitDate";
+        public const string lblLastEvaluation = "lblLastEvaluation";
+        public const string lblVisitType = "lblVisitType";
+        public const string lblAcademicYear = "lblAcademicYear";
+    }
+    public static class Assignment
+    {
+        public const string lblNoSelectedMembers = "lblNoSelectedMembers";
+        public const string lblAllTeams = "lblAllTeams";
+        public const string msgMembersAddedSuccessfully = "msgMembersAddedSuccessfully";
+        public const string lblTeamLeader = "lblTeamLeader";
+        public const string phSearchHere = "phSearchHere";
+        public const string lblSelectedVisitTeam = "lblSelectedVisitTeam";
+        public const string lblJobTitle = "lblJobTitle";
+        public const string lblMembers = "lblMembers";
+        public const string lblMemberName = "lblMemberName";
+        public const string btnFilter = "btnFilter";
+        public const string lblDomain = "lblDomain";
+        public const string btnSaveTeam = "btnSaveTeam";
+        public const string btnDeleteSelected = "btnDeleteSelected";
+        public const string lblNDA = "lblNDA";
+        public const string lblNoMembers = "lblNoMembers";
+        public const string lblLoading = "lblLoading";
+        public const string lblPartyType = "lblPartyType";
+    }
+
+
 
     public static class EvaluationPlanRequests
     {
@@ -1057,6 +1214,8 @@ public static class ConstantKeys
         public const string dropzone = "dropzone";
         public const string table = "table";
         public const string list = "list";
+        public const string EvaluationPlan = "EvaluationPlan";
+        public const string Evl_Form = "Evl_Form";
     }
 
     public static class Module
@@ -1085,9 +1244,12 @@ public static class ConstantKeys
         public const string SaveAsDraft = "SaveAsDraft";
         public const string Close = "Close";
         public const string INFO_Override_Approve = "INFO_Override_Approve";
-        public const string CreateEvaluationPlan = "CREATE_EVALUATION_PLAN";
+        public const string CreateEvaluationPlan = "CREATE_PLAN";
         public const string UPDATE_ITEGRATION_FIELDS = "UPDATE_ITEGRATION_FIELDS";
         public const string INFO_WITH_DRAFT = "INFO_WITH_DRAFT";
+        public const string CLOSE_AND_DELETE_PLAN = "CLOSE_AND_DELETE_PLAN";
+        public const string CLOSE_AND_UPDATE_PLAN = "CLOSE_AND_UPDATE_PLAN";
+        public const string CLOSE_AND_UPDATE_FORM = "CLOSE_AND_UPDATE_FORM";
     }
 
     public static class ServiceSettings
@@ -1116,10 +1278,17 @@ public static class ConstantKeys
     public static class ModuleType
     {
         public const string EvaluationPlan = "EvaluationPlan";
-        public const string EvaluationPlanRequest = "EvaluationPlanRequest";
+        public const string EvaluationRequest = "EvaluationRequest";
         public const string EvaluationParty = "EvaluationParty";
-        public const string Forms = "Forms";
-        public const string Complain = "Complain";
+
+    }
+    public static class ModuleTypeIds
+    {
+        public static readonly Guid EvaluationPlan = Guid.Parse("FFFBF420-AED3-4A73-B25E-B7B9E67337A7");
+
+        public static readonly Guid EvaluationRequest = Guid.Parse("6677F0C5-2531-4123-98F8-8E0A7C5B0ADA");
+
+        public static readonly Guid EvaluationParty = Guid.Parse("281E98ED-9ED5-4AF3-8C08-4A659BE99DC8");
     }
     public static class NDAStatic
     {

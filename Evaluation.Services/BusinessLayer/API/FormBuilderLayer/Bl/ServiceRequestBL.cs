@@ -12,6 +12,7 @@ using Evaluation.Services.BusinessLayer.API;
 using Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices;
 using Evaluation.Services.Extensions;
 using Evaluation.Services.Special;
+using Evaluation.SharedHelper.Dtos.TeamMemberDto;
 using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Helper;
@@ -19,6 +20,7 @@ using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Api.ActionEntitiesDTOs;
 using Evaluation.SharedHelper.Models.Api.EvaluationRequestEntities;
 using Evaluation.SharedHelper.Models.Api.FormBuilderDTO;
+using Evaluation.SharedHelper.Models.Api.ServiceDTOs;
 using Evaluation.SharedHelper.Models.Api.ServiceRequestEntitiesDTO;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -43,8 +45,8 @@ namespace Evaluation.Services.Models.API
 
 		public async Task<WebAppPlanRequestsDTO> GetPlanRequestsAsync(FilterRequestsDTO filter)
 		{
-			var userId = userInfo.UserId ?? Guid.Parse("C2536611-576B-4EB8-84F4-747F4ECE9A23") ;
-			return await _srvServiceRequest.GetPlanRequestsAsync(userId, filter);
+			
+			return await _srvServiceRequest.GetPlanRequestsAsync(filter);
 		}
 		public async Task<WebAppEvaluationRequestsDTO> GetEvaluationRequestsAsync(FilterRequestsDTO filter)
 		{
@@ -60,8 +62,8 @@ namespace Evaluation.Services.Models.API
 		{
 			return await _evaluationRequestService.GetEvaluationDetailsAsync(requestId);
 		}
-		public async Task<ServiceRequestDTO> HandleServiceRequestAsync(ActionFormDTO? actionFormDTO, Guid? planId,
-			Guid serviceId, string actionName, string fieldValuesJson, List<AssignUserDTO?> assignUsers,
+		public async Task<ServiceRequestDTO> HandleServiceRequestAsync(ActionFormDTO? actionFormDTO, Guid? planId,Guid? EvaluationRequestId,
+			Guid serviceId, string actionName, string fieldValuesJson, List<AssignUserDTO?> assignUsers, List<EvalTeamRequestDto> teamUsers,
 			IFormFileCollection files, string remarks, bool saveAsDraft = false)
 		{
 			string lang = _requestInfo.Lang;
@@ -74,7 +76,7 @@ namespace Evaluation.Services.Models.API
 				throw new BusinessException(ExceptionMessage.IncompleteRequest);
 			}
 			var requestType = systemModuleSrv.GetRequestType(serviceObj);
-			if (requestType == RequestType.Evaluation && (requestId == null || requestId == Guid.Empty))
+			if (requestType == RequestType.Evaluation && (EvaluationRequestId == null || EvaluationRequestId == Guid.Empty))
 			{
 				throw new BusinessException("EvaluationRequest cannot be created from web app.");
 			}
@@ -103,7 +105,7 @@ namespace Evaluation.Services.Models.API
 
 			// Step 3: Create or update the request
 			ServiceRequestDTO resultRequest = new ServiceRequestDTO();
-			if (requestId == null || requestId == Guid.Empty)
+			if ((requestId == null || requestId == Guid.Empty) && requestType != RequestType.Evaluation)
 			{
 				var status = await SrvStatus.GetInitialStatusByServiceId(serviceId);
 				if (status == null)
@@ -123,7 +125,7 @@ namespace Evaluation.Services.Models.API
 					StatusId = status.Id,
 					ServiceId = serviceId,
 					//OrgTreeId = OrgTreeId,
-					//EvaluationRequestId  = EvaluationRequestId ,
+					EvaluationRequestId  = EvaluationRequestId ,
 					//InitialHistoryId = InitialHistoryId,
 					
 
@@ -145,7 +147,7 @@ namespace Evaluation.Services.Models.API
 
 				resultRequest!.Id = request.Id;
 
-				var actionResult = await _performActionBL.PerformAction(request, requestType, serviceObj, actionFormDTO!.FieldValues!, action.BackendName, assignUsers.Where(c => c!.IsSelected).ToList()!, remarks, saveAsDraft);
+				var actionResult = await _performActionBL.PerformAction(request, requestType, serviceObj, actionFormDTO!.FieldValues!, action.BackendName, assignUsers.Where(c => c!.IsSelected).ToList()!,null, remarks, saveAsDraft);
 
 				var otherAttachmentsTask = _srvAttachments.UploadAndInsertOtherAttachments(othersAttachement, actionResult.actionlog,requestType,requestId, request.EvaluationRequestId);
 				var sequence = request.Sequence;
@@ -197,15 +199,17 @@ namespace Evaluation.Services.Models.API
 			}
 			else
 			{
+				if (requestType == RequestType.Evaluation)
+					requestId = EvaluationRequestId;
 				var application = await GetRequestUnifiedAsync(requestId!.Value,requestType, true);
 
 				var allFields = JsonConvert.DeserializeObject<List<FieldValueDTO?>>(fieldValuesJson);
 				var validatedFields = await SrvAction.ValidateActionAndActionFieldAsync(application, allFields!, remarks, othersAttachement, serviceObj, application.StatusId, action, fileFields, saveAsDraft);
 
 
-				actionFormDTO!.FieldValues = (await _srvAttachments.UploadAndInsertAttachments(validatedFields.ToList(),requestType, requestId, application.EvaluationRequestId, fileFields, filesWithFieldId)).Cast<FieldValueDTO?>().ToList();
+				actionFormDTO!.FieldValues = (await _srvAttachments.UploadAndInsertAttachments(validatedFields.ToList(),requestType, requestId, application.EvaluationRequestId??EvaluationRequestId, fileFields, filesWithFieldId)).Cast<FieldValueDTO?>().ToList();
 
-				var actionResult = await _performActionBL.PerformAction(application, requestType,serviceObj, actionFormDTO.FieldValues!, actionName, assignUsers.Where(c => c!.IsSelected).ToList()!, remarks, saveAsDraft);
+				var actionResult = await _performActionBL.PerformAction(application, requestType,serviceObj, actionFormDTO.FieldValues!, actionName, assignUsers.Where(c => c!.IsSelected).ToList()!, teamUsers, remarks, saveAsDraft);
 
 				var otherAttachments = await _srvAttachments.UploadAndInsertOtherAttachments(othersAttachement, actionResult.actionlog,requestType, application.Id, application.EvaluationRequestId);
 
@@ -270,21 +274,21 @@ namespace Evaluation.Services.Models.API
 			int defaultMaxCountOpen = int.Parse(ServiceSettings.MaxCountOpen);
 			int maxCountOpen = defaultMaxCountOpen;
 
-			var serviceSettingsJson = serviceObj.ServiceSettings ?? "{}";
-			var serviceSettings = JsonConvert.DeserializeObject<Dictionary<string, object>>(serviceSettingsJson);
+			//var serviceSettingsJson = serviceObj.ServiceSettings ?? "{}";
+			//var serviceSettings = JsonConvert.DeserializeObject<Dictionary<string, object>>(serviceSettingsJson);
 
-			if (!TryGetSettingValue(serviceSettings!, ServiceSettings.MaxCountOpen, out maxCountOpen))
-			{
-				var systemSettingsJson = await cacheDataProvider.GetSystemSettingValue(SystemSettings.ServiceSettings);
-				if (!string.IsNullOrEmpty(systemSettingsJson))
-				{
-					var systemSettings = JsonConvert.DeserializeObject<Dictionary<string, object>>(systemSettingsJson);
-					if (systemSettings == null || !TryGetSettingValue(systemSettings, ServiceSettings.MaxCountOpen, out maxCountOpen))
-					{
-						SrvService.UpdateServiceSettingsAsync(serviceObj, ServiceSettings.MaxCountOpen, maxCountOpen);
-					}
-				}
-			}
+			//if (!TryGetSettingValue(serviceSettings!, ServiceSettings.MaxCountOpen, out maxCountOpen))
+			//{
+			//	var systemSettingsJson = await cacheDataProvider.GetSystemSettingValue(SystemSettings.ServiceSettings);
+			//	if (!string.IsNullOrEmpty(systemSettingsJson))
+			//	{
+			//		var systemSettings = JsonConvert.DeserializeObject<Dictionary<string, object>>(systemSettingsJson);
+			//		if (systemSettings == null || !TryGetSettingValue(systemSettings, ServiceSettings.MaxCountOpen, out maxCountOpen))
+			//		{
+			//			SrvService.UpdateServiceSettingsAsync(serviceObj, ServiceSettings.MaxCountOpen, maxCountOpen);
+			//		}
+			//	}
+			//}
 
 			await ValidateIfThereIsOpenedRequestForServiceAsync(planId, serviceObj, maxCountOpen);
 
@@ -357,5 +361,10 @@ namespace Evaluation.Services.Models.API
 		{
 			return  await _srvEvaluationRequestAssignment.ApproveNda(dto);
 		}
-	}
+		public async Task<List<GetServiceStatusDR>> GetServiceStatus()
+		{
+			return await _srvEvaluationRequestAssignment.GetServiceStatus();
+		}
+
+    }
 }

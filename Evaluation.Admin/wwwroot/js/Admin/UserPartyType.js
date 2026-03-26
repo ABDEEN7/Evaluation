@@ -342,21 +342,21 @@ const getLookup = () => {
             if (result) {
                 const { data } = result;
                 if (data) {
-                    const { SystemModule } = data;
-                    const ddlData = SystemModule.map(item => (
+                    const { Department } = data;
+                    const ddlData = Department.map(item => (
                         {
                             id: item.id,
-                            text: txtDir === "RTL" ? item.nameAr : item.nameEn
+                            text: item.text
                         }
                     ));
-                    const ddlElm = document.querySelector(`[data-key="systemModuleId"]`);
+                    const ddlElm = document.querySelector(`[data-key="departmentId"]`);
                     if (ddlElm) {
                         const dropdown = '#' + ddlElm.getAttribute('id');
                         $(dropdown).select2({
                             width: 'resolve',
                             allowClear: true,
                             data: ddlData,
-                            placeholder: sharedFn().GetUiControlText('UserPartyTypeSystemModuleId'),
+                            placeholder: sharedFn().GetUiControlText('UserPartyTypeDepartmentId'),
                             dropdownCssClass: "manageselect2zindex"
                         })
                         $(dropdown).val('').trigger('change');
@@ -367,14 +367,14 @@ const getLookup = () => {
             }
         }
     };
-    jqClientAdvanced(options).Get("UserPartyType/GetSystemModule");
+    jqClientAdvanced(options).Get("UserPartyType/GetDepartment");
 
 };
 const searchColsDef = () => {
     return [
         {
-            field: 'systemModuleId',
-            header: sharedFn().GetUiControlText('UserPartyTypeSystemModuleId'),
+            field: 'departmentId',
+            header: sharedFn().GetUiControlText('UserPartyTypeDepartmentId'),
             type: 'DROPDOWN',
             collections: []
         },

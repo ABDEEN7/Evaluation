@@ -18,13 +18,19 @@
     <link href="~/css/admin/serviceselection.css" rel="stylesheet" />
    
 }
-
-
 <section id="divform">
     <div class="card app-card">
         <div class="card-body">
-            <form class="row">
-                <div class="col-auto">
+            <form class="row align-items-end g-2">
+                <div class="col-md-3">
+                    <div class="row">
+                        <label for="DepartmentId" class="col col-form-label"> @controlsList.GetUiControlText(AdminBackendUI.lblDepartment)</label>
+                        <div class="col">
+                            <select asp-for="DepartmentId" class="select2 DepartmentId form-control" required="required" id="DepartmentId"></select>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
                     <div class="row">
                         <label for="SystemModuleId" class="col col-form-label"> @controlsList.GetUiControlText(AdminBackendUI.lblSystemModule)</label>
                         <div class="col">
@@ -32,7 +38,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-auto">
+                <div class="col-md-3">
                     <div class="row">
                         <label for="ServiceId" class="col col-form-label">@controlsList.GetUiControlText(AdminBackendUI.lblService)</label>
                         <div class="col">
@@ -41,7 +47,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-auto">
+                <div class="col-md-3">
                     <button type="button" id="submitBtn" class="btn btn-primary mb-3">@controlsList.GetUiControlText(AdminBackendUI.lblSearch)</button>
                 </div>
             </form>
@@ -53,7 +59,7 @@
 <script src="~/lib/select2/dist/js/select2.js"></script>
 <script type="text/javascript">
     var controlsList = JSON.parse(`@Html.Raw(Json.Serialize(controlsList))`);
-
+     const DepartmentList = JSON.parse(`@Html.Raw(Json.Serialize(Model.Departments))`);
     const SystemModuleList = JSON.parse(`@Html.Raw(Json.Serialize(Model.SystemModules))`);
     const ServiceList = JSON.parse(`@Html.Raw(Json.Serialize(Model.Services))`);
     const lang = '@Html.Raw(Model.CurrentLanguage)';

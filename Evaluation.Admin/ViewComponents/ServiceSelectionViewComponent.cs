@@ -27,7 +27,7 @@ namespace Evaluation.Admin.ViewComponents
             var model = new ServiceSelectionVM(httpContextAccessor);
 
             await model.LoadAllAData();
-            
+            model.Departments = await _masterBL.GetAdminService<SrvBaseBL>().GetAllDepartments();
             model.SystemModules = await _masterBL.GetAdminService<SrvBaseBL>().GetAllSystemModules();
             model.Services = await _masterBL.GetAdminService<SrvBaseBL>().GetAllServices();
             model.ShowServiceDefault = ShowServiceDefault;

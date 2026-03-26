@@ -2,9 +2,9 @@
 
 namespace Evaluation.Admin.Models;
 
-public class DepartmentEvaluationPartyVM : BaseVM
+public class EvaluationPartyVM : BaseVM
 {
-    public DepartmentEvaluationPartyVM(IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor)
+    public EvaluationPartyVM(IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor)
     {
 
     }

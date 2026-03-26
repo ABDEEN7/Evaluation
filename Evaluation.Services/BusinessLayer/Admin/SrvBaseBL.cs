@@ -415,6 +415,24 @@ namespace Evaluation.Services.Models.Admin
                 property.SetValue(model, value);
             }
         }
+
+        public async Task<List<DepartmentDTO>> GetAllDepartments()
+        {
+            var result = await uow.GetRepository<Department>()
+                                  .GetAllNonDeleted()
+                                  .OrderBy(x => x.OrderNo)
+                                  .ThenByDescending(x => x.CreateDate)
+                                  .Select(x => new DepartmentDTO
+                                  {
+                                      Id = x.Id,
+                                      Name = _requestInfo.Lang == "ar" ? x.NameAr : x.NameEn,
+
+                                  }).ToListAsync();
+
+
+            return result;
+
+        }
         public async Task<List<SystemModuleDTO>> GetAllSystemModules()
         {
             var result = await uow.GetRepository<SystemModule>()
@@ -425,6 +443,7 @@ namespace Evaluation.Services.Models.Admin
                                   {
                                       Id = x.Id,
                                       Name = _requestInfo.Lang == "ar" ? x.NameAr : x.NameEn,
+                                      DepartmentId = x.DepartmentId,
 
                                   }).ToListAsync();
 

@@ -10,7 +10,7 @@
             //DepartmentRoutingPath: departmentName
         };
     }
-    let departmentRoutePath = sharedUtility().extractDepartmentName();
+    //let departmentRoutePath = sharedUtility().extractDepartmentName();
 
     const schoolsListing = evaluationListing.createListing({
         tableId: 'schoolTable',

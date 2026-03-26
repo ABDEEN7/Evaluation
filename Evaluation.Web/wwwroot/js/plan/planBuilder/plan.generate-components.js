@@ -36,6 +36,7 @@
     ns.planTypes = [];
     ns.semesters = [];
     ns.holidays = [];
+    ns.parentSchool = [];
     ns.currentPage = 1;
     ns.pageSize = 10;
 
@@ -223,7 +224,7 @@
 
     // ================== SCHOOL TABLE FIELD GENERATORS ==================
 
-    const generateSelectCheckbox = (fieldId, school, readonly) => {
+    const generateSelectCheckbox = (fieldId, school, readonly, isSelected = false) => {
         const label = $('<label>').addClass('custom-checkbox');
 
         const checkbox = $('<input>')
@@ -232,6 +233,11 @@
             .attr('data-id', `${fieldId}_${school.id}_chk`)
             .attr('data-school-id', school.id)
             .attr('data-name', school.name);
+
+        // Check the checkbox if the school is selected
+        if (isSelected) {
+            checkbox.prop('checked', true);
+        }
 
         if (readonly) {
             checkbox.prop('disabled', true);
@@ -249,16 +255,30 @@
         const infoDiv = $('<div>');
         const nameId = `${fieldId}_${school.id}_name`;
 
-        infoDiv.append($('<h6>').text(school.name || '-'))
+        // School name
+        infoDiv
+            .append($('<h6>').addClass('mb-1').text(school.name || '-'))
             .attr('data-name', nameId);
 
-        const levelBadge = $('<div>').addClass('square-bullet');
+        // Org parent (small label)
+        if (school.orgParent?.nameEn) {
+            infoDiv.append(
+                $('<small>')
+                    .addClass('text-muted d-block')
+                    .text(school.orgParent.nameEn)
+            );
+        }
+
+        // School levels
+        const levelBadge = $('<div>').addClass('square-bullet mt-1');
         const levelText = (school.schoolLevel && school.schoolLevel.length > 0)
             ? school.schoolLevel.map(l => l.name).join(', ')
             : '-';
+
         levelBadge.append($('<div>').text(levelText));
         infoDiv.append(levelBadge);
 
+        // Rating badge
         const ratingBadge = $('<span>')
             .addClass(`badge ${ratingClass}`)
             .text(school.rating || '');
@@ -266,6 +286,7 @@
         container.append(infoDiv, ratingBadge);
         return container;
     };
+
 
     const generateVisitDateField = (fieldId, school, readonly) => {
         let visitDateValue = '';
@@ -342,13 +363,13 @@
 
     // ================== TABLE ROW GENERATOR ==================
 
-    const generateSchoolRow = (fieldId, school, isReadOnly) => {
+    const generateSchoolRow = (fieldId, school, isReadOnly, isSelected = false) => {
         const readonly = isReadOnly;
         const row = $('<tr>');
 
         // Checkbox cell
         const checkboxCell = $('<td>');
-        checkboxCell.append(generateSelectCheckbox(fieldId, school, readonly));
+        checkboxCell.append(generateSelectCheckbox(fieldId, school, readonly, isSelected));
         row.append(checkboxCell);
 
         // School name cell
@@ -455,7 +476,7 @@
         return form;
     };
 
-    const renderSchoolTable = (fieldId, schools, isReadOnly) => {
+    const renderSchoolTable = (fieldId, schools, isReadOnly, selectedSchoolsMap = null) => {
         const tbody = $('<tbody>');
 
         if (!schools || schools.length === 0) {
@@ -469,7 +490,16 @@
             tbody.append(emptyRow);
         } else {
             schools.forEach(school => {
-                const row = generateSchoolRow(fieldId, school, isReadOnly);
+                // Check if this school is in the selected schools map
+                const isSelected = selectedSchoolsMap && selectedSchoolsMap.has(school.id);
+
+                // If selected, merge the selection data into the school object
+                if (isSelected) {
+                    const selectedData = selectedSchoolsMap.get(school.id);
+                    school = { ...school, ...selectedData };
+                }
+
+                const row = generateSchoolRow(fieldId, school, isReadOnly, isSelected);
                 tbody.append(row);
             });
         }
@@ -537,7 +567,7 @@
 
         // Destroy previous instance for this specific fieldId
         if ($input.data('flatpickr')) {
-            $input.data('flatpickr').destroy();
+                $input.data('flatpickr').destroy();
         }
 
         const config = {
@@ -691,7 +721,7 @@
                     const apply = document.createElement('button');
                     apply.type = 'button';
                     apply.className = 'fp-apply';
-                    apply.textContent = `${t('lblConfirm')}`; 
+                    apply.textContent = `${t('lblConfirm')}`;
                     apply.onclick = (e) => {
                         e.preventDefault();
                         instance.close();

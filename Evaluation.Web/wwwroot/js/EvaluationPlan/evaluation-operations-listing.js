@@ -1,5 +1,10 @@
 ﻿$(document).ready(function () {
     var DepartmentRouting = sharedUtility().extractDepartmentName();
+    const API_ENDPOINTS = {
+        GET_Service_Status: `/ServiceRequest/${DepartmentRouting}/GetServiceStatus`,
+        GET_Plans: `/Plan/${DepartmentRouting}/GetPlansDDL`,
+        GET_Schools: `Schools/${DepartmentRouting}/GetSchoolsDDL`
+    };
 
     function getUiText(key, fallback = '') {
         try {
@@ -19,15 +24,39 @@
             return fallback;
         }
     }
+    function loadSchools() {
+        const $scl = $('#evaluationOrgTreeFilter');
+        $scl
+            .empty()
+            .append('<option value="">الكل</option>')
+            .prop('disabled', true);
+
+        jqClient()
+            .Get(API_ENDPOINTS.GET_Schools)
+            .done(function (response) {
+                $scl.prop('disabled', false);
+                if (response) {
+                    response.forEach(function (school) {
+                        $scl.append(`
+                        <option value="${school.id}">${school.name}</option>`
+                        );
+                    });
+                }
+            }).fail(function (jqXHR, textStatus) {
+                console.error('Failed to load academic years:', textStatus);
+                $scl.prop('disabled', false);
+            });
+    }
+   
 
     function getEvaluationRequestFilter() {
         return {
             RequestNo: $('#evaluationRequestNoFilter').val(),
-            PlanId: $('#evaluationPlanIdFilter').val(),
-            OrgTreeId: $('#evaluationOrgTreeFilter').val(),
-            StatusesList: $('#evaluationRequestStatusFilter').val(),
-            RequestDateFrom: $('#evaluationRequestDateFrom').val(),
-            RequestDateTo: $('#evaluationRequestDateTo').val()
+            PlanId: $('#evaluationPlanIdFilter').val() || null,
+            OrgTree: $('#evaluationOrgTreeFilter').val(),
+            StatusesList: $('#evaluationRequestStatusFilter').val() || null,
+            RequestDateFrom: $('#evaluationRequestDateFrom').val() || null,
+            RequestDateTo: $('#evaluationRequestDateTo').val() || null
         };
     }
 
@@ -46,7 +75,7 @@
         rowClass: 'plan-request-card',
 
         columns: [
-           
+
             {
                 data: "Status",
                 title: uiControlsSetup().GetUiControlText("lblRequestStatus"),
@@ -123,7 +152,7 @@
         ],
 
         onRowClick: function (rowData) {
-            openEvaluationRequestDetails(rowData.id); 
+            openEvaluationRequestDetails(rowData.id);
         }
     });
 
@@ -143,17 +172,17 @@
                     response.actionTransactions,
                     response.attachments,
                     {
-                        requestId: requestId,                
-                        serviceId: response.serviceId, 
+                        requestId: requestId,
+                        serviceId: response.serviceId,
                         actionsContainerId: 'actions-container',
                         templateContainerId: 'divTemplates',
                         modalContainerId: 'Action-container-fields',
-                        root: '#evaluationRequestDetailsModal' 
+                        root: '#evaluationRequestDetailsModal'
                     }
                 );
-
-                if(response.isNdaApprovalPending)
-                {
+                formUtility.addQueryParameter('Evlid', requestId)
+                //formUtility.addQueryParameter('serviceId', response.serviceId)
+                if (response.isNdaApprovalPending) {
                     const container =
                         document.getElementById('evaluationMainContainer') ||
                         document.querySelector('#content-container');
@@ -161,8 +190,7 @@
                     container.insertAdjacentHTML('afterbegin', generateNdaApprovalDiv());
                     NdaSubmit(response);
                 }
-                else
-                {
+                else {
                     renderEvaluationPartiesSection(response);
                 }
 
@@ -235,132 +263,145 @@
         });
     }
 
-//    function generateNdaApprovalDiv() {
+    //    function generateNdaApprovalDiv() {
 
-//        const title = getUiText(
-//            'lblNdaConflictTitle',
-//            'هل لديك تضارب مصالح مع هذه المدرسة؟'
-//        );
+    //        const title = getUiText(
+    //            'lblNdaConflictTitle',
+    //            'هل لديك تضارب مصالح مع هذه المدرسة؟'
+    //        );
 
-//        const yesText = getUiText('lblYes', 'نعم');
-//        const noText = getUiText('lblNo', 'لا');
+    //        const yesText = getUiText('lblYes', 'نعم');
+    //        const noText = getUiText('lblNo', 'لا');
 
-//        const reasonLabel = getUiText(
-//            'lblNdaConflictReason',
-//            'أوضح سبب التضارب'
-//        );
+    //        const reasonLabel = getUiText(
+    //            'lblNdaConflictReason',
+    //            'أوضح سبب التضارب'
+    //        );
 
-//        const reasonPlaceholder = getUiText(
-//            'lblNdaConflictReasonPlaceholder',
-//            'اكتب سبب تضارب المصالح هنا...'
-//        );
+    //        const reasonPlaceholder = getUiText(
+    //            'lblNdaConflictReasonPlaceholder',
+    //            'اكتب سبب تضارب المصالح هنا...'
+    //        );
 
-//        const submitText = getUiText(
-//            'lblSubmit',
-//            'إرسال'
-//        );
+    //        const submitText = getUiText(
+    //            'lblSubmit',
+    //            'إرسال'
+    //        );
 
-//        return `
-//<div id="ndaApprovalWrapper" class="card mt-3">
-//  <div class="card-body">
+    //        return `
+    //<div id="ndaApprovalWrapper" class="card mt-3">
+    //  <div class="card-body">
 
-//    <h5 class="text-center mb-4 fw-bold">
-//        ${title}
-//    </h5>
+    //    <h5 class="text-center mb-4 fw-bold">
+    //        ${title}
+    //    </h5>
 
-//    <div class="d-flex justify-content-center gap-4 mb-3">
-//      <label class="d-flex align-items-center gap-2">
-//        <input type="radio" name="nda_conflict_choice" value="true">
-//        <span>${yesText}</span>
-//      </label>
+    //    <div class="d-flex justify-content-center gap-4 mb-3">
+    //      <label class="d-flex align-items-center gap-2">
+    //        <input type="radio" name="nda_conflict_choice" value="true">
+    //        <span>${yesText}</span>
+    //      </label>
 
-//      <label class="d-flex align-items-center gap-2">
-//        <input type="radio" name="nda_conflict_choice" value="false" checked>
-//        <span>${noText}</span>
-//      </label>
-//    </div>
+    //      <label class="d-flex align-items-center gap-2">
+    //        <input type="radio" name="nda_conflict_choice" value="false" checked>
+    //        <span>${noText}</span>
+    //      </label>
+    //    </div>
 
-//    <div class="mb-2">
-//      <label class="form-label fw-bold">
-//        ${reasonLabel} <span class="text-danger">*</span>
-//      </label>
+    //    <div class="mb-2">
+    //      <label class="form-label fw-bold">
+    //        ${reasonLabel} <span class="text-danger">*</span>
+    //      </label>
 
-//      <textarea id="ndaConflictReason"
-//                class="form-control"
-//                rows="4"
-//                placeholder="${reasonPlaceholder}"></textarea>
+    //      <textarea id="ndaConflictReason"
+    //                class="form-control"
+    //                rows="4"
+    //                placeholder="${reasonPlaceholder}"></textarea>
 
-//      <div id="ndaConflictError"
-//           class="text-danger small mt-1 d-none"></div>
-//    </div>
+    //      <div id="ndaConflictError"
+    //           class="text-danger small mt-1 d-none"></div>
+    //    </div>
 
-//    <div class="d-flex justify-content-end mt-4">
-//      <button id="ndaSubmitBtn" class="btn btn-primary px-4">
-//        ${submitText}
-//        <i class="la la-send ms-2"></i>
-//      </button>
-//    </div>
+    //    <div class="d-flex justify-content-end mt-4">
+    //      <button id="ndaSubmitBtn" class="btn btn-primary px-4">
+    //        ${submitText}
+    //        <i class="la la-send ms-2"></i>
+    //      </button>
+    //    </div>
 
-//  </div>
-//</div>`;
-//    }
-//    function NdaSubmit(response) {
+    //  </div>
+    //</div>`;
+    //    }
+    //    function NdaSubmit(response) {
 
-//        const btn = document.getElementById('ndaSubmitBtn');
-//        const reasonEl = document.getElementById('ndaConflictReason');
-//        const errEl = document.getElementById('ndaConflictError');
+    //        const btn = document.getElementById('ndaSubmitBtn');
+    //        const reasonEl = document.getElementById('ndaConflictReason');
+    //        const errEl = document.getElementById('ndaConflictError');
 
-//        const reasonRequiredText = getUiText('lblRequired','هذا الحقل مطلوب');
+    //        const reasonRequiredText = getUiText('lblRequired','هذا الحقل مطلوب');
 
-//        btn.addEventListener('click', async function (e) {
-//            e.preventDefault();
+    //        btn.addEventListener('click', async function (e) {
+    //            e.preventDefault();
 
-//            const reason = (reasonEl.value || '').trim();
+    //            const reason = (reasonEl.value || '').trim();
 
-//            if (!reason) {
-//                errEl.textContent = reasonRequiredText;
-//                errEl.classList.remove('d-none');
-//                reasonEl.focus();
-//                return;
-//            }
+    //            if (!reason) {
+    //                errEl.textContent = reasonRequiredText;
+    //                errEl.classList.remove('d-none');
+    //                reasonEl.focus();
+    //                return;
+    //            }
 
-//            errEl.classList.add('d-none');
+    //            errEl.classList.add('d-none');
 
-//            const hasConflict =
-//                document.querySelector('input[name="nda_conflict_choice"]:checked')
-//                    ?.value === 'true';
+    //            const hasConflict =
+    //                document.querySelector('input[name="nda_conflict_choice"]:checked')
+    //                    ?.value === 'true';
 
-//            const payload = {
-//                evaluationRequestId: response.requestId,
-//                planId: response.planId,
-//                hasConflict: hasConflict,
-//                conflictReason: reason
-//            };
+    //            const payload = {
+    //                evaluationRequestId: response.requestId,
+    //                planId: response.planId,
+    //                hasConflict: hasConflict,
+    //                conflictReason: reason
+    //            };
 
-//                const res = await $.ajax({
-//                    url: '/Evaluation/Nda/Approve',
-//                    method: 'POST',
-//                    contentType: 'application/json; charset=utf-8',
-//                    data: JSON.stringify(payload)
-//                });
+    //                const res = await $.ajax({
+    //                    url: '/Evaluation/Nda/Approve',
+    //                    method: 'POST',
+    //                    contentType: 'application/json; charset=utf-8',
+    //                    data: JSON.stringify(payload)
+    //                });
 
-//                document.getElementById('ndaApprovalWrapper')?.remove();
+    //                document.getElementById('ndaApprovalWrapper')?.remove();
 
-//                if (res?.isNdaApprovalPending === false) {
-//                    renderEvaluationPartiesSection(res);
-//                }
+    //                if (res?.isNdaApprovalPending === false) {
+    //                    renderEvaluationPartiesSection(res);
+    //                }
 
-//            } catch (err) {
-//                console.error(err);
-//                alert(getUiText('lblSaveFailed', 'حدث خطأ أثناء الحفظ'));
-//            } finally {
-//                if (window.formUtility?.coverSpin)
-//                    window.formUtility.coverSpin(false);
-//            }
-//        });
-    
-
-
+    //            } catch (err) {
+    //                console.error(err);
+    //                alert(getUiText('lblSaveFailed', 'حدث خطأ أثناء الحفظ'));
+    //            } finally {
+    //                if (window.formUtility?.coverSpin)
+    //                    window.formUtility.coverSpin(false);
+    //            }
+    //        });
+    $('#evaluationRequestStatusFilter').select2({
+        placeholder: "اختر الحالة",
+        allowClear: true,
+        width: '100%',
+        multiple: true
+    });
+    flatpickr('#evaluationRequestDateFrom', {
+        dateFormat: "Y-m-d",
+        allowInput: true
+    });
+    flatpickr("#evaluationRequestDateTo", {
+        dateFormat: "Y-m-d",
+        allowInput: true
+    });
+    Evaluation.Loaders.loadPlans('evaluationPlanIdFilter');
+    Evaluation.Loaders.loadServiceStatus('evaluationRequestStatusFilter');
     evaluationRequestsListing.reload();
 });
 

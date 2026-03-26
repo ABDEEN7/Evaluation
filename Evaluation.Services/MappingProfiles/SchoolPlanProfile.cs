@@ -14,12 +14,12 @@ public class SchoolPlanProfile : Profile
                 .ForMember(d => d.SchoolId, opt => opt.MapFrom(src => src.SchoolId));
 
         // Map School → ResponseSchools
-        CreateMap<School, ResponseSchoolsPlans>()
+        CreateMap<School, ResponseOrgsPlans>()
             .ForMember(d => d.Name, opt => opt.MapFrom(src => src.NameEn))
             .ForMember(d => d.SchoolLevel, opt => opt.MapFrom(src => src.SchoolLevel))
             .ReverseMap();
 
-        CreateMap<Employee, ResponseSchoolsPlans>()
+        CreateMap<Employee, ResponseOrgsPlans>()
             .ForMember(d => d.Name, opt => opt.MapFrom(src => src.NameEn))
             .ReverseMap();
     }

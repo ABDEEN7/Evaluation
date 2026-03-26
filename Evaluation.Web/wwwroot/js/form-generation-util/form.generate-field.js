@@ -140,7 +140,11 @@ var formGenerateFieldUtility = window.formUtility;
         return inputElement;
     };
 
-    const generateEvlFormField = (field, readonly) => {
+    const generateEvlFormField = (field, readonly, renderType) => {
+
+        let prefield = renderType === RENDER_TYPE.PREVIEW ? "field_view_" : "field_";
+        const fieldId = `${prefield}${field.fieldId}`;
+
         const container = $('<div>')
             .addClass('evl-form-wrapper')
             .attr('data-field-id', field.fieldId);
@@ -149,11 +153,7 @@ var formGenerateFieldUtility = window.formUtility;
 
         (async () => {
             try {
-                const formId =
-                    field.formId ||
-                    field.attributes?.find(a => (a.name || '').toLowerCase() === 'formid')?.value ||
-                    field.value?.formId ||
-                    field.value || null;
+                const formId =field.formId ;
 
                 //if (!formId) {
                 //    container.html(`<div class="text-danger">Missing formId for evl_Form.</div>`);
@@ -162,15 +162,15 @@ var formGenerateFieldUtility = window.formUtility;
 
                 const html = await generateFullFormPageHtml({
                     formId,
-                    fieldId: field.fieldId,
+                    fieldId: fieldId,
                     readOnly: readonly
                 });
 
                 container.html(html);
 
-                const controlValues = (typeof field.value === 'object' && field.value?.items) ? field.value : null;
+                const controlValues = JSON.parse(field.value);
 
-                await initializeControls(formId, field.fieldId, controlValues);
+                await initializeControls(formId, fieldId, controlValues);
 
             } catch (err) {
                 console.error('evl_Form render failed:', err);
@@ -832,7 +832,7 @@ var formGenerateFieldUtility = window.formUtility;
             lockThisFieldBecauseOld;
 
         const generator = fieldElementGenerators[field.type] || generateDefaultField;
-        return field.type === 'list'
+        return field.type === 'list' || field.type === 'evaluationPlan' || field.type === 'evl_Form'
             ? generator(field, isReadonly, renderType)
             : generator(field, isReadonly);
     };
@@ -1418,8 +1418,9 @@ var formGenerateFieldUtility = window.formUtility;
     };
 
 
-    function generateEvaluationPlanField  (field, readonly) {
-        const fieldId = field.fieldId;
+    function generateEvaluationPlanField(field, readonly, renderType) {
+        let prefield = renderType === RENDER_TYPE.PREVIEW ? "field_view_" : "field_";
+        const fieldId = `${prefield}${field.fieldId}`;
 
         const container = $('<div>')
             .addClass('evaluation-plan-wrapper')
@@ -1434,7 +1435,7 @@ var formGenerateFieldUtility = window.formUtility;
                     container.html(`<div class="text-danger">planUtility not found on window.</div>`);
                     return;
                 }
-                    pu.generatePlanFields(fieldId);
+                pu.generatePlanFields(fieldId);
 
                     const wrapperId = `${fieldId}_wrapper`;
                     const moved = document.getElementById(wrapperId);
@@ -1445,12 +1446,12 @@ var formGenerateFieldUtility = window.formUtility;
                         container.html(`<div class="text-danger">Failed to render plan wrapper (${wrapperId}).</div>`);
                         return;
                     }
-                PH.init(
+                //PH.init(
                     
-                    readonly,
-                    fieldId,
-                    field.value
-                );
+                //    readonly,
+                //    fieldId,
+                //    JSON.parse(field.value)
+                //);
                 if (readonly) {
                     container
                         .find('input, select, textarea, button')
