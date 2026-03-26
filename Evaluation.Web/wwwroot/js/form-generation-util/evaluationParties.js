@@ -273,7 +273,7 @@
                         modalContainerId: 'Request-Action-container-fields',
                         requestId: requestId,
                         serviceId: response.serviceId,
-                        ctx: { root: '#RequestModal' }
+                        root: '#RequestModal' 
                     }
                 );
 

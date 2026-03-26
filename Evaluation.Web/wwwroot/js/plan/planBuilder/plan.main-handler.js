@@ -85,11 +85,11 @@
             }
 
             if (planObject) {
-                renderPlanWithData(fieldId, planObject);
+                renderPlanWithData(fieldId, planObject, element);
             } else {
                 renderNewPlan(fieldId);
                 populatePlanTypes(fieldId, element);
-                populateSemesters(fieldId);
+                populateSemesters(fieldId, element);
             }
             bindEvents(fieldId);
             initializeFilterDatePickers(fieldId);
@@ -183,7 +183,9 @@
     };
 
 
-    const populateSemesters = (fieldId) => {
+    const populateSemesters = (fieldId, elementId = null) => {
+        const parentElement = elementId ? $(`#${elementId}`) : null;
+
         const $s = $p(fieldId, 'ddlSemester');
 
         if ($s.hasClass("select2-hidden-accessible")) {
@@ -201,8 +203,10 @@
                  </option>`
             )
         );
-
-        $s.select2({ width: '100%', allowClear: true });
+        const dropdownParent =
+            (parentElement && parentElement.length) ? parentElement :
+                ($modal.length ? $modal : $(document.body));
+        $s.select2({ width: '100%', allowClear: true, dropdownParent: dropdownParent });
     };
 
     const populateFilterVisitTypes = (fieldId) => {
@@ -249,7 +253,7 @@
     };
 
 
-    const renderPlanWithData = (fieldId, plan) => {
+    const renderPlanWithData = (fieldId, plan, element) => {
         const state = instances.get(fieldId);
 
         if (plan && plan.id) {
@@ -268,8 +272,8 @@
         const form = ns.renderPlanForm(fieldId, vm, state.isReadOnly);
         $p(fieldId, 'planFormContainer').find('.form-container').html(form);
 
-        populatePlanTypes(fieldId);
-        populateSemesters(fieldId);
+        populatePlanTypes(fieldId, element);
+        populateSemesters(fieldId, element);
         $p(fieldId, 'semesterContainer').hide();
 
         $p(fieldId, 'planTitle').val(vm.title);

@@ -45,8 +45,7 @@ namespace Evaluation.Services.BusinessLayer.API
 				SrvField _srvField, IServiceProvider serviceProvider , ServiceRequestBL serviceRequestBL, PlanServiceRequestServices planServiceRequestServices)
             : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, _requestInfo)
         {
-
-		public async Task<ActionCustomDTO> GetActionField(ServiceAction action, Guid serviceId, RequestType requestType, Guid? requestId = null , Guid? PlanId = null)
+		public async Task<ActionCustomDTO> GetActionField(ServiceAction action,Guid serviceId,RequestType requestType,Guid? requestId = null,Guid? PlanId = null)
 		{
 			string lang = _requestInfo.Lang;
 			var result = mapper.Map<ActionCustomDTO>(action);
@@ -55,22 +54,19 @@ namespace Evaluation.Services.BusinessLayer.API
 			var schAttachmentIds = new ConcurrentBag<string>();
 
 			var hiddenFieldsTask = _srvField.GetHiddenFields(action.ServiceId);
-			var ActionFieldsTask = _srvField.GetFieldsByActionId(action.Id, action.ServiceId);
-			var ActionFieldListsTask = _srvField.GetFieldsListByActionIdAsync(action.ServiceId);
+			var actionFieldsTask = _srvField.GetFieldsByActionId(action.Id, action.ServiceId);
+			var actionFieldListsTask = _srvField.GetFieldsListByActionIdAsync(action.ServiceId);
 			var requestFieldValuesTask = _srvServiceRequest.GetRequestFieldsValueAsync(requestId);
 
-			await Task.WhenAll(hiddenFieldsTask, ActionFieldsTask, ActionFieldListsTask, requestFieldValuesTask);
+			await Task.WhenAll(hiddenFieldsTask, actionFieldsTask, actionFieldListsTask, requestFieldValuesTask);
 
 			var hiddenFieldIds = await hiddenFieldsTask;
-			var ActionFields = await ActionFieldsTask;
-			var ActionFieldsList = await ActionFieldListsTask;
+			var actionFields = await actionFieldsTask;
+			var actionFieldsList = await actionFieldListsTask;
 			var requestFieldValues = await requestFieldValuesTask ?? new List<ServiceRequestFieldsValue>();
 
-			var visibleFieldsForAction = ActionFields;
-				//.Where(f => action.ActionFields!.Any(x => x.FieldId == f.Id) && !hiddenFieldIds.Contains(f.Id))
-				//.ToList();
+			var visibleFieldsForAction = actionFields;
 
-			// Group by form group
 			var grouped = visibleFieldsForAction
 				.GroupBy(f => new
 				{
@@ -93,7 +89,9 @@ namespace Evaluation.Services.BusinessLayer.API
 
 					if (field.FormGroupListId.HasValue)
 					{
-						jsonSchemaTask = _srvField.GenerateJsonSchemaForFormGroupList(field.FormGroupListId.Value, ActionFieldsList);
+						jsonSchemaTask = _srvField.GenerateJsonSchemaForFormGroupList(
+							field.FormGroupListId.Value,
+							actionFieldsList);
 					}
 
 					var isEditable = action.ActionFields!
@@ -103,6 +101,7 @@ namespace Evaluation.Services.BusinessLayer.API
 					var value = fieldValue?.Value;
 
 					string fieldType = field.FieldType!.NameEn;
+					var attributes = (await fieldAttributesTask ?? [])!;
 
 					var fieldDto = new FieldValueDTO
 					{
@@ -123,7 +122,7 @@ namespace Evaluation.Services.BusinessLayer.API
 						DropDownParentFieldId = field.DropDownParentFieldId,
 						ClassName = field.ClassName,
 						IsEditable = isEditable,
-						Attributes = (await fieldAttributesTask ?? [])!,
+						Attributes = attributes,
 						Conditions = (field.FieldViewConditions?.Select(c => new FieldViewConditionDTO
 						{
 							operators = c.operators,
@@ -134,9 +133,8 @@ namespace Evaluation.Services.BusinessLayer.API
 						JsonSchema = jsonSchemaTask != null ? await jsonSchemaTask : null
 					};
 
-					// Queue integration fields with empty value
 					if (string.IsNullOrWhiteSpace(value) &&
-						field.FieldAttributeValues?.Any(attr => attr.AttributeKey.StartsWith("Integration_")) == true)
+						fieldDto.Attributes?.Any(attr => attr!.Name != null && attr.Name.StartsWith("Integration_")) == true)
 					{
 						integrationFieldsToProcess.Add(fieldDto);
 					}
@@ -144,14 +142,12 @@ namespace Evaluation.Services.BusinessLayer.API
 					fieldDtos.Add(fieldDto);
 				}
 
-				// Handle read-from fields (collect attachments)
 				if (fieldDtos.Any(x => x.ReadFromFieldId != null))
 				{
-					var attachmentsFromReadFields =
-						await HandleFieldsWithReadFromFieldIdAsync(
-							fieldDtos.Where(x => x.ReadFromFieldId != null).ToList(),
-							requestId,
-							PlanId);
+					var attachmentsFromReadFields = await HandleFieldsWithReadFromFieldIdAsync(
+						fieldDtos.Where(x => x.ReadFromFieldId != null).ToList(),
+						requestId,
+						PlanId);
 
 					foreach (var att in attachmentsFromReadFields)
 						schAttachmentIds.Add(att);
@@ -165,38 +161,36 @@ namespace Evaluation.Services.BusinessLayer.API
 				});
 			}
 
-
-			if (requestId != null && requestId != Guid.Empty)
+			if (integrationFieldsToProcess.Any() && requestId.HasValue && requestId.Value != Guid.Empty)
 			{
-				// If you need: await ApplyContractSignatureIfNeededAsync(action, allStepDtos, requestFieldValues, requestId.Value);
+				var SchoolID = "";
+
+				if (!string.IsNullOrWhiteSpace(SchoolID))
+				{
+					var updatedFields = await _srvField.ProcessIntegrationFieldsAsync(
+						integrationFieldsToProcess.ToList(),
+						SchoolID,
+						requestId);
+
+					var allFields = formGroups.SelectMany(g => g.Fields).ToList();
+
+					foreach (var updated in updatedFields)
+					{
+						var target = allFields.FirstOrDefault(f => f.FieldId == updated.FieldId);
+						if (target != null)
+						{
+							target.Value = updated.Value;
+							target.IsApproved = updated.IsApproved;
+						}
+					}
+				}
 			}
 
-			// Optional integration post-processing (left as in your code)
-			// if (integrationFieldsToProcess.Any() && !string.IsNullOrEmpty(studentQID))
-			// {
-			//     var updatedFields = await srvField.ProcessIntegrationFieldsAsync(integrationFieldsToProcess.ToList(), studentQID, requestId);
-			//     foreach (var updated in updatedFields)
-			//     {
-			//         var target = allStepDtos
-			//             .SelectMany(s => s.FormGroups)
-			//             .SelectMany(g => g.Fields)
-			//             .FirstOrDefault(f => f.FieldId == updated.FieldId);
-			//         if (target != null)
-			//         {
-			//             target.Value = updated.Value;
-			//             target.IsApproved = updated.IsApproved;
-			//             if (target.Type == "file")
-			//                 target.Visible = false;
-			//         }
-			//     }
-			// }
-
-			result.FormGroups = formGroups.OrderBy(fg => fg.Order).ToList(); 
+			result.FormGroups = formGroups.OrderBy(fg => fg.Order).ToList();
 			result.SchAttachmentIds = schAttachmentIds.ToList();
 
 			return result;
 		}
-
 		private async Task<List<string>> HandleFieldsWithReadFromFieldIdAsync(List<FieldValueDTO> fields, Guid? requestId, Guid? PlanId)
 		{
 			var attachmentList = new List<string>();
@@ -308,18 +302,18 @@ namespace Evaluation.Services.BusinessLayer.API
 
 			return (JsonConvert.SerializeObject(mergedList), attachmentList);
 		}
-		//private async Task<string> GetStudentProfileFieldValue(StudentUser student, string backendName)
+		//private async Task<string> GetSchoolProfileFieldValue(SchoolUser School, string backendName)
 		//{
 		//	return backendName switch
 		//	{
-		//		"QID" => student.QID!,
-		//		"FullName" => student.FullNameAr!,
-		//		"GenderId" => student.UserGenderId.ToString()!,
-		//		"AccountMobile" => student.Mobile!,
-		//		"NationalityId" => (await SrvAccreditedUniversity.GetCountryBycode(student!.NationalityCode!))?.Id.ToString()!,
-		//		"AccountEmail" => student.Email!,
-		//		"DOB" => student.DOB?.ToString("dd-MM-yyyy")!,
-		//		"Age" => student.DOB.HasValue ? CalculateAge(student.DOB.Value).ToString()! : null!,
+		//		"QID" => School.QID!,
+		//		"FullName" => School.FullNameAr!,
+		//		"GenderId" => School.UserGenderId.ToString()!,
+		//		"AccountMobile" => School.Mobile!,
+		//		"NationalityId" => (await SrvAccreditedUniversity.GetCountryBycode(School!.NationalityCode!))?.Id.ToString()!,
+		//		"AccountEmail" => School.Email!,
+		//		"DOB" => School.DOB?.ToString("dd-MM-yyyy")!,
+		//		"Age" => School.DOB.HasValue ? CalculateAge(School.DOB.Value).ToString()! : null!,
 		//		_ => null!,
 		//	};
 		//}
