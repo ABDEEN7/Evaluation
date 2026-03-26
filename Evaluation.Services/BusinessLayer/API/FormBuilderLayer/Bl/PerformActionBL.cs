@@ -175,7 +175,7 @@ namespace Evaluation.Services.Models.API
 							break;
 
 							var dto = JsonConvert.DeserializeObject<CreateEvaluationPlanDto>(planField.Value!);
-							if (dto == null) throw new BusinessException("Invalid Evaluation Plan data");
+							if (dto == null) throw new BusinessException(ExceptionMessage.msgInvalidEvaluationPlan);
 
 							await planServiceRequestServices.InsertOrUpdatePlan(dto);
 
@@ -201,7 +201,7 @@ namespace Evaluation.Services.Models.API
 							break;
 
 							var dto = JsonConvert.DeserializeObject<CreateEvaluationPlanDto>(planField.Value!);
-							if (dto == null) throw new BusinessException("Invalid Evaluation Plan data");
+							if (dto == null) throw new BusinessException(ExceptionMessage.msgInvalidEvaluationPlan);
 
 							await planServiceRequestServices.InsertOrUpdatePlan(dto);
 
@@ -229,7 +229,7 @@ namespace Evaluation.Services.Models.API
 
 						var dto = JsonConvert.DeserializeObject<FormEvaluationDto>(FormField.Value!);
 
-						if (dto == null) throw new BusinessException("Invalid Evaluation Plan data");
+						if (dto == null) throw new BusinessException(ExceptionMessage.msgInvalidEvaluationForm);
 
 						await _FormBL.SaveEvaluationForm(dto);
 
@@ -256,7 +256,7 @@ namespace Evaluation.Services.Models.API
 
 						var dto = JsonConvert.DeserializeObject<CreateEvaluationPlanDto>(planField.Value);
 
-						if (dto == null) throw new BusinessException("Invalid Evaluation Plan data");
+						if (dto == null) throw new BusinessException(ExceptionMessage.msgInvalidEvaluationForm);
 
 						await planServiceRequestServices.DeletePlanDraft(dto.Id);
 

@@ -20,6 +20,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 using System.Text.RegularExpressions;
+using static Evaluation.SharedHelper.Enums.ConstantKeys;
 
 namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 {
@@ -316,7 +317,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 			using var _uow = serviceScopeFactory.CreateScopedUow();
 
 			if (!Guid.TryParse(attachmentId, out var id))
-                throw new BusinessException("Invalid attachment id.");
+                throw new BusinessException(ExceptionMessage.msgInvalidEvaluationPlan);
 
             var repo = _uow.GetRepository<EvalAttachment>();
             var attachment = await repo.GetAllQueryFiltered(x => x.Id == id).FirstOrDefaultAsync();

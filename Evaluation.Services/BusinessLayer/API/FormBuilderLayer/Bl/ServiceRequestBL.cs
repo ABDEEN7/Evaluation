@@ -77,7 +77,7 @@ namespace Evaluation.Services.Models.API
 			var requestType = systemModuleSrv.GetRequestType(serviceObj);
 			if (requestType == RequestType.Evaluation && (EvaluationRequestId == null || EvaluationRequestId == Guid.Empty))
 			{
-				throw new BusinessException("EvaluationRequest cannot be created from web app.");
+				throw new BusinessException(ExceptionMessage.IncompleteRequest);
 			}
 			var action = await SrvAction.GetActionByBackendNameAsync(serviceObj.Id, actionName) ??
 						 await SrvAction.GetInitialActionAsync(serviceId, actionName);
