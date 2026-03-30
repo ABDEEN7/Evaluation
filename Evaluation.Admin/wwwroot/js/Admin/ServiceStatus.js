@@ -328,7 +328,18 @@ $(document).ready(function () {
                         $('#CancelOrSave').hide();
                         $('#DeleteOrEdit').show();
                         DisableFormElements('UpdateStatusForm', true);
-
+                        const ServiceStatusTypeList_select2 = ServiceStatusTypeList
+                            .map(item => ({
+                                id: item.id,
+                                text: lang == "ar" ? item.nameAr : item.nameEn
+                            }));
+                        $("#ServiceStatusTypeId").select2({
+                            width: 'resolve',
+                            allowClear: true,
+                            data: ServiceStatusTypeList_select2,
+                            placeholder: sharedFn().GetUiControlText('ServiceStatusTypeId'),
+                            dropdownCssClass: "manageselect2zindex",
+                        })
                         //debugger
                         const partyTypesList_select2 = result.partyTypesList
                             .map(item => ({
@@ -435,6 +446,8 @@ $(document).ready(function () {
         $('#ServiceStatusStatusGroupId').trigger('change');
         $('#ServiceStatusNameEn').val(statusObj.nameEn);
         $('#ServiceStatusNameAr').val(statusObj.nameAr);
+        $('#ServiceStatusTypeId').val(statusObj.serviceStatusTypeId);
+        $('#ServiceStatusTypeId').trigger('change');
         $('#ServiceStatusColorCode').val(statusObj.colorCode);
         $('#ServiceStatusColorCodepicker').val(statusObj.colorCode);
         $('#ServiceStatusIsActive').prop('checked', statusObj.isActive);
@@ -448,6 +461,8 @@ $(document).ready(function () {
         $('#ServiceStatusId').val('');
         $('#ServiceStatusStatusGroupId').val('');
         $('#ServiceStatusStatusGroupId').trigger('change');
+        $('#ServiceStatusTypeId').val('');
+        $('#ServiceStatusTypeId').trigger('change');
         $('#ServiceStatusNameEn').val('');
         $('#ServiceStatusNameAr').val('');
         $('#ServiceStatusColorCode').val('');
@@ -570,6 +585,7 @@ $(document).ready(function () {
                 NameAr: $("#ServiceStatusNameAr").val(),
                 ColorCode: $("#ServiceStatusColorCode").val(),
                 StatusGroupId: $("#ServiceStatusStatusGroupId").val(),
+                ServiceStatusTypeId: $("#ServiceStatusTypeId").val(),
 
                 IsInitial: $("#ServiceStatusIsInitial").prop("checked"),
                 IsActive: $("#ServiceStatusIsActive").prop("checked"),
@@ -723,6 +739,18 @@ $(document).ready(function () {
                     id: item.id,
                     text: lang == "ar" ? item.nameAr : item.nameEn
                 }));
+            const ServiceStatusTypeList_select2 = ServiceStatusTypeList
+                .map(item => ({
+                    id: item.id,
+                    text: lang == "ar" ? item.nameAr : item.nameEn
+                }));
+            $("#ServiceStatusTypeId").select2({
+                width: 'resolve',
+                allowClear: true,
+                data: ServiceStatusTypeList_select2,
+                placeholder: sharedFn().GetUiControlText('ServiceStatusTypeId'),
+                dropdownCssClass: "manageselect2zindex",
+            })
 
             let uibackendName = "ServiceStatusPreventPartyType";
             let mainuibackendName = "main_ServiceStatusPreventPartyType";

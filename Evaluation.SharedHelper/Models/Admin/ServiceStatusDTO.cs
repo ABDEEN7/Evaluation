@@ -1,4 +1,5 @@
 ﻿
+
 namespace Evaluation.SharedHelper.Models.Admin
 {
     public class ServiceStatusDTO : EntityBaseDTO
@@ -17,7 +18,8 @@ namespace Evaluation.SharedHelper.Models.Admin
 
         public bool IsInitial { get; set; }
 
-        public bool IsOpen { get; set; }
+        public Guid ServiceStatusTypeId { get; set; }
+        public string? ServiceStatusType { get; set; }
 
         //public int? OrderNo { get; set; }
     }

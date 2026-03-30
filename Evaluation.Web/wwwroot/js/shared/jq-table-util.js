@@ -326,7 +326,7 @@ const tableUtil = (function () {
         return headerMenu;
     }
 
-    const createTabulator = ({ id, uniqueRowId, config, sortColumn = 'updateDate', sortDir = 'asc', columns, rowMoved, rowFormatter, isShowHeaderMenu, paginationConfig, isResponsiveLayout = true }) => {
+    const createTabulator = ({ id, uniqueRowId, config, sortColumn, sortDir = 'asc', columns, rowMoved, rowFormatter, isShowHeaderMenu, paginationConfig, isResponsiveLayout = true }) => {
         //const responsiveLayout = config?.responsiveLayout ?? "collapse";
         const responsiveLayout = isResponsiveLayout ? config?.responsiveLayout ?? "collapse" : null;
         paginationConfig = paginationConfig ?? {};

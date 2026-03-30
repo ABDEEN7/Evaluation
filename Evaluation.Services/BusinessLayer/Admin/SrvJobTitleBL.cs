@@ -55,7 +55,7 @@ public class SrvJobTitleBL : AdminBase
         jobTitle.HRCode = message.HrCode;
         uow.GetRepository<JobTitle>().Insert(jobTitle);
         await uow.CommitAsync();
-        message.ResponseStatus = DBResult.Updated;
+        message.ResponseStatus = DBResult.Inserted;
         return message;
     }
     public async Task<JobTitleDto> DeleteJobTitleAsync(Guid? id)

@@ -12,7 +12,7 @@ public class EvaluationFormDto : EntityBaseDTO
     public string? FormEvalMatrix { get; set; }
     public string NameAr { get; set; } = null!;
     public string NameEn { get; set; } = null!;
-    public bool IsRopric { get; set; }
+    public bool IsFinalEval { get; set; }
     public bool HasOneValue { get; set; }
     public Guid EvaluationPartyId { get; set; }
     public string? EvaluationParty { get; set; }

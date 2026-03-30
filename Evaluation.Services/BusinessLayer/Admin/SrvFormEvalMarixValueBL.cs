@@ -54,6 +54,8 @@ namespace Evaluation.Services.Models.Admin
                 obj.NameEn = message.NameEn;
                 obj.MinValue = message.MinValue;
                 obj.MaxValue = message.MaxValue;
+                obj.NextEvalDays = message.NextEvalDays;
+                obj.ActualMatrixValue = message.ActualMatrixValue;
                 obj.DescAr = message.DescAr;
                 obj.DescEn = message.DescEn;
                 obj.IsActive = message.IsActive;
@@ -91,6 +93,8 @@ namespace Evaluation.Services.Models.Admin
                 obj.MaxValue = message.MaxValue;
                 obj.DescAr = message.DescAr;
                 obj.DescEn = message.DescEn;
+                obj.NextEvalDays = message.NextEvalDays;
+                obj.ActualMatrixValue = message.ActualMatrixValue;
                 obj.IsActive = message.IsActive;
 
                 uow.GetRepository<FormEvalMatrixValue>().Update(obj);

@@ -43,7 +43,7 @@ public class SrvEvaluationPartyBL : AdminBase
 
         uow.GetRepository<EvaluationParty>().Insert(EvaluationParty);
         await uow.CommitAsync();
-        message.ResponseStatus = DBResult.Updated;
+        message.ResponseStatus = DBResult.Inserted;
         return message;
     }
     public async Task<EvaluationPartyDto> DeleteEvaluationPartyAsync(Guid? id)
