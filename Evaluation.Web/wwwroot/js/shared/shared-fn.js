@@ -823,7 +823,7 @@ const sharedFn = (options) => {
     }
     //===========================================================
 
-    const populateColumn = (columnList, dynamicaction = '') => {
+    const populateColumn = (columnList, dynamicaction = '', noupdatebydetails = false) => {
         let tabularcolumns = [];
         if (columnList) {
 
@@ -870,20 +870,99 @@ const sharedFn = (options) => {
                 }
 
                 if (item.tabulatorConfig) {
-                    const tabulatorConfigarray = JSON.parse(item.tabulatorConfig);
-                    tabulatorConfigarray.forEach(configItem => {
+                    const tabulatorConfigArray = JSON.parse(item.tabulatorConfig);
+                    tabulatorConfigArray.forEach(configItem => {
                         for (const key in configItem) {
+
+                            // Editor
                             if (key === "editor") {
-                                columnfield[key] = configItem[key] == "true" ? true : false;
-                            }
-                            else {
-                                columnfield[key] = configItem[key] == "customImageFormatter" ? customImageFormatter : configItem[key];
+                                columnfield.editor = configItem[key] == "true" ? true : configItem[key] == "false" ? false : configItem[key]; // "select", "input", etc.
                             }
 
-                           
+                            // Formatter
+                            else if (key === "formatter") {
+                                if (configItem[key] === "customImageFormatter") {
+                                    columnfield.formatter = customImageFormatter;
+                                } else if (configItem[key] === "lookup") {
+                                    // Lookup formatter for dropdowns
+                                    columnfield.formatter = function (cell) {
+                                        const valuesKey = columnfield.editorParams?.valuesKey;
+                                        return lookupSources[valuesKey]?.[cell.getValue()] || "";
+                                    };
+                                } else {
+                                    columnfield.formatter = configItem[key]; // built-in Tabulator formatter
+                                }
+                            }
+
+                            // Other properties
+                            else {
+                                columnfield[key] = configItem[key];
+                            }
                         }
                     });
                 }
+
+                // Special handling for DROPDOWN columns if editorParams are missing
+                if (item.controlType === "DROPDOWN") {
+                    if (columnfield.editor !== undefined) {
+
+                        const keyName = columnfield.editorParams?.valuesKey;
+                        const list = lookupSources[keyName];
+
+                        if (!Array.isArray(list)) return;
+
+                        const valuesMap = {};
+                        list.forEach(x => {
+                            valuesMap[x.id] = x.name;
+                        });
+
+                        // ---------- SELECT ----------
+                        if (columnfield.editor === "select") {
+                            columnfield.editorParams = {
+                                values: valuesMap,
+                                clearable: true
+                            };
+
+                            columnfield.formatter = function (cell) {
+                                return valuesMap[cell.getValue()] || "";
+                            };
+                        }
+
+                        // ---------- LIST (MULTISELECT) ----------
+                        else if (columnfield.editor === "multiselect") {
+                            columnfield.editor = "select";
+                            columnfield.editable = true;
+                            columnfield.editorParams = {
+                                values: valuesMap,
+                                multiselect: true,
+                                clearable: true
+                            };
+
+                            columnfield.formatter = function (cell) {
+                                const value = cell.getValue();
+                                if (!Array.isArray(value)) return "";
+                                return value
+                                    .map(v => valuesMap[v])
+                                    .filter(Boolean)
+                                    .join(", ");
+                            };
+                            columnfield.cellClick = function (e, cell) {
+                                const colDef = cell.getColumn().getDefinition();
+                                console.log(colDef.editor, colDef.editable, colDef.editorParams);
+                                if (cell.getColumn().getDefinition().editor) {
+                                    cell.edit();
+                                }
+                            };
+                            columnfield.mutator = function (value) {
+                                if (Array.isArray(value)) return value;
+                                if (typeof value === "string") return value.split(",").map(v => Number(v.trim()));
+                                return [];
+                            };
+                        }
+                    }
+                }
+
+
 
 
                 if (item.controlType == "DATE") {
@@ -912,7 +991,7 @@ const sharedFn = (options) => {
                 tabularcolumns.push(columnfield);
             });
             //Adding last updated columns
-            if (tabularcolumns.length > 0) {
+            if (tabularcolumns.length > 0 && noupdatebydetails == false) {
                 var titlecreatedby = getUiControlText('LAST_UPDATED_BY');
                 tabularcolumns.push({ title: titlecreatedby, headerTooltip: titlecreatedby, field: "updateBy", hozAlign: "center", headerFilter: "input" });
                 var titlecreateddate = getUiControlText('LAST_UPDATED_DATE');
@@ -1470,7 +1549,7 @@ const sharedFn = (options) => {
     const actionCellClick = (event, cell) => {
 
         let tableId = cell.getTable().element.id;
-        table = Tabulator.prototype.findTable("#" + tableId)[0];
+        table = Tabulator.findTable("#" + tableId)[0];
 
         let pkId = '', loaderId = '';
         const cellElem = event.target.closest('section');

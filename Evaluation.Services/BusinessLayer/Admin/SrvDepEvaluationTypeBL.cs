@@ -50,7 +50,7 @@ public class SrvDepEvaluationTypeBL : AdminBase
         DepEvaluationType.BackendName = bacendName;
         uow.GetRepository<DepEvaluationType>().Insert(DepEvaluationType);
         await uow.CommitAsync();
-        message.ResponseStatus = DBResult.Updated;
+        message.ResponseStatus = DBResult.Inserted;
         return message;
     }
     public async Task<DepEvaluationTypeDto> DeleteDepEvaluationTypeAsync(Guid? id)

@@ -546,7 +546,7 @@ const deleteData = (id) => {
 };
 $("#btn-submit").click(function (e) {
 
-
+   
     if (sharedFn().NewvalidateForm("form-control", sharedFn().GetUiControlText('WEB_CNTRL_REQUIRED'), sharedFn().GetUiControlText('WEB_MSG_MAX_CHAR_LENGTH'), sharedFn().GetUiControlText('WEB_MSG_MIN_CHAR_LENGTH'))) {
 
 
@@ -559,8 +559,7 @@ $("#btn-submit").click(function (e) {
                 
                 if (response.responseStatus == '1') {
                     table.addData([response], true);
-                    table.deselectRow();
-                    table.getRows()[0].select();
+                   
                     if (response) {
                         notificationUtil.success(sharedFn().GetUiControlText('WEB_MSG_SAVE'));
 
@@ -579,6 +578,7 @@ $("#btn-submit").click(function (e) {
 
                 }
                 sharedFn().ViewMode();
+                table.refreshFilter();
             }
         };
 
@@ -785,11 +785,11 @@ initTables = () => {
         id: gridContainerId,
         config: {
             textDirection: txtDir,
-            paginationSize: 10,
             placeholder: sharedFn().GetUiControlText('NO_DATA_FOUND'),
             headerFilterPlaceholder: sharedFn().GetUiControlText('FILTER_COLUMN'),
             movableRows: true,
         },
+        isResponsiveLayout: false,
         uniqueRowId: 'id',
         sortColumn: "updateDate",
         sortDir: "desc",
