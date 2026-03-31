@@ -3,14 +3,17 @@
 @model EvaluationPartyVM
 @{
 	string Lang = Model.CurrentLanguage;
-	var uiControlItems = Model.UiControlItems.Where(x => x.RowOrder > 0).ToList();
+	var uiControlItems = Model.UiControlItems.Where(x => x.RowOrder > 0 && x.Constraint.Permission.BackEndName == AdminPermission.ADD_ADMIN_EVALUATIONPARTIES).ToList();
+	var PartyTypeEvalPartyStatusuiControlItems = Model.UiControlItems.Where(x => x.RowOrder > 0 && x.Constraint.Permission.BackEndName == AdminPermission.ADD_ADMIN_PartyTypeEvalPartyStatus).ToList();
 	string? textDir = Lang == "ar" ? "RTL" : "LTR";
 	var permissionsList = Model.PermissionsList;
 	var controlsList = Model.ControlsList;
+
 	var settingList = Model.SettingList;
 	var settingsList = Model.SettingList;
 	var containsOrderNo = Model.UiControlItems.Where(x => x.Constraint.ShowInGrid == true).ToList();
-	var columnList = Model.UiControlItems.Where(x => x.Constraint.ShowInGrid == true).ToList();
+	var columnList = Model.UiControlItems.Where(x => x.Constraint.ShowInGrid == true && x.Constraint.Permission.BackEndName == AdminPermission.ADD_ADMIN_EVALUATIONPARTIES).ToList();
+	var PartyTypeEvalPartyStatuscolumnList = Model.UiControlItems.Where(x => x.Constraint.ShowInGrid == true && x.Constraint.Permission.BackEndName == AdminPermission.ADD_ADMIN_PartyTypeEvalPartyStatus).ToList();
 }
 <section id="tbl-template-container" class="section-container">
 	<div class="card app-card">
@@ -55,16 +58,24 @@
 	<script>
 		 var controlsList = JSON.parse(`@Html.Raw(Json.Serialize(controlsList))`);
 		 var columnList = @Html.Raw(Json.Serialize(columnList));
+		 var PartyTypeEvalPartyStatuscolumnList = @Html.Raw(Json.Serialize(PartyTypeEvalPartyStatuscolumnList));
 		const settingList = JSON.parse(`@Html.Raw(Json.Serialize(settingList))`);
 		 sharedFn().PopulateUiControl(controlsList);
 		 var lang='@Lang';
 		let txtDir = '@textDir';
 		let containsOrderNo='@containsOrderNo';
 		  const controlvalidationlist = @Html.Raw(Json.Serialize(uiControlItems));
-		let IsEdit='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.EDIT_ADMIN_EVALUATIONPARTIES))';
-		let IsDelete='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.DELETE_ADMIN_EVALUATIONPARTIES))';
-		let IsView='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.VIEW_ADMIN_EVALUATIONPARTIES))';
-		let TableColumns = sharedFn().PopulateColumn(columnList);
+		   const PartyTypeEvalPartyStatuscontrolvalidationlist = @Html.Raw(Json.Serialize(PartyTypeEvalPartyStatusuiControlItems));
+		let IsEdit_EvaluationParty='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.EDIT_ADMIN_EVALUATIONPARTIES))';
+		let IsDelete_EvaluationParty='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.DELETE_ADMIN_EVALUATIONPARTIES))';
+		let IsView_EvaluationParty='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.VIEW_ADMIN_EVALUATIONPARTIES))';
+
+		 let IsAdd_PartyTypeEvalPartyStatus='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.ADD_ADMIN_PartyTypeEvalPartyStatus))';
+		 let IsEdit_PartyTypeEvalPartyStatus='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.EDIT_ADMIN_PartyTypeEvalPartyStatus))';
+		let IsDelete_PartyTypeEvalPartyStatus='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.DELETE_ADMIN_PartyTypeEvalPartyStatus))';
+		let IsView_PartyTypeEvalPartyStatus='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.VIEW_ADMIN_PartyTypeEvalPartyStatus))';
+
+		
 		sharedFn
 		().InitializeControl(controlvalidationlist, settingList);
 	</script>

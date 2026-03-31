@@ -1530,6 +1530,9 @@ const sharedFn = (options) => {
             if (tableId == "UserTeamScopeRelationtabulator") {
                 popupname = "UserTeamScope";
             }
+            if (tableId == "EvaluationPartiesPartyTypeEvalPartyStatustabulator") {
+                popupname = "PartyTypeEvalPartyStatus";
+            }
 
             ClearvalidateForm("form-control");
             deleteData(pkId);
