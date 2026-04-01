@@ -162,7 +162,7 @@ namespace Evaluation.Services.Models.Admin
             entity.NameAr = model.status.NameAr;
             entity.NameEn = model.status.NameEn;
             entity.IsInitial = model.status.IsInitial;
-            //entity.IsOpen = model.status.IsOpen;
+            entity.ServiceStatusTypeId = model.status.ServiceStatusTypeId;
             entity.IsActive = model.status.IsActive;
             entity.StatusGroupId = model.status.StatusGroupId;
             entity.ColorCode = model.status.ColorCode;
@@ -354,7 +354,25 @@ namespace Evaluation.Services.Models.Admin
             return result;
         }
 
-        
+        public async Task<List<DropdownItem>> GetServiceStatusTypeList()
+        {
+            using (var uow = serviceScopeFactory.CreateScopedUow())
+            {
+                var ServiceStatusTypeList = new List<DropdownItem>();
+                ServiceStatusTypeList = await uow.GetRepository<ServiceStatusType>()
+                                    .GetAllNonDeleted()
+                                    .Select(x => new DropdownItem
+                                    {
+                                        Id = x.Id,
+                                        NameAr = x.NameAr,
+                                        NameEn = x.NameEN,
+                                        Type = "ServiceStatusType",
+                                    })
+                                    //.OrderBy(x => x.OrderNo)
+                                    .ToListAsync();
+                return ServiceStatusTypeList;
+            }
+        }
         public async Task<List<DropdownItem>> GetPartyTypesList()
         {
             using (var uow = serviceScopeFactory.CreateScopedUow())

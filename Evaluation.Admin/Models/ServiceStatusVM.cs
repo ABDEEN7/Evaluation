@@ -19,5 +19,7 @@ namespace Evaluation.Admin.Models
         public List<ServiceStatusDTO> ServiceStatusList { get; set; } = new();
         public List<DropdownItem> ActionTypes { get; set; } = new();
         public List<ControlValidationDTO> StatusPartyTypeDisplayNameList_Controls { get; set; } = new();
+
+        public List<DropdownItem> ServiceStatusTypeList { get; set; } = new();
     }
 }

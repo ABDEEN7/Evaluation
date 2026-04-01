@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Evaluation.DAL.Helper;
+using Evaluation.DAL.Models.Org;
 using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
 using Evaluation.DAL.Repositories;
 using Evaluation.Services.Models.Admin;
@@ -20,6 +21,7 @@ public class SrvNdaStatusBL : AdminBase
     }
     public async Task<List<NdaStatusDto>> GetNdaStatusList(int page, int pageSize)
     {
+        var mapper = await CreateMapperForAdmin<NdaStatus, NdaStatusDto>();
         var list = await uow.GetRepository<NdaStatus>()
             .GetAllActiveNonDeleted()
             .Include(x => x.CreateBy)
@@ -28,11 +30,12 @@ public class SrvNdaStatusBL : AdminBase
             .Skip(page * pageSize)
             .Take(pageSize)
             .ToListAsync();
-        var result = mapper.Map<List<NdaStatusDto>>(list, opts => opts.Items["Language"] = _requestInfo.Lang);
+        var result = mapper.Map<List<NdaStatusDto>>(list);
         return result;
     }
     public async Task<NdaStatusDto> SaveNdaStatus(NdaStatusDto message)
     {
+        var mapper = await CreateMapperForAdmin<NdaStatus, NdaStatusDto>();
         var bacendName = await GenerateBackendNameByTitle(message.NameEn);
 
         var existBacendName = await uow.GetRepository<NdaStatus>()
@@ -50,11 +53,13 @@ public class SrvNdaStatusBL : AdminBase
         NdaStatus.BackendName = bacendName;
         uow.GetRepository<NdaStatus>().Insert(NdaStatus);
         await uow.CommitAsync();
-        message.ResponseStatus = DBResult.Updated;
-        return message;
+        var result = mapper.Map<NdaStatusDto>(NdaStatus);
+        result.ResponseStatus = DBResult.Inserted;
+        return result;
     }
     public async Task<NdaStatusDto> DeleteNdaStatusAsync(Guid? id)
     {
+        var mapper = await CreateMapperForAdmin<NdaStatus, NdaStatusDto>();
         var repository = uow.GetRepository<NdaStatus>();
         var ndaStatus = await repository
             .GetAllActiveNonDeleted(x => x.Id == id)
@@ -76,13 +81,13 @@ public class SrvNdaStatusBL : AdminBase
 
         repository.Delete(ndaStatus);
         await uow.CommitAsync();
-        var result = mapper.Map<NdaStatusDto>(ndaStatus, opts =>
-        opts.Items["Language"] = _requestInfo.Lang);
+        var result = mapper.Map<NdaStatusDto>(ndaStatus);
         result.ResponseStatus = DBResult.Deleted;
         return result;
     }
     public async Task<NdaStatusDto> UpdateNdaStatus(NdaStatusDto ndaStatus)
     {
+        var mapper = await CreateMapperForAdmin<NdaStatus, NdaStatusDto>();
         if (ndaStatus == null)
         {
             return new NdaStatusDto

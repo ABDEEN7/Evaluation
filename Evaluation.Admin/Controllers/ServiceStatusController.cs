@@ -46,10 +46,12 @@ namespace Evaluation.Admin.Controllers
 
             var ServicesTask = masterBL.GetAdminService<SrvServiceStatusBL>().GetServicesForStatus();
             var PartyTypesListTask = masterBL.GetAdminService<SrvServiceStatusBL>().GetPartyTypesList();
+            var ServiceStatusTypeListTask = masterBL.GetAdminService<SrvServiceStatusBL>().GetServiceStatusTypeList();
             var ActionTypesTask = masterBL.GetAdminService<SrvServiceActionBL>().GetServiceActionTypes();
             var AllActionTask = masterBL.GetAdminService<SrvServiceStatusBL>().GetServiceAllAction();
             model.Services = await ServicesTask;
             model.PartyTypesList = await PartyTypesListTask;
+            model.ServiceStatusTypeList = await ServiceStatusTypeListTask;
             model.ActionTypes = await ActionTypesTask;
             ViewBag.AllActions = await AllActionTask;
             var property = typeof(ActionStatusConfiguration).GetProperty("OrderNo");

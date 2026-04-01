@@ -244,6 +244,7 @@
         const IsDelete_ActionStatusConfigNotification='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.DELETE_ADMIN_ACTIONSTATUSCONFIGURATION_NOTIFICATION))';
 
         const partyTypesList = JSON.parse(`@Html.Raw(Json.Serialize(Model.PartyTypesList))`);
+        const ServiceStatusTypeList = JSON.parse(`@Html.Raw(Json.Serialize(Model.ServiceStatusTypeList))`);
         sharedFn().PopulateUiControl(controlsList);
 
 
