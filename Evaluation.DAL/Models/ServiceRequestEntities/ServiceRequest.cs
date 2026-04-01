@@ -8,6 +8,7 @@ using Evaluation.DAL.Models.ServiceEnities;
 using Evaluation.DAL.Models.StatusEntities;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.Metrics;
 using System.Linq;
 using System.Text;
@@ -24,6 +25,8 @@ namespace Evaluation.DAL.Models.ServiceRequestEntities
 		public Service? Service { get; set; }
 		public Guid? OrgTreeId { get; set; }
 		public OrgTree? OrgTree { get; set; }
+
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)] 
 		public long Sequence { get; set; }
 		public Guid? PlanId { get; set; }
 		public Plan? Plan { get; set; }

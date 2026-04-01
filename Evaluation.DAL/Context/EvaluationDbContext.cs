@@ -154,7 +154,18 @@ public partial class EvaluationDbContext : DbContext
 
     private void ApplyGeneralConfigurations(ModelBuilder modelBuilder)
     {
-
+        modelBuilder.Entity<EvaluationRequest>(entity =>
+        {
+            entity.Property(e => e.Sequence)
+                .ValueGeneratedOnAdd()
+                .UseIdentityColumn(1, 1); // seed: 1, increment: 1
+        });
+        modelBuilder.Entity<ServiceRequest>(entity =>
+        {
+            entity.Property(e => e.Sequence)
+                .ValueGeneratedOnAdd()
+                .UseIdentityColumn(1, 1); // seed: 1, increment: 1
+        });
         modelBuilder.Entity<OrgTree>()
            .HasOne(x => x.OrgType)
                    .WithMany()

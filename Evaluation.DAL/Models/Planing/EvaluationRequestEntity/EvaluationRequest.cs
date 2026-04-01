@@ -9,6 +9,7 @@ using Evaluation.DAL.Models.ServiceEnities;
 using Evaluation.DAL.Models.ServiceRequestEntities;
 using Evaluation.DAL.Models.StatusEntities;
 using Evaluation.DAL.Models.Template;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
 
@@ -27,6 +28,7 @@ public class EvaluationRequest : EntityBase, IAuditLogEntity
 	public Guid ServiceStatusId { get; set; }
 	public ServiceStatus? ServiceStatus { get; set; }
     public string? RequestNumber  { get; set; }
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public long Sequence { get; set; }
     public Guid? FormEvalMatrixValueId { get; set; }
     public FormEvalMatrixValue? FormEvalMatrixValue { get; set; }

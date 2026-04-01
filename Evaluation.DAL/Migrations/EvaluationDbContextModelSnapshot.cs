@@ -34,7 +34,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("WebGroupId");
 
-                    b.ToTable("DepartmentWebGroup");
+                    b.ToTable("DepartmentWebGroup", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.ActionEntities.ActionAssignPartyType", b =>
@@ -94,7 +94,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("ActionAssignPartyType");
+                    b.ToTable("ActionAssignPartyType", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.ActionEntities.ActionCondition", b =>
@@ -161,7 +161,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("ActionCondition");
+                    b.ToTable("ActionCondition", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.ActionEntities.ActionPartyType", b =>
@@ -224,7 +224,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("ActionPartyType");
+                    b.ToTable("ActionPartyType", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.ActionEntities.ActionShowLogPartyType", b =>
@@ -281,7 +281,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("ActionShowLogPartyType");
+                    b.ToTable("ActionShowLogPartyType", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.ActionEntities.ActionStatusConfigNotification", b =>
@@ -362,7 +362,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("ActionStatusConfigNotification");
+                    b.ToTable("ActionStatusConfigNotification", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.ActionEntities.ActionStatusConfiguration", b =>
@@ -457,7 +457,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("ActionStatusConfiguration");
+                    b.ToTable("ActionStatusConfiguration", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.ActionEntities.ActionTemplateDoc", b =>
@@ -514,7 +514,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("ActionTemplateDoc");
+                    b.ToTable("ActionTemplateDoc", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.ActionEntities.ActionType", b =>
@@ -582,7 +582,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("ActionType");
+                    b.ToTable("ActionType", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.ActionEntities.ServiceAction", b =>
@@ -679,7 +679,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("ServiceAction");
+                    b.ToTable("ServiceAction", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.Attachments.EvalAttachment", b =>
@@ -785,7 +785,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("EvalAttachments");
+                    b.ToTable("EvalAttachments", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.Attachments.PlaceHolder", b =>
@@ -855,7 +855,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("PlaceHolder");
+                    b.ToTable("PlaceHolder", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.Audit.AuditLog", b =>
@@ -920,7 +920,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("AuditLogs");
+                    b.ToTable("AuditLogs", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.Authentication.UserLoginLog", b =>
@@ -979,7 +979,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserLoginLogs");
+                    b.ToTable("UserLoginLogs", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.Authentication.UserToken", b =>
@@ -1050,7 +1050,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserToken");
+                    b.ToTable("UserToken", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.BaseModule.ControlValidation", b =>
@@ -1159,7 +1159,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("ControlValidations");
+                    b.ToTable("ControlValidations", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.Calendars.AcademicYear", b =>
@@ -1232,7 +1232,7 @@ namespace Evaluation.DAL.Migrations
                     b.HasIndex("DepartmentId", "Year")
                         .IsUnique();
 
-                    b.ToTable("AcademicYears");
+                    b.ToTable("AcademicYears", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.Calendars.DepartmentHoliday", b =>
@@ -1304,7 +1304,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("DepartmentHolidays");
+                    b.ToTable("DepartmentHolidays", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.Calendars.PlanType", b =>
@@ -1369,7 +1369,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("PlanType");
+                    b.ToTable("PlanType", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.Calendars.PlanTypeDep", b =>
@@ -1437,7 +1437,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("PlanTypeDep");
+                    b.ToTable("PlanTypeDep", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.Calendars.Semester", b =>
@@ -1513,7 +1513,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("Semesters");
+                    b.ToTable("Semesters", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.DepartementEntites.DepEvaluationType", b =>
@@ -1580,7 +1580,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("DepEvaluationType");
+                    b.ToTable("DepEvaluationType", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.DepartementEntites.DepTargetOrgTree", b =>
@@ -1648,7 +1648,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("DepTargetOrgTree");
+                    b.ToTable("DepTargetOrgTree", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.DepartementEntites.DepWebGroup", b =>
@@ -1705,7 +1705,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("WebGroupId");
 
-                    b.ToTable("DepWebGroup");
+                    b.ToTable("DepWebGroup", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.DepartementEntites.Department", b =>
@@ -1792,7 +1792,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("WebsiteAttachmentId");
 
-                    b.ToTable("Departments");
+                    b.ToTable("Departments", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.DepartementEntites.DepartmentRoleAttributeValue", b =>
@@ -1852,7 +1852,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("DepartmentRoleAttributeValue");
+                    b.ToTable("DepartmentRoleAttributeValue", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.DepartementEntites.SystemAttribute", b =>
@@ -1911,7 +1911,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("SystemAttributes");
+                    b.ToTable("SystemAttributes", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.DepartementEntites.SystemModule", b =>
@@ -2009,7 +2009,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("SystemModules");
+                    b.ToTable("SystemModules", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.DepartementEntites.SystemModuleType", b =>
@@ -2073,7 +2073,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("SystemModuleTypes");
+                    b.ToTable("SystemModuleTypes", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.EvalResult.DepEvalMatrix", b =>
@@ -2155,7 +2155,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("DepEvalMatrixs");
+                    b.ToTable("DepEvalMatrixs", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.EvalResult.OrgEvalResult", b =>
@@ -2220,7 +2220,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("OrgEvalResults");
+                    b.ToTable("OrgEvalResults", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.Exception.ExceptionLog", b =>
@@ -2288,7 +2288,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("ExceptionLog");
+                    b.ToTable("ExceptionLog", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.FormBuilder.ActionField", b =>
@@ -2351,7 +2351,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("ActionField");
+                    b.ToTable("ActionField", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.FormBuilder.ActionFieldAttribute", b =>
@@ -2429,7 +2429,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("ActionFieldAttribute");
+                    b.ToTable("ActionFieldAttribute", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.FormBuilder.Attribute", b =>
@@ -2484,7 +2484,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("Attribute");
+                    b.ToTable("Attribute", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.FormBuilder.CssApplyType", b =>
@@ -2546,7 +2546,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("CssApplyType");
+                    b.ToTable("CssApplyType", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.FormBuilder.CssClass", b =>
@@ -2606,7 +2606,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("CssClass");
+                    b.ToTable("CssClass", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.FormBuilder.DropDownType", b =>
@@ -2676,7 +2676,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("DropDownType");
+                    b.ToTable("DropDownType", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.FormBuilder.Field", b =>
@@ -2803,7 +2803,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("Field");
+                    b.ToTable("Field", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.FormBuilder.FieldAttributeValue", b =>
@@ -2871,7 +2871,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("FieldAttributeValue");
+                    b.ToTable("FieldAttributeValue", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.FormBuilder.FieldDropDownValue", b =>
@@ -2942,7 +2942,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("FieldDropDownValue");
+                    b.ToTable("FieldDropDownValue", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.FormBuilder.FieldPartyType", b =>
@@ -2999,7 +2999,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("FieldPartyType");
+                    b.ToTable("FieldPartyType", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.FormBuilder.FieldType", b =>
@@ -3066,7 +3066,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("FieldType");
+                    b.ToTable("FieldType", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.FormBuilder.FieldTypeShow", b =>
@@ -3129,7 +3129,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("FieldTypeShow");
+                    b.ToTable("FieldTypeShow", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.FormBuilder.FieldViewCondition", b =>
@@ -3200,7 +3200,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("FieldViewCondition");
+                    b.ToTable("FieldViewCondition", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.FormBuilder.FieldVisabilityConfig", b =>
@@ -3265,7 +3265,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("FieldVisabilityConfig");
+                    b.ToTable("FieldVisabilityConfig", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.FormBuilder.FormGroup", b =>
@@ -3341,7 +3341,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("FormGroup");
+                    b.ToTable("FormGroup", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.FormBuilder.FormGroupCustomList", b =>
@@ -3404,7 +3404,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("FormGroupCustomList");
+                    b.ToTable("FormGroupCustomList", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.FormBuilder.FormGroupType", b =>
@@ -3467,7 +3467,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("FormGroupType");
+                    b.ToTable("FormGroupType", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.FormBuilder.RelatedFieldsGroup", b =>
@@ -3532,7 +3532,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("RelatedFieldsGroup");
+                    b.ToTable("RelatedFieldsGroup", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.FormsModules.AcademicYearScope", b =>
@@ -3594,7 +3594,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("AcademicYearScope");
+                    b.ToTable("AcademicYearScope", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.FormsModules.CalcMethod", b =>
@@ -3666,7 +3666,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("CalcMethods");
+                    b.ToTable("CalcMethods", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.FormsModules.EvalForm", b =>
@@ -3755,7 +3755,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("EvalForms");
+                    b.ToTable("EvalForms", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.FormsModules.EvalFormType", b =>
@@ -3817,7 +3817,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("EvalFormType");
+                    b.ToTable("EvalFormType", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.FormsModules.EvaluationParty", b =>
@@ -3883,7 +3883,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("EvaluationParties");
+                    b.ToTable("EvaluationParties", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.FormsModules.FormEvalMatrix", b =>
@@ -3956,7 +3956,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("FormEvalMatrix");
+                    b.ToTable("FormEvalMatrix", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.FormsModules.FormEvalMatrixValue", b =>
@@ -4037,7 +4037,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("FormEvalMatrixValue");
+                    b.ToTable("FormEvalMatrixValue", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.FormsModules.FormItem", b =>
@@ -4133,7 +4133,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("FormItem");
+                    b.ToTable("FormItem", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.FormsModules.FormItemRelated", b =>
@@ -4187,7 +4187,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("FormItemRelated");
+                    b.ToTable("FormItemRelated", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.FormsModules.FormItemValue", b =>
@@ -4268,7 +4268,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("FormItemValues");
+                    b.ToTable("FormItemValues", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.FormsModules.FormScope", b =>
@@ -4328,7 +4328,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("FormScopes");
+                    b.ToTable("FormScopes", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.FormsModules.FormStatus", b =>
@@ -4387,7 +4387,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("FormStatus");
+                    b.ToTable("FormStatus", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.FormsModules.PartyTypeEvalParty", b =>
@@ -4444,7 +4444,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("PartyTypeEvalParty");
+                    b.ToTable("PartyTypeEvalParty", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.FormsModules.PartyTypeEvalPartyStatus", b =>
@@ -4501,7 +4501,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("PartyTypeEvalPartyStatus");
+                    b.ToTable("PartyTypeEvalPartyStatus", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.FormsModules.Scope", b =>
@@ -4569,7 +4569,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("Scopes");
+                    b.ToTable("Scopes", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.FormsModules.ScopeAcademicYear", b =>
@@ -4631,7 +4631,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("ScopeAcademicYears");
+                    b.ToTable("ScopeAcademicYears", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.FormsModules.ScopeType", b =>
@@ -4702,7 +4702,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("ScopeTypes");
+                    b.ToTable("ScopeTypes", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.FormsModules.SubFormItem", b =>
@@ -4770,7 +4770,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("SubFormItems");
+                    b.ToTable("SubFormItems", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.FormsModules.SubFormItemValue", b =>
@@ -4835,7 +4835,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("SubFormItemValues");
+                    b.ToTable("SubFormItemValues", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.IntegrationEntity.IntegrationPoint", b =>
@@ -4908,7 +4908,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("IntegrationPoint");
+                    b.ToTable("IntegrationPoint", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.Master.Country", b =>
@@ -4997,7 +4997,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("Countries");
+                    b.ToTable("Countries", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.Master.EvaluationType", b =>
@@ -5059,7 +5059,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("EvaluationType");
+                    b.ToTable("EvaluationType", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.Master.JobTitle", b =>
@@ -5127,7 +5127,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("JobTitle");
+                    b.ToTable("JobTitle", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.Master.TransactionType", b =>
@@ -5186,7 +5186,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("TransactionType");
+                    b.ToTable("TransactionType", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.Master.UserGender", b =>
@@ -5245,7 +5245,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("UserGender");
+                    b.ToTable("UserGender", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.Org.DepartmentOrgTree", b =>
@@ -5305,7 +5305,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("DepartmentOrgTrees");
+                    b.ToTable("DepartmentOrgTrees", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.Org.EducationLevel", b =>
@@ -5367,7 +5367,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("EducationLevel");
+                    b.ToTable("EducationLevel", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.Org.OrgAcademicYear", b =>
@@ -5433,7 +5433,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("OrgAcademicYears");
+                    b.ToTable("OrgAcademicYears", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.Org.OrgClass", b =>
@@ -5503,7 +5503,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("OrgClass");
+                    b.ToTable("OrgClass", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.Org.OrgTree", b =>
@@ -5579,7 +5579,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("OrgTree");
+                    b.ToTable("OrgTree", (string)null);
 
                     b.UseTptMappingStrategy();
                 });
@@ -5644,7 +5644,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("SchoolLevel");
+                    b.ToTable("SchoolLevel", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.Org.SchoolType", b =>
@@ -5699,7 +5699,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("SchoolTypes");
+                    b.ToTable("SchoolTypes", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.PermissionEntity.Page", b =>
@@ -5756,7 +5756,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("Pages");
+                    b.ToTable("Pages", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.PermissionEntity.PagePermission", b =>
@@ -5813,7 +5813,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("PagePermissions");
+                    b.ToTable("PagePermissions", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.PermissionEntity.Permission", b =>
@@ -5876,7 +5876,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("Permissions");
+                    b.ToTable("Permissions", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.PermissionEntity.Role", b =>
@@ -5931,7 +5931,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("Roles");
+                    b.ToTable("Roles", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.PermissionEntity.RolePermission", b =>
@@ -5988,7 +5988,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("RolePermissions");
+                    b.ToTable("RolePermissions", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.Planing.Category", b =>
@@ -6046,7 +6046,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("Category");
+                    b.ToTable("Category", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.Planing.ChangeRequestStatus", b =>
@@ -6101,7 +6101,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("ChangeRequestStatus");
+                    b.ToTable("ChangeRequestStatus", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.Planing.EvaluationRequestEntity.EvalRequestAssignmentScope", b =>
@@ -6161,7 +6161,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("EvalRequestAssignmentScope");
+                    b.ToTable("EvalRequestAssignmentScope", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.Planing.EvaluationRequestEntity.EvaluationRequest", b =>
@@ -6259,7 +6259,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("EvaluationRequest");
+                    b.ToTable("EvaluationRequest", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.Planing.EvaluationRequestEntity.EvaluationRequestAssignment", b =>
@@ -6338,7 +6338,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("EvaluationRequestAssignment");
+                    b.ToTable("EvaluationRequestAssignment", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.Planing.EvaluationRequestEntity.EvaluationRequestHistory", b =>
@@ -6421,7 +6421,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("EvaluationRequestHistory");
+                    b.ToTable("EvaluationRequestHistory", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.Planing.EvaluationRequestEntity.EvaluationRequestHistoryFieldsValue", b =>
@@ -6495,7 +6495,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("EvaluationRequestHistoryFieldsValue");
+                    b.ToTable("EvaluationRequestHistoryFieldsValue", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.Planing.EvaluationRequestEntity.NdaStatus", b =>
@@ -6557,7 +6557,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("NdaStatus");
+                    b.ToTable("NdaStatus", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.Planing.EvaluationRequestEntity.NdaStatusDepartment", b =>
@@ -6625,7 +6625,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("NdaStatusDepartments");
+                    b.ToTable("NdaStatusDepartments", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.Planing.OrgType", b =>
@@ -6684,7 +6684,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("OrgTypes");
+                    b.ToTable("OrgTypes", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.Planing.Plan", b =>
@@ -6764,7 +6764,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("Plans");
+                    b.ToTable("Plans", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.Planing.PlanHistory", b =>
@@ -6853,7 +6853,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("PlanHistory");
+                    b.ToTable("PlanHistory", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.Planing.PlanServiceRequest", b =>
@@ -6922,7 +6922,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("PlanServiceRequest");
+                    b.ToTable("PlanServiceRequest", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.Planing.PlanStatus", b =>
@@ -6987,7 +6987,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("PlanStatuses");
+                    b.ToTable("PlanStatuses", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.Planing.TeamsModule.Team", b =>
@@ -7047,7 +7047,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("Team");
+                    b.ToTable("Team", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.Planing.TeamsModule.UserTeam", b =>
@@ -7104,7 +7104,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserTeams");
+                    b.ToTable("UserTeams", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.Planing.TeamsModule.UserTeamScope", b =>
@@ -7161,7 +7161,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UserTeamId");
 
-                    b.ToTable("UserTeamScope");
+                    b.ToTable("UserTeamScope", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.Planing.UserDepartment", b =>
@@ -7218,7 +7218,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserDepartment");
+                    b.ToTable("UserDepartment", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.ServiceEnities.Service", b =>
@@ -7340,7 +7340,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("Services");
+                    b.ToTable("Services", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.ServiceEnities.ServiceInitiatorPartyType", b =>
@@ -7397,7 +7397,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("serviceId");
 
-                    b.ToTable("ServiceInitiatorPartyType");
+                    b.ToTable("ServiceInitiatorPartyType", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.ServiceEnities.ServiceRequestShowPartyType", b =>
@@ -7454,7 +7454,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("serviceId");
 
-                    b.ToTable("ServiceRequestShowPartyType");
+                    b.ToTable("ServiceRequestShowPartyType", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.ServiceRequestEntities.RequestAssignment", b =>
@@ -7522,7 +7522,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("RequestAssignment");
+                    b.ToTable("RequestAssignment", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.ServiceRequestEntities.RequestAssignmentScope", b =>
@@ -7579,7 +7579,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("RequestAssignmentScopes");
+                    b.ToTable("RequestAssignmentScopes", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.ServiceRequestEntities.ServiceRequest", b =>
@@ -7679,7 +7679,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("ServiceRequests");
+                    b.ToTable("ServiceRequests", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.ServiceRequestEntities.ServiceRequestFieldsValue", b =>
@@ -7756,7 +7756,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("ServiceRequestFieldsValue");
+                    b.ToTable("ServiceRequestFieldsValue", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.ServiceRequestEntities.ServiceStatusConfiguration", b =>
@@ -7814,7 +7814,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("ServiceStatusConfiguration");
+                    b.ToTable("ServiceStatusConfiguration", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.StatusEntities.ServiceStatus", b =>
@@ -7895,7 +7895,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("ServiceStatus");
+                    b.ToTable("ServiceStatus", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.StatusEntities.ServiceStatusPartyTypeDisplayName", b =>
@@ -7960,7 +7960,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("ServiceStatusPartyTypeDisplayName");
+                    b.ToTable("ServiceStatusPartyTypeDisplayName", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.StatusEntities.ServiceStatusPreventPartyType", b =>
@@ -8017,7 +8017,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("ServiceStatusPreventPartyType");
+                    b.ToTable("ServiceStatusPreventPartyType", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.StatusEntities.ServiceStatusType", b =>
@@ -8089,7 +8089,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("ServiceStatusType");
+                    b.ToTable("ServiceStatusType", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.SystemLog.ActionTransactionsLog", b =>
@@ -8162,7 +8162,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("ActionTransactionsLog");
+                    b.ToTable("ActionTransactionsLog", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.SystemLog.EmailLog", b =>
@@ -8233,7 +8233,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("EmailLog");
+                    b.ToTable("EmailLog", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.SystemLog.EvalRequestActionTransactionsLog", b =>
@@ -8307,7 +8307,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("EvalRequestActionTransactionsLog");
+                    b.ToTable("EvalRequestActionTransactionsLog", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.SystemLog.FieldValueTransactionsLog", b =>
@@ -8378,7 +8378,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("FieldValueTransactionsLog");
+                    b.ToTable("FieldValueTransactionsLog", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.SystemLog.SMSLog", b =>
@@ -8442,7 +8442,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("SMSLog");
+                    b.ToTable("SMSLog", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.SystemSetting.EmailProfile", b =>
@@ -8534,7 +8534,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("EmailProfile");
+                    b.ToTable("EmailProfile", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.SystemSetting.SMSProfile", b =>
@@ -8603,7 +8603,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("SMSProfiles");
+                    b.ToTable("SMSProfiles", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.SystemSetting.SystemSetting", b =>
@@ -8670,7 +8670,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("SystemSetting");
+                    b.ToTable("SystemSetting", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.SystemSetting.UiControl", b =>
@@ -8750,7 +8750,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("UiControls");
+                    b.ToTable("UiControls", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.Template.EmailTemplate", b =>
@@ -8834,7 +8834,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("EmailTemplates");
+                    b.ToTable("EmailTemplates", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.Template.EmailTemplateDocument", b =>
@@ -8894,7 +8894,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("EmailTemplateDocuments");
+                    b.ToTable("EmailTemplateDocuments", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.Template.Notification", b =>
@@ -8974,7 +8974,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Notifications");
+                    b.ToTable("Notifications", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.Template.NotificationTemplate", b =>
@@ -9047,7 +9047,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("NotificationTemplates");
+                    b.ToTable("NotificationTemplates", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.Template.SMSTemplate", b =>
@@ -9118,7 +9118,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("SMSTemplates");
+                    b.ToTable("SMSTemplates", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.Template.TemplateDocument", b =>
@@ -9200,7 +9200,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("TemplateDocuments");
+                    b.ToTable("TemplateDocuments", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.Template.TemplateGenrationType", b =>
@@ -9262,7 +9262,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("TemplateGenrationTypies");
+                    b.ToTable("TemplateGenrationTypies", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.UserEntiy.MinistryUser", b =>
@@ -9445,7 +9445,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("PartyTypes");
+                    b.ToTable("PartyTypes", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.UserEntiy.UserPartyType", b =>
@@ -9505,7 +9505,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserPartyTypes");
+                    b.ToTable("UserPartyTypes", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.UserEntiy.UserPartyTypeSignature", b =>
@@ -9561,7 +9561,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UserPartyTypeId");
 
-                    b.ToTable("UserPartyTypeSignatures");
+                    b.ToTable("UserPartyTypeSignatures", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.UserEntiy.UserRole", b =>
@@ -9618,7 +9618,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserRoles");
+                    b.ToTable("UserRoles", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.UserEntiy.UserType", b =>
@@ -9677,7 +9677,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("UserType");
+                    b.ToTable("UserType", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.Website.Banner", b =>
@@ -9811,7 +9811,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("WebGroupId");
 
-                    b.ToTable("Banner");
+                    b.ToTable("Banner", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.Website.Navbar", b =>
@@ -9896,7 +9896,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("Navbar");
+                    b.ToTable("Navbar", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.Website.SideBar", b =>
@@ -9971,7 +9971,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("SideBar");
+                    b.ToTable("SideBar", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.Website.SiteContent", b =>
@@ -10081,7 +10081,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("SiteContent");
+                    b.ToTable("SiteContent", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.Website.SiteDocument", b =>
@@ -10165,7 +10165,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("SiteDocument");
+                    b.ToTable("SiteDocument", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.Website.WebGroup", b =>
@@ -10228,7 +10228,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("WebGroups");
+                    b.ToTable("WebGroups", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.Website.WebsiteAttachment", b =>
@@ -10299,7 +10299,7 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("UpdateById");
 
-                    b.ToTable("WebsiteAttachment");
+                    b.ToTable("WebsiteAttachment", (string)null);
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.Org.Employee", b =>
