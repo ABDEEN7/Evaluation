@@ -259,6 +259,7 @@ function ClearForViewMode() {
     $("#UserTeamScopeRelationtabulator").css("pointer-events", "none");
 }
 $(document).ready(function () {
+    
     IsEdit = IsEdit_Team;
     IsDelete = IsDelete_Team;
     IsView = IsView_Team;

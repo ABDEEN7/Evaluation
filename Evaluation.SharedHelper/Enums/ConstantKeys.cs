@@ -348,6 +348,7 @@ public static class ConstantKeys
         public static readonly string AdminNDAStatusDepartment = "AdminNDAStatusDepartment";
         public static readonly string AdminUserTeamScope = "AdminUserTeamScope";
         public static readonly string AdminDepTargetOrgTree = "AdminDepTargetOrgTree";
+        public static readonly string AdminPartyTypeEvalPartyStatus = "AdminPartyTypeEvalPartyStatus";
     }
     public static class WebAppPages
     {
@@ -934,6 +935,16 @@ public static class ConstantKeys
         public const string DELETE_ADMIN_DEPTARGETORGTREE = "DELETE_ADMIN_DEPTARGETORGTREE";
 
         #endregion
+
+        #region USERTEAMSCOPE
+
+        public const string VIEW_ADMIN_PartyTypeEvalPartyStatus = "VIEW_ADMIN_PartyTypeEvalPartyStatus";
+        public const string ADD_ADMIN_PartyTypeEvalPartyStatus = "ADD_ADMIN_PartyTypeEvalPartyStatus";
+        public const string EDIT_ADMIN_PartyTypeEvalPartyStatus = "EDIT_ADMIN_PartyTypeEvalPartyStatus";
+        public const string DELETE_ADMIN_PartyTypeEvalPartyStatus = "DELETE_ADMIN_PartyTypeEvalPartyStatus";
+
+        #endregion
+
 
     }
 

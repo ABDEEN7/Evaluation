@@ -108,7 +108,7 @@ public class TeamController : Controller
     {
         var request = Request.Form["request"][0]?.StringToObject<UserTeamScopeDTO>();
         var result = new UserTeamScopeDTO();
-        bool validateObject = await masterBL.GetAdminService<SrvBaseBL>().ValidateObject(request!, ConstantKeys.AdminPermission.EDIT_ADMIN_USERTEAMSCOPE);
+        bool validateObject = await masterBL.GetAdminService<SrvBaseBL>().ValidateObject(request!, ConstantKeys.AdminPermission.ADD_ADMIN_USERTEAMSCOPE);
         if (validateObject)
         {
             result = await masterBL.GetAdminService<SrvTeamBL>().UpdateUserTeamScope(request!);

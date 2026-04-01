@@ -26,8 +26,10 @@ public class EvaluationPartyController : Controller
     public async Task<IActionResult> Index()
     {
         var model = new EvaluationPartyVM(httpContextAccessor);
-        await model.LoadAllAData(new string[] { ConstantKeys.AdminPages.AdminEvaluationParties },
-                new string[] { ConstantKeys.AdminPermission.ADD_ADMIN_EVALUATIONPARTIES });
+        await model.LoadAllAData(new string[] { ConstantKeys.AdminPages.AdminEvaluationParties,
+        ConstantKeys.AdminPages.AdminPartyTypeEvalPartyStatus},
+                new string[] { ConstantKeys.AdminPermission.ADD_ADMIN_EVALUATIONPARTIES,
+                ConstantKeys.AdminPermission.ADD_ADMIN_PartyTypeEvalPartyStatus});
         var property = typeof(EvaluationParty).GetProperty("OrderNo");
         model.containsOrderNo = property != null ? true : false;
         return View(model);
@@ -41,14 +43,35 @@ public class EvaluationPartyController : Controller
         var response = await masterBL.GetAdminService<SrvEvaluationPartyBL>().GetEvaluationPartyList(page, pageSize);
         return Ok(response);
     }
+
+    [HttpGet]
+    [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.AdminPermission.VIEW_ADMIN_PartyTypeEvalPartyStatus })]
+    public async Task<IActionResult> GetAllPartyTypeEvalPartyStatus(Guid EvaluationPartyId)
+    {
+
+        var response = await masterBL.GetAdminService<SrvEvaluationPartyBL>().GetAllPartyTypeEvalPartyStatusList(EvaluationPartyId);
+        return Ok(response);
+    }
+    [HttpGet]
+    [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.AdminPermission.VIEW_ADMIN_EVALUATIONPARTIES })]
+    public async Task<IActionResult> GetPartyTypeEvalPartyStatus()
+    {
+
+        Dictionary<string, object> response = new Dictionary<string, object>();
+        var PartyTypeList = await masterBL.GetAdminService<SrvEvaluationPartyBL>().GetPartyTypeList();
+        var ServiceStatusList = await masterBL.GetAdminService<SrvEvaluationPartyBL>().GetServiceStatusList();
+        response.Add("PartyTypeList", PartyTypeList);
+        response.Add("ServiceStatusList", ServiceStatusList);
+        return Ok(new ResponseEntity(response));
+    }
     [HttpPost]
     [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.AdminPermission.ADD_ADMIN_EVALUATIONPARTIES })]
     public async Task<IActionResult> SaveEvaluationParty()
     {
 
-        var request = Request.Form["request"][0]?.StringToObject<EvaluationPartyDto>();
+        var request = Request.Form["request"][0]?.StringToObject<EvaluationPartyDTO>();
 
-        var result = new EvaluationPartyDto();
+        var result = new EvaluationPartyDTO();
         bool validateObject = await masterBL.GetAdminService<SrvBaseBL>().ValidateObject(request!, ConstantKeys.AdminPermission.ADD_ADMIN_EVALUATIONPARTIES);
         if (validateObject)
         {
@@ -70,8 +93,8 @@ public class EvaluationPartyController : Controller
     [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.AdminPermission.EDIT_ADMIN_EVALUATIONPARTIES })]
     public async Task<IActionResult> UpdateEvaluationParty()
     {
-        var request = Request.Form["request"][0]?.StringToObject<EvaluationPartyDto>();
-        var result = new EvaluationPartyDto();
+        var request = Request.Form["request"][0]?.StringToObject<EvaluationPartyDTO>();
+        var result = new EvaluationPartyDTO();
         bool validateObject = await masterBL.GetAdminService<SrvBaseBL>().ValidateObject(request!, ConstantKeys.AdminPermission.ADD_ADMIN_EVALUATIONPARTIES);
         if (validateObject)
         {
@@ -85,6 +108,30 @@ public class EvaluationPartyController : Controller
     {
         var model = Request.Form["OrderObj"][0]?.StringToObject<List<OrderingDTO>>();
         var result = await masterBL.GetAdminService<SrvEvaluationPartyBL>().UpdateEvaluationPartyOrderAsync(model!);
+        return Ok(result);
+    }
+
+    [HttpPost]
+    [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.AdminPermission.EDIT_ADMIN_PartyTypeEvalPartyStatus })]
+    public async Task<IActionResult> UpdatePartyTypeEvalPartyStatus()
+    {
+        var request = Request.Form["request"][0]?.StringToObject<PartyTypeEvalPartyStatusDTO>();
+        var result = new PartyTypeEvalPartyStatusDTO();
+        bool validateObject = await masterBL.GetAdminService<SrvBaseBL>().ValidateObject(request!, ConstantKeys.AdminPermission.ADD_ADMIN_PartyTypeEvalPartyStatus);
+        if (validateObject)
+        {
+            result = await masterBL.GetAdminService<SrvEvaluationPartyBL>().UpdatePartyTypeEvalPartyStatus(request!);
+        }
+        return Ok(result);
+    }
+
+    [HttpPost]
+    [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.AdminPermission.DELETE_ADMIN_PartyTypeEvalPartyStatus })]
+    public async Task<IActionResult> DeletePartyTypeEvalPartyStatus(Guid id)
+    {
+        var result = await masterBL
+            .GetAdminService<SrvEvaluationPartyBL>()
+            .DeletePartyTypeEvalPartyStatusAsync(id);
         return Ok(result);
     }
 }
