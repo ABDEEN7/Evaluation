@@ -73,7 +73,7 @@ namespace Evaluation.API.Controllers
 			var assignUsersJson = Request?.Form!["teamUsers"].FirstOrDefault();
 			var teamUsersJson = Request?.Form!["teamUsers"].FirstOrDefault();
 			Guid requestId = Guid.TryParse(Request?.Form!["requestId"], out var tempId) ? tempId : Guid.Empty;
-			Guid evaluationRequestId = Guid.TryParse(Request?.Form!["evaluationRequestId"], out var EvlId) ? EvlId : Guid.Empty;
+			Guid? evaluationRequestId = Guid.TryParse(Request?.Form!["evaluationRequestId"], out var EvlId) ? EvlId : null;
 
             var assignUsers = !string.IsNullOrEmpty(assignUsersJson)
                 ? JsonConvert.DeserializeObject<List<AssignUserDTO?>>(assignUsersJson)!

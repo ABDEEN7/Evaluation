@@ -22,6 +22,7 @@ using Evaluation.DAL.Models.Template;
 using Evaluation.DAL.Models.UserEntiy;
 using Evaluation.DAL.Models.Website;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 using System.Reflection;
 
 namespace Evaluation.DAL.Context;
@@ -106,7 +107,7 @@ public partial class EvaluationDbContext : DbContext
     public virtual DbSet<RequestAssignmentScope> RequestAssignmentScopes { get; set; }
     public virtual DbSet<EvalAttachment> EvalAttachments { get; set; }
     public virtual DbSet<PlanTypeDep> PlanTypeDep { get; set; }
-    public virtual DbSet<WebGroup> WebGroups{ get; set; }
+    public virtual DbSet<WebGroup> WebGroups { get; set; }
     public virtual DbSet<DepWebGroup> DepWebGroup { get; set; }
     public virtual DbSet<DepEvaluationType> DepEvaluationType { get; set; }
     public virtual DbSet<EvaluationRequestAssignment> EvaluationRequestAssignment { get; set; }
@@ -158,13 +159,15 @@ public partial class EvaluationDbContext : DbContext
         {
             entity.Property(e => e.Sequence)
                 .ValueGeneratedOnAdd()
-                .UseIdentityColumn(1, 1); // seed: 1, increment: 1
+                .UseIdentityColumn(1, 1)
+                .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore); // seed: 1, increment: 1
         });
         modelBuilder.Entity<ServiceRequest>(entity =>
         {
             entity.Property(e => e.Sequence)
                 .ValueGeneratedOnAdd()
-                .UseIdentityColumn(1, 1); // seed: 1, increment: 1
+                .UseIdentityColumn(1, 1)
+                .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore); // seed: 1, increment: 1
         });
         modelBuilder.Entity<OrgTree>()
            .HasOne(x => x.OrgType)
