@@ -23,19 +23,19 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
         public async Task<SystemModule> GetSystemModuleByRoutingAsync(string BackendName)
         {
-            var scopedUow = serviceScopeFactory.CreateScopedUow();
+           using var scopedUow = serviceScopeFactory.CreateScopedUow();
 
             var SystemModule = await scopedUow.GetRepository<SystemModule>()
                 .GetAllQueryFiltered()
                 .Include(x=>x.SystemModuleType)
-                .FirstOrDefaultAsync(c => c.SystemModuleType.BackendName == BackendName && c.DepartmentId==requestInfo.DepId);
+                .FirstOrDefaultAsync(c => c.SystemModuleType!.BackendName == BackendName && c.DepartmentId==requestInfo.DepId);
 
             return SystemModule!;
         }
 
         public async Task<SystemModuleDTO> GetSystemModuleDTOByIdAsync(Guid SystemModuleId)
         {
-            var scopedUow = serviceScopeFactory.CreateScopedUow();
+            using var scopedUow = serviceScopeFactory.CreateScopedUow();
 
             var SystemModule = await scopedUow.GetRepository<SystemModule>()
                 .GetAllQueryFiltered()
@@ -46,7 +46,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
         }
         public async Task<SystemModule> GetSystemModuleByIdAsync(Guid SystemModuleId)
         {
-            var scopedUow = serviceScopeFactory.CreateScopedUow();
+           using var scopedUow = serviceScopeFactory.CreateScopedUow();
 
             var SystemModule = await scopedUow.GetRepository<SystemModule>()
                 .GetAllQueryFiltered()

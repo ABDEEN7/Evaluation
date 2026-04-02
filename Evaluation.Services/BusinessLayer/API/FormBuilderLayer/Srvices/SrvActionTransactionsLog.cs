@@ -28,7 +28,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
         public async Task<Guid> UpdateStatusAndLogAction(RequestType requestType, ServiceRequest application, Guid actionId, Guid nextStatusId, string Remarks, bool saveAsDraft = false)
         {
-            var scopedUow = serviceScopeFactory.CreateScopedUow();
+            using var scopedUow = serviceScopeFactory.CreateScopedUow();
 
             var status =await scopedUow.GetRepository<ServiceStatus>()
                                   .GetAllQueryFiltered()
@@ -109,9 +109,9 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
            
             List<ActionTransactionLogDTO> actionTransactionLogs;
 
-           
-            var query =await serviceScopeFactory.CreateScopedUow()
-                        .GetRepository<ActionTransactionsLog>()
+			using var scopedUow = serviceScopeFactory.CreateScopedUow();
+
+			var query =await scopedUow.GetRepository<ActionTransactionsLog>()
                         .GetAllQueryFiltered()
                         .Include(c => c.CreateBy)
                         .Include(c => c.ServiceAction)
@@ -155,8 +155,8 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
         public async Task<List<AttachementDTO>?> GetActionTransactionAttachments(Guid id)
         {
-            var attachments = await serviceScopeFactory.CreateScopedUow()
-                            .GetRepository<EvalAttachment>()
+			using var scopedUow = serviceScopeFactory.CreateScopedUow();
+			var attachments = await scopedUow.GetRepository<EvalAttachment>()
                             .GetAllActiveNonDeleted()
                             .Where(c => c.ActionTransactionsLogId == id)
                             .Select(m => new AttachementDTO() { Id = m.Id, UiFileName = m.UiFileName }).ToListAsync();

@@ -26,10 +26,11 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
         {
         
 
-        public async Task<ServiceDTO> GetServiceByIdAsync(Guid serviceId, string Lang)
-        {
-            var service = await serviceScopeFactory.CreateScopedUow()
-                                       .GetRepository<Service>()
+        public async Task<ServiceDTO?> GetServiceByIdAsync(Guid serviceId, string Lang)
+		{
+			using var scopedUow = serviceScopeFactory.CreateScopedUow();
+
+			var service = await scopedUow.GetRepository<Service>()
                 .GetAllQueryFiltered(x => x.Id == serviceId)
                 .AsNoTracking()
                 .FirstOrDefaultAsync();
@@ -39,27 +40,29 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
             return MapToServiceDTO(service, Lang);
         }
-        public async Task<Service> GetServiceById(Guid serviceId)
-        {
-            var service = await serviceScopeFactory.CreateScopedUow()
-                                       .GetRepository<Service>()
+        public async Task<Service?> GetServiceById(Guid serviceId)
+		{
+			using var scopedUow = serviceScopeFactory.CreateScopedUow();
+
+			var service = await scopedUow.GetRepository<Service>()
                 .GetAllQueryFiltered(x => x.Id == serviceId)
                 .Include(x=>x.SystemModule)
-                .Include(x=>x.SystemModule.SystemModuleType)
+                .Include(x=>x.SystemModule!.SystemModuleType)
                 .AsNoTracking()
                 .FirstOrDefaultAsync();
 
             return service;
 
         }
-        public async Task<Service> GetActiveAndOpenServiceById(Guid serviceId)
-        {
-            DateTime today = DateTime.Now;
-            var service = await serviceScopeFactory.CreateScopedUow()
-                                       .GetRepository<Service>()
+        public async Task<Service?> GetActiveAndOpenServiceById(Guid serviceId)
+		{
+			using var scopedUow = serviceScopeFactory.CreateScopedUow();
+
+			DateTime today = DateTime.Now;
+            var service = await scopedUow.GetRepository<Service>()
                 .GetAllQueryFiltered(x => x.Id == serviceId)
                 .Include(c=>c.SystemModule)
-                .Include(c=>c.SystemModule.SystemModuleType)
+                .Include(c=>c.SystemModule!.SystemModuleType)
                 .Where(c =>(!c.StartDate.HasValue || today >= c.StartDate) && (null == c.EndDate || c.EndDate.Value.AddDays(1) >= today))
                 .AsNoTracking()
                 .FirstOrDefaultAsync();
@@ -68,9 +71,10 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
         }
         public async Task<Service?> GetIntialService(Guid moduleId)
-        {
-            var service = await serviceScopeFactory.CreateScopedUow()
-                                       .GetRepository<Service>()
+		{
+			using var scopedUow = serviceScopeFactory.CreateScopedUow();
+
+			var service = await scopedUow.GetRepository<Service>()
                 .GetAllQueryFiltered(x => x.SystemModuleId == moduleId && x.Initialservice)
                 .AsNoTracking()
                 .FirstOrDefaultAsync();
@@ -83,8 +87,9 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
         {
             string lang = requestInfo.Lang;
             var userPartyTypes = userInfo.PartyTypes;
+			using var scopedUow = serviceScopeFactory.CreateScopedUow();
 
-            var repo = serviceScopeFactory.CreateScopedUow().GetRepository<Service>();
+			var repo = scopedUow.GetRepository<Service>();
 
             var query = repo.GetAllQueryFiltered(x => x.SystemModuleId == moduleId)
                             .Include(x => x.RequestShowPartyType)
@@ -107,9 +112,10 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
 
         public async Task<Guid> GetModuleIdForServiceAsync(Guid serviceId)
-        {
-            var SystemModulesId = await serviceScopeFactory.CreateScopedUow()
-                                       .GetRepository<Service>()
+		{
+			using var scopedUow = serviceScopeFactory.CreateScopedUow();
+
+			var SystemModulesId = await scopedUow.GetRepository<Service>()
                 .GetAllQueryFiltered(x => x.Id == serviceId)
                 .Select(x => x.SystemModuleId)
                 .FirstOrDefaultAsync();
@@ -128,9 +134,9 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
             if (serviceId == Guid.Empty)
                 throw new ArgumentException("Service ID cannot be null or empty.", nameof(serviceId));
+			using var scopedUow = serviceScopeFactory.CreateScopedUow();
 
-            var service = await serviceScopeFactory.CreateScopedUow()
-                                   .GetRepository<Service>().GetAllQueryFiltered()
+			var service = await scopedUow.GetRepository<Service>().GetAllQueryFiltered()
                                   .AsNoTracking()
                                   .Include(x => x.SystemModule)
                                   //.Include(x => x.SchServiceStatusConfiguration)
@@ -271,7 +277,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                     {
                         serviceList = await Scoped.GetRepository<ServiceInitiatorPartyType>().GetAllQueryFiltered()
                                      .Where(c => employeeUserPartyTypes.Contains(c.PartyTypeId))
-                                     .Where(c => c.service.SystemModuleId == Module.Id)
+                                     .Where(c => c.service!.SystemModuleId == Module.Id)
                                      .Select(x => x.serviceId)
                                      .Distinct()
                                      .ToListAsync();
@@ -287,8 +293,8 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                         //}
                             serviceList = await Scoped.GetRepository<ServiceInitiatorPartyType>().GetAllQueryFiltered()
                                     .Include(x => x.PartyType)
-                                    .Where(c => !c.PartyType.IsEmployeePartyType)
-                                    .Where(c => c.service.SystemModuleId == Module.Id)
+                                    .Where(c => !c.PartyType!.IsEmployeePartyType)
+                                    .Where(c => c.service!.SystemModuleId == Module.Id)
                                     .Select(x => x.serviceId)
                                     .Distinct()
                                     .ToListAsync();
@@ -422,19 +428,23 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
         //}
 
         public async Task<bool> CanCreateDraftAsync(Guid? serviceId, Guid? ownerId)
-        {
-            if (serviceId is null || ownerId is null)
+		{
+			using var scopedUow = serviceScopeFactory.CreateScopedUow();
+			using var scopedUow1 = serviceScopeFactory.CreateScopedUow();
+			using var scopedUow2 = serviceScopeFactory.CreateScopedUow();
+
+			if (serviceId is null || ownerId is null)
                 throw new ArgumentException("Service ID and Owner ID cannot be null or empty.");
 
-            var service = await serviceScopeFactory.CreateScopedUow()
+            var service = await scopedUow
                                  .GetRepository<Service>().GetAllQueryFiltered()
                 .FirstOrDefaultAsync(x => x.Id == serviceId);
 
             if (service == null)
                 throw new BusinessException(ExceptionMessage.ServiceNotFound);
 
-            var draftRequestsCount = await serviceScopeFactory.CreateScopedUow()
-                                          .GetRepository<ServiceRequest>()
+            var draftRequestsCount = await scopedUow1
+										  .GetRepository<ServiceRequest>()
                                           .GetAllQueryFiltered()
                                           .Include(x => x.Status)
                                          .CountAsync(x => x.ServiceId == serviceId && x.StatusId == ownerId && x.Status!.ServiceStatusType!.IsOpen && x.Status.IsInitial);
@@ -442,8 +452,8 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             if (draftRequestsCount > 0)
                 return false;
 
-            var draftActionsCount = await serviceScopeFactory.CreateScopedUow()
-                                          .GetRepository<ActionStatusConfiguration>()
+            var draftActionsCount = await scopedUow2
+										  .GetRepository<ActionStatusConfiguration>()
                                           .GetAllQueryFiltered()
                                           .Include(x => x.ServiceAction)
                                           .Include(x => x.CurrentStatus)
@@ -459,18 +469,20 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             {
                 throw new BusinessException(ExceptionMessage.ServiceNotFound);
             }
-
-            var serviceSettings = JsonConvert.DeserializeObject<Dictionary<string, object>>(serviceObj.ServiceSettings);
-            if (serviceSettings == null)
+            if (serviceObj.ServiceSettings is not null)
             {
-                serviceSettings = new Dictionary<string, object>();
+                var serviceSettings = JsonConvert.DeserializeObject<Dictionary<string, object>>(serviceObj.ServiceSettings);
+                if (serviceSettings == null)
+                {
+                    serviceSettings = new Dictionary<string, object>();
+                }
+
+                serviceSettings[settingKey] = value;
+
+                serviceObj.ServiceSettings = JsonConvert.SerializeObject(serviceSettings);
+
+                uow.GetRepository<Service>().Update(serviceObj);
             }
-
-            serviceSettings[settingKey] = value;
-
-            serviceObj.ServiceSettings = JsonConvert.SerializeObject(serviceSettings);
-
-             uow.GetRepository<Service>().Update(serviceObj);
         }
     }
 }

@@ -42,9 +42,9 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             var actionsId = ActionStatusConfiguration.Intersect(actionPartType).ToList();
 
             if (!actionsId.Any()) return new List<ActionDTO>();
-
-            var actionsquery = serviceScopeFactory.CreateScopedUow()
-                                        .GetRepository<ServiceAction>()
+			using var ScopedUow = serviceScopeFactory.CreateScopedUow();
+			var actionsquery = ScopedUow
+										.GetRepository<ServiceAction>()
                                         .GetAllQueryFiltered()
                                         .AsNoTracking()
                                         .Include(c => c.ActionType!)
@@ -104,9 +104,9 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
         {
             string lang = _requestInfo.Lang;
             var userTask = srvUser.GetByIDActiveNonDeleted(userInfo.UserId!.Value);
+			using var ScopedUow = serviceScopeFactory.CreateScopedUow();
 
-			var request = await serviceScopeFactory.CreateScopedUow()
-                                       .GetRepository<ServiceRequest>().GetByIDActiveNonDeleted(requestId);
+			var request = await ScopedUow.GetRepository<ServiceRequest>().GetByIDActiveNonDeleted(requestId);
 
             if (request == null) { throw new BusinessException(ConstantKeys.ExceptionMessage.ServiceRequestNotFound); }
             var statusId = request.StatusId;
@@ -120,9 +120,8 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                                            .OrderBy(c => c.OrderNo)
                                            .Select(c => c.ServiceActionId)
                                            .ToList();
-               
-                var actionsquery = serviceScopeFactory.CreateScopedUow()
-                                       .GetRepository<ServiceAction>()
+				using var ScopedUow1 = serviceScopeFactory.CreateScopedUow();
+				var actionsquery = ScopedUow1.GetRepository<ServiceAction>()
                                        .GetAllQueryFiltered()
                                        .Include(c => c.ActionType!)
                                        .Include(c => c.ActionTemplateDocs!)
@@ -144,8 +143,8 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
         public async Task<bool> ValidateActionConditions(Guid ActionId, Guid? RequestId, Guid? planId)
         {
-            var uow = serviceScopeFactory.CreateScopedUow();
-            var conditions = await uow.GetRepository<ActionCondition>()
+            using var ScopedUow = serviceScopeFactory.CreateScopedUow();
+            var conditions = await ScopedUow.GetRepository<ActionCondition>()
                 .GetAllQueryFiltered()
                 .Where(c => c.ServiceActionId == ActionId)
                 .ToListAsync();
@@ -161,7 +160,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
                 if (condition.Type.Equals("Service", StringComparison.OrdinalIgnoreCase))
                 {
-                    var fieldValueEntity = await uow.GetRepository<ServiceRequestFieldsValue>()
+                    var fieldValueEntity = await ScopedUow.GetRepository<ServiceRequestFieldsValue>()
                         .GetAllQueryFiltered()
                         .FirstOrDefaultAsync(c => c.RefId == RequestId && c.FieldId == condition.RefID);
 
@@ -172,56 +171,56 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
                     fieldValue = fieldValueEntity.Value;
                 }
-                //else if (condition.Type.Equals("scholarship", StringComparison.OrdinalIgnoreCase))
-                //{
-                //    var sysField = await uow.GetRepository<SystemField>()
-                //        .GetAllQueryFiltered()
-                //        .FirstOrDefaultAsync(f => f.Id == condition.RefID);
+				//else if (condition.Type.Equals("scholarship", StringComparison.OrdinalIgnoreCase))
+				//{
+				//    var sysField = await ScopedUow.GetRepository<SystemField>()
+				//        .GetAllQueryFiltered()
+				//        .FirstOrDefaultAsync(f => f.Id == condition.RefID);
 
-                //    if (sysField == null)
-                //    {
-                //        return false;
-                //    }
+				//    if (sysField == null)
+				//    {
+				//        return false;
+				//    }
 
-                //    if (sysField.IsCoreColumn)
-                //    {
-                //        var schData = await uow.GetRepository<ScholarshipData>()
-                //            .GetAllQueryFiltered()
-                //            .FirstOrDefaultAsync(c => c.Id == planId);
+				//    if (sysField.IsCoreColumn)
+				//    {
+				//        var schData = await ScopedUow.GetRepository<ScholarshipData>()
+				//            .GetAllQueryFiltered()
+				//            .FirstOrDefaultAsync(c => c.Id == planId);
 
-                //        if (schData == null)
-                //        {
-                //            return false;
-                //        }
+				//        if (schData == null)
+				//        {
+				//            return false;
+				//        }
 
-                //        fieldValue = sysField.BackendName switch
-                //        {
-                //            "MajorId" => schData.MajorId,
-                //            "CountryId" => schData.CountryId,
-                //            "UniversityId" => schData.UniversityId,
-                //            "AcademicDegreeId" => schData.AcademicDegreeId,
-                //            "ParentAcademicDegreeId" => schData.ParentAcademicDegreeId,
-                //            "SchPlanId" => schData.SchPlanId,
-                //            "SchStatusId" => schData.SchStatusId,
-                //            _ => throw new ArgumentException($"Unsupported BackendName: {sysField.BackendName}")
-                //        };
-                //    }
-                //    else
-                //    {
-                //        var schFieldValueEntity = await uow.GetRepository<SchFieldValue>()
-                //            .GetAllQueryFiltered()
-                //            .FirstOrDefaultAsync(c => c.planId == planId && c.SystemFieldId == condition.RefID);
+				//        fieldValue = sysField.BackendName switch
+				//        {
+				//            "MajorId" => schData.MajorId,
+				//            "CountryId" => schData.CountryId,
+				//            "UniversityId" => schData.UniversityId,
+				//            "AcademicDegreeId" => schData.AcademicDegreeId,
+				//            "ParentAcademicDegreeId" => schData.ParentAcademicDegreeId,
+				//            "SchPlanId" => schData.SchPlanId,
+				//            "SchStatusId" => schData.SchStatusId,
+				//            _ => throw new ArgumentException($"Unsupported BackendName: {sysField.BackendName}")
+				//        };
+				//    }
+				//    else
+				//    {
+				//        var schFieldValueEntity = await ScopedUow.GetRepository<SchFieldValue>()
+				//            .GetAllQueryFiltered()
+				//            .FirstOrDefaultAsync(c => c.planId == planId && c.SystemFieldId == condition.RefID);
 
-                //        if (schFieldValueEntity == null)
-                //        {
-                //            return false;
-                //        }
+				//        if (schFieldValueEntity == null)
+				//        {
+				//            return false;
+				//        }
 
-                //        fieldValue = schFieldValueEntity.Value;
-                //    }
-                //}
-                else
-                {
+				//        fieldValue = schFieldValueEntity.Value;
+				//    }
+				//}
+				else
+				{
                     throw new ArgumentException($"Unsupported condition type: {condition.Type}");
                 }
 

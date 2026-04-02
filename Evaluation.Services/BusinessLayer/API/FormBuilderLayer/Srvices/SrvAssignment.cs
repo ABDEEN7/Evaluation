@@ -24,7 +24,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
         public async Task PerformAssignAction(Guid requestId, List<SharedHelper.Models.Api.ActionEntitiesDTOs.AssignUserDTO?> users)
         {
-            var _Uow = serviceScopeFactory.CreateScopedUow();
+           using var _Uow = serviceScopeFactory.CreateScopedUow();
 
             var userEmails = users.Select(c => c!.Email).Distinct().ToList();
 
@@ -196,9 +196,9 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
         private async Task<List<Guid>> GetAllowedPartyTypeIds(Guid actionId)
         {
-            using var uow = serviceScopeFactory.CreateScopedUow();
+            using var _uow = serviceScopeFactory.CreateScopedUow();
 
-            var assignablePartyTypes = await uow.GetRepository<ActionAssignPartyType>()
+            var assignablePartyTypes = await _uow.GetRepository<ActionAssignPartyType>()
                 .GetAllQueryFiltered(c => c.EvaluationActionId == actionId)
                 .Include(x => x.PartyType)
                 .AsNoTracking()
@@ -212,8 +212,9 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
         public async Task<List<AssignUserDTO>> GetAssignedUsers(ServiceRequest request, Guid? actionId, bool showIsDefault)
         {
             string lang = _requestInfo.Lang;
+			using var _uow = serviceScopeFactory.CreateScopedUow();
 
-            if (actionId is null)
+			if (actionId is null)
             {
                 throw new BusinessException(ConstantKeys.ExceptionMessage.lblActionNotFound);
             }
@@ -227,8 +228,8 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                 return new List<AssignUserDTO>();
             }
 
-            var users = await serviceScopeFactory.CreateScopedUow()
-                            .GetRepository<MinistryUser>()
+            var users = await _uow
+							.GetRepository<MinistryUser>()
                             .GetAllQueryFiltered()
                             .Include(u => u.UserPartTypes!)
                                 .ThenInclude(pt => pt.PartyType)
@@ -280,9 +281,9 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
         //}
         public async Task<List<RequestAssignment>> GetRequestAssignet(Guid requestId)
         {
+			using var _uow = serviceScopeFactory.CreateScopedUow();
 
-            var assignmentUserIds = await serviceScopeFactory.CreateScopedUow()
-                                                 .GetRepository<RequestAssignment>()
+			var assignmentUserIds = await _uow.GetRepository<RequestAssignment>()
                                                  .GetAllQueryFiltered()
                                                  .Where(c => c.ServiceRequestId == requestId)
                                                  .ToListAsync();

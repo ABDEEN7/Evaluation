@@ -81,16 +81,18 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
         }
         private List<MinistryUser> GetEmployeeRecipients( Guid serviceRequestId,  List<MinistryUser> allUserProfiles, PartyType partyType)
         {
-            var assignmentRepo = serviceScopeFactory.CreateScopedUow().GetRepository<RequestAssignment>();
+			using var scope = serviceScopeFactory.CreateScopedUow();
+
+			var assignmentRepo = scope.GetRepository<RequestAssignment>();
 
             var assignments = assignmentRepo.GetAllQueryFiltered()
                 .Where(a => a.ServiceRequestId == serviceRequestId)
-                .Include(a => a.MinistryUser.UserPartTypes)
+                .Include(a => a.MinistryUser!.UserPartTypes)
                 .ToList();
 
             // 1. Directly assigned users in this PartyType
             var assignedUsers = assignments
-                .Where(a => a.MinistryUser.UserPartTypes!.Any(pt => pt.PartyTypeId == partyType.Id))
+                .Where(a => a.MinistryUser!.UserPartTypes!.Any(pt => pt.PartyTypeId == partyType.Id))
                 .Select(a => a.MinistryUser)
                 .ToList();
 
@@ -104,9 +106,9 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             assignedUsers.AddRange(usersWithViewAllOrCountryAccess);
 
             // Remove duplicates
-            return assignedUsers
+            return assignedUsers!
                 .GroupBy(u => u.Id)
-                .Select(g => g.First())
+                .Select(g => g.First()!)
                 .ToList();
         }
         private List<MinistryUser> GetStudentRecipient(Guid? studentId, List<MinistryUser> allUserProfiles)

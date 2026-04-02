@@ -24,15 +24,9 @@ using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Api.ActionEntitiesDTOs;
 using Evaluation.SharedHelper.Models.Api.FormBuilderDTO;
 using Evaluation.SharedHelper.Models.Api.ServiceRequestEntitiesDTO;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System.Globalization;
-using System.Text.Json;
-using System.Text.RegularExpressions;
 using static Evaluation.DAL.ConstantKeys;
 using static Evaluation.SharedHelper.Enums.ConstantKeys;
 
@@ -178,27 +172,18 @@ namespace Evaluation.Services.Models.API
                         if (planField == null)
                             break;
 
-                        try
-                        {
-                            var dto = JsonConvert.DeserializeObject<CreateEvaluationPlanDto>(planField.Value);
-                            if (dto == null) throw new BusinessException("Invalid Evaluation Plan data");
+							var dto = JsonConvert.DeserializeObject<CreateEvaluationPlanDto>(planField.Value!);
+							if (dto == null) throw new BusinessException(ExceptionMessage.msgInvalidEvaluationPlan);
 
                             await planServiceRequestServices.InsertOrUpdatePlan(dto);
 
-                        }
-
-                        catch (Exception ex)
-                        {
-
-                        }
-
-                        break;
-                    }
-                case ActionTypeKeys.CLOSE_AND_UPDATE_PLAN:
-                    {
-                        if (FieldsToUpdates.Count > 0)
-                        {
-                            var updatedFields = await PrepareAndUpdateFields(application.ServiceId, RequestType, application.Id, FieldsToUpdates, existingFields, lang, actiondb.Id);
+						break;
+					}
+				case ActionTypeKeys.CLOSE_AND_UPDATE_PLAN:
+					{
+						if (FieldsToUpdates.Count > 0)
+						{
+							var updatedFields = await PrepareAndUpdateFields(application.ServiceId,RequestType,application.Id,FieldsToUpdates,existingFields,lang,actiondb.Id);
 
                             existingFields.AddRange(updatedFields);
                         }
@@ -213,31 +198,18 @@ namespace Evaluation.Services.Models.API
                         if (planField == null)
                             break;
 
+							var dto = JsonConvert.DeserializeObject<CreateEvaluationPlanDto>(planField.Value!);
+							if (dto == null) throw new BusinessException(ExceptionMessage.msgInvalidEvaluationPlan);
 
-                        try
-                        {
-                            var dto = JsonConvert.DeserializeObject<CreateEvaluationPlanDto>(planField.Value);
-                            if (dto == null) throw new BusinessException("Invalid Evaluation Plan data");
-                            await planServiceRequestServices.InsertOrUpdatePlan(dto);
+							await planServiceRequestServices.InsertOrUpdatePlan(dto);
 
-                        }
-
-                        catch (Exception ex)
-                        {
-
-                        }
-                        //						var dto = JsonConvert.DeserializeObject<CreateEvaluationPlanDto>(
-                        //	planField.Value.ToString()
-                        //);
-
-
-                        break;
-                    }
-                case ActionTypeKeys.CLOSE_AND_UPDATE_FORM:
-                    {
-                        if (FieldsToUpdates.Count > 0)
-                        {
-                            var updatedFields = await PrepareAndUpdateFields(application.ServiceId, RequestType, application.Id, FieldsToUpdates, existingFields, lang, actiondb.Id);
+						break;
+					}
+				case ActionTypeKeys.CLOSE_AND_UPDATE_FORM:
+					{
+						if (FieldsToUpdates.Count > 0)
+						{
+							var updatedFields = await PrepareAndUpdateFields(application.ServiceId,RequestType,application.Id,FieldsToUpdates,existingFields,lang,actiondb.Id);
 
                             existingFields.AddRange(updatedFields);
                         }
@@ -253,9 +225,9 @@ namespace Evaluation.Services.Models.API
                             break;
 
 
-                        var dto = JsonConvert.DeserializeObject<EvaluationFormDto>(FormField.Value);
+						var dto = JsonConvert.DeserializeObject<EvaluationFormDto>(FormField.Value!);
 
-                        if (dto == null) throw new BusinessException("Invalid Evaluation Plan data");
+						if (dto == null) throw new BusinessException(ExceptionMessage.msgInvalidEvaluationForm);
 
                         await _EvaluationFormBL.SaveEvaluationForm(dto);
 
@@ -280,14 +252,9 @@ namespace Evaluation.Services.Models.API
                         if (planField == null)
                             break;
 
+						var dto = JsonConvert.DeserializeObject<CreateEvaluationPlanDto>(planField.Value);
 
-                        //var dto = Newtonsoft.Json.JsonConvert.DeserializeObject<CreateEvaluationPlanDto>(planField.Value.ToString());
-                        var dto = JsonConvert.DeserializeObject<CreateEvaluationPlanDto>(planField.Value);
-
-                        //						var dto = JsonConvert.DeserializeObject<CreateEvaluationPlanDto>(
-                        //	planField.Value.ToString()
-                        //);
-                        if (dto == null) throw new BusinessException("Invalid Evaluation Plan data");
+						if (dto == null) throw new BusinessException(ExceptionMessage.msgInvalidEvaluationForm);
 
                         await planServiceRequestServices.DeletePlanDraft(dto.Id);
 
@@ -323,17 +290,17 @@ namespace Evaluation.Services.Models.API
 
             var status = SrvStatus.GetStatusById(currentStatus);
 
-            if (serviceObj.IsAutoAssignEnabled == true && !saveAsDraft)
-            {
-
-                var Assignaction = await serviceScopeFactory.CreateScopedUow()
-                    .GetRepository<ActionStatusConfiguration>()
-                    .GetAllQueryFiltered()
-                    .Include(c => c.ServiceAction)
-                    .ThenInclude(c => c!.ActionType)
-                    .AsSplitQuery()
-                    .FirstOrDefaultAsync(c => c.ServiceAction!.ActionType!.BackendName == ActionTypeKeys.Assign
-                        && c.CurrentStatusId == application.StatusId && c.IsAuto);
+			if (serviceObj.IsAutoAssignEnabled == true && !saveAsDraft)
+			{
+				using var scope = serviceScopeFactory.CreateScopedUow();
+				var Assignaction = await scope
+					.GetRepository<ActionStatusConfiguration>()
+					.GetAllQueryFiltered()
+					.Include(c => c.ServiceAction)
+					.ThenInclude(c => c!.ActionType)
+					.AsSplitQuery()
+					.FirstOrDefaultAsync(c => c.ServiceAction!.ActionType!.BackendName == ActionTypeKeys.Assign
+						&& c.CurrentStatusId == application.StatusId && c.IsAuto);
 
                 if (Assignaction != null && Assignaction.IsAuto)
                 {
@@ -581,14 +548,15 @@ namespace Evaluation.Services.Models.API
         private async Task<IList<FieldValueDTO>> UpdateCustomFieldJsonSchemaValue(Guid requestId, IList<FieldValueDTO> fields)
         {
 
-            var fieldIdsList = fields.Select(x => x.FieldId).Distinct().ToList();
+			var fieldIdsList = fields.Select(x => x.FieldId).Distinct().ToList();
+			using var scope = serviceScopeFactory.CreateScopedUow();
 
-            var list = await serviceScopeFactory.CreateScopedUow()
-                                                .GetRepository<ServiceRequestFieldsValue>()
-                                                .GetAllQueryFiltered(x => x.RefId == requestId && fieldIdsList.Contains(x.FieldId))
-                                                .Include(x => x.Field).AsNoTracking()
-                                                .Where(x => x.Field!.FormGroupListId != null)
-                                                .ToListAsync();
+			var list = await scope
+												.GetRepository<ServiceRequestFieldsValue>()
+												.GetAllQueryFiltered(x => x.RefId == requestId && fieldIdsList.Contains(x.FieldId))
+												.Include(x => x.Field).AsNoTracking()
+												.Where(x => x.Field!.FormGroupListId != null)
+												.ToListAsync();
 
 
             var ServiceRequestFieldsValues = list.GroupBy(x => x.Field!.FieldTypeId)

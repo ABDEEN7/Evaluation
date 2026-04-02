@@ -70,7 +70,7 @@ namespace Evaluation.API.Controllers
 			[FromForm] bool saveAsDraft)
 		{
 			var files = Request.Form?.Files;
-			var assignUsersJson = Request?.Form!["users"].FirstOrDefault();
+			var assignUsersJson = Request?.Form!["teamUsers"].FirstOrDefault();
 			var teamUsersJson = Request?.Form!["teamUsers"].FirstOrDefault();
 			Guid requestId = Guid.TryParse(Request?.Form!["requestId"], out var tempId) ? tempId : Guid.Empty;
 			Guid evaluationRequestId = Guid.TryParse(Request?.Form!["evaluationRequestId"], out var EvlId) ? EvlId : Guid.Empty;

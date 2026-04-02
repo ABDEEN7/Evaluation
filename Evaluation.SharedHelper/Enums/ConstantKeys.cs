@@ -194,6 +194,9 @@ public static class ConstantKeys
         public static readonly string RequestEvaluationNotExist = "RequestEvaluationNotExist";
 
         public static readonly string TeamExistsUserTeam = "TeamExistsUserTeam";
+        public static readonly string msgInvalidEvaluationPlan = "msgInvalidEvaluationPlan"; //TO DO INSERTED
+        public static readonly string msgInvalidEvaluationForm = "msgInvalidEvaluationForm"; //TO DO INSERTED
+        public static readonly string msgInvalidAttachmentId = "msgInvalidAttachmentId"; //TO DO INSERTED
     }
 
     public static class AdminSettings
