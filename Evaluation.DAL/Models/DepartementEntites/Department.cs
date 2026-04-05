@@ -17,6 +17,7 @@ public class Department : EntityBase, IAuditLogEntity
     public Guid? WebsiteAttachmentId { get; set; }
     public WebsiteAttachment? WebsiteAttachment { get; set; }
     public bool IsNDA { get; set; }
+    public bool IsEvaluated { get; set; }
     public string? DescAr { get; set; }
     public string? DescEn { get; set; }
     public int OrderNo { get; set; } = 0;

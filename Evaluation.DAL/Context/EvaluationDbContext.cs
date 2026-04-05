@@ -16,6 +16,7 @@ using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
 using Evaluation.DAL.Models.Planing.TeamsModule;
 using Evaluation.DAL.Models.ServiceEnities;
 using Evaluation.DAL.Models.ServiceRequestEntities;
+using Evaluation.DAL.Models.StatusEntities;
 using Evaluation.DAL.Models.SystemSetting;
 using Evaluation.DAL.Models.Template;
 using Evaluation.DAL.Models.UserEntiy;
@@ -119,6 +120,10 @@ public partial class EvaluationDbContext : DbContext
     public virtual DbSet<Country> Countries { get; set; }
     public virtual DbSet<DepTargetOrgTree> DepTargetOrgTree { get; set; }
     public virtual DbSet<CssClass> CssClass { get; set; }
+    public virtual DbSet<PartyTypeEvalParty> PartyTypeEvalParty { get; set; }
+    public virtual DbSet<PartyTypeEvalPartyStatus> PartyTypeEvalPartyStatus { get; set; }
+    public virtual DbSet<ServiceStatusType> ServiceStatusType { get; set; }
+
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {

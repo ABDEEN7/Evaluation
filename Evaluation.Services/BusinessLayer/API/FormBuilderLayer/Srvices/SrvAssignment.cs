@@ -175,7 +175,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                 .ThenInclude(sr => sr.Status)
                 .Where(a => a.IsActive == true &&
                             eligibleUsers.Contains(a.MinistryUserId) &&
-                            a.ServiceRequest.Status!.IsOpen == false)
+                            a.ServiceRequest.Status!.ServiceStatusType!.IsOpen == false)
                 .GroupBy(a => a.MinistryUserId)
                 .Select(g => new { UserId = g.Key, Count = g.Count() })
                 .ToListAsync();

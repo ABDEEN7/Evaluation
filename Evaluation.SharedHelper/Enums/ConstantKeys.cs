@@ -406,6 +406,8 @@ public static class ConstantKeys
 		public static readonly string lblUnnamedFile = "lblUnnamedFile";
 		public static readonly string lblInvalidFileExtension = "lblInvalidFileExtension";
 		public static readonly string lblCloseModal = "lblCloseModal";
+		public static readonly string lblEvaluationFileScope = "lblEvaluationFileScope";
+		public static readonly string lblEvaluationFileHeader = "lblEvaluationFileHeader";
 	}
 
 	public static class AdminPermission

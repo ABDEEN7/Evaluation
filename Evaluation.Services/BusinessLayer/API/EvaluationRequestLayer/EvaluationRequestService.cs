@@ -154,7 +154,7 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 			StatusId = x.ServiceStatusId,
 			Status = lang == "ar" ? x.ServiceStatus!.NameAr : x.ServiceStatus!.NameEn,
 			StatusColor = x.ServiceStatus!.ColorCode,
-			StatusISOPen = x.ServiceStatus!.IsOpen,
+			StatusISOPen = x.ServiceStatus!.ServiceStatusType!.IsOpen,
 
 			CreateDate = x.CreateDate,
 			CreateOn = x.CreateDate.ToString(dateFormat),

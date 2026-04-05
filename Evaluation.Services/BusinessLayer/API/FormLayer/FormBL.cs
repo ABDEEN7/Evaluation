@@ -67,7 +67,7 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
         {
             var formItem = formItems.Where(f => f.Id == item.Id).FirstOrDefault();//await formService.GetFormItem(item.Id);
             var evalForm = await formService.GetEvalForm(dto.Id);
-            var formEvalMatrixValues = await formService.GetFormEvalMatrixValues(evalForm.FormEvalMatrixId.Value);
+            var formEvalMatrixValues = await formService.GetFormEvalMatrixValues(evalForm.FormEvalMatrixId);
 
             
             if (item.ValueId != null)
@@ -232,7 +232,7 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
     {
 
         var evalForm = await formService.GetEvalForm(FormId);
-        var formEvalMatrixValues = await formService.GetFormEvalMatrixValues(evalForm.FormEvalMatrixId.Value);
+        var formEvalMatrixValues = await formService.GetFormEvalMatrixValues(evalForm.FormEvalMatrixId);
 
         return mapper.Map<List<FormEvalMarixValueDto>>(formEvalMatrixValues);
     }

@@ -437,7 +437,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                                           .GetRepository<ServiceRequest>()
                                           .GetAllQueryFiltered()
                                           .Include(x => x.Status)
-                                         .CountAsync(x => x.ServiceId == serviceId && x.StatusId == ownerId && x.Status.IsOpen && x.Status.IsInitial);
+                                         .CountAsync(x => x.ServiceId == serviceId && x.StatusId == ownerId && x.Status!.ServiceStatusType!.IsOpen && x.Status.IsInitial);
 
             if (draftRequestsCount > 0)
                 return false;

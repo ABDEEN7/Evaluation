@@ -18,4 +18,6 @@ public class FormItemValue : EntityBase ,IAuditLogEntity
     public string? DepEvalMatrixValueName { get; set; }   // Copy Text of Matrix Name
     public decimal? ActualValue { get; set; }
     public string? Note { get; set; }
+    public Guid? CalcMethodId { get; set; }
+    public CalcMethod? CalcMethod { get; set; }
 }

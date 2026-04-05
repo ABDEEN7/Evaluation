@@ -13,7 +13,7 @@ namespace Evaluation.SharedHelper.Models.Api.EvaluationRequestEntities
 		public string NameAr { get; set; } = null!;
 		public string NameEn { get; set; } = null!;
 		public int OrderNo { get; set; }
-
-		public List<EvaluationPartyServiceDTO> Services { get; set; } = new();
+        public bool IsSupportFiles { get; set; }
+        public List<EvaluationPartyServiceDTO> Services { get; set; } = new();
 	}
 }

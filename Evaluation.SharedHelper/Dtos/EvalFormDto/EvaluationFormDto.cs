@@ -8,7 +8,7 @@ public class EvaluationFormDto : EntityBaseDTO
 {
     public Guid EvalFormTypeId { get; set; }
     public string? EvalFormType { get; set; }
-    public Guid? FormEvalMatrixId { get; set; }
+    public Guid FormEvalMatrixId { get; set; }
     public string? FormEvalMatrix { get; set; }
     public string NameAr { get; set; } = null!;
     public string NameEn { get; set; } = null!;

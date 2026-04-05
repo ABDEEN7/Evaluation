@@ -81,7 +81,8 @@ namespace Evaluation.Services.BusinessLayer.API.EvaluationRequestLayer
 					NameAr = p.NameAr,
 					NameEn = p.NameEn,
 					OrderNo = p.OrderNo,
-					Services = new List<EvaluationPartyServiceDTO>()
+                    IsSupportFiles = p.IsSupportFiles,
+                    Services = new List<EvaluationPartyServiceDTO>()
 				}).ToListAsync();
 
 			if (!parties.Any())
@@ -140,7 +141,7 @@ namespace Evaluation.Services.BusinessLayer.API.EvaluationRequestLayer
 					r.Id,
 					r.RequestNumber,
 					r.StatusId,
-					r.Status!.IsOpen,
+					r.Status!.ServiceStatusType!.IsOpen,
 					StatusNameAr = r.Status!.NameAr,
 					StatusNameEn = r.Status!.NameEn,
 					r.ServiceId,
