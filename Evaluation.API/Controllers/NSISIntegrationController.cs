@@ -27,7 +27,7 @@ public class NSISIntegrationController(NSISService nsisService) : ControllerBase
     }
 
     [HttpGet()]
-    public async Task<SchoolDto> GetNSISSchoolByIdAsync(Guid Id)
+    public async Task<NSISSchool> GetNSISSchoolByIdAsync(Guid Id)
     {
         var result = await _nsisService.GetSchoolbyIdAsync(Id);
         return result;

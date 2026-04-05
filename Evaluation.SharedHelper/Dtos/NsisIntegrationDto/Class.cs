@@ -13,5 +13,4 @@ public class Class : NSISBaseDto
     public string? ClassCode { get; set; }
     public string? ClassType { get; set; }
     public ClassMetaData? MetaData { get; set; }
-    //TODO:Need To Add > School, Course, Terms
 }

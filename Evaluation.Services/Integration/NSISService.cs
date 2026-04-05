@@ -1,4 +1,7 @@
-﻿using Evaluation.Services.Special;
+﻿using AutoMapper;
+using Evaluation.DAL.Dtos.Form;
+using Evaluation.DAL.Models.FormsModules;
+using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Dtos.NsisIntegrationDto;
 using System.Text;
 using System.Text.Json;
@@ -9,6 +12,7 @@ public class NSISService
 {
     private readonly HttpClient _httpClient;
     private readonly LoggingServices _loggingServices;
+    private readonly IMapper _mapper;
     private readonly string baseURL = "https://nsis-test.edu.gov.qa/INTCore.Web";
     private readonly string authenticationURL = "https://nsis-test.edu.gov.qa/GWCore.Web/connect/token";
     private readonly string username = "svc_eval-nsis_api";
@@ -16,13 +20,17 @@ public class NSISService
     private readonly string grant_type = "client_credentials";
     private readonly string nsis_schools_api = "ims/oneroster/v1p1/schools";
     private readonly string nsis_classes_api = "ims/oneroster/v1p1/schools/{0}/classes?offset=0&limit=100&filter=status='active'";
+    private readonly string nsis_teachers_api = "ims/oneroster/v1p1/schools/{0}/teachers?offset=0&limit=200";
+    private readonly string nsis_staff_api = "ims/oneroster/v1p1/schools/{0}/staff";
+    private readonly string nsis_enrollment_api = "ims/oneroster/v1p1/schools/{0}/enrollments?offset=0&limit=10000&filter=role='student'";
     private readonly int limit = 1000;
     private readonly string? status = "active";
 
-    public NSISService(HttpClient httpClient, LoggingServices loggingServices)
+    public NSISService(HttpClient httpClient, LoggingServices loggingServices, IMapper mapper)
     {
         _httpClient = httpClient;
         _loggingServices = loggingServices;
+        _mapper = mapper;
     }
 
 
@@ -100,14 +108,26 @@ public class NSISService
         var result = await SendRequestAsync<NSISSchoolsResponse>(endpoint);
         return result.Orgs;
     }
-    public async Task<SchoolDto> GetSchoolbyIdAsync(Guid Id)
+    public async Task<NSISSchool> GetSchoolbyIdAsync(Guid Id)
     {
         var endpoint = $"{nsis_schools_api}/{Id}";
         var classesEndpoint = string.Format(nsis_classes_api,Id);
+        var teachersEndpoint = string.Format(nsis_teachers_api, Id);
+        var staffEndpoint = string.Format(nsis_staff_api, Id);
+        var enrollmentEndpoint = string.Format(nsis_enrollment_api, Id);
         var result = await SendRequestAsync<NSISSchoolResponse>(endpoint);
         var classesResult = await SendRequestAsync<NSISClassResponse>(classesEndpoint);
+        var teachersResult = await SendRequestAsync<NSISTeacherResponse>(teachersEndpoint);
+        var staffResult = await SendRequestAsync<NSISStaffResponse>(staffEndpoint);
+        var enrollmentResult = await SendRequestAsync<NSISEnrollmentResponse>(enrollmentEndpoint);
         result.Org.Classes = classesResult.Classes;
-        return result.Org;
+        result.Org.Teachers = teachersResult.Users;
+        result.Org.Staff = staffResult.Users;
+        result.Org.Enrollments = enrollmentResult.Enrollments;
+
+        var mappedData = _mapper.Map<NSISSchool>(result.Org);
+
+        return mappedData;
     }
 
 }
