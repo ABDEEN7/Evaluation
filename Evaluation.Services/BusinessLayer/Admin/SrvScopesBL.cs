@@ -55,7 +55,6 @@ namespace Evaluation.Services.Models.Admin
 
                 obj.NameAr = message.NameAr;
                 obj.NameEn = message.NameEn;
-                obj.DepartmentId = message.DepartmentId;
                 obj.ScopeTypeId = message.ScopeTypeId;
                 obj.IsActive = message.IsActive;
 
@@ -87,7 +86,6 @@ namespace Evaluation.Services.Models.Admin
 
                 obj.NameAr = message.NameAr;
                 obj.NameEn = message.NameEn;
-                obj.DepartmentId = message.DepartmentId;
                 obj.ScopeTypeId = message.ScopeTypeId;
                 obj.IsActive = message.IsActive;
 
