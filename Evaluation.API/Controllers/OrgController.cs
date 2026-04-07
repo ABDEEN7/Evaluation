@@ -21,6 +21,13 @@ public class OrgController : ControllerBase
         var details = await _masterBl.GetApiService<OrgBL>().GetOrgDetails(OrgID);
         return details;
     }
+
+    [HttpGet]
+    public async Task<List<OrgDetailsDto>> GetEmployeesBySchoolId([FromQuery] Guid OrgID)
+    {
+        var employees = await _masterBl.GetApiService<OrgBL>().GetEmployeesBySchoolId(OrgID);
+        return employees;
+    }
     [HttpGet]
     public async Task<IActionResult> GetParentOrgTree()
     {
