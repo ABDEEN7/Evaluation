@@ -302,7 +302,6 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             var scopes = await uow.GetRepository<Scope>()
     .GetAllNonDeleted()
     .Include(x => x.ScopeType)
-    .Where(x => x.DepartmentId == departmentid)
     .ToListAsync();
             var treeData = new List<JsTreeNodeDto>();
 
