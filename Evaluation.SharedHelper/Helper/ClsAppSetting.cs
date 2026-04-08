@@ -27,5 +27,17 @@ namespace Evaluation.SharedHelper.Helper
         public static string FormJwtConfigKey { get; set; } = "";
         public static string FormJwtExpirationTime { get; set; } = "";
         public static string OracleDBConnection { get; set; } = "";
+        public static string NsisBaseURL { get; set; } = "";
+        public static string NsisAuthenticationURL { get; set; } = "";
+        public static string NsisUsername { get; set; } = "";
+        public static string NsisPassword { get; set; } = "";
+        public static string NsisGrantType { get; set; } = "";
+        public static string NsisSchoolsApi { get; set; } = "";
+        public static string NsisClassesApi { get; set; } = "";
+        public static string NsisTeachersApi { get; set; } = "";
+        public static string NsisStaffApi { get; set; } = "";
+        public static string NsisEnrollmentApi { get; set; } = "";
+        public static int NsisLimit { get; set; } = 0;
+        public static string? NsisStatus { get; set; } = "";
     }
 }

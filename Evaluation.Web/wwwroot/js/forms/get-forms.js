@@ -36,7 +36,7 @@ const createPlaceholderOption = (text = 'Please select') => {
 // Accordion Builders
 // ==============================
 
-const generateFormAccordionItem = (rowsHtml, hasAnyNote) => `
+const generateFormAccordionItem = (rowsHtml, hasAnyNote, hasAnyChildren) => `
 <div class="accordion-item mb-3 rounded">
     <div id="item3" class="accordion-collapse collapse show">
         <div class="accordion-body">
@@ -44,7 +44,7 @@ const generateFormAccordionItem = (rowsHtml, hasAnyNote) => `
             <table class="table table-bordered table-hover align-middle w-100 dataTable no-footer">
                 <thead class="table-light">
                     <tr>
-                        <th></th>
+                        ${hasAnyChildren ? '<th></th>' : ''}
                         <th>#</th>
                         <th>المعايير</th>
                         <th>اختر التقييم</th>
@@ -248,7 +248,7 @@ const generateFullFormPageHtml = async ({ formId, fieldId, readOnly }) => {
         readOnly
     );
 
-    return `${generateFormAccordionItem(rowsHtml, hasAnyNote)}`;
+    return `${generateFormAccordionItem(rowsHtml, hasAnyNote, hasAnyChildren)}`;
 };
 
 

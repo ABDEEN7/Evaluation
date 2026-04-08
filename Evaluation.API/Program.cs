@@ -50,6 +50,20 @@ internal class Program
             ClsAppSetting.BaseApiUrl = (isKeyVault ? config["BaseApiUrl"] : config["AppSettings:baseApiUrl"]) ?? "";
             ClsAppSetting.AllowWebCorsOnly = (isKeyVault ? config["baseAppUrl"] : config["AppSettings:baseAppUrl"]) ?? "";
             ClsAppSetting.AllowAdminCorsOnly = (isKeyVault ? config["baseAdminUrl"] : config["AppSettings:baseAdminUrl"]) ?? "";
+
+            
+            ClsAppSetting.NsisBaseURL = config["NsisSettings:NsisBaseURL"] ?? "";
+            ClsAppSetting.NsisAuthenticationURL = config["NsisSettings:NsisAuthenticationURL"] ?? "";
+            ClsAppSetting.NsisUsername = config["NsisSettings:NsisUsername"] ?? "";
+            ClsAppSetting.NsisPassword = config["NsisSettings:NsisPassword"] ?? "";
+            ClsAppSetting.NsisGrantType = config["NsisSettings:NsisGrantType"] ?? "";
+            ClsAppSetting.NsisSchoolsApi = config["NsisSettings:NsisSchoolsApi"] ?? "";
+            ClsAppSetting.NsisClassesApi = config["NsisSettings:NsisClassesApi"] ?? "";
+            ClsAppSetting.NsisTeachersApi = config["NsisSettings:NsisTeachersApi"] ?? "";
+            ClsAppSetting.NsisStaffApi = config["NsisSettings:NsisStaffApi"] ?? "";
+            ClsAppSetting.NsisEnrollmentApi = config["NsisSettings:NsisEnrollmentApi"] ?? "";
+            ClsAppSetting.NsisLimit = config.GetValue<int>("NsisSettings:NsisLimit");
+            ClsAppSetting.NsisStatus = config["NsisSettings:NsisStatus"] ?? "";
             // -------------------------------------
             // 2️⃣ Add Core Services
             // -------------------------------------
