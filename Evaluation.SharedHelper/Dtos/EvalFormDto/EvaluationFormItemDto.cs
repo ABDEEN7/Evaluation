@@ -21,6 +21,7 @@ public class EvaluationFormItemDto : EntityBaseDTO
     public Guid CalcMethodId { get; set; }
     public string? CalcMethod { get; set; }
     public bool HasNote { get; set; } = false;
+    public bool NoteRequired { get; set; }
     public virtual ICollection<EvaluationFormSubItemDto>? SubFormItems { get; set; }
     public Guid[]? FormItemRelated { get; set; }
 }

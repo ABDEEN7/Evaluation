@@ -14,6 +14,7 @@ public class FormProfile : Profile
             .ForMember(d => d.Name, opt => opt.MapFrom(src => src.NameEn))
             //.ForMember(d => d.OrderNo, opt => opt.MapFrom(src => src.OrderNo))
             .ForMember(d => d.HasNote, opt => opt.MapFrom(src => src.HasNote))
+            .ForMember(d => d.NoteRequired, opt => opt.MapFrom(src => src.NoteRequired))
             .ForMember(d => d.SubFormItems, opt => opt.MapFrom(src => src.SubFormItems))
             //.ForMember(d => d.RelatedItemName, opt => opt.MapFrom(src => src.RelatedFrom.FirstOrDefault().RelatedItem.NameAr))
             //.ForMember(d => d.RelatedItemId, opt => opt.MapFrom(src => src.RelatedFrom.FirstOrDefault().RelatedItemId))
