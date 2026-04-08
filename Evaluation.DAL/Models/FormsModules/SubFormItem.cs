@@ -20,5 +20,8 @@ namespace Evaluation.DAL.Models.FormsModules
 
         public Guid? DropDownTypeId { get; set; }
         public DropDownType? DropDownType { get; set; }
+        public bool HasNote { get; set; }
+        public bool NoteRequired { get; set; }
+        public int OrderNo { get; set; } = 0;
     }
 }
