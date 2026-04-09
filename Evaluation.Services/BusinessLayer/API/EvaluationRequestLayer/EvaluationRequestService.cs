@@ -214,7 +214,7 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 			Plan = er.Plan
 		};
 	}
-	public async Task<EvaluationRequestDTO> GetEvaluationDetailsAsync(Guid id, CancellationToken ct = default)
+	public async Task<EvaluationRequestDTO> GetEvaluationDetailsAsync(Guid id)
 	{
 		var lang = requestInfo.Lang;
 		var userId = userInfo.UserId ??  Guid.Parse("C2536611-576B-4EB8-84F4-747F4ECE9A23");// throw new BusinessException(ExceptionMessage.UserNotFound);
@@ -263,8 +263,10 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 
 		// bool hasFieldHistoryPermission = false;
 		// bool hasAllFieldHistoryPermission = false;
-
-		var evaluationPartiesTask = srvEvaluationParty.GetPartiesWithServicesAndRequestsAsync(request.Id, module.DepartmentId);
+		var userPartyTypeIds = user.UserPartTypes?
+								.Select(x => x.PartyTypeId)
+								.Distinct().ToList() ?? new List<Guid>();
+		var evaluationPartiesTask = srvEvaluationParty.GetPartiesWithServicesAndRequestsAsync(request.Id, module.DepartmentId, request.ServiceStatusId, userPartyTypeIds);
 		var attachmentsTask = GetAllEvaluationRequestAttachmentsAsync(request.Id, lang);
 		var actionTransactionsTask = SrvActionTransactionsLog.GetActionLog(request.Id, request.ServiceId, module?.Id, user);
 		var schoolTask = schoolRepository.GetSchoolDetails(request.OrgTreeId);
