@@ -92,7 +92,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
         {
 			 using var Scope = serviceScopeFactory.CreateScopedUow();
 
-			var request = await Scope.GetRepository<ServiceRequest>()
+			var request = await Scope.GetRepository<EvaluationRequest>()
                                         .GetAllActiveNonDeleted(x => x.Id == reqId).FirstOrDefaultAsync();
             return request?.OrgTreeId;
         }

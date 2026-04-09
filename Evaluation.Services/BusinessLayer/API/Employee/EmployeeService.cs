@@ -5,6 +5,7 @@ using Evaluation.DAL.Models.Master;
 using Evaluation.DAL.Models.Org;
 using Evaluation.DAL.Models.Planing;
 using Evaluation.DAL.Repositories;
+using Evaluation.Services.Extensions;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Dtos.SchoolDto;
 using Evaluation.SharedHelper.Extensions;
@@ -29,15 +30,19 @@ public class EmployeeService(IServiceScopeFactory serviceScopeFactory,
 {
     public async Task<Employee> GetEmployee(string qId)
     {
-        return await unitOfWork.GetRepository<Employee>()
+		using var scopedUow = serviceScopeFactory.CreateScopedUow();
+
+		return await scopedUow.GetRepository<Employee>()
                     .GetAllNonDeleted()
                     .Where(c => c.QID.ToLower() == qId)
                     .FirstOrDefaultAsync();
     }
     public async Task<PaginatedResult<Employee>> GetEmployeeAsync(SchoolRequest request, List<Guid?> targetOrgTreeIds, List<Guid> employees)
     {
-        var filter = BuildFilterExpression(request, targetOrgTreeIds, employees);
-        var query = unitOfWork.GetRepository<Employee>()
+		using var scopedUow = serviceScopeFactory.CreateScopedUow();
+
+		var filter = BuildFilterExpression(request, targetOrgTreeIds, employees);
+        var query = scopedUow.GetRepository<Employee>()
                     .GetAllNonDeleted(filter)
                     .Include(x=>x.OrgParent);
         return await query.GetPaginatedResult(request.PageNumber, request.PageSize);
@@ -45,21 +50,27 @@ public class EmployeeService(IServiceScopeFactory serviceScopeFactory,
 
     public async Task<JobTitle> GetJobTitle(string jobNo)
     {
-        return await unitOfWork.GetRepository<JobTitle>()
+		using var scopedUow = serviceScopeFactory.CreateScopedUow();
+
+		return await scopedUow.GetRepository<JobTitle>()
                     .GetAllNonDeleted()
                     .Where(c => c.HRCode.ToLower() == jobNo)
                     .FirstOrDefaultAsync();
     }
     public async Task<OrgType> GetOrgType(string orgLocNo)
     {
-        return await unitOfWork.GetRepository<OrgType>()
+		using var scopedUow = serviceScopeFactory.CreateScopedUow();
+
+		return await scopedUow.GetRepository<OrgType>()
                     .GetAllNonDeleted()
                     .Where(c => c.BackendName.ToLower() == orgLocNo)
                     .FirstOrDefaultAsync();
     }
     public async Task<OrgClass> GetOrgClass(string orgClass)
     {
-        return await unitOfWork.GetRepository<OrgClass>()
+		using var scopedUow = serviceScopeFactory.CreateScopedUow();
+
+		return await scopedUow.GetRepository<OrgClass>()
                     .GetAllNonDeleted()
                     .Where(c => c.HRCode.ToLower() == orgClass)
                     .FirstOrDefaultAsync();
@@ -82,7 +93,9 @@ public class EmployeeService(IServiceScopeFactory serviceScopeFactory,
 
     public async Task<Employee> GetEmployeeById(Guid Id)
     {
-        return await unitOfWork.GetRepository<Employee>()
+		using var scopedUow = serviceScopeFactory.CreateScopedUow();
+
+		return await scopedUow.GetRepository<Employee>()
                     .GetAllNonDeleted()
                     .Include(e => e.UserGender)
                     .Include(e => e.JobTitle)
@@ -93,7 +106,8 @@ public class EmployeeService(IServiceScopeFactory serviceScopeFactory,
 
     public async Task<List<Employee>> GetEmployeesBySchoolId(Guid Id, Guid? JobTitleId = null)
     {
-        var query = unitOfWork.GetRepository<Employee>()
+		using var scopedUow = serviceScopeFactory.CreateScopedUow();
+		var query = scopedUow.GetRepository<Employee>()
                     .GetAllNonDeleted()
                     .Include(e => e.UserGender)
                     .Include(e => e.JobTitle)
@@ -102,6 +116,18 @@ public class EmployeeService(IServiceScopeFactory serviceScopeFactory,
         if (JobTitleId != null)
             query = query.Where(c => c.JobTitleId == JobTitleId);
 
-        return await query.ToListAsync();
-    }
+        List<Employee> employees = new List<Employee>();
+        try
+        {
+			employees = await query.ToListAsync();
+
+		}
+		catch (Exception ex)
+        {
+
+            throw;
+        }
+        return employees;
+
+	}
 }

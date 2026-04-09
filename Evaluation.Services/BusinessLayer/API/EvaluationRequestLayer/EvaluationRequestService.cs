@@ -124,8 +124,8 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 			.Include(x => x.Plan)
 				.ThenInclude(p => p!.PlanStatus);
 
-		//baseQuery = baseQuery.AsSplitQuery()
-		//	.Where(x => x.Service!.SystemModuleId == module.Id);
+		baseQuery = baseQuery.AsSplitQuery()
+			.Where(x => x.Service!.SystemModuleId == module.Id);
 
 		var permissions = new
 		{

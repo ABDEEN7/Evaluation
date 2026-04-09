@@ -163,9 +163,12 @@ namespace Evaluation.Services.BusinessLayer.API
 
 			if (integrationFieldsToProcess.Any() && requestId.HasValue && requestId.Value != Guid.Empty)
 			{
-				var SchoolID = "";
+				
+				var SchoolID = requestId != Guid.Empty ? await _srvServiceRequest.GetOrgTreeIdByRequestIdAsync(requestId.Value) : Guid.Empty;
+				
 
-				if (!string.IsNullOrWhiteSpace(SchoolID))
+
+				if (SchoolID != Guid.Empty)
 				{
 					var updatedFields = await _srvField.ProcessIntegrationFieldsAsync(
 						integrationFieldsToProcess.ToList(),

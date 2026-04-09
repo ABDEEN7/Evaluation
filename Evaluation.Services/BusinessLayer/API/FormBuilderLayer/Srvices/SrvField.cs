@@ -6,6 +6,7 @@ using Evaluation.DAL.Models.IntegrationEntity;
 using Evaluation.DAL.Repositories;
 using Evaluation.Services.BusinessLayer.API.FormLayer;
 using Evaluation.Services.Extensions;
+using Evaluation.Services.Integration;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Exceptions;
@@ -402,7 +403,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 			}
 		}
 
-		public async Task<List<FieldValueDTO>> ProcessIntegrationFieldsAsync(List<FieldValueDTO> integrationFieldsToProcess,string OrgId,Guid? RequestId,bool isDownload = false)
+		public async Task<List<FieldValueDTO>> ProcessIntegrationFieldsAsync(List<FieldValueDTO> integrationFieldsToProcess,Guid? OrgId,Guid? RequestId,bool isDownload = false)
 		{
 			if (integrationFieldsToProcess == null || integrationFieldsToProcess.Count == 0)
 				return integrationFieldsToProcess!;
@@ -448,11 +449,13 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 					{
 						switch (integrationName)
 						{
-							case "NSISServices":
-								integrationResult = await OrgBl.GetSchoolEnrollmentAsync(OrgId);
-								break;
 							case "HR":
-								integrationResult = await INSISServices.GetSchoolbyIdAsync(OrgId);
+								integrationResult = await OrgBl.GetOrgDetails(OrgId.Value);
+								break;
+							case "NSISServices":
+								var ScId = Guid.Parse("160C62A6-0556-4A33-B6C6-0AD687062492");
+
+								integrationResult = await NSISService.GetSchoolbyIdAsync(ScId);
 								break;
 
 							default:
@@ -470,11 +473,11 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 						if (!string.IsNullOrEmpty(config.URLParameter))
 						{
 							string paramName = config.URLParameter;
-							string paramValue = OrgId;
+							Guid? paramValue = OrgId;
 
 							url += url.Contains("?")
-								? $"&{paramName}={Uri.EscapeDataString(paramValue)}"
-								: $"?{paramName}={Uri.EscapeDataString(paramValue)}";
+								? $"&{paramName}={Uri.EscapeDataString(paramValue.ToString())}"
+								: $"?{paramName}={Uri.EscapeDataString(paramValue.ToString())}";
 						}
 
 						var response = await httpClient.GetAsync(url);
@@ -624,7 +627,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 						}
 					}
 				}
-				catch
+				catch (Exception ex)
 				{
 					foreach (var item in fieldsByIntegration[integrationName])
 					{
