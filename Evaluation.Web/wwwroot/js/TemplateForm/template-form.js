@@ -348,7 +348,13 @@ function SetDropDown() {
             }
         };
         jqClient(options).Get("/EvaluationForm/GetAllFormItemsFromDepartment".concat('?EvalformId=', EvalformId));
-       
+        //$("label[for='EvalFormItemNoteRequired']").hide();
+
+        //$("#EvalFormItemNoteRequired").parent().hide();
+        toggleNoteRequired();
+        $("#EvalFormItemHasNote").on("change", function () {
+            toggleNoteRequired();
+        });
     }
     
 }
@@ -798,17 +804,20 @@ initTables = () => {
     });
     loadData();
 };
+function toggleNoteRequired() {
+    if ($("#EvalFormItemHasNote").prop("checked")) {
+        //$("#EvalFormItemNoteRequired")
+        //    .closest(".col-3")
+        //    .show();
+        $("label[for='EvalFormItemNoteRequired']").show();
 
+        $("#EvalFormItemNoteRequired").parent().show();
+    } else {
+        //$("#EvalFormItemNoteRequired")
+        //    .closest(".col-3")
+        //    .hide();
+        $("label[for='EvalFormItemNoteRequired']").hide();
 
-
-
-
-
-
-
-
-
-
-
-
-
+        $("#EvalFormItemNoteRequired").parent().hide();
+    }
+}
