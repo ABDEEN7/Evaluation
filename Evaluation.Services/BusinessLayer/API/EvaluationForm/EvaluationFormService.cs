@@ -138,7 +138,17 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
 
 
     }
-
+    public async Task<bool> CheckEvaluationForm(Guid? evaluationId = null)
+    {
+        var department = new Guid("98FA3000-C5CA-45ED-B416-52CF0B7ABFA3");
+        return await uow.GetRepository<EvalForm>()
+            .GetAllActiveNonDeleted()
+            .Where(x => x.IsFinalEval)
+            .Where(x => x.EvaluationParties != null &&
+                        x.EvaluationParties.DepartmentId == department)
+            .AnyAsync(x => !evaluationId.HasValue || x.Id != evaluationId.Value);
+    }
+ 
     public async Task<EvaluationFormDto> SaveEvaluationForm(EvaluationFormDto message)
     {
 
@@ -154,7 +164,14 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
         obj.CalcMethodId = message.CalcMethodId;
         obj.FormStatusId = message.FormStatusId;
         obj.IsActive = message.IsActive;
-
+        if (!await CheckEvaluationForm())
+        {
+            obj.IsFinalEval = message.IsFinalEval;
+        }
+        else
+        {
+            throw new BusinessException("لقد تجاوزت الحد الاعلى من الاستمارات التي تحتوي على IsFinalEvaluation");
+        }
         uow.GetRepository<EvalForm>().Insert(obj);
 
 
@@ -185,6 +202,14 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
             obj.CalcMethodId = message.CalcMethodId;
             obj.FormStatusId = message.FormStatusId;
             obj.IsActive = message.IsActive;
+            if (!await CheckEvaluationForm(message.Id))
+            {
+                obj.IsFinalEval = message.IsFinalEval;
+            }
+            else
+            {
+                throw new BusinessException("لا يمكن ان يكون للدارة اكثر من استمارة بfinal evaluation");
+            }
             uow.GetRepository<EvalForm>().Update(obj);
             await uow.CommitAsync();
             result = mapper.Map<EvaluationFormDto>(obj, opts => opts.Items["Language"] = requestInfo.Lang);

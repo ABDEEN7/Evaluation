@@ -10,6 +10,8 @@ const gridContainerId = "view-container",
     $btnAddParent = $('#btnAddParent'),
     btnSubmitId = "btn-submit",
     btnpopupSubmitId = "btn-submit_popup";
+var deprouting = sharedUtility().extractDepartmentName();
+
 let lang = sharedUtility().GetCookie('lang');
 let txtDir = lang === "ar" ? "RTL" : "LTR";
 const loadData = () => {
@@ -29,7 +31,7 @@ const loadData = () => {
         }
     };
 
-    jqClient(options).Get("/EvaluationForm/GetAllEvalForm".concat('?page=', currentPage));
+    jqClient(options).Get(`/EvaluationForm/${deprouting}/GetAllEvalForm`.concat('?page=', currentPage));
 };
 
 $btnAddbutton.click(function () {
@@ -258,7 +260,7 @@ function Loadtabledata() {
             }
         };
 
-        jqClient(options).Get("/EvaluationForm/GetAllFormScope".concat('?formIdValue=', formIdValue));
+        jqClient(options).Get(`/EvaluationForm/${deprouting}/GetAllFormScope`.concat('?formIdValue=', formIdValue));
     }
 
 }
@@ -347,7 +349,7 @@ function SetDropDown() {
                 }
             }
         };
-        jqClient(options).Get("/EvaluationForm/GetAllFormItemsFromDepartment".concat('?EvalformId=', EvalformId));
+        jqClient(options).Get(`/EvaluationForm/${deprouting}/GetAllFormItemsFromDepartment`.concat('?EvalformId=', EvalformId));
         //$("label[for='EvalFormItemNoteRequired']").hide();
 
         //$("#EvalFormItemNoteRequired").parent().hide();
@@ -368,7 +370,7 @@ function BindFormItem() {
             renderFormItemTable();
         }
     };
-    jqClient(options).Get("/EvaluationForm/GetAllEvalFormItems".concat('?EvalformId=', EvalformId));
+    jqClient(options).Get(`/EvaluationForm/${deprouting}/GetAllEvalFormItems`.concat('?EvalformId=', EvalformId));
 }
 function renderFormItemTable() {
     let html = "";
@@ -496,19 +498,19 @@ const deleteData = (id) => {
     if (!id) return;
     var deleteurl = '';
     if (popupname == 'EvalFormItem') {
-        deleteurl = "/EvaluationForm/DeleteEvaluationFormItem";
+        deleteurl = `/EvaluationForm/${deprouting}/DeleteEvaluationFormItem`;
     }
     else if (popupname == 'EvalSubFormItem') {
-        deleteurl = "/EvaluationForm/DeleteEvaluationSubFormItem";
+        deleteurl = `/EvaluationForm/${deprouting}/DeleteEvaluationSubFormItem`;
     }
     else if (popupname == 'FormScope') {
-        deleteurl = "/EvaluationForm/DeleteFormScope";
+        deleteurl = `/EvaluationForm/${deprouting}/DeleteFormScope`;
     }
     else {
         const obj = table.getData().find(f => f.id == id);
         if (!obj) return;
 
-        deleteurl = "/EvaluationForm/DeleteEvaluationForm";
+        deleteurl = `/EvaluationForm/${deprouting}/DeleteEvaluationForm`;
     }
 
     
@@ -592,9 +594,9 @@ $("#btn-submit").click(function (e) {
         let id = $('#Id').val();
 
         if (id) {
-            url = "/EvaluationForm/UpdateEvaluationForm";
+            url = `/EvaluationForm/${deprouting}/UpdateEvaluationForm`;
         } else {
-            url = "/EvaluationForm/SaveEvaluationForm";
+            url = `/EvaluationForm/${deprouting}/SaveEvaluationForm`;
 
         }
         jqClient(options).PostFormData(url, requestdata);
@@ -756,9 +758,9 @@ $("#btn-submit_popup").click(function (e) {
         let id = $('#PopupId').val();
 
         if (id) {
-            url = popupname == "EvalFormItem" ? "/EvaluationForm/UpdateEvaluationFormItem" : popupname == "EvalSubFormItem" ? "/EvaluationForm/UpdateEvaluationSubFormItem" : popupname == "FormScope" ? "/EvaluationForm/UpdateFormScope" : null;
+            url = popupname == "EvalFormItem" ? `/EvaluationForm/${deprouting}/UpdateEvaluationFormItem` : popupname == "EvalSubFormItem" ? `/EvaluationForm/${deprouting}/UpdateEvaluationSubFormItem` : popupname == "FormScope" ? `/EvaluationForm/${deprouting}/UpdateFormScope` : null;
         } else {
-            url = popupname == "EvalFormItem" ? "/EvaluationForm/SaveEvaluationFormItem" : popupname == "EvalSubFormItem" ? "/EvaluationForm/SaveEvaluationSubFormItem" : popupname == "FormScope" ? "/EvaluationForm/SaveFormScope" : null;
+            url = popupname == "EvalFormItem" ? `/EvaluationForm/${deprouting}/SaveEvaluationFormItem` : popupname == "EvalSubFormItem" ? `/EvaluationForm/${deprouting}/SaveEvaluationSubFormItem` : popupname == "FormScope" ? `/EvaluationForm/${deprouting}/SaveFormScope` : null;
 
         }
         jqClient(options).PostFormData(url, requestdata);
