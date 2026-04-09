@@ -140,12 +140,11 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
     }
     public async Task<bool> CheckEvaluationForm(Guid? evaluationId = null)
     {
-        var department = new Guid("98FA3000-C5CA-45ED-B416-52CF0B7ABFA3");
         return await uow.GetRepository<EvalForm>()
             .GetAllActiveNonDeleted()
             .Where(x => x.IsFinalEval)
             .Where(x => x.EvaluationParties != null &&
-                        x.EvaluationParties.DepartmentId == department)
+                        x.EvaluationParties.DepartmentId == requestInfo.DepId)
             .AnyAsync(x => !evaluationId.HasValue || x.Id != evaluationId.Value);
     }
  
