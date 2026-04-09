@@ -49,6 +49,7 @@ public class FormService(IServiceScopeFactory serviceScopeFactory,
                       .Include(d => d.SubFormItems)
                       .Include(f => f.RelatedFrom)
                       .ThenInclude(y=>y.RelatedItem)
+                      .OrderBy(x => x.OrderNo)
                       .ToListAsync();
 
             return formItems;

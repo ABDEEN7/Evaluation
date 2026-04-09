@@ -4,6 +4,7 @@ using Evaluation.Services.BusinessLayer;
 using Evaluation.Services.BusinessLayer.API;
 using Evaluation.Services.BusinessLayer.API.EvaluationRequestLayer;
 using Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices;
+using Evaluation.Services.Integration;
 using Evaluation.Services.Models.Admin;
 using Evaluation.Services.Models.API;
 using Evaluation.Services.Models.JWT;
@@ -113,6 +114,7 @@ public static class ServiceExtensions
 
         services.AddScoped<ISmsServices, SmsServices>();
         services.AddScoped<MasterBL>();
+        services.AddScoped<NSISService>();
 
     }
     public static UnitOfWork CreateScopedUow(this IServiceProvider serviceProvider)

@@ -90,4 +90,18 @@ public class EmployeeService(IServiceScopeFactory serviceScopeFactory,
                     .FirstOrDefaultAsync();
     }
 
+
+    public async Task<List<Employee>> GetEmployeesBySchoolId(Guid Id, Guid? JobTitleId = null)
+    {
+        var query = unitOfWork.GetRepository<Employee>()
+                    .GetAllNonDeleted()
+                    .Include(e => e.UserGender)
+                    .Include(e => e.JobTitle)
+                    .Where(c => c.OrgParentId == Id);
+
+        if (JobTitleId != null)
+            query = query.Where(c => c.JobTitleId == JobTitleId);
+
+        return await query.ToListAsync();
+    }
 }

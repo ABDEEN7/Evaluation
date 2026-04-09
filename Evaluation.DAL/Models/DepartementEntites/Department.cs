@@ -21,6 +21,12 @@ public class Department : EntityBase, IAuditLogEntity
     public string? DescAr { get; set; }
     public string? DescEn { get; set; }
     public int OrderNo { get; set; } = 0;
+    public string? DepImageFileNameAr { get; set; } = null!;
+    public string? DepImageUiFileNameAr { get; set; } = null!;
+    public string? DepImageBlobUrlAr { get; set; }
+    public string? DepImageFileNameEn { get; set; } = null!;
+    public string? DepImageUiFileNameEn { get; set; } = null!;
+    public string? DepImageBlobUrlEn { get; set; }
     public virtual ICollection<UserDepartment>? UserDepartments { get; set; }
     public virtual ICollection<AcademicYear>? AcademicYears { get; set; }
     public virtual ICollection<WebGroup>? WebGroup { get; set; }

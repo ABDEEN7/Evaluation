@@ -4,6 +4,7 @@ using Evaluation.DAL.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Evaluation.DAL.Migrations
 {
     [DbContext(typeof(EvaluationDbContext))]
-    partial class EvaluationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260408054549_AddNoteToSubEvalItem")]
+    partial class AddNoteToSubEvalItem
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1734,24 +1737,6 @@ namespace Evaluation.DAL.Migrations
 
                     b.Property<string>("DepIcon")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("DepImageBlobUrlAr")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("DepImageBlobUrlEn")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("DepImageFileNameAr")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("DepImageFileNameEn")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("DepImageUiFileNameAr")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("DepImageUiFileNameEn")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("DescAr")
@@ -5606,145 +5591,6 @@ namespace Evaluation.DAL.Migrations
                     b.UseTptMappingStrategy();
                 });
 
-            modelBuilder.Entity("Evaluation.DAL.Models.Org.SchoolClass", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("CourseId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("CreateById")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreateDate")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("getdate()");
-
-                    b.Property<Guid?>("DeleteById")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("DeleteDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("Duration")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Grade")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsActive")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(true);
-
-                    b.Property<bool>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false);
-
-                    b.Property<string>("NameAr")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NameEn")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("SchoolId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid?>("UpdateById")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("UpdateDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CourseId");
-
-                    b.HasIndex("CreateById");
-
-                    b.HasIndex("DeleteById");
-
-                    b.HasIndex("SchoolId");
-
-                    b.HasIndex("UpdateById");
-
-                    b.ToTable("SchoolClass");
-                });
-
-            modelBuilder.Entity("Evaluation.DAL.Models.Org.SchoolCourse", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("CreateById")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreateDate")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("getdate()");
-
-                    b.Property<Guid?>("DeleteById")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("DeleteDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsActive")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(true);
-
-                    b.Property<bool>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false);
-
-                    b.Property<string>("NameAr")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NameEn")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid?>("UpdateById")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("UpdateDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreateById");
-
-                    b.HasIndex("DeleteById");
-
-                    b.HasIndex("UpdateById");
-
-                    b.ToTable("SchoolCourse");
-                });
-
             modelBuilder.Entity("Evaluation.DAL.Models.Org.SchoolLevel", b =>
                 {
                     b.Property<Guid>("Id")
@@ -5806,76 +5652,6 @@ namespace Evaluation.DAL.Migrations
                     b.HasIndex("UpdateById");
 
                     b.ToTable("SchoolLevel");
-                });
-
-            modelBuilder.Entity("Evaluation.DAL.Models.Org.SchoolTerm", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("CreateById")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreateDate")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("getdate()");
-
-                    b.Property<Guid?>("DeleteById")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("DeleteDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("EndDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsActive")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(true);
-
-                    b.Property<bool>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false);
-
-                    b.Property<Guid?>("SchoolClassId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("SchoolYear")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid?>("UpdateById")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("UpdateDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreateById");
-
-                    b.HasIndex("DeleteById");
-
-                    b.HasIndex("SchoolClassId");
-
-                    b.HasIndex("UpdateById");
-
-                    b.ToTable("SchoolTerm");
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.Org.SchoolType", b =>
@@ -13628,72 +13404,6 @@ namespace Evaluation.DAL.Migrations
                     b.Navigation("UpdateBy");
                 });
 
-            modelBuilder.Entity("Evaluation.DAL.Models.Org.SchoolClass", b =>
-                {
-                    b.HasOne("Evaluation.DAL.Models.Org.SchoolCourse", "Course")
-                        .WithMany()
-                        .HasForeignKey("CourseId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "CreateBy")
-                        .WithMany()
-                        .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "DeleteBy")
-                        .WithMany()
-                        .HasForeignKey("DeleteById")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Evaluation.DAL.Models.Org.School", "School")
-                        .WithMany("Classes")
-                        .HasForeignKey("SchoolId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "UpdateBy")
-                        .WithMany()
-                        .HasForeignKey("UpdateById")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("Course");
-
-                    b.Navigation("CreateBy");
-
-                    b.Navigation("DeleteBy");
-
-                    b.Navigation("School");
-
-                    b.Navigation("UpdateBy");
-                });
-
-            modelBuilder.Entity("Evaluation.DAL.Models.Org.SchoolCourse", b =>
-                {
-                    b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "CreateBy")
-                        .WithMany()
-                        .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "DeleteBy")
-                        .WithMany()
-                        .HasForeignKey("DeleteById")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "UpdateBy")
-                        .WithMany()
-                        .HasForeignKey("UpdateById")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("CreateBy");
-
-                    b.Navigation("DeleteBy");
-
-                    b.Navigation("UpdateBy");
-                });
-
             modelBuilder.Entity("Evaluation.DAL.Models.Org.SchoolLevel", b =>
                 {
                     b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "CreateBy")
@@ -13731,36 +13441,6 @@ namespace Evaluation.DAL.Migrations
                     b.Navigation("EducationLevel");
 
                     b.Navigation("School");
-
-                    b.Navigation("UpdateBy");
-                });
-
-            modelBuilder.Entity("Evaluation.DAL.Models.Org.SchoolTerm", b =>
-                {
-                    b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "CreateBy")
-                        .WithMany()
-                        .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "DeleteBy")
-                        .WithMany()
-                        .HasForeignKey("DeleteById")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Evaluation.DAL.Models.Org.SchoolClass", null)
-                        .WithMany("Terms")
-                        .HasForeignKey("SchoolClassId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "UpdateBy")
-                        .WithMany()
-                        .HasForeignKey("UpdateById")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("CreateBy");
-
-                    b.Navigation("DeleteBy");
 
                     b.Navigation("UpdateBy");
                 });
@@ -16287,11 +15967,6 @@ namespace Evaluation.DAL.Migrations
                     b.Navigation("SubFormItems");
                 });
 
-            modelBuilder.Entity("Evaluation.DAL.Models.Org.SchoolClass", b =>
-                {
-                    b.Navigation("Terms");
-                });
-
             modelBuilder.Entity("Evaluation.DAL.Models.PermissionEntity.Permission", b =>
                 {
                     b.Navigation("ControlValidations");
@@ -16383,8 +16058,6 @@ namespace Evaluation.DAL.Migrations
 
             modelBuilder.Entity("Evaluation.DAL.Models.Org.School", b =>
                 {
-                    b.Navigation("Classes");
-
                     b.Navigation("SchoolLevel");
                 });
 #pragma warning restore 612, 618

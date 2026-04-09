@@ -50,6 +50,12 @@ public class OrgBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider c
 
         return orgDetails;
     }
+
+    public async Task<List<OrgDetailsDto>> GetEmployeesBySchoolId(Guid id)
+    {
+        return mapper.Map<List<OrgDetailsDto>>(await employeeService.GetEmployeesBySchoolId(id));
+    }
+
     public async Task<List<ParentOrgTreeDto>> GetParentOrgTreeAsync()
     {
         List<DepTargetOrgTree> depTargetOrgTrees = await orgService.GetDepTargetOrgTree();
