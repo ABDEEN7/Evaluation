@@ -13,5 +13,6 @@ public class ScopeType: EntityBase, IAuditLogEntity
     public ScopeType? Parent { get; set; }
     public Guid DepartmentId { get; set; }
     public Department? Department { get; set; }
+    public string? ColorCode { get; set; }
     public int OrderNo { get; set; }
 }
