@@ -64,7 +64,6 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
             IsEvaluation = x.IsEvaluation,
             Weight = x.Weight,
             EvalFormId = x.EvalFormId,
-            CalcMethodId = x.CalcMethodId,
             ScopeId = x.ScopeId,
             IsActive = x.IsActive,
             HasNote = x.HasNote,
@@ -272,7 +271,6 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
         obj.Weight = message.Weight;
         obj.EvalFormId = message.EvalFormId;
         obj.ScopeId = message.ScopeId;
-        obj.CalcMethodId = message.CalcMethodId;
         obj.HasNote = message.HasNote;
         obj.NoteRequired = message.NoteRequired;
         obj.DropDownTypeId = message.DropDownTypeId;
@@ -322,7 +320,6 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
             obj.Weight = message.Weight;
             obj.EvalFormId = obj.EvalFormId;
             obj.ScopeId = message.ScopeId;
-            obj.CalcMethodId = message.CalcMethodId;
             obj.HasNote = message.HasNote;
             obj.NoteRequired = message.NoteRequired;
             obj.DropDownTypeId = message.DropDownTypeId;

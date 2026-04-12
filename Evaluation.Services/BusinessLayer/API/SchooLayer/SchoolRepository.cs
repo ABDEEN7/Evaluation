@@ -49,7 +49,7 @@ public class SchoolRepository(IServiceScopeFactory serviceScopeFactory,
     {
         var department = await serviceProvider.CreateScopedUow().GetRepository<Department>()
              .GetAllQueryFiltered()
-             .AsNoTracking()
+             .AsNoTracking().Include(c=>c.DepTargetOrgTrees)
              .Where(c => c.Id == depId)
              .FirstOrDefaultAsync();
 

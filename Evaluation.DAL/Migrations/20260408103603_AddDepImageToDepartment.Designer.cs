@@ -4,6 +4,7 @@ using Evaluation.DAL.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Evaluation.DAL.Migrations
 {
     [DbContext(typeof(EvaluationDbContext))]
-    partial class EvaluationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260408103603_AddDepImageToDepartment")]
+    partial class AddDepImageToDepartment
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -3693,9 +3696,6 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<bool>("AllowRename")
-                        .HasColumnType("bit");
-
                     b.Property<Guid>("CalcMethodId")
                         .HasColumnType("uniqueidentifier");
 
@@ -4067,8 +4067,8 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("ColorCode")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<Guid>("CalcMethodId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("CreateById")
                         .HasColumnType("uniqueidentifier");
@@ -4140,6 +4140,8 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CalcMethodId");
+
                     b.HasIndex("CreateById");
 
                     b.HasIndex("DeleteById");
@@ -4153,84 +4155,6 @@ namespace Evaluation.DAL.Migrations
                     b.HasIndex("UpdateById");
 
                     b.ToTable("FormItem");
-                });
-
-            modelBuilder.Entity("Evaluation.DAL.Models.FormsModules.FormItemConfig", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("CalcMethodId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("CreateById")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreateDate")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("getdate()");
-
-                    b.Property<Guid?>("DeleteById")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("DeleteDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("EvalFormId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("FormItemId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("IsActive")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(true);
-
-                    b.Property<bool>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false);
-
-                    b.Property<string>("NameAr")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NameEn")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("PartyTypeId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<decimal>("Percentage")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<Guid?>("UpdateById")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("UpdateDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CalcMethodId");
-
-                    b.HasIndex("CreateById");
-
-                    b.HasIndex("DeleteById");
-
-                    b.HasIndex("EvalFormId");
-
-                    b.HasIndex("FormItemId");
-
-                    b.HasIndex("PartyTypeId");
-
-                    b.HasIndex("UpdateById");
-
-                    b.ToTable("FormItemConfig");
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.FormsModules.FormItemRelated", b =>
@@ -4322,9 +4246,6 @@ namespace Evaluation.DAL.Migrations
                     b.Property<Guid?>("FormEvalMatrixValueId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("FormItemConfigId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<Guid>("FormItemId")
                         .HasColumnType("uniqueidentifier");
 
@@ -4339,9 +4260,6 @@ namespace Evaluation.DAL.Migrations
                         .HasDefaultValue(false);
 
                     b.Property<string>("Note")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("RenameItem")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid?>("UpdateById")
@@ -4364,8 +4282,6 @@ namespace Evaluation.DAL.Migrations
                     b.HasIndex("DepEvalMatrixId");
 
                     b.HasIndex("FormEvalMatrixValueId");
-
-                    b.HasIndex("FormItemConfigId");
 
                     b.HasIndex("FormItemId");
 
@@ -4615,9 +4531,6 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("ColorCode")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<Guid>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
@@ -4744,9 +4657,6 @@ namespace Evaluation.DAL.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("BackendName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ColorCode")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("CreateById")
@@ -7782,65 +7692,6 @@ namespace Evaluation.DAL.Migrations
                     b.HasIndex("serviceId");
 
                     b.ToTable("ServiceRequestShowPartyType");
-                });
-
-            modelBuilder.Entity("Evaluation.DAL.Models.ServiceEnities.ServiceType", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("BackendName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("CreateById")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreateDate")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("getdate()");
-
-                    b.Property<Guid?>("DeleteById")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("DeleteDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsActive")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(true);
-
-                    b.Property<bool>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false);
-
-                    b.Property<string>("NameAr")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NameEn")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid?>("UpdateById")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("UpdateDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreateById");
-
-                    b.HasIndex("DeleteById");
-
-                    b.HasIndex("UpdateById");
-
-                    b.ToTable("ServiceType");
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.ServiceRequestEntities.RequestAssignment", b =>
@@ -12934,6 +12785,12 @@ namespace Evaluation.DAL.Migrations
 
             modelBuilder.Entity("Evaluation.DAL.Models.FormsModules.FormItem", b =>
                 {
+                    b.HasOne("Evaluation.DAL.Models.FormsModules.CalcMethod", "CalcMethod")
+                        .WithMany()
+                        .HasForeignKey("CalcMethodId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "CreateBy")
                         .WithMany()
                         .HasForeignKey("CreateById")
@@ -12967,6 +12824,8 @@ namespace Evaluation.DAL.Migrations
                         .HasForeignKey("UpdateById")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.Navigation("CalcMethod");
+
                     b.Navigation("CreateBy");
 
                     b.Navigation("DeleteBy");
@@ -12976,62 +12835,6 @@ namespace Evaluation.DAL.Migrations
                     b.Navigation("EvalForm");
 
                     b.Navigation("Scope");
-
-                    b.Navigation("UpdateBy");
-                });
-
-            modelBuilder.Entity("Evaluation.DAL.Models.FormsModules.FormItemConfig", b =>
-                {
-                    b.HasOne("Evaluation.DAL.Models.FormsModules.CalcMethod", "CalcMethod")
-                        .WithMany()
-                        .HasForeignKey("CalcMethodId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "CreateBy")
-                        .WithMany()
-                        .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "DeleteBy")
-                        .WithMany()
-                        .HasForeignKey("DeleteById")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Evaluation.DAL.Models.FormsModules.EvalForm", "EvalForm")
-                        .WithMany()
-                        .HasForeignKey("EvalFormId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Evaluation.DAL.Models.FormsModules.FormItem", "FormItem")
-                        .WithMany()
-                        .HasForeignKey("FormItemId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Evaluation.DAL.Models.UserEntiy.PartyType", "PartyType")
-                        .WithMany()
-                        .HasForeignKey("PartyTypeId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "UpdateBy")
-                        .WithMany()
-                        .HasForeignKey("UpdateById")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("CalcMethod");
-
-                    b.Navigation("CreateBy");
-
-                    b.Navigation("DeleteBy");
-
-                    b.Navigation("EvalForm");
-
-                    b.Navigation("FormItem");
-
-                    b.Navigation("PartyType");
 
                     b.Navigation("UpdateBy");
                 });
@@ -13105,11 +12908,6 @@ namespace Evaluation.DAL.Migrations
                         .HasForeignKey("FormEvalMatrixValueId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Evaluation.DAL.Models.FormsModules.FormItemConfig", "FormItemConfig")
-                        .WithMany()
-                        .HasForeignKey("FormItemConfigId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("Evaluation.DAL.Models.FormsModules.FormItem", "FormItem")
                         .WithMany()
                         .HasForeignKey("FormItemId")
@@ -13138,8 +12936,6 @@ namespace Evaluation.DAL.Migrations
                     b.Navigation("FormEvalMatrixValue");
 
                     b.Navigation("FormItem");
-
-                    b.Navigation("FormItemConfig");
 
                     b.Navigation("UpdateBy");
 
@@ -15031,29 +14827,6 @@ namespace Evaluation.DAL.Migrations
                     b.Navigation("UpdateBy");
 
                     b.Navigation("service");
-                });
-
-            modelBuilder.Entity("Evaluation.DAL.Models.ServiceEnities.ServiceType", b =>
-                {
-                    b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "CreateBy")
-                        .WithMany()
-                        .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "DeleteBy")
-                        .WithMany()
-                        .HasForeignKey("DeleteById");
-
-                    b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "UpdateBy")
-                        .WithMany()
-                        .HasForeignKey("UpdateById");
-
-                    b.Navigation("CreateBy");
-
-                    b.Navigation("DeleteBy");
-
-                    b.Navigation("UpdateBy");
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.ServiceRequestEntities.RequestAssignment", b =>

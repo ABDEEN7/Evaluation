@@ -20,5 +20,6 @@ public class EvalForm : EntityBase , IAuditLogEntity
     public Guid FormStatusId { get; set; }
     public FormStatus? FormStatus { get; set; } 
     public bool IsFinalEval { get; set; }
+    public bool AllowRename { get; set; }
 
 }
