@@ -1,4 +1,10 @@
-﻿$('#Email').keypress(function (event) {
+﻿let departmentRoutePath = sharedUtility().extractDepartmentName();
+
+$(document).ready(function () {
+    loadSelectedDepartment();
+});
+
+$('#Email').keypress(function (event) {
     if (event.keyCode === 13) {
         event.preventDefault();
         checkUserAndRedirect();
@@ -54,5 +60,22 @@ const checkUserAndRedirect = () => {
 
     jqClient(options).Post(`/Account/CheckUserAuth?username=${username}`);
 };
+
+function loadSelectedDepartment() {
+    jqClient().Get(`/Website/GetDepartment?routingPath=${departmentRoutePath}`)
+        .done((result) => {
+
+            const data = result.result.result;
+            if (data != null) {
+                if (data.depImage !== null && data.depImage !== undefined && data.depImage !== "") {
+                    // valid string
+                    $("#loginImg").attr("src", data.depImage);
+                }
+            }
+        })
+        .fail((jqXHR, textStatus, err) => {
+            console.error('GetAll department failed', textStatus, err);
+        });
+}
 
 
