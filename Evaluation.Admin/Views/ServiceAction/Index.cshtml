@@ -28,7 +28,7 @@
 @section Styles {
 
     <link href="~/css/admin/serviceaction.css" rel="stylesheet" />
-    
+
 }
 
 @await Component.InvokeAsync("ServiceSelection")
@@ -303,7 +303,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                       
+
 
                                         control = uiControlItems.Where(item => item.Control.BackEndName == "ActionPartyType").FirstOrDefault();
                                         <div class="row">
@@ -414,102 +414,102 @@
 <div class="row">
     <div class="col-12">
         <div class="card app-card">
-            
-    <div class="sub-page-container EvaluationActionDetails" id="EvaluationActionsDivId" style="display:none;">
-        <section class="section-container">
-            <div class="card app-card">
 
-                <div class="card-header bg-light">
-                    <div class=" row">
-                        <div class="col-md-4">
-                            <h4 class="heading m-0">
-                                @controlsList.GetUiControlText(AdminBackendUI.EvaluationActionDetails)
-                                <button type="button" id="btnshowdetailsDiv2" class="btn btn-sm btn-primary fas fa-chevron-down"></button>
-                            </h4>
+            <div class="sub-page-container EvaluationActionDetails" id="EvaluationActionsDivId" style="display:none;">
+                <section class="section-container">
+                    <div class="card app-card">
+
+                        <div class="card-header bg-light">
+                            <div class=" row">
+                                <div class="col-md-4">
+                                    <h4 class="heading m-0">
+                                        @controlsList.GetUiControlText(AdminBackendUI.EvaluationActionDetails)
+                                        <button type="button" id="btnshowdetailsDiv2" class="btn btn-sm btn-primary fas fa-chevron-down"></button>
+                                    </h4>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </div>
-                <div class="nav nav-tabs tab">
-                    <button type="button" id="defaultOpen" class="nav-link tablinks " onclick="opentab(event, 'EvaluationActionDtepDiv')">@controlsList.GetUiControlText(AdminBackendUI.ActionTab) </button>
-                    @if (permissionsList.IsPermissionAvailabe(AdminPermission.VIEW_ADMIN_ACTIONSTATUSCONFIGURATION))
-                    {
-                        <button type="button" class="nav-link tablinks" onclick="opentab(event, 'EvaluationActionStatusConfigDiv')">@controlsList.GetUiControlText(AdminBackendUI.ActionStatusConfigTab) </button>
-                    }
-                    @if (permissionsList.IsPermissionAvailabe(AdminPermission.VIEW_ADMIN_ACTIONCONDITION))
-                    {
-                        <button type="button" class="nav-link tablinks" onclick="opentab(event, 'EvaluationActionConditionDiv')">@controlsList.GetUiControlText(AdminBackendUI.ActionConditionTab) </button>
-                    }
-                </div>
-                <div id="EvaluationActionDtepDiv" class="card-body EvaluationActionDtepDiv tabcontent">
+                        <div class="nav nav-tabs tab">
+                            <button type="button" id="defaultOpen" class="nav-link tablinks " onclick="opentab(event, 'EvaluationActionDtepDiv')">@controlsList.GetUiControlText(AdminBackendUI.ActionTab) </button>
+                            @if (permissionsList.IsPermissionAvailabe(AdminPermission.VIEW_ADMIN_ACTIONSTATUSCONFIGURATION))
+                            {
+                                <button type="button" class="nav-link tablinks" onclick="opentab(event, 'EvaluationActionStatusConfigDiv')">@controlsList.GetUiControlText(AdminBackendUI.ActionStatusConfigTab) </button>
+                            }
+                            @if (permissionsList.IsPermissionAvailabe(AdminPermission.VIEW_ADMIN_ACTIONCONDITION))
+                            {
+                                <button type="button" class="nav-link tablinks" onclick="opentab(event, 'EvaluationActionConditionDiv')">@controlsList.GetUiControlText(AdminBackendUI.ActionConditionTab) </button>
+                            }
+                        </div>
+                        <div id="EvaluationActionDtepDiv" class="card-body EvaluationActionDtepDiv tabcontent">
 
 
-                    <div class=" row">
-                               
-                        @if (permissionsList.IsPermissionAvailabe(AdminPermission.UPDATE_ADMIN_ACTION_FIELD))
-                        {
+                            <div class=" row">
+
+                                @if (permissionsList.IsPermissionAvailabe(AdminPermission.UPDATE_ADMIN_ACTION_FIELD))
+                                {
                                     <div class="col-md-12 d-flex justify-content-end">
-                                <button id="saveActionFieldBtnId" type="button" class="btn btn-primary btn-sm">@controlsList.GetUiControlText(AdminBackendUI.SAVE_BUTTON)</button>
+                                        <button id="saveActionFieldBtnId" type="button" class="btn btn-primary btn-sm">@controlsList.GetUiControlText(AdminBackendUI.SAVE_BUTTON)</button>
+
+                                    </div>
+                                }
+                            </div>
+
+                            <div class="row mt-4">
+                                <div class="col-12">
+                                    <h3 class="heading lg">@controlsList.GetUiControlText(AdminBackendUI.EvaluationActionsFieldsRoster)</h3>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <input type="text" id="tree-search" placeholder="@controlsList.GetUiControlText(AdminBackendUI.lblSearchTree)" class="form-control mb-2">
+                                    <div id="tree-container"></div>
+                                </div>
+                                <div class="col-md-8">
+                                    <input type="text" id="table-search" placeholder="@controlsList.GetUiControlText(AdminBackendUI.lblSearchTable)" class="form-control mb-2">
+                                    <div id="table"></div>
+                                </div>
+                            </div>
+
+                        </div>
+                        @if (permissionsList.IsPermissionAvailabe(AdminPermission.VIEW_ADMIN_ACTIONSTATUSCONFIGURATION))
+                        {
+                            <div id="EvaluationActionStatusConfigDiv" class="card-body  tabcontent">
+                                <div class="card-header justify-content-end d-flex align-items-center bg-light">
+                                    @if (permissionsList.IsPermissionAvailabe(AdminPermission.ADD_ADMIN_ACTIONSTATUSCONFIGURATION))
+                                    {
+                                        <button id="btnActionStatusConfigAdd" type="button" class="btn btn-primary">
+                                            <i class="fa fa-plus-circle"></i> &nbsp;@controlsList.GetUiControlText(AdminBackendUI.ADD_RECORD)
+                                        </button>
+                                    }
+
+                                </div>
+                                <div id="ActionStatusConfigtable"></div>
+
+
+                            </div>
+                        }
+                        @if (permissionsList.IsPermissionAvailabe(AdminPermission.VIEW_ADMIN_ACTIONCONDITION))
+                        {
+                            <div id="EvaluationActionConditionDiv" class="card-body  tabcontent">
+                                <div class="card-header justify-content-end d-flex align-items-center bg-light">
+                                    @if (permissionsList.IsPermissionAvailabe(AdminPermission.ADD_ADMIN_ACTIONCONDITION))
+                                    {
+                                        <button id="btnActionConditionAdd" type="button" class="btn btn-primary">
+                                            <i class="fa fa-plus-circle"></i> &nbsp;@controlsList.GetUiControlText(AdminBackendUI.ADD_RECORD)
+                                        </button>
+                                    }
+
+                                </div>
+                                <div id="ActionConditiontable"></div>
+
 
                             </div>
                         }
                     </div>
-
-                    <div class="row mt-4">
-                        <div class="col-12">
-                            <h3 class="heading lg">@controlsList.GetUiControlText(AdminBackendUI.EvaluationActionsFieldsRoster)</h3>
-                        </div>
-                    </div>
-
-                    <div class="row mb-3">
-                        <div class="col-md-4">
-                            <input type="text" id="tree-search" placeholder="@controlsList.GetUiControlText(AdminBackendUI.lblSearchTree)" class="form-control mb-2">
-                            <div id="tree-container"></div>
-                        </div>
-                        <div class="col-md-8">
-                            <input type="text" id="table-search" placeholder="@controlsList.GetUiControlText(AdminBackendUI.lblSearchTable)" class="form-control mb-2">
-                            <div id="table"></div>
-                        </div>
-                    </div>
-
-                </div>
-                @if (permissionsList.IsPermissionAvailabe(AdminPermission.VIEW_ADMIN_ACTIONSTATUSCONFIGURATION))
-                {
-                    <div id="EvaluationActionStatusConfigDiv" class="card-body  tabcontent">
-                        <div class="card-header justify-content-end d-flex align-items-center bg-light">
-                            @if (permissionsList.IsPermissionAvailabe(AdminPermission.ADD_ADMIN_ACTIONSTATUSCONFIGURATION))
-                            {
-                                <button id="btnActionStatusConfigAdd" type="button" class="btn btn-primary">
-                                    <i class="fa fa-plus-circle"></i> &nbsp;@controlsList.GetUiControlText(AdminBackendUI.ADD_RECORD)
-                                </button>
-                            }
-
-                        </div>
-                        <div id="ActionStatusConfigtable"></div>
-
-
-                    </div>
-                }
-                @if (permissionsList.IsPermissionAvailabe(AdminPermission.VIEW_ADMIN_ACTIONCONDITION))
-                {
-                    <div id="EvaluationActionConditionDiv" class="card-body  tabcontent">
-                        <div class="card-header justify-content-end d-flex align-items-center bg-light">
-                            @if (permissionsList.IsPermissionAvailabe(AdminPermission.ADD_ADMIN_ACTIONCONDITION))
-                            {
-                                <button id="btnActionConditionAdd" type="button" class="btn btn-primary">
-                                    <i class="fa fa-plus-circle"></i> &nbsp;@controlsList.GetUiControlText(AdminBackendUI.ADD_RECORD)
-                                </button>
-                            }
-
-                        </div>
-                        <div id="ActionConditiontable"></div>
-
-
-                    </div>
-                }
+                </section>
             </div>
-        </section>
-    </div>
-    </div>
+        </div>
     </div>
 </div>
 
@@ -533,11 +533,11 @@
 
 
 @section Scripts {
-    
+
     <script src="~/js/admin/TreeTabulator.js" asp-append-version="true"></script>
     <script>
 
-       
+
 
 
         var uiControlItemsList = @Json.Serialize(uiControlItems);
@@ -550,7 +550,7 @@
         const services = @Json.Serialize(Model.Services);
         const actionTypes = @Json.Serialize(Model.ActionTypes);
 
-       
+
         var ActionFieldAttributecolumnList = @Html.Raw(Json.Serialize(ActionFieldAttributecolumnList));
         const ActionFieldAttributecontrolvalidationlist = @Html.Raw(Json.Serialize(ActionFieldAttributeControlItems));
          const IsView_ActionFieldAttribute='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.VIEW_ADMIN_ACTION_FIELD_ATTRIBUTE))';
@@ -576,7 +576,7 @@
         const IsDelete_ActionCondition='@Html.Raw(permissionsList.IsPermissionAvailabe(AdminPermission.DELETE_ADMIN_ACTIONCONDITION))';
 
         sharedFn().PopulateUiControl(controlsList);
-       
+
 
     </script>
 

@@ -25,7 +25,7 @@
 @section Styles {
 
     <link href="~/css/admin/servicestatus.css" rel="stylesheet" />
-   
+
 }
 
 @await Component.InvokeAsync("ServiceSelection")
@@ -43,7 +43,7 @@
                     <div class="card-body">
 
 
-                       @*  <div class=" row">
+                        @*  <div class=" row">
                             <div class="col-auto">
                                 <label class="form-label m-0">@controlsList.GetUiControlText(AdminBackendUI.lblStatusService)</label>
                             </div>
@@ -74,7 +74,7 @@
 
                         <div class=" row">
                             <div class="col-auto listclass">
-                                <ul id="filteredList" class="list-group" >
+                                <ul id="filteredList" class="list-group">
                                 </ul>
 
                                 <div class="offcanvas offcanvas-start  border-0" tabindex="-1" id="offcanvas" aria-labelledby="offcanvasLabel">
@@ -129,7 +129,7 @@
                                 </div>
                             </div>
 
-                           
+
                         </div>
                     </div>
 
@@ -159,7 +159,7 @@
                             </div>
                         </div>
                         <hr />
-                       
+
                     </div>
 
                 </div>
@@ -220,10 +220,10 @@
 
 
 @section Scripts {
-    
+
     <script>
 
-      
+
         let txtDir = '@textDir';
          const AllActions = @Json.Serialize(AllActions);
         var controlsList = JSON.parse(`@Html.Raw(Json.Serialize(controlsList))`);

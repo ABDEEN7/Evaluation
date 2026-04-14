@@ -1,8 +1,8 @@
 ﻿var maintable = null;
 var actionconditiontable = null;
 var popupname = "";
-var ServiceFieldList =[];
-var SystemFieldList =[];
+var ServiceFieldList = [];
+var SystemFieldList = [];
 var fieldselectvalue = '';
 var actiontypebackendname = '';
 function SetPopupCount() {
@@ -43,14 +43,14 @@ $(document).ready(function () {
     IsEdit = IsEdit_ActionStatusConfig;
     IsDelete = IsDelete_ActionStatusConfig;
     IsView = "";
-    
+
     var viewItem = IsView_ActionStatusConfigNotification == "True" ?
         `<span class="Attr pointer" title="` + sharedFn().GetUiControlText('ADMIN_TOOLTIP_VIEW_NOTIFICATION') + `"><i class="Attr fa fa-bell" onclick="ActionStatusConfigClick(this)">
         <span class="actionnotificationconfigcount">0</span>
 </i></span>`
         : '';
     let TableColumns = sharedFn().PopulateColumn(ActionStatusConfigcolumnList, viewItem);
-   
+
     maintable = tableUtil.createTabulator({
         id: "ActionStatusConfigtable",
         config: {
@@ -81,7 +81,7 @@ $(document).ready(function () {
                 });
             });
         }
-        
+
     });
 
     //Acton Condition
@@ -109,9 +109,9 @@ $(document).ready(function () {
 
     });
 
-   
+
     let AttributeList = [];
-   
+
 
 
     //Code start for Action Table
@@ -239,11 +239,11 @@ $(document).ready(function () {
             jqClientAdvanced(options).Get(`ServiceAction/GetEvaluationActionDetails`.concat('?actionId=', actionId));
 
         }
-       
+
     }
 
     const InitializePartyTypes = (EvaluationAction, partyTypesList, templateDocsList) => {
-      
+
 
         const partyTypes_select2 = partyTypesList
             .map(item => ({
@@ -257,8 +257,8 @@ $(document).ready(function () {
                 text: lang == "ar" ? item.nameAr : item.nameEn
             }));
 
-       
-       
+
+
         $("#ActionTemplateDoc").empty();
         //ActionPartyType
         let uibackendName = "ActionPartyType";
@@ -437,7 +437,7 @@ $(document).ready(function () {
             event.preventDefault();
         });
 
-       
+
         $("#ActionTemplateDoc").select2({
             width: '100%',
             allowClear: true,
@@ -449,13 +449,13 @@ $(document).ready(function () {
 
         });
 
-       
 
-     
+
+
         $("#ActionTemplateDoc").val(EvaluationAction.actionTemplateDocList);
         $("#ActionTemplateDoc").trigger('change');
         $("#EvaluationActionActionTypeId").trigger('change');
-        
+
     }
     $("#EvaluationActionActionTypeId").on("change", function () {
         actiontypebackendname = '';
@@ -508,7 +508,7 @@ $(document).ready(function () {
                     $("#defaultOpen").show();
                     $("#EvaluationActionDtepDiv").show();
                     SetActiveTabs();
-                    
+
                 }
             }
 
@@ -537,7 +537,7 @@ $(document).ready(function () {
                 $('#EvaluationActionAllowDraft').prop("checked", false);
                 $('.ActionAllowDraftClass').hide();
             }
-            
+
         }
     });
     const addStyleForTheSelectLi = (liId) => {
@@ -577,7 +577,7 @@ $(document).ready(function () {
         $('#EvaluationActionActionTypeId').val(obj.actionTypeId);
         //$('#EvaluationActionSchStatusId').val(obj.schStatusId);
         $('#EvaluationActionActionTypeId').trigger('change');
-       // $('#EvaluationActionSchStatusId').trigger('change');
+        // $('#EvaluationActionSchStatusId').trigger('change');
 
         $('#EvaluationActionIsActive').prop('checked', obj.isActive);
         $('#EvaluationActionIsInitialAction').prop('checked', obj.isInitialAction);
@@ -619,7 +619,7 @@ $(document).ready(function () {
         $('#EvaluationActionActionTypeId').trigger('change');
 
         ///$('#EvaluationActionSchStatusId').val('');
-       // $('#EvaluationActionSchStatusId').trigger('change');
+        // $('#EvaluationActionSchStatusId').trigger('change');
 
         $('#EvaluationActionIsActive').prop('checked', true);
         $('#EvaluationActionIsInitialAction').prop('checked', false);
@@ -631,7 +631,7 @@ $(document).ready(function () {
         $('#EvaluationActionConfirmationTitleAr').val('');
         $('#EvaluationActionConfirmationTitleEn').val('');
     }
-   
+
 
     const DisableAllElementsForTabulator = (tabulator, disable = true) => {
 
@@ -678,12 +678,12 @@ $(document).ready(function () {
 
     //});
 
-   
+
 
     $('#submitBtn').click(function () {
         LoadAllEvaluationActions();
 
-        
+
     });
 
     const actionTypes_select2 = actionTypes
@@ -698,7 +698,7 @@ $(document).ready(function () {
         data: actionTypes_select2,
         dropdownCssClass: "manageselect2zindex",
         placeholder: sharedFn().GetUiControlText('PleaseSelect'),
-       // dropdownParent: $("#ModalPopup")
+        // dropdownParent: $("#ModalPopup")
 
     });
 
@@ -784,7 +784,7 @@ $(document).ready(function () {
                 NameEn: $("#EvaluationActionNameEn").val(),
                 NameAr: $("#EvaluationActionNameAr").val(),
                 ActionTypeId: $("#EvaluationActionActionTypeId").val(),
-               // SchStatusId: $("#EvaluationActionSchStatusId").val(),
+                // SchStatusId: $("#EvaluationActionSchStatusId").val(),
                 IsInitialAction: $("#EvaluationActionIsInitialAction").prop("checked"),
                 AllowDraft: $("#EvaluationActionAllowDraft").prop("checked"),
                 IsActive: $("#EvaluationActionIsActive").prop("checked"),
@@ -926,15 +926,15 @@ $(document).ready(function () {
 
     $('#ServiceId').on('change', function () {
 
-       
+
     });
-    
-  
+
+
     var treeTabulator;
     const LoadActionFieldTree = (actionId) => {
 
         if (actionId) {
-            if (IsView_ActionStatusConfig=='True') {
+            if (IsView_ActionStatusConfig == 'True') {
                 LoadAllActionStatusConfiguration(actionId);
             }
             if (IsView_ActionCondition == 'True') {
@@ -952,7 +952,7 @@ $(document).ready(function () {
                             data: result.formGroups,
                             searchInput: '#tree-search',
                             multipleSelection: true,
-                           
+
                         };
 
                         var tabulatorConfig = {
@@ -968,27 +968,27 @@ $(document).ready(function () {
                                     maxWidth: 100,
                                     minWidth: 100,
                                     formatter: function (cell) {
-                                        var value = cell.getValue(); 
-                                        return value!=null?`<span class="Attr pointer" title="` + sharedFn().GetUiControlText('ADMIN_TOOLTIP_VIEW_ATTRIBUTE') + `"><i class="Attr fa fa-clipboard">
+                                        var value = cell.getValue();
+                                        return value != null ? `<span class="Attr pointer" title="` + sharedFn().GetUiControlText('ADMIN_TOOLTIP_VIEW_ATTRIBUTE') + `"><i class="Attr fa fa-clipboard">
        
-</i></span>`:'';
+</i></span>`: '';
                                     },
-                                cellClick: function (e, cell) {
-                                    var actionfieldid = cell.getValue();
-                                    var fieldid = cell._cell.row.data.id;
-                                    if (actionfieldid != null) { 
-                                        IsEdit = IsEdit_ActionFieldAttribute;
-                                        IsDelete = IsDelete_ActionFieldAttribute;
-                                        IsView = '';
-                                        containsOrderNo = 'False';
-                                        var ActionFieldAttributetabulatorcolumns = sharedFn().PopulateColumn(ActionFieldAttributecolumnList);
-                                        var modaltitle = sharedFn().GetUiControlText('ActionFieldAttributeHeader'); sharedFn().OpenFormPopup(modaltitle, ActionFieldAttributecontrolvalidationlist, null, ActionFieldAttributetabulatorcolumns, settingList);
-                                        $("#fieldid").val(fieldid);
-                                        $("#actionfieldid").val(actionfieldid);
-                                        popupname = "ActionFieldAttribute";
+                                    cellClick: function (e, cell) {
+                                        var actionfieldid = cell.getValue();
+                                        var fieldid = cell._cell.row.data.id;
+                                        if (actionfieldid != null) {
+                                            IsEdit = IsEdit_ActionFieldAttribute;
+                                            IsDelete = IsDelete_ActionFieldAttribute;
+                                            IsView = '';
+                                            containsOrderNo = 'False';
+                                            var ActionFieldAttributetabulatorcolumns = sharedFn().PopulateColumn(ActionFieldAttributecolumnList);
+                                            var modaltitle = sharedFn().GetUiControlText('ActionFieldAttributeHeader'); sharedFn().OpenFormPopup(modaltitle, ActionFieldAttributecontrolvalidationlist, null, ActionFieldAttributetabulatorcolumns, settingList);
+                                            $("#fieldid").val(fieldid);
+                                            $("#actionfieldid").val(actionfieldid);
+                                            popupname = "ActionFieldAttribute";
+                                        }
+
                                     }
-                                   
-                                }
                                 }
                             ],
                             height: '400px',
@@ -1001,16 +1001,16 @@ $(document).ready(function () {
                             searchInput: '#table-search',
                             placeholder: sharedFn().GetUiControlText('NO_DATA_FOUND'),
                         };
-                       
+
 
 
                         treeTabulator = new TreeWithTabulator(treeConfig, tabulatorConfig);
-                       
+
 
                     }
                 },
             };
-           
+
             jqClientAdvanced(options).Get(`ServiceAction/GetActionFieldTree`.concat('?actionId=', actionId));
         }
 
@@ -1018,15 +1018,15 @@ $(document).ready(function () {
 
     }
 
-   
-  
-    
 
-    
+
+
+
+
 
     $('#saveActionFieldBtnId').click(function () {
         let actionId = $('#EvaluationActionId').val();
-       
+
         if (actionId) {
 
 
@@ -1072,15 +1072,15 @@ $(document).ready(function () {
 var LoadAllActionStatusConfiguration = (actionId) => {
     maintable.setData([]);
     const serviceId = $("#ServiceId").val();
-  
+
     const options = {
         success: function (data) {
             if (data) {
                 maintable.setData([]);
                 if (data && data.length > 0) {
-                    
+
                     maintable.addData(data);
-                    
+
                 }
                 else {
 
@@ -1096,14 +1096,14 @@ var LoadAllActionStatusConfiguration = (actionId) => {
 
 var LoadAllActionCondition = (actionId) => {
     actionconditiontable.setData([]);
-   
+
     const options = {
         success: function (data) {
             if (data) {
 
                 if (data && data.length > 0) {
                     actionconditiontable.addData(data);
-                    
+
                 }
                 else {
 
@@ -1117,13 +1117,13 @@ var LoadAllActionCondition = (actionId) => {
     jqClientAdvanced(options).Get("ServiceAction/GetActionConditionByAction".concat('?actionId=', actionId));
 }
 $("#btnActionStatusConfigAdd").click(function () {
-    
-   
+
+
     var modaltitle = sharedFn().GetUiControlText('ActionStatusConfigHeader');
 
     sharedFn().OpenFormPopup(modaltitle, ActionStatusConfigcontrolvalidationlist, null, null, null);
     popupname = "ActionStatusConfiguration";
-   
+
 });
 
 $("#btnActionConditionAdd").click(function () {
@@ -1191,12 +1191,12 @@ function DefaultSetUp() {
             }
         })
         $("#ActionStatusConfigurationNotificationIsNotificationSend").trigger("change");
-        
+
     }
     if (popupname == "ActionCondition") {
         var actionid = $('#EvaluationActionId').val();
         $("#ActionConditionServiceActionId").val(actionid);
-        
+
     }
 }
 function SetActiveTabs() {
@@ -1288,12 +1288,12 @@ function AfterDataBind() {
             }
         })
     }
-    
+
 }
 $('#btn-submit_popup').click(function () {
     if (sharedFn().NewvalidateForm("form-control", sharedFn().GetUiControlText('ADMIN_CNTRL_REQUIRED'), sharedFn().GetUiControlText('ADMIN_MSG_MAX_CHAR_LENGTH'), sharedFn().GetUiControlText('ADMIN_MSG_MIN_CHAR_LENGTH'))) {
         commonUtil.btnProgress("btn-submit_popup");
-        var controlvalidation = (popupname == "ActionStatusConfiguration" ? ActionStatusConfigcontrolvalidationlist : popupname == "ActionFieldAttribute" ? ActionFieldAttributecontrolvalidationlist : popupname == "ActionStatusConfigurationNotification" ? ActionStatusConfigNotificationcontrolvalidationlist : popupname == "ActionCondition" ? ActionConditioncontrolvalidationlist :null);
+        var controlvalidation = (popupname == "ActionStatusConfiguration" ? ActionStatusConfigcontrolvalidationlist : popupname == "ActionFieldAttribute" ? ActionFieldAttributecontrolvalidationlist : popupname == "ActionStatusConfigurationNotification" ? ActionStatusConfigNotificationcontrolvalidationlist : popupname == "ActionCondition" ? ActionConditioncontrolvalidationlist : null);
         var requestdata = sharedFn().GetSaveObject(controlvalidation, $('#Id').val());
 
         var url = '';
@@ -1333,8 +1333,8 @@ $('#btn-submit_popup').click(function () {
                                 DefaultSetUp();
                                 table.addData([data], true);
                             }
-                            
-                            
+
+
                             notificationUtil.success(sharedFn().GetUiControlText('ADMIN_MSG_SAVE'));
                             break;
 
@@ -1354,7 +1354,7 @@ $('#btn-submit_popup').click(function () {
                                 DefaultSetUp();
                                 table.updateData([data]);
                             }
-                            
+
                             notificationUtil.success(sharedFn().GetUiControlText('ADMIN_MSG_UPDATE'));
                             break;
 
@@ -1383,7 +1383,7 @@ $('#btn-submit_popup').click(function () {
 
 
 });
-function opentab  (evt, cityName) {
+function opentab(evt, cityName) {
     // Declare all variables
     var i, tabcontent, tablinks;
 
@@ -1478,16 +1478,16 @@ function SetDropDown() {
         AfterDataBind();
         $("#ActionStatusConfigurationIsRemark").trigger('change');
         $("#ActionStatusConfigurationIsOtherAttachment").trigger('change');
-       
+
     }
     if (popupname == "ActionCondition") {
-       
+
         $("#ActionConditionFieldValue").parent().show();
         $("#ActionConditionFieldDropDownValueIds").parent().hide();
         $('#ActionConditionType').on("change", function (event) {
             var ActionConditionType = event.target.value;
             $("#ActionConditionRefID").empty();
-            
+
             if (ActionConditionType) {
                 if (ActionConditionType == "Service") {
                     var ddldata = ServiceFieldList.map(dpitem => (
@@ -1534,18 +1534,18 @@ function SetDropDown() {
             }
 
         })
-        
+
         $('#ActionConditionRefID').on("change", function (event) {
             FieldChangeEvent();
         });
         $('#ActionConditionoperators').on("change", function (event) {
-          
+
             FieldChangeEvent();
         });
     }
-   
 
-    
+
+
 }
 function GetFieldList() {
     const serviceId = $("#ServiceId").val();
@@ -1555,21 +1555,21 @@ function GetFieldList() {
                 ServiceFieldList = [];
                 const { Field } = result.data;
                 ServiceFieldList = Field;
-                
+
 
 
             }
         }
     };
     jqClientAdvanced(options).Get("FormGroup/GetAllField".concat('?serviceid=', serviceId));
-   
+
     const options1 = {
         success: function (result) {
             if (result) {
-                SystemFieldList =[];
+                SystemFieldList = [];
                 const { SystemField } = result.data;
                 SystemFieldList = SystemField;
-                
+
 
 
             }
@@ -1588,8 +1588,8 @@ function SetPopupMode() {
         AfterDataBind();
         $("#ActionStatusConfigurationIsRemark").trigger('change');
         $("#ActionStatusConfigurationIsOtherAttachment").trigger('change');
-        
-        
+
+
     }
     if (popupname == "ActionStatusConfigurationNotification") {
         if (ActionStatusConfigNotificationcontrolvalidationlist) {
@@ -1638,7 +1638,7 @@ function SetPopupMode() {
         var ActionConditionRefID = $('#ActionConditionRefID').data("value");
         var ActionConditionType = $('#ActionConditionType').data("value");
         fieldselectvalue = $('#ActionConditionFieldValue').val();
-        
+
     }
 }
 function FieldChangeEvent() {
@@ -1650,7 +1650,7 @@ function FieldChangeEvent() {
         if (fieldtype) {
             var selectedvalue = fieldtype.type;
             var DropDownTypeId = fieldtype.dropDownTypeId;
-            
+
             if (selectedvalue == "dropdown" || selectedvalue == "select2" || selectedvalue == "VacancySeat") {
                 $("#ActionConditionFieldValue").val('');
                 $("#ActionConditionFieldValue").parent().hide();
@@ -1681,17 +1681,17 @@ function FieldChangeEvent() {
                                     data: DropDownValueList,
                                     placeholder: sharedFn().GetUiControlText('ActionConditionFieldDropDownValueIds'),
                                     dropdownCssClass: "manageselect2zindex",
-                                     dropdownParent: $("#ModalPopup")
+                                    dropdownParent: $("#ModalPopup")
                                 })
                                 if (fieldselectvalue) {
                                     var Ids = String(fieldselectvalue).split(',').map(function (item) {
                                         return item.trim();
                                     });
-                                    
+
                                     $dropdown.attr("data-value", Ids);
                                     $dropdown.val(Ids).trigger('change');
                                 }
-                               
+
                             }
                         }
                     }
@@ -1742,7 +1742,7 @@ const deleteData = (id, urlname = null) => {
                             sharedFn().ResetVisibleControls("PopupForm");
                             table.deleteRow(id);
                             notificationUtil.success(sharedFn().GetUiControlText('ADMIN_MSG_DELETE'));
-                            
+
                         }
                         DefaultSetUp();
                     }
@@ -1758,7 +1758,7 @@ const deleteData = (id, urlname = null) => {
 };
 
 function Loadtabledata() {
-    
+
     if (popupname == "ActionFieldAttribute") {
         var actionfieldid = $("#actionfieldid").val();
         const options = {
@@ -1780,7 +1780,7 @@ function Loadtabledata() {
 
         jqClientAdvanced(options).Get("ServiceAction/GetAllActionFieldAttribute".concat('?actionfieldid=', actionfieldid));
     }
-   
+
     if (popupname == "ActionStatusConfigurationNotification") {
         var actionstatusconfigid = $("#actionstatusconfigid").val();
         const options = {
@@ -1805,14 +1805,14 @@ function Loadtabledata() {
 }
 
 function CreateEditForFormGroup(pkId) {
-  
-   
-   
+
+
+
     if (popupname == "ActionStatusConfiguration") {
         const obj = maintable.getData().find(f => f.id == pkId);
         var modaltitle = sharedFn().GetUiControlText('ActionStatusConfigHeader');
         sharedFn().OpenFormPopup(modaltitle, ActionStatusConfigcontrolvalidationlist, obj);
-        
+
     }
     if (popupname == "ActionCondition") {
         const obj = actionconditiontable.getData().find(f => f.id == pkId);
@@ -1843,7 +1843,7 @@ function CreateEditForFormGroup(pkId) {
                 if (contrains.controlType == 'DROPDOWN') {
                     $('#' + contrains.uibackendName).attr("data-value", obj[fieldname]);
                     $('#' + contrains.uibackendName).val(obj[fieldname]).trigger('change');
-                  
+
                 }
                 if (contrains.controlType == 'MULTIDROPDOWN') {
                     if (obj[fieldname]) {
@@ -1889,8 +1889,8 @@ function CreateEditForFormGroup(pkId) {
             $('#ActionFieldAttributeAttributeKey').val(attribute);
         }
     }
-    
-    
+
+
 }
 function ActionStatusConfigClick(event) {
     const cellElem = event.closest('section');
@@ -1905,6 +1905,6 @@ function ActionStatusConfigClick(event) {
     sharedFn().OpenFormPopup(modaltitle, ActionStatusConfigNotificationcontrolvalidationlist, null, ActionStatusConfigNotificationtabulatorcolumns, settingList);
     $("#actionstatusconfigid").val(actionstatusconfigid);
     popupname = "ActionStatusConfigurationNotification";
-   
+
 
 }
