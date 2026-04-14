@@ -1,6 +1,7 @@
 ﻿var maintable = null;
 var popupname = "";
 $(document).ready(function () {
+    $('.StatusDetails').hide();
     IsEdit = IsEdit_ActionStatusConfig;
     IsDelete = IsDelete_ActionStatusConfig;
     IsView = "";
@@ -502,26 +503,26 @@ $(document).ready(function () {
 
     }
 
-    const services_select2 = services
-        .map(item => ({
-            id: item.id,
-            text: lang == "ar" ? item.nameAr : item.nameEn
-        }));
+    //const services_select2 = services
+    //    .map(item => ({
+    //        id: item.id,
+    //        text: lang == "ar" ? item.nameAr : item.nameEn
+    //    }));
 
-    $("#ServiceId").select2({
-        width: '100%',
-        allowClear: false,
-        data: services_select2,
-        dropdownCssClass: "manageselect2zindex",
-        placeholder: sharedFn().GetUiControlText('PleaseSelect'),
+    //$("#ServiceId").select2({
+    //    width: '100%',
+    //    allowClear: false,
+    //    data: services_select2,
+    //    dropdownCssClass: "manageselect2zindex",
+    //    placeholder: sharedFn().GetUiControlText('PleaseSelect'),
 
-    });
+    //});
 
 
-    $('#ServiceId').change(function () {
+    $('#submitBtn').click(function () {
         LoadAllStatuses();
       
-        $('.StatusDetails').hide();
+       
 
 
     });

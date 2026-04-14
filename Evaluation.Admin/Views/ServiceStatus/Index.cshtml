@@ -11,7 +11,7 @@
     var uiControlItems = Model.UiControlItems.Where(x => x.RowOrder > 0 && x.Constraint.Permission.BackEndName == AdminPermission.ADD_ADMIN_SERVICE_STATUS).ToList();
     var ActionStatusConfigControlItems = Model.UiControlItems.Where(x => x.RowOrder > 0 && x.Constraint.Permission.BackEndName == AdminPermission.ADD_ADMIN_ACTIONSTATUSCONFIGURATION).ToList();
     var ActionStatusConfigNotificationControlItems = Model.UiControlItems.Where(x => x.RowOrder > 0 && x.Constraint.Permission.BackEndName == AdminPermission.ADD_ADMIN_ACTIONSTATUSCONFIGURATION_NOTIFICATION).ToList();
-    var textDir = Lang == "ar" ? "RTL" : "LTR";
+    var textDir = Model.CurrentLanguage == "ar" ? "RTL" : "LTR";
     var permissionsList = Model.PermissionsList;
     var controlsList = Model.ControlsList;
     var settingList = Model.SettingList;
@@ -28,7 +28,7 @@
    
 }
 
-
+@await Component.InvokeAsync("ServiceSelection")
 <div class="row">
 
 
@@ -43,7 +43,7 @@
                     <div class="card-body">
 
 
-                        <div class=" row">
+                       @*  <div class=" row">
                             <div class="col-auto">
                                 <label class="form-label m-0">@controlsList.GetUiControlText(AdminBackendUI.lblStatusService)</label>
                             </div>
@@ -51,7 +51,7 @@
                             <div class="col-auto">
                                 <select class="select2 form-control" required="required" id="ServiceId"></select>
                             </div>
-                        </div>
+                        </div> *@
 
                         <div class="row mt-4">
                             <div class="col-12">
@@ -223,7 +223,7 @@
     
     <script>
 
-        var lang = `@Html.Raw(Lang)`;
+      
         let txtDir = '@textDir';
          const AllActions = @Json.Serialize(AllActions);
         var controlsList = JSON.parse(`@Html.Raw(Json.Serialize(controlsList))`);
