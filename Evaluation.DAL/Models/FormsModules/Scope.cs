@@ -10,5 +10,6 @@ public class Scope : EntityBase, IAuditLogEntity
     public string NameEn { get; set; } = null!;
     public Guid ScopeTypeId { get; set; }
     public ScopeType? ScopeType { get; set; }
+    public string? ColorCode { get; set; }
     public int OrderNo { get; set; }
 }

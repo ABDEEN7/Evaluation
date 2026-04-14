@@ -20,4 +20,7 @@ public class FormItemValue : EntityBase ,IAuditLogEntity
     public string? Note { get; set; }
     public Guid? CalcMethodId { get; set; }
     public CalcMethod? CalcMethod { get; set; }
+    public string? RenameItem { get; set; }
+    public Guid? FormItemConfigId { get; set; }
+    public FormItemConfig? FormItemConfig { get; set; }
 }

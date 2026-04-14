@@ -19,11 +19,10 @@ public class FormItem : EntityBase, IAuditLogEntity
     public Scope? Scope { get; set; }
     public Guid? DropDownTypeId { get; set; } // if activate Min Max or not and if mkae questioning or not
     public DropDownType? DropDownType { get; set; } // if activate Min Max or not and if mkae questioning or not
-    public Guid CalcMethodId { get; set; }
-    public CalcMethod? CalcMethod { get; set; }
     public bool HasNote { get; set; } 
     public bool NoteRequired { get; set; }
     public int OrderNo { get; set; } = 0;
+    public string? ColorCode { get; set; }
 
     public virtual ICollection<SubFormItem>? SubFormItems { get; set; }
     public ICollection<FormItemRelated>? RelatedFrom { get; set; }
