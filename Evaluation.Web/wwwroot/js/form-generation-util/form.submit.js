@@ -145,7 +145,6 @@ window.serviceRequestForm = window.serviceRequestForm || {};
                 case "text":
                 case "textarea":
                 case "number":
-                case "vacancyseat":
                 case "tinymce":
                 case "jqte":
                 default:

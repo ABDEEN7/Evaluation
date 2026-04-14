@@ -553,7 +553,7 @@ function SetDropDown() {
                         var data = event.target.value;
                         if (data) {
                             var selectedvalue = FieldTypeList.find(x => x.id == data).backendName;
-                            if (selectedvalue == "dropdown" || selectedvalue == "select2" || selectedvalue == "VacancySeat") {
+                            if (selectedvalue == "dropdown" || selectedvalue == "select2" ) {
                                 showdropdown(true);
                                 $("#FieldFormGroupList").parent().hide();
                                 $("#FieldFormGroupList").val('').trigger('change');
@@ -703,7 +703,7 @@ function SetDropDown() {
                             var selectdata = FieldList.find(x => x.id == data);
                             var selectedvalue = selectdata.type;
                             var DropDownTypeId = selectdata.dropDownTypeId;
-                            if (selectedvalue == "dropdown" || selectedvalue == "select2" || selectedvalue == "VacancySeat") {
+                            if (selectedvalue == "dropdown" || selectedvalue == "select2") {
                                 $("#FieldConditionFieldValue").parent().hide();
                                 $("#FieldConditionFieldDropDownValueIds").parent().show();
                                 
@@ -868,7 +868,7 @@ function SetDropDown() {
                     if (selectdata) {
                         var selectedvalue = selectdata.type;
 
-                        if (selectedvalue == "dropdown" || selectedvalue == "select2" || selectedvalue == "VacancySeat") {
+                        if (selectedvalue == "dropdown" || selectedvalue == "select2" ) {
                             if (data == "in" || data == "not in") {
 
                                 var $FieldDropDown = $("#FieldConditionFieldDropDownValueIds");
