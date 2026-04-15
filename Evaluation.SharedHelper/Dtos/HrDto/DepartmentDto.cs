@@ -11,4 +11,5 @@ public class DepartmentDto
     public string? TypeName { get; set; }
     public string? RoutingPath { get; set; }
     public string? ImgBlobUrl { get; set; }
+    public string? DepImage { get; set; }
 }
