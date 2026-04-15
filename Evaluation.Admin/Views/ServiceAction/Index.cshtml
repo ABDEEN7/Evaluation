@@ -348,7 +348,16 @@
                                             </div>
                                         </div>
 
-
+                                        control = uiControlItems.Where(item => item.Control.BackEndName == "EvaluationActionNewStatusId").FirstOrDefault();
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <div class="mb-3">
+                                                    @{
+                                                        @await Component.InvokeAsync("UiControl", control)
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
 
 
                                         // control = uiControlItems.Where(item => item.Control.BackEndName == "EvaluationActionServiceId").FirstOrDefault();

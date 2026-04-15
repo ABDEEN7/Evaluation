@@ -13,6 +13,8 @@ namespace Evaluation.SharedHelper.Models.Admin
 
         public Guid ServiceId { get; set; }
 
+        public Guid? NewStatusId { get; set; }
+
         public bool IsInitialAction { get; set; }
         public bool AllowDraft { get; set; }
         public string? ConfirmationBodyAr { get; set; }

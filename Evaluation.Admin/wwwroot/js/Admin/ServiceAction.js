@@ -5,6 +5,7 @@ var ServiceFieldList = [];
 var SystemFieldList = [];
 var fieldselectvalue = '';
 var actiontypebackendname = '';
+var newstatusid = '';
 function SetPopupCount() {
     // Get the Tabulator instance
     const tableInstance = maintable;
@@ -456,6 +457,42 @@ $(document).ready(function () {
         $("#ActionTemplateDoc").trigger('change');
         $("#EvaluationActionActionTypeId").trigger('change');
 
+        const opt = {
+            success: function (result) {
+                if (result) {
+
+
+                    var data = result.map(item => (
+                        {
+                            id: item.id,
+                            text: txtDir === "RTL" ? item.nameAr : item.nameEn
+                        }
+                    ));
+                   
+                    $("#EvaluationActionNewStatusId").select2({
+                        width: 'resolve',
+                        allowClear: true,
+                        data: data,
+                        placeholder: sharedFn().GetUiControlText('EvaluationActionNewStatusId'),
+                        dropdownCssClass: "manageselect2zindex",
+                    });
+                   
+                    if (newstatusid!='') {
+                        $("#EvaluationActionNewStatusId").val(newstatusid).trigger('change');
+                    }
+                    else {
+                        $("#EvaluationActionNewStatusId").val('').trigger('change');
+                    }
+                    
+
+                }
+            }
+        };
+        jqClientAdvanced(opt).Get("ServiceAction/GetNewStatusList");
+
+
+
+
     }
     $("#EvaluationActionActionTypeId").on("change", function () {
         actiontypebackendname = '';
@@ -588,7 +625,11 @@ $(document).ready(function () {
         $('#EvaluationActionConfirmationBodyEn').val(obj.confirmationBodyEn);
         $('#EvaluationActionConfirmationTitleAr').val(obj.confirmationTitleAr);
         $('#EvaluationActionConfirmationTitleEn').val(obj.confirmationTitleEn);
+        $('#EvaluationActionNewStatusId').val(obj.newStatusId);
+        newstatusid = obj.newStatusId;
+        $('#EvaluationActionNewStatusId').trigger('change');
 
+        
 
     }
 
@@ -630,6 +671,9 @@ $(document).ready(function () {
         $('#EvaluationActionConfirmationBodyEn').val('');
         $('#EvaluationActionConfirmationTitleAr').val('');
         $('#EvaluationActionConfirmationTitleEn').val('');
+        $('#EvaluationActionNewStatusId').val('');
+        newstatusid = '';
+        $('#EvaluationActionNewStatusId').trigger('change');
     }
 
 
@@ -799,6 +843,7 @@ $(document).ready(function () {
                 AssignActionPartyTypeList: AssignActionPartyTypeArray,
                 ActionShowLogPartyTypeList: ActionShowLogPartyTypeArray,
                 ActionTemplateDocList: $("#ActionTemplateDoc").val(),
+                NewStatusId: $("#EvaluationActionNewStatusId").val(),
 
 
             }
