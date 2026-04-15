@@ -271,7 +271,7 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 		var actionTransactionsTask = SrvActionTransactionsLog.GetActionLog(request.Id, request.ServiceId, module?.Id, user);
 		var schoolTask = schoolRepository.GetSchoolDetails(request.OrgTreeId);
 		var actionsTask = srvActionStatusConfiguration.GetActionsByStatus(request.ServiceId,request.ServiceStatusId,request.Id,request.PlanId,lang);
-		var Status = request.ServiceStatus.NameAr;//SrvStatus.GetStatusDisplayName(request.ServiceStatusId, module?.Id);
+		var Status = SrvStatus.GetStatusDisplayName(request.ServiceStatusId, module?.Id);
 		await Task.WhenAll(attachmentsTask, actionTransactionsTask, schoolTask, actionsTask, evaluationPartiesTask);
 
 		var school = await schoolTask;

@@ -107,7 +107,7 @@
             <div class="modal-header align-items-start border-0 justify-content-between">
                
                     <div>
-                        <h4 class="fw-bold m-0" id="evaluationRequestModalLabel"></h4>
+                    <h4 class="fw-bold m-0" id="evaluationRequeststatus"></h4>
 
                         <nav aria-label="breadcrumb">
                             <ol class="breadcrumb">
@@ -149,20 +149,25 @@
                                             aria-expanded="true">
                                         <div class="d-flex align-items-center gap-2 fs-18">
                                             <i class="la la-building text-primary fs-25"></i>
-                                            <span class="fw-semibold">بيانات المدرسة</span>
+                                            <span class="fw-semibold"> بيانات المدرسة الاساسية </span>
                                         </div>
                                         <span class="toggle-icon"><i class="la la-angle-up fs-22"></i></span>
                                     </button>
                                 </h2>
-
                                 <div id="itemSchool" class="accordion-collapse collapse show">
                                     <div class="accordion-body">
-                                        <div id="school-details-container"></div>
+                                        <div id="school-details-container">
+                                            @await Component.InvokeAsync("SchoolDetailsModal", new {
+                                                                                        modalId = "SCHOOL",
+                                                                                        title = "تفاصيل المدرسة",
+                                                                                        body = "",
+                                                                                        isModal = false
+                                                                                        })
+                                        </div>
                                         <div id="NDAContainerDiv"></div>
                                     </div>
                                 </div>
                             </div>
-
                             <div class="accordion-item mb-3 rounded">
                                 <h2 class="accordion-header">
                                     <button class="accordion-button collapsed d-flex align-items-center justify-content-between"
