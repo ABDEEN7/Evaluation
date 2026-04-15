@@ -1,11 +1,18 @@
-﻿@{
-    var lang = "en";
+﻿
+@using Evaluation.SharedHelper.Enums
+@{
+    
+    var lang = responseInfo.Lang;
+    var showlang = lang == "ar" ? "EN" : "AR";
     var title = "وزارة التربية والتعليم والتعليم العالي";
     var footerText = "جميع حقوق الملكية محفوظة © 2025 وزارة التربية والتعليم والتعليم العالي .";
+    var dir = responseInfo.Lang == "ar" ? "rtl" : "ltr";
 }
-
 <!DOCTYPE html>
-<html lang="en" class="">
+
+
+<html lang="@responseInfo.Lang" dir="@dir">
+
 <head>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
