@@ -161,7 +161,7 @@
             success: function (response) {
 
                 formUtility.attachments = response.attachments || [];
-                $('#evaluationRequestModalLabel').text(response.status || '');
+                $('#evaluationRequeststatus').text(response.status || '');
                 $('#evaluationRequestNoText').text(response.requestNumber || '');
                 $('#evaluationRequestDetailsModal').modal('show');
 

@@ -281,6 +281,7 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 		var evaluationParties = await evaluationPartiesTask;
 		var requestDetails= new EvaluationRequestDTO
 		{
+			RequestNumber=request.RequestNumber,
 			formGroups = formGroups,
 			Attachments =  attachments,
 			ActionTransactions =  actionTransactions,
