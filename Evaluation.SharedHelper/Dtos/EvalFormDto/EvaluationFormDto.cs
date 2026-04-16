@@ -21,4 +21,5 @@ public class EvaluationFormDto : EntityBaseDTO
     public string? CalcMethod { get; set; }
     public string? FormStatus { get; set; }
     public Guid FormStatusId { get; set; }
+    public bool AllowRename { get; set; }
 }

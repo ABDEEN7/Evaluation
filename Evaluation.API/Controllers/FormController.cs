@@ -24,7 +24,7 @@ public class FormController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<Result<List<FormItemDto>>> GetItems([FromQuery] Guid formId)
+    public async Task<Result<FormDto>> GetItems([FromQuery] Guid formId)
     {
         return await _masterBl.GetApiService<FormBL>().GetFormItems(formId);
     }
@@ -33,6 +33,12 @@ public class FormController : ControllerBase
     public async Task<Result<FormEvaluationDto>> SaveEvaluationForm([FromBody] FormEvaluationDto formEvaluation)
     {
         return await _masterBl.GetApiService<FormBL>().SaveEvaluationForm(formEvaluation);
+    }
+
+    [HttpPost]
+    public async Task<Result<FormEvaluationDto>> RenameFormItems([FromBody] FormEvaluationDto formEvaluation)
+    {
+        return await _masterBl.GetApiService<FormBL>().RenameFormItems(formEvaluation);
     }
 
     [HttpPost]

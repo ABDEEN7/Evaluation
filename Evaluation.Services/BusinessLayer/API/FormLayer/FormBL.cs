@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
 using Evaluation.DAL.Dtos.Form;
 using Evaluation.DAL.Helper;
+using Evaluation.DAL.Models.FormsModules;
 using Evaluation.DAL.Repositories;
 using Evaluation.Services.Special;
+using Evaluation.SharedHelper.Dtos.EvalFormDto;
 using Evaluation.SharedHelper.Dtos.Form;
 using Evaluation.SharedHelper.Dtos.Shared;
 using Evaluation.SharedHelper.Enums;
@@ -19,10 +21,15 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
         IServiceProvider serviceProvider, RequestInfo requestInfo, FormService formService)
         : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, requestInfo)
 {
-    public async Task<Result<List<FormItemDto>>> GetFormItems(Guid FormId)
+    public async Task<Result<FormDto>> GetFormItems(Guid FormId)
     {
+
+        var evalForm = await formService.GetEvalForm(FormId);
+        var mappedEvalForm = mapper.Map<EvaluationFormDto>(evalForm);
+
         var formItems = await formService.GetFormItems(FormId);
         var mappedData = mapper.Map<List<FormItemDto>>(formItems);
+
         foreach (var item in formItems)
         {
             var relatedItemDtos = new List<RelatedItemDto>();
@@ -45,7 +52,7 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
             mappedData.Where(md => md.Id == item.Id).FirstOrDefault().RelatedItems = relatedItemDtos;
         }
 
-        return mappedData;
+        return new FormDto() { EvalForm = mappedEvalForm , Items = mappedData};
     }
 
     public async Task<Result<ValidationResult>> ValidateEvaluationForm(FormEvaluationDto formEvaluationDto)
@@ -220,6 +227,35 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
 
         return Result.Ok(formEvaluationDto);
     }
+
+    public async Task<Result<FormEvaluationDto>> RenameFormItems(FormEvaluationDto formEvaluationDto)
+    {
+
+        if (formEvaluationDto == null)
+            return Result.Fail<FormEvaluationDto>(ConstantKeys.ExceptionMessage.FormDataIsNull);
+
+        var userId = userInfo.UserId;
+
+        if (userId == null)
+            return Result.Fail<FormEvaluationDto>(ConstantKeys.ExceptionMessage.UserNotFound);
+
+        var form = mapper.Map<FormEvaluationValue>(formEvaluationDto);
+
+        var evalForm = await formService.GetEvalForm(formEvaluationDto.Id);
+
+        if (evalForm != null)
+        {
+            foreach (var item in form.Items)
+            {
+                item.UserId = userId.Value;
+            }
+
+            await formService.SaveFormItemsAndSubs(form);
+        }
+
+        return Result.Ok(formEvaluationDto);
+    }
+
 
     public async Task<Result<List<FormItemDto>>> GetForm(Guid FormId)
     {
