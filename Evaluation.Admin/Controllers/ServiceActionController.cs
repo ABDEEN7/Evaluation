@@ -119,7 +119,17 @@ namespace Evaluation.Admin.Controllers
             return Ok(response);
         }
 
+        [HttpGet()]
+        [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.AdminPermission.VIEW_ADMIN_ACTION })]
+        public async Task<IActionResult> GetNewStatusList()
+        {
 
+            var response = new List<DropdownItem>();
+
+            var NewStatusListList =await masterBL.GetAdminService<SrvServiceActionBL>().GetNewStatusList();
+            response.AddRange(NewStatusListList);
+            return Ok(response);
+        }
         [HttpGet()]
         [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.AdminPermission.VIEW_ADMIN_ACTION })]
         public async Task<IActionResult> GetEvaluationActionDetails(Guid actionId)

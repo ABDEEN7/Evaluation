@@ -31,4 +31,14 @@ public class DepartmentBL(IServiceScopeFactory serviceScopeFactory, CacheDataPro
 
         return mapper.Map<List<DepartmentDto>>(departments);
     }
+
+    public async Task<DepartmentDto> GetDepartmentByRoutingPath(string routingPath, string lang = "ar")
+    {
+        var departments = await departmentService.GetDepartmentByRoutingPath(routingPath);
+
+        return mapper.Map<DepartmentDto>(departments, opt =>
+        {
+            opt.Items["lang"] = lang;
+        });
+    }
 }
