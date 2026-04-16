@@ -23,7 +23,9 @@ public class EvalFormProfile : Profile
                 .ForMember(dest => dest.EvalFormType, opt => opt.MapFrom<EvalFormTypeResolver, Guid?>(src => src.EvalFormTypeId))
                 .ForMember(dest => dest.FormEvalMatrix, opt => opt.MapFrom<FormEvalMatrixResolver, Guid?>(src => src.FormEvalMatrixId))
                 .ForMember(dest => dest.EvaluationParty, opt => opt.MapFrom<EvaluationPartyResolver, Guid?>(src => src.EvaluationPartyId))
-                 .ForMember(dest => dest.FormStatus, opt => opt.MapFrom<FormStatusResolver, Guid?>(src => src.FormStatusId));
+                 .ForMember(dest => dest.FormStatus, opt => opt.MapFrom<FormStatusResolver, Guid?>(src => src.FormStatusId))
+                  .ForMember(dest => dest.AllowRename, opt => opt.MapFrom(src => src.AllowRename));
+
     }
 }
 public class EvalFormTypeResolver : IMemberValueResolver<object, object, Guid?, string?>

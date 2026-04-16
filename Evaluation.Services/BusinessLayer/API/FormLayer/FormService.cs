@@ -81,9 +81,10 @@ public class FormService(IServiceScopeFactory serviceScopeFactory,
 
     public async Task<FormEvaluationValue> SaveFormItemsAndSubs(FormEvaluationValue form)
     {
-
-        await unitOfWork.GetRepository<FormItemValue>().InsertRange(form.Items);
-        await unitOfWork.GetRepository<SubFormItemValue>().InsertRange(form.SubItems);
+        if(form.Items.Count > 0)
+            await unitOfWork.GetRepository<FormItemValue>().InsertRange(form.Items);
+        if (form.SubItems.Count > 0)
+            await unitOfWork.GetRepository<SubFormItemValue>().InsertRange(form.SubItems);
         await uow.CommitAsync();
 
         return form;
