@@ -124,8 +124,8 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 			.Include(x => x.Plan)
 				.ThenInclude(p => p!.PlanStatus);
 
-		//baseQuery = baseQuery.AsSplitQuery()
-		//	.Where(x => x.Service!.SystemModuleId == module.Id);
+		baseQuery = baseQuery.AsSplitQuery()
+			.Where(x => x.Service!.SystemModuleId == module.Id);
 
 		var permissions = new
 		{
@@ -214,7 +214,7 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 			Plan = er.Plan
 		};
 	}
-	public async Task<EvaluationRequestDTO> GetEvaluationDetailsAsync(Guid id, CancellationToken ct = default)
+	public async Task<EvaluationRequestDTO> GetEvaluationDetailsAsync(Guid id)
 	{
 		var lang = requestInfo.Lang;
 		var userId = userInfo.UserId ??  Guid.Parse("C2536611-576B-4EB8-84F4-747F4ECE9A23");// throw new BusinessException(ExceptionMessage.UserNotFound);
@@ -263,13 +263,15 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 
 		// bool hasFieldHistoryPermission = false;
 		// bool hasAllFieldHistoryPermission = false;
-
-		var evaluationPartiesTask = srvEvaluationParty.GetPartiesWithServicesAndRequestsAsync(request.Id, module.DepartmentId);
+		var userPartyTypeIds = user.UserPartTypes?
+								.Select(x => x.PartyTypeId)
+								.Distinct().ToList() ?? new List<Guid>();
+		var evaluationPartiesTask = srvEvaluationParty.GetPartiesWithServicesAndRequestsAsync(request.Id, module.DepartmentId, request.ServiceStatusId, userPartyTypeIds);
 		var attachmentsTask = GetAllEvaluationRequestAttachmentsAsync(request.Id, lang);
 		var actionTransactionsTask = SrvActionTransactionsLog.GetActionLog(request.Id, request.ServiceId, module?.Id, user);
 		var schoolTask = schoolRepository.GetSchoolDetails(request.OrgTreeId);
 		var actionsTask = srvActionStatusConfiguration.GetActionsByStatus(request.ServiceId,request.ServiceStatusId,request.Id,request.PlanId,lang);
-		var Status = request.ServiceStatus.NameAr;//SrvStatus.GetStatusDisplayName(request.ServiceStatusId, module?.Id);
+		var Status = SrvStatus.GetStatusDisplayName(request.ServiceStatusId, module?.Id);
 		await Task.WhenAll(attachmentsTask, actionTransactionsTask, schoolTask, actionsTask, evaluationPartiesTask);
 
 		var school = await schoolTask;
@@ -279,6 +281,7 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 		var evaluationParties = await evaluationPartiesTask;
 		var requestDetails= new EvaluationRequestDTO
 		{
+			RequestNumber=request.RequestNumber,
 			formGroups = formGroups,
 			Attachments =  attachments,
 			ActionTransactions =  actionTransactions,

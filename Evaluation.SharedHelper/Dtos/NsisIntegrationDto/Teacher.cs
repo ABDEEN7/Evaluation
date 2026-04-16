@@ -2,6 +2,7 @@
 
 public class Teacher : NSISBaseDto
 {
+    public string? Id { get; set; }
     public string? Username { get; set; }
     public string? Identifier { get; set; }//QID
     public string? GivenName { get; set; }

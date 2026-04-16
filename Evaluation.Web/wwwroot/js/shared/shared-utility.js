@@ -57,8 +57,8 @@ const sharedUtility = () => {
         //        }
 
         //    }
-        //}
-        let depName = "/EvaluationPlan";//GetLocalStorageValue(LocalStorageKeys.ModuleName);
+        //}/
+        let depName ="/evaluationPlan/"+ extractDepartmentName();//GetLocalStorageValue(LocalStorageKeys.ModuleName);
         if (depName) {
             url = url.concat(depName)
         }
@@ -181,7 +181,7 @@ const sharedUtility = () => {
 
     const baseApiUrl = () => getCookie('webApiBaseURL'); //"https://localhost:14066/api";
 
-    const baseAppUrl = () => getCookie("webAppBaseURL") //"https://localhost:44375";
+    const baseAppUrl = () => "https://localhost:7221/en";// getCookie("webAppBaseURL") //
 
     const displayAlert = (msg, icon = null) => {
         if (msg) {

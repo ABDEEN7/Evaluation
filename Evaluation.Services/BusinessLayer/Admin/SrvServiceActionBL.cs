@@ -112,7 +112,7 @@ namespace Evaluation.Services.Models.Admin
             fieldType = field?.FieldType?.BackendName;
             fielddropdowntype = field?.DropDownTypeId;
 
-            if (fieldType is "select2" or "dropdown" or "VacancySeat")
+            if (fieldType is "select2" or "dropdown" )
             {
 
                 var dataSource = uow.GetRepository<DropDownType>()

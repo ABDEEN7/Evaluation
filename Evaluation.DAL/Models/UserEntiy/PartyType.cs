@@ -1,6 +1,7 @@
 ﻿using Evaluation.DAL.Models.Audit;
 using Evaluation.DAL.Models.BaseModule;
 using Evaluation.DAL.Models.DepartementEntites;
+using Evaluation.DAL.Models.FormsModules;
 using Microsoft.EntityFrameworkCore;
 
 namespace Evaluation.DAL.Models.UserEntiy;
@@ -18,4 +19,6 @@ public class PartyType : EntityBase, IAuditLogEntity
     public Guid DepartmentId { get; set; }
     public Department? Department { get; set; }
     public bool IsAssignment { get; set; }
+	public ICollection<PartyTypeEvalParty> PartyTypeEvalParties { get; set; } = new List<PartyTypeEvalParty>();
+
 }

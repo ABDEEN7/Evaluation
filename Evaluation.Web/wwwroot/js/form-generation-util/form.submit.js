@@ -36,7 +36,7 @@ window.serviceRequestForm = window.serviceRequestForm || {};
     }
     const getRequestId = () => {
         const id = getUrlParam("id");
-        return id ? id : getUrlParam("1Evlid");
+        return id ? id : getUrlParam("Evlid");
     };
     const getEvlRequestId = () => {
         const id = getUrlParam("Evlid");
@@ -145,7 +145,6 @@ window.serviceRequestForm = window.serviceRequestForm || {};
                 case "text":
                 case "textarea":
                 case "number":
-                case "vacancyseat":
                 case "tinymce":
                 case "jqte":
                 default:

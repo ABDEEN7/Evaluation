@@ -2,6 +2,7 @@
 namespace Evaluation.SharedHelper.Dtos.NsisIntegrationDto;
 public class NSISTeacher
 {
+    public Guid Id { get; set; }
     public string QId { get; set; }
     public string NameAr { get; set; }
     public string NameEn { get; set; }

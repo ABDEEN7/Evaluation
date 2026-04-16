@@ -10,6 +10,7 @@ using Evaluation.DAL.Models.StatusEntities;
 using Evaluation.DAL.Repositories;
 using Evaluation.Services.BusinessLayer.API.AcademicYearLayer;
 using Evaluation.Services.BusinessLayer.API.DepartmentLayer;
+using Evaluation.Services.Extensions;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Consts;
 using Evaluation.SharedHelper.Dtos.PlanDto;
@@ -18,9 +19,11 @@ using Evaluation.SharedHelper.Dtos.SchoolDto;
 using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Models;
+using Evaluation.SharedHelper.Models.Api;
 using FluentResults;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using System.Globalization;
 using System.Text.Json;
 using static Evaluation.SharedHelper.Enums.ConstantKeys;
 using ValidationResult = Evaluation.SharedHelper.Models.ValidationResult;
@@ -205,7 +208,8 @@ public class PlanServiceRequestServices(
     private async Task<Result<CreateEvaluationPlanDto>> UpdatePlan(
       CreateEvaluationPlanDto modelDto)
     {
-        return await ExecuteWithResult(async () =>
+		
+		return await ExecuteWithResult(async () =>
         {
             Plan? plan = await unitOfWork.GetRepository<Plan>()
                 .GetAllActiveNonDeleted(x => x.Id == modelDto.Id)
@@ -242,43 +246,59 @@ public class PlanServiceRequestServices(
                 .Select(x => x.Id)
                 .FirstAsync();
     }
-    private async Task InsertEvaluationRequests(
-    Guid planId, CreateEvaluationPlanDto modelDto)
-    {
-        if (modelDto.Schools?.Any() != true)
-            return;
+	private async Task InsertEvaluationRequests(
+	  Guid planId, CreateEvaluationPlanDto modelDto)
+	{
+		if (modelDto.Schools?.Any() != true)
+			return;
 
-        Guid serviceId = await uow.GetRepository<Service>()
-                        .GetAllActiveNonDeleted(x =>
-                            x.Initialservice == true
-                            && x.SystemModule.DepartmentId == requestInfo.DepId
-                            && x.SystemModule.SystemModuleType.BackendName == ModuleType.EvaluationRequest
-                        )
-                        .Include(x => x.SystemModule)
-                            .ThenInclude(sm => sm.SystemModuleType)
-                        .Select(x => x.Id)
-                        .FirstAsync();
+		var serviceObj = await unitOfWork.GetRepository<Service>()
+						.GetAllActiveNonDeleted(x =>
+							x.Initialservice == true
+							&& x.SystemModule!.DepartmentId == requestInfo.DepId
+							&& x.SystemModule!.SystemModuleType!.BackendName == ModuleType.EvaluationRequest
+						)
+						.Include(x => x.SystemModule)
+							.ThenInclude(sm => sm.SystemModuleType)
+						.FirstAsync();
 
-        Guid serviceStatusId = await GetServiceStatus(serviceId);
+		Guid serviceId = serviceObj.Id;
+		Guid serviceStatusId = await GetServiceStatus(serviceId);
 
-        var requests = modelDto.Schools.Select(school => new EvaluationRequest
-        {
-            Id = Guid.NewGuid(),
-            PlanId = planId,
-            ServiceId = serviceId,
-            OrgTreeId = school.Id,
-            DepEvaluationTypeId = school.VisitTypeId,
-            FromDate = school.StartEvaluationDate,
-            ToDate = school.EndEvaluationDate,
-            ServiceStatusId = serviceStatusId,
-            CreateDate = DateTime.UtcNow,
-            IsDeleted = false
-        });
+		int lastSequence = await unitOfWork.GetRepository<EvaluationRequest>()
+			.GetAllNonDeleted(x => x.ServiceId == serviceId)
+			.Select(x => (int?)x.Sequence)
+			.MaxAsync() ?? 0;
 
-        await unitOfWork.GetRepository<EvaluationRequest>()
-            .InsertRange(requests);
-    }
-    private async Task ReplaceEvaluationRequests(
+		var requests = modelDto.Schools.Select(school =>
+		{
+			lastSequence++;
+			var requestNumber = DateTime.Now.ToString(serviceObj.ReqNumberDef ?? "", new CultureInfo("en-US"))
+								+ lastSequence;
+
+			return new EvaluationRequest
+			{
+				Id = Guid.NewGuid(),
+				PlanId = planId,
+				ServiceId = serviceId,
+				OrgTreeId = school.Id,
+				DepEvaluationTypeId = school.VisitTypeId,
+				FromDate = school.StartEvaluationDate,
+				ToDate = school.EndEvaluationDate,
+				ServiceStatusId = serviceStatusId,
+				Sequence = lastSequence,
+				RequestNumber = requestNumber,
+				CreateDate = DateTime.UtcNow,
+				IsDeleted = false
+			};
+		}).ToList();
+
+		await unitOfWork.GetRepository<EvaluationRequest>()
+			.InsertRange(requests);
+
+		
+	}
+	private async Task ReplaceEvaluationRequests(
     Guid planId,
     CreateEvaluationPlanDto modelDto)
     {
@@ -304,9 +324,7 @@ public class PlanServiceRequestServices(
     {
         return await ExecuteWithResult(async () =>
         {
-            using var scope = serviceScopeFactory.CreateScope();
-
-            var scopedUow = scope.ServiceProvider.GetRequiredService<UnitOfWork>();
+            using var scopedUow = serviceScopeFactory.CreateScopedUow();
 
             var json = await scopedUow.GetRepository<Plan>()
                 .GetAllActiveNonDeleted(x => x.Id == planId)
@@ -327,7 +345,8 @@ public class PlanServiceRequestServices(
       Guid planId,
       CreateEvaluationPlanDto modelDto)
     {
-        var repo = unitOfWork.GetRepository<EvaluationRequest>();
+		
+		var repo = unitOfWork.GetRepository<EvaluationRequest>();
 
         var existing = await repo
             .GetAllActiveNonDeleted(x => x.PlanId == planId)
@@ -341,14 +360,33 @@ public class PlanServiceRequestServices(
 
         var existingByOrg = existing.ToDictionary(x => x.OrgTreeId);
 
-        Guid serviceId = existing.First().ServiceId; // reuse
+		var newSchools = incomingSchools
+	                       .Where(s => !existingByOrg.ContainsKey(s.Id))
+	                       .ToList();
+
+		Guid serviceId = existing.First().ServiceId; // reuse
         Guid serviceStatusId = existing.First().ServiceStatusId;
+		Service? serviceObj = null;
+		int lastSequence = 0;
 
-        //--------------------------------------------
-        // UPDATE + INSERT
-        //--------------------------------------------
+		if (newSchools.Any())
+		{
+			serviceObj = await unitOfWork.GetRepository<Service>()
+				.GetAllActiveNonDeleted(x => x.Id == serviceId)
+				.Include(x => x.SystemModule)
+					.ThenInclude(sm => sm.SystemModuleType)
+				.FirstAsync();
 
-        foreach (var school in incomingSchools)
+			lastSequence = await unitOfWork.GetRepository<EvaluationRequest>()
+				.GetAllNonDeleted(x => x.ServiceId == serviceId)
+				.Select(x => (int?)x.Sequence)
+				.MaxAsync() ?? 0;
+		}
+		//--------------------------------------------
+		// UPDATE + INSERT
+		//--------------------------------------------
+
+		foreach (var school in incomingSchools)
         {
             if (existingByOrg.TryGetValue(school.Id, out var request))
             {
@@ -358,7 +396,6 @@ public class PlanServiceRequestServices(
                 {
                     request.FromDate = school.StartEvaluationDate;
                     request.ToDate = school.EndEvaluationDate;
-                    request.UpdateDate = DateTime.UtcNow;
                     request.DepEvaluationTypeId = school.VisitTypeId;
                     repo.Update(request);
                 }
@@ -368,8 +405,14 @@ public class PlanServiceRequestServices(
             }
             else
             {
-                // INSERT NEW
-                await repo.InsertAsync(new EvaluationRequest
+
+				// INSERT NEW
+
+				lastSequence++;
+				var requestNumber = DateTime.Now.ToString(serviceObj!.ReqNumberDef ?? "", new CultureInfo("en-US"))
+									+ lastSequence;
+
+				await repo.InsertAsync(new EvaluationRequest
                 {
                     Id = Guid.NewGuid(),
                     PlanId = planId,
@@ -379,9 +422,9 @@ public class PlanServiceRequestServices(
                     FromDate = school.StartEvaluationDate,
                     ToDate = school.EndEvaluationDate,
                     ServiceStatusId = serviceStatusId,
-                    CreateDate = DateTime.UtcNow,
-                    IsDeleted = false
-                });
+					RequestNumber = requestNumber,
+
+				});
             }
         }
 
