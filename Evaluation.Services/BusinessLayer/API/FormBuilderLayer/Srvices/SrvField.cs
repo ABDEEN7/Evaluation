@@ -4,7 +4,9 @@ using Evaluation.DAL.Models.BaseModule;
 using Evaluation.DAL.Models.FormBuilder;
 using Evaluation.DAL.Models.IntegrationEntity;
 using Evaluation.DAL.Repositories;
+using Evaluation.Services.BusinessLayer.API.FormLayer;
 using Evaluation.Services.Extensions;
+using Evaluation.Services.Integration;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Exceptions;
@@ -23,7 +25,7 @@ using static Evaluation.SharedHelper.Enums.ConstantKeys;
 
 namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 {
-    public class SrvField(SrvAttachments SrvAttachments,  IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow, LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, IServiceProvider serviceProvider, RequestInfo _requestInfo)
+    public class SrvField(SrvAttachments SrvAttachments, OrgBL OrgBl, NSISService NSISService, IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow, LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, IServiceProvider serviceProvider, RequestInfo _requestInfo)
             : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, _requestInfo)
     {
 	
@@ -401,7 +403,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 			}
 		}
 
-		public async Task<List<FieldValueDTO>> ProcessIntegrationFieldsAsync(List<FieldValueDTO> integrationFieldsToProcess,string studentQID,Guid? RequestId,bool isDownload = false)
+		public async Task<List<FieldValueDTO>> ProcessIntegrationFieldsAsync(List<FieldValueDTO> integrationFieldsToProcess,Guid? OrgId,Guid? RequestId,bool isDownload = false)
 		{
 			if (integrationFieldsToProcess == null || integrationFieldsToProcess.Count == 0)
 				return integrationFieldsToProcess!;
@@ -447,15 +449,15 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 					{
 						switch (integrationName)
 						{
-							// case "NSISServices":
-							//     integrationResult = await INSISServices.GetSchoolEnrollmentAsync(studentQID);
-							//     break;
-							// case "NSISAcademicCertificate":
-							//     integrationResult = await INSISServices.GetStudentDetails(studentQID, isDownload);
-							//     break;
-							// case "NSISFullStudentDetails":
-							//     integrationResult = await INSISServices.GetFullStudentDetails(studentQID, isDownload);
-							//     break;
+							case "HR":
+								integrationResult = await OrgBl.GetOrgDetails(OrgId.Value);
+								break;
+							case "NSISServices":
+								var ScId = Guid.Parse("160C62A6-0556-4A33-B6C6-0AD687062492");
+
+								integrationResult = await NSISService.GetSchoolbyIdAsync(ScId);
+								break;
+
 							default:
 								break;
 						}
@@ -471,11 +473,11 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 						if (!string.IsNullOrEmpty(config.URLParameter))
 						{
 							string paramName = config.URLParameter;
-							string paramValue = studentQID;
+							Guid? paramValue = OrgId;
 
 							url += url.Contains("?")
-								? $"&{paramName}={Uri.EscapeDataString(paramValue)}"
-								: $"?{paramName}={Uri.EscapeDataString(paramValue)}";
+								? $"&{paramName}={Uri.EscapeDataString(paramValue.ToString())}"
+								: $"?{paramName}={Uri.EscapeDataString(paramValue.ToString())}";
 						}
 
 						var response = await httpClient.GetAsync(url);
@@ -625,7 +627,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 						}
 					}
 				}
-				catch
+				catch (Exception ex)
 				{
 					foreach (var item in fieldsByIntegration[integrationName])
 					{

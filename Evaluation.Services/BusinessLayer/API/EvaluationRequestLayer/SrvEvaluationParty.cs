@@ -5,6 +5,7 @@ using Evaluation.DAL.Models.FormsModules;
 using Evaluation.DAL.Models.ServiceEnities;
 using Evaluation.DAL.Models.ServiceRequestEntities;
 using Evaluation.DAL.Repositories;
+using Evaluation.Services.BusinessLayer.API.DepartmentLayer;
 using Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices;
 using Evaluation.Services.Extensions;
 using Evaluation.Services.Models.API;
@@ -65,14 +66,20 @@ namespace Evaluation.Services.BusinessLayer.API.EvaluationRequestLayer
 				})
 				.FirstOrDefaultAsync();
 		}
-		public async Task<List<EvaluationPartyDTO>> GetPartiesWithServicesAndRequestsAsync(Guid evaluationRequestId,Guid DepartementId )
+		public async Task<List<EvaluationPartyDTO>> GetPartiesWithServicesAndRequestsAsync(Guid evaluationRequestId,Guid DepartementId, Guid? requestStatusId,List<Guid> partyTypeIds)
 		{
 			var Lang=requestInfo.Lang;
 			using var uow = serviceScopeFactory.CreateScopedUow();
 			var parties = await uow
 				.GetRepository<EvaluationParty>()
-				.GetAllActiveNonDeleted()
-				.Where(p => p.DepartmentId== DepartementId)
+				.GetAllQueryFiltered()
+				.Include(x=>x.PartyTypeEvalParties)
+				.ThenInclude(x=>x.PartyTypeEvalPartyStatuses)
+				.Where(p => p.DepartmentId== DepartementId  && (
+							!partyTypeIds.Any() ||requestStatusId == null ||
+							p.PartyTypeEvalParties.Any(pt =>partyTypeIds.Contains(pt.PartyTypeId) &&
+															pt.PartyTypeEvalPartyStatuses.Any(s => s.ServiceStatusId == requestStatusId))
+					))
 				.OrderBy(p => p.OrderNo)
 				.Select(p => new EvaluationPartyDTO
 				{

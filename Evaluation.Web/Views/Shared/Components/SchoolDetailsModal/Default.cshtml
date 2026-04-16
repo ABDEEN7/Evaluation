@@ -1,246 +1,162 @@
 ﻿@{
     var modalId = ViewData["ModalId"] as string ?? "myModal";
+    var isModal = ViewBag.IsModal ?? true;
+
+    var Type = (modalId == "ORGANIZATION") ? "SCHOOL" : modalId;
+
+    Func<object, Microsoft.AspNetCore.Html.IHtmlContent> content = @<text>
+    @if (Type == "SCHOOL")
+    {
+            <div class="col-md-6">
+                <div class="card card-table  mb-4">
+                    <div class="card-body">
+                        <h5 class="fw-bold text-primary mb-3"> <i class="la la-building"></i> معلومات أساسية</h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <p class="text-light">المدير</p>
+                                <h5 class="fw-bold" id="managerName"></h5>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <p class="text-light">تاريخ الإنشاء</p>
+                                <h5 class="fw-bold" id="establishmentDate"></h5>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <p class="text-light">المدرسون</p>
+                                <h5 class="fw-bold" id="teachers"></h5>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <p class="text-light">الطلاب</p>
+                                <h5 class="fw-bold" id="students"></h5>
+                            </div>
+                        </div>
+                        <hr class="mt-0">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class=" d-flex gap-2 align-items-center mb-3">
+                                    <div class="social-icon"><i class="la la-phone-volume"></i></div>
+                                    <div><a id="phone" href="#" class="text-dark"></a></div>
+                                </div>
+                                <div class=" d-flex gap-2 align-items-center mb-3">
+                                    <div class="social-icon"><i class="la la-envelope"></i></div>
+                                    <div><a id="email" href="" class="text-dark"></a></div>
+                                </div>
+                                <div class=" d-flex gap-2 align-items-center mb-3">
+                                    <div class="social-icon"><i class="la la-location-arrow"></i></div>
+                                    <div><p id="address" class="text-dark m-0"></p></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    }
+    else if (Type == "EMPLOYEE")
+    {
+            <div class="col-md-6">
+                <div class="card card-table  mb-4">
+                    <div class="card-body">
+                        <h5 class="fw-bold text-primary mb-3"> <i class="la la-building"></i> معلومات أساسية</h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <p class="text-light">الرقم الوظيفي</p>
+                                <h5 class="fw-bold" id="employeeNo"></h5>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <p class="text-light">تاريخ الميلاد</p>
+                                <h5 class="fw-bold" id="birthDate"></h5>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <p class="text-light">الجنسية</p>
+                                <h5 class="fw-bold" id="nationalityCode"></h5>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <p class="text-light">تاريخ الالتحاق</p>
+                                <h5 class="fw-bold" id="joinDate"></h5>
+                            </div>
+                        </div>
+                        <hr class="mt-0">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class=" d-flex gap-2 align-items-center mb-3">
+                                    <div class="social-icon"><i class="la la-phone-volume"></i></div>
+                                    <div><a id="jobTitle" href="#" class="text-dark"></a></div>
+                                </div>
+                                <div class=" d-flex gap-2 align-items-center mb-3">
+                                    <div class="social-icon"><i class="la la-envelope"></i></div>
+                                    <div><a id="email" href="" class="text-dark"></a></div>
+                                </div>
+                                <div class=" d-flex gap-2 align-items-center mb-3">
+                                    <div class="social-icon"><i class="la la-location-arrow"></i></div>
+                                    <div><p id="qID" class="text-dark m-0"></p></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    }
+
+        <div class="col-md-6">
+            <div class="card card-table  mb-4">
+                <div class="card-body">
+                    <h5 class="fw-bold text-primary mb-3"> <i class="la la-chart-bar"></i> الوضع الحالي</h5>
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <div class="bg-success-light p-3 text-center br-8 ">
+                                <p>التقييم الحالي</p>
+                                <h3>ممتاز</h3>
+                                <p>10-02-2025</p>
+                            </div>
+                        </div>
+                        <div class="col-md-12 mb-3">
+                            <div class="bg-danger-light p-3 text-center br-8 ">
+                                <p>التقييم السابق</p>
+                                <h3>ضعيف</h3>
+                                <p>10-02-2025</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </text>;
 }
 
-<div class="modal fade" id="@modalId" tabindex="-1" aria-labelledby="@($"{modalId}Label")" aria-hidden="true">
-    <div class="modal-dialog  modal-xl modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header align-items-start border-0">
-                <div>
-                    <h4 class="modal-title fw-semibold mb-2" id="modalLabel"></h4>
-            
+@if (isModal)
+{
+    <div class="modal fade" id="@modalId" tabindex="-1" aria-labelledby="@($"{modalId}Label")" aria-hidden="true">
+        <div class="modal-dialog  modal-xl modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header align-items-start border-0">
+                    <div>
+                        <h4 class="modal-title fw-semibold mb-2" id="modalLabel"></h4>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"><i class="la la-close mt-1"></i></button>
                 </div>
-
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"><i class="la la-close mt-1"></i></button>
-            </div>
-            <div class="modal-body py-0">
-                <div class="row">
-                    @{
-                        switch (modalId)
-                        {
-                            case "SCHOOL":
-                                <div class="col-md-6">
-                                    <div class="card card-table  mb-4">
-                                        <div class="card-body">
-                                            <h5 class="fw-bold text-primary mb-3"> <i class="la la-building"></i> معلومات أساسية</h5>
-                                            <div class="row">
-                                                <div class="col-md-6 mb-3">
-                                                    <p class="text-light">المدير</p>
-                                                    <h5 class="fw-bold" id="managerName"></h5>
-                                                </div>
-                                                <div class="col-md-6 mb-3">
-                                                    <p class="text-light">تاريخ الإنشاء</p>
-                                                    <h5 class="fw-bold" id="establishmentDate"></h5>
-                                                </div>
-                                                <div class="col-md-6 mb-3">
-                                                    <p class="text-light">المدرسون</p>
-                                                    <h5 class="fw-bold" id="teachers"></h5>
-                                                </div>
-                                                <div class="col-md-6 mb-3">
-                                                    <p class="text-light">الطلاب</p>
-                                                    <h5 class="fw-bold" id="students"></h5>
-                                                </div>
-                                            </div>
-                                            <hr class="mt-0">
-                                            <div class="row">
-                                                <div class="col-md-12">
-                                                    <div class=" d-flex gap-2 align-items-center mb-3">
-                                                        <div class="social-icon"><i class="la la-phone-volume"></i></div>
-                                                        <div><a id="phone" href="#" class="text-dark"></a></div>
-                                                    </div>
-                                                    <div class=" d-flex gap-2 align-items-center mb-3">
-                                                        <div class="social-icon"><i class="la la-envelope"></i></div>
-                                                        <div><a id="email" href="" class="text-dark"></a></div>
-                                                    </div>
-                                                    <div class=" d-flex gap-2 align-items-center mb-3">
-                                                        <div class="social-icon"><i class="la la-location-arrow"></i></div>
-                                                        <div><p id="address" class="text-dark m-0"></p></div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="card card-table  mb-4">
-                                        <div class="card-body">
-                                            <h5 class="fw-bold text-primary mb-3"> <i class="la la-chart-bar"></i> الوضع الحالي</h5>
-                                            <div class="row">
-                                                <div class="col-md-12 mb-3">
-                                                    <div class="bg-success-light p-3 text-center br-8 ">
-                                                        <p>التقييم الحالي</p>
-                                                        <h3>ممتاز</h3>
-                                                        <p>10-02-2025</p>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-12 mb-3">
-                                                    <div class="bg-danger-light p-3 text-center br-8 ">
-                                                        <p>التقييم السابق</p>
-                                                        <h3>ضعيف</h3>
-                                                        <p>10-02-2025</p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                break;
-                            case "EMPLOYEE":
-                                <div class="col-md-6">
-                                    <div class="card card-table  mb-4">
-                                        <div class="card-body">
-                                            <h5 class="fw-bold text-primary mb-3"> <i class="la la-building"></i> معلومات أساسية</h5>
-                                            <div class="row">
-                                                <div class="col-md-6 mb-3">
-                                                    <p class="text-light">الرقم الوظيفي</p>
-                                                    <h5 class="fw-bold" id="employeeNo"></h5>
-                                                </div>
-                                                <div class="col-md-6 mb-3">
-                                                    <p class="text-light">تاريخ الميلاد</p>
-                                                    <h5 class="fw-bold" id="birthDate"></h5>
-                                                </div>
-                                                <div class="col-md-6 mb-3">
-                                                    <p class="text-light">الجنسية</p>
-                                                    <h5 class="fw-bold" id="nationalityCode"></h5>
-                                                </div>
-                                                <div class="col-md-6 mb-3">
-                                                    <p class="text-light">تاريخ الالتحاق</p>
-                                                    <h5 class="fw-bold" id="joinDate"></h5>
-                                                </div>
-                                            </div>
-                                            <hr class="mt-0">
-                                            <div class="row">
-                                                <div class="col-md-12">
-                                                    <div class=" d-flex gap-2 align-items-center mb-3">
-                                                        <div class="social-icon"><i class="la la-phone-volume"></i></div>
-                                                        <div><a id="jobTitle" href="#" class="text-dark"></a></div>
-                                                    </div>
-                                                    <div class=" d-flex gap-2 align-items-center mb-3">
-                                                        <div class="social-icon"><i class="la la-envelope"></i></div>
-                                                        <div><a id="email" href="" class="text-dark"></a></div>
-                                                    </div>
-                                                    <div class=" d-flex gap-2 align-items-center mb-3">
-                                                        <div class="social-icon"><i class="la la-location-arrow"></i></div>
-                                                        <div><p id="qID" class="text-dark m-0"></p></div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="card card-table  mb-4">
-                                        <div class="card-body">
-                                            <h5 class="fw-bold text-primary mb-3"> <i class="la la-chart-bar"></i> الوضع الحالي</h5>
-                                            <div class="row">
-                                                <div class="col-md-12 mb-3">
-                                                    <div class="bg-success-light p-3 text-center br-8 ">
-                                                        <p>التقييم الحالي</p>
-                                                        <h3>ممتاز</h3>
-                                                        <p>10-02-2025</p>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-12 mb-3">
-                                                    <div class="bg-danger-light p-3 text-center br-8 ">
-                                                        <p>التقييم السابق</p>
-                                                        <h3>ضعيف</h3>
-                                                        <p>10-02-2025</p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                break;
-                            case "ORGANIZATION":
-                                <div class="col-md-6">
-                                    <div class="card card-table  mb-4">
-                                        <div class="card-body">
-                                            <h5 class="fw-bold text-primary mb-3"> <i class="la la-building"></i> معلومات أساسية</h5>
-                                            <div class="row">
-                                                <div class="col-md-6 mb-3">
-                                                    <p class="text-light">المدير</p>
-                                                    <h5 class="fw-bold" id="managerName"></h5>
-                                                </div>
-                                                <div class="col-md-6 mb-3">
-                                                    <p class="text-light">تاريخ الإنشاء</p>
-                                                    <h5 class="fw-bold" id="establishmentDate"></h5>
-                                                </div>
-                                                <div class="col-md-6 mb-3">
-                                                    <p class="text-light">المدرسون</p>
-                                                    <h5 class="fw-bold" id="teachers"></h5>
-                                                </div>
-                                                <div class="col-md-6 mb-3">
-                                                    <p class="text-light">الطلاب</p>
-                                                    <h5 class="fw-bold" id="students"></h5>
-                                                </div>
-                                            </div>
-                                            <hr class="mt-0">
-                                            <div class="row">
-                                                <div class="col-md-12">
-                                                    <div class=" d-flex gap-2 align-items-center mb-3">
-                                                        <div class="social-icon"><i class="la la-phone-volume"></i></div>
-                                                        <div><a id="phone" href="#" class="text-dark"></a></div>
-                                                    </div>
-                                                    <div class=" d-flex gap-2 align-items-center mb-3">
-                                                        <div class="social-icon"><i class="la la-envelope"></i></div>
-                                                        <div><a id="email" href="" class="text-dark"></a></div>
-                                                    </div>
-                                                    <div class=" d-flex gap-2 align-items-center mb-3">
-                                                        <div class="social-icon"><i class="la la-location-arrow"></i></div>
-                                                        <div><p id="address" class="text-dark m-0"></p></div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="card card-table  mb-4">
-                                        <div class="card-body">
-                                            <h5 class="fw-bold text-primary mb-3"> <i class="la la-chart-bar"></i> الوضع الحالي</h5>
-                                            <div class="row">
-                                                <div class="col-md-12 mb-3">
-                                                    <div class="bg-success-light p-3 text-center br-8 ">
-                                                        <p>التقييم الحالي</p>
-                                                        <h3>ممتاز</h3>
-                                                        <p>10-02-2025</p>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-12 mb-3">
-                                                    <div class="bg-danger-light p-3 text-center br-8 ">
-                                                        <p>التقييم السابق</p>
-                                                        <h3>ضعيف</h3>
-                                                        <p>10-02-2025</p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                break;
-                        }
-
-                    }
-                   
+                <div class="modal-body py-0">
+                    <div class="row">
+                        @content(null)
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
+}
+else
+{
+    <div class="row">
+        @content(null)
+    </div>
+}
 
+@section Scripts {
 
-@section Scripts{
+    <script src="~/js/org/orgdetails.js" asp-append-version="true"></script>
 
-
-<script src="~/js/org/orgdetails.js" asp-append-version="true"></script>
-
-@{
-    switch (modalId)
+    @if (Type == "SCHOOL")
     {
-        case "SCHOOL":
-            <script type="text/javascript">
-                  $(document).on('click', 'a[data-bs-target="#@modalId"]',async function() {
+        <script type="text/javascript">
+            $(document).on('click', 'a[data-bs-target="#@modalId"]', async function () {
                 let ordId = $(this).attr('data-id');
                 console.log(ordId);
                 await initSchoolDetailsPage(ordId);
@@ -250,12 +166,13 @@
                 $("#phone").text(orgDetails.phone);
                 $("#email").text(orgDetails.orgEmail);
                 $("#address").text(orgDetails.address);
-                });
-            </script>
-            break;
-        case "EMPLOYEE":
-            <script type="text/javascript">
-                  $(document).on('click', 'a[data-bs-target="#@modalId"]',async function() {
+            });
+        </script>
+    }
+    else if (Type == "EMPLOYEE")
+    {
+        <script type="text/javascript">
+            $(document).on('click', 'a[data-bs-target="#@modalId"]', async function () {
                 let ordId = $(this).attr('data-id');
                 console.log(ordId);
                 await initSchoolDetailsPage(ordId);
@@ -267,26 +184,7 @@
                 $("#jobTitle").text(orgDetails.jobTitle);
                 $("#email").text(orgDetails.email);
                 $("#qID").text(orgDetails.qID);
-                });
-            </script>
-            break;
-
-        case "ORGANIZATION":
-            <script type="text/javascript">
-                  $(document).on('click', 'a[data-bs-target="#@modalId"]',async function() {
-                let ordId = $(this).attr('data-id');
-                console.log(ordId);
-                await initSchoolDetailsPage(ordId);
-                $("#modalLabel").text(orgDetails.name);
-                $("#managerName").text(orgDetails.manageName);
-                $("#establishmentDate").text(orgDetails.establishmentDate);
-                $("#phone").text(orgDetails.phone);
-                $("#email").text(orgDetails.orgEmail);
-                $("#address").text(orgDetails.address);
-                });
-            </script>
-            break;
+            });
+        </script>
     }
-}
- 
 }

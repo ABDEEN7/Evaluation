@@ -283,7 +283,7 @@ namespace Evaluation.Services.Models.Admin
 
             if(field!=null)
             {
-                if (field?.FieldType!.BackendName is "select2" or "dropdown" or "VacancySeat")
+                if (field?.FieldType!.BackendName is "select2" or "dropdown" )
                 {
 
                     var dataSource = uow.GetRepository<DropDownType>()

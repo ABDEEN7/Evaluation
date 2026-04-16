@@ -5,7 +5,8 @@
         GET_Plans: `/Plan/${DepartmentRouting}/GetPlansDDL`,
         GET_Schools: `Schools/${DepartmentRouting}/GetSchoolsDDL`
     };
-
+    let lang = sharedUtility().GetCookie('lang');
+     window.currentLang = lang;
     function getUiText(key, fallback = '') {
         try {
             const text = uiControlsSetup().GetUiControlText(key);
@@ -161,8 +162,10 @@
             success: function (response) {
 
                 formUtility.attachments = response.attachments || [];
-                $('#evaluationRequestModalLabel').text(response.status || '');
+                $('#evaluationRequeststatus').text(response.status || '');
                 $('#evaluationRequestNoText').text(response.requestNumber || '');
+               
+                $('#breadcrumbSchoolName').text((window.currentLang === "ar" ? response.school.nameAr : response.school.nameEn) || '');
                 $('#evaluationRequestDetailsModal').modal('show');
 
                 formUtility.renderPreviewView(
@@ -201,7 +204,7 @@
 
         jqClient(options).Get(`/ServiceRequest/${DepartmentRouting}/GetEvaluationDetails?requestId=${requestId}`);
     }
-    function bindSchoolDetails(response) {
+    function bindSchoolDetails_old(response) {
         const s = response && response.school ? response.school : null;
         if (!s) return;
 
@@ -248,7 +251,19 @@
             response.previousRatingDate ? formatDate(response.previousRatingDate) : ""
         );
     }
+    function bindSchoolDetails(response) {
+        const $root = $("#school-details-container");
+        const s = response.school || {};
 
+        $root.find("#modalLabel").text((window.currentLang === "ar" ? s.nameAr : s.nameEn) || '');
+        $root.find("#managerName").text(s.manageName || '');
+        $root.find("#establishmentDate").text(s.establishmentDate || '');
+        $root.find("#teachers").text(s.teachers || '');
+        $root.find("#students").text(s.students || '');
+        $root.find("#phone").text(s.phone || '');
+        $root.find("#email").text(s.orgEmail || '');
+        $root.find("#address").text(s.address || '');
+    }
     function renderEvaluationPartiesSection(response, requestId) {
         const parties = response?.evaluationParties || [];
 

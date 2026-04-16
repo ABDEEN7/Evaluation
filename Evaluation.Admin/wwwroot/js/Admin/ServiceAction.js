@@ -1695,8 +1695,8 @@ function FieldChangeEvent() {
         if (fieldtype) {
             var selectedvalue = fieldtype.type;
             var DropDownTypeId = fieldtype.dropDownTypeId;
-
-            if (selectedvalue == "dropdown" || selectedvalue == "select2" || selectedvalue == "VacancySeat") {
+            
+            if (selectedvalue == "dropdown" || selectedvalue == "select2" ) {
                 $("#ActionConditionFieldValue").val('');
                 $("#ActionConditionFieldValue").parent().hide();
                 $("#ActionConditionFieldDropDownValueIds").parent().show();
