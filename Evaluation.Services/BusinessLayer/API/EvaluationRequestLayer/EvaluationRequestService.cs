@@ -239,7 +239,7 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 		var module = await moduleTask;
 		var assignment = await assignmentTask;
 		bool departmentRequiresNda =  module?.Department?.IsNDA == true;
-		bool userAssignmentRequiresNda = departmentRequiresNda && assignment.Any(x=>x.MinistryUserId== userId && x.IsNDA == true && (x.NdaDate == null || x.NdaStatusId == null));
+		bool userAssignmentRequiresNda = departmentRequiresNda && assignment.Any(x=>x.MinistryUserId== userId && x.IsNDA == false && (x.NdaDate == null || x.NdaStatusId == null));
 
 		var formGroups = await fieldsTask;
 

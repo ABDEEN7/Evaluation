@@ -159,11 +159,16 @@ var formGenerateFieldUtility = window.formUtility;
                 //    container.html(`<div class="text-danger">Missing formId for evl_Form.</div>`);
                 //    return;
                 //}
-
+                const allowAddFormItem = field.attributes?.find(c => c.name === 'allowAddFormItem');
+                const allowDeleteFormItem = field.attributes?.find(c => c.name === 'allowDeleteFormItem');
+                const allowRenameFormItem = field.attributes?.find(c => c.name === 'allowRenameFormItem');
                 const html = await generateFullFormPageHtml({
                     formId,
                     fieldId: fieldId,
-                    readOnly: readonly
+                    readOnly: readonly,
+                    allowRename: !allowRenameFormItem || allowRenameFormItem.value == true || allowRenameFormItem.value == "true",
+                    allowDelete: !allowDeleteFormItem || allowDeleteFormItem.value == true || allowDeleteFormItem.value == "true",
+                    allowAdd: !allowAddFormItem || allowAddFormItem.value == true || allowAddFormItem.value == "true"
                 });
 
                 container.html(html);

@@ -9,10 +9,11 @@ namespace Evaluation.SharedHelper.Models.Api.EvaluationRequestEntities
 	public class NdaApproveRequest
 	{
 		public Guid EvaluationRequestId { get; set; }
-		public Guid? PlanId { get; set; }
-		public Guid? MinistryUserId { get; set; } 
-		public Guid? NDAStatusId { get; set; }
-		public string ConflictReason { get; set; } = null!;
+		//public Guid? PlanId { get; set; }
+		//public Guid? MinistryUserId { get; set; }
+		//public Guid? NDAStatusId { get; set; }
+		public bool HasConflict { get; set; }     
+		public string? ConflictReason { get; set; }
 	}
 	public class NdaApproveResponse
 	{
