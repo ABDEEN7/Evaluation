@@ -74,7 +74,7 @@
 </div>
 </section>
 @section Scripts {
-   
+    
     <script src="~/js/EvaluationForm/evaluation-form.js" asp-append-version="true"></script>
     <script src="~/lib/tabulator/js/tabulator.js" asp-append-version="true"></script>
     <script>
@@ -108,12 +108,13 @@
                      '@nameof(ConstantKeys.WebPermissions.ADD_WEB_FORMSCOPES)',
                 ],
             }).then((result) => {
-
+                       let lang = sharedUtility().GetCookie('lang');
+             
                  uiControlItems = result.uiControlItems.filter(x => x.rowOrder > 0 && x.permissionBackendName=='@ConstantKeys.WebPermissions.ADD_WEB_EVALFORMS');
                  FormItemuiControlItems = result.uiControlItems.filter(x => x.rowOrder > 0 && x.permissionBackendName=='@ConstantKeys.WebPermissions.ADD_WEB_FORMITEMS');
                   SubFormItemuiControlItems = result.uiControlItems.filter(x => x.rowOrder > 0 && x.permissionBackendName=='@ConstantKeys.WebPermissions.ADD_WEB_SUBFORMITEMS');
                    FormScopeuiControlItems = result.uiControlItems.filter(x => x.rowOrder > 0 && x.permissionBackendName=='@ConstantKeys.WebPermissions.ADD_WEB_FORMSCOPES');
-                textDir = result.currentlanguage === "ar" ? "RTL" : "LTR";
+                textDir = lang=== "ar" ? "RTL" : "LTR";
                 permissionsList = result.permissionsList;
                 controlsList = result.controlsList;
                 columnList = uiControlItems.filter(x => x.constraint.showInGrid === true && x.control).map(c => ({

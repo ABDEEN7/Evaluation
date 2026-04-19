@@ -27,19 +27,16 @@ namespace Evaluation.API.Controllers
         }
 
         [HttpGet]
+        public IActionResult GetDepartment([FromQuery] string routingPath)
+        {
+            var lang = _requestInfo.Lang;
+            return Ok(new { result = GetDepartmentByRoutingPath(routingPath, lang) });
+        }
+
+        [HttpGet]
         public IActionResult GetDepartmentsForWebGroup([FromQuery] string webGroupPath)
         {
             return Ok(new { result = GetAllDepartmentsForWebGroupList(webGroupPath) });
-        }
-
-        private async Task<List<DepartmentDto>> GetAllDepartmentsForWebGroupList(string webGroupPath)
-        {
-           return await _masterBl.GetApiService<DepartmentBL>().GetAllDepartmentsForWebGroup(webGroupPath);
-        }
-
-        private async Task<List<DepartmentDto>> GetDepartmentList()
-        {
-           return await _masterBl.GetApiService<DepartmentBL>().GetAllDepartments();
         }
         [HttpGet()]
         public async Task<List<NavbarDTO>> GetNavbar()
@@ -55,6 +52,22 @@ namespace Evaluation.API.Controllers
 
             var banners = await _masterBl.GetApiService<WebsiteBL>().GetBanners(webGroupPath, lang);
             return banners;
+        }
+
+
+        private async Task<List<DepartmentDto>> GetAllDepartmentsForWebGroupList(string webGroupPath)
+        {
+            return await _masterBl.GetApiService<DepartmentBL>().GetAllDepartmentsForWebGroup(webGroupPath);
+        }
+
+        private async Task<List<DepartmentDto>> GetDepartmentList()
+        {
+            return await _masterBl.GetApiService<DepartmentBL>().GetAllDepartments();
+        }
+
+        private async Task<DepartmentDto> GetDepartmentByRoutingPath(string routingPath, string lang)
+        {
+            return await _masterBl.GetApiService<DepartmentBL>().GetDepartmentByRoutingPath(routingPath, lang);
         }
     }
 }

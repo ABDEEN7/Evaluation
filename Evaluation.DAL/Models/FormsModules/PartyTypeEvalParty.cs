@@ -16,5 +16,8 @@ namespace Evaluation.DAL.Models.FormsModules
         public PartyType? PartyType { get; set; }
         public Guid EvaluationPartyId { get; set; }
         public EvaluationParty? EvaluationParty { get; set; }
-    }
+
+		public virtual ICollection<PartyTypeEvalPartyStatus> PartyTypeEvalPartyStatuses { get; set; } = [];
+
+	}
 }

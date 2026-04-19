@@ -369,33 +369,7 @@ namespace Evaluation.Services.Models.API
                     .ToList();
             }
 
-            if (fieldsToUpdate.Any())
-            {
-                var userId = requestId != Guid.Empty ? await SrvServiceRequest.GetOrgTreeIdByRequestIdAsync(requestId) : userInfo.UserId;
-                if (userId == null)
-                    userId = userInfo.UserId;
-
-                if (userId != null)
-                {
-                    var student = await SrvUser.GetStudentByIdAsync(userId.Value);
-
-                    var studentQID = ""; // Replace with student.QID if available    // "30663401929";
-
-                    var updatedIntegrationFields = await SrvField.ProcessIntegrationFieldsAsync(fieldsToUpdate, studentQID, requestId, true);
-
-                    foreach (var updated in updatedIntegrationFields)
-                    {
-                        if (!updated.FieldId.HasValue) continue;
-
-                        var target = allFields.FirstOrDefault(f => f.FieldId == updated.FieldId);
-                        if (target != null && !string.IsNullOrWhiteSpace(updated.Value?.ToString()))
-                        {
-                            target.Value = updated.Value;
-                            target.IsApproved = true;
-                        }
-                    }
-                }
-            }
+          
 
             var approvedFields = allFields.Where(f => f.IsApproved == true).ToList();
 

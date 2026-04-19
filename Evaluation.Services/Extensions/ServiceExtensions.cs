@@ -48,13 +48,15 @@ public static class ServiceExtensions
                 };
 
                 // Only bypass SSL certificate validation in development
-                if (isDevEnvironment)
-                {
-                    handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true;
-                }
+                //if (isDevEnvironment)
+                //{
+                //    handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true;
+                //}
 
                 return handler;
             });
+
+
 
         services.AddScoped<LoggingServices>();
         services.AddScoped<IMapper, Mapper>();

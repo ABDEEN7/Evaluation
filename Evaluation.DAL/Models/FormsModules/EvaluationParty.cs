@@ -12,5 +12,8 @@ public class EvaluationParty : EntityBase, IAuditLogEntity
     public string NameEn { get; set; } = null!;
     public bool IsSupportFiles { get; set; }
     public int OrderNo { get; set; }
- 
+
+	public virtual ICollection<PartyTypeEvalParty> PartyTypeEvalParties { get; set; } = [];
+
+
 }

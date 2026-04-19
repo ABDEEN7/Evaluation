@@ -13,4 +13,5 @@ public class SubFormItemEvaluationDto
 
     public decimal? Value { get; set; }
     public string? Note { get; set; }
+    public string? Name { get; set; }
 }

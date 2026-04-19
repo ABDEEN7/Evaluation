@@ -7,5 +7,6 @@ public class FormItemEvaluationDto
     public Guid? ValueId { get; set; }
     public decimal Value { get; set; }
     public string? Note { get; set; }
+    public string? Name{ get; set; }
     public List<SubFormItemEvaluationDto>? SubItems { get; set; }
 }

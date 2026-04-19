@@ -3,6 +3,7 @@ using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.ActionEntities;
 using Evaluation.DAL.Models.FormBuilder;
 using Evaluation.DAL.Models.ServiceEnities;
+using Evaluation.DAL.Models.StatusEntities;
 using Evaluation.DAL.Models.Template;
 using Evaluation.DAL.Models.UserEntiy;
 using Evaluation.DAL.Repositories;
@@ -111,7 +112,7 @@ namespace Evaluation.Services.Models.Admin
             fieldType = field?.FieldType?.BackendName;
             fielddropdowntype = field?.DropDownTypeId;
 
-            if (fieldType is "select2" or "dropdown" or "VacancySeat")
+            if (fieldType is "select2" or "dropdown" )
             {
 
                 var dataSource = uow.GetRepository<DropDownType>()
@@ -393,7 +394,29 @@ namespace Evaluation.Services.Models.Admin
             }
         }
 
-
+        public async Task<List<DropdownItem>> GetNewStatusList()
+        {
+            using (var uow = serviceScopeFactory.CreateScopedUow())
+            {
+               
+                var ServiceStatusList = await uow.GetRepository<ServiceStatus>()
+                                    .GetAllNonDeleted()
+                                    .Include(x=>x.Service)
+                                    .ThenInclude(x=>x.SystemModule)
+                                    .ThenInclude(x=>x.Department)
+                                    .Where(x=>x.Service!.SystemModule!.Department!.BackendName=="EvaluationSystem" && x.Service.Initialservice==true)
+                                    .Select(x => new DropdownItem
+                                    {
+                                        Id = x.Id,
+                                        NameAr = x.NameAr,
+                                        NameEn = x.NameEn,
+                                        BackendName = x.BackendName ?? string.Empty
+                                    })
+                                    //.OrderBy(x => x.OrderNo)
+                                    .ToListAsync();
+                return ServiceStatusList;
+            }
+        }
         public async Task<List<DropdownItem>> GetTemplateDocsList(Guid serviceId)
         {
             using (var uow = serviceScopeFactory.CreateScopedUow())
@@ -573,6 +596,7 @@ namespace Evaluation.Services.Models.Admin
             entity.ConfirmationTitleAr = model.action.ConfirmationTitleAr;
             entity.ConfirmationTitleEn = model.action.ConfirmationTitleEn;
             entity.IsInitialAction = model.action.IsInitialAction;
+            entity.NewStatusId = model.action.NewStatusId;
 
             entity = uow.GetRepository<ServiceAction>().Update(entity);
 

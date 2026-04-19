@@ -27,6 +27,14 @@ public class DepartmentService(IServiceScopeFactory serviceScopeFactory,
             .Where(d => d.Id == Id).FirstOrDefaultAsync();
         return department;
     }
+    public async Task<Department> GetDepartmentByRoutingPath(string routingPath)
+    {
+        var department = await unitOfWork.GetRepository<Department>()
+            .GetAllActiveNonDeleted()
+            //.Include(d => d.Category)
+            .Where(d => d.RoutingPath == routingPath).FirstOrDefaultAsync();
+        return department;
+    }
     public async Task<List<Department>> GetAllDepartments()
     {
         var departments = await unitOfWork.GetRepository<Department>()

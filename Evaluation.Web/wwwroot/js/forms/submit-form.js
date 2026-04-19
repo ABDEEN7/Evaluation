@@ -81,6 +81,54 @@ function evaluationFormResult(formId) {
     return payload;
 }
 
+
+function renameFormItems(formId) {
+    const mainItems = [];
+
+    // ========== LOOP MAIN ITEMS ONLY ==========
+    $("#tbodyRows tr.main-row").each(function () {
+
+        const row = $(this);
+
+        const itemInput = row.find("input.item-name");
+
+        const itemInputVal =
+            itemInput.val() || null;
+
+        const mainId = itemInput.data("id");
+
+
+        const mainObj = {
+            id: mainId,
+            name: itemInputVal,
+            subItems: []
+        };
+
+        mainItems.push(mainObj);
+    });
+
+    const payload = {
+        id: formId,
+        items: mainItems
+    };
+
+    console.log("FINAL NESTED JSON:", payload);
+
+    return payload;
+}
+
+//function renameitemForm(formId) {
+//    var result = renameFormItems(formId);
+//    jqClient().Post(`/Form/${departmentPath}/RenameFormItems`, result)
+//        .done((res) => {
+//            Swal.fire({
+//                icon: "success",
+//                title: "تم الإرسال",
+//                text: "تم الإرسال بنجاح"
+//            });
+//        });
+//}
+
 function submitForm(formId) {
     var result = evaluationFormResult(formId);
     jqClient().Post(`/Form/${departmentPath}/SaveEvaluationForm`, result)
