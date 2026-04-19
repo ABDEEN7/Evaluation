@@ -312,6 +312,26 @@ const generateTableBodyHtmlForRelatedItems = async (items, hasAnyNote) => {
     }).join('');
 };
 
+async function fillRenameControls(fieldId, controlValues) {
+    if (!controlValues || !controlValues.items) return;
+
+    P_fieldId = fieldId;
+
+    const tbody = $("#tbodyRows");
+
+    controlValues.items.forEach((item, index) => {
+        let row = tbody.find("tr.main-row").filter(function () {
+            return $(this).find("input.item-name").data("id") === item.id;
+        });
+
+        row.find("input.item-name").val(item.name || "");
+
+        if (index < controlValues.items.length - 1) {
+            addNewRow();
+        }
+    });
+}
+
 
 function buildHorizontalTable(data) {
     const table = document.createElement("table");
