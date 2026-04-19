@@ -1,12 +1,14 @@
 ﻿using AutoMapper;
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.FormsModules;
+using Evaluation.DAL.Models.UserEntiy;
 using Evaluation.DAL.Repositories;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Dtos.EvalFormDto;
 using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Api;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Evaluation.Services.BusinessLayer.API.EvaluationForm;
@@ -16,13 +18,13 @@ public class EvaluationFormBL(IServiceScopeFactory serviceScopeFactory, CacheDat
         IServiceProvider serviceProvider, RequestInfo requestInfo, EvaluationFormService evaluationFormService)
         : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, requestInfo)
 {
-    public async Task<List<EvaluationFormDto>> GetEvaluationForm(int Page)
+    public async Task<List<TemplateFormDto>> GetEvaluationForm(int Page)
     {
         var result = await evaluationFormService.GetEvaluationFormList(Page);
         return result;
     }
 
-    public async Task<List<EvaluationFormItemDto> >GetAllEvalFormItems(Guid EvalformId)
+    public async Task<List<EvaluationFormItemDto>> GetAllTemplateFormItems(Guid EvalformId)
     {
         var result = await evaluationFormService.GetEvaluationFormItemList(EvalformId);
         return result;
@@ -39,9 +41,9 @@ public class EvaluationFormBL(IServiceScopeFactory serviceScopeFactory, CacheDat
         return result;
     }
 
-    public async Task<EvaluationFormDto> SaveEvaluationForm(EvaluationFormDto model)
+    public async Task<TemplateFormDto> SaveEvaluationForm(TemplateFormDto model)
     {
-        var result = new EvaluationFormDto();
+        var result = new TemplateFormDto();
         bool validateObject = await ValidateObject(model!, ConstantKeys.WebPermissions.ADD_WEB_EVALFORMS);
         if (validateObject)
         {
@@ -50,9 +52,9 @@ public class EvaluationFormBL(IServiceScopeFactory serviceScopeFactory, CacheDat
         }
         return result;
     }
-    public async Task<EvaluationFormDto> UpdateEvaluationForm(EvaluationFormDto model)
+    public async Task<TemplateFormDto> UpdateEvaluationForm(TemplateFormDto model)
     {
-        var result = new EvaluationFormDto();
+        var result = new TemplateFormDto();
         bool validateObject = await ValidateObject(model!, ConstantKeys.WebPermissions.ADD_WEB_EVALFORMS);
         if (validateObject)
         {
@@ -61,7 +63,7 @@ public class EvaluationFormBL(IServiceScopeFactory serviceScopeFactory, CacheDat
         }
         return result;
     }
-    public async Task<EvaluationFormDto> DeleteEvaluationForm(Guid Id)
+    public async Task<TemplateFormDto> DeleteEvaluationForm(Guid Id)
     {
         var result = await evaluationFormService.DeleteEvaluationForm(Id!);
         return result;
@@ -149,5 +151,67 @@ public class EvaluationFormBL(IServiceScopeFactory serviceScopeFactory, CacheDat
         var result = await evaluationFormService.DeleteFormScope(Id!);
         return result;
     }
+    public async Task<IReadOnlyList<DropdownItem>> GetPartyTypeListAsync()
+    {
+        return await uow.GetRepository<PartyType>()
+            .GetAllActiveNonDeleted()
+            .Select(x => new DropdownItem
+            {
+                Id = x.Id,
+                Name = requestInfo.Lang == "ar" ? x.NameAr : x.NameEn
+            })
+            .AsNoTracking()
+            .ToListAsync();
+    }
 
+    public async Task<IReadOnlyList<DropdownItem>> GetFormItemListAsync()
+    {
+        return await uow.GetRepository<FormItem>()
+            .GetAllActiveNonDeleted()
+            .Select(x => new DropdownItem
+            {
+                Id = x.Id,
+                Name = requestInfo.Lang == "ar" ? x.NameAr : x.NameEn
+            })
+            .AsNoTracking()
+            .ToListAsync();
+    }
+    public async Task<IReadOnlyList<DropdownItem>> GetCalcMethodsListAsync()
+    {
+        return await uow.GetRepository<CalcMethod>()
+            .GetAllActiveNonDeleted()
+            .Select(x => new DropdownItem
+            {
+                Id = x.Id,
+                Name = requestInfo.Lang == "ar" ? x.NameAr : x.NameEn
+            })
+            .AsNoTracking()
+            .ToListAsync();
+    }
+    public async Task<List<FormItemConfigDto>> GetAllFormItemConfig(Guid? evalFormId)
+    {
+        var result = await evaluationFormService.GetAllFormItemConfigAsync(evalFormId);
+        return result;
+    }
+    public async Task<List<FormItemConfigDto>> SaveFormItemConfig(List<FormItemConfigDto> model)
+    {
+        var result = new List<FormItemConfigDto>();
+        bool validateObject = await ValidateObject(model!, ConstantKeys.WebPermissions.ADD_WEB_FORMITEMCONFIG);
+        if (validateObject)
+        {
+            result = await evaluationFormService.SaveFormItemConfig(model);
+
+        }
+        return result;
+    }
+    public async Task<FormItemConfigDto> UpdateFormItemConfig(FormItemConfigDto model)
+    {
+        var result = new FormItemConfigDto();
+        bool validateObject = await ValidateObject(model!, ConstantKeys.WebPermissions.ADD_WEB_FORMITEMCONFIG);
+        if (validateObject)
+        {
+            result = await evaluationFormService.UpdateFormItemConfig(model);
+        }
+        return result;
+    }
 }

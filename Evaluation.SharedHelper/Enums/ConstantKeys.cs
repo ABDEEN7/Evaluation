@@ -986,7 +986,7 @@ public static class ConstantKeys
         public const string DELETE_WEB_FORMITEMS = "DELETE_WEB_FORMITEMS";
 
         #endregion
-
+        
         #region SUBFORMITEMS
 
         public const string VIEW_WEB_SUBFORMITEMS = "VIEW_WEB_SUBFORMITEMS";
@@ -995,7 +995,9 @@ public static class ConstantKeys
         public const string DELETE_WEB_SUBFORMITEMS = "DELETE_WEB_SUBFORMITEMS";
 
         #endregion
-        
+        #region FORMITEMCONFIG
+        public const string ADD_WEB_FORMITEMCONFIG = "ADD_WEB_FORMITEMCONFIG";
+        #endregion
         #region TEAM
 
         public const string VIEW_WEB_TEAM = "VIEW_WEB_TEAM";

@@ -1,6 +1,7 @@
 ﻿
 let table = null, currentPage = 0, isLoading = true, popupname = "",
-formItems = [];
+    formItems = [];
+let lookupSources = {};
 const gridContainerId = "view-container",
     $tblContentContainer = $('#tbltemplatecontainer'),
     $formSection = $('#formsection'),
@@ -31,11 +32,27 @@ const loadData = () => {
         }
     };
 
-    jqClient(options).Get(`/EvaluationForm/${deprouting}/GetAllEvalForm`.concat('?page=', currentPage));
+    jqClient(options).Get(`/TemplateForm/${deprouting}/GetAllTemplateForm`.concat('?page=', currentPage));
 };
-
+function getlookup() {
+    const options = {
+        success: function (result) {
+            if (result) {
+                const { data } = result;
+                if (data) {
+                    const { PartyTypeList, FormItemList, CalcMethodsList } = data;
+                    lookupSources["PartyTypeList"] = PartyTypeList;
+                    lookupSources["FormItemList"] = FormItemList;
+                    lookupSources["CalcMethodsList"] = CalcMethodsList;
+                }
+            }
+        }
+    };
+    jqClient(options).Get(`/TemplateForm/${deprouting}/GetEvalFormItemLists`);
+}
 $btnAddbutton.click(function () {
     sharedFn().InitialPageControls(uiControlItems);
+    //renderFormItemRelatedButton();
     $itemcontent.hide();
     $('#Id').val('');
 });
@@ -215,8 +232,8 @@ function ClearControlByPage() {
 
         BindFormItem();
     }
-    
-    
+
+
 }
 $("#btnAddParent").click(function () {
     popupname = "EvalFormItem";
@@ -226,6 +243,15 @@ $("#btnAddParent").click(function () {
     sharedFn().OpenFormPopup(modaltitle, FormItemcontrolvalidationlist, null, null, null);
 
 });
+//function renderFormItemRelatedButton() {
+//    $("#formItemConfig").remove();
+//    const btn = `
+//        <button type="button" id="formItemConfig" class="btn btn-sm btn-info mb-2">
+//            <i class="las la-link"></i>
+//        </button>
+//   `;
+//    $('#custm-code').prepend(btn);
+//}
 function FormScopeClick(event) {
     const cellElem = event.closest('section');
     const Evalformid = cellElem.getAttribute('data-key');
@@ -260,7 +286,7 @@ function Loadtabledata() {
             }
         };
 
-        jqClient(options).Get(`/EvaluationForm/${deprouting}/GetAllFormScope`.concat('?formIdValue=', formIdValue));
+        jqClient(options).Get(`/TemplateForm/${deprouting}/GetAllFormScope`.concat('?formIdValue=', formIdValue));
     }
 
 }
@@ -344,12 +370,12 @@ function SetDropDown() {
                         $dropdown.val(null).trigger("change.select2");
                     }
 
-                    
+
 
                 }
             }
         };
-        jqClient(options).Get(`/EvaluationForm/${deprouting}/GetAllFormItemsFromDepartment`.concat('?EvalformId=', EvalformId));
+        jqClient(options).Get(`/TemplateForm/${deprouting}/GetAllFormItemsFromDepartment`.concat('?EvalformId=', EvalformId));
         //$("label[for='EvalFormItemNoteRequired']").hide();
 
         //$("#EvalFormItemNoteRequired").parent().hide();
@@ -358,7 +384,7 @@ function SetDropDown() {
             toggleNoteRequired();
         });
     }
-    
+
 }
 
 function BindFormItem() {
@@ -370,7 +396,7 @@ function BindFormItem() {
             renderFormItemTable();
         }
     };
-    jqClient(options).Get(`/EvaluationForm/${deprouting}/GetAllEvalFormItems`.concat('?EvalformId=', EvalformId));
+    jqClient(options).Get(`/TemplateForm/${deprouting}/GetAllTemplateFormItems`.concat('?TemplateFormId=', EvalformId));
 }
 function renderFormItemTable() {
     let html = "";
@@ -449,7 +475,7 @@ $(document).on("click", ".toggle", function () {
 
 // FormItem delete button
 $(document).on("click", ".deleteParent", function () {
-    var id = $(this).data("id"); 
+    var id = $(this).data("id");
     popupname = 'EvalFormItem';
     deleteData(id);
 });
@@ -464,7 +490,7 @@ $(document).on("click", ".deleteChild", function () {
 // FormItem Edit button
 $(document).on("click", ".editParent", function () {
     var row = $(this).closest("tr");
-    var id = $(this).data("id");  
+    var id = $(this).data("id");
     var jsonString = row.find("td:last").text();
     var objdata = JSON.parse(jsonString);
     popupname = "EvalFormItem";
@@ -472,7 +498,28 @@ $(document).on("click", ".editParent", function () {
     sharedFn().OpenFormPopup(modaltitle, FormItemcontrolvalidationlist, objdata, null, null);
     $("#PopupId").val(id);
 });
+$(document).on("click", "#formItemConfig", function () {
+    popupname = "FormItemConfig";
 
+    var EvalformId = $("#Id").val();
+    $("#evalformidvalue").val(EvalformId);
+
+    var modaltitle = sharedFn().GetUiControlText('FormItemHeader');
+
+
+    IsEdit = IsEditFormItem ? "True" : "";
+    IsDelete = IsDeleteFormItem ? "True" : "";
+    IsView = IsViewFormItem ? "True" : "";
+
+    var tableColumns = sharedFn().PopulateColumn(FormItemConfigCollist);
+
+    OpenFormItemConfigPopup(
+        modaltitle,
+        FormItemConfiglist,
+        tableColumns,
+        settingList
+    );
+});
 // SubFormItem Add button
 $(document).on("click", ".addSub", function () {
     var id = $(this).data("id");
@@ -494,26 +541,74 @@ $(document).on("click", ".editChild", function () {
     sharedFn().OpenFormPopup(modaltitle, SubFormItemcontrolvalidationlist, objdata, null, null);
     $("#PopupId").val(id);
 });
+$(document).on("click", ".edit", function () {
+    if (popupname !== "FormItemConfig") return;
+
+    const cellElem = $(this).closest('section')[0];
+    const id = cellElem.getAttribute('data-key');
+    const obj = tableFormItemConfig.getData().find(f => f.id == id);
+
+    if (!obj) return;
+
+    var data = {
+        Id: obj.id,
+        EvalFormId: $("#evalformidvalue").val(),
+        NameAr: obj.nameAr || null,
+        NameEn: obj.nameEn || null,
+        PartyTypeId: obj.partyTypeId || obj.partyType || null,
+        FormItemIds: obj.formItemId
+            ? (Array.isArray(obj.formItemId) ? obj.formItemId : [obj.formItemId])
+            : obj.formItem
+                ? (Array.isArray(obj.formItem) ? obj.formItem : [obj.formItem])
+                : null,
+        CalcMethodId: obj.calcMethodId || obj.calcMethod || null,
+        Percentage: obj.percentage || 0
+    };
+
+    var formData = new FormData();
+    formData.append('request', JSON.stringify(data));
+
+    jqClient({
+        success: function (response) {
+            if (response?.responseStatus == 2) {
+                notificationUtil.success(sharedFn().GetUiControlText('WEB_MSG_UPDATE'));
+                // حدّث الصف في الجدول
+                tableFormItemConfig.updateData([{
+                    id: response.id,
+                    ...response
+                }]);
+            } else {
+                notificationUtil.error(response?.message);
+            }
+        },
+        error: function () {
+            notificationUtil.error('Request failed');
+        }
+    }).PostFormData(
+        `/TemplateForm/${deprouting}/UpdateFormItemConfig`,
+        formData
+    );
+});
 const deleteData = (id) => {
     if (!id) return;
     var deleteurl = '';
     if (popupname == 'EvalFormItem') {
-        deleteurl = `/EvaluationForm/${deprouting}/DeleteEvaluationFormItem`;
+        deleteurl = `/TemplateForm/${deprouting}/DeleteTemplateFormItem`;
     }
     else if (popupname == 'EvalSubFormItem') {
-        deleteurl = `/EvaluationForm/${deprouting}/DeleteEvaluationSubFormItem`;
+        deleteurl = `/TemplateForm/${deprouting}/DeleteEvaluationSubFormItem`;
     }
     else if (popupname == 'FormScope') {
-        deleteurl = `/EvaluationForm/${deprouting}/DeleteFormScope`;
+        deleteurl = `/TemplateForm/${deprouting}/DeleteFormScope`;
     }
     else {
         const obj = table.getData().find(f => f.id == id);
         if (!obj) return;
 
-        deleteurl = `/EvaluationForm/${deprouting}/DeleteEvaluationForm`;
+        deleteurl = `/TemplateForm/${deprouting}/DeleteTemplateForm`;
     }
 
-    
+
 
 
     notificationUtil.confirmation({ title: sharedFn().GetUiControlText('WEB_WARNING_DELETE'), okText: sharedFn().GetUiControlText('WEB_DELETE_BUTTON'), cancelText: sharedFn().GetUiControlText('WEB_CANCEL') }, result => {
@@ -533,7 +628,7 @@ const deleteData = (id) => {
                         else {
                             table.deleteRow(id);
                         }
-                       
+
                         notificationUtil.success(sharedFn().GetUiControlText('WEB_MSG_DELETE'));
                     }
 
@@ -545,7 +640,7 @@ const deleteData = (id) => {
             ,
             error: function (xhr) {
                 notificationUtil.error(xhr.responseJSON.Message);
-                
+
             }
         };
         jqClient(options).Post(deleteurl.concat('?Id=', id));
@@ -554,7 +649,7 @@ const deleteData = (id) => {
 };
 $("#btn-submit").click(function (e) {
 
-   
+
     if (sharedFn().NewvalidateForm("form-control", sharedFn().GetUiControlText('WEB_CNTRL_REQUIRED'), sharedFn().GetUiControlText('WEB_MSG_MAX_CHAR_LENGTH'), sharedFn().GetUiControlText('WEB_MSG_MIN_CHAR_LENGTH'))) {
 
 
@@ -564,10 +659,10 @@ $("#btn-submit").click(function (e) {
             success: function (response) {
                 commonUtil.btnProgress(btnSubmitId, true);
 
-                
+
                 if (response.responseStatus == '1') {
                     table.addData([response], true);
-                   
+
                     if (response) {
                         notificationUtil.success(sharedFn().GetUiControlText('WEB_MSG_SAVE'));
 
@@ -594,9 +689,9 @@ $("#btn-submit").click(function (e) {
         let id = $('#Id').val();
 
         if (id) {
-            url = `/EvaluationForm/${deprouting}/UpdateEvaluationForm`;
+            url = `/TemplateForm/${deprouting}/UpdateTemplateForm`;
         } else {
-            url = `/EvaluationForm/${deprouting}/SaveEvaluationForm`;
+            url = `/TemplateForm/${deprouting}/SaveTemplateForm`;
 
         }
         jqClient(options).PostFormData(url, requestdata);
@@ -665,22 +760,67 @@ function GetSubformItemrow(response) {
 }
 $("#btn-submit_popup").click(function (e) {
 
-
     if (sharedFn().NewvalidateForm("form-control", sharedFn().GetUiControlText('WEB_CNTRL_REQUIRED'), sharedFn().GetUiControlText('WEB_MSG_MAX_CHAR_LENGTH'), sharedFn().GetUiControlText('WEB_MSG_MIN_CHAR_LENGTH'))) {
 
-
         commonUtil.btnProgress(btnpopupSubmitId);
-        var validationlist = popupname == "EvalFormItem" ? FormItemcontrolvalidationlist : popupname == "EvalSubFormItem" ? SubFormItemcontrolvalidationlist : popupname == "FormScope" ? FormScopecontrolvalidationlist: null;
+
+        if (popupname == "FormItemConfig") {
+            const allRows = tableFormItemConfig.getData();
+            if (!allRows || allRows.length === 0) {
+                notificationUtil.error('No data to save');
+                commonUtil.btnProgress(btnpopupSubmitId, true);
+                return;
+            }
+
+            const dataToSave = allRows.map(obj => ({
+                Id: obj.id === "00000000-0000-0000-0000-000000000000" ? null : obj.id,
+                EvalFormId: $("#evalformidvalue").val(),
+                NameAr: obj.nameAr || null,
+                NameEn: obj.nameEn || null,
+                PartyTypeId: obj.partyTypeId || obj.partyType,
+                FormItemIds: (obj.formItemId || obj.formItem)
+                    ? (Array.isArray(obj.formItemId || obj.formItem)
+                        ? (obj.formItemId || obj.formItem)
+                        : [obj.formItemId || obj.formItem])
+                    : null,
+                CalcMethodId: obj.calcMethodId || obj.calcMethod,
+                Percentage: obj.percentage || 0
+            }));
+
+            var formData = new FormData();
+            formData.append('request', JSON.stringify(dataToSave));
+
+            jqClient({
+                success: function (response) {
+                    commonUtil.btnProgress(btnpopupSubmitId, true);
+                    if (response?.responseStatus == 1 || response?.responseStatus == 2) {
+                        notificationUtil.success(sharedFn().GetUiControlText('WEB_MSG_SAVE'));
+                        LoadFormItemConfigData();
+                    } else {
+                        notificationUtil.error(response?.message);
+                    }
+                },
+                error: function () {
+                    commonUtil.btnProgress(btnpopupSubmitId, true);
+                    notificationUtil.error('Request failed');
+                }
+            }).PostFormData(`/TemplateForm/${deprouting}/SaveAllFormItemConfig`, formData);
+
+            return;
+        }
+        var validationlist = popupname == "EvalFormItem" ? FormItemcontrolvalidationlist
+            : popupname == "EvalSubFormItem" ? SubFormItemcontrolvalidationlist
+                : popupname == "FormScope" ? FormScopecontrolvalidationlist
+                    : null;
+
         var requestdata = sharedFn().GetSaveObject(validationlist, $('#PopupId').val());
+
         const options = {
             success: function (response) {
                 commonUtil.btnProgress(btnSubmitId, true);
 
-
                 if (response.responseStatus == '1') {
                     if (popupname == "EvalFormItem") {
-
-
                         var formitemrow = GetformItemrow(response);
                         $("#formitemTable tbody").prepend(formitemrow);
                         sharedFn().ClearPopup();
@@ -688,52 +828,35 @@ $("#btn-submit_popup").click(function (e) {
                     else if (popupname == "EvalSubFormItem") {
                         var parentId = response.formItemId;
                         var parentRow = $("#formitemTable tbody").find(`tr.parent-row[data-id='${parentId}']`);
-
                         var formitemrow = GetSubformItemrow(response);
-
                         parentRow.after(formitemrow);
                         sharedFn().ClearPopup();
-
                     }
                     else if (popupname == "FormScope") {
                         table.addData([response], true);
                         table.deselectRow();
                         table.getRows()[0].select();
-                       
                         sharedFn().ResetVisibleControls('PopupForm');
                     }
                     if (response) {
                         notificationUtil.success(sharedFn().GetUiControlText('WEB_MSG_SAVE'));
-
                     }
                 }
                 else if (response.responseStatus == '2') {
                     if (popupname == "EvalFormItem") {
-
                         var formitemrow = GetformItemrow(response);
-
-                        // Check if the row already exists
                         var existingRow = $("#formitemTable tbody").find(`tr[data-id='${response.id}']`);
-
                         if (existingRow.length) {
-                            // Update row by replacing HTML
                             existingRow.replaceWith(formitemrow);
                         }
-
                         sharedFn().ClearPopup();
                     }
                     else if (popupname == "EvalSubFormItem") {
-
                         var formitemrow = GetSubformItemrow(response);
-
-                        // Check if the row already exists
                         var existingRow = $("#formitemTable tbody").find(`tr[data-id='${response.id}']`);
-
                         if (existingRow.length) {
-                            // Update row by replacing HTML
                             existingRow.replaceWith(formitemrow);
                         }
-
                         sharedFn().ClearPopup();
                     }
                     else if (popupname == "FormScope") {
@@ -742,15 +865,11 @@ $("#btn-submit_popup").click(function (e) {
                     }
                     if (response) {
                         notificationUtil.success(sharedFn().GetUiControlText('WEB_MSG_UPDATE'));
-
                     }
-
                 }
                 else {
                     notificationUtil.error(response.message);
-
                 }
-               
             }
         };
 
@@ -758,37 +877,40 @@ $("#btn-submit_popup").click(function (e) {
         let id = $('#PopupId').val();
 
         if (id) {
-            url = popupname == "EvalFormItem" ? `/EvaluationForm/${deprouting}/UpdateEvaluationFormItem` : popupname == "EvalSubFormItem" ? `/EvaluationForm/${deprouting}/UpdateEvaluationSubFormItem` : popupname == "FormScope" ? `/EvaluationForm/${deprouting}/UpdateFormScope` : null;
+            url = popupname == "EvalFormItem" ? `/TemplateForm/${deprouting}/UpdateTemplateFormItem`
+                : popupname == "EvalSubFormItem" ? `/TemplateForm/${deprouting}/UpdateEvaluationSubFormItem`
+                    : popupname == "FormScope" ? `/TemplateForm/${deprouting}/UpdateFormScope`
+                        : null;
         } else {
-            url = popupname == "EvalFormItem" ? `/EvaluationForm/${deprouting}/SaveEvaluationFormItem` : popupname == "EvalSubFormItem" ? `/EvaluationForm/${deprouting}/SaveEvaluationSubFormItem` : popupname == "FormScope" ? `/EvaluationForm/${deprouting}/SaveFormScope` : null;
-
+            url = popupname == "EvalFormItem" ? `/TemplateForm/${deprouting}/SaveTemplateFormItem`
+                : popupname == "EvalSubFormItem" ? `/TemplateForm/${deprouting}/SaveEvaluationSubFormItem`
+                    : popupname == "FormScope" ? `/TemplateForm/${deprouting}/SaveFormScope`
+                        : null;
         }
+
         jqClient(options).PostFormData(url, requestdata);
-
-
-
     }
 });
 $(document).ready(function () {
     $formSection.hide();
 });
 initTables = () => {
-    
+
     sharedFn().PopulateUiControl(controlsList);
     var viewItem = IsViewFormScope == true ?
         `<span class="Attr pointer" title="` + sharedFn().GetUiControlText('WEB_TOOLTIP_VIEW_FORMSCOPE') + `"><i class="Attr las la-bell" onclick="FormScopeClick(this)">
 </i></span>`
         : '';
     var TableColumns = sharedFn().PopulateColumn(columnList, viewItem);
-    
-   
+
+
     if (IsAdd) {
         $btnAddbutton.show();
     }
     else {
         $btnAddbutton.hide();
     }
-   
+
     table = tableUtil.createTabulator({
         id: gridContainerId,
         config: {
@@ -805,6 +927,7 @@ initTables = () => {
 
     });
     loadData();
+    getlookup();
 };
 function toggleNoteRequired() {
     if ($("#EvalFormItemHasNote").prop("checked")) {
@@ -822,4 +945,276 @@ function toggleNoteRequired() {
 
         $("#EvalFormItemNoteRequired").parent().hide();
     }
+}
+
+//function ClearControlByPage() {
+
+//    if (IsAdd_FormItemConfig) {
+//        $("#FormItemConfigRelationbutton").show();
+//        $("#FormItemConfigRelationbutton").html(
+//            sharedFn().GetUiControlText('FormItemConfigAddButton')
+//        );
+//    } else {
+//        $("#FormItemConfigRelationbutton").hide();
+//    }
+
+//    if (IsView_FormItemConfig == "True") {
+
+//        $("#FormItemConfigRelationdiv").show();
+//        $("#FormItemConfigRelationtabulator").css("pointer-events", "");
+
+//        var viewItem = IsAdd_FormItemConfig == "True"
+//            ? `<span class="Attr pointer" title="Save">
+//                <i class="Attr fa fa-save" onclick="SaveFormItemConfig(this)"></i>
+//               </span>`
+//            : '';
+
+//        IsEdit = '';
+//        IsDelete = IsDelete_FormItemConfig;
+//        IsView = '';
+
+//        let columns = sharedFn().PopulateColumn(FormItemConfigcolumnList, viewItem, true);
+
+//        tableFormItemConfig = tableUtil.createTabulator({
+//            id: "FormItemConfigRelationtabulator",
+//            config: {
+//                textDirection: txtDir,
+//                pagination: "local",
+//                paginationSize: 10,
+//                placeholder: sharedFn().GetUiControlText('NO_DATA_FOUND'),
+//                headerFilterPlaceholder: sharedFn().GetUiControlText('FILTER_COLUMN'),
+//                movableRows: true,
+//                selectable: true,
+//                editable: true
+//            },
+//            uniqueRowId: 'id',
+//            columns: columns
+//        });
+
+//        tableFormItemConfig.setData([]);
+
+//        const options = {
+//            success: function (data) {
+//                if (data && data.length > 0) {
+//                    tableFormItemConfig.setData(data);
+//                }
+//            }
+//        };
+
+//        jqClientAdvanced(options).Get(
+//            "FormItemConfig/GetAll?ParentId=" + $("#Id").val()
+//        );
+
+//    } else {
+//        $("#FormItemConfigRelationdiv").hide();
+//    }
+
+//    $("#FormItemConfigRelationdiv").parent().show();
+//}
+$("#FormItemConfigRelationbutton").click(function () {
+    tableFormItemConfig.addRow({
+        id: "00000000-0000-0000-0000-000000000000",
+        evalFormId: null,
+        formItemId: null,
+        partyTypeId: null,
+        nameAr: "",
+        nameEn: "",
+        calcMethodId: null,
+        percentage: 0,
+        isActive: true
+    });
+});
+function ClearForViewMode() {
+    $("#FormItemConfigRelationbutton").hide();
+    $("#FormItemConfigRelationtabulator").css("pointer-events", "none");
+}
+function OpenFormItemConfigPopup(
+    modaltitle,
+    ControlItems,
+    tablecolumnlist,
+    settingList
+) {
+
+    InitFormItemConfigPopup(
+        modaltitle,
+        ControlItems,
+        tablecolumnlist,
+        settingList
+    );
+
+    $("#ModalPopup").modal("show");
+
+    $("#PopupForm").trigger("reset");
+}
+async function InitFormItemConfigPopup(
+    modaltitle,
+    ControlItems,
+    tablecolumnlist,
+    settingList
+) {
+    $("#PopupId").val('');
+    $('#ModalPopup .modal-body #PopupForm').empty();
+    $('#ModalPopup .modal-title').html(modaltitle);
+    $("#btn-back_popup").html(sharedFn().GetUiControlText("BACK_BUTTON"));
+    $("#btn-submit_popup").html(sharedFn().GetUiControlText("SAVE_BUTTON"));
+    $("#btn-clear_popup").html(sharedFn().GetUiControlText("CLEAR_BUTTON"));
+
+    let popupdivcontent = `
+        <div class="row">
+            <div class="card-header justify-content-end d-flex align-items-center bg-light">
+                <button type="button" id="FormItemConfigRelationbutton" class="btn btn-primary">
+                    ${sharedFn().GetUiControlText('FormItemConfigAddButton')}
+                </button>
+            </div>
+            <div id="FormItemConfigRelationdiv">
+                <div id="FormItemConfigRelationtabulator"></div>
+            </div>
+        </div>
+    `;
+
+    $('#ModalPopup .modal-body #PopupForm').html(popupdivcontent);
+
+    var viewItem = IsAdd_FormItemConfig
+        ? `<span class="Attr pointer" title="${sharedFn().GetUiControlText('ADMIN_TOOLTIP_SAVE_FORMITEMCONFIG')}">
+            <i class="Attr fa fa-save" onclick="SaveFormItemConfig(this)"></i>
+           </span>`
+        : '';
+
+    IsEdit = IsEditFormItemConfig ? true : "";
+    IsDelete = IsDeleteFormItemConfig ? true : "";
+    IsView = '';
+    tableFormItemConfig = tableUtil.createTabulator({
+        id: "FormItemConfigRelationtabulator",
+        config: {
+            textDirection: txtDir,
+            pagination: "local",
+            paginationSize: 10,
+            placeholder: sharedFn().GetUiControlText('NO_DATA_FOUND'),
+            headerFilterPlaceholder: sharedFn().GetUiControlText('FILTER_COLUMN'),
+            movableRows: true,
+            selectable: true,
+            editable: true,
+            lookupSources: lookupSources  
+        },
+        uniqueRowId: 'id',
+        sortColumn: "updateDate",
+        sortDir: "desc",
+        columns: tablecolumnlist,
+        rowClick: function (e, row) {
+            currentrowclicked = row.getPosition();
+        }
+    });
+
+    tableFormItemConfig.setData([]);
+
+ 
+    if (IsAdd_FormItemConfig) {
+        $("#FormItemConfigRelationbutton").show();
+    } else {
+        $("#FormItemConfigRelationbutton").hide();
+    }
+
+    $("#FormItemConfigRelationbutton").off("click").on("click", function () {
+        tableFormItemConfig.addRow({
+            id: "00000000-0000-0000-0000-000000000000",
+            evalFormId: null,
+            formItemId: null,
+            partyTypeId: null,
+            nameAr: "",
+            nameEn: "",
+            calcMethodId: null,
+            percentage: 0,
+            isActive: true
+        });
+    });
+
+    LoadFormItemConfigData();
+}
+function LoadFormItemConfigData() {
+
+    const evalformId = $("#evalformidvalue").val();
+
+    const options = {
+
+        success: function (data) {
+
+            if (data && data.length > 0) {
+                tableFormItemConfig.setData(data); 
+            } else {
+                tableFormItemConfig.setData([]); 
+            }
+
+        }
+
+    };
+
+    jqClient(options).Get(
+        `/TemplateForm/${deprouting}/GetAllFormItemConfig?evalFormId=` + evalformId
+    );
+
+}
+function SaveFormItemConfig(event) {
+    const cellElem = event.closest('section');
+    const id = cellElem.getAttribute('data-key');
+    const obj = tableFormItemConfig.getData().find(f => f.id == id);
+
+    if (!obj) {
+        notificationUtil.error('Row data not found');
+        return;
+    }
+
+    var data = {
+        Id: id === "00000000-0000-0000-0000-000000000000" ? null : id,
+        EvalFormId: $("#evalformidvalue").val(),
+        NameAr: obj.nameAr || null,
+        NameEn: obj.nameEn || null,
+        PartyTypeId: obj.partyTypeId || null,
+        FormItemIds: obj.formItemId
+            ? (Array.isArray(obj.formItemId) ? obj.formItemId : [obj.formItemId])
+            : null,
+        CalcMethodId: obj.calcMethodId || null,
+        Percentage: obj.percentage || 0
+    };
+
+    var formData = new FormData();
+    formData.append('request', JSON.stringify(data));
+
+    const options = {
+        success: function (response) {
+            if (response) {
+                switch (response.responseStatus) {
+                    case 1: 
+                        const rows = tableFormItemConfig.getRows();
+                        const row = rows[currentrowclicked];
+                        if (row) {
+                            const rowData = row.getData();
+                            const rowElement = row.getElement();
+                            const section = rowElement.querySelector('.sec-center');
+                            if (section) {
+                                section.setAttribute('data-key', response.id);
+                                section.id = `action__section__${response.id}`;
+                            }
+                            rowData.id = response.id;
+                            row.update(rowData);
+                        }
+                        notificationUtil.success(sharedFn().GetUiControlText('WEB_MSG_SAVE'));
+                        break;
+                    case 2: // Update
+                        notificationUtil.success(sharedFn().GetUiControlText('WEB_MSG_UPDATE'));
+                        break;
+                    default:
+                        notificationUtil.error(response.message);
+                        break;
+                }
+            }
+        },
+        error: function () {
+            notificationUtil.error('Request failed');
+        }
+    };
+
+    jqClient(options).PostFormData(
+        `/TemplateForm/${deprouting}/SaveFormItemConfig`,
+        formData
+    );
 }

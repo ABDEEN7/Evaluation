@@ -1,4 +1,18 @@
 ﻿@using Evaluation.SharedHelper.Enums
+<style>
+    #FormItemConfigRelationtabulator .tabulator-cell {
+        border-right: 1px solid #dee2e6 !important;
+        border-bottom: 1px solid #dee2e6 !important;
+    }
+
+    #FormItemConfigRelationtabulator .tabulator-col {
+        border-right: 1px solid #dee2e6 !important;
+    }
+
+    #FormItemConfigRelationtabulator .tabulator-table {
+        border: 1px solid #dee2e6 !important;
+    }
+</style>
 @{
     ViewData["Title"] = "Evaluation Form";
 }
@@ -48,6 +62,7 @@
                     <div class="card-body">
                         <div id="formcontent"></div>
                         <div id="itemcontent">
+                        <button type="button" id="formItemConfig" class="btn btn-primary mb-2 AddConfig">Add Form Item Config</button>
                             <button type="button" id="btnAddParent" class="btn btn-danger mb-2 ADDPARENT"></button>
 
                             <table id="formitemTable" class="table table-bordered">
@@ -72,7 +87,7 @@
                 </form>
             </div>
         </section>
-
+    
     </div>
     <div>
         <input id="formIdValue" hidden />
@@ -82,6 +97,7 @@
 
     <script src="~/js/TemplateForm/template-form.js" asp-append-version="true"></script>
     <script src="~/lib/tabulator/js/tabulator.js" asp-append-version="true"></script>
+
     <script>
         $(document).ready(async function () {
 
@@ -110,14 +126,19 @@
                     '@nameof(ConstantKeys.WebPermissions.ADD_WEB_EVALFORMS)',
                     '@nameof(ConstantKeys.WebPermissions.ADD_WEB_FORMITEMS)', ,
                     '@nameof(ConstantKeys.WebPermissions.ADD_WEB_SUBFORMITEMS)',
+                    '@nameof(ConstantKeys.WebPermissions.ADD_WEB_FORMITEMCONFIG)',
                     '@nameof(ConstantKeys.WebPermissions.ADD_WEB_FORMSCOPES)',
                 ],
             }).then((result) => {
-
+                var data = result;
+                console.log(data);
                 uiControlItems = result.uiControlItems.filter(x => x.rowOrder > 0 && x.permissionBackendName == '@ConstantKeys.WebPermissions.ADD_WEB_EVALFORMS');
                 FormItemuiControlItems = result.uiControlItems.filter(x => x.rowOrder > 0 && x.permissionBackendName == '@ConstantKeys.WebPermissions.ADD_WEB_FORMITEMS');
                 SubFormItemuiControlItems = result.uiControlItems.filter(x => x.rowOrder > 0 && x.permissionBackendName == '@ConstantKeys.WebPermissions.ADD_WEB_SUBFORMITEMS');
                 FormScopeuiControlItems = result.uiControlItems.filter(x => x.rowOrder > 0 && x.permissionBackendName == '@ConstantKeys.WebPermissions.ADD_WEB_FORMSCOPES');
+                FormItemConfig = result.uiControlItems.filter(x => x.rowOrder > 0 && x.permissionBackendName == '@ConstantKeys.WebPermissions.ADD_WEB_FORMITEMCONFIG');
+                FormItemColConfig = result.uiControlItems.filter(x=> x.constraint.showInGrid == true && x.permissionBackendName == '@ConstantKeys.WebPermissions.ADD_WEB_FORMITEMCONFIG');
+                console.log(FormItemColConfig);
                 textDir = result.currentlanguage === "ar" ? "RTL" : "LTR";
                 permissionsList = result.permissionsList;
                 controlsList = result.controlsList;
@@ -125,12 +146,13 @@
                     ...c.constraint,
                     pageName: c.control.pageName
                 }));
-
                 settingList = result.settingList;
                 targetSetting = result.targetSetting;
                 containsOrderNo = result.containsOrderNo;
                 controlvalidationlist = uiControlItems;
                 FormItemcontrolvalidationlist = FormItemuiControlItems;
+                FormItemConfiglist = FormItemConfig;
+                FormItemConfigCollist = FormItemColConfig;
                 SubFormItemcontrolvalidationlist = SubFormItemuiControlItems;
                 FormScopecontrolvalidationlist = FormScopeuiControlItems;
                 FormScopecolumnList = FormScopeuiControlItems.filter(x => x.constraint.showInGrid === true && x.control).map(c => ({
@@ -157,6 +179,10 @@
                 IsEditFormScope = permissionsList?.some(p => p === '@ConstantKeys.WebPermissions.EDIT_WEB_FORMSCOPES') ?? false;
                 IsDeleteFormScope = permissionsList?.some(p => p === '@ConstantKeys.WebPermissions.DELETE_WEB_FORMSCOPES') ?? false;
                 initTables();
+                //EvaluationFormItemConfig
+                IsAdd_FormItemConfig = true;
+                IsEditFormItemConfig = true;
+                IsDeleteFormItemConfig = true;
             });
 
 

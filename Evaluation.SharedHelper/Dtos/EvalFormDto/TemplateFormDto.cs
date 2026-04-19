@@ -4,7 +4,7 @@ using Evaluation.SharedHelper.Models;
 
 namespace Evaluation.SharedHelper.Dtos.EvalFormDto;
 
-public class EvaluationFormDto : EntityBaseDTO
+public class TemplateFormDto : EntityBaseDTO
 {
     public Guid EvalFormTypeId { get; set; }
     public string? EvalFormType { get; set; }
@@ -21,4 +21,5 @@ public class EvaluationFormDto : EntityBaseDTO
     public string? CalcMethod { get; set; }
     public string? FormStatus { get; set; }
     public Guid FormStatusId { get; set; }
+    public bool AllowRename { get; set; }
 }
