@@ -2,18 +2,17 @@
 <link href="~/assets/css/application-requests.css" rel="stylesheet" asp-append-version="true" />
 
 <div class="filter-section g-3 align-item-end">
-	<div class="row">
-        <div class="col-md-4">
+	<div class="row p-2 mb-5">
+        <div class="col-md-5">
             <label class="form-label">رقم الطلب</label>
             <input id="planRequestNoFilter" style="height: 45px;" class="form-control filter-enter" />
         </div>
-        <div class="col-md-4">
+        <div class="col-md-5">
             <label class="form-label">الحالة</label>
-            <select id="planRequestStatusFilter" style="height: 45px;" class="form-select w-100">
+            <select id="planRequestStatusFilter" class="form-select w-100">
             </select>
         </div>
-        <div class="col-md-4 d-flex gap-2"></div>
-        <div class="col-md-4 d-flex align-items-end justify-content-end ms-auto">
+        <div class="col-md-2 d-flex align-items-end justify-content-end ms-auto gap-2">
 			<button id="filterPlanBtnsId" class="btn btn-primary">بحث</button>
 			<button id="clearFilterPlanBtnId" class="btn btn-outline-secondary">
                 @ConstantKeys.EvaluationPlanRequests.lblClear
@@ -23,7 +22,6 @@
 	</div>
 </div>
 <div class="card mb-4">
-
     <div class="card-header">
         <div class="row align-items-center">
               <div class="col-md-6">
