@@ -50,15 +50,15 @@
         }
     }
     async function InitializeCreateEvaluationPartRequest(serviceId) {
+        const Evlid = GetUrlParam("Evlid");
         if (!serviceId) {
             console.error("ServiceId is required");
             redirectToDefault();
             return;
         }
         const CreateEvaluationPartyService = await fapi.fetchJSON(
-            `/FormRender/${departmentRoutePath}/GetCreateEvaluationPartyService?serviceId=${encodeURIComponent(serviceId)}`
+            `/FormRender/${departmentRoutePath}/GetCreateEvaluationPartyService?serviceId=${encodeURIComponent(serviceId)}&EvlReqId=${encodeURIComponent(Evlid || "")}`
         );
-
         if (!CreateEvaluationPartyService) {
             redirectToDefault();
             return;

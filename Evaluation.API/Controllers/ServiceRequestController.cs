@@ -115,7 +115,7 @@ namespace Evaluation.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> ApproveNda([FromBody] NdaApproveRequest dto)
+        public async Task<IActionResult> ApproveNda( NdaApproveRequest dto)
         {
             var result = await _serviceRequestBL.ApproveNda(dto);
             return Ok(result);

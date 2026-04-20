@@ -2,7 +2,9 @@
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.Calendars;
 using Evaluation.DAL.Models.FormBuilder;
+using Evaluation.DAL.Models.FormsModules;
 using Evaluation.DAL.Models.Org;
+using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
 using Evaluation.DAL.Models.ServiceRequestEntities;
 using Evaluation.DAL.Repositories;
 using Evaluation.Services.Extensions;
@@ -540,8 +542,16 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
 						break;
 					}
-
-
+				case "scops":
+					{
+						result = await GetScopesData(requestInfo.DepId!.Value,fieldValueId);
+						break;
+					}
+				case "teamMember":
+					{
+						result = await GetTeamMembersData(requestInfo.DepId!.Value, fieldValueId);
+						break;
+					}
 				default:
                     if (!allowedTables.Any(t => t.Equals(tableName, StringComparison.OrdinalIgnoreCase)))
                         return new List<Dictionary<string, object>>();
@@ -594,14 +604,98 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                 { "EndDate", item.EndDate.ToString("yyyy") }
             }).ToList();
         }
-  
-        private int CalculateAge(DateTime birthDate)
-        {
-            var today = DateTime.Today;
-            var age = today.Year - birthDate.Year;
-            if (birthDate.Date > today.AddYears(-age)) age--;
-            return age;
-        }
+		private async Task<List<Dictionary<string, object>>> GetScopesData(Guid DepId,Guid? fieldValueId = null)
+		{
+			using var scopedUow = serviceScopeFactory.CreateScopedUow();
+
+			var repository = scopedUow.GetRepository<AcademicYearScope>();
+
+		
+			var currentAcademicYear = await scopedUow.GetRepository<AcademicYear>()
+				.GetAllQueryFiltered()
+				.Where(x => x.IsCurrent && x.DepartmentId== DepId)
+				.Select(x => x.Id)
+				.FirstOrDefaultAsync();
+
+			if (currentAcademicYear == Guid.Empty)
+				return new List<Dictionary<string, object>>();
+
+			IQueryable<AcademicYearScope> query = repository.GetAllQueryFiltered()
+				.Include(x => x.Scope);
+
+
+			if (fieldValueId.HasValue && fieldValueId != Guid.Empty)
+			{
+				query = query.Where(x => x.ScopeId == fieldValueId);
+			}
+			else
+			{
+				query = query.Where(x => x.AcademicYearId == currentAcademicYear);
+			}
+
+			var data = await query.ToListAsync();
+
+			if (data == null || !data.Any())
+				return new List<Dictionary<string, object>>();
+
+			return data
+				.Where(x => x.Scope != null)
+				.OrderBy(x => x.Scope.OrderNo)
+				.Select(x => new Dictionary<string, object>
+				{
+					["Id"] = x.Scope!.Id,
+					["NameAr"] = x.Scope.NameAr ?? string.Empty,
+					["NameEn"] = x.Scope.NameEn ?? string.Empty,
+					["OrderNo"] = x.Scope.OrderNo,
+					["ColorCode"] = x.Scope.ColorCode ?? ""
+				})
+				.ToList();
+		}
+		private async Task<List<Dictionary<string, object>>> GetTeamMembersData(Guid evaluationRequestId,Guid? fieldValueId = null)
+		{
+			if (evaluationRequestId == Guid.Empty)
+				return new List<Dictionary<string, object>>();
+
+			using var scopedUow = serviceScopeFactory.CreateScopedUow();
+
+			var repository = scopedUow.GetRepository<EvaluationRequestAssignment>();
+
+			IQueryable<EvaluationRequestAssignment> query = repository
+				.GetAllQueryFiltered()
+				.Include(x => x.MinistryUser)
+				.Where(x => x.EvaluationRequestId == evaluationRequestId && x.MinistryUser != null);
+
+			if (fieldValueId.HasValue && fieldValueId != Guid.Empty)
+			{
+				query = query.Where(x => x.MinistryUserId == fieldValueId.Value);
+			}
+
+			var data = await query
+				.OrderByDescending(x => x.IsLeader)
+				.ThenBy(x => x.MinistryUser!.NameAr)
+				.Select(x => new
+				{
+					Id = x.MinistryUser!.Id,
+					NameAr = x.MinistryUser.NameAr ?? string.Empty,
+					NameEn = x.MinistryUser.NameEn ?? string.Empty,
+					IsLeader = x.IsLeader,
+					IsNDA = x.IsNDA,
+					PartyTypeId = x.PartyTypeId,
+					OrderNo = x.IsLeader ? 0 : 1
+				})
+				.ToListAsync();
+
+			return data.Select(x => new Dictionary<string, object>
+			{
+				["Id"] = x.Id,
+				["NameAr"] = x.NameAr,
+				["NameEn"] = x.NameEn,
+				["IsLeader"] = x.IsLeader,
+				["IsNDA"] = x.IsNDA,
+				["PartyTypeId"] = x.PartyTypeId,
+				["OrderNo"] = x.OrderNo
+			}).ToList();
+		}
 		public async Task<string> ResolveDropDownTextAsync(string lang, string rawValue, Guid dropDownTypeId, Guid? PlanId)
 		{
 			if (Guid.TryParse(rawValue, out var singleId) && singleId != Guid.Empty)

@@ -159,18 +159,30 @@ var formGenerateFieldUtility = window.formUtility;
                 //    container.html(`<div class="text-danger">Missing formId for evl_Form.</div>`);
                 //    return;
                 //}
-
+                const allowAddFormItem = field.attributes?.find(c => c.name === 'allowAddFormItem');
+                const allowDeleteFormItem = field.attributes?.find(c => c.name === 'allowDeleteFormItem');
+                const allowRenameFormItem = field.attributes?.find(c => c.name === 'allowRenameFormItem');
+                const allowRename = field.attributes?.find(c => c.name === 'allowRename');
                 const html = await generateFullFormPageHtml({
                     formId,
                     fieldId: fieldId,
-                    readOnly: readonly
+                    readOnly: readonly,
+                    allowRename: allowRenameFormItem && (!allowRenameFormItem || allowRenameFormItem.value == true || allowRenameFormItem.value == "true"),
+                    allowDelete: allowDeleteFormItem && (!allowDeleteFormItem || allowDeleteFormItem.value == true || allowDeleteFormItem.value == "true"),
+                    allowAdd: allowAddFormItem &&(!allowAddFormItem || allowAddFormItem.value == true || allowAddFormItem.value == "true")
                 });
 
                 container.html(html);
 
                 const controlValues = JSON.parse(field.value);
+                if (allowRenameFormItem) {
+                   await fillRenameControls(fieldId, controlValues)
+                }
+                else {
+                    await initializeControls(formId, fieldId, controlValues);
 
-                await initializeControls(formId, fieldId, controlValues);
+                }
+                    
 
             } catch (err) {
                 console.error('evl_Form render failed:', err);

@@ -11,7 +11,7 @@ public class FormProfile : Profile
     {
         CreateMap<FormItem, FormItemDto>()
             .ForMember(d => d.Id, opt => opt.MapFrom(src => src.Id))
-            .ForMember(d => d.Name, opt => opt.MapFrom(src => src.NameEn))
+            .ForMember(d => d.Name, opt => opt.MapFrom(src => src.NameAr))
             //.ForMember(d => d.OrderNo, opt => opt.MapFrom(src => src.OrderNo))
             .ForMember(d => d.HasNote, opt => opt.MapFrom(src => src.HasNote))
             .ForMember(d => d.SubFormItems, opt => opt.MapFrom(src => src.SubFormItems))
@@ -21,7 +21,7 @@ public class FormProfile : Profile
 
         CreateMap<SubFormItem, SubFormItemDto>()
             .ForMember(d => d.Id, opt => opt.MapFrom(src => src.Id))
-            .ForMember(d => d.Name, opt => opt.MapFrom(src => src.NameEn))
+            .ForMember(d => d.Name, opt => opt.MapFrom(src => src.NameAr))
             .ReverseMap();
 
         CreateMap<FormItemValue, FormItemEvaluationDto>()
