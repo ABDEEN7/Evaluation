@@ -92,7 +92,7 @@ const generateFormAccordionItem = (rowsHtml, hasAnyNote, hasAnyChildren, isRenam
                     ${rowsHtml}
                 </tbody>
             </table>
-            ${allowAdd ?`<div><button type="button" onclick="addNewRow()" class="btn btn-sm"><i class="la la-plus"></i> Add New</button></div>`:''}
+            ${allowAdd ?`<div><button type="button" onclick="addNewRow(this)" class="btn btn-sm add-btn"><i class="la la-plus"></i> Add New</button></div>`:''}
         </div>
     </div>
 </div>
@@ -261,7 +261,7 @@ const generateTableBodyHtml = async (
 
 };
 
-function addNewRow()
+function addNewRow(button)
 {
     if (renameItems.length > 0) {
 
@@ -289,9 +289,8 @@ function addNewRow()
         );
 
         renameItems.shift()
-        if (renameItems.length > 0)
-        {
-            //hide add button
+        if (renameItems.length == 0) {
+            button.style.display = "none";
         }
     }
     else
@@ -312,6 +311,26 @@ const generateTableBodyHtmlForRelatedItems = async (items, hasAnyNote) => {
         return mainRow;
     }).join('');
 };
+
+async function fillRenameControls(fieldId, controlValues) {
+    if (!controlValues || !controlValues.items) return;
+
+    P_fieldId = fieldId;
+
+    const tbody = $("#tbodyRows");
+
+    controlValues.items.forEach((item, index) => {
+        let row = tbody.find("tr.main-row").filter(function () {
+            return $(this).find("input.item-name").data("id") === item.id;
+        });
+
+        row.find("input.item-name").val(item.name || "");
+
+        if (index < controlValues.items.length - 1) {
+            addNewRow();
+        }
+    });
+}
 
 
 function buildHorizontalTable(data) {
@@ -536,5 +555,16 @@ function deleteRow(button)
 
     if (row) {
         row.remove();
+        const rows = document.querySelectorAll("#tbodyRows tr");
+        var lastIndex = 0;
+        rows.forEach((tr, index) => {
+            tr.children[0].textContent = index + 1;
+            lastIndex = index + 1;
+        });
+        lastOrder = lastIndex;
+    }
+
+    if (renameItems.length > 0) {
+        $(".add-btn").show();
     }
 }
