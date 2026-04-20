@@ -39,6 +39,9 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 				.Include(x => x.FormGroup)
 				.Include(x => x.FieldViewConditions)
 				.Include(x => x.FieldAttributeValues)
+				.Include(x => x.Service)
+				.ThenInclude(x => x.SystemModule)
+				.ThenInclude(x => x.SystemModuleType)
 				.AsSplitQuery()
 				.AsNoTracking()
 				.FirstOrDefaultAsync();

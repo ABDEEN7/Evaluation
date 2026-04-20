@@ -50,10 +50,9 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                                         .Include(c => c.ActionType!)
                                         .Include(c => c.ActionTemplateDocs!)
                                         .ThenInclude(c => c.TemplateDoc)
-                                        .Where(c => actionsId.Contains(c.Id));
-            //&&
-                                               //     ((requestId == null && c.IsInitialAction == true) ||
-                                                  //   (requestId != null && c.IsInitialAction == false)));
+                                        .Where(c => actionsId.Contains(c.Id)&&
+                                          ((requestId == null && c.IsInitialAction == true) ||
+                                       (requestId != null && c.IsInitialAction == false)));
 
             var actions = await actionsquery.Select(c => new ActionDTO
             {

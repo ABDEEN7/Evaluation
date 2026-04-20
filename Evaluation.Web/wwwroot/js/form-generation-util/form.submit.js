@@ -134,10 +134,18 @@ window.serviceRequestForm = window.serviceRequestForm || {};
                 }
 
                 case "evl_form": {
-
-                    const formObj = saveForm(field.formId);
-                    value = formObj ? JSON.stringify(formObj) : null;
-                    break;
+                    const allowRenameFormItem = field.attributes?.find(c => c.name === 'allowRenameFormItem');
+                    if (allowRenameFormItem) {
+                        const formObj = renameFormItems(field.formId);
+                        value = formObj ? JSON.stringify(formObj) : null;
+                        break;
+                    }
+                    else {
+                        const formObj = saveForm(field.formId);
+                        value = formObj ? JSON.stringify(formObj) : null;
+                        break;
+                    }
+                   
                 }
                 case "datetime":
                 case "date":
