@@ -1002,3 +1002,7 @@ table#requesttable.dataTable thead th.card-img {
 #planRequestStatusFilter + .select2 .select2-selection__arrow {
     height: 45px !important;
 }
+
+.text-align-end {
+    text-align: end;
+}
