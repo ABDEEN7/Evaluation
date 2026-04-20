@@ -2,9 +2,11 @@
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.Calendars;
 using Evaluation.DAL.Models.FormBuilder;
+using Evaluation.DAL.Models.Org;
 using Evaluation.DAL.Models.ServiceRequestEntities;
 using Evaluation.DAL.Repositories;
 using Evaluation.Services.Extensions;
+using Evaluation.Services.Integration;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Models;
@@ -17,7 +19,7 @@ using static Evaluation.SharedHelper.Enums.ConstantKeys;
 
 namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 {
-    public class SrvDropdown(IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow,SrvPartyType SrvPartyType,  LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, IServiceProvider serviceProvider, RequestInfo _requestInfo)
+    public class SrvDropdown(IServiceScopeFactory serviceScopeFactory, OrgBL OrgBL,NSISService NSISService, CacheDataProvider cacheDataProvider, UnitOfWork uow,SrvPartyType SrvPartyType,  LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, IServiceProvider serviceProvider, RequestInfo _requestInfo)
             : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, _requestInfo)
     {
 
@@ -496,7 +498,51 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                     result = await GetCurrentAcademicYearData(fieldValueId);
                     break;
 
-                default:
+				case "SchoolClasses":
+					{
+						//if (SchId == null || SchId == Guid.Empty)
+						//	return new List<Dictionary<string, object>>();
+						SchId =Guid.Parse("aface110-2a67-e311-93f9-00155d283a04");
+						var school = await NSISService.GetSchoolbyIdAsync(SchId.Value);
+
+						result = school.Classes
+	                       .Where(x => fieldValueId == null || x.Id == fieldValueId)
+	                       .Select((x, index) => new Dictionary<string, object>
+	                       {
+		                       ["Id"] = x.Id ,
+		                       ["NameEn"] = x.NameEn ?? string.Empty,
+		                       ["NameAr"] = x.NameAr ?? string.Empty,
+		                       ["OrderNo"] = index + 1,
+		                      
+	                       })
+	                       .ToList();
+
+						break;
+					}
+
+				case "schoolEmployee":
+					{
+						SchId = Guid.Parse("a297a912-2e70-453c-befc-5dd502cd4894");
+
+						var schoolEmployee = await OrgBL.GetEmployeesBySchoolId(SchId.Value);
+
+						result = schoolEmployee?
+							.Where(x => fieldValueId == null || x.Id== fieldValueId)
+							.Select(x => new Dictionary<string, object>
+							{
+								["Id"] = x.Id ,
+								["NameEn"] = x.Name ?? string.Empty,
+								["NameAr"] = x.Name ?? string.Empty,
+								["OrderNo"] = 0
+							})
+							.ToList()
+							?? new List<Dictionary<string, object>>();
+
+						break;
+					}
+
+
+				default:
                     if (!allowedTables.Any(t => t.Equals(tableName, StringComparison.OrdinalIgnoreCase)))
                         return new List<Dictionary<string, object>>();
                     var query = fieldValueId == null

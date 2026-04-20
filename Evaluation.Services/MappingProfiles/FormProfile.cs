@@ -30,6 +30,7 @@ public class FormProfile : Profile
           .ForMember(d => d.Note, opt => opt.MapFrom(src => src.Note))
           .ForMember(d => d.Id, opt => opt.MapFrom(src => src.FormItemId))
           .ForMember(d => d.ValueId, opt => opt.MapFrom(src => src.Id))
+          .ForMember(d => d.Name, opt => opt.MapFrom(src => src.RenameItem))
           .ReverseMap();
 
 

@@ -72,7 +72,25 @@ namespace Evaluation.Services.Models.Admin
                         attachment.FileSize = item.FileSize;
                         attachment.IsActive = true;
                         await uow.GetRepository<WebsiteAttachment>().InsertAsync(attachment);
-                        message.WebsiteAttachmentId = attachment.Id;
+
+                        switch (item.ControlFileName)
+                        {
+                            case "DepartmentDepImageFileNameAr":
+                                message.DepImageFileNameAr_BlobURL = item.BlobUrl;
+                                message.DepImageFileNameAr = item.FileName;
+                                message.DepImageFileNameAr_UiFileName = item.UiFileName;
+
+                                break;
+                            case "DepartmentDepImageFileNameEn":
+                                message.DepImageFileNameEn_BlobURL = item.BlobUrl;
+                                message.DepImageFileNameEn = item.FileName;
+                                message.DepImageFileNameEn_UiFileName = item.UiFileName;
+
+                                break;
+                            case "WebsiteAttachmentId":
+                                message.WebsiteAttachmentId = attachment.Id;
+                                break;
+                        }
                     }
 
 
@@ -94,6 +112,40 @@ namespace Evaluation.Services.Models.Admin
             obj.DescEn = message.DescEn;
             obj.WebsiteAttachmentId = message.WebsiteAttachmentId;
             obj.IsActive = message.IsActive;
+
+
+            obj.DepImageFileNameAr = message.DepImageFileNameAr;
+            if (message.DepImageFileNameAr_UiFileName != null && message.DepImageFileNameAr_UiFileName.Length > 45)
+            {
+                obj.DepImageUiFileNameAr = message.DepImageFileNameAr_UiFileName != null
+                    ? message.DepImageFileNameAr_UiFileName.Substring(0, 40) +
+                      message.DepImageFileNameAr_UiFileName.Substring(message.DepImageFileNameAr_UiFileName.Length - 5)
+                    : null;
+                ;
+            }
+            else
+            {
+                obj.DepImageUiFileNameAr = message.DepImageFileNameAr_UiFileName;
+
+            }
+            obj.DepImageBlobUrlAr = message.DepImageFileNameAr_BlobURL;
+
+
+            obj.DepImageFileNameEn = message.DepImageFileNameEn;
+            if (message.DepImageFileNameEn != null && message.DepImageFileNameEn.Length > 45)
+            {
+                obj.DepImageFileNameEn = message.DepImageFileNameEn != null
+                    ? message.DepImageFileNameEn.Substring(0, 40) +
+                      message.DepImageFileNameEn.Substring(message.DepImageFileNameEn.Length - 5)
+                    : null;
+                ;
+            }
+            else
+            {
+                obj.DepImageFileNameEn = message.DepImageFileNameEn;
+
+            }
+            obj.DepImageBlobUrlEn = message.DepImageFileNameEn_BlobURL;
 
             uow.GetRepository<Department>().Insert(obj);
                 await uow.CommitAsync();
@@ -127,16 +179,33 @@ namespace Evaluation.Services.Models.Admin
 
                         foreach (var item in filemodel)
                         {
-                            WebsiteAttachment attachment = new WebsiteAttachment();
-                            attachment.FileName = item.FileName;
-                            attachment.UiFileName = item.UiFileName;
-                            attachment.BlobUrl = item.BlobUrl;
-                            attachment.FileExtension = item.FileExtension;
-                            attachment.FileSize = item.FileSize;
-                            attachment.IsActive = true;
-                            attachmentinserted = 1;
-                            uow.GetRepository<WebsiteAttachment>().Insert(attachment);
-                            message.WebsiteAttachmentId = attachment.Id;
+                            switch (item.ControlFileName)
+                            {
+                                case "DepartmentDepImageFileNameAr":
+                                    message.DepImageFileNameAr_BlobURL = item.BlobUrl;
+                                    message.DepImageFileNameAr = item.FileName;
+                                message.DepImageFileNameAr_UiFileName = item.UiFileName;
+
+                                    break;
+                                case "DepartmentDepImageFileNameEn":
+                                    message.DepImageFileNameEn_BlobURL = item.BlobUrl;
+                                    message.DepImageFileNameEn = item.FileName;
+                                    message.DepImageFileNameEn_UiFileName = item.UiFileName;
+
+                                    break;
+                                case "WebsiteAttachmentId":
+                                    WebsiteAttachment attachment = new WebsiteAttachment();
+                                    attachment.FileName = item.FileName;
+                                    attachment.UiFileName = item.UiFileName;
+                                    attachment.BlobUrl = item.BlobUrl;
+                                    attachment.FileExtension = item.FileExtension;
+                                    attachment.FileSize = item.FileSize;
+                                    attachment.IsActive = true;
+                                    attachmentinserted = 1;
+                                    uow.GetRepository<WebsiteAttachment>().Insert(attachment);
+                                    message.WebsiteAttachmentId = attachment.Id;
+                                    break;
+                            }
                         }
 
 
@@ -157,6 +226,48 @@ namespace Evaluation.Services.Models.Admin
                 obj.DescEn = message.DescEn;
                 obj.WebsiteAttachmentId = (attachmentinserted == 1 ? message.WebsiteAttachmentId : obj.WebsiteAttachmentId);
                 obj.IsActive = message.IsActive;
+
+
+                if (message.DepImageFileNameAr != null)
+                    obj.DepImageFileNameAr = message.DepImageFileNameAr;
+
+                if (message.DepImageFileNameAr_UiFileName != null && message.DepImageFileNameAr_UiFileName.Length > 45)
+                {
+                    obj.DepImageUiFileNameAr = message.DepImageFileNameAr_UiFileName != null
+                        ? message.DepImageFileNameAr_UiFileName.Substring(0, 40) +
+                          message.DepImageFileNameAr_UiFileName.Substring(message.DepImageFileNameAr_UiFileName.Length - 5)
+                        : null;
+                    ;
+                }
+                else if (message.DepImageFileNameAr_UiFileName != null && message.DepImageFileNameAr_UiFileName.Length < 45)
+                {
+                    obj.DepImageUiFileNameAr = message.DepImageFileNameAr_UiFileName;
+
+                }
+
+                if (message.DepImageFileNameAr_BlobURL != null)
+                    obj.DepImageBlobUrlAr = message.DepImageFileNameAr_BlobURL;
+
+                if (message.DepImageFileNameEn != null)
+                    obj.DepImageFileNameEn = message.DepImageFileNameEn;
+
+                if (message.DepImageFileNameEn_UiFileName != null && message.DepImageFileNameEn_UiFileName.Length > 45)
+                {
+                    obj.DepImageUiFileNameEn = message.DepImageFileNameEn_UiFileName != null
+                        ? message.DepImageFileNameEn_UiFileName.Substring(0, 40) +
+                          message.DepImageFileNameEn_UiFileName.Substring(message.DepImageFileNameEn_UiFileName.Length - 5)
+                        : null;
+                    ;
+                }
+                else if (message.DepImageFileNameEn_UiFileName != null && message.DepImageFileNameEn_UiFileName.Length < 45)
+                {
+                    obj.DepImageUiFileNameEn = message.DepImageFileNameEn_UiFileName;
+
+                }
+
+                if (message.DepImageFileNameEn_BlobURL != null)
+                    obj.DepImageBlobUrlEn = message.DepImageFileNameEn_BlobURL;
+
 
                 uow.GetRepository<Department>().Update(obj);
                     await uow.CommitAsync();

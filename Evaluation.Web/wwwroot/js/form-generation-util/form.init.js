@@ -167,7 +167,6 @@ window.formUtility = window.formUtility || {};
         const datetimePcikerElements = [];
         const jqteElements = [];
         const select2Fields = [];
-        const vacancySeatFields = [];
         const DualSelectFieldFields = [];
         const dropzoneElements = [];
         const checkboxElements = [];
@@ -714,9 +713,9 @@ window.formUtility = window.formUtility || {};
 
         $('#' + modalId).modal('show');
         initializeFields(json_schema_copy.fields, modalId, RENDER_TYPE.ACTION);
-        //InitializeCascadingDropdown(json_schema_copy);
-        //evaluateConditionsAfterLoadForList(json_schema_copy);
-        //handleListFieldConditionalFields(json_schema_copy);
+        InitializeCascadingDropdown(json_schema_copy);
+        evaluateConditionsAfterLoadForList(json_schema_copy);
+        handleListFieldConditionalFields(json_schema_copy);
 
         bindModalButtons(modalId, addObjectBtnId, 'cancelModalBtnId', modalBodyId, jsonSchema, table, maxCount, maxCountNew, minCountNew);
     };
@@ -1098,9 +1097,9 @@ window.formUtility = window.formUtility || {};
 
         $('#' + modalId).modal('show');
         initializeFields(json_schema_copy.fields, modalId, RENDER_TYPE.PREVIEW);
-        // InitializeCascadingDropdown(json_schema_copy);
-       // handleListFieldConditionalFields(json_schema_copy);
-        //evaluateConditionsAfterLoadForList(json_schema_copy);
+        InitializeCascadingDropdown(json_schema_copy);
+       handleListFieldConditionalFields(json_schema_copy);
+        evaluateConditionsAfterLoadForList(json_schema_copy);
         bindModalButtons(modalId, addObjectBtnId, 'cancelModalBtnId', modalBodyId, jsonSchema, table, maxCount, maxCountNew, minCountNew);
     };
     function ShowModalForAddModel  (modalId, modalTitleId, addObjectBtnId, jsonSchema, modalBodyId, modalTitleText, tableId, maxCount, maxCountNew, minCountNew)  {
@@ -1115,9 +1114,9 @@ window.formUtility = window.formUtility || {};
         $('#' + addObjectBtnId).removeClass('edit-object-btn');
 
         initializeFields(jsonSchema.fields, modalId, RENDER_TYPE.ACTION);
-        //InitializeCascadingDropdown(jsonSchema);
-        //evaluateConditionsAfterLoadForList(jsonSchema);
-        //handleListFieldConditionalFields(jsonSchema);
+        InitializeCascadingDropdown(jsonSchema);
+        evaluateConditionsAfterLoadForList(jsonSchema);
+        handleListFieldConditionalFields(jsonSchema);
 
         bindModalButtons(modalId, addObjectBtnId, 'cancelModalBtnId', modalBodyId, jsonSchema, tableId, maxCount, maxCountNew, minCountNew);
 
@@ -1688,14 +1687,11 @@ window.formUtility = window.formUtility || {};
 
         initializeFields(fields, elementId, renderType, actionType);
 
-        if (renderType === RENDER_TYPE.ACTION && typeof ns.InitializeCascadingDropdown === "function") {
-          //  ns.InitializeCascadingDropdown(formGroups);
-        }
-
-        if (typeof ns.evaluateConditionsAfterLoad === "function") ns.evaluateConditionsAfterLoad();
-        if (typeof ns.handleConditionalFields === "function") ns.handleConditionalFields();
-        if (typeof ns.handleFormGroupVisibility === "function") ns.handleFormGroupVisibility();
-        if (typeof ns.evaluateConditionsAfterLoadForList === "function") ns.evaluateConditionsAfterLoadForList(formGroups);
+        ns.InitializeCascadingDropdown(formGroups);
+        ns.evaluateConditionsAfterLoad();
+        ns.handleConditionalFields();
+        //ns.handleFormGroupVisibility();
+        ns.evaluateConditionsAfterLoadForList(formGroups);
 
         // scrollables & closing flatpickr on scroll
         const scrollables = new Set();

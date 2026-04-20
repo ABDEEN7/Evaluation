@@ -1,6 +1,7 @@
 ﻿var maintable = null;
 var popupname = "";
 $(document).ready(function () {
+    $('.StatusDetails').hide();
     IsEdit = IsEdit_ActionStatusConfig;
     IsDelete = IsDelete_ActionStatusConfig;
     IsView = "";
@@ -75,9 +76,9 @@ $(document).ready(function () {
         $('#ServiceStatusColorCode').val(this.value);
         $('#ServiceStatusColorCode').trigger('keyup');
     });
-  
 
-  
+
+
     let tabulatorTable;
     const GetServiceStatusPartyTypeDisplayNameList = (serviceStatusId, disableTable) => {
 
@@ -265,7 +266,7 @@ $(document).ready(function () {
             else {
                 $(".dual-list-container").removeClass("disabled-div");
             }
-            
+
         }
 
     }
@@ -291,7 +292,7 @@ $(document).ready(function () {
     });
 
 
-   
+
     const restoreOrder = (order) => {
         // Restore the order of items in the list based on the old order
         var $listItems = $("#filteredList .statuses-li");
@@ -350,9 +351,9 @@ $(document).ready(function () {
                         let mainuibackendName = "main_ServiceStatusPreventPartyType";
                         $("#" + mainuibackendName + " ul").empty();
                         $("#" + uibackendName + " ul").empty();
-                        if (result.serviceStatusPreventPartyTypesList.length>0) {
+                        if (result.serviceStatusPreventPartyTypesList.length > 0) {
                             $.each(partyTypesList_select2, function (index, dualistitem) {
-                              
+
                                 const exists = result.serviceStatusPreventPartyTypesList.find(x => x == dualistitem.id);
                                 const listItem = "<li data-index='0' data-id='" + dualistitem.id + "'>" + dualistitem.text + "</li>";
 
@@ -365,11 +366,11 @@ $(document).ready(function () {
                         }
                         else {
                             $.each(partyTypesList_select2, function (index, item) {
-                               
+
                                 $("#" + mainuibackendName + " ul").append("<li data-index='0' data-id='" + item.id + "'>" + item.text + "</li>");
                             });
                             $("#" + uibackendName + " ul").empty();
-                            
+
 
                         }
                         //initialzing list select
@@ -402,7 +403,7 @@ $(document).ready(function () {
                             $('#' + uibackendName + ' li').appendTo('#' + mainuibackendName + ' ul').removeClass('selected');
                             event.preventDefault();
                         });
-                       
+
 
                     } else {
                         $('.StatusDetails').hide();
@@ -502,26 +503,26 @@ $(document).ready(function () {
 
     }
 
-    const services_select2 = services
-        .map(item => ({
-            id: item.id,
-            text: lang == "ar" ? item.nameAr : item.nameEn
-        }));
+    //const services_select2 = services
+    //    .map(item => ({
+    //        id: item.id,
+    //        text: lang == "ar" ? item.nameAr : item.nameEn
+    //    }));
 
-    $("#ServiceId").select2({
-        width: '100%',
-        allowClear: false,
-        data: services_select2,
-        dropdownCssClass: "manageselect2zindex",
-        placeholder: sharedFn().GetUiControlText('PleaseSelect'),
+    //$("#ServiceId").select2({
+    //    width: '100%',
+    //    allowClear: false,
+    //    data: services_select2,
+    //    dropdownCssClass: "manageselect2zindex",
+    //    placeholder: sharedFn().GetUiControlText('PleaseSelect'),
 
-    });
+    //});
 
 
-    $('#ServiceId').change(function () {
+    $('#submitBtn').click(function () {
         LoadAllStatuses();
-      
-        $('.StatusDetails').hide();
+
+
 
 
     });
@@ -709,7 +710,7 @@ $(document).ready(function () {
                     }
                 };
                 jqClientAdvanced(options).PostFormData("ServiceStatus/UpdateServiceStatusOrder", formData);
-              
+
             }
         }
     });
@@ -845,7 +846,7 @@ var LoadAllActionStatusConfiguration = (statusIdId) => {
 
                 if (data && data.length > 0) {
                     maintable.addData(data);
-                   
+
                 }
                 else {
 
@@ -930,7 +931,7 @@ function DefaultSetUp() {
 function AfterDataBind() {
     if (popupname == "ActionStatusConfiguration") {
         $("#ActionStatusConfigurationServiceActionId").on("change", function () {
-            
+
             if ($("#ActionStatusConfigurationServiceActionId").val() != "") {
                 var Actiontype = AllActions.find(x => x.id == $("#ActionStatusConfigurationServiceActionId").val());
                 if (Actiontype) {
@@ -989,7 +990,7 @@ function AfterDataBind() {
 $('#btn-submit_popup').click(function () {
     if (sharedFn().NewvalidateForm("form-control", sharedFn().GetUiControlText('ADMIN_CNTRL_REQUIRED'), sharedFn().GetUiControlText('ADMIN_MSG_MAX_CHAR_LENGTH'), sharedFn().GetUiControlText('ADMIN_MSG_MIN_CHAR_LENGTH'))) {
         commonUtil.btnProgress("btn-submit_popup");
-        var controlvalidation = (popupname == "ActionStatusConfiguration" ? ActionStatusConfigcontrolvalidationlist :  popupname == "ActionStatusConfigurationNotification" ? ActionStatusConfigNotificationcontrolvalidationlist : null);
+        var controlvalidation = (popupname == "ActionStatusConfiguration" ? ActionStatusConfigcontrolvalidationlist : popupname == "ActionStatusConfigurationNotification" ? ActionStatusConfigNotificationcontrolvalidationlist : null);
         var requestdata = sharedFn().GetSaveObject(controlvalidation, $('#Id').val());
 
         var url = '';
@@ -999,7 +1000,7 @@ $('#btn-submit_popup').click(function () {
         else if (popupname == "ActionStatusConfigurationNotification") {
             url = ($('#Id').val() != '' ? "ActionStatusConfiguration/UpdateActionStatusConfigurationNotification" : "ActionStatusConfiguration/SaveActionStatusConfigurationNotification");
         }
-       
+
 
 
         const options = {
@@ -1082,7 +1083,7 @@ function opentab(evt, cityName) {
     }
 }
 function SetDropDown() {
-    
+
     if (popupname == "ActionStatusConfiguration") {
         DefaultSetUp();
         var StatusId = $('#ServiceStatusId').val();
@@ -1094,7 +1095,7 @@ function SetDropDown() {
         $("#ActionStatusConfigurationIsOtherAttachment").trigger('change');
     }
 
-   
+
 
 
 }
@@ -1155,7 +1156,7 @@ function SetPopupMode() {
 }
 
 const deleteData = (id, urlname = null) => {
-    
+
     if (popupname == "ActionStatusConfiguration") {
         urlname = "ActionStatusConfiguration/DeleteActionStatusConfiguration";
     }
@@ -1197,7 +1198,7 @@ const deleteData = (id, urlname = null) => {
 
 function Loadtabledata() {
 
-  
+
 
     if (popupname == "ActionStatusConfigurationNotification") {
         var actionstatusconfigid = $("#actionstatusconfigid").val();
@@ -1234,7 +1235,7 @@ function CreateEditForFormGroup(pkId) {
     }
     if (popupname == "ActionStatusConfigurationNotification") {
         const obj = table.getData().find(f => f.id == pkId);
-        
+
         if (ActionStatusConfigNotificationcontrolvalidationlist.length > 0) {
             ActionStatusConfigNotificationcontrolvalidationlist.forEach(item => {
                 var contrains = item.constraint;
@@ -1271,7 +1272,7 @@ function CreateEditForFormGroup(pkId) {
 
             });
         }
-        
+
     }
 
 
