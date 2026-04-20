@@ -203,6 +203,7 @@
                  </option>`
             )
         );
+        const $modal = $s.closest('.modal');
         const dropdownParent =
             (parentElement && parentElement.length) ? parentElement :
                 ($modal.length ? $modal : $(document.body));
@@ -262,7 +263,7 @@
 
         const vm = {
             title: plan.name || '',
-            planTypeId: plan.planTypeDepId || plan.PlanTypeDepId,
+            planTypeId: plan.planTypeId || plan.planTypeDepId || plan.PlanTypeDepId,
             semesterId: plan.semesterId,
             dateRange: toDateOnly(plan.startDate) && (plan.endDate) ?
                 `${toDateOnly(plan.startDate)} to ${toDateOnly(plan.endDate)}` : '',

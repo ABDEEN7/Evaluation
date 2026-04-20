@@ -217,13 +217,14 @@ public class PlanRequestRepository(IServiceScopeFactory serviceScopeFactory, Srv
     public async Task<PaginatedResult<PlanListDto>> GetPlans(PlanDetailsRequestDto request)
     {
         IQueryable<Plan> plans = unitOfWork.GetRepository<Plan>()
-            .GetAllQueryFiltered(x => x.PlanStatus.BackendName == StatusBackEnds.ApprovedPlans && x.PlanTypeDep.DepartmentId == requestInfo.DepId);
+            .GetAllQueryFiltered(x => x.PlanStatus.BackendName == StatusBackEnds.ApprovedPlans && x.PlanTypeDep.DepartmentId == requestInfo.DepId)
+            .Include(x => x.EvaluationRequests);
 
         if (request.YearId != null)
             plans = plans.Where(x => x.AcademicYearId == request.YearId);
 
         if (!string.IsNullOrEmpty(request.SchoolName))
-            plans = plans.Where(x => x.EvaluationRequests.Any(er => er.OrgTree.NameAr.Contains(request.SchoolName)));
+            plans = plans.Where(x => x.EvaluationRequests.Any(er => er.OrgTree.NameAr.Contains(request.SchoolName) || er.OrgTree.NameEn.Contains(request.SchoolName)));
 
         var query = plans
             .Select(x => new PlanListDto

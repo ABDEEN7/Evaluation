@@ -601,7 +601,17 @@ const deleteData = (id) => {
     else if (popupname == 'FormScope') {
         deleteurl = `/TemplateForm/${deprouting}/DeleteFormScope`;
     }
-    else if (popupname == 'FormItemConfig') {
+    if (popupname == 'FormItemConfig') {
+        notificationUtil.confirmation({
+            title: sharedFn().GetUiControlText('WEB_WARNING_DELETE'),
+            okText: sharedFn().GetUiControlText('WEB_DELETE_BUTTON'),
+            cancelText: sharedFn().GetUiControlText('WEB_CANCEL')
+        }, result => {
+            tableFormItemConfig.deleteRow(id);
+            notificationUtil.success(sharedFn().GetUiControlText('WEB_MSG_DELETE'));
+        });
+        return;
+    }
     else {
         const obj = table.getData().find(f => f.id == id);
         if (!obj) return;
