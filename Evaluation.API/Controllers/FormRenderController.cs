@@ -45,9 +45,9 @@ namespace Evaluation.API.Controllers
 			return await _formRenderBL.GetPlanService(serviceId, planId);
 		}
 		[HttpGet]
-		public async Task<ServiceDTO> GetCreateEvaluationPartyService( Guid serviceId)
+		public async Task<ServiceDTO> GetCreateEvaluationPartyService( Guid serviceId, Guid? EvlReqId)
 		{
-			return await _formRenderBL.GetCreateEvaluationPartyService( serviceId);
+			return await _formRenderBL.GetCreateEvaluationPartyService( serviceId,  EvlReqId);
 		}
 		[HttpGet]
 		public async Task<List<ServiceDTO>> GetServicesWebApp(string? moduelName)
@@ -106,9 +106,10 @@ namespace Evaluation.API.Controllers
 			[FromQuery] Guid serviceId,
 			[FromQuery] string actionBackendKey,
 			[FromQuery] Guid? requestId = null,
-			[FromQuery] Guid? planId = null)
+			[FromQuery] Guid? planId = null,
+			[FromQuery] Guid? EvlReqId = null)
 		{
-			return await _formRenderBL.GetActionFieldAsync(serviceId, actionBackendKey, requestId, planId);
+			return await _formRenderBL.GetActionFieldAsync(serviceId, actionBackendKey, requestId, planId, EvlReqId);
 		}
 	}
 }

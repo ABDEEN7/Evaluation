@@ -45,7 +45,7 @@ namespace Evaluation.Services.BusinessLayer.API
 				SrvField _srvField, IServiceProvider serviceProvider , ServiceRequestBL serviceRequestBL, PlanServiceRequestServices planServiceRequestServices)
             : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, _requestInfo)
         {
-		public async Task<ActionCustomDTO> GetActionField(ServiceAction action,Guid serviceId,RequestType requestType,Guid? requestId = null,Guid? PlanId = null)
+		public async Task<ActionCustomDTO> GetActionField(ServiceAction action,Guid serviceId,RequestType requestType,Guid? requestId = null,Guid? PlanId = null, Guid? EvlReqId = null)
 		{
 			string lang = _requestInfo.Lang;
 			var result = mapper.Map<ActionCustomDTO>(action);
@@ -147,7 +147,7 @@ namespace Evaluation.Services.BusinessLayer.API
 					var attachmentsFromReadFields = await HandleFieldsWithReadFromFieldIdAsync(
 						fieldDtos.Where(x => x.ReadFromFieldId != null).ToList(),
 						requestId,
-						PlanId);
+						PlanId, EvlReqId);
 
 					foreach (var att in attachmentsFromReadFields)
 						schAttachmentIds.Add(att);
@@ -194,7 +194,7 @@ namespace Evaluation.Services.BusinessLayer.API
 
 			return result;
 		}
-		private async Task<List<string>> HandleFieldsWithReadFromFieldIdAsync(List<FieldValueDTO> fields, Guid? requestId, Guid? PlanId)
+		private async Task<List<string>> HandleFieldsWithReadFromFieldIdAsync(List<FieldValueDTO> fields, Guid? requestId, Guid? PlanId, Guid? EvlReqId)
 		{
 			var attachmentList = new List<string>();
 
@@ -202,35 +202,49 @@ namespace Evaluation.Services.BusinessLayer.API
 				return attachmentList;
 
 			var fieldsWithReadFrom = fields
-				.Where(f =>f != null && f.ReadFromFieldId.HasValue && string.IsNullOrWhiteSpace(f.Value))
+				.Where(f => f != null && f.ReadFromFieldId.HasValue && string.IsNullOrWhiteSpace(f.Value))
 				.ToList();
 
 			if (fieldsWithReadFrom.Count == 0)
 				return attachmentList;
 
+			var requestFieldValues = (EvlReqId.HasValue && EvlReqId.Value != Guid.Empty)
+				? await _srvServiceRequest.GetRequestFieldsValueAsync(EvlReqId.Value)
+				: null;
+
 			foreach (var field in fieldsWithReadFrom)
 			{
-				if (!field.ReadFromFieldId.HasValue)
+				if (field == null || !field.ReadFromFieldId.HasValue)
 					continue;
 
 				var sourceField = await _srvField.GetFieldsByIdsAsync(field.ReadFromFieldId.Value);
 				if (sourceField?.FieldType?.BackendName == null)
 					continue;
 
-				if (sourceField.FieldType.BackendName==FieldTypeConstant.EvaluationPlan)
+				if (sourceField.FieldType.BackendName == FieldTypeConstant.EvaluationPlan)
 				{
 					if (!PlanId.HasValue || PlanId.Value == Guid.Empty)
-						return attachmentList;
+						continue;
 
-					var planJsonResult =
-						await planServiceRequestServices.GetPlanJsonById(PlanId!.Value);
+					var planJsonResult = await planServiceRequestServices.GetPlanJsonById(PlanId.Value);
 
 					if (!planJsonResult.IsSuccess || string.IsNullOrWhiteSpace(planJsonResult.Value))
 						continue;
 
 					field.Value = planJsonResult.Value;
 				}
+				else if (sourceField.Service?.SystemModule?.SystemModuleType?.BackendName == "EvaluationRequest")
+				{
+					var sourceFieldValue = requestFieldValues?
+						.FirstOrDefault(x => x.FieldId == field.ReadFromFieldId.Value);
+
+					if (sourceFieldValue == null || string.IsNullOrWhiteSpace(sourceFieldValue.Value))
+						continue;
+
+					field.Value = sourceFieldValue.Value;
+				}
 			}
+
 			return attachmentList;
 		}
 		public (string extractedJson, List<string> attachmentList) ExtractFieldValues(List<Field> fieldList, string jsonData)
@@ -571,7 +585,7 @@ namespace Evaluation.Services.BusinessLayer.API
 
 			return service;
 		}
-		public async Task<ServiceDTO> GetCreateEvaluationPartyService( Guid serviceId)
+		public async Task<ServiceDTO> GetCreateEvaluationPartyService( Guid serviceId, Guid? EvlReqId)
 		{
 			var lang = _requestInfo.Lang;
 			var userId = userInfo.UserId ?? Guid.Parse("C2536611-576B-4EB8-84F4-747F4ECE9A23");
@@ -581,7 +595,7 @@ namespace Evaluation.Services.BusinessLayer.API
 			if (service.Actions != null && service.Actions.Any() && service.Actions.Count == 1)
 			{
 				var action = service.Actions.First();
-				service.ServiceRequestDTO = await GetActionFieldAsync(service.Id!.Value, action.BakendName, null, null);
+				service.ServiceRequestDTO = await GetActionFieldAsync(service.Id!.Value, action.BakendName, null,null, EvlReqId);
 			}
 
 			return service;
@@ -659,7 +673,7 @@ namespace Evaluation.Services.BusinessLayer.API
 			return await _srvActionStatusConfiguration.GetActionTemplatesByStatus(requestId);
 		}
 
-		public async Task<ServiceRequestDTO> GetActionFieldAsync(Guid serviceId,string actionBackendKey,Guid? requestId = null,Guid? PlanId = null)
+		public async Task<ServiceRequestDTO> GetActionFieldAsync(Guid serviceId,string actionBackendKey,Guid? requestId = null,Guid? PlanId = null, Guid? EvlReqId = null)
 		{
 			string lang = _requestInfo.Lang;
 			var userId = userInfo.UserId ?? throw new BusinessException(ExceptionMessage.UserNotFound); 
@@ -717,7 +731,7 @@ namespace Evaluation.Services.BusinessLayer.API
 			{
 				ActionTypeKeys.RequestDataChange => GetApprovedAndMissingFields(requestObj!, action),
 				ActionTypeKeys.SubmitMissingData => GetMissingFields(requestObj!, action),
-				_ => GetActionField(action, service.Id, requestType, requestId, PlanId)
+				_ => GetActionField(action, service.Id, requestType, requestId, PlanId, EvlReqId)
 			};
 
 			var statusId = requestId is not null
