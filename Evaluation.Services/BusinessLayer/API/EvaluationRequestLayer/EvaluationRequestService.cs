@@ -370,6 +370,7 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 			.Where(c => c.RefId == request.Id && !hiddenFieldsIds.Contains(c.FieldId))
 			.Select(c => new
 			{
+				formId=c.Field.EvalFormId,
 				c.FieldId,
 				c.Value,
 				Type = c.Field!.DropDownTypeId != null ? "text" : c.Field!.FieldType!.NameEn, // Convert type to "text" if dropdown
@@ -485,6 +486,7 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 			return new FieldValueDTO
 			{
 				FieldId = c.FieldId,
+				formId = c.formId,
 				Value = fieldValue,
 				Type = c.Type,
 				FormGroupId = c.FormGroupId,
