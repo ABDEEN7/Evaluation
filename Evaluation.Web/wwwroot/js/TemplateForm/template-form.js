@@ -601,6 +601,7 @@ const deleteData = (id) => {
     else if (popupname == 'FormScope') {
         deleteurl = `/TemplateForm/${deprouting}/DeleteFormScope`;
     }
+    else if (popupname == 'FormItemConfig') {
     else {
         const obj = table.getData().find(f => f.id == id);
         if (!obj) return;
