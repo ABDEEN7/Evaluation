@@ -17,7 +17,7 @@ function evaluationFormResult(formId) {
     const mainItems = [];
 
     // ========== LOOP MAIN ITEMS ONLY ==========
-    $("#tbodyRows tr.main-row").each(function () {
+    $(`#${P_fieldId}-${SELECTORS.tbody} tr.main-row`).each(function () {
 
         const row = $(this);
         const select = row.find("select.eval-select");
@@ -86,7 +86,7 @@ function renameFormItems(formId) {
     const mainItems = [];
 
     // ========== LOOP MAIN ITEMS ONLY ==========
-    $("#tbodyRows tr.main-row").each(function () {
+    $(`#${P_fieldId}-${SELECTORS.tbody} tr.main-row`).each(function () {
 
         const row = $(this);
 
