@@ -45,4 +45,11 @@ public class AssignmentController : ControllerBase
     [HttpPost]
     public async Task<Result<ValidationResult>> ValidationEvaluationRequestAssignment(Guid evaluationRequestId, [FromBody] List<EvalTeamRequestDto> model)
                 => await _masterBl.GetApiService<AssignmentBL>().AssignmentValidationResult(evaluationRequestId, model);
+
+    [HttpPost]
+    public async Task<Result<bool>> SendMail(Guid userId)
+    {
+       var result = await _masterBl.GetApiService<AssignmentBL>().SendMailUser(userId);
+        return Ok(result);
+    }
 }

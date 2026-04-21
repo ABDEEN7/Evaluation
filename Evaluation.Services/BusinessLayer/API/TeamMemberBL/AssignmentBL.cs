@@ -2,8 +2,10 @@
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.DepartementEntites;
 using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
+using Evaluation.DAL.Models.Template;
 using Evaluation.DAL.Models.UserEntiy;
 using Evaluation.DAL.Repositories;
+using Evaluation.Services.Models.SMTP;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Dtos.TeamMemberDto;
 using Evaluation.SharedHelper.Enums;
@@ -14,6 +16,7 @@ using Evaluation.SharedHelper.Validations;
 using FluentResults;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using static Evaluation.DAL.ConstantKeys;
 namespace Evaluation.Services.BusinessLayer.API.TeamMemberBL;
 
 public class AssignmentBL(IServiceScopeFactory serviceScopeFactory,
@@ -24,7 +27,9 @@ public class AssignmentBL(IServiceScopeFactory serviceScopeFactory,
     UserInfo userInfo,
     IServiceProvider serviceProvider,
     RequestInfo requestInfo,
-    AssignmentService teamMemberService
+    IEmailServices emailServices,
+    AssignmentService teamMemberService,
+    EmailTemplateProvider emailTemplateProvider
     ) : ApiBase(serviceScopeFactory, cacheDataProvider, unitOfWork, loggingServices, mapper, userInfo,
         serviceProvider, requestInfo)
 {
@@ -299,5 +304,21 @@ public class AssignmentBL(IServiceScopeFactory serviceScopeFactory,
 
         return Result.Ok(validation);
     }
+    public async Task<bool> SendMailUser(Guid userId)
+    {
+        var user = await unitOfWork.GetRepository<MinistryUser>()
+            .GetAllActiveNonDeleted(x => x.Id == userId)
+            .FirstOrDefaultAsync();
+        var config = await emailTemplateProvider.BuildEmailMessageModelConfig(EmailTemplateList.EMAIL_TEMPLATE_SendTeamMember);
+        config.messageModel.ToEmails = new List<string> { user.Email };
+        var template = await unitOfWork.GetRepository<EmailTemplate>()
+            .GetAllNonDeleted(x => x.BackendName == EmailTemplateList.EMAIL_TEMPLATE_SendTeamMember)
+            .FirstOrDefaultAsync();
+        config.messageModel.Body = template.TemplateBody;
+        config.messageModel.Subject = template.TemplateSubject;
+        config.messageModel.ModuleBackendName = ConstantKeys.Module.Alert;
 
+        var result = await emailServices.SendEmail(config.messageModel);
+        return result;
+    }
 }

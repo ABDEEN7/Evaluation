@@ -245,6 +245,7 @@
             <th>${t('lblDomain')}</th>
             <th>${t('lblPartyType')}</th>
             <th>${t('lblTeamLeader')}</th>
+            <th>${t('lblSendMail', 'إرسال بريد')}</th>
         `;
 
         $thead.html(headerHTML);
@@ -398,6 +399,13 @@
                             <span class="checkmark"></span>
                         </label>
                     </td>
+            <td>
+                <button class="btn btn-sm btn-outline-primary send-mail-btn"
+                        data-member-id="${member.id}"
+                        data-member-name="${member.memberName}">
+                    <i class="las la-envelope"></i>
+                </button>
+            </td>
                 </tr>
             `;
         }).join('');
@@ -609,8 +617,6 @@
                 state.selectedAssignments.forEach(member => {
                     member.isLeader = member.id === leaderId;
                 });
-
-                console.log('👑 قائد الفريق:', leaderId);
             });
 
         // Party Type Selection
@@ -799,6 +805,25 @@
                 renderMembersTable();
                 showSuccess('تم حذف الأعضاء المحددين بنجاح');
             });
+        $(document).off('click', '.send-mail-btn')
+            .on('click', '.send-mail-btn', function () {
+                const memberId = $(this).data('member-id');
+                notificationUtil.confirmation({
+                    title: sharedFn().GetUiControlText("WEB_WARNING_CONFIRM"),
+                    okText: sharedFn().GetUiControlText("WEB_CONFIRM_BUTTON"),
+                    cancelText: sharedFn().GetUiControlText('WEB_CANCEL')
+                },
+                    result => {
+                        const endpoint = `${API_ENDPOINTS.SEND_MAIL_NOTIFICATION}/${memberId}`;
+                        const response = await jqClient().Post(endpoint, { ministryUserId: memberId });
+
+                        if (response.success || response.isSuccess) {
+                            showSuccess(t('msgMailSentSuccess', 'تم إرسال البريد بنجاح'));
+                        } else {
+                            throw new Error(response.message || 'فشل في إرسال البريد');
+                        }
+                    });
+            });
     }
 
     // ================== HELPERS ==================
@@ -844,7 +869,7 @@
 
     // ================== INIT ==================
 
-    ns.init = async function (fieldId, evaluationRequestId = null, elementId=null) {
+    ns.init = async function (fieldId, evaluationRequestId = null, elementId = null) {
         state.fieldId = fieldId;
         state.evaluationRequestId = evaluationRequestId;
 
