@@ -62,7 +62,9 @@ public class AssignmentBL(IServiceScopeFactory serviceScopeFactory,
     public async Task<Result<List<AssignmentDto>>> GetMembersByTeamId(Guid? teamId)
     {
         var member = unitOfWork.GetRepository<MinistryUser>()
-               .GetAllActiveNonDeleted();
+               .GetAllQueryFiltered()
+               .AsNoTracking()
+                .Where(x => x.UserTeams.Any(ut => ut.User.UserPartTypes.Any()));
         if (teamId != null)
             member = member.Where(x => x.UserTeams!.Any(t => t.TeamId == teamId));
 
