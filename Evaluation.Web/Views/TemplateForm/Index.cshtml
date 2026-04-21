@@ -131,14 +131,12 @@
                 ],
             }).then((result) => {
                 var data = result;
-                console.log(data);
                 uiControlItems = result.uiControlItems.filter(x => x.rowOrder > 0 && x.permissionBackendName == '@ConstantKeys.WebPermissions.ADD_WEB_EVALFORMS');
                 FormItemuiControlItems = result.uiControlItems.filter(x => x.rowOrder > 0 && x.permissionBackendName == '@ConstantKeys.WebPermissions.ADD_WEB_FORMITEMS');
                 SubFormItemuiControlItems = result.uiControlItems.filter(x => x.rowOrder > 0 && x.permissionBackendName == '@ConstantKeys.WebPermissions.ADD_WEB_SUBFORMITEMS');
                 FormScopeuiControlItems = result.uiControlItems.filter(x => x.rowOrder > 0 && x.permissionBackendName == '@ConstantKeys.WebPermissions.ADD_WEB_FORMSCOPES');
                 FormItemConfig = result.uiControlItems.filter(x => x.rowOrder > 0 && x.permissionBackendName == '@ConstantKeys.WebPermissions.ADD_WEB_FORMITEMCONFIG');
                 FormItemColConfig = result.uiControlItems.filter(x=> x.constraint.showInGrid == true && x.permissionBackendName == '@ConstantKeys.WebPermissions.ADD_WEB_FORMITEMCONFIG');
-                console.log(FormItemColConfig);
                 textDir = result.currentlanguage === "ar" ? "RTL" : "LTR";
                 permissionsList = result.permissionsList;
                 controlsList = result.controlsList;

@@ -40,8 +40,8 @@ internal class Program
         {
             ClsAppSetting.AzureBlobConnectionString = config.GetSection("AzureBlobStorageConnectionString").Value ?? "";
             ClsAppSetting.BlobSasUrl = config.GetSection("ConnectionStrings:AzureBlobStorage").Value ?? "";
-           
-           
+
+
             ClsAppSetting.OracleDBConnection = config["OracleDBConnection"] ?? "";
 
             // Form JWT
@@ -51,7 +51,7 @@ internal class Program
             ClsAppSetting.AllowWebCorsOnly = (isKeyVault ? config["baseAppUrl"] : config["AppSettings:baseAppUrl"]) ?? "";
             ClsAppSetting.AllowAdminCorsOnly = (isKeyVault ? config["baseAdminUrl"] : config["AppSettings:baseAdminUrl"]) ?? "";
 
-            
+
             ClsAppSetting.NsisBaseURL = config["NsisSettings:NsisBaseURL"] ?? "";
             ClsAppSetting.NsisAuthenticationURL = config["NsisSettings:NsisAuthenticationURL"] ?? "";
             ClsAppSetting.NsisUsername = config["NsisSettings:NsisUsername"] ?? "";
@@ -64,6 +64,7 @@ internal class Program
             ClsAppSetting.NsisEnrollmentApi = config["NsisSettings:NsisEnrollmentApi"] ?? "";
             ClsAppSetting.NsisLimit = config.GetValue<int>("NsisSettings:NsisLimit");
             ClsAppSetting.NsisStatus = config["NsisSettings:NsisStatus"] ?? "";
+            ClsAppSetting.CountPage = config.GetValue<int>("PageSettings:CountPage");
             // -------------------------------------
             // 2️⃣ Add Core Services
             // -------------------------------------
@@ -100,7 +101,7 @@ internal class Program
             // -------------------------------------
             builder.Services.AddDbContext<EvaluationDbContext>(options =>
                 options.UseSqlServer(config.GetConnectionString("EvaluationDBConn")));
-            
+
             // -------------------------------------
             // 4️⃣ Mapster Mapper Registration
             // -------------------------------------
@@ -216,11 +217,11 @@ internal class Program
             // -------------------------------------
             var app = builder.Build();
 
-			app.UseRouting(); 
-							  // -------------------------------------
-							  // 7️⃣ Middlewares (correct order)
-							  // -------------------------------------
-			app.UseMiddleware<SecurityLayerMiddleware>();
+            app.UseRouting();
+            // -------------------------------------
+            // 7️⃣ Middlewares (correct order)
+            // -------------------------------------
+            app.UseMiddleware<SecurityLayerMiddleware>();
             app.UseMiddleware<ExceptionHandlingMiddleware>();
 
             if (app.Environment.IsDevelopment())
@@ -247,20 +248,20 @@ internal class Program
 
             app.UseCors("AllowWebAndAdmin");
 
-			app.UseMiddleware<PopulateUserInfoMiddleware>();
-			app.UseMiddleware<PopulateRequestInfoMiddleware>();
+            app.UseMiddleware<PopulateUserInfoMiddleware>();
+            app.UseMiddleware<PopulateRequestInfoMiddleware>();
 
-			app.UseAuthentication();
+            app.UseAuthentication();
             app.UseAuthorization();
 
-           
+
             app.MapControllers();
-			app.MapControllerRoute(
-			name: "default",
-			pattern: "api/{controller=Home}/{action=Index}/{id?}");
+            app.MapControllerRoute(
+            name: "default",
+            pattern: "api/{controller=Home}/{action=Index}/{id?}");
 
 
-			app.Run();
+            app.Run();
         }
     }
 }

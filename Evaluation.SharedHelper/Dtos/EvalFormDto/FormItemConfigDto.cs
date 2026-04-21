@@ -1,8 +1,9 @@
-﻿namespace Evaluation.SharedHelper.Dtos.EvalFormDto;
+﻿using Evaluation.SharedHelper.Models;
 
-public class FormItemConfigDto
+namespace Evaluation.SharedHelper.Dtos.EvalFormDto;
+
+public class FormItemConfigDto : EntityBaseDTO
 {
-    public Guid Id { get; set; }
     public Guid EvalFormId { get; set; }
     public List<Guid>? FormItemIds { get; set; }
     public Guid PartyTypeId { get; set; }

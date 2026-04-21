@@ -197,6 +197,7 @@ public static class ConstantKeys
         public static readonly string msgInvalidEvaluationPlan = "msgInvalidEvaluationPlan"; //TO DO INSERTED
         public static readonly string msgInvalidEvaluationForm = "msgInvalidEvaluationForm"; //TO DO INSERTED
         public static readonly string msgInvalidAttachmentId = "msgInvalidAttachmentId"; //TO DO INSERTED
+        public static readonly string FormItemConfigPercentageMax = "FormItemConfigPercentageMax";
     }
 
     public static class AdminSettings

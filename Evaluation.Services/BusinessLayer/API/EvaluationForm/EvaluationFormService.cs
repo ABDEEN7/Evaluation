@@ -6,8 +6,11 @@ using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Dtos.EvalFormDto;
 using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Exceptions;
+using Evaluation.SharedHelper.Helper;
 using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Api;
+using FluentResults;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -31,8 +34,8 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
                 .GetAllNonDeleted()
                 .Include(x => x.CreateBy)
                 .OrderByDescending(x => x.CreateDate)
-                 .Skip(Page * 20)
-                .Take(20)
+                 .Skip(Page * ClsAppSetting.CountPage)
+                .Take(ClsAppSetting.CountPage)
                 .ToListAsync();
 
         var result = mapper.Map<List<TemplateFormDto>>(list, opts => opts.Items["Language"] = requestInfo.Lang);
@@ -71,7 +74,6 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
             DropDownTypeId = x.DropDownTypeId,
 
             SubFormItems = x.SubFormItems
-        .Where(s => s.IsDeleted == false)
         .Select(s => new EvaluationFormSubItemDto
         {
             Id = s.Id,
@@ -607,7 +609,9 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
     {
         if (messages == null || !messages.Any())
             throw new ArgumentException("No data provided");
-
+        var total = messages.Sum(x => x.Percentage);
+        if (total != 100)
+            throw new BusinessException(ConstantKeys.ExceptionMessage.FormItemConfigPercentageMax);
         var repo = uow.GetRepository<FormItemConfig>();
 
         var newRecords = messages.SelectMany(m =>
@@ -644,7 +648,7 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
         var evalFormId = newRecords.First().EvalFormId;
         var partyTypeId = newRecords.First().PartyTypeId;
 
-        
+
         var duplicates = newRecords
             .GroupBy(x => new { x.FormItemId, x.PartyTypeId, x.EvalFormId })
             .Where(g => g.Count() > 1)
@@ -653,15 +657,8 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
         if (duplicates)
             throw new InvalidOperationException("Duplicate records in request");
 
-        
-        var total = newRecords.Sum(x => x.Percentage);
 
-        if (total != 100)
-            throw new InvalidOperationException(
-                $"Total Percentage must equal 100. Current total = {total}"
-            );
-
-        var existing = await repo.GetAll()
+        var existing = await repo.GetAllActiveNonDeleted()
             .Where(x => x.EvalFormId == evalFormId && x.PartyTypeId == partyTypeId)
             .ToListAsync();
 
@@ -673,7 +670,8 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
         repo.InsertRange(newRecords);
 
         await uow.CommitAsync();
-
+        var result = mapper.Map<FormItemConfigDto>(newRecords, opts => opts.Items["Language"] = requestInfo.Lang);
+        result.ResponseStatus = DBResult.Inserted;
         return messages;
     }
     public async Task<FormItemConfigDto> UpdateFormItemConfig(FormItemConfigDto dto)
@@ -696,13 +694,19 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
                 x.Id != existingRecord.Id)
             .ToListAsync();
 
-        var total =
-            otherRecords.Sum(x => x.Percentage) +
-            dto.Percentage;
+        var total = await repo.GetAll()
+    .Where(x =>
+        x.EvalFormId == existingRecord.EvalFormId &&
+        x.PartyTypeId == existingRecord.PartyTypeId &&
+        x.FormItemId == existingRecord.FormItemId &&
+        x.Id != existingRecord.Id)
+    .SumAsync(x => (decimal?)x.Percentage) ?? 0;
+
+        total += dto.Percentage;
 
         if (total != 100)
-            throw new InvalidOperationException(
-                $"Total Percentage must equal 100. Current total = {total}"
+            throw new BusinessException(
+                ConstantKeys.ExceptionMessage.FormItemConfigPercentageMax
             );
         existingRecord.NameAr = dto.NameAr;
         existingRecord.NameEn = dto.NameEn;
@@ -712,7 +716,8 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
         repo.Update(existingRecord);
 
         await uow.CommitAsync();
-
+        var result = mapper.Map<TemplateFormDto>(existingRecord, opts => opts.Items["Language"] = requestInfo.Lang);
+        result.ResponseStatus = DBResult.Updated;
         return dto;
     }
     public async Task DeleteFormItemConfig(Guid id)
