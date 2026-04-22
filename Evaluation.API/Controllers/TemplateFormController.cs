@@ -5,6 +5,7 @@ using Evaluation.Services.BusinessLayer;
 using Evaluation.Services.BusinessLayer.Admin;
 using Evaluation.Services.BusinessLayer.API.EvaluationForm;
 using Evaluation.SharedHelper.Dtos.EvalFormDto;
+using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Models.Admin;
 using Microsoft.AspNetCore.Mvc;
 
@@ -23,7 +24,7 @@ public class TemplateFormController : ControllerBase
 
     [HttpGet]
     //[CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.VIEW_WEB_TemplateFormS })]
-    public async Task<IActionResult> GetAllTemplateForm(int Page = 1)
+    public async Task<IActionResult> GetAllTemplateForm(PaginatedQuery Page)
     {
         return Ok(await _masterBl.GetApiService<EvaluationFormBL>().GetEvaluationForm(Page));
     }

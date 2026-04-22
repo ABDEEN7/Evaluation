@@ -26,15 +26,13 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
     RequestInfo requestInfo
     ) : ApiBase(serviceScopeFactory, cacheDataProvider, unitOfWork, loggingServices, mapper, userInfo, serviceProvider, requestInfo)
 {
-    public async Task<List<TemplateFormDto>> GetEvaluationFormList(int Page)
+    public async Task<List<TemplateFormDto>> GetEvaluationFormList(PaginatedQuery pagination)
     {
         var list = await uow.GetRepository<EvalForm>()
-                .GetAllNonDeleted(x => x.EvaluationParties != null 
+                .GetAllNonDeleted(x => x.EvaluationParties != null
                 && x.EvaluationParties.DepartmentId == requestInfo.DepId)
                 .Include(x => x.CreateBy)
                 .OrderByDescending(x => x.CreateDate)
-                 .Skip(Page * ClsAppSetting.CountPage)
-                .Take(ClsAppSetting.CountPage)
                 .AsNoTracking()
                 .ToListAsync();
         var result = mapper.Map<List<TemplateFormDto>>(list, opts => opts.Items["Language"] = requestInfo.Lang);
@@ -87,7 +85,7 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
         .ToList(),
 
             FormItemRelated = relatedformitems
-        .Where(r =>r.FormItemId == x.Id)
+        .Where(r => r.FormItemId == x.Id)
         .Select(r => r.RelatedItemId)
         .ToArray()
         })
