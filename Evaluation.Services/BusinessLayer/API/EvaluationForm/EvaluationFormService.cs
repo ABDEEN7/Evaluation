@@ -28,20 +28,17 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
 {
     public async Task<List<TemplateFormDto>> GetEvaluationFormList(int Page)
     {
-
-
         var list = await uow.GetRepository<EvalForm>()
-                .GetAllNonDeleted()
+                .GetAllNonDeleted(x => x.EvaluationParties != null 
+                && x.EvaluationParties.DepartmentId == requestInfo.DepId)
                 .Include(x => x.CreateBy)
                 .OrderByDescending(x => x.CreateDate)
                  .Skip(Page * ClsAppSetting.CountPage)
                 .Take(ClsAppSetting.CountPage)
+                .AsNoTracking()
                 .ToListAsync();
-
         var result = mapper.Map<List<TemplateFormDto>>(list, opts => opts.Items["Language"] = requestInfo.Lang);
         return result;
-
-
     }
 
     public async Task<List<EvaluationFormItemDto>> GetEvaluationFormItemList(Guid EvalformId)
