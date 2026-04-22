@@ -1,4 +1,15 @@
 ﻿// ==============================
+// API Endpoints
+// ==============================
+const API = {
+    getItems: (depRoutePath, formId) =>
+        `/Form/${depRoutePath}/GetItems?formId=${formId}`,
+
+    getMatrixValues: (depRoutePath, formId) =>
+        `/Form/${depRoutePath}/GetFormEvalMarixValues?formId=${formId}`
+};
+
+// ==============================
 // Globals & Constants
 // ==============================
 const params = new URLSearchParams(window.location.search);
@@ -377,8 +388,12 @@ function buildHorizontalTable(data) {
 // ==============================
 // Page Generator 
 // ==============================
-const generateFullFormPageHtml = async ({ formId, fieldId, readOnly, allowRename, allowDelete, allowAdd, namingResult = null}) => {
-    itemsResult = await jqClient().Get(`/Form/${depRoutePath}/GetItems?formId=${formId}`);
+const generateFullFormPageHtml = async ({ formId, fieldId, readOnly, allowRename, allowDelete, allowAdd, namingResult = null }) => {
+
+    itemsResult = await jqClient().Get(
+        API.getItems(depRoutePath, formId)
+    );
+
     let items = itemsResult?.value.items ?? [];
 
     if (readOnly) {
@@ -475,8 +490,10 @@ const relatedItemPopup = (rowsHtml) => `<div class="modal fade" id="RealatedItem
 // Initialize Controls
 // ==============================
 async function initializeControls(formId, fieldId, controlValues) {
-    //var formId = 'b8fb67a9-b09a-4e0c-a466-d0625d92521d'
-    const matrixResponse = await jqClient().Get(`/Form/${depRoutePath}/GetFormEvalMarixValues?formId=${formId}`);
+
+    const matrixResponse = await jqClient().Get(
+        API.getMatrixValues(depRoutePath, formId)
+    );
 
     const items = itemsResult?.value ?? [];
     const matrixValues = matrixResponse?.value ?? matrixResponse ?? [];
