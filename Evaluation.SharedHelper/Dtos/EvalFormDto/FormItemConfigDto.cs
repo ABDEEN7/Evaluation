@@ -9,6 +9,6 @@ public class FormItemConfigDto : EntityBaseDTO
     public Guid PartyTypeId { get; set; }
     public string NameAr { get; set; } = null!;
     public string NameEn { get; set; } = null!;
-    public Guid? CalcMethodId { get; set; }
+    public Guid CalcMethodId { get; set; }
     public decimal Percentage { get; set; } = 0;
 }
