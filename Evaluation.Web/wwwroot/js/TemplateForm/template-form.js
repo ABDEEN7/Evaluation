@@ -510,8 +510,10 @@ $(document).on("click", "#formItemConfig", function () {
     IsEdit = IsEditFormItem ? "True" : "";
     IsDelete = IsDeleteFormItem ? "True" : "";
     IsView = IsViewFormItem ? "True" : "";
-
-    var tableColumns = sharedFn().PopulateColumn(FormItemConfigCollist);
+    var filteredColList = FormItemConfigCollist.filter(x =>
+        x.constraint.controlType !== 'TEXT_BOX_HIDDEN'
+    );
+    var tableColumns = sharedFn().PopulateColumn(filteredColList,'',true);
 
     OpenFormItemConfigPopup(
         modaltitle,
@@ -958,70 +960,6 @@ function toggleNoteRequired() {
     }
 }
 
-//function ClearControlByPage() {
-
-//    if (IsAdd_FormItemConfig) {
-//        $("#FormItemConfigRelationbutton").show();
-//        $("#FormItemConfigRelationbutton").html(
-//            sharedFn().GetUiControlText('FormItemConfigAddButton')
-//        );
-//    } else {
-//        $("#FormItemConfigRelationbutton").hide();
-//    }
-
-//    if (IsView_FormItemConfig == "True") {
-
-//        $("#FormItemConfigRelationdiv").show();
-//        $("#FormItemConfigRelationtabulator").css("pointer-events", "");
-
-//        var viewItem = IsAdd_FormItemConfig == "True"
-//            ? `<span class="Attr pointer" title="Save">
-//                <i class="Attr fa fa-save" onclick="SaveFormItemConfig(this)"></i>
-//               </span>`
-//            : '';
-
-//        IsEdit = '';
-//        IsDelete = IsDelete_FormItemConfig;
-//        IsView = '';
-
-//        let columns = sharedFn().PopulateColumn(FormItemConfigcolumnList, viewItem, true);
-
-//        tableFormItemConfig = tableUtil.createTabulator({
-//            id: "FormItemConfigRelationtabulator",
-//            config: {
-//                textDirection: txtDir,
-//                pagination: "local",
-//                paginationSize: 10,
-//                placeholder: sharedFn().GetUiControlText('NO_DATA_FOUND'),
-//                headerFilterPlaceholder: sharedFn().GetUiControlText('FILTER_COLUMN'),
-//                movableRows: true,
-//                selectable: true,
-//                editable: true
-//            },
-//            uniqueRowId: 'id',
-//            columns: columns
-//        });
-
-//        tableFormItemConfig.setData([]);
-
-//        const options = {
-//            success: function (data) {
-//                if (data && data.length > 0) {
-//                    tableFormItemConfig.setData(data);
-//                }
-//            }
-//        };
-
-//        jqClientAdvanced(options).Get(
-//            "FormItemConfig/GetAll?ParentId=" + $("#Id").val()
-//        );
-
-//    } else {
-//        $("#FormItemConfigRelationdiv").hide();
-//    }
-
-//    $("#FormItemConfigRelationdiv").parent().show();
-//}
 $("#FormItemConfigRelationbutton").click(function () {
     tableFormItemConfig.addRow({
         id: "00000000-0000-0000-0000-000000000000",
@@ -1142,27 +1080,33 @@ async function InitFormItemConfigPopup(
     LoadFormItemConfigData();
 }
 function LoadFormItemConfigData() {
-
     const evalformId = $("#evalformidvalue").val();
 
     const options = {
-
         success: function (data) {
-
             if (data && data.length > 0) {
-                tableFormItemConfig.setData(data); 
+
+                data.forEach(x => {
+                    x.formItem = Array.isArray(x.formItemIds) ? x.formItemIds : (x.formItemIds ? [x.formItemIds] : []);
+                    x.calcMethod = x.calcMethodId || null;
+                    x.partyType = x.partyTypeId || null;
+
+                    //console.log("partyType:", x.partyType);
+                    //console.log("formItem:", x.formItem);
+                    //console.log("calcMethod:", x.calcMethod);
+                });
+
+                tableFormItemConfig.setData(data);
+
             } else {
-                tableFormItemConfig.setData([]); 
+                tableFormItemConfig.setData([]);
             }
-
         }
-
     };
 
     jqClient(options).Get(
         `/TemplateForm/${deprouting}/GetAllFormItemConfig?evalFormId=` + evalformId
     );
-
 }
 function SaveFormItemConfig(event) {
     const cellElem = event.closest('section');
