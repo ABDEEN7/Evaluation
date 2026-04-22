@@ -17,6 +17,7 @@ using FluentResults;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using static Evaluation.DAL.ConstantKeys;
+using static Evaluation.SharedHelper.Enums.ConstantKeys;
 namespace Evaluation.Services.BusinessLayer.API.TeamMemberBL;
 
 public class AssignmentBL(IServiceScopeFactory serviceScopeFactory,
@@ -309,10 +310,11 @@ public class AssignmentBL(IServiceScopeFactory serviceScopeFactory,
         var user = await unitOfWork.GetRepository<MinistryUser>()
             .GetAllActiveNonDeleted(x => x.Id == userId)
             .FirstOrDefaultAsync();
-        var config = await emailTemplateProvider.BuildEmailMessageModelConfig(EmailTemplateList.EMAIL_TEMPLATE_SendTeamMember);
+        var reminderMailTemplateKey = await cacheDataProvider.GetSystemSettingValue(SystemSettings.TemplateSendReminderToUser);
+        var config = await emailTemplateProvider.BuildEmailMessageModelConfig(reminderMailTemplateKey);
         config.messageModel.ToEmails = new List<string> { user.Email };
         var template = await unitOfWork.GetRepository<EmailTemplate>()
-            .GetAllNonDeleted(x => x.BackendName == EmailTemplateList.EMAIL_TEMPLATE_SendTeamMember)
+            .GetAllNonDeleted(x => x.BackendName == reminderMailTemplateKey)
             .FirstOrDefaultAsync();
         config.messageModel.Body = template.TemplateBody;
         config.messageModel.Subject = template.TemplateSubject;

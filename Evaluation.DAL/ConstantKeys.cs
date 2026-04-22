@@ -60,8 +60,5 @@ public static class ConstantKeys
         public const string GET_SEMESTERS_REQUEST = "GET_SEMESTERS_REQUEST";
 
     }
-    public static class EmailTemplateList
-    {
-        public static readonly string EMAIL_TEMPLATE_SendTeamMember = "EMAIL_TEMPLATE_SendTeamMember";
-    }
+
 }
