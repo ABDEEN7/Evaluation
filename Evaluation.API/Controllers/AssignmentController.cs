@@ -49,7 +49,7 @@ public class AssignmentController : ControllerBase
     [HttpPost]
     public async Task<Result<bool>> SendMail(Guid userId)
     {
-       var result = await _masterBl.GetApiService<AssignmentBL>().SendMailUser(userId);
-        return Ok(result);
+        var result = await _masterBl.GetApiService<AssignmentBL>().SendMailUser(userId);
+        return result;
     }
 }

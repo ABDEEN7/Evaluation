@@ -304,7 +304,7 @@ public class AssignmentBL(IServiceScopeFactory serviceScopeFactory,
 
         return Result.Ok(validation);
     }
-    public async Task<bool> SendMailUser(Guid userId)
+    public async Task<Result<bool>> SendMailUser(Guid userId)
     {
         var user = await unitOfWork.GetRepository<MinistryUser>()
             .GetAllActiveNonDeleted(x => x.Id == userId)
@@ -319,6 +319,6 @@ public class AssignmentBL(IServiceScopeFactory serviceScopeFactory,
         config.messageModel.ModuleBackendName = ConstantKeys.Module.Alert;
 
         var result = await emailServices.SendEmail(config.messageModel);
-        return result;
+        return Result.Ok(result);
     }
 }
