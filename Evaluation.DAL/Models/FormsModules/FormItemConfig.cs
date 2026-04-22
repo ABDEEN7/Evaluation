@@ -20,7 +20,7 @@ namespace Evaluation.DAL.Models.FormsModules
 
         public string NameAr { get; set; } = null!;
         public string NameEn { get; set; } = null!;
-        public Guid? CalcMethodId { get; set; }
+        public Guid CalcMethodId { get; set; }
         public CalcMethod? CalcMethod { get; set; }
         public decimal Percentage { get; set; } = 0;
     }
