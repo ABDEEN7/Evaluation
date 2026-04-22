@@ -64,7 +64,6 @@ internal class Program
             ClsAppSetting.NsisEnrollmentApi = config["NsisSettings:NsisEnrollmentApi"] ?? "";
             ClsAppSetting.NsisLimit = config.GetValue<int>("NsisSettings:NsisLimit");
             ClsAppSetting.NsisStatus = config["NsisSettings:NsisStatus"] ?? "";
-            ClsAppSetting.CountPage = config.GetValue<int>("PageSettings:CountPage");
             // -------------------------------------
             // 2️⃣ Add Core Services
             // -------------------------------------
