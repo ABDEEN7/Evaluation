@@ -87,7 +87,7 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
         .ToList(),
 
             FormItemRelated = relatedformitems
-        .Where(r => r.IsDeleted == false && r.FormItemId == x.Id)
+        .Where(r =>r.FormItemId == x.Id)
         .Select(r => r.RelatedItemId)
         .ToArray()
         })
