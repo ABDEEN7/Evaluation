@@ -2,21 +2,27 @@
 	#searchPlansBtn {
 		white-space: nowrap;
 	}
+
+	#planYearFilter.form-select {
+		padding-top: 0.5rem !important;
+		padding-bottom: 0.5rem !important;
+	}
 </style>
 
-<div class="filter-section mb-3">
-	<div class="row">
-		<div class="col-md-4">
-			<label>السنة الدراسية</label>
+
+<div class="filter-section g-3 align-item-end">
+	<div class="row p-2 mb-5">
+		<div class="col-lg-5 col-sm-12">
+			<label class="mb-2">السنة الدراسية</label>
 			<select id="planYearFilter" class="form-select">
 				<option value="">الكل</option>
 			</select>
 		</div>
-		<div class="col-md-4">
-			<label>اسم المدرسة</label>
+		<div class="col-lg-5 col-sm-12 mb-sm-4">
+			<label class="mb-2">اسم المدرسة</label>
 			<input type="text" id="schoolName" class="form-control" />
 		</div>
-		<div class="col-md-4 d-flex align-items-end justify-content-end">
+		<div class="col-lg-2 col-sm-12 d-flex align-items-end justify-content-end align-self-center ms-auto gap-2">
 			<button id="filterPlanBtnId" class="btn btn-primary">بحث</button>
 			<button id="clearFilterPlanBtnId" class="btn btn-outline-secondary">
 				مسح
@@ -25,6 +31,7 @@
 
 	</div>
 </div>
+
 
 <div class="btn-group mb-3" role="group" aria-label="View mode">
 	<button id="cardViewEvaluationPlans" type="button" class="btn btn-outline-primary active">

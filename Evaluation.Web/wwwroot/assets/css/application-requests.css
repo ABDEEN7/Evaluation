@@ -506,7 +506,7 @@ table#requesttable.dataTable thead th.card-img {
 
         .application-request.card .requeststableBody .plan-request-card {
             margin: 0;
-            padding: 0 !important;
+            padding: 1rem !important;
             border: 1px solid #dee2e6;
             padding: 1rem 0.5rem 0.5rem 0.5rem;
             position: relative;
@@ -997,6 +997,7 @@ table#requesttable.dataTable thead th.card-img {
 #planRequestStatusFilter + .select2 .select2-selection--multiple .select2-search__field {
     height: 43px !important;
     margin-top: 0 !important;
+    align-content: center;
 }
 
 #planRequestStatusFilter + .select2 .select2-selection__arrow {

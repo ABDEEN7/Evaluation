@@ -108,7 +108,7 @@
                 data: "statusCode",
                 className: "td-right",
                 render: function (data) {
-                    return `<span class="request-status">${data || ""}</span>`;
+                    return `<span class="request-status w-100">${data || ""}</span>`;
                 }
             },
             {
@@ -119,7 +119,7 @@
                     return `
                 <button
                     type="button"
-                    class="btn btn-sm btn-primary view-plan"
+                    class="btn btn-sm btn-secondary view-plan w-100 mt-2"
                     data-plan-id="${row.id}"
                     onclick="InitializePlanDetails('${row.id}'); return false;">
                     عرض
