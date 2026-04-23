@@ -1,4 +1,5 @@
-﻿@{
+﻿@using Evaluation.SharedHelper.Enums
+@{
     Layout = "_Layout";
 }
 
@@ -18,8 +19,8 @@
     <div class="container">
         <div class="row mb-3">
             <div class="col-md-9">
-                <h4 class="fw-bold mb-3">المنشآت التعليمية</h4>
-                <p>الجهات المعنية بقياس ومتابعة جودة العملية التعليمية والأداء المدرسي لضمان تحقيق معايير التميز والتحسين المستمر.</p>
+                <h4 class="fw-bold mb-3">@ConstantKeys.WebAppPages.FormEducationalEntitiesTitle</h4>
+                <p>@ConstantKeys.WebAppPages.EducationalEntitiesDescription </p>
             </div>
             <div class="col-md-3 text-md-end mt-3 mt-md-0">
                 <!-- Single Toggle Buttons -->

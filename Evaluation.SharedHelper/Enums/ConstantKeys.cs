@@ -371,7 +371,8 @@ public static class ConstantKeys
         public static readonly string WebAppRequest = "WebAppRequest";
         public static readonly string WebAppCommon = "WebAppCommon";
         public static readonly string AssignmentUserTeam = "AssignmentUserTeam";
-
+        public static readonly string EducationalEntitiesDescription = "EducationalEntitiesDescription";
+        public static readonly string FormEducationalEntitiesTitle = "FormEducationalEntitiesTitle";
     }
     public static class WebAppRequest
     {
