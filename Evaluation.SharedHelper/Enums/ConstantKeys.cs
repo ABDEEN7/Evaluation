@@ -198,6 +198,12 @@ public static class ConstantKeys
         public static readonly string msgInvalidEvaluationForm = "msgInvalidEvaluationForm"; //TO DO INSERTED
         public static readonly string msgInvalidAttachmentId = "msgInvalidAttachmentId"; //TO DO INSERTED
         public static readonly string FormItemConfigPercentageMax = "FormItemConfigPercentageMax";
+        public static readonly string Exception_No_Data_Provided = "Exception_No_Data_Provided";
+        public static readonly string DuplicateRecordsinRequest = "DuplicateRecordsinRequest";
+        public static readonly string RECORD_NOT_FOUND = "RECORD_NOT_FOUND";
+        public static readonly string Exception_Invalid_Total_Percentage_After_Delete = "Exception_Invalid_Total_Percentage_After_Delete";
+        public static readonly string Final_Evaluation_Form_Limit = "Final_Evaluation_Form_Limit";
+        public static readonly string Max_Final_Evaluation_Forms_Exceeded = "Max_Final_Evaluation_Forms_Exceeded";
     }
 
     public static class AdminSettings

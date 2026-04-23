@@ -166,7 +166,7 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
         }
         else
         {
-            throw new BusinessException("لقد تجاوزت الحد الاعلى من الاستمارات التي تحتوي على IsFinalEvaluation");
+            throw new BusinessException(ConstantKeys.ExceptionMessage.Max_Final_Evaluation_Forms_Exceeded);
         }
         uow.GetRepository<EvalForm>().Insert(obj);
 
@@ -205,7 +205,7 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
             }
             else
             {
-                throw new BusinessException("لا يمكن ان يكون للدارة اكثر من استمارة بfinal evaluation");
+                throw new BusinessException(ConstantKeys.ExceptionMessage.Final_Evaluation_Form_Limit);
             }
             uow.GetRepository<EvalForm>().Update(obj);
             await uow.CommitAsync();
@@ -603,7 +603,7 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
     public async Task<List<FormItemConfigDto>> SaveFormItemConfig(List<FormItemConfigDto> messages)
     {
         if (messages == null || !messages.Any())
-            throw new ArgumentException("No data provided");
+            throw new ArgumentException(ConstantKeys.ExceptionMessage.Exception_No_Data_Provided);
         var total = messages.Sum(x => x.Percentage);
         if (total != 100)
             throw new BusinessException(ConstantKeys.ExceptionMessage.FormItemConfigPercentageMax);
@@ -650,7 +650,7 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
             .Any();
 
         if (duplicates)
-            throw new InvalidOperationException("Duplicate records in request");
+            throw new InvalidOperationException(ConstantKeys.ExceptionMessage.DuplicateRecordsinRequest);
 
 
         var existing = await repo.GetAllActiveNonDeleted()
@@ -680,7 +680,7 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
             .FirstOrDefaultAsync(x => x.Id == dto.Id);
 
         if (existingRecord == null)
-            throw new InvalidOperationException("Record not found");
+            throw new InvalidOperationException(ConstantKeys.ExceptionMessage.RECORD_NOT_FOUND);
 
         var otherRecords = await repo.GetAll()
             .Where(x =>
@@ -722,7 +722,7 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
             .FirstOrDefaultAsync(x => x.Id == id);
 
         if (record == null)
-            throw new InvalidOperationException("Record not found");
+            throw new InvalidOperationException(ConstantKeys.ExceptionMessage.RECORD_NOT_FOUND);
 
         var remainingTotal = await repo.GetAll()
             .Where(x =>
@@ -734,7 +734,7 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
         // 3. تحقق
         if (remainingTotal != 100)
             throw new InvalidOperationException(
-                $"Cannot delete. Total Percentage after delete will be {remainingTotal}, must equal 100"
+               string.Format(ConstantKeys.ExceptionMessage.Exception_Invalid_Total_Percentage_After_Delete, remainingTotal)
             );
 
         // 4. حذف
