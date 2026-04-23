@@ -47,9 +47,9 @@ public class AssignmentController : ControllerBase
                 => await _masterBl.GetApiService<AssignmentBL>().AssignmentValidationResult(evaluationRequestId, model);
 
     [HttpPost]
-    public async Task<Result<bool>> SendMail(Guid userId)
+    public async Task<Result<bool>> SendNotificationMailUser([FromBody] SendNotificationUserMail notificationUserMail)
     {
-        var result = await _masterBl.GetApiService<AssignmentBL>().SendMailUser(userId);
+        var result = await _masterBl.GetApiService<AssignmentBL>().SendNotificationMailUser(notificationUserMail);
         return result;
     }
 }

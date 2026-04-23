@@ -305,11 +305,15 @@ public class AssignmentBL(IServiceScopeFactory serviceScopeFactory,
 
         return Result.Ok(validation);
     }
-    public async Task<Result<bool>> SendMailUser(Guid userId)
+    public async Task<Result<bool>> SendNotificationMailUser(SendNotificationUserMail notificationUserMail)
     {
-        var user = await unitOfWork.GetRepository<MinistryUser>()
-            .GetAllActiveNonDeleted(x => x.Id == userId)
+        var user = await unitOfWork.GetRepository<EvaluationRequestAssignment>()
+            .GetAllActiveNonDeleted(x => x.EvaluationRequestId == notificationUserMail.EvaluationRequestId && x.MinistryUserId == notificationUserMail.UserId)
+            .Select(x => new { Email = x.MinistryUser.Email })
             .FirstOrDefaultAsync();
+        if (user == null)
+            throw new BusinessException(ConstantKeys.ExceptionMessage.UserNotExsistInThisEvaluationRequest);
+
         var reminderMailTemplateKey = await cacheDataProvider.GetSystemSettingValue(SystemSettings.TemplateSendReminderToUser);
         var config = await emailTemplateProvider.BuildEmailMessageModelConfig(reminderMailTemplateKey);
         config.messageModel.ToEmails = new List<string> { user.Email };

@@ -204,6 +204,7 @@ public static class ConstantKeys
         public static readonly string Exception_Invalid_Total_Percentage_After_Delete = "Exception_Invalid_Total_Percentage_After_Delete";
         public static readonly string Final_Evaluation_Form_Limit = "Final_Evaluation_Form_Limit";
         public static readonly string Max_Final_Evaluation_Forms_Exceeded = "Max_Final_Evaluation_Forms_Exceeded";
+        public static readonly string UserNotExsistInThisEvaluationRequest = "UserNotExsistInThisEvaluationRequest";
     }
 
     public static class AdminSettings
