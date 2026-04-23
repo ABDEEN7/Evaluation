@@ -11,7 +11,6 @@ const gridContainerId = "view-container",
     $btnAddParent = $('#btnAddParent'),
     btnSubmitId = "btn-submit",
     btnpopupSubmitId = "btn-submit_popup";
-var deprouting = sharedUtility().extractDepartmentName();
 
 let lang = sharedUtility().GetCookie('lang');
 let txtDir = lang === "ar" ? "RTL" : "LTR";
@@ -31,10 +30,12 @@ const loadData = () => {
             }
         }
     };
-
-    jqClient(options).Get(`/TemplateForm/${deprouting}/GetAllTemplateForm`.concat('?page=', currentPage));
+    const url = API_ROUTES.getAllForms() +
+        `?PageNumber=${currentPage}&PageSize=${TABLE_CONFIG.pageSize}`;
+    jqClient(options).Get(url);
 };
 function getlookup() {
+    var EvalformId = $("#Id").val();
     const options = {
         success: function (result) {
             if (result) {
@@ -48,7 +49,7 @@ function getlookup() {
             }
         }
     };
-    jqClient(options).Get(`/TemplateForm/${deprouting}/GetEvalFormItemLists`);
+    jqClient(options).Get(API_ROUTES.getFormItemLists(EvalformId));
 }
 $btnAddbutton.click(function () {
     sharedFn().InitialPageControls(uiControlItems);
@@ -286,7 +287,7 @@ function Loadtabledata() {
             }
         };
 
-        jqClient(options).Get(`/TemplateForm/${deprouting}/GetAllFormScope`.concat('?formIdValue=', formIdValue));
+        jqClient(options).Get(API_ROUTES.getAllFormScopes(formIdValue));
     }
 
 }
@@ -375,7 +376,7 @@ function SetDropDown() {
                 }
             }
         };
-        jqClient(options).Get(`/TemplateForm/${deprouting}/GetAllFormItemsFromDepartment`.concat('?EvalformId=', EvalformId));
+        jqClient(options).Get(API_ROUTES.getFormItemsFromDepartment(EvalformId));
         //$("label[for='EvalFormItemNoteRequired']").hide();
 
         //$("#EvalFormItemNoteRequired").parent().hide();
@@ -396,7 +397,7 @@ function BindFormItem() {
             renderFormItemTable();
         }
     };
-    jqClient(options).Get(`/TemplateForm/${deprouting}/GetAllTemplateFormItems`.concat('?TemplateFormId=', EvalformId));
+    jqClient(options).Get(API_ROUTES.getAllFormItems(EvalformId));
 }
 function renderFormItemTable() {
     let html = "";
@@ -502,6 +503,7 @@ $(document).on("click", "#formItemConfig", function () {
     popupname = "FormItemConfig";
 
     var EvalformId = $("#Id").val();
+    getlookup();
     $("#evalformidvalue").val(EvalformId);
 
     var modaltitle = sharedFn().GetUiControlText('FormItemHeader');
@@ -513,7 +515,7 @@ $(document).on("click", "#formItemConfig", function () {
     var filteredColList = FormItemConfigCollist.filter(x =>
         x.constraint.controlType !== 'TEXT_BOX_HIDDEN'
     );
-    var tableColumns = sharedFn().PopulateColumn(filteredColList,'',true);
+    var tableColumns = sharedFn().PopulateColumn(filteredColList, '', true);
 
     OpenFormItemConfigPopup(
         modaltitle,
@@ -587,7 +589,7 @@ $(document).on("click", ".edit", function () {
             notificationUtil.error('Request failed');
         }
     }).PostFormData(
-        `/TemplateForm/${deprouting}/UpdateFormItemConfig`,
+        API_ROUTES.updateFormItemConfig(),
         formData
     );
 });
@@ -595,13 +597,13 @@ const deleteData = (id) => {
     if (!id) return;
     var deleteurl = '';
     if (popupname == 'EvalFormItem') {
-        deleteurl = `/TemplateForm/${deprouting}/DeleteTemplateFormItem`;
+        deleteurl = `${API_ROUTES.deleteFormItem()}`;
     }
     else if (popupname == 'EvalSubFormItem') {
-        deleteurl = `/TemplateForm/${deprouting}/DeleteEvaluationSubFormItem`;
+        deleteurl = `${API_ROUTES.deleteSubFormItem()}`;
     }
     else if (popupname == 'FormScope') {
-        deleteurl = `/TemplateForm/${deprouting}/DeleteFormScope`;
+        deleteurl = API_ROUTES.deleteFormScope();
     }
     if (popupname == 'FormItemConfig') {
         notificationUtil.confirmation({
@@ -618,7 +620,7 @@ const deleteData = (id) => {
         const obj = table.getData().find(f => f.id == id);
         if (!obj) return;
 
-        deleteurl = `/TemplateForm/${deprouting}/DeleteTemplateForm`;
+        deleteurl = `${API_ROUTES.deleteForm()}`;
     }
 
 
@@ -702,9 +704,9 @@ $("#btn-submit").click(function (e) {
         let id = $('#Id').val();
 
         if (id) {
-            url = `/TemplateForm/${deprouting}/UpdateTemplateForm`;
+            url = API_ROUTES.updateForm();
         } else {
-            url = `/TemplateForm/${deprouting}/SaveTemplateForm`;
+            url = API_ROUTES.saveForm();
 
         }
         jqClient(options).PostFormData(url, requestdata);
@@ -817,7 +819,7 @@ $("#btn-submit_popup").click(function (e) {
                     commonUtil.btnProgress(btnpopupSubmitId, true);
                     notificationUtil.error('Request failed');
                 }
-            }).PostFormData(`/TemplateForm/${deprouting}/SaveAllFormItemConfig`, formData);
+            }).PostFormData(API_ROUTES.saveFormItemConfig(), formData);
 
             return;
         }
@@ -890,14 +892,14 @@ $("#btn-submit_popup").click(function (e) {
         let id = $('#PopupId').val();
 
         if (id) {
-            url = popupname == "EvalFormItem" ? `/TemplateForm/${deprouting}/UpdateTemplateFormItem`
-                : popupname == "EvalSubFormItem" ? `/TemplateForm/${deprouting}/UpdateEvaluationSubFormItem`
-                    : popupname == "FormScope" ? `/TemplateForm/${deprouting}/UpdateFormScope`
+            url = popupname == "EvalFormItem" ? API_ROUTES.updateFormItem()
+                : popupname == "EvalSubFormItem" ? API_ROUTES.updateSubFormItem()
+                    : popupname == "FormScope" ? API_ROUTES.updateFormScope()
                         : null;
         } else {
-            url = popupname == "EvalFormItem" ? `/TemplateForm/${deprouting}/SaveTemplateFormItem`
-                : popupname == "EvalSubFormItem" ? `/TemplateForm/${deprouting}/SaveEvaluationSubFormItem`
-                    : popupname == "FormScope" ? `/TemplateForm/${deprouting}/SaveFormScope`
+            url = popupname == "EvalFormItem" ? API_ROUTES.saveFormItem()
+                : popupname == "EvalSubFormItem" ? API_ROUTES.saveSubFormItem()
+                    : popupname == "FormScope" ? API_ROUTES.saveFormScope()
                         : null;
         }
 
@@ -940,7 +942,7 @@ initTables = () => {
 
     });
     loadData();
-    getlookup();
+    //getlookup();
 };
 function toggleNoteRequired() {
     if ($("#EvalFormItemHasNote").prop("checked")) {
@@ -1043,7 +1045,7 @@ async function InitFormItemConfigPopup(
             movableRows: true,
             selectable: true,
             editable: true,
-            lookupSources: lookupSources  
+            lookupSources: lookupSources
         },
         uniqueRowId: 'id',
         sortColumn: "updateDate",
@@ -1056,7 +1058,7 @@ async function InitFormItemConfigPopup(
 
     tableFormItemConfig.setData([]);
 
- 
+
     if (IsAdd_FormItemConfig) {
         $("#FormItemConfigRelationbutton").show();
     } else {
@@ -1105,7 +1107,7 @@ function LoadFormItemConfigData() {
     };
 
     jqClient(options).Get(
-        `/TemplateForm/${deprouting}/GetAllFormItemConfig?evalFormId=` + evalformId
+        `${API_ROUTES.getAllFormItemConfig(evalformId)}`
     );
 }
 function SaveFormItemConfig(event) {
@@ -1138,7 +1140,7 @@ function SaveFormItemConfig(event) {
         success: function (response) {
             if (response) {
                 switch (response.responseStatus) {
-                    case 1: 
+                    case 1:
                         const rows = tableFormItemConfig.getRows();
                         const row = rows[currentrowclicked];
                         if (row) {
@@ -1169,7 +1171,7 @@ function SaveFormItemConfig(event) {
     };
 
     jqClient(options).PostFormData(
-        `/TemplateForm/${deprouting}/SaveFormItemConfig`,
+        `${API_ROUTES.saveFormItemConfig()}`,
         formData
     );
 }

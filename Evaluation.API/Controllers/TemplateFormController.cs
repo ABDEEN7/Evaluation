@@ -24,7 +24,7 @@ public class TemplateFormController : ControllerBase
 
     [HttpGet]
     //[CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.VIEW_WEB_TemplateFormS })]
-    public async Task<IActionResult> GetAllTemplateForm(PaginatedQuery Page)
+    public async Task<IActionResult> GetAllTemplateForm([FromQuery] SearchTemplateForm Page)
     {
         return Ok(await _masterBl.GetApiService<EvaluationFormBL>().GetEvaluationForm(Page));
     }
@@ -145,11 +145,11 @@ public class TemplateFormController : ControllerBase
 
     }
     [HttpGet]
-    public async Task<IActionResult> GetEvalFormItemLists()
+    public async Task<IActionResult> GetEvalFormItemLists(Guid formId)
     {
         Dictionary<string, object> response = new Dictionary<string, object>();
         var PartyTypeList = await _masterBl.GetApiService<EvaluationFormBL>().GetPartyTypeListAsync();
-        var FormItemList = await _masterBl.GetApiService<EvaluationFormBL>().GetFormItemListAsync();
+        var FormItemList = await _masterBl.GetApiService<EvaluationFormBL>().GetFormItemListAsync(formId);
         var CalcMethodsList = await _masterBl.GetApiService<EvaluationFormBL>().GetCalcMethodsListAsync();
         response.Add("PartyTypeList", PartyTypeList);
         response.Add("FormItemList", FormItemList);

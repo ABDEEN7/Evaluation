@@ -18,7 +18,7 @@ public class EvaluationFormBL(IServiceScopeFactory serviceScopeFactory, CacheDat
         IServiceProvider serviceProvider, RequestInfo requestInfo, EvaluationFormService evaluationFormService)
         : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, requestInfo)
 {
-    public async Task<List<TemplateFormDto>> GetEvaluationForm(PaginatedQuery pagination)
+    public async Task<List<TemplateFormDto>> GetEvaluationForm(SearchTemplateForm pagination)
     {
         var result = await evaluationFormService.GetEvaluationFormList(pagination);
         return result;
@@ -154,7 +154,7 @@ public class EvaluationFormBL(IServiceScopeFactory serviceScopeFactory, CacheDat
     public async Task<IReadOnlyList<DropdownItem>> GetPartyTypeListAsync()
     {
         return await uow.GetRepository<PartyType>()
-            .GetAllActiveNonDeleted()
+            .GetAllActiveNonDeleted(x => x.DepartmentId == requestInfo.DepId)
             .Select(x => new DropdownItem
             {
                 Id = x.Id,
@@ -164,10 +164,10 @@ public class EvaluationFormBL(IServiceScopeFactory serviceScopeFactory, CacheDat
             .ToListAsync();
     }
 
-    public async Task<IReadOnlyList<DropdownItem>> GetFormItemListAsync()
+    public async Task<IReadOnlyList<DropdownItem>> GetFormItemListAsync(Guid formId)
     {
         return await uow.GetRepository<FormItem>()
-            .GetAllActiveNonDeleted()
+            .GetAllActiveNonDeleted(x => x.EvalFormId == formId)
             .Select(x => new DropdownItem
             {
                 Id = x.Id,
@@ -179,7 +179,7 @@ public class EvaluationFormBL(IServiceScopeFactory serviceScopeFactory, CacheDat
     public async Task<IReadOnlyList<DropdownItem>> GetCalcMethodsListAsync()
     {
         return await uow.GetRepository<CalcMethod>()
-            .GetAllActiveNonDeleted()
+            .GetAllActiveNonDeleted(x => x.DepartmentId == requestInfo.DepId)
             .Select(x => new DropdownItem
             {
                 Id = x.Id,
