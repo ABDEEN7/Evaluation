@@ -6,6 +6,7 @@ using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Dtos.EvalFormDto;
 using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Exceptions;
+using Evaluation.SharedHelper.Extensions;
 using Evaluation.SharedHelper.Helper;
 using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Api;
@@ -28,15 +29,15 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
 {
     public async Task<List<TemplateFormDto>> GetEvaluationFormList(SearchTemplateForm pagination)
     {
-        var list = await uow.GetRepository<EvalForm>()
+        var list = uow.GetRepository<EvalForm>()
                 .GetAllNonDeleted(x => x.EvaluationParties != null
                 && x.EvaluationParties.DepartmentId == requestInfo.DepId)
                 .Include(x => x.CreateBy)
                 .OrderByDescending(x => x.CreateDate)
-                .AsNoTracking()
-                .ToListAsync();
-        var result = mapper.Map<List<TemplateFormDto>>(list, opts => opts.Items["Language"] = requestInfo.Lang);
-        return result;
+                .AsNoTracking();
+        var result = list.GetPaginatedResult(pagination.PageNumber, pagination.PageSize = 10);
+        var dto = mapper.Map<List<TemplateFormDto>>(list, opts => opts.Items["Language"] = requestInfo.Lang);
+        return dto;
     }
 
     public async Task<List<EvaluationFormItemDto>> GetEvaluationFormItemList(Guid EvalformId)
