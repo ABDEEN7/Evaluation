@@ -18,9 +18,9 @@ public class EvaluationFormBL(IServiceScopeFactory serviceScopeFactory, CacheDat
         IServiceProvider serviceProvider, RequestInfo requestInfo, EvaluationFormService evaluationFormService)
         : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, requestInfo)
 {
-    public async Task<List<TemplateFormDto>> GetEvaluationForm(SearchTemplateForm pagination)
+    public List<TemplateFormDto> GetEvaluationForm(SearchTemplateForm pagination)
     {
-        var result = await evaluationFormService.GetEvaluationFormList(pagination);
+        var result = evaluationFormService.GetEvaluationFormList(pagination);
         return result;
     }
 

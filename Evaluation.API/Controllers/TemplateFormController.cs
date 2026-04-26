@@ -24,9 +24,9 @@ public class TemplateFormController : ControllerBase
 
     [HttpGet]
     //[CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.VIEW_WEB_TemplateFormS })]
-    public async Task<IActionResult> GetAllTemplateForm([FromQuery] SearchTemplateForm Page)
+    public IActionResult GetAllTemplateForm([FromQuery] SearchTemplateForm Page)
     {
-        return Ok(await _masterBl.GetApiService<EvaluationFormBL>().GetEvaluationForm(Page));
+        return Ok(_masterBl.GetApiService<EvaluationFormBL>().GetEvaluationForm(Page));
     }
 
     [HttpGet]
@@ -159,7 +159,7 @@ public class TemplateFormController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAllFormItemConfig(Guid? evalFormId)
     {
-        var data =await _masterBl.GetApiService<EvaluationFormBL>().GetAllFormItemConfig(evalFormId);
+        var data = await _masterBl.GetApiService<EvaluationFormBL>().GetAllFormItemConfig(evalFormId);
         return Ok(data);
     }
     [HttpPost]

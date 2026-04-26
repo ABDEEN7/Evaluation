@@ -27,7 +27,7 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
     RequestInfo requestInfo
     ) : ApiBase(serviceScopeFactory, cacheDataProvider, unitOfWork, loggingServices, mapper, userInfo, serviceProvider, requestInfo)
 {
-    public async Task<List<TemplateFormDto>> GetEvaluationFormList(SearchTemplateForm pagination)
+    public List<TemplateFormDto> GetEvaluationFormList(SearchTemplateForm pagination)
     {
         var list = uow.GetRepository<EvalForm>()
                 .GetAllNonDeleted(x => x.EvaluationParties != null
