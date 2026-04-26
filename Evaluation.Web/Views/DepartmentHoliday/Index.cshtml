@@ -55,6 +55,8 @@
 @section Scripts {
     <script src="/plan-assets/vendor/flatpickr/js/flatpickr.js"></script>
     <script src="~/js/DepartmentHoliday/department-holiday.js" asp-append-version="true"></script>
+    <script src="~/lib/tabulator/js/tabulator.js" asp-append-version="true"></script>
+
     <script>
         $(document).ready(async function () {
 
@@ -71,7 +73,10 @@
                     '@nameof(ConstantKeys.WebAppPages.WebDepartmentHoliday)'
                 ],
                  permissions: [
-                    '@nameof(ConstantKeys.WebPermissions.ADD_WEB_DEPARTMENT_HOLIDAY)'
+                    '@nameof(ConstantKeys.WebPermissions.VIEW_WEB_DEPARTMENT_HOLIDAY)',
+                    '@nameof(ConstantKeys.WebPermissions.ADD_WEB_DEPARTMENT_HOLIDAY)',
+                    '@nameof(ConstantKeys.WebPermissions.EDIT_WEB_DEPARTMENT_HOLIDAY)',
+                    '@nameof(ConstantKeys.WebPermissions.DELETE_WEB_DEPARTMENT_HOLIDAY)'
                 ],
             }).then((result) => {
 
