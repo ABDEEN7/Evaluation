@@ -1,4 +1,15 @@
 ﻿// ==============================
+// API Endpoints
+// ==============================
+const API = {
+    getItems: (depRoutePath, formId) =>
+        `/Form/${depRoutePath}/GetItems?formId=${formId}`,
+
+    getMatrixValues: (depRoutePath, formId) =>
+        `/Form/${depRoutePath}/GetFormEvalMarixValues?formId=${formId}`
+};
+
+// ==============================
 // Globals & Constants
 // ==============================
 const params = new URLSearchParams(window.location.search);
@@ -38,21 +49,19 @@ const escapeHtml = (text = '', isRename, { id }, fieldId, allowRename) => {
     }
     else
     {
-        if (allowRename) {
-            const input = document.createElement("input");
-            input.type = "text";
-            input.className = "form-control form-control-sm item-name";
-            input.id = `${fieldId}_${id}_ItemName`;
-            input.setAttribute("data-id", id);
-            //input.setAttribute("value", text);
+        const input = document.createElement("input");
+        input.type = "text";
+        input.className = "form-control form-control-sm item-name";
+        input.id = `${fieldId}_${id}_ItemName`;
+        input.setAttribute("data-id", id);
 
-            return input.outerHTML;
+        if (!allowRename) {
+
+            input.disabled = true;
+
         }
-        else {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
+
+        return input.outerHTML;
  
     }
 
@@ -69,12 +78,12 @@ const createPlaceholderOption = (text = 'Please select') => {
 // Accordion Builders
 // ==============================
 
-const generateFormAccordionItem = (rowsHtml, hasAnyNote, hasAnyChildren, isRename, allowDelete, allowAdd) => `
+const generateFormAccordionItem = (rowsHtml, hasAnyNote, hasAnyChildren, fieldId, isRename, allowDelete, allowAdd) => `
 <div class="accordion-item mb-3 rounded">
     <div id="item3" class="accordion-collapse collapse show">
         <div class="accordion-body">
-        <div id="index-table" class=""></div>
-            <table class="table table-bordered table-hover align-middle w-100 dataTable no-footer">
+        <div id="${fieldId}-index-table" class=""></div>
+            <table id="${fieldId}" class="table table-bordered table-hover align-middle w-100 dataTable no-footer">
                 <thead class="table-light">
                     <tr>
                         ${hasAnyChildren ? '<th></th>' : ''}
@@ -88,7 +97,7 @@ const generateFormAccordionItem = (rowsHtml, hasAnyNote, hasAnyChildren, isRenam
                    
                     </tr>
                 </thead>
-                <tbody id="${SELECTORS.tbody}">
+                <tbody id="${fieldId}-${SELECTORS.tbody}">
                     ${rowsHtml}
                 </tbody>
             </table>
@@ -282,7 +291,7 @@ function addNewRow(button)
             allowDelete: P_allowDelete
         });
 
-        const tbody = document.getElementById(SELECTORS.tbody);
+        const tbody = document.getElementById(`${P_fieldId}-${SELECTORS.tbody}`);
         tbody.insertAdjacentHTML(
             "beforeend",
             row
@@ -317,7 +326,7 @@ async function fillRenameControls(fieldId, controlValues) {
 
     P_fieldId = fieldId;
 
-    const tbody = $("#tbodyRows");
+    const tbody = $(`#${P_fieldId}-${SELECTORS.tbody}`);
 
     controlValues.items.forEach((item, index) => {
         let row = tbody.find("tr.main-row").filter(function () {
@@ -379,13 +388,44 @@ function buildHorizontalTable(data) {
 // ==============================
 // Page Generator 
 // ==============================
-const generateFullFormPageHtml = async ({ formId, fieldId, readOnly, allowRename, allowDelete, allowAdd }) => {
-    itemsResult = await jqClient().Get(`/Form/${depRoutePath}/GetItems?formId=${formId}`);
-    const items = itemsResult?.value.items ?? [];
+const generateFullFormPageHtml = async ({ formId, fieldId, readOnly, allowRename, allowDelete, allowAdd, namingResult = null }) => {
+
+    itemsResult = await jqClient().Get(
+        API.getItems(depRoutePath, formId)
+    );
+
+    let items = itemsResult?.value.items ?? [];
+
+    if (readOnly) {
+        allowRename = false;
+        allowDelete = false;
+        allowAdd = false;
+    }
+
+    let isRename = itemsResult?.value.evalForm.allowRename
+
+    let isRenamedEvaluation = false;
+
+    if (allowRename == false && isRename == true && readOnly == false)
+        isRenamedEvaluation = true;
+
+    if (isRenamedEvaluation) {
+        isRename = false;
+        const map = new Map(namingResult.items.map(item => [item.id, item.name]));
+
+        items = items
+            .filter(item => map.has(item.id))
+            .map(item => ({
+                ...item,
+                name: map.get(item.id) // replace name
+            }));
+    }
+    
 
     const hasAnyNote = items.some(i => i.hasNote);
     const hasAnyChildren = items.some(i => i.subFormItems?.length);
-    const isRename = itemsResult?.value.evalForm.allowRename
+
+
 
     P_fieldId = fieldId;
     P_allowRename = allowRename;
@@ -410,7 +450,7 @@ const generateFullFormPageHtml = async ({ formId, fieldId, readOnly, allowRename
         allowAdd
     );
 
-    return `${generateFormAccordionItem(rowsHtml, hasAnyNote, hasAnyChildren, isRename, allowDelete, allowAdd)}`;
+    return `${generateFormAccordionItem(rowsHtml, hasAnyNote, hasAnyChildren, fieldId, isRename, allowDelete, allowAdd)}`;
 };
 
 
@@ -450,8 +490,10 @@ const relatedItemPopup = (rowsHtml) => `<div class="modal fade" id="RealatedItem
 // Initialize Controls
 // ==============================
 async function initializeControls(formId, fieldId, controlValues) {
-    //var formId = 'b8fb67a9-b09a-4e0c-a466-d0625d92521d'
-    const matrixResponse = await jqClient().Get(`/Form/${depRoutePath}/GetFormEvalMarixValues?formId=${formId}`);
+
+    const matrixResponse = await jqClient().Get(
+        API.getMatrixValues(depRoutePath, formId)
+    );
 
     const items = itemsResult?.value ?? [];
     const matrixValues = matrixResponse?.value ?? matrixResponse ?? [];
@@ -510,7 +552,7 @@ async function initializeControls(formId, fieldId, controlValues) {
 
     const table = buildHorizontalTable(matrixValues);
 
-    const container = document.getElementById("index-table");
+    const container = document.getElementById(`${fieldId}-index-table`);
 
     container.appendChild(table);
 }
@@ -555,7 +597,7 @@ function deleteRow(button)
 
     if (row) {
         row.remove();
-        const rows = document.querySelectorAll("#tbodyRows tr");
+        const rows = document.querySelectorAll(`#${P_fieldId}-${SELECTORS.tbody} tr`);
         var lastIndex = 0;
         rows.forEach((tr, index) => {
             tr.children[0].textContent = index + 1;
