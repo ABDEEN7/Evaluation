@@ -984,7 +984,7 @@ public static class ConstantKeys
         public const string ADD_WEB_EVALFORMS = "ADD_WEB_EVALFORMS";
         public const string EDIT_WEB_EVALFORMS = "EDIT_WEB_EVALFORMS";
         public const string DELETE_WEB_EVALFORMS = "DELETE_WEB_EVALFORMS";
-
+        
         #endregion
 
         #region DEPARTMENTHOLIDAY
@@ -1233,6 +1233,10 @@ public static class ConstantKeys
         public static readonly string AddAttachment_FILE_COUNT = "AddAttachment_FILE_COUNT";
         public static readonly string useAsposeLib = "useAsposeLib";
         public static readonly string TemplateSendReminderToUser = "TemplateSendReminderToUser";
+    }
+    public static class EvalFormSettings
+    {
+        public static readonly string Eval_WEB_From_PageSize = "Eval_WEB_From_PageSize";
     }
 
     public static class FieldTypeConstant

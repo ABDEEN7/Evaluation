@@ -15,6 +15,7 @@ using FluentResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using static Evaluation.SharedHelper.Enums.ConstantKeys;
 
 namespace Evaluation.Services.BusinessLayer.API;
 
@@ -36,7 +37,9 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
                 .Include(x => x.CreateBy)
                 .OrderByDescending(x => x.CreateDate)
                 .AsNoTracking();
-        var result = await query.GetPaginatedResult(request.PageNumber, request.PageSize = 10);
+        var pageSizeString = await cacheDataProvider.GetSystemSettingValue(EvalFormSettings.Eval_WEB_From_PageSize);
+        int pageSize = int.TryParse(pageSizeString, out var value) ? value : 20;
+        var result = await query.GetPaginatedResult(request.PageNumber, pageSize);
         var dto = mapper.Map<PaginatedResult<TemplateFormDto>>(result);
         //var dto = mapper.Map<PaginatedResult<TemplateFormDto>>(result, opts => opts.Items["Language"] = requestInfo.Lang);
         return dto;
