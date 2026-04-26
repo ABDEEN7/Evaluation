@@ -24,9 +24,9 @@ public class TemplateFormController : ControllerBase
 
     [HttpGet]
     //[CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.VIEW_WEB_TemplateFormS })]
-    public IActionResult GetAllTemplateForm([FromQuery] SearchTemplateForm Page)
+    public async Task<IActionResult> GetAllTemplateForm([FromQuery] SearchTemplateForm Page)
     {
-        return Ok(_masterBl.GetApiService<EvaluationFormBL>().GetEvaluationForm(Page));
+        return Ok(await _masterBl.GetApiService<EvaluationFormBL>().GetEvaluationForm(Page));
     }
 
     [HttpGet]

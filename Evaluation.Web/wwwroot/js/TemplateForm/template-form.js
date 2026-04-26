@@ -1,5 +1,5 @@
 ﻿
-let table = null, currentPage = 0, isLoading = true, popupname = "",
+let table = null, currentPage = 1, isLoading = true, popupname = "",
     formItems = [];
 let lookupSources = {};
 const gridContainerId = "view-container",
@@ -18,20 +18,22 @@ const loadData = () => {
     isLoading = true;
 
     const options = {
-        success: function (data) {
-            if (data) {
-                if (data && data.length > 0) {
-
-                    table.addData(data);
-                    currentPage = currentPage + 1;
+        success: function (response) {
+            if (response && response.items && response.items.length > 0) {
+                table.addData(response.items);
+                currentPage = currentPage + 1;
+                if (currentPage > response.totalPages) {
+                    isLoading = true;
+                } else {
                     isLoading = false;
                 }
-
             }
         }
     };
+
     const url = API_ROUTES.getAllForms() +
         `?PageNumber=${currentPage}&PageSize=${TABLE_CONFIG.pageSize}`;
+
     jqClient(options).Get(url);
 };
 function getlookup() {

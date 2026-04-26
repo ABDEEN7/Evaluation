@@ -8,6 +8,7 @@ using Evaluation.SharedHelper.Dtos.EvalFormDto;
 using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Api;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -18,9 +19,9 @@ public class EvaluationFormBL(IServiceScopeFactory serviceScopeFactory, CacheDat
         IServiceProvider serviceProvider, RequestInfo requestInfo, EvaluationFormService evaluationFormService)
         : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, requestInfo)
 {
-    public List<TemplateFormDto> GetEvaluationForm(SearchTemplateForm pagination)
+    public async Task<PaginatedResult<TemplateFormDto>> GetEvaluationForm(SearchTemplateForm pagination)
     {
-        var result = evaluationFormService.GetEvaluationFormList(pagination);
+        var result = await evaluationFormService.GetEvaluationFormList(pagination);
         return result;
     }
 

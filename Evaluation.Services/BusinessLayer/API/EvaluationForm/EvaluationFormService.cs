@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Azure.Core;
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.FormsModules;
 using Evaluation.DAL.Repositories;
@@ -27,16 +28,17 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
     RequestInfo requestInfo
     ) : ApiBase(serviceScopeFactory, cacheDataProvider, unitOfWork, loggingServices, mapper, userInfo, serviceProvider, requestInfo)
 {
-    public List<TemplateFormDto> GetEvaluationFormList(SearchTemplateForm pagination)
+    public async Task<PaginatedResult<TemplateFormDto>> GetEvaluationFormList(SearchTemplateForm request)
     {
-        var list = uow.GetRepository<EvalForm>()
+        var query = uow.GetRepository<EvalForm>()
                 .GetAllNonDeleted(x => x.EvaluationParties != null
                 && x.EvaluationParties.DepartmentId == requestInfo.DepId)
                 .Include(x => x.CreateBy)
                 .OrderByDescending(x => x.CreateDate)
                 .AsNoTracking();
-        var result = list.GetPaginatedResult(pagination.PageNumber, pagination.PageSize = 10);
-        var dto = mapper.Map<List<TemplateFormDto>>(list, opts => opts.Items["Language"] = requestInfo.Lang);
+        var result = await query.GetPaginatedResult(request.PageNumber, request.PageSize = 10);
+        var dto = mapper.Map<PaginatedResult<TemplateFormDto>>(result);
+        //var dto = mapper.Map<PaginatedResult<TemplateFormDto>>(result, opts => opts.Items["Language"] = requestInfo.Lang);
         return dto;
     }
 
