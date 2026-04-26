@@ -91,35 +91,35 @@
         columns: [
             {
                 data: "name",
-                className: "td-left"
+                className: "td-left py-1"
             },
             {
                 data: "countSchools",
-                className: "td-left"
+                className: "td-left py-1"
             },
             {
                 data: null,
-                className: "td-left",
+                className: "td-left py-1",
                 render: function (data, type, row) {
                     return `${row.startDate} - ${row.endDate}`;
                 }
             },
             {
                 data: "statusCode",
-                className: "td-right",
+                className: "td-right p-1",
                 render: function (data) {
-                    return `<span class="request-status w-100">${data || ""}</span>`;
+                    return `<span class="request-status w-100 mt-3 py-1">${data || ""}</span>`;
                 }
             },
             {
                 data: null,
                 orderable: false,
-                className: "td-center",
+                className: "td-center p-1",
                 render: function (data, type, row) {
                     return `
                 <button
                     type="button"
-                    class="btn btn-sm btn-secondary view-plan w-100 mt-2"
+                    class="btn btn-sm btn-secondary view-plan w-100 mt-1 p-2"
                     data-plan-id="${row.id}"
                     onclick="InitializePlanDetails('${row.id}'); return false;">
                     عرض
@@ -139,11 +139,11 @@
 
                     const dropdownId = `dropdownMenuButton_${row?.id || meta?.row || Math.random().toString(36).slice(2)}`;
 
-                    let actionsHtml = `<div class="dropdown d-block w-100">`;
+                    let actionsHtml = `<div class="dropdown d-block w-100 p-1">`;
 
                     actionsHtml += `
             <button
-                class="btn mb-0 dropdown-toggle w-100 btn-primary mt-3"
+                class="btn dropdown-toggle w-100 btn-primary mt-1 py-2"
                 type="button"
                 id="${dropdownId}"
                 data-bs-toggle="dropdown"

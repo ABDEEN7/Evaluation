@@ -51,7 +51,7 @@
 
 .add-request-btn {
     background-color: #6b1225;
-    color: #fff;
+    color: #ffffff;
     border-radius: 8px;
     padding: 9px 18px;
     font-size: 16px;
@@ -217,8 +217,7 @@
         box-shadow: rgba(0, 0, 0, 0.05) 0px 5px 15px;
         max-height: 220px;
         overflow-y: scroll;
-        /*        background: rgb(242, 242, 242) !important;
-*/
+        background: transparent !important;
     }
         .application-request.card .requeststableBody .plan-request-card td.process .dropdown-menu a{
             padding:10px 5px;
@@ -226,26 +225,26 @@
             .application-request.card .requeststableBody .plan-request-card td.process .dropdown-menu a i{
                 color:var(--accent-color)
             }
-                
-                .application-request.card .requeststableBody .plan-request-card td.process .dropdown-item:hover i,
-                .application-request.card .requeststableBody .plan-request-card td.process .dropdown-item.active:hover i,
-                .application-request.card .requeststableBody .plan-request-card td.process .dropdown-item.active i {
-                    color: #fff
-                }
+
+    .application-request.card .requeststableBody .plan-request-card td.process .dropdown-item:hover i,
+    .application-request.card .requeststableBody .plan-request-card td.process .dropdown-item.active:hover i,
+    .application-request.card .requeststableBody .plan-request-card td.process .dropdown-item.active i {
+        color: transparent;
+    }
     .application-request.card .requeststableBody .plan-request-card td.process .dropdown-menu:hover a#AddNote i,
     .application-request.card .requeststableBody .plan-request-card td.process .dropdown-menu a#AddNote i
     .application-request.card .requeststableBody .plan-request-card td.process .dropdown-menuactive a#AddNote i {
-        color: #085f5c !important
+        color: #085f5c !important;
     }
     .application-request.card .requeststableBody .plan-request-card td.process .dropdown-menu:hover a#ChangeEmployee i,
     .application-request.card .requeststableBody .plan-request-card td.process .dropdown-menu a#ChangeEmployee i,
     .application-request.card .requeststableBody .plan-request-card td.process .dropdown-menuactive a#ChangeEmployee i {
-        color: #145da0 !important
+        color: #145da0 !important;
     }
     .application-request.card .requeststableBody .plan-request-card td.process .dropdown-menu:hover a#AddAttach i,
     .application-request.card .requeststableBody .plan-request-card td.process .dropdown-menu a#AddAttach i,
     .application-request.card .requeststableBody .plan-request-card td.process .dropdown-menuactive a#AddAttach i {
-        color: #145da0 !important
+        color: #145da0 !important;
     }
 
 .application-request.card .requeststableBody tr {
@@ -254,7 +253,6 @@
     width: 31.33333333%;
     margin: 0;
     box-shadow: none;
-    border: 1px solid #dee2e6;
     border: 1px solid #dee2e6;
     padding: 1rem 0.5rem 0.5rem 0.5rem;
     position: relative;
@@ -395,7 +393,7 @@ table#requesttable.dataTable thead th.card-img {
     position: relative;
     padding-top: 0;
     padding-bottom: 0;
-    background-color: var(--bg-surface-color);
+    background-color: transparent !important;
     line-height: 1.2;
 }
 
@@ -410,7 +408,7 @@ table#requesttable.dataTable thead th.card-img {
     position: relative;
     font-size: 1.25rem;
     border-radius: 10px 10px 0 0px;
-    background-color: var(--bg-surface-color) !important;
+    background-color: transparent !important;
     margin-top: 20px;
 }
 
@@ -432,6 +430,7 @@ table#requesttable.dataTable thead th.card-img {
 .application-request.card .requeststableBody tr td:last-child,
 #scholarshiptable.card #ScholarshipTableBody tr td:last-child {
     border-radius: 0 0 10px 10px;
+    background-color: transparent !important;
 }
 
 /*.application-request.card .requeststableBody tr td:before {
@@ -501,6 +500,7 @@ table#requesttable.dataTable thead th.card-img {
         row-gap: 0;
         position: relative;
         justify-content: center;
+        background-color: transparent !important;
     }
 
 
@@ -511,7 +511,7 @@ table#requesttable.dataTable thead th.card-img {
             padding: 1rem 0.5rem 0.5rem 0.5rem;
             position: relative;
             margin-bottom: 25px;
-            border: 1px solid var(--color-grey);
+            border: 1px solid var(--bs-border-color) !important;
             border-radius: 8px;
             margin-bottom: 2rem;
             flex-direction: row;
@@ -519,28 +519,35 @@ table#requesttable.dataTable thead th.card-img {
             float: none;
             flex: 0 0 auto;
             width: 31.33333333%;
-            background-color: rgb(253 253 253) !important;
+            background-color: transparent !important;
             display: flex;
-            box-shadow: 0 .125rem .25rem rgba(0, 0, 0, .075) !important;
+            cursor: pointer !important;
+            transition: all 0.3s ease;
         }
-@media only screen and (max-width: 992px) {
-    .application-request.card .requeststableBody .plan-request-card {
-        width: 48%;
-    }
-}
+            .application-request.card .requeststableBody .plan-request-card:hover {
+                transform: translateY(-2px) !important;
+                box-shadow: 0 6px 18px rgba(0,0,0,0.1) !important;
+            }
+            @media only screen and (max-width: 992px) {
+                .application-request.card .requeststableBody .plan-request-card {
+                    width: 48%;
+                }
+            }
 
 
 
 .application-request.card .requeststableBody .plan-request-card td {
     border: 0;
     box-sizing: border-box;
-    height:45px;
+    height: 45px;
+    background-color: transparent !important;
 }
 .application-request.card .requeststableBody .plan-request-card .header-left {
     display: flex;
     align-items: center;
     flex: 0 0 auto;
     width: 50%;
+    background-color: transparent !important;
 }
 .application-request.card .requeststableBody .plan-request-card .header-right {
     display: flex;
@@ -549,7 +556,7 @@ table#requesttable.dataTable thead th.card-img {
     width: 50%;
     font-weight: 600;
     justify-content: end;
-    background-color: var(--bg-surface-color);
+    background-color: transparent !important;
 }
 .application-request.card .requeststableBody .plan-request-card .status {
     font-size: 1rem;
@@ -575,7 +582,7 @@ table#requesttable.dataTable thead th.card-img {
     font-weight: 600;
     padding: .25rem .5rem;
     border-radius: 0 !important;
-    background-color: var(--bg-surface-color);
+    background-color: transparent !important;
 }
 .application-request.card .requeststableBody .plan-request-card .td-full {
     display: flex;
@@ -583,7 +590,7 @@ table#requesttable.dataTable thead th.card-img {
     flex: 0 0 auto;
     width: 100%;
     padding: .25rem .5rem;
-
+    background-color: transparent !important;
 }
 /*.application-request.card .requeststableBody .sch-status {
     font-size: 0.9rem;
@@ -595,11 +602,10 @@ table#requesttable.dataTable thead th.card-img {
 }*/
 .application-request .requeststableBody .request-status {
     font-size: 0.9rem;
-    font-weight: 600;
-    background-color: var(--bg-surface-color);
-    color: var(--accent-color);
-    padding: 0rem 0.6rem;
-    border-radius: 0.5rem;
+    font-weight: 700;
+    background-color: #D8F4DD70;
+    color: #0E6B32;
+    border-radius: 4px;
     display: inline-block;
     white-space: nowrap;
     overflow: hidden !important;
@@ -616,8 +622,8 @@ table#requesttable.dataTable thead th.card-img {
     text-align: center;
 }
 .application-request.card .requeststableBody .request-status {
-    max-width: 95%;
-    width: 95%;
+    max-width: 100%;
+    width: 100%;
     display: block;
     line-height: 30px;
     text-align: center;
@@ -705,10 +711,7 @@ table#requesttable.dataTable thead th.card-img {
     color: var(--accent-color);
     margin-right: 5px;
 }
-.application-request.card .requeststableBody .plan-request-card .date,
-.application-request.card .requeststableBody .plan-request-card .time {
-    background-color: #f2f2f2 !important;
-}
+
 .application-request.card .requeststableBody .plan-request-card .date:before {
     content: "\f783";
     font-weight: 900;
@@ -840,7 +843,7 @@ table#requesttable.dataTable thead th.card-img {
     border: 2px solid #d0d0d0;
     border-radius: 10px;
     padding: 14px;
-    background: #fff;
+    background: transparent;
     cursor: pointer;
     text-align: center;
 }
@@ -855,7 +858,7 @@ table#requesttable.dataTable thead th.card-img {
 .gridtable {
     border-collapse: separate;
     border-spacing: 0;
-    background: #fff;
+    background: transparent;
     border-radius: 10px;
     overflow: hidden;
     box-shadow: 0 4px 12px rgba(0,0,0,.04);
@@ -1007,3 +1010,28 @@ table#requesttable.dataTable thead th.card-img {
 .text-align-end {
     text-align: end;
 }
+.application-request.card .requeststableBody .plan-request-card .date,
+.application-request.card .requeststableBody .plan-request-card .time {
+    background-color: #fff !important;
+}
+.application-request.card .requeststableBody tr > *,
+.application-request.card .requeststableBody tr:nth-of-type(odd) > *,
+.application-request.card .requeststableBody tr:nth-of-type(even) > * {
+    --bs-table-bg-type: transparent !important;
+    --bs-table-accent-bg: transparent !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+}
+
+.application-request.card .requeststableBody .plan-request-card {
+    background-color: #fff !important;
+}
+
+.plan-row {
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+    .plan-row:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.1) !important;
+    }
