@@ -856,3 +856,27 @@ table.dataTable td p i{ font-size: 1.3rem;}
 }
 .uploaded-files .alert-dark .btn-close{padding: 1rem;}
 
+
+
+
+
+
+
+/*Header*/
+.border-top-primary {
+    border-top: 5px solid var(--color-primary);
+}
+/*Hero*/
+.hero-image {
+    height: 4rem;
+}
+/*Align Icon Vertically*/
+.vertical-align {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+.vertical-align i {
+    line-height: 1;
+}
+

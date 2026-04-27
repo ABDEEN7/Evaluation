@@ -22,10 +22,10 @@
 .nav-tabs.main-tabs .nav-link {
     font-size: 22px;
     font-weight: 600;
-    color: #6b1225;
+    color: #666766;
     border: none;
     padding: 10px 25px;
-    background-color:transparent
+    background-color: transparent
 }
 
     .nav-tabs.main-tabs .nav-link.active {
@@ -43,9 +43,9 @@
 }
 
     .nav-tabs.sub-tabs .nav-link.active {
-        background: var(--color-primary);
-        border: 1px solid var(--color-primary);
-        color: #fff;
+        background: #F1E6E5;
+        border: 1px solid #DDC2C2;
+        color: #89153D;
     }
 
 
@@ -938,14 +938,14 @@ table#requesttable.dataTable thead th.card-img {
 }
 
 .nav-tabs .nav-link {
-    font-weight: 600;
-    color: #495057;
+    font-weight: 300;
+    color: #666766;
 }
 
     .nav-tabs .nav-link.active {
-        background: #fff;
+        font-weight: 700;
         border-bottom: 3px solid #0d6efd;
-        color: #0d6efd;
+        color: #89153D;
     }
 
 #filedivid {
@@ -976,3 +976,33 @@ table#requesttable.dataTable thead th.card-img {
         word-break: break-word;
         text-align: center;
     }
+
+
+#planRequestStatusFilter + .select2 .select2-selection--multiple,
+#planRequestStatusFilter + .select2 .select2-selection--single {
+    min-height: 45px !important;
+    height: 45px !important;
+    display: flex !important;
+    align-items: center !important;
+    box-sizing: border-box !important;
+    border: 1px solid #ccc;
+}
+
+#planRequestStatusFilter + .select2 .select2-selection__rendered {
+    line-height: 45px !important;
+    padding-right: 12px !important;
+    padding-left: 12px !important;
+}
+
+#planRequestStatusFilter + .select2 .select2-selection--multiple .select2-search__field {
+    height: 43px !important;
+    margin-top: 0 !important;
+}
+
+#planRequestStatusFilter + .select2 .select2-selection__arrow {
+    height: 45px !important;
+}
+
+.text-align-end {
+    text-align: end;
+}
