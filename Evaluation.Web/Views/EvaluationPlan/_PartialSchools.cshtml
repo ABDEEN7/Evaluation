@@ -1,17 +1,20 @@
-﻿
+﻿@using Evaluation.SharedHelper.Enums
+
 <div class="card mb-4">
     <div class="card-header d-flex justify-content-between align-items-center">
         <h4 class="mb-0" id="tabSchoolsAnchorTag">
-            @* هيتغير بالـ JS ويضيف عدد المدارس *@
-            المدارس
+            @ConstantKeys.WebSchools.Schools
         </h4>
 
-        <div class="btn-group" role="group" aria-label="View mode">
+        <div class="btn-group" role="group">
             <button id="cardViewSchool" type="button" class="btn btn-outline-primary active">
-                <i class="la la-th-large"></i> عرض كبطاقات
+                <i class="la la-th-large"></i>
+                @ConstantKeys.WebAppCommon.lblDisplayAsCards
             </button>
+
             <button id="tblViewSchool" type="button" class="btn btn-outline-secondary">
-                <i class="la la-list"></i> عرض كجدول
+                <i class="la la-list"></i>
+                @ConstantKeys.WebAppCommon.lblDisplayAsTable
             </button>
         </div>
     </div>
@@ -23,17 +26,17 @@
             <div class="row g-3">
 
                 <div class="col-md-4">
-                    <label for="schoolNameFilter" class="form-label">اسم المدرسة</label>
+                    <label for="schoolNameFilter" class="form-label">@ConstantKeys.WebSchools.SchoolName</label>
                     <input id="schoolNameFilter" class="form-control filter-enter" />
                 </div>
 
                 <div class="col-md-4">
-                    <label for="schoolCodeFilter" class="form-label">كود المدرسة</label>
+                    <label for="schoolCodeFilter" class="form-label">@ConstantKeys.WebSchools.SchoolCode</label>
                     <input id="schoolCodeFilter" class="form-control filter-enter" />
                 </div>
 
                 <div class="col-md-4">
-                    <label for="schoolPhaseFilter" class="form-label">المرحلة</label>
+                    <label for="schoolPhaseFilter" class="form-label">@ConstantKeys.WebSchools.Phase</label>
                     <select id="schoolPhaseFilter" class="form-select filter-enter">
                         <option value="">الكل</option>
                         <option value="1">ابتدائية</option>
@@ -43,7 +46,7 @@
                 </div>
 
                 <div class="col-md-4">
-                    <label for="schoolTypeFilter" class="form-label">نوع المدرسة</label>
+                    <label for="schoolTypeFilter" class="form-label">@ConstantKeys.WebSchools.Type</label>
                     <select id="schoolTypeFilter" class="form-select filter-enter">
                         <option value="">الكل</option>
                         <option value="1">حكومية</option>
@@ -53,7 +56,7 @@
                 </div>
 
                 <div class="col-md-4">
-                    <label for="schoolRegionFilter" class="form-label">المنطقة</label>
+                    <label for="schoolRegionFilter" class="form-label">@ConstantKeys.WebSchools.Region</label>
                     <select id="schoolRegionFilter" class="form-select filter-enter">
                         <option value="">الكل</option>
                         <option value="1">الدوحة</option>
@@ -63,7 +66,7 @@
                 </div>
 
                 <div class="col-md-4">
-                    <label for="schoolStatusFilter" class="form-label">حالة الخطة الحالية</label>
+                    <label for="schoolStatusFilter" class="form-label">@ConstantKeys.WebSchools.CurrentPlanStatus</label>
                     <select id="schoolStatusFilter" class="form-select filter-enter">
                         <option value="">الكل</option>
                         <option value="1">لم تبدأ</option>
@@ -72,14 +75,15 @@
                     </select>
                 </div>
 
-                <div class="col-md-12 d-flex justify-content-end gap-2 mt-2">
-                    <button id="filterSchoolBtnId" type="button" class="btn btn-primary">
-                        <i class="la la-search"></i> بحث
-                    </button>
-                    <button id="clearFilterSchoolBtnId" type="button" class="btn btn-outline-secondary">
-                        <i class="la la-undo"></i> مسح التصفية
-                    </button>
-                </div>
+                <button id="filterSchoolBtnId" class="btn btn-primary">
+                    <i class="la la-search"></i>
+                    @ConstantKeys.WebSchools.Search
+                </button>
+
+                <button id="clearFilterSchoolBtnId" class="btn btn-outline-secondary">
+                    <i class="la la-undo"></i>
+                    @ConstantKeys.WebSchools.ClearFilter
+                </button>
             </div>
         </form>
 
@@ -88,12 +92,12 @@
             <table id="schoolTable" class="table table-striped table-bordered w-100 application-request card">
                 <thead>
                     <tr>
-                        <th>اسم المدرسة</th>
-                        <th>الكود</th>
-                        <th>النوع</th>
-                        <th>المرحلة</th>
-                        <th>المنطقة</th>
-                        <th>حالة الخطة الحالية</th>
+                        <th>@ConstantKeys.WebSchools.Name</th>
+                        <th>@ConstantKeys.WebSchools.Code</th>
+                        <th>@ConstantKeys.WebSchools.TypeCol</th>
+                        <th>@ConstantKeys.WebSchools.PhaseCol</th>
+                        <th>@ConstantKeys.WebSchools.RegionCol</th>
+                        <th>@ConstantKeys.WebSchools.StatusCol</th>
                     </tr>
                 </thead>
                 <tbody class="requeststableBody"></tbody>
