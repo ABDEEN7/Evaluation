@@ -24,7 +24,7 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
     public async Task<Result<FormDto>> GetFormItems(Guid FormId)
     {
 
-        var evalForm = await formService.GetEvalForm(FormId);
+        var evalForm = await formService.GetEvalForm(FormId, IncludeCalcMethod: true);
         var mappedEvalForm = mapper.Map<EvaluationFormDto>(evalForm);
 
         var formItems = await formService.GetFormItems(FormId);

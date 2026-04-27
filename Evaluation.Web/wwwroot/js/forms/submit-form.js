@@ -1,18 +1,6 @@
 ﻿let departmentPath = sharedUtility().extractDepartmentName();
 
-$(document).ready(function () {
-    $("#btnSubmitForm").on("click", function (e) {
-        e.preventDefault();
-        submitForm();
-    });
-});
 
-$(document).ready(function () {
-    $("#btnSaveForm").on("click", function (e) {
-        e.preventDefault();
-        validateForm();
-    });
-});
 function evaluationFormResult(formId) { 
     const mainItems = [];
 
@@ -73,15 +61,60 @@ function evaluationFormResult(formId) {
 
     const payload = {
         id: formId,
-        items: mainItems
+        items: mainItems,
+        formSettings: evalForm,
+        //results:,
     };
 
     console.log("FINAL NESTED JSON:", payload);
 
     return payload;
 }
+async function evaluationFormWithCalculationResult(formId) {
+    var result = evaluationFormResult(formId);
+    var finalResult = {
+        id: result.id,
+        items: result.items,
+        formSettings: result.formSettings,
+        results: await calculate(formId),
+    };
+
+    console.log(finalResult);
+    return finalResult;
 
 
+}
+async function calculate(formId) {
+    var result = evaluationFormResult(formId);
+
+    return new Promise((resolve, reject) => {
+    jqClient().Post(`/Form/${departmentPath}/CalculateEvaluationFormResult`, result)
+        .done((res) => {
+            console.log(res);
+            resolve(res); 
+        }).fail((err) => {
+            reject(err);
+        });
+    });
+}
+
+function validateForm(formId) {
+    var result = evaluationFormResult(formId);
+    jqClient().Post(`/Form/${departmentPath}/ValidateEvaluationForm`, result)
+        .done((res) => {
+
+            if (res.value.isValid) {
+                return res.value.isValid;
+            }
+            else {
+                clearValidation();
+                res.value.errors.forEach(error => {
+                    showValidation(error.itemId, error.message, error.itemPropertyType);
+                });
+                return res.value.isValid;
+            }
+        });
+}
 function renameFormItems(formId) {
     const mainItems = [];
 

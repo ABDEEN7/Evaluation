@@ -61,4 +61,11 @@ public class FormController : ControllerBase
         return await _masterBl.GetApiService<FormBL>().ValidateEvaluationForm(formEvaluation);
     }
 
+
+    [HttpPost]
+    public async Task<Result<CalculationFormResult>> CalculateEvaluationFormResult([FromBody] FormEvaluationDto formEvaluation)
+    {
+        return new CalculationFormResult() { };
+    }
+
 }

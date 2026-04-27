@@ -6,7 +6,7 @@ const API = {
         `/Form/${depRoutePath}/GetItems?formId=${formId}`,
 
     getMatrixValues: (depRoutePath, formId) =>
-        `/Form/${depRoutePath}/GetFormEvalMarixValues?formId=${formId}`
+        `/Form/${depRoutePath}/GetFormEvalMarixValues?formId=${formId}`,
 };
 
 // ==============================
@@ -34,6 +34,8 @@ const ItemPropertyType = Object.freeze({
     SELECT: 1,
     NOTE: 2
 });
+
+let evalForm;
 
 // ==============================
 // Utilities
@@ -394,6 +396,7 @@ const generateFullFormPageHtml = async ({ formId, fieldId, readOnly, allowRename
         API.getItems(depRoutePath, formId)
     );
 
+    evalForm = itemsResult?.value.evalForm;
     let items = itemsResult?.value.items ?? [];
 
     if (readOnly) {
