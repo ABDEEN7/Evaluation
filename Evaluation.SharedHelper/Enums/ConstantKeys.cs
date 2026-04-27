@@ -1172,7 +1172,7 @@ public static class ConstantKeys
     }
     public static class EvaluationOperations
     {
-        private const string Prefix = "EvaluationOperations.";
+        private const string Prefix = "lblEvaluationOperations";
 
         // Titles
         public const string PlansListTitle = Prefix + nameof(PlansListTitle);
@@ -1181,7 +1181,6 @@ public static class ConstantKeys
 
         // Filters
         public const string Filter = Prefix + nameof(Filter);
-        public const string ApplyFilter = Prefix + nameof(ApplyFilter);
         public const string Clear = Prefix + nameof(Clear);
 
         public const string RequestNo = Prefix + nameof(RequestNo);
@@ -1192,7 +1191,7 @@ public static class ConstantKeys
         public const string CreatedTime = Prefix + nameof(CreatedTime);
 
         // Plan Info
-        public const string PlanName = Prefix + nameof(PlanName);
+        public const string PlanName = "lblEvaluationOperationsPlanName";
         public const string PlanStatus = Prefix + nameof(PlanStatus);
         public const string PlanStartDate = Prefix + nameof(PlanStartDate);
         public const string PlanEndDate = Prefix + nameof(PlanEndDate);
@@ -1231,7 +1230,7 @@ public static class ConstantKeys
     }
     public static class EvaluationPlans
     {
-        private const string Prefix = "EvaluationPlans.";
+        private const string Prefix = "lblEvaluationPlans";
 
         // Filters
         public const string AcademicYear = Prefix + "AcademicYear";
@@ -1251,6 +1250,41 @@ public static class ConstantKeys
         public const string Status = Prefix + "Status";
         public const string View = Prefix + "View";
         public const string Actions = Prefix + "Actions";
+    }
+    public static class EvaluationForm
+    {
+        private const string Prefix = "lblEvaluationForm"; 
+
+        public const string PageTitle = Prefix + "PageTitle";
+        public const string PageDescription = Prefix + "PageDescription";
+
+        public const string TabEvaluationPlans = Prefix + "TabEvaluationPlans";
+        public const string TabEvaluationOperations = Prefix + "TabEvaluationOperations";
+        public const string TabSchools = Prefix + "TabSchools";
+
+        public const string SubTabPlanRequests = Prefix + "SubTabPlanRequests";
+        public const string SubTabPlanDetails = Prefix + "SubTabPlanDetails";
+
+        public const string BreadcrumbSchool = Prefix + "BreadcrumbSchool";
+        public const string BreadcrumbRequestNo = Prefix + "BreadcrumbRequestNo";
+
+        public const string AccordionSchoolBasicData = Prefix + "AccordionSchoolBasicData";
+        public const string AccordionSchoolData = Prefix + "AccordionSchoolData";
+
+        public const string PlanDetailsTitle = Prefix + "PlanDetailsTitle";
+        public const string PlanDetailsClose = Prefix + "PlanDetailsClose";
+
+        public const string BreadcrumbPlans = Prefix + "BreadcrumbPlans";
+        public const string BreadcrumbRequestDetails = Prefix + "BreadcrumbRequestDetails";
+
+        public const string CreateRequestTitle = Prefix + "CreateRequestTitle";
+        public const string CreateRequestBreadcrumb = Prefix + "CreateRequestBreadcrumb";
+
+        public const string ActionDetailsHeader = Prefix + "ActionDetailsHeader";
+        public const string ActionCloseBtn = Prefix + "ActionCloseBtn";
+
+        public const string AccordionRequestDetails = Prefix + "AccordionRequestDetails";
+        public const string AccordionActionLog = Prefix + "AccordionActionLog";
     }
 
 
@@ -1433,7 +1467,7 @@ public static class ConstantKeys
     }
     public static class WebSchools
     {
-        private const string Prefix = "WebSchools.";
+        private const string Prefix = "lblWebSchools";
 
         // Header
         public const string Schools = Prefix + "Schools";

@@ -180,7 +180,7 @@ public class EvaluationFormBL(IServiceScopeFactory serviceScopeFactory, CacheDat
     public async Task<IReadOnlyList<DropdownItem>> GetCalcMethodsListAsync()
     {
         return await uow.GetRepository<CalcMethod>()
-            .GetAllActiveNonDeleted(x => x.DepartmentId == requestInfo.DepId)
+            .GetAllActiveNonDeleted()
             .Select(x => new DropdownItem
             {
                 Id = x.Id,

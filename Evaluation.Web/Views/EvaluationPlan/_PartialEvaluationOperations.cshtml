@@ -6,27 +6,24 @@
             <button id="cardViewEvaluationRequest"
                     type="button"
                     class="btn btn-outline-primary active">
-                <i class="la la-th-large"></i>
-                @ConstantKeys.EvaluationOperations.CardView
+                <i class="la la-th-large @ConstantKeys.WebAppCommon.lblDisplayAsCards"></i>
             </button>
 
             <button id="tblViewEvaluationRequest"
                     type="button"
                     class="btn btn-outline-secondary">
-                <i class="la la-list"></i>
-                @ConstantKeys.EvaluationOperations.TableView
+                <i class="la la-list @ConstantKeys.WebAppCommon.lblDisplayAsTable"></i>
             </button>
         </div>
 
         <div class="d-flex gap-2">
             <button id="filterEvaluationRequestBtnId"
-                    class="btn btn-primary">
-                @ConstantKeys.EvaluationOperations.ApplyFilter
+                    class="btn btn-primary @ConstantKeys.EvaluationPlanRequests.lblApplyFilter">
             </button>
 
             <button id="clearFilterEvaluationRequestBtnId"
-                    class="btn btn-outline-secondary">
-                @ConstantKeys.EvaluationOperations.Clear
+                    class="btn btn-outline-secondary @ConstantKeys.EvaluationPlanRequests.lblClear">
+                
             </button>
         </div>
 
@@ -37,15 +34,15 @@
             <div class="row g-3">
 
                 <div class="col-md-4">
-                    <label class="form-label">
-                        @ConstantKeys.EvaluationOperations.RequestNo
+                    <label class="form-label @ConstantKeys.EvaluationOperations.RequestNo">
+                        
                     </label>
                     <input id="evaluationRequestNoFilter" class="form-control filter-enter" />
                 </div>
 
                 <div class="col-md-4">
-                    <label class="form-label">
-                        @ConstantKeys.EvaluationOperations.PlanName
+                    <label class="form-label @ConstantKeys.EvaluationOperations.PlanName">
+                        
                     </label>
                     <select id="evaluationPlanIdFilter" class="form-select filter-enter">
                         <option value="">
@@ -55,30 +52,28 @@
                 </div>
 
                 <div class="col-md-4">
-                    <label class="form-label">
-                        @ConstantKeys.EvaluationOperations.School
+                    <label class="form-label @ConstantKeys.EvaluationOperations.School">
+                        
                     </label>
                     <input id="evaluationOrgTreeFilter" class="form-control filter-enter" />
                 </div>
               
 
                 <div class="col-lg-4 col-sm-12 mb-sm-4">
-                    <label class="form-label">@ConstantKeys.EvaluationOperations.Status</label>
+                    <label class="form-label @ConstantKeys.EvaluationOperations.Status"></label>
                     <select id="evaluationRequestStatusFilter" class="form-select w-100">
                     </select>
                 </div>
 
 
                 <div class="col-md-4">
-                    <label class="form-label">
-                        @ConstantKeys.EvaluationOperations.PlanStartDate
+                    <label class="form-label @ConstantKeys.EvaluationOperations.PlanStartDate">
                     </label>
                     <input id="evaluationRequestDateFrom" type="date" class="form-control filter-enter" />
                 </div>
 
                 <div class="col-md-4">
-                    <label class="form-label">
-                        @ConstantKeys.EvaluationOperations.PlanEndDate
+                    <label class="form-label @ConstantKeys.EvaluationOperations.PlanEndDate">
                     </label>
                     <input id="evaluationRequestDateTo" type="date" class="form-control filter-enter" />
                 </div>
@@ -94,12 +89,12 @@
 
         <thead>
             <tr>
-                <th>@ConstantKeys.EvaluationOperations.PlanName</th>
-                <th>@ConstantKeys.EvaluationOperations.Status</th>
-                <th>@ConstantKeys.EvaluationOperations.School</th>
-                <th>@ConstantKeys.EvaluationOperations.RequestNo</th>
-                <th>@ConstantKeys.EvaluationOperations.CreatedDate</th>
-                <th>@ConstantKeys.EvaluationOperations.CreatedTime</th>
+                <th class="@ConstantKeys.EvaluationOperations.PlanName"></th>
+                <th class="@ConstantKeys.EvaluationOperations.Status"></th>
+                <th class="@ConstantKeys.EvaluationOperations.School"></th>
+                <th class="@ConstantKeys.EvaluationOperations.RequestNo"></th>
+                <th class="@ConstantKeys.EvaluationOperations.CreatedDate"></th>
+                <th class="@ConstantKeys.EvaluationOperations.CreatedTime"></th>
             </tr>
         </thead>
 
@@ -121,17 +116,15 @@
                                 <i class="la la-angle-left fs-32"></i>
 
                                 <div>
-                                    <h3 class="fw-bold m-0"
+                                    <h3 class="fw-bold m-0 @ConstantKeys.EvaluationOperations.RequestDetails"
                                         id="evaluationRequestModalLabel">
-                                        @ConstantKeys.EvaluationOperations.RequestDetails
                                     </h3>
 
                                     <nav aria-label="breadcrumb">
                                         <ol class="breadcrumb">
 
                                             <li class="breadcrumb-item">
-                                                <a href="#">
-                                                    @ConstantKeys.EvaluationOperations.PlanRequests
+                                                <a href="#" class="@ConstantKeys.EvaluationOperations.PlanRequests">
                                                 </a>
                                             </li>
 
