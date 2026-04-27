@@ -18,6 +18,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using System.Text.Json;
 using static Evaluation.SharedHelper.Enums.ConstantKeys;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 {
@@ -494,12 +495,22 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
             switch (tableName)
             {
-             
 
-                case "CurrentAcademicYear":
-                    result = await GetCurrentAcademicYearData(fieldValueId);
+
+
+				case "CurrentAcademicYear":
+					result = await GetCurrentAcademicYearData(fieldValueId);
+					break;
+
+				case "LastTwoAcademicYears":
+					result = await GetLastTwoAcademicYearsData(fieldValueId);
+					break;
+				case "AcademicYearsByYears":
+                    result = await GetAcademicYearsByYears(fieldValueId);
                     break;
-
+				case "AcademicYear":
+					result = await GetAllAcademicYearsData(fieldValueId);
+					break;
 				case "SchoolClasses":
 					{
 						//if (SchId == null || SchId == Guid.Empty)
@@ -566,8 +577,151 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
             return result;
         }
+		private async Task<List<Dictionary<string, object>>> GetAllAcademicYearsData(Guid? fieldValueId = null)
+		{
+			var data = cacheDataProvider.GetFromCache<List<AcademicYear>>(
+				ConstantKeys.WebAppCacheTableName.CACHE_ACADEMICYEAR);
 
-         private async Task<List<Dictionary<string, object>>> GetCurrentAcademicYearData(Guid? fieldValueId = null)
+			using var scopedUow = serviceScopeFactory.CreateScopedUow();
+			var repository = scopedUow.GetRepository<AcademicYear>();
+
+			if (data == null)
+			{
+				data = await repository.GetAllQueryFiltered().ToListAsync();
+
+				await cacheDataProvider.SetToCache(
+					ConstantKeys.WebAppCacheTableName.CACHE_ACADEMICYEAR,
+					data);
+			}
+
+			
+				data = data
+					.Where(x => x.DepartmentId == requestInfo.DepId!.Value)
+					.ToList();
+		
+
+			if (fieldValueId.HasValue && fieldValueId != Guid.Empty)
+			{
+				data = data
+					.Where(x => x.Id == fieldValueId.Value)
+					.ToList();
+			}
+
+			return data
+				.OrderByDescending(x => x.StartDate)
+				.Select(item => new Dictionary<string, object>
+				{
+					["Id"] = item.Id,
+					["NameAr"] = item.NameAr ?? string.Empty,
+					["NameEn"] = item.NameEn ?? string.Empty,
+					["StartDate"] = item.StartDate.ToString("yyyy"),
+					["EndDate"] = item.EndDate.ToString("yyyy")
+				})
+				.ToList();
+		}
+		private async Task<List<Dictionary<string, object>>> GetLastTwoAcademicYearsData(Guid? fieldValueId = null)
+		{
+			var data = cacheDataProvider.GetFromCache<List<AcademicYear>>(
+				ConstantKeys.WebAppCacheTableName.CACHE_ACADEMICYEAR);
+
+			using var scopedUow = serviceScopeFactory.CreateScopedUow();
+			var repository = scopedUow.GetRepository<AcademicYear>();
+
+			if (data == null)
+			{
+				data = await repository.GetAllQueryFiltered().ToListAsync();
+
+				await cacheDataProvider.SetToCache(
+					ConstantKeys.WebAppCacheTableName.CACHE_ACADEMICYEAR,
+					data);
+			}
+
+			
+				data = data
+					.Where(x => x.DepartmentId == requestInfo.DepId!.Value)
+					.ToList();
+			
+
+			if (fieldValueId.HasValue && fieldValueId != Guid.Empty)
+			{
+				data = data
+					.Where(x => x.Id == fieldValueId.Value)
+					.ToList();
+			}
+			else
+			{
+				data = data
+					.OrderByDescending(x => x.StartDate)
+					.Take(2)
+					.ToList();
+			}
+
+			return data
+				.OrderByDescending(x => x.StartDate)
+				.Select(item => new Dictionary<string, object>
+				{
+					["Id"] = item.Id,
+					["NameAr"] = item.NameAr ?? string.Empty,
+					["NameEn"] = item.NameEn ?? string.Empty,
+					["StartDate"] = item.StartDate.ToString("yyyy"),
+					["EndDate"] = item.EndDate.ToString("yyyy")
+				})
+				.ToList();
+		}
+		private async Task<List<Dictionary<string, object>>> GetAcademicYearsByYears(List<int> years , Guid? fieldValueId = null)
+		{
+			if (years == null || !years.Any())
+				return new List<Dictionary<string, object>>();
+
+			var data = cacheDataProvider.GetFromCache<List<AcademicYear>>(
+				ConstantKeys.WebAppCacheTableName.CACHE_ACADEMICYEAR);
+
+			using var scopedUow = serviceScopeFactory.CreateScopedUow();
+			var repository = scopedUow.GetRepository<AcademicYear>();
+
+			if (data == null)
+			{
+				data = await repository.GetAllQueryFiltered().ToListAsync();
+
+				await cacheDataProvider.SetToCache(
+					ConstantKeys.WebAppCacheTableName.CACHE_ACADEMICYEAR,
+					data);
+			}
+
+			
+				data = data
+					.Where(x => x.DepartmentId == requestInfo.DepId.Value)
+					.ToList();
+
+
+			if (fieldValueId.HasValue && fieldValueId != Guid.Empty)
+			{
+				data = data.Where(x => x.Id == fieldValueId).ToList();
+			}
+			else
+			{
+				data = data
+					.Where(x =>
+						years.Contains(x.StartDate.Year) ||
+						years.Contains(x.EndDate.Year))
+					.ToList();
+			}
+
+			
+
+			return data
+				.OrderByDescending(x => x.StartDate)
+				.Select(item => new Dictionary<string, object>
+				{
+					["Id"] = item.Id,
+					["NameAr"] = item.NameAr ?? string.Empty,
+					["NameEn"] = item.NameEn ?? string.Empty,
+					["StartDate"] = item.StartDate.ToString("yyyy"),
+					["EndDate"] = item.EndDate.ToString("yyyy")
+				})
+				.ToList();
+		}
+		private async Task<List<Dictionary<string, object>>> GetCurrentAcademicYearData(Guid? fieldValueId = null)
         {
             // 1. Try to get the full list from cache
             var data = cacheDataProvider.GetFromCache<List<AcademicYear>>(ConstantKeys.WebAppCacheTableName.CACHE_ACADEMICYEAR);
@@ -583,7 +737,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                 await cacheDataProvider.SetToCache(ConstantKeys.WebAppCacheTableName.CACHE_ACADEMICYEAR, data);
             }
 
-             data = data.Where(a => a.IsCurrent).ToList();
+             data = data.Where(a => a.IsCurrent && a.DepartmentId==requestInfo.DepId).ToList();
 
             if (fieldValueId is not null && fieldValueId != Guid.Empty)
             {
