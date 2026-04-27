@@ -305,7 +305,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             if (dto.EvaluationRequestId == Guid.Empty)
                 return new NdaApproveResponse { IsSuccess = false, IsNdaApprovalPending = true, Message = "Invalid request id." };
 
-            if (string.IsNullOrWhiteSpace(dto.ConflictReason))
+            if (string.IsNullOrWhiteSpace(dto.ConflictReason) && dto.HasConflict)
                 return new NdaApproveResponse { IsSuccess = false, IsNdaApprovalPending = true, Message = "Conflict reason is required." };
 
             var assignment = await scope.GetRepository<EvaluationRequestAssignment>()
@@ -325,8 +325,9 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             }
 
             assignment.Note = dto.ConflictReason;
+            assignment.IsNDA =! dto.HasConflict;
             assignment.NdaDate = DateTime.UtcNow;
-            assignment.NdaStatusId = dto.NDAStatusId;
+            //assignment.NdaStatusId = dto.NDAStatusId;
 
             await scope.CommitAsync();
 

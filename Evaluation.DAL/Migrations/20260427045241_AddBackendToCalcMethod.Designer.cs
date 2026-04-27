@@ -4,6 +4,7 @@ using Evaluation.DAL.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Evaluation.DAL.Migrations
 {
     [DbContext(typeof(EvaluationDbContext))]
-    partial class EvaluationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260427045241_AddBackendToCalcMethod")]
+    partial class AddBackendToCalcMethod
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -3622,7 +3625,6 @@ namespace Evaluation.DAL.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("BackendName")
-                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<Guid>("CreateById")
@@ -3638,6 +3640,9 @@ namespace Evaluation.DAL.Migrations
 
                     b.Property<DateTime?>("DeleteDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<Guid>("DepartmentId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
@@ -3669,9 +3674,6 @@ namespace Evaluation.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("OrderNo")
-                        .HasColumnType("int");
-
                     b.Property<Guid?>("UpdateById")
                         .HasColumnType("uniqueidentifier");
 
@@ -3681,11 +3683,14 @@ namespace Evaluation.DAL.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("BackendName")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[BackendName] IS NOT NULL");
 
                     b.HasIndex("CreateById");
 
                     b.HasIndex("DeleteById");
+
+                    b.HasIndex("DepartmentId");
 
                     b.HasIndex("UpdateById");
 
@@ -12728,6 +12733,12 @@ namespace Evaluation.DAL.Migrations
                         .HasForeignKey("DeleteById")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("Evaluation.DAL.Models.DepartementEntites.Department", "Department")
+                        .WithMany()
+                        .HasForeignKey("DepartmentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "UpdateBy")
                         .WithMany()
                         .HasForeignKey("UpdateById")
@@ -12736,6 +12747,8 @@ namespace Evaluation.DAL.Migrations
                     b.Navigation("CreateBy");
 
                     b.Navigation("DeleteBy");
+
+                    b.Navigation("Department");
 
                     b.Navigation("UpdateBy");
                 });

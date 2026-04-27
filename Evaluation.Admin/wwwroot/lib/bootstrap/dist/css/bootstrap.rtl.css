@@ -3050,6 +3050,12 @@ textarea.form-control-lg {
   border-color: #198754;
 }
 
+.btn-information {
+    color: var(--bs-primary);
+    background-color: #F1E6E5;
+    border-color: var(--bs-primary);
+}
+
 .btn-info {
   color: #000;
   background-color: #0dcaf0;
