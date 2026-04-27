@@ -162,19 +162,21 @@ var formGenerateFieldUtility = window.formUtility;
                 const allowAddFormItem = field.attributes?.find(c => c.name === 'allowAddFormItem');
                 const allowDeleteFormItem = field.attributes?.find(c => c.name === 'allowDeleteFormItem');
                 const allowRenameFormItem = field.attributes?.find(c => c.name === 'allowRenameFormItem');
-                const allowRename = field.attributes?.find(c => c.name === 'allowRename');
+                //const allowRename = field.attributes?.find(c => c.name === 'allowRename');
+
+                const controlValues = JSON.parse(field.value);
                 const html = await generateFullFormPageHtml({
                     formId,
                     fieldId: fieldId,
                     readOnly: readonly,
-                    allowRename: allowRenameFormItem && (!allowRenameFormItem || allowRenameFormItem.value == true || allowRenameFormItem.value == "true"),
-                    allowDelete: allowDeleteFormItem && (!allowDeleteFormItem || allowDeleteFormItem.value == true || allowDeleteFormItem.value == "true"),
-                    allowAdd: allowAddFormItem &&(!allowAddFormItem || allowAddFormItem.value == true || allowAddFormItem.value == "true")
+                    allowRename: allowRenameFormItem != undefined && (!allowRenameFormItem || allowRenameFormItem.value == true || allowRenameFormItem.value == "true"),
+                    allowDelete: allowDeleteFormItem != undefined && (!allowDeleteFormItem || allowDeleteFormItem.value == true || allowDeleteFormItem.value == "true"),
+                    allowAdd: allowAddFormItem != undefined && (!allowAddFormItem || allowAddFormItem.value == true || allowAddFormItem.value == "true"),
+                    namingResult: controlValues
                 });
 
                 container.html(html);
 
-                const controlValues = JSON.parse(field.value);
                 if (allowRenameFormItem) {
                    await fillRenameControls(fieldId, controlValues)
                 }
