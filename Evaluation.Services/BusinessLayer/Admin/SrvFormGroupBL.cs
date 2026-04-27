@@ -76,11 +76,13 @@ namespace Evaluation.Services.Models.Admin
 
         public async Task<List<Field>> GetAllSystemField(Guid systemmoduleid)
         {
-            var insitalservice=await uow.GetRepository<Service>().GetAllActiveNonDeleted().Where(x=>x.SystemModuleId==systemmoduleid && x.Initialservice==true).Select(x=>x.Id).FirstOrDefaultAsync();
+			var ParentModuleTypeId = await uow.GetRepository<SystemModule>().GetAllActiveNonDeleted().Include(x => x.SystemModuleType).Where(x => x.Id == systemmoduleid).Select(x => x.SystemModuleType.ParentModuleTypeId).ToListAsync();
 
-            var result = await uow.GetRepository<Field>()
+			var insitalservice =await uow.GetRepository<Service>().GetAllActiveNonDeleted().Include(x=>x.SystemModule).Where(x=>(x.SystemModuleId==systemmoduleid || ParentModuleTypeId.Contains( x.SystemModule.SystemModuleTypeId)) && x.Initialservice==true).Select(x=>x.Id).ToListAsync();
+			
+			var result = await uow.GetRepository<Field>()
                     .GetAllActiveNonDeleted()
-                    .Where(x=>x.ServiceId==insitalservice)
+                    .Where(x=>insitalservice.Contains(x.ServiceId))
                     .OrderByDescending(x => x.CreateDate)
                     .ToListAsync();
            

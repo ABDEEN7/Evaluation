@@ -26,38 +26,40 @@
 </div>End Page Title -->
 
 
-<section id="evaluation" class="banner px-0 pt-5 mt-5">
-    <div class="container-fluid container-xxxl">
-        <div class="row">
-            <div class="col-lg-12">
+<section id="evaluation" class="banner p-4">
+    <div class="card container-fluid container-xxxl p-4">
+        <h2>We need a title</h2>
+        <h6>We need a description of this page</h6>
+        <div class="row py-4">
+            <div class="col-lg-12 mb-3">
                 <ul class="nav nav-tabs row main-tabs bg-grey">
                     <li id="tabEvaluationPlans" class="nav-item col-md-4">
                         <a class="nav-link text-center active fs-6" data-bs-toggle="tab" href="#tab-plans">
-                            <h4 class="mb-0">خطط التقييم</h4>
+                            <span class="my-1">خطط التقييم</span>
                         </a>
                     </li>
 
                     <li id="tabEvaluationOperations" class="nav-item col-md-4">
                         <a class="nav-link fs-6 text-center " data-bs-toggle="tab" href="#tab-operations">
-                            <h4 class="mb-0">عمليات التقييم</h4>
+                            <span class="my-1">عمليات التقييم</span>
                         </a>
                     </li>
 
                     <li id="tabSchools" class="nav-item col-md-4">
                         <a class="nav-link fs-6 text-center " data-bs-toggle="tab" href="#tab-schools">
-                            <h4 class="mb-0">المدارس</h4>
+                            <span class="my-1">المدارس</span>
                         </a>
                     </li>
 
                 </ul>
             </div>
 
-            <div class="col-lg-12">
+            <div class="card col-lg-12">
                 <div class="tab-content p-0">
 
                     <!-- خطط التقييم -->
                     <div id="tab-plans" class="tab-pane fade show active">
-                        <ul class="nav nav-tabs sub-tabs mt-3">
+                        <ul class="nav nav-tabs sub-tabs my-3">
                             <li class="nav-item">
                                 <a class="nav-link active fs-6" data-bs-toggle="tab" href="#tab-plan-requests">
                                     طلبات خطة التقييم
@@ -71,7 +73,7 @@
                             </li>
                         </ul>
 
-                        <div class="tab-content mt-3">
+                        <div class="card tab-content p-3">
                             <div id="tab-plan-requests" class="tab-pane fade show active">
                                 <partial name="_PartialEvaluationPlanRequests" />
                             </div>
@@ -107,12 +109,12 @@
             <div class="modal-header align-items-start border-0 justify-content-between">
                
                     <div>
-                    <h4 class="fw-bold m-0" id="evaluationRequeststatus"></h4>
+                    <h4 class="fw-bold m-0" id="breadcrumbSchoolName"></h4>
 
                         <nav aria-label="breadcrumb">
                             <ol class="breadcrumb">
                                 <li class="breadcrumb-item">
-                                    <a href="#" id="breadcrumbSchoolName">مدرسة</a>
+                                <a href="#" id="evaluationRequeststatus">مدرسة</a>
                                 </li>
                                 <li class="breadcrumb-item active" aria-current="page">
                                     رقم الطلب:

@@ -187,11 +187,10 @@
                 //formUtility.addQueryParameter('serviceId', response.serviceId)
                 if (response.isNdaApprovalPending) {
                     const container =
-                        document.getElementById('evaluationMainContainer') ||
-                        document.querySelector('#content-container');
+                        document.getElementById('NDAContainerDiv') ;
 
                     container.insertAdjacentHTML('afterbegin', generateNdaApprovalDiv());
-                    NdaSubmit(response);
+                    NdaSubmit(response, requestId);
                 }
                 else
                 {
@@ -279,129 +278,140 @@
         });
     }
 
-    //    function generateNdaApprovalDiv() {
+    function generateNdaApprovalDiv() {
 
-    //        const title = getUiText(
-    //            'lblNdaConflictTitle',
-    //            'هل لديك تضارب مصالح مع هذه المدرسة؟'
-    //        );
+        const title = getUiText(
+            'lblNdaConflictTitle',
+            'هل لديك تضارب مصالح مع هذه المدرسة؟'
+        );
 
-    //        const yesText = getUiText('lblYes', 'نعم');
-    //        const noText = getUiText('lblNo', 'لا');
+        const yesText = getUiText('lblYes', 'نعم');
+        const noText = getUiText('lblNo', 'لا');
 
-    //        const reasonLabel = getUiText(
-    //            'lblNdaConflictReason',
-    //            'أوضح سبب التضارب'
-    //        );
+        const reasonLabel = getUiText(
+            'lblNdaConflictReason',
+            'أوضح سبب التضارب'
+        );
 
-    //        const reasonPlaceholder = getUiText(
-    //            'lblNdaConflictReasonPlaceholder',
-    //            'اكتب سبب تضارب المصالح هنا...'
-    //        );
+        const reasonPlaceholder = getUiText(
+            'lblNdaConflictReasonPlaceholder',
+            'اكتب سبب تضارب المصالح هنا...'
+        );
 
-    //        const submitText = getUiText(
-    //            'lblSubmit',
-    //            'إرسال'
-    //        );
+        const submitText = getUiText(
+            'lblSubmit',
+            'إرسال'
+        );
 
-    //        return `
-    //<div id="ndaApprovalWrapper" class="card mt-3">
-    //  <div class="card-body">
+        return `
+    <div id="ndaApprovalWrapper" class="card mt-3">
+      <div class="card-body">
 
-    //    <h5 class="text-center mb-4 fw-bold">
-    //        ${title}
-    //    </h5>
+        <h5 class="text-center mb-4 fw-bold">
+            ${title}
+        </h5>
 
-    //    <div class="d-flex justify-content-center gap-4 mb-3">
-    //      <label class="d-flex align-items-center gap-2">
-    //        <input type="radio" name="nda_conflict_choice" value="true">
-    //        <span>${yesText}</span>
-    //      </label>
+        <div class="d-flex justify-content-center gap-4 mb-3">
+          <label class="d-flex align-items-center gap-2">
+            <input type="radio" name="nda_conflict_choice" value="true">
+            <span>${yesText}</span>
+          </label>
 
-    //      <label class="d-flex align-items-center gap-2">
-    //        <input type="radio" name="nda_conflict_choice" value="false" checked>
-    //        <span>${noText}</span>
-    //      </label>
-    //    </div>
+          <label class="d-flex align-items-center gap-2">
+            <input type="radio" name="nda_conflict_choice" value="false" checked>
+            <span>${noText}</span>
+          </label>
+        </div>
 
-    //    <div class="mb-2">
-    //      <label class="form-label fw-bold">
-    //        ${reasonLabel} <span class="text-danger">*</span>
-    //      </label>
+        <div id="ndaReasonWrapper" class="mb-2 d-none">
+          <label class="form-label fw-bold">
+            ${reasonLabel} <span class="text-danger">*</span>
+          </label>
 
-    //      <textarea id="ndaConflictReason"
-    //                class="form-control"
-    //                rows="4"
-    //                placeholder="${reasonPlaceholder}"></textarea>
+          <textarea id="ndaConflictReason"
+                    class="form-control"
+                    rows="4"
+                    placeholder="${reasonPlaceholder}"></textarea>
 
-    //      <div id="ndaConflictError"
-    //           class="text-danger small mt-1 d-none"></div>
-    //    </div>
+          <div id="ndaConflictError"
+               class="text-danger small mt-1 d-none"></div>
+        </div>
 
-    //    <div class="d-flex justify-content-end mt-4">
-    //      <button id="ndaSubmitBtn" class="btn btn-primary px-4">
-    //        ${submitText}
-    //        <i class="la la-send ms-2"></i>
-    //      </button>
-    //    </div>
+        <div class="d-flex justify-content-end mt-4">
+          <button id="ndaSubmitBtn" class="btn btn-primary px-4">
+            ${submitText}
+            <i class="la la-send ms-2"></i>
+          </button>
+        </div>
 
-    //  </div>
-    //</div>`;
-    //    }
-    //    function NdaSubmit(response) {
+      </div>
+    </div>`;
+    }
+    function NdaSubmit(response, requestId) {
+        const btn = document.getElementById('ndaSubmitBtn');
+        const reasonEl = document.getElementById('ndaConflictReason');
+        const errEl = document.getElementById('ndaConflictError');
+        const wrapperEl = document.getElementById('ndaReasonWrapper');
+        const radios = document.querySelectorAll('input[name="nda_conflict_choice"]');
 
-    //        const btn = document.getElementById('ndaSubmitBtn');
-    //        const reasonEl = document.getElementById('ndaConflictReason');
-    //        const errEl = document.getElementById('ndaConflictError');
+        const reasonRequiredText = getUiText('lblRequired', 'هذا الحقل مطلوب');
 
-    //        const reasonRequiredText = getUiText('lblRequired','هذا الحقل مطلوب');
+        // Toggle reason textarea visibility based on Yes/No
+        radios.forEach(r => {
+            r.addEventListener('change', function () {
+                if (this.value === 'true' && this.checked) {
+                    wrapperEl.classList.remove('d-none');
+                } else {
+                    wrapperEl.classList.add('d-none');
+                    errEl.classList.add('d-none');
+                }
+            });
+        });
 
-    //        btn.addEventListener('click', async function (e) {
-    //            e.preventDefault();
+        btn.addEventListener('click', function (e) {
+            e.preventDefault();
 
-    //            const reason = (reasonEl.value || '').trim();
+            const selectedValue =
+                document.querySelector('input[name="nda_conflict_choice"]:checked')?.value;
 
-    //            if (!reason) {
-    //                errEl.textContent = reasonRequiredText;
-    //                errEl.classList.remove('d-none');
-    //                reasonEl.focus();
-    //                return;
-    //            }
+            const hasConflict = selectedValue === 'true';
+            const reason = (reasonEl.value || '').trim();
 
-    //            errEl.classList.add('d-none');
+            if (hasConflict && !reason) {
+                errEl.textContent = reasonRequiredText;
+                errEl.classList.remove('d-none');
+                reasonEl.focus();
+                return;
+            }
+            errEl.classList.add('d-none');
 
-    //            const hasConflict =
-    //                document.querySelector('input[name="nda_conflict_choice"]:checked')
-    //                    ?.value === 'true';
+            const payload = {
+                evaluationRequestId: requestId,
+                hasConflict: hasConflict,
+                conflictReason: hasConflict ? reason : null
+            };
 
-    //            const payload = {
-    //                evaluationRequestId: response.requestId,
-    //                planId: response.planId,
-    //                hasConflict: hasConflict,
-    //                conflictReason: reason
-    //            };
+            console.log('NDA payload:', payload);
 
-    //                const res = await $.ajax({
-    //                    url: '/Evaluation/Nda/Approve',
-    //                    method: 'POST',
-    //                    contentType: 'application/json; charset=utf-8',
-    //                    data: JSON.stringify(payload)
-    //                });
+            const options = {
+              
+                success: function (res) {
+                    document.getElementById('ndaApprovalWrapper')?.remove();
 
-    //                document.getElementById('ndaApprovalWrapper')?.remove();
+                    if (res?.isNdaApprovalPending === false) {
+                        renderEvaluationPartiesSection(res);
+                    }
+                },
+                error: function (err) {
+                    console.error('NDA submit failed:', err);
+                    alert(getUiText('lblSaveFailed', 'حدث خطأ أثناء الحفظ'));
+                }
+            };
 
-    //                if (res?.isNdaApprovalPending === false) {
-    //                    renderEvaluationPartiesSection(res);
-    //                }
+            jqClient(options).Post(`/ServiceRequest/${DepartmentRouting}/ApproveNda`,payload);
+        });
+    }
 
-    //            } catch (err) {
-    //                console.error(err);
-    //                alert(getUiText('lblSaveFailed', 'حدث خطأ أثناء الحفظ'));
-    //            } finally {
-    //                if (window.formUtility?.coverSpin)
-    //                    window.formUtility.coverSpin(false);
-    //            }
-    //        });
     $('#evaluationRequestStatusFilter').select2({
         placeholder: "اختر الحالة",
         allowClear: true,

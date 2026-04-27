@@ -10,7 +10,7 @@ const loadMainNavbar = () => {
             // Add your static first item
             fragment.append(`
     <li class="nav-item">
-        <a class="nav-link" href="index.html"><i class="la la-home"></i></a>
+        <a class="nav-link" href="index.html"></i></a>
     </li>
 `);
             $.each(data, function (index, navItem) {
