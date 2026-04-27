@@ -505,9 +505,9 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 				case "LastTwoAcademicYears":
 					result = await GetLastTwoAcademicYearsData(fieldValueId);
 					break;
-				case "AcademicYearsByYears":
-                    result = await GetAcademicYearsByYears(fieldValueId);
-                    break;
+				//case "AcademicYearsByYears":
+    //                result = await GetAcademicYearsByYears(fieldValueId);
+    //                break;
 				case "AcademicYear":
 					result = await GetAllAcademicYearsData(fieldValueId);
 					break;

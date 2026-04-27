@@ -713,9 +713,9 @@ window.formUtility = window.formUtility || {};
 
         $('#' + modalId).modal('show');
         initializeFields(json_schema_copy.fields, modalId, RENDER_TYPE.ACTION);
-        InitializeCascadingDropdown(json_schema_copy);
-        evaluateConditionsAfterLoadForList(json_schema_copy);
-        handleListFieldConditionalFields(json_schema_copy);
+        ns.InitializeCascadingDropdown(json_schema_copy);
+        ns.evaluateConditionsAfterLoadForList(json_schema_copy);
+        ns.handleListFieldConditionalFields(json_schema_copy);
 
         bindModalButtons(modalId, addObjectBtnId, 'cancelModalBtnId', modalBodyId, jsonSchema, table, maxCount, maxCountNew, minCountNew);
     };
@@ -1097,9 +1097,9 @@ window.formUtility = window.formUtility || {};
 
         $('#' + modalId).modal('show');
         initializeFields(json_schema_copy.fields, modalId, RENDER_TYPE.PREVIEW);
-        InitializeCascadingDropdown(json_schema_copy);
-       handleListFieldConditionalFields(json_schema_copy);
-        evaluateConditionsAfterLoadForList(json_schema_copy);
+        ns.InitializeCascadingDropdown(json_schema_copy);
+        ns.handleListFieldConditionalFields(json_schema_copy);
+        ns.evaluateConditionsAfterLoadForList(json_schema_copy);
         bindModalButtons(modalId, addObjectBtnId, 'cancelModalBtnId', modalBodyId, jsonSchema, table, maxCount, maxCountNew, minCountNew);
     };
     function ShowModalForAddModel  (modalId, modalTitleId, addObjectBtnId, jsonSchema, modalBodyId, modalTitleText, tableId, maxCount, maxCountNew, minCountNew)  {
@@ -1114,9 +1114,9 @@ window.formUtility = window.formUtility || {};
         $('#' + addObjectBtnId).removeClass('edit-object-btn');
 
         initializeFields(jsonSchema.fields, modalId, RENDER_TYPE.ACTION);
-        InitializeCascadingDropdown(jsonSchema);
-        evaluateConditionsAfterLoadForList(jsonSchema);
-        handleListFieldConditionalFields(jsonSchema);
+        ns.InitializeCascadingDropdown(jsonSchema);
+        ns.evaluateConditionsAfterLoadForList(jsonSchema);
+        ns.handleListFieldConditionalFields(jsonSchema);
 
         bindModalButtons(modalId, addObjectBtnId, 'cancelModalBtnId', modalBodyId, jsonSchema, tableId, maxCount, maxCountNew, minCountNew);
 
