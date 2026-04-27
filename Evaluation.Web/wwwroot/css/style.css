@@ -880,3 +880,32 @@ table.dataTable td p i{ font-size: 1.3rem;}
     line-height: 1;
 }
 
+
+select.form-select#planYearFilter {
+    padding-top: 0.5rem !important;
+    padding-bottom: 0.5rem !important;
+}
+
+#planYearFilter {
+    padding-top: 0.5rem !important;
+    padding-bottom: 0.5rem !important;
+}
+.form-select {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+}
+
+
+#planYearFilter.form-select {
+    padding-top: 0.5rem !important;
+    padding-bottom: 0.5rem !important;
+}
+td.td-center.view-plan {
+    width: 100% !important;
+}
+
+.btn-information {
+    color: var(--bs-primary);
+    background-color: #F1E6E5;
+    border-color: var(--bs-primary);
+}

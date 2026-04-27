@@ -12,7 +12,7 @@
             <select id="planRequestStatusFilter" class="form-select w-100">
             </select>
         </div>
-        <div class="col-md-2 d-flex align-items-center justify-content-end ms-auto gap-2">
+        <div class="col-lg-2 col-sm-12 d-flex align-items-center justify-content-end align-self-center ms-auto gap-2">
 			<button id="filterPlanBtnsId" class="btn btn-primary">بحث</button>
 			<button id="clearFilterPlanBtnId" class="btn btn-outline-secondary">
                 @ConstantKeys.EvaluationPlanRequests.lblClear
@@ -87,8 +87,7 @@
                                 <th class="@ConstantKeys.EvaluationPlanRequests.lblRequestService"></th>
                                 <th class="@ConstantKeys.EvaluationPlanRequests.lblScholarships"></th>
                                 <th class="@ConstantKeys.EvaluationPlanRequests.lblRequestCreatedDate"></th>
-                                <th class="@ConstantKeys.EvaluationPlanRequests.lblRequestCreatedTime"></th>
-                                <th></th>
+                                @* <th class="@ConstantKeys.EvaluationPlanRequests.lblRequestCreatedTime"></th> *@
                             </tr>
                         </thead>
                         <tbody id="requeststableBody" class="requeststableBody"></tbody>
