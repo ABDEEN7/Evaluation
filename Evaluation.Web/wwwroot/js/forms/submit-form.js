@@ -1,5 +1,18 @@
-﻿let departmentPath = sharedUtility().extractDepartmentName();
+﻿// ==============================
+// API Endpoints
+// ==============================
+const API = {
+    calculateEvaluationResult: (departmentPath) =>
+        `/Form/${departmentPath}/CalculateEvaluationFormResult`,
 
+    validateEvaluationForm: (departmentPath) =>
+        `/Form/${departmentPath}/ValidateEvaluationForm`,
+
+    saveEvaluationForm: (departmentPath) =>
+        `/Form/${departmentPath}/SaveEvaluationForm`,
+};
+
+let departmentPath = sharedUtility().extractDepartmentName();
 
 function evaluationFormResult(formId) { 
     const mainItems = [];
@@ -88,7 +101,9 @@ async function calculate(formId) {
     var result = evaluationFormResult(formId);
 
     return new Promise((resolve, reject) => {
-    jqClient().Post(`/Form/${departmentPath}/CalculateEvaluationFormResult`, result)
+        jqClient().Post(
+            API.calculateEvaluationResult(depRoutePath)
+            , result)
         .done((res) => {
             console.log(res);
             resolve(res); 
@@ -100,7 +115,9 @@ async function calculate(formId) {
 
 function validateForm(formId) {
     var result = evaluationFormResult(formId);
-    jqClient().Post(`/Form/${departmentPath}/ValidateEvaluationForm`, result)
+    jqClient().Post(
+        API.validateEvaluationForm(depRoutePath)
+        , result)
         .done((res) => {
 
             if (res.value.isValid) {
@@ -150,21 +167,11 @@ function renameFormItems(formId) {
     return payload;
 }
 
-//function renameitemForm(formId) {
-//    var result = renameFormItems(formId);
-//    jqClient().Post(`/Form/${departmentPath}/RenameFormItems`, result)
-//        .done((res) => {
-//            Swal.fire({
-//                icon: "success",
-//                title: "تم الإرسال",
-//                text: "تم الإرسال بنجاح"
-//            });
-//        });
-//}
-
 function submitForm(formId) {
     var result = evaluationFormResult(formId);
-    jqClient().Post(`/Form/${departmentPath}/SaveEvaluationForm`, result)
+    jqClient().Post(
+        API.saveEvaluationForm(depRoutePath)
+        , result)
         .done((res) => {
             Swal.fire({
                 icon: "success",
@@ -173,23 +180,7 @@ function submitForm(formId) {
             });
         });
 }
-function validateForm(formId) {
-    var result = evaluationFormResult(formId);
-    jqClient().Post(`/Form/${departmentPath}/ValidateEvaluationForm`, result)
-        .done((res) => {
 
-            if (res.value.isValid) {
-                return res.value.isValid;
-            }
-            else {
-                clearValidation();
-                res.value.errors.forEach(error => {
-                    showValidation(error.itemId, error.message, error.itemPropertyType);
-                });
-                return res.value.isValid;
-            }
-        });
-}
 function saveForm(formId) {
     return evaluationFormResult(formId);
 }
