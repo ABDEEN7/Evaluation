@@ -16,5 +16,6 @@ public class SchoolRequest : PaginatedQuery
     public string? DepartmentRoutingPath { get; set; }
     public Guid StatusId { get; set; }
     public Guid? ParentId { get; set; }
+    public Guid? FomrEvalMatrixValueId { get; set; }
 
 }

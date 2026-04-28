@@ -76,6 +76,11 @@ public class OrgnizationService(IServiceScopeFactory serviceScopeFactory,
 
         if (!string.IsNullOrWhiteSpace(request.Name))
             filter = filter.And(s => s.NameEn.Contains(request.Name) || s.NameAr.Contains(request.Name));
+        if (request.FomrEvalMatrixValueId != Guid.Empty && request.FomrEvalMatrixValueId != null)
+        {
+            filter = filter.And(s => s.EvaluationRequests != null &&
+                                     s.EvaluationRequests.Any(er => er.FormEvalMatrixValueId == request.FomrEvalMatrixValueId));
+        }
         return filter;
     }
 }

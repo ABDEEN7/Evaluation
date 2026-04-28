@@ -3,6 +3,7 @@ using AutoMapper;
 using Evaluation.DAL.Dtos;
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.DepartementEntites;
+using Evaluation.DAL.Models.FormsModules;
 using Evaluation.DAL.Models.Planing;
 using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
 using Evaluation.DAL.Models.ServiceEnities;
@@ -13,6 +14,7 @@ using Evaluation.Services.BusinessLayer.API.DepartmentLayer;
 using Evaluation.Services.Extensions;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Consts;
+using Evaluation.SharedHelper.Dtos.Form;
 using Evaluation.SharedHelper.Dtos.PlanDto;
 using Evaluation.SharedHelper.Dtos.PlanDto.EditDto;
 using Evaluation.SharedHelper.Dtos.SchoolDto;
@@ -208,8 +210,8 @@ public class PlanServiceRequestServices(
     private async Task<Result<CreateEvaluationPlanDto>> UpdatePlan(
       CreateEvaluationPlanDto modelDto)
     {
-		
-		return await ExecuteWithResult(async () =>
+
+        return await ExecuteWithResult(async () =>
         {
             Plan? plan = await unitOfWork.GetRepository<Plan>()
                 .GetAllActiveNonDeleted(x => x.Id == modelDto.Id)
@@ -246,59 +248,59 @@ public class PlanServiceRequestServices(
                 .Select(x => x.Id)
                 .FirstAsync();
     }
-	private async Task InsertEvaluationRequests(
-	  Guid planId, CreateEvaluationPlanDto modelDto)
-	{
-		if (modelDto.Schools?.Any() != true)
-			return;
+    private async Task InsertEvaluationRequests(
+      Guid planId, CreateEvaluationPlanDto modelDto)
+    {
+        if (modelDto.Schools?.Any() != true)
+            return;
 
-		var serviceObj = await unitOfWork.GetRepository<Service>()
-						.GetAllActiveNonDeleted(x =>
-							x.Initialservice == true
-							&& x.SystemModule!.DepartmentId == requestInfo.DepId
-							&& x.SystemModule!.SystemModuleType!.BackendName == ModuleType.EvaluationRequest
-						)
-						.Include(x => x.SystemModule)
-							.ThenInclude(sm => sm.SystemModuleType)
-						.FirstAsync();
+        var serviceObj = await unitOfWork.GetRepository<Service>()
+                        .GetAllActiveNonDeleted(x =>
+                            x.Initialservice == true
+                            && x.SystemModule!.DepartmentId == requestInfo.DepId
+                            && x.SystemModule!.SystemModuleType!.BackendName == ModuleType.EvaluationRequest
+                        )
+                        .Include(x => x.SystemModule)
+                            .ThenInclude(sm => sm.SystemModuleType)
+                        .FirstAsync();
 
-		Guid serviceId = serviceObj.Id;
-		Guid serviceStatusId = await GetServiceStatus(serviceId);
+        Guid serviceId = serviceObj.Id;
+        Guid serviceStatusId = await GetServiceStatus(serviceId);
 
-		int lastSequence = await unitOfWork.GetRepository<EvaluationRequest>()
-			.GetAllNonDeleted(x => x.ServiceId == serviceId)
-			.Select(x => (int?)x.Sequence)
-			.MaxAsync() ?? 0;
+        int lastSequence = await unitOfWork.GetRepository<EvaluationRequest>()
+            .GetAllNonDeleted(x => x.ServiceId == serviceId)
+            .Select(x => (int?)x.Sequence)
+            .MaxAsync() ?? 0;
 
-		var requests = modelDto.Schools.Select(school =>
-		{
-			lastSequence++;
-			var requestNumber = DateTime.Now.ToString(serviceObj.ReqNumberDef ?? "", new CultureInfo("en-US"))
-								+ lastSequence;
+        var requests = modelDto.Schools.Select(school =>
+        {
+            lastSequence++;
+            var requestNumber = DateTime.Now.ToString(serviceObj.ReqNumberDef ?? "", new CultureInfo("en-US"))
+                                + lastSequence;
 
-			return new EvaluationRequest
-			{
-				Id = Guid.NewGuid(),
-				PlanId = planId,
-				ServiceId = serviceId,
-				OrgTreeId = school.Id,
-				DepEvaluationTypeId = school.VisitTypeId,
-				FromDate = school.StartEvaluationDate,
-				ToDate = school.EndEvaluationDate,
-				ServiceStatusId = serviceStatusId,
-				Sequence = lastSequence,
-				RequestNumber = requestNumber,
-				CreateDate = DateTime.UtcNow,
-				IsDeleted = false
-			};
-		}).ToList();
+            return new EvaluationRequest
+            {
+                Id = Guid.NewGuid(),
+                PlanId = planId,
+                ServiceId = serviceId,
+                OrgTreeId = school.Id,
+                DepEvaluationTypeId = school.VisitTypeId,
+                FromDate = school.StartEvaluationDate,
+                ToDate = school.EndEvaluationDate,
+                ServiceStatusId = serviceStatusId,
+                Sequence = lastSequence,
+                RequestNumber = requestNumber,
+                CreateDate = DateTime.UtcNow,
+                IsDeleted = false
+            };
+        }).ToList();
 
-		await unitOfWork.GetRepository<EvaluationRequest>()
-			.InsertRange(requests);
+        await unitOfWork.GetRepository<EvaluationRequest>()
+            .InsertRange(requests);
 
-		
-	}
-	private async Task ReplaceEvaluationRequests(
+
+    }
+    private async Task ReplaceEvaluationRequests(
     Guid planId,
     CreateEvaluationPlanDto modelDto)
     {
@@ -341,12 +343,42 @@ public class PlanServiceRequestServices(
     {
         return await planRepository.GetPlans();
     }
+    public async Task<List<DDLFomrEvalMatrixValueDto>> GetFomrEvalMatrixValueList()
+    {
+        var latestIds = await unitOfWork
+    .GetRepository<EvaluationRequest>()
+    .GetAllActiveNonDeleted(x =>
+        x.FormEvalMatrixValueId != null &&
+        x.FormEvalMatrixValue.FormEvalMatrix.DepartmentId == requestInfo.DepId)
+    .GroupBy(x => x.OrgTreeId)
+    .Select(g => g
+        .OrderByDescending(x => x.EvaluationDate ?? DateOnly.MinValue)
+        .Select(x => x.FormEvalMatrixValueId)
+        .FirstOrDefault())
+    .Where(x => x != null)
+    .Distinct()
+    .ToListAsync();
+        var data = await unitOfWork
+            .GetRepository<FormEvalMatrixValue>()
+            .GetAllActiveNonDeleted(x => latestIds.Contains(x.Id))
+            .OrderByDescending(x => x.OrderNo)
+            .ToListAsync();
+        var result = data.Select(x => new DDLFomrEvalMatrixValueDto
+        {
+            Id = x.Id,
+            Name = LanguageStatic.SelectLang(
+        requestInfo.Lang,
+        x.NameAr,
+        x.NameEn)
+        }).ToList();
+        return result;
+    }
     private async Task SyncEvaluationRequests(
       Guid planId,
       CreateEvaluationPlanDto modelDto)
     {
-		
-		var repo = unitOfWork.GetRepository<EvaluationRequest>();
+
+        var repo = unitOfWork.GetRepository<EvaluationRequest>();
 
         var existing = await repo
             .GetAllActiveNonDeleted(x => x.PlanId == planId)
@@ -360,33 +392,33 @@ public class PlanServiceRequestServices(
 
         var existingByOrg = existing.ToDictionary(x => x.OrgTreeId);
 
-		var newSchools = incomingSchools
-	                       .Where(s => !existingByOrg.ContainsKey(s.Id))
-	                       .ToList();
+        var newSchools = incomingSchools
+                           .Where(s => !existingByOrg.ContainsKey(s.Id))
+                           .ToList();
 
-		Guid serviceId = existing.First().ServiceId; // reuse
+        Guid serviceId = existing.First().ServiceId; // reuse
         Guid serviceStatusId = existing.First().ServiceStatusId;
-		Service? serviceObj = null;
-		int lastSequence = 0;
+        Service? serviceObj = null;
+        int lastSequence = 0;
 
-		if (newSchools.Any())
-		{
-			serviceObj = await unitOfWork.GetRepository<Service>()
-				.GetAllActiveNonDeleted(x => x.Id == serviceId)
-				.Include(x => x.SystemModule)
-					.ThenInclude(sm => sm.SystemModuleType)
-				.FirstAsync();
+        if (newSchools.Any())
+        {
+            serviceObj = await unitOfWork.GetRepository<Service>()
+                .GetAllActiveNonDeleted(x => x.Id == serviceId)
+                .Include(x => x.SystemModule)
+                    .ThenInclude(sm => sm.SystemModuleType)
+                .FirstAsync();
 
-			lastSequence = await unitOfWork.GetRepository<EvaluationRequest>()
-				.GetAllNonDeleted(x => x.ServiceId == serviceId)
-				.Select(x => (int?)x.Sequence)
-				.MaxAsync() ?? 0;
-		}
-		//--------------------------------------------
-		// UPDATE + INSERT
-		//--------------------------------------------
+            lastSequence = await unitOfWork.GetRepository<EvaluationRequest>()
+                .GetAllNonDeleted(x => x.ServiceId == serviceId)
+                .Select(x => (int?)x.Sequence)
+                .MaxAsync() ?? 0;
+        }
+        //--------------------------------------------
+        // UPDATE + INSERT
+        //--------------------------------------------
 
-		foreach (var school in incomingSchools)
+        foreach (var school in incomingSchools)
         {
             if (existingByOrg.TryGetValue(school.Id, out var request))
             {
@@ -406,13 +438,13 @@ public class PlanServiceRequestServices(
             else
             {
 
-				// INSERT NEW
+                // INSERT NEW
 
-				lastSequence++;
-				var requestNumber = DateTime.Now.ToString(serviceObj!.ReqNumberDef ?? "", new CultureInfo("en-US"))
-									+ lastSequence;
+                lastSequence++;
+                var requestNumber = DateTime.Now.ToString(serviceObj!.ReqNumberDef ?? "", new CultureInfo("en-US"))
+                                    + lastSequence;
 
-				await repo.InsertAsync(new EvaluationRequest
+                await repo.InsertAsync(new EvaluationRequest
                 {
                     Id = Guid.NewGuid(),
                     PlanId = planId,
@@ -422,9 +454,9 @@ public class PlanServiceRequestServices(
                     FromDate = school.StartEvaluationDate,
                     ToDate = school.EndEvaluationDate,
                     ServiceStatusId = serviceStatusId,
-					RequestNumber = requestNumber,
+                    RequestNumber = requestNumber,
 
-				});
+                });
             }
         }
 

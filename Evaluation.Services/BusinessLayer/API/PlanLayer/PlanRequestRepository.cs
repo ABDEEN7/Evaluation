@@ -283,19 +283,6 @@ public class PlanRequestRepository(IServiceScopeFactory serviceScopeFactory, Srv
               }).ToListAsync();
         return result;
     }
-    public async Task<List<DDLFomrEvalMatrixValueDto>> GetFomrEvalMatrixValueList()
-    {
-        var result = await unitOfWork.GetRepository<FormEvalMatrixValue>()
-            .GetAllActiveNonDeleted(x => x.FormEvalMatrix.DepartmentId == requestInfo.DepId)
-            .OrderByDescending(x => x.OrderNo)
-            .DistinctBy(x => x.FormEvalMatrixId)
-            .Select(x => new DDLFomrEvalMatrixValueDto
-            {
-                Id = x.Id,
-                Name = LanguageStatic.SelectLang(requestInfo.Lang, x.NameAr, x.NameAr)
-            }).ToListAsync();
-        return result;
-    }
     private async Task<bool> IsThereExistingDraftPlanForSameAcadmicYear(PlanServiceRequest model)
     {
         return await

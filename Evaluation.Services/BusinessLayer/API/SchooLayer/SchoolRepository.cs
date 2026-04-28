@@ -125,6 +125,11 @@ public class SchoolRepository(IServiceScopeFactory serviceScopeFactory,
         {
             filter = filter.And(x => x.OrgParentId == request.ParentId);
         }
+        if (request.FomrEvalMatrixValueId != Guid.Empty && request.FomrEvalMatrixValueId != null)
+        {
+            filter = filter.And(s => s.EvaluationRequests != null &&
+                                     s.EvaluationRequests.Any(er => er.FormEvalMatrixValueId == request.FomrEvalMatrixValueId));
+        }
         //if(request.VisitType != null)
         //    filter = filter.And(x=>x.)
         return filter;

@@ -37,6 +37,7 @@
     ns.semesters = [];
     ns.holidays = [];
     ns.parentSchool = [];
+    ns.fomrEvalMatrixValue = [];
     ns.currentPage = 1;
     ns.pageSize = 10;
 
