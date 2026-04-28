@@ -2,8 +2,10 @@
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.DepartementEntites;
 using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
+using Evaluation.DAL.Models.Template;
 using Evaluation.DAL.Models.UserEntiy;
 using Evaluation.DAL.Repositories;
+using Evaluation.Services.Models.SMTP;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Dtos.TeamMemberDto;
 using Evaluation.SharedHelper.Enums;
@@ -14,6 +16,8 @@ using Evaluation.SharedHelper.Validations;
 using FluentResults;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using static Evaluation.DAL.ConstantKeys;
+using static Evaluation.SharedHelper.Enums.ConstantKeys;
 namespace Evaluation.Services.BusinessLayer.API.TeamMemberBL;
 
 public class AssignmentBL(IServiceScopeFactory serviceScopeFactory,
@@ -24,7 +28,9 @@ public class AssignmentBL(IServiceScopeFactory serviceScopeFactory,
     UserInfo userInfo,
     IServiceProvider serviceProvider,
     RequestInfo requestInfo,
-    AssignmentService teamMemberService
+    IEmailServices emailServices,
+    AssignmentService teamMemberService,
+    EmailTemplateProvider emailTemplateProvider
     ) : ApiBase(serviceScopeFactory, cacheDataProvider, unitOfWork, loggingServices, mapper, userInfo,
         serviceProvider, requestInfo)
 {
@@ -62,7 +68,9 @@ public class AssignmentBL(IServiceScopeFactory serviceScopeFactory,
     public async Task<Result<List<AssignmentDto>>> GetMembersByTeamId(Guid? teamId)
     {
         var member = unitOfWork.GetRepository<MinistryUser>()
-               .GetAllActiveNonDeleted();
+               .GetAllQueryFiltered()
+               .AsNoTracking()
+                .Where(x => x.UserTeams.Any(ut => ut.User.UserPartTypes.Any()));
         if (teamId != null)
             member = member.Where(x => x.UserTeams!.Any(t => t.TeamId == teamId));
 
@@ -297,5 +305,26 @@ public class AssignmentBL(IServiceScopeFactory serviceScopeFactory,
 
         return Result.Ok(validation);
     }
+    public async Task<Result<bool>> SendNotificationMailUser(SendNotificationUserMail notificationUserMail)
+    {
+        var user = await unitOfWork.GetRepository<EvaluationRequestAssignment>()
+            .GetAllActiveNonDeleted(x => x.EvaluationRequestId == notificationUserMail.EvaluationRequestId && x.MinistryUserId == notificationUserMail.UserId)
+            .Select(x => new { Email = x.MinistryUser.Email })
+            .FirstOrDefaultAsync();
+        if (user == null)
+            throw new BusinessException(ConstantKeys.ExceptionMessage.UserNotExsistInThisEvaluationRequest);
 
+        var reminderMailTemplateKey = await cacheDataProvider.GetSystemSettingValue(SystemSettings.TemplateSendReminderToUser);
+        var config = await emailTemplateProvider.BuildEmailMessageModelConfig(reminderMailTemplateKey);
+        config.messageModel.ToEmails = new List<string> { user.Email };
+        var template = await unitOfWork.GetRepository<EmailTemplate>()
+            .GetAllNonDeleted(x => x.BackendName == reminderMailTemplateKey)
+            .FirstOrDefaultAsync();
+        config.messageModel.Body = template.TemplateBody;
+        config.messageModel.Subject = template.TemplateSubject;
+        config.messageModel.ModuleBackendName = ConstantKeys.Module.Alert;
+
+        var result = await emailServices.SendEmail(config.messageModel);
+        return Result.Ok(result);
+    }
 }

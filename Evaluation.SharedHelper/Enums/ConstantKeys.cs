@@ -197,6 +197,14 @@ public static class ConstantKeys
         public static readonly string msgInvalidEvaluationPlan = "msgInvalidEvaluationPlan"; //TO DO INSERTED
         public static readonly string msgInvalidEvaluationForm = "msgInvalidEvaluationForm"; //TO DO INSERTED
         public static readonly string msgInvalidAttachmentId = "msgInvalidAttachmentId"; //TO DO INSERTED
+        public static readonly string FormItemConfigPercentageMax = "FormItemConfigPercentageMax";
+        public static readonly string Exception_No_Data_Provided = "Exception_No_Data_Provided";
+        public static readonly string DuplicateRecordsinRequest = "DuplicateRecordsinRequest";
+        public static readonly string RECORD_NOT_FOUND = "RECORD_NOT_FOUND";
+        public static readonly string Exception_Invalid_Total_Percentage_After_Delete = "Exception_Invalid_Total_Percentage_After_Delete";
+        public static readonly string Final_Evaluation_Form_Limit = "Final_Evaluation_Form_Limit";
+        public static readonly string Max_Final_Evaluation_Forms_Exceeded = "Max_Final_Evaluation_Forms_Exceeded";
+        public static readonly string UserNotExsistInThisEvaluationRequest = "UserNotExsistInThisEvaluationRequest";
     }
 
     public static class AdminSettings
@@ -363,59 +371,61 @@ public static class ConstantKeys
         public static readonly string WebDepartmentHoliday = "WebDepartmentHoliday";
         public static readonly string WebAppRequest = "WebAppRequest";
         public static readonly string WebAppCommon = "WebAppCommon";
-
+        public static readonly string AssignmentUserTeam = "AssignmentUserTeam";
+        public static readonly string EducationalEntitiesDescription = "EducationalEntitiesDescription";
+        public static readonly string FormEducationalEntitiesTitle = "FormEducationalEntitiesTitle";
     }
-	public static class WebAppRequest
-	{
-		public static readonly string lblDownload = "lblDownload";
-		public static readonly string lblMinLengthNotReached = "lblMinLengthNotReached";
-		public static readonly string lblMissingFormIdForEvaluationForm = "lblMissingFormIdForEvaluationForm";
-		public static readonly string lblLoadingEvaluationForm = "lblLoadingEvaluationForm";
-		public static readonly string lblMaximumRowsExceeded = "lblMaximumRowsExceeded";
-		public static readonly string lblValueMustBeGreaterOrEqual = "lblValueMustBeGreaterOrEqual";
-		public static readonly string lblMaxLengthExceeded = "lblMaxLengthExceeded";
-		public const string actionTransactionsdetailsLabel = "actionTransactionsdetailsLabel";
-		public static readonly string lblFileSizeExceeded = "lblFileSizeExceeded";
-		public static readonly string lblMaximumNewRowsExceeded = "lblMaximumNewRowsExceeded";
-		public static readonly string lblLoadingEvaluationPlan = "lblLoadingEvaluationPlan";
-		public static readonly string lblRenderFormGroupsNotDefined = "lblRenderFormGroupsNotDefined";
-		public static readonly string lblNotEqualValidation = "lblNotEqualValidation";
-		public static readonly string lblFailedToLoadEvaluationPlan = "lblFailedToLoadEvaluationPlan";
-		public static readonly string lblRemarkISRequired = "lblRemarkISRequired";
-		public static readonly string lblPlanUtilityNotFound = "lblPlanUtilityNotFound";
-		public static readonly string lblFileTypeNotAllowed = "lblFileTypeNotAllowed";
-		public static readonly string lblFormSubmittedSuccessfully = "lblFormSubmittedSuccessfully";
-		public static readonly string lblDefaultValidationMessage = "lblDefaultValidationMessage";
-		public static readonly string lblUnexpectedErrorOccurred = "lblUnexpectedErrorOccurred";
-		public static readonly string lblInvalidNumberFormat = "lblInvalidNumberFormat";
-		public static readonly string lblValueMustBeLessOrEqual = "lblValueMustBeLessOrEqual";
-		public static readonly string lblMinimumNewRowsRequired = "lblMinimumNewRowsRequired";
-		public static readonly string lblMinimumRowsRequired = "lblMinimumRowsRequired";
-		public static readonly string lblFailedToLoadEvaluationForm = "lblFailedToLoadEvaluationForm";
-		public static readonly string lblInvalidBase64Content = "lblInvalidBase64Content";
-		public static readonly string lblRequestCreatedSuccessfully = "lblRequestCreatedSuccessfully";
-		public static readonly string lblSaveChanges = "lblSaveChanges";
-		public static readonly string lblSaveAsDraft = "lblSaveAsDraft";
-		public static readonly string lblFailedToLoadFile = "lblFailedToLoadFile";
-		public static readonly string lblRequestSavedAsDraftSuccessfully = "lblRequestSavedAsDraftSuccessfully";
-		public static readonly string lblFailedToRenderPlanWrapper = "lblFailedToRenderPlanWrapper";
-		public static readonly string lblUnnamedGroup = "lblUnnamedGroup";
-		public static readonly string lblBase64PdfFileName = "lblBase64PdfFileName";
-		public static readonly string lblUnexpectedEmptyResponse = "lblUnexpectedEmptyResponse";
-		public static readonly string lblInvalidFormat = "lblInvalidFormat";
-		public static readonly string lblViewHistory = "lblViewHistory";
-		public static readonly string lblProcedures = "lblProcedures";
-		public static readonly string lblDateRangeInvalid = "lblDateRangeInvalid";
-		public static readonly string lblRemarks = "lblRemarks";
-		public static readonly string lblRequiredField = "lblRequiredField";
-		public static readonly string lblUnnamedFile = "lblUnnamedFile";
-		public static readonly string lblInvalidFileExtension = "lblInvalidFileExtension";
-		public static readonly string lblCloseModal = "lblCloseModal";
-		public static readonly string lblEvaluationFileScope = "lblEvaluationFileScope";
-		public static readonly string lblEvaluationFileHeader = "lblEvaluationFileHeader";
-	}
+    public static class WebAppRequest
+    {
+        public static readonly string lblDownload = "lblDownload";
+        public static readonly string lblMinLengthNotReached = "lblMinLengthNotReached";
+        public static readonly string lblMissingFormIdForEvaluationForm = "lblMissingFormIdForEvaluationForm";
+        public static readonly string lblLoadingEvaluationForm = "lblLoadingEvaluationForm";
+        public static readonly string lblMaximumRowsExceeded = "lblMaximumRowsExceeded";
+        public static readonly string lblValueMustBeGreaterOrEqual = "lblValueMustBeGreaterOrEqual";
+        public static readonly string lblMaxLengthExceeded = "lblMaxLengthExceeded";
+        public const string actionTransactionsdetailsLabel = "actionTransactionsdetailsLabel";
+        public static readonly string lblFileSizeExceeded = "lblFileSizeExceeded";
+        public static readonly string lblMaximumNewRowsExceeded = "lblMaximumNewRowsExceeded";
+        public static readonly string lblLoadingEvaluationPlan = "lblLoadingEvaluationPlan";
+        public static readonly string lblRenderFormGroupsNotDefined = "lblRenderFormGroupsNotDefined";
+        public static readonly string lblNotEqualValidation = "lblNotEqualValidation";
+        public static readonly string lblFailedToLoadEvaluationPlan = "lblFailedToLoadEvaluationPlan";
+        public static readonly string lblRemarkISRequired = "lblRemarkISRequired";
+        public static readonly string lblPlanUtilityNotFound = "lblPlanUtilityNotFound";
+        public static readonly string lblFileTypeNotAllowed = "lblFileTypeNotAllowed";
+        public static readonly string lblFormSubmittedSuccessfully = "lblFormSubmittedSuccessfully";
+        public static readonly string lblDefaultValidationMessage = "lblDefaultValidationMessage";
+        public static readonly string lblUnexpectedErrorOccurred = "lblUnexpectedErrorOccurred";
+        public static readonly string lblInvalidNumberFormat = "lblInvalidNumberFormat";
+        public static readonly string lblValueMustBeLessOrEqual = "lblValueMustBeLessOrEqual";
+        public static readonly string lblMinimumNewRowsRequired = "lblMinimumNewRowsRequired";
+        public static readonly string lblMinimumRowsRequired = "lblMinimumRowsRequired";
+        public static readonly string lblFailedToLoadEvaluationForm = "lblFailedToLoadEvaluationForm";
+        public static readonly string lblInvalidBase64Content = "lblInvalidBase64Content";
+        public static readonly string lblRequestCreatedSuccessfully = "lblRequestCreatedSuccessfully";
+        public static readonly string lblSaveChanges = "lblSaveChanges";
+        public static readonly string lblSaveAsDraft = "lblSaveAsDraft";
+        public static readonly string lblFailedToLoadFile = "lblFailedToLoadFile";
+        public static readonly string lblRequestSavedAsDraftSuccessfully = "lblRequestSavedAsDraftSuccessfully";
+        public static readonly string lblFailedToRenderPlanWrapper = "lblFailedToRenderPlanWrapper";
+        public static readonly string lblUnnamedGroup = "lblUnnamedGroup";
+        public static readonly string lblBase64PdfFileName = "lblBase64PdfFileName";
+        public static readonly string lblUnexpectedEmptyResponse = "lblUnexpectedEmptyResponse";
+        public static readonly string lblInvalidFormat = "lblInvalidFormat";
+        public static readonly string lblViewHistory = "lblViewHistory";
+        public static readonly string lblProcedures = "lblProcedures";
+        public static readonly string lblDateRangeInvalid = "lblDateRangeInvalid";
+        public static readonly string lblRemarks = "lblRemarks";
+        public static readonly string lblRequiredField = "lblRequiredField";
+        public static readonly string lblUnnamedFile = "lblUnnamedFile";
+        public static readonly string lblInvalidFileExtension = "lblInvalidFileExtension";
+        public static readonly string lblCloseModal = "lblCloseModal";
+        public static readonly string lblEvaluationFileScope = "lblEvaluationFileScope";
+        public static readonly string lblEvaluationFileHeader = "lblEvaluationFileHeader";
+    }
 
-	public static class AdminPermission
+    public static class AdminPermission
     {
         public const string VIEW_ADMIN_HOME = "VIEW_ADMIN_HOME";
 
@@ -974,7 +984,7 @@ public static class ConstantKeys
         public const string ADD_WEB_EVALFORMS = "ADD_WEB_EVALFORMS";
         public const string EDIT_WEB_EVALFORMS = "EDIT_WEB_EVALFORMS";
         public const string DELETE_WEB_EVALFORMS = "DELETE_WEB_EVALFORMS";
-
+        
         #endregion
 
         #region DEPARTMENTHOLIDAY
@@ -1003,7 +1013,9 @@ public static class ConstantKeys
         public const string DELETE_WEB_SUBFORMITEMS = "DELETE_WEB_SUBFORMITEMS";
 
         #endregion
-        
+        #region FORMITEMCONFIG
+        public const string ADD_WEB_FORMITEMCONFIG = "ADD_WEB_FORMITEMCONFIG";
+        #endregion
         #region TEAM
 
         public const string VIEW_WEB_TEAM = "VIEW_WEB_TEAM";
@@ -1013,7 +1025,7 @@ public static class ConstantKeys
 
         #endregion
 
-   
+        public const string IS_SEND_USERTEAM_MAIL = "IS_SEND_USERTEAM_MAIL";
 
         #region FORMSCOPES
 
@@ -1192,6 +1204,10 @@ public static class ConstantKeys
         public static readonly string CACHE_DROPDOWNVALUE = "CACHE_DROPDOWNVALUE";
         public static readonly string CACHE_ACADEMICYEAR = "CACHE_ACADEMICYEAR";
     }
+    //public static class AssignmentUserTeam
+    //{
+    
+    //}
 
     public static class LanguageConst
     {
@@ -1216,6 +1232,11 @@ public static class ConstantKeys
         public static readonly string AddAttachment_FILE_SIZE = "AddAttachment_FILE_SIZE"; // in MB
         public static readonly string AddAttachment_FILE_COUNT = "AddAttachment_FILE_COUNT";
         public static readonly string useAsposeLib = "useAsposeLib";
+        public static readonly string TemplateSendReminderToUser = "TemplateSendReminderToUser";
+    }
+    public static class EvalFormSettings
+    {
+        public static readonly string Eval_WEB_From_PageSize = "Eval_WEB_From_PageSize";
     }
 
     public static class FieldTypeConstant

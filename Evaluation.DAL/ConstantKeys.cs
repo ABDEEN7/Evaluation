@@ -60,4 +60,5 @@ public static class ConstantKeys
         public const string GET_SEMESTERS_REQUEST = "GET_SEMESTERS_REQUEST";
 
     }
+
 }
