@@ -78,7 +78,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             }
         }
 
-        public async Task<List<DropDownValueDTO>> GetDropDownValues(string lang, Guid StudentId, Guid? SchId, List<Guid?>? dropDownTypeIds = null)
+        public async Task<List<DropDownValueDTO>> GetDropDownValues(string lang, Guid? EvalId, Guid? SchId, List<Guid?>? dropDownTypeIds = null)
         {
             using var scopedUow = serviceScopeFactory.CreateScopedUow();
             // 1. Try to get the full list from cache
@@ -128,7 +128,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                         var tableName = dropdownType.DataSourceTable;
 
 
-                        var rawData = await GetDataFromTable(tableName, StudentId, SchId, lang);
+                        var rawData = await GetDataFromTable(tableName, EvalId, SchId, lang);
                         if (rawData != null)
                         {
                             values = rawData.Select(c => new DropDownValueDTO
@@ -182,7 +182,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
 
 
-        public async Task<List<DropDownValueDTO>> GetDropDownValuesByDropDownTypeId(Guid dropDownTypeId, Guid StudentId,Guid? schId, Guid? parentDropDownId = null, Guid? fieldValueId = null)
+        public async Task<List<DropDownValueDTO>> GetDropDownValuesByDropDownTypeId(Guid dropDownTypeId, Guid? EvalId, Guid? schId, Guid? parentDropDownId = null, Guid? fieldValueId = null)
         {
             string lang = _requestInfo.Lang;
             using var scopedUow = serviceScopeFactory.CreateScopedUow();
@@ -229,7 +229,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             if (!string.IsNullOrEmpty(dropdownType.DataSourceTable))
             {
                 var tableName = dropdownType.DataSourceTable;
-                var rawData = await GetDataFromTable(tableName, StudentId, schId, lang, fieldValueId);
+                var rawData = await GetDataFromTable(tableName, EvalId, schId, lang, fieldValueId);
 
                 if (rawData != null)
                 {
@@ -294,7 +294,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             return dropdownValue;
         }
 
-        public async Task<List<DropDownValueDTO?>> GetDropDownValuesForAction(Guid? SchId, Guid? studentId, Guid actionId, string? dropDownTypeIds, string lang, Guid? requestId)
+        public async Task<List<DropDownValueDTO?>> GetDropDownValuesForAction(Guid? PlanId, Guid? EvalId, Guid actionId, string? dropDownTypeIds, string lang, Guid? requestId)
         {
             var dropDownTypeIdsList = ParseDropDownTypeIds(dropDownTypeIds);
 
@@ -302,12 +302,12 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
             var tasks = new List<Task<List<DropDownValueDTO>>>
                                 {
-                                    LoadRegularDropDowns(allFields, dropDownTypeIdsList, studentId.Value,SchId, lang),
+                                    LoadRegularDropDowns(allFields, dropDownTypeIdsList, EvalId,PlanId, lang),
                                 };
 
             if (requestId.HasValue)
             {
-                tasks.Add(LoadLazyDropDownsWithValues(allFields, requestId.Value, studentId.Value));
+                tasks.Add(LoadLazyDropDownsWithValues(allFields, requestId.Value, EvalId));
             }
 
             var results = await Task.WhenAll(tasks);
@@ -351,7 +351,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
         }
 
 
-        private async Task<List<DropDownValueDTO>> LoadRegularDropDowns(List<ActionFieldInfo> fields, List<Guid> excludeDropDownTypeIds, Guid studentId, Guid? SchId, string lang)
+        private async Task<List<DropDownValueDTO>> LoadRegularDropDowns(List<ActionFieldInfo> fields, List<Guid> excludeDropDownTypeIds, Guid? EvalId, Guid? PlanId, string lang)
         {
             var ids = fields
                 .Where(f => !f.IsLazy)
@@ -361,10 +361,10 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                 .ToList();
 
             return ids.Any()
-                ? await GetDropDownValues(lang, studentId,  SchId, ids.Cast<Guid?>().ToList()) ?? new List<DropDownValueDTO>()
+                ? await GetDropDownValues(lang, EvalId,  PlanId, ids.Cast<Guid?>().ToList()) ?? new List<DropDownValueDTO>()
                 : new List<DropDownValueDTO>();
         }
-        private async Task<List<DropDownValueDTO>> LoadLazyDropDownsWithValues(List<ActionFieldInfo> fields, Guid requestId, Guid studentId)
+        private async Task<List<DropDownValueDTO>> LoadLazyDropDownsWithValues(List<ActionFieldInfo> fields, Guid requestId, Guid? EvalId)
         {
             using var uow = serviceScopeFactory.CreateScopedUow();
             var requestValueRepo = uow.GetRepository<ServiceRequestFieldsValue>();
@@ -387,7 +387,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                 var ParentvalueEntry = values.FirstOrDefault(x => x.FieldId == field.DropDownParentFieldId);
                 if (valueEntry != null && ParentvalueEntry != null && ParentvalueEntry.Value != null)
                 {
-                    var valuesList = await GetDropDownValuesByDropDownTypeId(field.DropDownTypeId, studentId,Guid.Empty,Guid.Parse(ParentvalueEntry!.Value!));
+                    var valuesList = await GetDropDownValuesByDropDownTypeId(field.DropDownTypeId, EvalId, Guid.Empty,Guid.Parse(ParentvalueEntry!.Value!));
                     if (valuesList != null)
                         result.AddRange(valuesList);
                 }
@@ -484,7 +484,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
             return null;
         }
-        private async Task<List<Dictionary<string, object>>> GetDataFromTable(string tableName, Guid? studentId,Guid? SchId, string lang, Guid? fieldValueId = null)
+        private async Task<List<Dictionary<string, object>>> GetDataFromTable(string tableName, Guid? EvalId, Guid? SchId, string lang, Guid? fieldValueId = null)
         {
             
             var allowedTablesSettingValue = await cacheDataProvider.GetSystemSettingValue(SystemSettings.DropDownDataSourceAllowedTables);

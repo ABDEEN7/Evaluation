@@ -654,6 +654,22 @@ window.formUtility = window.formUtility || {};
         }, 300);
         return columns;
     };
+
+
+    const GetDropdownOptionsForTabulator = () => {
+
+        let lang = currentLang;
+        if (!dropdowns || !Array.isArray(dropdowns)) {
+            return [];
+        }
+        const result = dropdowns.map(x => {
+            var item = { id: x.id, value: lang == 'ar' ? x.titleAr : x.titleEn, };
+
+            return item;
+        });
+
+        return result;
+    }
     function toggleAddButtonVisibility(tableId, addButtonId, maxCount, maxCountNew, minCountNew) {
         const addButton = $('#' + addButtonId);
         if (!addButton.length) return;

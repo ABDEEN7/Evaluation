@@ -122,6 +122,10 @@ namespace Evaluation.Services.Models.API
 
 			// Step 3: Create or update the request
 			ServiceRequestDTO resultRequest = new ServiceRequestDTO();
+			if(requestType == RequestType.Evaluation)
+			{
+				requestId = EvaluationRequestId;
+			}
 			if ((requestId == null || requestId == Guid.Empty) && requestType != RequestType.Evaluation)
 			{
 				var status = await SrvStatus.GetInitialStatusByServiceId(serviceId);

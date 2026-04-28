@@ -736,6 +736,18 @@
             });
 
             window.formUtility = window.formUtility || {};
+             const searchParams = new URLSearchParams(window.location.search);
+                const reqId = searchParams.get('id');
+                const serviceId = searchParams.get('serviceId');
+                const EvlId = searchParams.get('Evlid');
+
+                 if (reqId) {
+                 openPlanRequestDetails(reqId);
+                }
+
+                if (EvlId) {
+                      openEvaluationRequestDetails(EvlId);
+                }
 
          $('#evaluationRequestDetailsModal').on('hidden.bs.modal', function () {
             formUtility.removeQueryParameter(['Evlid', 'serviceId']);
@@ -751,6 +763,10 @@
                   uiControlsSetup().UpdatPageTitle('WebAppScholarship');
                     $('body').show();
                     GetScopes();
+
+                
+
+
                 // await LoadUserDetails();
                 // InitNavbarSection();
 
@@ -764,18 +780,6 @@
                 // CheckRequiredEmailOrMobileVerification();
                 //InitializeAdvancedSearch();
 
-            //     const searchParams = new URLSearchParams(window.location.search);
-            //     const reqId = searchParams.get('id');
-            //     const scholarshipId = searchParams.get('schId');
-            //     const serviceId = searchParams.get('serviceId');
-
-            //     if (reqId) {
-            //         OpenRequestDetails(reqId, '', '', serviceId);
-            //     }
-
-            //     if (scholarshipId) {
-            //         OpenscholarshipDetails(scholarshipId, '', '');
-            //     }
 
             //     InitializeAdvancedSearch();
             // } else {
@@ -787,6 +791,7 @@
             //     e.preventDefault();
             //     ServiceCardBuilder.handleCardClick.call(this, e);
             // });
+
 
         }
 

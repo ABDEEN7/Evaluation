@@ -41,30 +41,34 @@ const sharedUtility = () => {
         return urlPattern.test(url);
     }
 
-    const RedirectToModuleOrDefault = () => {
+    const RedirectToModuleOrDefault = (params = {}) => {
 
         let url = decodeURIComponent(baseAppUrl());
-        //if (userProfileDetailsInfo) {
 
-        //    if (userProfileDetailsInfo.RoutingList && userProfileDetailsInfo.RoutingList.length > 0) {
-        //        if (userProfileDetailsInfo.RoutingList.length == 1) {
-        //            url = CombineWithBaseWebAppUrlOrDefault(['/home', userProfileDetailsInfo.RoutingList[0]]);
-        //        }
-        //    } else {
-        //        let depName = "scholarship";//GetLocalStorageValue(LocalStorageKeys.ModuleName);
-        //        if (depName) {
-        //            url = CombineWithBaseWebAppUrlOrDefault(['/home', depName]);
-        //        }
+        let depName = "/evaluationPlan/" + extractDepartmentName();
 
-        //    }
-        //}/
-        let depName ="/evaluationPlan/"+ extractDepartmentName();//GetLocalStorageValue(LocalStorageKeys.ModuleName);
         if (depName) {
-            url = url.concat(depName)
+            url = url.concat(depName);
         }
-        window.location.href = url;
 
-    }
+        const query = new URLSearchParams();
+
+        Object.keys(params).forEach(key => {
+            const value = params[key];
+
+            if (value !== null && value !== undefined && value !== '') {
+                query.set(key, value);
+            }
+        });
+
+        const queryString = query.toString();
+
+        if (queryString) {
+            url += `?${queryString}`;
+        }
+
+        window.location.href = url;
+    };
 
     const redirectToUrl = (url, openNewBlank = false) => {
         if (url) {
