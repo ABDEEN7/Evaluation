@@ -53,59 +53,47 @@ public class SchoolBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvide
 
 		return schoolsResponse;
 	}
-	//public async Task<PaginatedResult<ResponseSchools>> GetSchools(SchoolRequest request)
-	//{
-	//    //TODO: Get Department Id by Department Routing Path
+    //public async Task<PaginatedResult<ResponseSchools>> GetSchools(SchoolRequest request)
+    //{
+    //    //TODO: Get Department Id by Department Routing Path
 
     //    var result = await schoolRepository.GetSchoolsAsync(request);
     //    return mapper.Map<PaginatedResult<ResponseSchools>>(result);
     //}
     public async Task<PaginatedResult<ResponseOrgsPlans>> GetSchoolsPlan(SchoolRequest request)
     {
-        List<DepTargetOrgTree> depTargetOrgTrees = await orgService.GetDepTargetOrgTree();
-        int? academicYear = await academicYearServices.GetCurrentAcademicYear();
-        List<Guid?> targetOrgTreeIds =
-                    depTargetOrgTrees
-                              .Select(x => (Guid?)x.TargetOrgTreeId)
-                              .ToList();
-        List<Guid> currentOrgTree = await orgService.GetCurrentOrgTreeIds(targetOrgTreeIds, academicYear);
+        var depTargetOrgTrees = await orgService.GetDepTargetOrgTree();
+        var academicYear = await academicYearServices.GetCurrentAcademicYear();
 
-        PaginatedResult<ResponseOrgsPlans> response;
+        var targetOrgTreeIds = depTargetOrgTrees
+            .Select(x => (Guid?)x.TargetOrgTreeId)
+            .ToList();
+
+        var currentOrgTree = await orgService.GetCurrentOrgTreeIds(targetOrgTreeIds, academicYear);
+
         var dep = depTargetOrgTrees
-            .GroupBy(s => s.Category?.BackendName).Select(x => x.Key).ToList();
+            .GroupBy(s => s.Category?.BackendName)
+            .Select(x => x.Key)
+            .ToList();
+
         if (dep.Count == 1)
-            switch (dep.FirstOrDefault())
-            {
-                case DepartmentCateogry.Schools:
-                    {
-                        var result = await schoolRepository.GetSchoolsAsync(request, targetOrgTreeIds, currentOrgTree);
-                        response = mapper.Map<PaginatedResult<ResponseOrgsPlans>>(result);
-                        break;
-                    }
-
-                case DepartmentCateogry.Employee:
-                    {
-                        var result = await employeeService.GetEmployeeAsync(request, targetOrgTreeIds, currentOrgTree);
-                        response = mapper.Map<PaginatedResult<ResponseOrgsPlans>>(result);
-                        break;
-                    }
-                case DepartmentCateogry.Orgnization:
-                    {
-                        var result = await orgnizationService.GetOrgnizationAsync(request, targetOrgTreeIds, currentOrgTree);
-                        response = mapper.Map<PaginatedResult<ResponseOrgsPlans>>(result);
-                        break;
-                    }
-
-                default:
-                    throw new BusinessException("Unsupported department category");
-            }
-        else
         {
-            var result = await orgnizationService.GetOrgnizationAsync(request, targetOrgTreeIds, currentOrgTree);
-            response = mapper.Map<PaginatedResult<ResponseOrgsPlans>>(result);
+            return dep.First() switch
+            {
+                DepartmentCateogry.Schools =>
+                    await schoolRepository.GetSchoolsAsync(request, targetOrgTreeIds, currentOrgTree),
+
+                DepartmentCateogry.Employee =>
+                    await employeeService.GetEmployeeAsync(request, targetOrgTreeIds, currentOrgTree),
+
+                DepartmentCateogry.Orgnization =>
+                    await orgnizationService.GetOrgnizationAsync(request, targetOrgTreeIds, currentOrgTree),
+
+                _ => throw new BusinessException("Unsupported department category")
+            };
         }
 
-        return response;
+        return await orgnizationService.GetOrgnizationAsync(request, targetOrgTreeIds, currentOrgTree);
     }
 
     public async Task<List<SchoolVisits>> GetVisitsAsync()

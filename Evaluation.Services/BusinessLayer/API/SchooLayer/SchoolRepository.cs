@@ -31,18 +31,42 @@ public class SchoolRepository(IServiceScopeFactory serviceScopeFactory,
     ) : ApiBase(serviceScopeFactory, cacheDataProvider, unitOfWork, loggingServices, mapper, userInfo,
         serviceProvider, requestInfo)
 {
-    public async Task<PaginatedResult<School>> GetSchoolsAsync(SchoolRequest request, List<Guid?> targetOrgTreeId, List<Guid> currentSelectedSchools)
+    public async Task<PaginatedResult<ResponseOrgsPlans>> GetSchoolsAsync(
+    SchoolRequest request,
+    List<Guid?> targetOrgTreeIds,
+    List<Guid> currentSelectedSchools)
     {
-        var filter = BuildFilterExpression(request, targetOrgTreeId, currentSelectedSchools);
-        var query = serviceScopeFactory
-             .CreateScopedUow()
-             .GetRepository<School>()
-             .GetAllNonDeleted(filter)
-             .Include(x => x.OrgParent)
-             .Include(x => x.SchoolType)
-             .Include(x => x.SchoolLevel!)
-             .ThenInclude(x => x.EducationLevel);
-        return await query.GetPaginatedResult(request.PageNumber, request.PageSize = 10);
+        using var uow = serviceScopeFactory.CreateScopedUow();
+
+        var filter = BuildFilterExpression(request, targetOrgTreeIds, currentSelectedSchools);
+
+        var query = uow.GetRepository<School>()
+            .GetAllNonDeleted(filter)
+            .Select(s => new
+            {
+                School = s,
+                LastEval = s.EvaluationRequests
+                    .OrderByDescending(e => e.EvaluationDate)
+                    .FirstOrDefault()
+            })
+            .Select(x => new ResponseOrgsPlans
+            {
+                Id = x.School.Id,
+                Name = x.School.NameEn,
+
+                SchoolLevel = x.School.SchoolLevel!
+                    .Select(sl => new SchoolLevelDto
+                    {
+                        Name = sl.EducationLevel.NameEn,
+                        BackendName = sl.EducationLevel.BackendName,
+                        SchoolId = sl.SchoolId
+                    }).ToList(),
+
+                LastEvaluationDate = x.LastEval.EvaluationDate,
+                AcademicYear = x.LastEval.NextEvaluationDate
+            });
+
+        return await query.GetPaginatedResult(request.PageNumber, request.PageSize);
     }
 
     public async Task<List<School>> GetSchoolsByDepartmentId(Guid depId)

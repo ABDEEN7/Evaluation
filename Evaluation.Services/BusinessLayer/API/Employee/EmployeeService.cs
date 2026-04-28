@@ -37,14 +37,33 @@ public class EmployeeService(IServiceScopeFactory serviceScopeFactory,
                     .Where(c => c.QID.ToLower() == qId)
                     .FirstOrDefaultAsync();
     }
-    public async Task<PaginatedResult<Employee>> GetEmployeeAsync(SchoolRequest request, List<Guid?> targetOrgTreeIds, List<Guid> employees)
+    public async Task<PaginatedResult<ResponseOrgsPlans>> GetEmployeeAsync(
+    SchoolRequest request,
+    List<Guid?> targetOrgTreeIds,
+    List<Guid> employees)
     {
-		using var scopedUow = serviceScopeFactory.CreateScopedUow();
+        using var uow = serviceScopeFactory.CreateScopedUow();
 
-		var filter = BuildFilterExpression(request, targetOrgTreeIds, employees);
-        var query = scopedUow.GetRepository<Employee>()
-                    .GetAllNonDeleted(filter)
-                    .Include(x=>x.OrgParent);
+        var filter = BuildFilterExpression(request, targetOrgTreeIds, employees);
+
+        var query = uow.GetRepository<Employee>()
+            .GetAllNonDeleted(filter)
+            .Select(e => new
+            {
+                Emp = e,
+                LastEval = e.EvaluationRequests
+                    .OrderByDescending(ev => ev.EvaluationDate)
+                    .FirstOrDefault()
+            })
+            .Select(x => new ResponseOrgsPlans
+            {
+                Id = x.Emp.Id,
+                Name = x.Emp.NameEn,
+
+                LastEvaluationDate = x.LastEval.EvaluationDate,
+                AcademicYear = x.LastEval.NextEvaluationDate
+            });
+
         return await query.GetPaginatedResult(request.PageNumber, request.PageSize);
     }
 
