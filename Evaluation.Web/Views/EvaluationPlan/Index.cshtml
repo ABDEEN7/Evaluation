@@ -28,130 +28,110 @@
 
 <section id="evaluation" class="banner p-4">
     <div class="card container-fluid container-xxxl p-4">
-        <h2>We need a title</h2>
-        <h6>We need a description of this page</h6>
+        <h2 class="@ConstantKeys.EvaluationForm.PageTitle"></h2>
+        <h6 class="@ConstantKeys.EvaluationForm.PageDescription"></h6>
         <div class="row py-4">
             <div class="col-lg-12 mb-3">
                 <ul class="nav nav-tabs row main-tabs bg-grey">
                     <li id="tabEvaluationPlans" class="nav-item col-md-4">
                         <a class="nav-link text-center active fs-6" data-bs-toggle="tab" href="#tab-plans">
-                            <span class="my-1">خطط التقييم</span>
+                            <span class="my-1 @ConstantKeys.EvaluationForm.TabEvaluationPlans"></span>
                         </a>
                     </li>
-
                     <li id="tabEvaluationOperations" class="nav-item col-md-4">
-                        <a class="nav-link fs-6 text-center " data-bs-toggle="tab" href="#tab-operations">
-                            <span class="my-1">عمليات التقييم</span>
+                        <a class="nav-link fs-6 text-center" data-bs-toggle="tab" href="#tab-operations">
+                            <span class="my-1 @ConstantKeys.EvaluationForm.TabEvaluationOperations"></span>
                         </a>
                     </li>
-
                     <li id="tabSchools" class="nav-item col-md-4">
-                        <a class="nav-link fs-6 text-center " data-bs-toggle="tab" href="#tab-schools">
-                            <span class="my-1">المدارس</span>
+                        <a class="nav-link fs-6 text-center" data-bs-toggle="tab" href="#tab-schools">
+                            <span class="my-1 @ConstantKeys.EvaluationForm.TabSchools"></span>
                         </a>
                     </li>
-
                 </ul>
             </div>
 
             <div class="card col-lg-12">
                 <div class="tab-content p-0">
 
-                    <!-- خطط التقييم -->
+                    <!-- Tab: Evaluation Plans -->
                     <div id="tab-plans" class="tab-pane fade show active">
                         <ul class="nav nav-tabs sub-tabs my-3">
                             <li class="nav-item">
-                                <a class="nav-link active fs-6" data-bs-toggle="tab" href="#tab-plan-requests">
-                                    طلبات خطة التقييم
-                                </a>
+                                <a class="nav-link active fs-6 @ConstantKeys.EvaluationForm.SubTabPlanRequests"
+                                   data-bs-toggle="tab" href="#tab-plan-requests"></a>
                             </li>
-
                             <li class="nav-item">
-                                <a class="nav-link fs-6" data-bs-toggle="tab" href="#tab-plan-details">
-                                    خطة التقييم
-                                </a>
+                                <a class="nav-link fs-6 @ConstantKeys.EvaluationForm.SubTabPlanDetails"
+                                   data-bs-toggle="tab" href="#tab-plan-details"></a>
                             </li>
                         </ul>
-
                         <div class="card tab-content p-3">
                             <div id="tab-plan-requests" class="tab-pane fade show active">
                                 <partial name="_PartialEvaluationPlanRequests" />
                             </div>
-
                             <div id="tab-plan-details" class="tab-pane fade">
                                 <partial name="_PartialEvaluationPlans" />
                             </div>
                         </div>
                     </div>
 
-                    <!-- عمليات التقييم -->
+                    <!-- Tab: Evaluation Operations -->
                     <div id="tab-operations" class="tab-pane fade">
                         <partial name="_PartialEvaluationOperations" />
                     </div>
 
-                    <!-- المدارس -->
+                    <!-- Tab: Schools -->
                     <div id="tab-schools" class="tab-pane fade">
                         <partial name="_PartialSchools" />
                     </div>
-
-                  
-
                 </div>
             </div>
         </div>
     </div>
 </section>
 
+<!-- evaluationRequestDetailsModal -->
 <div class="modal fade" id="evaluationRequestDetailsModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-fullscreen modal-dialog-scrollable">
         <div class="modal-content">
-
             <div class="modal-header align-items-start border-0 justify-content-between">
-               
-                    <div>
+                <div>
                     <h4 class="fw-bold m-0" id="breadcrumbSchoolName"></h4>
-
-                        <nav aria-label="breadcrumb">
-                            <ol class="breadcrumb">
-                                <li class="breadcrumb-item">
-                                <a href="#" id="evaluationRequeststatus">مدرسة</a>
-                                </li>
-                                <li class="breadcrumb-item active" aria-current="page">
-                                    رقم الطلب:
-                                    <strong id="evaluationRequestNoText"></strong>
-                                </li>
-                            </ol>
-                        </nav>
-                    </div>
-
-                    <div class="d-flex justify-content-end align-items-center gap-3">
-                            <div class="dropdown" id="actions-container"></div>
-
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
-                                <i class="la la-close mt-1"></i>
-                            </button>
-                        </div>
-                   
-                
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item">
+                                <a href="#" id="evaluationRequeststatus"
+                                   class="@ConstantKeys.EvaluationForm.BreadcrumbSchool"></a>
+                            </li>
+                            <li class="breadcrumb-item active" aria-current="page">
+                                <span class="@ConstantKeys.EvaluationForm.BreadcrumbRequestNo"></span>
+                                <strong id="evaluationRequestNoText"></strong>
+                            </li>
+                        </ol>
+                    </nav>
+                </div>
+                <div class="d-flex justify-content-end align-items-center gap-3">
+                    <div class="dropdown" id="actions-container"></div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                        <i class="la la-close mt-1"></i>
+                    </button>
+                </div>
             </div>
 
             <div class="modal-body py-0">
-
                 <div class="card card-table mb-4">
                     <div class="card-body">
-
                         <div class="accordion" id="customAccordion">
 
                             <div class="accordion-item mb-3 rounded">
                                 <h2 class="accordion-header">
                                     <button class="accordion-button d-flex align-items-center justify-content-between"
-                                            type="button"
-                                            data-bs-toggle="collapse"
-                                            data-bs-target="#itemSchool"
-                                            aria-expanded="true">
+                                            type="button" data-bs-toggle="collapse"
+                                            data-bs-target="#itemSchool" aria-expanded="true">
                                         <div class="d-flex align-items-center gap-2 fs-18">
                                             <i class="la la-building text-primary fs-25"></i>
-                                            <span class="fw-semibold"> بيانات المدرسة الاساسية </span>
+                                            <span class="fw-semibold @ConstantKeys.EvaluationForm.AccordionSchoolBasicData"></span>
                                         </div>
                                         <span class="toggle-icon"><i class="la la-angle-up fs-22"></i></span>
                                     </button>
@@ -159,31 +139,31 @@
                                 <div id="itemSchool" class="accordion-collapse collapse show">
                                     <div class="accordion-body">
                                         <div id="school-details-container">
-                                            @await Component.InvokeAsync("SchoolDetailsModal", new {
-                                                                                        modalId = "SCHOOL",
-                                                                                        title = "تفاصيل المدرسة",
-                                                                                        body = "",
-                                                                                        isModal = false
-                                                                                        })
+                                            @await Component.InvokeAsync("SchoolDetailsModal", new
+                                                {
+                                                    modalId = "SCHOOL",
+                                                    title = "تفاصيل المدرسة",
+                                                    body = "",
+                                                    isModal = false
+                                                })
                                         </div>
                                         <div id="NDAContainerDiv"></div>
                                     </div>
                                 </div>
                             </div>
+
                             <div class="accordion-item mb-3 rounded">
                                 <h2 class="accordion-header">
                                     <button class="accordion-button collapsed d-flex align-items-center justify-content-between"
-                                            type="button"
-                                            data-bs-toggle="collapse"
+                                            type="button" data-bs-toggle="collapse"
                                             data-bs-target="#itemForm">
                                         <div class="d-flex align-items-center gap-2 fs-18">
                                             <i class="las la-clipboard text-primary fs-25"></i>
-                                            <span class="fw-semibold">بيانات المدرسة</span>
+                                            <span class="fw-semibold @ConstantKeys.EvaluationForm.AccordionSchoolData"></span>
                                         </div>
                                         <span class="toggle-icon"><i class="la la-angle-up fs-22"></i></span>
                                     </button>
                                 </h2>
-
                                 <div id="itemForm" class="accordion-collapse collapse">
                                     <div class="accordion-body">
                                         <div class="accordion" id="formGroupsAccordion"></div>
@@ -192,46 +172,35 @@
                             </div>
 
                             <div id="evaluationPartiesContainer"></div>
-
                         </div>
-
                     </div>
                 </div>
-
             </div>
-
         </div>
     </div>
 </div>
 
-<!-- Plan Details Modal - Minimal Container -->
+<!-- PlanDetailsModal -->
 <div class="modal fade" id="PlanDetailsModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-fullscreen modal-dialog-scrollable">
         <div class="modal-content">
-
-            <!-- Modal Header -->
             <div class="modal-header">
-                <h5 class="modal-title" id="PlanDetailsModalLabel">تفاصيل الخطة</h5>
+                <h5 class="modal-title @ConstantKeys.EvaluationForm.PlanDetailsTitle" id="PlanDetailsModalLabel"></h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-
-            <!-- Modal Body - Content will be rendered by planUtility.generatePlanFields() -->
-            <div class="modal-body">
-                <!-- The plan form and details will be injected here by generatePlanFields('view') -->
-            </div>
-
-            <!-- Modal Footer -->
+            <div class="modal-body"></div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+                <button type="button" class="btn btn-secondary @ConstantKeys.EvaluationForm.PlanDetailsClose"
+                        data-bs-dismiss="modal"></button>
             </div>
-
         </div>
     </div>
 </div>
+
+<!-- planRequestModal -->
 <div class="modal fade" id="planRequestModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-fullscreen modal-dialog-scrollable">
         <div class="modal-content">
-
             <div class="modal-header align-items-start border-0 justify-content-between">
                 <div>
                     <h4 class="modal-title fw-semibold mb-2">
@@ -242,111 +211,81 @@
                             <span id="planRequestNoText"></span>
                         </span>
                     </h4>
-
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb">
                             <li class="breadcrumb-item">
-                                <a href="#">الخطط</a>
+                                <a href="#" class="@ConstantKeys.EvaluationForm.BreadcrumbPlans"></a>
                             </li>
                             <li class="breadcrumb-item active" aria-current="page">
-                                تفاصيل الطلب
+                                <span class="@ConstantKeys.EvaluationForm.BreadcrumbRequestDetails"></span>
                             </li>
                         </ol>
                     </nav>
                 </div>
                 <div class="d-flex justify-content-end align-items-center gap-3">
                     <h5 class="fw-semibold m-0" id="planRequestModalSubTitle"></h5>
-
                     <div class="dropdown" id="plan-actions-container"></div>
-
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
                         <i class="la la-close mt-1"></i>
                     </button>
                 </div>
-                
             </div>
-
             <div class="modal-body py-0">
-
                 <div class="card card-table mb-4">
                     <div class="card-body">
-
                         <div class="mb-4">
                             <div class="divNotes" id="divNotes"></div>
                             <div class="divTemplates" id="plan-divTemplates"></div>
                         </div>
-
                         <div class="accordion" id="planRequestViewAccordion">
-
                             <div class="accordion-item mb-3 rounded">
                                 <h2 class="accordion-header" id="planRequestHeadingDetails">
                                     <button class="accordion-button d-flex align-items-center justify-content-between"
-                                            type="button"
-                                            data-bs-toggle="collapse"
-                                            data-bs-target="#planRequestCollapseDetails"
-                                            aria-expanded="true">
-
+                                            type="button" data-bs-toggle="collapse"
+                                            data-bs-target="#planRequestCollapseDetails" aria-expanded="true">
                                         <div class="d-flex align-items-center gap-2 fs-18">
                                             <i class="la la-file-alt text-primary fs-25"></i>
-                                            <span class="fw-semibold">تفاصيل الطلب</span>
+                                            <span class="fw-semibold @ConstantKeys.EvaluationForm.AccordionRequestDetails"></span>
                                         </div>
-
-                                        <span class="toggle-icon">
-                                            <i class="la la-angle-up fs-22"></i>
-                                        </span>
+                                        <span class="toggle-icon"><i class="la la-angle-up fs-22"></i></span>
                                     </button>
                                 </h2>
-
-                                <div id="planRequestCollapseDetails"
-                                     class="accordion-collapse collapse show">
+                                <div id="planRequestCollapseDetails" class="accordion-collapse collapse show">
                                     <div class="accordion-body">
                                         <div id="plan-request-details-container"></div>
                                     </div>
                                 </div>
                             </div>
-
                             <div class="accordion-item mb-3 rounded">
                                 <h2 class="accordion-header" id="planRequestHeadingLogs">
                                     <button class="accordion-button collapsed d-flex align-items-center justify-content-between"
-                                            type="button"
-                                            data-bs-toggle="collapse"
-                                            data-bs-target="#planRequestCollapseLogs"
-                                            aria-expanded="false">
-
+                                            type="button" data-bs-toggle="collapse"
+                                            data-bs-target="#planRequestCollapseLogs" aria-expanded="false">
                                         <div class="d-flex align-items-center gap-2 fs-18">
                                             <i class="la la-history text-primary fs-25"></i>
-                                            <span class="fw-semibold">سجل الإجراءات</span>
+                                            <span class="fw-semibold @ConstantKeys.EvaluationForm.AccordionActionLog"></span>
                                         </div>
-
-                                        <span class="toggle-icon">
-                                            <i class="la la-angle-up fs-22"></i>
-                                        </span>
+                                        <span class="toggle-icon"><i class="la la-angle-up fs-22"></i></span>
                                     </button>
                                 </h2>
-
-                                <!-- ✅ remove show -->
-                                <div id="planRequestCollapseLogs"
-                                     class="accordion-collapse collapse">
+                                <div id="planRequestCollapseLogs" class="accordion-collapse collapse">
                                     <div class="accordion-body">
                                         <div id="logTableContainer" class="table-responsive"></div>
                                     </div>
                                 </div>
                             </div>
-
                         </div>
-
-
                     </div>
                 </div>
-
             </div>
         </div>
     </div>
 </div>
+
+<!-- RequestModal -->
 <div class="modal fade" id="RequestModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-fullscreen modal-dialog-scrollable">
         <div class="modal-content">
-
             <div class="modal-header align-items-start border-0 justify-content-between">
                 <div>
                     <h4 class="modal-title fw-semibold mb-2">
@@ -357,238 +296,163 @@
                             <span id="RequestNoText"></span>
                         </span>
                     </h4>
-
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb">
                             <li class="breadcrumb-item">
-                                <a href="#">الخطط</a>
+                                <a href="#" class="@ConstantKeys.EvaluationForm.BreadcrumbPlans"></a>
                             </li>
                             <li class="breadcrumb-item active" aria-current="page">
-                                تفاصيل الطلب
+                                <span class="@ConstantKeys.EvaluationForm.BreadcrumbRequestDetails"></span>
                             </li>
                         </ol>
                     </nav>
                 </div>
                 <div class="d-flex justify-content-end align-items-center gap-3">
                     <h5 class="fw-semibold m-0" id="RequestModalSubTitle"></h5>
-
                     <div class="dropdown" id="Request-actions-container"></div>
-
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
                         <i class="la la-close mt-1"></i>
                     </button>
                 </div>
-                
             </div>
-
             <div class="modal-body py-0">
-
                 <div class="card card-table mb-4">
                     <div class="card-body">
-
                         <div class="mb-4">
                             <div class="divNotes" id="divNotes"></div>
                             <div class="divTemplates" id="Request-divTemplates"></div>
                         </div>
-
                         <div class="accordion" id="RequestViewAccordion">
-
                             <div class="accordion-item mb-3 rounded">
                                 <h2 class="accordion-header" id="RequestRequestHeadingDetails">
                                     <button class="accordion-button d-flex align-items-center justify-content-between"
-                                            type="button"
-                                            data-bs-toggle="collapse"
-                                            data-bs-target="#RequestCollapseDetails"
-                                            aria-expanded="true">
-
+                                            type="button" data-bs-toggle="collapse"
+                                            data-bs-target="#RequestCollapseDetails" aria-expanded="true">
                                         <div class="d-flex align-items-center gap-2 fs-18">
                                             <i class="la la-file-alt text-primary fs-25"></i>
-                                            <span class="fw-semibold">تفاصيل الطلب</span>
+                                            <span class="fw-semibold @ConstantKeys.EvaluationForm.AccordionRequestDetails"></span>
                                         </div>
-
-                                        <span class="toggle-icon">
-                                            <i class="la la-angle-up fs-22"></i>
-                                        </span>
+                                        <span class="toggle-icon"><i class="la la-angle-up fs-22"></i></span>
                                     </button>
                                 </h2>
-
-                                <div id="RequestCollapseDetails"
-                                     class="accordion-collapse collapse show">
+                                <div id="RequestCollapseDetails" class="accordion-collapse collapse show">
                                     <div class="accordion-body">
                                         <div id="request-details-container"></div>
                                     </div>
                                 </div>
                             </div>
-
                             <div class="accordion-item mb-3 rounded">
                                 <h2 class="accordion-header" id="RequestHeadingLogs">
                                     <button class="accordion-button collapsed d-flex align-items-center justify-content-between"
-                                            type="button"
-                                            data-bs-toggle="collapse"
-                                            data-bs-target="#RequestCollapseLogs"
-                                            aria-expanded="false">
-
+                                            type="button" data-bs-toggle="collapse"
+                                            data-bs-target="#RequestCollapseLogs" aria-expanded="false">
                                         <div class="d-flex align-items-center gap-2 fs-18">
                                             <i class="la la-history text-primary fs-25"></i>
-                                            <span class="fw-semibold">سجل الإجراءات</span>
+                                            <span class="fw-semibold @ConstantKeys.EvaluationForm.AccordionActionLog"></span>
                                         </div>
-
-                                        <span class="toggle-icon">
-                                            <i class="la la-angle-up fs-22"></i>
-                                        </span>
-
+                                        <span class="toggle-icon"><i class="la la-angle-up fs-22"></i></span>
                                     </button>
                                 </h2>
-
-                                <!-- ✅ remove show -->
-                                <div id="RequestCollapseLogs"
-                                     class="accordion-collapse collapse">
+                                <div id="RequestCollapseLogs" class="accordion-collapse collapse">
                                     <div class="accordion-body">
                                         <div id="logTableContainer" class="table-responsive"></div>
                                     </div>
                                 </div>
                             </div>
-
                         </div>
-
-
                     </div>
                 </div>
-
             </div>
         </div>
     </div>
 </div>
 
+<!-- actionModal -->
 <div class="modal fade" id="actionModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
     <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
-
             <div class="modal-header align-items-start border-0">
-                <div>
-                    <h4 class="modal-title fw-semibold mb-2" id="ActionModalTitle"></h4>
-
-                </div>
-
+                <h4 class="modal-title fw-semibold mb-2" id="ActionModalTitle"></h4>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
                     <i class="la la-close mt-1"></i>
                 </button>
             </div>
-
             <div class="modal-body py-0">
-
-               @*  <div class="row">
-                    <div class="col-md-12">
-                        <div class="card card-table mb-4">
-                            <div class="card-body">
-
-                                <h5 class="fw-bold text-primary mb-3">
-                                    <i class="la la-info-circle"></i> ملاحظات ومستخدمين
-                                </h5>
-
-                                <div class="divNotes" id="ActiondivNotes"></div>
-
-                                <div id="user-wrapper" class="mt-3">
-                                    <div id="user-tables"></div>
+                <div class="col-md-12">
+                    <div class="card card-table mb-4">
+                        <div class="card-body">
+                            <h5 class="fw-bold text-primary mb-3 @ConstantKeys.EvaluationForm.ActionDetailsHeader">
+                                <i class="la la-list"></i>
+                            </h5>
+                            <form>
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div id="progress-container"></div>
+                                        <div class="accordion mt-4" id="actionAccordion">
+                                            <div id="Action-container-fields"></div>
+                                        </div>
+                                    </div>
                                 </div>
-
-                            </div>
-                        </div>
-                    </div> *@
-
-                    <div class="col-md-12">
-                        <div class="card card-table mb-4">
-                            <div class="card-body">
-
-                                <h5 class="fw-bold text-primary mb-3">
-                                    <i class="la la-list"></i> تفاصيل الإجراء
-                                </h5>
-
-                                <form>
-                                    <div class="row">
-                                        <div class="col-12">
-                                            <div id="progress-container"></div>
-
-                                            <div class="accordion mt-4" id="actionAccordion">
-                                                <div id="Action-container-fields"></div>
-                                            </div>
-                                        </div>
+                                <div class="row mt-3">
+                                    <div class="col-12">
+                                        <div class="d-flex justify-content-end w-100 gap-2" id="actions-container"></div>
                                     </div>
-
-                                    <div class="row mt-3">
-                                        <div class="col-12">
-                                            <div class="d-flex justify-content-end w-100 gap-2" id="actions-container"></div>
-                                        </div>
-                                    </div>
-                                </form>
-
-                            </div>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
-
-          
-
+            </div>
             <div class="modal-footer border-0 pt-0">
                 <div>
-                    <button type="button" class="btn btn-outline-primary mw-200" data-bs-dismiss="modal">
-                        <i class="la la-window-close"></i> Close
+                    <button type="button" class="btn btn-outline-primary mw-200 @ConstantKeys.EvaluationForm.ActionCloseBtn"
+                            data-bs-dismiss="modal">
+                        <i class="la la-window-close"></i>
                     </button>
                 </div>
                 <div id="Action-container-button" class="d-flex gap-2"></div>
             </div>
         </div>
-     </div>
+    </div>
 </div>
 
-<div class="modal fade" id="CreateRequestModal" tabindex="-1" aria-labelledby="CreateRequestModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
-
+<!-- CreateRequestModal -->
+<div class="modal fade" id="CreateRequestModal" tabindex="-1"
+     aria-labelledby="CreateRequestModalLabel" aria-hidden="true"
+     data-bs-backdrop="static" data-bs-keyboard="false">
     <div class="modal-dialog modal-fullscreen modal-dialog-scrollable">
         <div class="modal-content">
-
             <div class="modal-header align-items-start border-0">
                 <div>
-
-                    <h4 class="modal-title fw-semibold mb-2" id="CreateRequestModalLabel">
-                        إنشاء طلب خطة تقييم
-                    </h4>
-
+                    <h4 class="modal-title fw-semibold mb-2 @ConstantKeys.EvaluationForm.CreateRequestTitle"
+                        id="CreateRequestModalLabel"></h4>
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="#">الخطط</a></li>
-                            <li class="breadcrumb-item active" aria-current="page">إنشاء طلب</li>
+                            <li class="breadcrumb-item">
+                                <a href="#" class="@ConstantKeys.EvaluationForm.BreadcrumbPlans"></a>
+                            </li>
+                            <li class="breadcrumb-item active" aria-current="page">
+                                <span class="@ConstantKeys.EvaluationForm.CreateRequestBreadcrumb"></span>
+                            </li>
                         </ol>
                     </nav>
                 </div>
-                <button type="button"
-                        class="btn-close"
-                        data-bs-dismiss="modal"
-                        aria-label="Close">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
                     <i class="la la-close mt-1"></i>
                 </button>
-
             </div>
-
             <div class="modal-body py-0">
-
                 <div class="card card-table mb-4">
                     <div class="card-body">
-
                         <form id="create-plan-form" autocomplete="off">
-
                             <div class="row">
                                 <div class="col-12">
-
                                     <div class="accordion mt-4" id="accordionExample" hidden>
                                         <select id="partyTypeSelect" class="form-select mb-3"></select>
-
                                     </div>
-
                                     <div id="content-container"></div>
-
                                 </div>
                             </div>
-
                             <div class="row mt-3" id="divForCreatedRequestButtons">
                                 <div class="col-12">
                                     <div id="Requestbtns" class="d-flex justify-content-end gap-2"></div>
@@ -638,7 +502,7 @@
                     <input type="text" hidden id="EvaluationfileSectionRequestId" />
                 </div>
                 <div class="row mb-2">
-                <label class="@ConstantKeys.WebAppRequest.lblEvaluationFileScope"></label>
+                    <label class="@ConstantKeys.WebAppRequest.lblEvaluationFileScope"></label>
                     <div id="EvaluationFileScopetree"></div>
                 </div>
                 <div class="row mb-2">
@@ -646,7 +510,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" id="btnSaveEvaluationFileScope" class="btn btn-secondary @ConstantKeys.WebAppRequest.lblSaveChanges">Save</button>
+                <button type="button" id="btnSaveEvaluationFileScope" class="btn btn-secondary @ConstantKeys.WebAppRequest.lblSaveChanges"></button>
             </div>
         </div>
     </div>
@@ -656,13 +520,13 @@
 @section Scripts {
     <!-- Tables -->
     <script src="~/lib/dropzone/dist/dropzone.js" asp-append-version="true"></script>
-   <script src="~/lib/datatable/jquery.dataTables.min.js"></script>
+    <script src="~/lib/datatable/jquery.dataTables.min.js"></script>
     <script src="~/lib/datatable/dataTables.buttons.min.js"></script>
     <script src="~/lib/datatable/buttons.html5.min.js"></script>
 
     <!-- Date -->
     <script src="~/plan-assets/vendor/select2/js/select2.min.js"></script>
-        <script src="~/plan-assets/vendor/flatpickr/js/flatpickr.js"></script>
+    <script src="~/plan-assets/vendor/flatpickr/js/flatpickr.js"></script>
     <script src="~/vendor/flatpickr/js/ar.js"></script>
     <script src="~/vendor/flatpickr/js/index.js"></script>
 
@@ -679,23 +543,23 @@
     <script src="~/js/evaluationplan/evaluation-schools-listing.js"></script>
     <script src="~/js/evaluationplan/evaluation-operations-listing.js"></script>
     <script src="~/js/evaluationplan/evaluation-plan-requests-listing.js"></script>
-   
+
 
     <!-- Form Generation -->
     <script src="/js/form-generation-util/form.constants.js"></script>
-  
-@*     <script src="~/js/form-generation-util/form.evaluationplanfield.js"></script>
+
+    @*     <script src="~/js/form-generation-util/form.evaluationplanfield.js"></script>
 
  *@   <script src="~/js/plan/planBuilder/plan.constants.js"></script>
     <script src="~/js/plan/planBuilder/plan.generate-plan-fields.js"></script>
     <script src="~/js/plan/planBuilder/plan.generate-components.js"></script>
     <script src="~/js/plan/planBuilder/plan.main-handler.js"></script>
-    <script src="~/js/plan/submit-evaluation-plan.js"></script> 
+    <script src="~/js/plan/submit-evaluation-plan.js"></script>
 
-       <script src="~/js/forms/get-forms.js"></script>
+    <script src="~/js/forms/get-forms.js"></script>
     <script src="~/js/forms/submit-form.js"></script>
 
-   <script src="/js/form-generation-util/form.generate-field.js"></script>
+    <script src="/js/form-generation-util/form.generate-field.js"></script>
     <script src="/js/form-generation-util/form.render.js"></script>
     <script src="~/js/form-generation-util/form.validation.js"></script>
     <script src="/js/form-generation-util/form.submit.js"></script>
@@ -720,37 +584,43 @@
 
             await webAppConfigsSetup().Init({
                 pageNames: [
-                     '@nameof(ConstantKeys.WebAppRequest)',
-                     '@nameof(ConstantKeys.WebAppCommon)',
+                    '@nameof(ConstantKeys.WebAppRequest)',
+                    '@nameof(ConstantKeys.WebAppCommon)',
                     '@nameof(ConstantKeys.CreatePlan)',
-                    '@nameof(ConstantKeys.EvaluationPlanRequests)'
-                    
-                  
-                ],
-                 pages: [
-                     '@nameof(ConstantKeys.WebAppCommon)',
-                    '@nameof(ConstantKeys.CreatePlan)',
+                    '@nameof(ConstantKeys.EvaluationPlans)',
+                    '@nameof(ConstantKeys.EvaluationPlanRequests)',
+                    '@nameof(ConstantKeys.EvaluationOperations)',
+                    '@nameof(ConstantKeys.EvaluationDetailsModal)',
+                    '@nameof(ConstantKeys.EvaluationForm)',
+                    '@nameof(ConstantKeys.WebSchools)'
+
 
                 ],
-                    additional_keys: []
+                pages: [
+                    '@nameof(ConstantKeys.WebAppCommon)',
+                    '@nameof(ConstantKeys.CreatePlan)',
+                    '@nameof(ConstantKeys.EvaluationOperations)'
+
+                ],
+                additional_keys: []
             });
 
             window.formUtility = window.formUtility || {};
 
-         $('#evaluationRequestDetailsModal').on('hidden.bs.modal', function () {
-            formUtility.removeQueryParameter(['Evlid', 'serviceId']);
+            $('#evaluationRequestDetailsModal').on('hidden.bs.modal', function () {
+                formUtility.removeQueryParameter(['Evlid', 'serviceId']);
             });
-             $('#planRequestModal').on('hidden.bs.modal', function () {
-            formUtility.removeQueryParameter(['id', 'serviceId']);
+            $('#planRequestModal').on('hidden.bs.modal', function () {
+                formUtility.removeQueryParameter(['id', 'serviceId']);
             });
 
-                $('#RequestModal').on('hidden.bs.modal', function () {
-            formUtility.removeQueryParameter(['id', 'serviceId']);
+            $('#RequestModal').on('hidden.bs.modal', function () {
+                formUtility.removeQueryParameter(['id', 'serviceId']);
             });
             if (sharedUtility().ExistingToken()) {
-                  uiControlsSetup().UpdatPageTitle('WebAppScholarship');
-                    $('body').show();
-                    GetScopes();
+                uiControlsSetup().UpdatPageTitle('WebAppScholarship');
+                $('body').show();
+                GetScopes();
                 // await LoadUserDetails();
                 // InitNavbarSection();
 
@@ -764,37 +634,37 @@
                 // CheckRequiredEmailOrMobileVerification();
                 //InitializeAdvancedSearch();
 
-            //     const searchParams = new URLSearchParams(window.location.search);
-            //     const reqId = searchParams.get('id');
-            //     const scholarshipId = searchParams.get('schId');
-            //     const serviceId = searchParams.get('serviceId');
+                //     const searchParams = new URLSearchParams(window.location.search);
+                //     const reqId = searchParams.get('id');
+                //     const scholarshipId = searchParams.get('schId');
+                //     const serviceId = searchParams.get('serviceId');
 
-            //     if (reqId) {
-            //         OpenRequestDetails(reqId, '', '', serviceId);
-            //     }
+                //     if (reqId) {
+                //         OpenRequestDetails(reqId, '', '', serviceId);
+                //     }
 
-            //     if (scholarshipId) {
-            //         OpenscholarshipDetails(scholarshipId, '', '');
-            //     }
+                //     if (scholarshipId) {
+                //         OpenscholarshipDetails(scholarshipId, '', '');
+                //     }
 
-            //     InitializeAdvancedSearch();
-            // } else {
-            //     sharedUtility().RedirectToUrl(ConstantUrls.LoginURL);
-            // }
+                //     InitializeAdvancedSearch();
+                // } else {
+                //     sharedUtility().RedirectToUrl(ConstantUrls.LoginURL);
+                // }
 
-            // $(document).on('click', '.more-details-btn', ServiceCardBuilder.handleCardClick);
-            // $(document).on('click', 'a[data-role="trigger-card-click"]', function (e) {
-            //     e.preventDefault();
-            //     ServiceCardBuilder.handleCardClick.call(this, e);
-            // });
+                // $(document).on('click', '.more-details-btn', ServiceCardBuilder.handleCardClick);
+                // $(document).on('click', 'a[data-role="trigger-card-click"]', function (e) {
+                //     e.preventDefault();
+                //     ServiceCardBuilder.handleCardClick.call(this, e);
+                // });
 
-        }
+            }
 
-         });
+        });
     </script>
 
 
- 
+
 
 }
 

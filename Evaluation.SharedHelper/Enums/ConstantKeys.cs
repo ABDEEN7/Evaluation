@@ -984,7 +984,7 @@ public static class ConstantKeys
         public const string ADD_WEB_EVALFORMS = "ADD_WEB_EVALFORMS";
         public const string EDIT_WEB_EVALFORMS = "EDIT_WEB_EVALFORMS";
         public const string DELETE_WEB_EVALFORMS = "DELETE_WEB_EVALFORMS";
-        
+
         #endregion
 
         #region DEPARTMENTHOLIDAY
@@ -1054,6 +1054,8 @@ public static class ConstantKeys
         public const string LASTUPDATEDBY = "LASTUPDATEDBY";
         public const string LASTUPDATEDDATE = "LASTUPDATEDDATE";
         public const string lblDisplayAsCards = "lblDisplayAsCards";
+        public const string lblDisplayAsTable = "lblDisplayAsTable";
+
     }
     public static class CreatePlan
     {
@@ -1168,6 +1170,122 @@ public static class ConstantKeys
         public const string lblAddPlan = "lblAddPlan";
         public const string lblPlanRequests = "lblPlanRequests";
     }
+    public static class EvaluationOperations
+    {
+        private const string Prefix = "lblEvaluationOperations";
+
+        // Titles
+        public const string PlansListTitle = Prefix + nameof(PlansListTitle);
+        public const string PlanRequests = Prefix + nameof(PlanRequests);
+        public const string RequestDetails = Prefix + nameof(RequestDetails);
+
+        // Filters
+        public const string Filter = Prefix + nameof(Filter);
+        public const string Clear = Prefix + nameof(Clear);
+
+        public const string RequestNo = Prefix + nameof(RequestNo);
+        public const string Status = Prefix + nameof(Status);
+        public const string RequestService = Prefix + nameof(RequestService);
+
+        public const string CreatedDate = Prefix + nameof(CreatedDate);
+        public const string CreatedTime = Prefix + nameof(CreatedTime);
+
+        // Plan Info
+        public const string PlanName = "lblEvaluationOperationsPlanName";
+        public const string PlanStatus = Prefix + nameof(PlanStatus);
+        public const string PlanStartDate = Prefix + nameof(PlanStartDate);
+        public const string PlanEndDate = Prefix + nameof(PlanEndDate);
+        public const string PlanCreatedOn = Prefix + nameof(PlanCreatedOn);
+        public const string PlanSchoolsCount = Prefix + nameof(PlanSchoolsCount);
+
+        // Actions
+        public const string Actions = Prefix + nameof(Actions);
+        public const string View = Prefix + nameof(View);
+        public const string Edit = Prefix + nameof(Edit);
+        public const string Delete = Prefix + nameof(Delete);
+
+        // Dialogs
+        public const string ConfirmDelete = Prefix + nameof(ConfirmDelete);
+        public const string DeletePlanConfirm = Prefix + nameof(DeletePlanConfirm);
+
+        // Sections
+        public const string Statistics = Prefix + nameof(Statistics);
+        public const string School = Prefix + nameof(School);
+        public const string SupportingFiles = Prefix + nameof(SupportingFiles);
+        public const string InterviewsSchedule = Prefix + nameof(InterviewsSchedule);
+        public const string EvidenceCollection = Prefix + nameof(EvidenceCollection);
+        public const string ClassroomObservations = Prefix + nameof(ClassroomObservations);
+        public const string SchoolRounds = Prefix + nameof(SchoolRounds);
+        public const string LabsVisits = Prefix + nameof(LabsVisits);
+        public const string ResultsAnalysis = Prefix + nameof(ResultsAnalysis);
+        public const string RealtimeEvaluationSystem = Prefix + nameof(RealtimeEvaluationSystem);
+        public const string PeriodicReport = Prefix + nameof(PeriodicReport);
+
+        // Buttons
+        public const string CloseModal = Prefix + nameof(CloseModal);
+        public const string AddPlan = Prefix + nameof(AddPlan);
+        public const string CardView = Prefix + nameof(CardView);
+        public const string TableView = Prefix + nameof(TableView);
+        public const string All = Prefix + nameof(All);
+    }
+    public static class EvaluationPlans
+    {
+        private const string Prefix = "lblEvaluationPlans";
+
+        // Filters
+        public const string AcademicYear = Prefix + "AcademicYear";
+        public const string SchoolName = Prefix + "SchoolName";
+        public const string Search = Prefix + "Search";
+        public const string Clear = Prefix + "Clear";
+        public const string All = Prefix + "All";
+
+        // View Mode
+        public const string CardView = Prefix + "CardView";
+        public const string TableView = Prefix + "TableView";
+
+        // Table
+        public const string PlanName = Prefix + "PlanName";
+        public const string SchoolsCount = Prefix + "SchoolsCount";
+        public const string Period = Prefix + "Period";
+        public const string Status = Prefix + "Status";
+        public const string View = Prefix + "View";
+        public const string Actions = Prefix + "Actions";
+    }
+    public static class EvaluationForm
+    {
+        private const string Prefix = "lblEvaluationForm"; 
+
+        public const string PageTitle = Prefix + "PageTitle";
+        public const string PageDescription = Prefix + "PageDescription";
+
+        public const string TabEvaluationPlans = Prefix + "TabEvaluationPlans";
+        public const string TabEvaluationOperations = Prefix + "TabEvaluationOperations";
+        public const string TabSchools = Prefix + "TabSchools";
+
+        public const string SubTabPlanRequests = Prefix + "SubTabPlanRequests";
+        public const string SubTabPlanDetails = Prefix + "SubTabPlanDetails";
+
+        public const string BreadcrumbSchool = Prefix + "BreadcrumbSchool";
+        public const string BreadcrumbRequestNo = Prefix + "BreadcrumbRequestNo";
+
+        public const string AccordionSchoolBasicData = Prefix + "AccordionSchoolBasicData";
+        public const string AccordionSchoolData = Prefix + "AccordionSchoolData";
+
+        public const string PlanDetailsTitle = Prefix + "PlanDetailsTitle";
+        public const string PlanDetailsClose = Prefix + "PlanDetailsClose";
+
+        public const string BreadcrumbPlans = Prefix + "BreadcrumbPlans";
+        public const string BreadcrumbRequestDetails = Prefix + "BreadcrumbRequestDetails";
+
+        public const string CreateRequestTitle = Prefix + "CreateRequestTitle";
+        public const string CreateRequestBreadcrumb = Prefix + "CreateRequestBreadcrumb";
+
+        public const string ActionDetailsHeader = Prefix + "ActionDetailsHeader";
+        public const string ActionCloseBtn = Prefix + "ActionCloseBtn";
+
+        public const string AccordionRequestDetails = Prefix + "AccordionRequestDetails";
+        public const string AccordionActionLog = Prefix + "AccordionActionLog";
+    }
 
 
     public static class WebAppLoginPage
@@ -1206,7 +1324,7 @@ public static class ConstantKeys
     }
     //public static class AssignmentUserTeam
     //{
-    
+
     //}
 
     public static class LanguageConst
@@ -1339,5 +1457,42 @@ public static class ConstantKeys
     {
         public static string Pending = "PENDING";
         public static string Objection = "OBJECTION";
+    }
+    public static class EvaluationDetailsModal
+    {
+        private const string Prefix = "EvaluationDetailsModal.";
+
+        public const string Title = Prefix + "Title";
+        public const string Statistics = Prefix + "Statistics";
+    }
+    public static class WebSchools
+    {
+        private const string Prefix = "lblWebSchools";
+
+        // Header
+        public const string Schools = Prefix + "Schools";
+
+        // Filters
+        public const string SchoolName = Prefix + "SchoolName";
+        public const string SchoolCode = Prefix + "SchoolCode";
+        public const string Phase = Prefix + "Phase";
+        public const string Type = Prefix + "Type";
+        public const string Region = Prefix + "Region";
+        public const string CurrentPlanStatus = Prefix + "CurrentPlanStatus";
+
+        // Buttons
+        public const string Search = Prefix + "Search";
+        public const string ClearFilter = Prefix + "ClearFilter";
+
+        // Table
+        public const string Name = Prefix + "Name";
+        public const string Code = Prefix + "Code";
+        public const string TypeCol = Prefix + "TypeCol";
+        public const string PhaseCol = Prefix + "PhaseCol";
+        public const string RegionCol = Prefix + "RegionCol";
+        public const string StatusCol = Prefix + "StatusCol";
+
+        // Modal
+        public const string SchoolDetails = Prefix + "SchoolDetails";
     }
 }
