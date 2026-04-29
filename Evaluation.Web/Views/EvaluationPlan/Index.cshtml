@@ -610,6 +610,7 @@
                 const reqId = searchParams.get('id');
                 const serviceId = searchParams.get('serviceId');
                 const EvlId = searchParams.get('Evlid');
+                const planId = searchParams.get('PlanId');
 
                  if (reqId) {
                  openPlanRequestDetails(reqId);
@@ -617,6 +618,9 @@
 
                 if (EvlId) {
                       openEvaluationRequestDetails(EvlId);
+                }
+                if(planId){
+                    InitializePlanDetails(planId);
                 }
 
          $('#evaluationRequestDetailsModal').on('hidden.bs.modal', function () {
@@ -628,6 +632,9 @@
 
             $('#RequestModal').on('hidden.bs.modal', function () {
                 formUtility.removeQueryParameter(['id', 'serviceId']);
+            });
+            $('#PlanDetailsModal').on('hidden.bs.modal', function () {
+                formUtility.removeQueryParameter(['planId', 'serviceId']);
             });
             if (sharedUtility().ExistingToken()) {
                 uiControlsSetup().UpdatPageTitle('WebAppScholarship');
