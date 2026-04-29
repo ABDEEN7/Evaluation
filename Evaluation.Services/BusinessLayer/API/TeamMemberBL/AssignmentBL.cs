@@ -5,7 +5,6 @@ using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
 using Evaluation.DAL.Models.Template;
 using Evaluation.DAL.Models.UserEntiy;
 using Evaluation.DAL.Repositories;
-using Evaluation.Services.Models.SMTP;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Dtos.TeamMemberDto;
 using Evaluation.SharedHelper.Enums;
@@ -16,7 +15,6 @@ using Evaluation.SharedHelper.Validations;
 using FluentResults;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using static Evaluation.DAL.ConstantKeys;
 using static Evaluation.SharedHelper.Enums.ConstantKeys;
 namespace Evaluation.Services.BusinessLayer.API.TeamMemberBL;
 

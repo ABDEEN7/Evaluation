@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Evaluation.DAL;
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.Calendars;
 using Evaluation.DAL.Models.DepartementEntites;
@@ -9,11 +10,14 @@ using Evaluation.Services.BusinessLayer.API.OrganizationLayer;
 using Evaluation.Services.BusinessLayer.API.SchooLayer;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Consts;
+using Evaluation.SharedHelper.Dtos.AcademicYearDto;
 using Evaluation.SharedHelper.Dtos.SchoolDto;
+using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.VisualBasic;
 
 namespace Evaluation.Services.BusinessLayer.API;
 
@@ -53,59 +57,73 @@ public class SchoolBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvide
 
 		return schoolsResponse;
 	}
-	//public async Task<PaginatedResult<ResponseSchools>> GetSchools(SchoolRequest request)
-	//{
-	//    //TODO: Get Department Id by Department Routing Path
+    //public async Task<PaginatedResult<ResponseSchools>> GetSchools(SchoolRequest request)
+    //{
+    //    //TODO: Get Department Id by Department Routing Path
 
     //    var result = await schoolRepository.GetSchoolsAsync(request);
     //    return mapper.Map<PaginatedResult<ResponseSchools>>(result);
     //}
     public async Task<PaginatedResult<ResponseOrgsPlans>> GetSchoolsPlan(SchoolRequest request)
     {
-        List<DepTargetOrgTree> depTargetOrgTrees = await orgService.GetDepTargetOrgTree();
-        int? academicYear = await academicYearServices.GetCurrentAcademicYear();
-        List<Guid?> targetOrgTreeIds =
-                    depTargetOrgTrees
-                              .Select(x => (Guid?)x.TargetOrgTreeId)
-                              .ToList();
-        List<Guid> currentOrgTree = await orgService.GetCurrentOrgTreeIds(targetOrgTreeIds, academicYear);
+        var depTargetOrgTrees = await orgService.GetDepTargetOrgTree();
+        var academicYear = await academicYearServices.GetCurrentAcademicYear();
 
-        PaginatedResult<ResponseOrgsPlans> response;
+        var targetOrgTreeIds = depTargetOrgTrees
+            .Select(x => (Guid?)x.TargetOrgTreeId)
+            .ToList();
+
+        var currentOrgTree = await orgService.GetCurrentOrgTreeIds(targetOrgTreeIds, academicYear);
+
         var dep = depTargetOrgTrees
-            .GroupBy(s => s.Category?.BackendName).Select(x => x.Key).ToList();
+            .GroupBy(s => s.Category?.BackendName)
+            .Select(x => x.Key)
+            .ToList();
+        PaginatedResult<ResponseOrgsPlans> result;
         if (dep.Count == 1)
-            switch (dep.FirstOrDefault())
+        {
+            result = dep.First() switch
             {
-                case DepartmentCateogry.Schools:
-                    {
-                        var result = await schoolRepository.GetSchoolsAsync(request, targetOrgTreeIds, currentOrgTree);
-                        response = mapper.Map<PaginatedResult<ResponseOrgsPlans>>(result);
-                        break;
-                    }
+                DepartmentCateogry.Schools =>
+                    await schoolRepository.GetSchoolsAsync(request, targetOrgTreeIds, currentOrgTree),
 
-                case DepartmentCateogry.Employee:
-                    {
-                        var result = await employeeService.GetEmployeeAsync(request, targetOrgTreeIds, currentOrgTree);
-                        response = mapper.Map<PaginatedResult<ResponseOrgsPlans>>(result);
-                        break;
-                    }
-                case DepartmentCateogry.Orgnization:
-                    {
-                        var result = await orgnizationService.GetOrgnizationAsync(request, targetOrgTreeIds, currentOrgTree);
-                        response = mapper.Map<PaginatedResult<ResponseOrgsPlans>>(result);
-                        break;
-                    }
+                DepartmentCateogry.Employee =>
+                    await employeeService.GetEmployeeAsync(request, targetOrgTreeIds, currentOrgTree),
 
-                default:
-                    throw new BusinessException("Unsupported department category");
-            }
+                DepartmentCateogry.Orgnization =>
+                    await orgnizationService.GetOrgnizationAsync(request, targetOrgTreeIds, currentOrgTree),
+
+                _ => throw new BusinessException(ConstantKeys.ExceptionMessage.UnsupportedDepartmentCategory)
+            };
+        }
         else
         {
-            var result = await orgnizationService.GetOrgnizationAsync(request, targetOrgTreeIds, currentOrgTree);
-            response = mapper.Map<PaginatedResult<ResponseOrgsPlans>>(result);
+            result = await orgnizationService.GetOrgnizationAsync(request, targetOrgTreeIds, currentOrgTree);
+        }
+        await FillAcademicYear(result);
+        return result;
+    }
+    private async Task FillAcademicYear(PaginatedResult<ResponseOrgsPlans> result)
+    {
+        var academicYears = await uow.GetRepository<AcademicYear>()
+            .GetAllActiveNonDeleted(x => x.DepartmentId == requestInfo.DepId && x.Year >= DateTime.UtcNow.Year)
+            .Select(x => new AcademicYearLite
+            {
+                StartDate = x.StartDate,
+                EndDate = x.EndDate,
+                Year = x.Year
+            })
+            .OrderBy(x => x.StartDate)
+            .ToListAsync();
+
+        foreach (var item in result.Items)
+        {
+            item.YearAcdemicYear = ConstantLogic.ResolveAcademicYear(
+                item.AcademicYear,
+                academicYears
+            );
         }
 
-        return response;
     }
 
     public async Task<List<SchoolVisits>> GetVisitsAsync()
