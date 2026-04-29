@@ -606,9 +606,21 @@
             });
 
             window.formUtility = window.formUtility || {};
+             const searchParams = new URLSearchParams(window.location.search);
+                const reqId = searchParams.get('id');
+                const serviceId = searchParams.get('serviceId');
+                const EvlId = searchParams.get('Evlid');
 
-            $('#evaluationRequestDetailsModal').on('hidden.bs.modal', function () {
-                formUtility.removeQueryParameter(['Evlid', 'serviceId']);
+                 if (reqId) {
+                 openPlanRequestDetails(reqId);
+                }
+
+                if (EvlId) {
+                      openEvaluationRequestDetails(EvlId);
+                }
+
+         $('#evaluationRequestDetailsModal').on('hidden.bs.modal', function () {
+            formUtility.removeQueryParameter(['Evlid', 'serviceId']);
             });
             $('#planRequestModal').on('hidden.bs.modal', function () {
                 formUtility.removeQueryParameter(['id', 'serviceId']);
@@ -634,18 +646,6 @@
                 // CheckRequiredEmailOrMobileVerification();
                 //InitializeAdvancedSearch();
 
-                //     const searchParams = new URLSearchParams(window.location.search);
-                //     const reqId = searchParams.get('id');
-                //     const scholarshipId = searchParams.get('schId');
-                //     const serviceId = searchParams.get('serviceId');
-
-                //     if (reqId) {
-                //         OpenRequestDetails(reqId, '', '', serviceId);
-                //     }
-
-                //     if (scholarshipId) {
-                //         OpenscholarshipDetails(scholarshipId, '', '');
-                //     }
 
                 //     InitializeAdvancedSearch();
                 // } else {
@@ -658,7 +658,8 @@
                 //     ServiceCardBuilder.handleCardClick.call(this, e);
                 // });
 
-            }
+
+        }
 
         });
     </script>

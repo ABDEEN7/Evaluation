@@ -180,10 +180,11 @@ namespace Evaluation.Services.BusinessLayer.API
 					foreach (var updated in updatedFields)
 					{
 						var target = allFields.FirstOrDefault(f => f.FieldId == updated.FieldId);
-						if (target != null)
+						if (target != null && updated.Value != null && updated.Value != "")
 						{
 							target.Value = updated.Value;
-							target.IsApproved = updated.IsApproved;
+							target.IsApproved = true;
+							target.IsEditable = false;
 						}
 					}
 				}

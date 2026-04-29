@@ -654,6 +654,22 @@ window.formUtility = window.formUtility || {};
         }, 300);
         return columns;
     };
+
+
+    const GetDropdownOptionsForTabulator = () => {
+
+        let lang = currentLang;
+        if (!dropdowns || !Array.isArray(dropdowns)) {
+            return [];
+        }
+        const result = dropdowns.map(x => {
+            var item = { id: x.id, value: lang == 'ar' ? x.titleAr : x.titleEn, };
+
+            return item;
+        });
+
+        return result;
+    }
     function toggleAddButtonVisibility(tableId, addButtonId, maxCount, maxCountNew, minCountNew) {
         const addButton = $('#' + addButtonId);
         if (!addButton.length) return;
@@ -713,9 +729,9 @@ window.formUtility = window.formUtility || {};
 
         $('#' + modalId).modal('show');
         initializeFields(json_schema_copy.fields, modalId, RENDER_TYPE.ACTION);
-        InitializeCascadingDropdown(json_schema_copy);
-        evaluateConditionsAfterLoadForList(json_schema_copy);
-        handleListFieldConditionalFields(json_schema_copy);
+        ns.InitializeCascadingDropdown(json_schema_copy);
+        ns.evaluateConditionsAfterLoadForList(json_schema_copy);
+        ns.handleListFieldConditionalFields(json_schema_copy);
 
         bindModalButtons(modalId, addObjectBtnId, 'cancelModalBtnId', modalBodyId, jsonSchema, table, maxCount, maxCountNew, minCountNew);
     };
@@ -1097,9 +1113,9 @@ window.formUtility = window.formUtility || {};
 
         $('#' + modalId).modal('show');
         initializeFields(json_schema_copy.fields, modalId, RENDER_TYPE.PREVIEW);
-        InitializeCascadingDropdown(json_schema_copy);
-       handleListFieldConditionalFields(json_schema_copy);
-        evaluateConditionsAfterLoadForList(json_schema_copy);
+        ns.InitializeCascadingDropdown(json_schema_copy);
+        ns.handleListFieldConditionalFields(json_schema_copy);
+        ns.evaluateConditionsAfterLoadForList(json_schema_copy);
         bindModalButtons(modalId, addObjectBtnId, 'cancelModalBtnId', modalBodyId, jsonSchema, table, maxCount, maxCountNew, minCountNew);
     };
     function ShowModalForAddModel  (modalId, modalTitleId, addObjectBtnId, jsonSchema, modalBodyId, modalTitleText, tableId, maxCount, maxCountNew, minCountNew)  {
@@ -1114,9 +1130,9 @@ window.formUtility = window.formUtility || {};
         $('#' + addObjectBtnId).removeClass('edit-object-btn');
 
         initializeFields(jsonSchema.fields, modalId, RENDER_TYPE.ACTION);
-        InitializeCascadingDropdown(jsonSchema);
-        evaluateConditionsAfterLoadForList(jsonSchema);
-        handleListFieldConditionalFields(jsonSchema);
+        ns.InitializeCascadingDropdown(jsonSchema);
+        ns.evaluateConditionsAfterLoadForList(jsonSchema);
+        ns.handleListFieldConditionalFields(jsonSchema);
 
         bindModalButtons(modalId, addObjectBtnId, 'cancelModalBtnId', modalBodyId, jsonSchema, tableId, maxCount, maxCountNew, minCountNew);
 
