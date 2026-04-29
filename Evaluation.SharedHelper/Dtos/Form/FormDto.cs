@@ -5,6 +5,6 @@ namespace Evaluation.SharedHelper.Dtos.Form;
 
 public class FormDto
 {
-    public EvaluationFormDto EvalForm { get; set; }
+    public TemplateFormDto EvalForm { get; set; }
     public List<FormItemDto> Items { get; set; }
 }

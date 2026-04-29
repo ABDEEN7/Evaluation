@@ -23,6 +23,5 @@ namespace Evaluation.DAL.Models.FormsModules
         public Guid CalcMethodId { get; set; }
         public CalcMethod? CalcMethod { get; set; }
         public decimal Percentage { get; set; } = 0;
-
     }
 }

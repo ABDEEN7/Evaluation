@@ -285,12 +285,7 @@ const planUtility = window.planUtility;
                             <select id="${pid(fieldId, 'filterPreviousResult')}"
                                     name="previousResult"
                                     class="form-control">
-                                <option value="">${t('lblAll')}</option>
-                                <option value="Perfect">${t('lblPerfect')}</option>
-                                <option value="VeryGood">${t('lblVeryGood')}</option>
-                                <option value="Good">${t('lblGood')}</option>
-                                <option value="Acceptable">${t('lblAcceptable')}</option>
-                                <option value="Week">${t('lblWeak')}</option>
+                                    <option value="">${t('lblAll')}</option>
                             </select>
                         </div>
                         <hr>

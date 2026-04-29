@@ -80,7 +80,8 @@
                     loadSemesters(),
                     loadVisitTypes(),
                     loadVacationDays(),
-                    loadParentOrgTree()
+                    loadParentOrgTree(),
+                    loadFomrEvalMatrixValue()
                 ]);
             }
 
@@ -95,6 +96,7 @@
             initializeFilterDatePickers(fieldId);
             populateFilterVisitTypes(fieldId);
             populateFilterParentOrgTree(fieldId);
+            populateFilterPreviousResult(fieldId);
         } catch (e) {
             console.error(`[PlanHandler] Init failed for ${fieldId}`, e);
             alert('حدث خطأ أثناء التحميل');
@@ -132,6 +134,9 @@
         const r = await jqClient().Get(`${API_ENDPOINTS.GET_PLAN_DETAILS}/${planId}`);
         renderPlanWithData(fieldId, r.result);
     };
+    const loadFomrEvalMatrixValue = () =>
+        jqClient().Get(API_ENDPOINTS.GetFomrEvalMatrixValue)
+            .then(r => ns.fomrEvalMatrixValue = r?.result || []);
 
     /* ===================== POPULATE ===================== */
 
@@ -203,6 +208,7 @@
                  </option>`
             )
         );
+        const $modal = $s.closest('.modal');
         const dropdownParent =
             (parentElement && parentElement.length) ? parentElement :
                 ($modal.length ? $modal : $(document.body));
@@ -222,7 +228,12 @@
             $select.append(`<option value="${parent.id}">${parent.nameEn}</option>`)
         });
     }
-
+    const populateFilterPreviousResult = (fieldId) => {
+        const $select = $p(fieldId, 'filterPreviousResult');
+        ns.fomrEvalMatrixValue.forEach(fromEval => {
+            $select.append(`<option value="${fromEval.id}">${fromEval.name}</option>`);
+        });
+    };
     const initializeFilterDatePickers = (fieldId) => {
         const dateFields = ['filterLastEvalDate', 'filterCreatedDate', 'filterNextEvalDate'];
 
@@ -262,7 +273,7 @@
 
         const vm = {
             title: plan.name || '',
-            planTypeId: plan.planTypeDepId || plan.PlanTypeDepId,
+            planTypeId: plan.planTypeId || plan.planTypeDepId || plan.PlanTypeDepId,
             semesterId: plan.semesterId,
             dateRange: toDateOnly(plan.startDate) && (plan.endDate) ?
                 `${toDateOnly(plan.startDate)} to ${toDateOnly(plan.endDate)}` : '',
@@ -700,7 +711,7 @@
             lastEvalDate: $p(fieldId, 'filterLastEvalDate').val(),
             establishmentDate: $p(fieldId, 'filterCreatedDate').val(),
             nextEvalDate: $p(fieldId, 'filterNextEvalDate').val(),
-            previousResult: $p(fieldId, 'filterPreviousResult').val(),
+            fomrEvalMatrixValueId: $p(fieldId, 'filterPreviousResult').val(),
             visitType: $p(fieldId, 'filterVisitType').val()
         };
 

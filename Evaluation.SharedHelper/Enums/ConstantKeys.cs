@@ -1,4 +1,6 @@
-﻿namespace Evaluation.SharedHelper.Enums;
+﻿using Evaluation.DAL.Models.DepartementEntites;
+
+namespace Evaluation.SharedHelper.Enums;
 
 #pragma warning disable S3218, S101
 public static class ConstantKeys
@@ -197,6 +199,15 @@ public static class ConstantKeys
         public static readonly string msgInvalidEvaluationPlan = "msgInvalidEvaluationPlan"; //TO DO INSERTED
         public static readonly string msgInvalidEvaluationForm = "msgInvalidEvaluationForm"; //TO DO INSERTED
         public static readonly string msgInvalidAttachmentId = "msgInvalidAttachmentId"; //TO DO INSERTED
+        public static readonly string FormItemConfigPercentageMax = "FormItemConfigPercentageMax";
+        public static readonly string Exception_No_Data_Provided = "Exception_No_Data_Provided";
+        public static readonly string DuplicateRecordsinRequest = "DuplicateRecordsinRequest";
+        public static readonly string RECORD_NOT_FOUND = "RECORD_NOT_FOUND";
+        public static readonly string Exception_Invalid_Total_Percentage_After_Delete = "Exception_Invalid_Total_Percentage_After_Delete";
+        public static readonly string Final_Evaluation_Form_Limit = "Final_Evaluation_Form_Limit";
+        public static readonly string Max_Final_Evaluation_Forms_Exceeded = "Max_Final_Evaluation_Forms_Exceeded";
+        public static readonly string UserNotExsistInThisEvaluationRequest = "UserNotExsistInThisEvaluationRequest";
+        public static readonly string UnsupportedDepartmentCategory = "UnsupportedDepartmentCategory";
     }
 
     public static class AdminSettings
@@ -363,59 +374,61 @@ public static class ConstantKeys
         public static readonly string WebDepartmentHoliday = "WebDepartmentHoliday";
         public static readonly string WebAppRequest = "WebAppRequest";
         public static readonly string WebAppCommon = "WebAppCommon";
-
+        public static readonly string AssignmentUserTeam = "AssignmentUserTeam";
+        public static readonly string EducationalEntitiesDescription = "EducationalEntitiesDescription";
+        public static readonly string FormEducationalEntitiesTitle = "FormEducationalEntitiesTitle";
     }
-	public static class WebAppRequest
-	{
-		public static readonly string lblDownload = "lblDownload";
-		public static readonly string lblMinLengthNotReached = "lblMinLengthNotReached";
-		public static readonly string lblMissingFormIdForEvaluationForm = "lblMissingFormIdForEvaluationForm";
-		public static readonly string lblLoadingEvaluationForm = "lblLoadingEvaluationForm";
-		public static readonly string lblMaximumRowsExceeded = "lblMaximumRowsExceeded";
-		public static readonly string lblValueMustBeGreaterOrEqual = "lblValueMustBeGreaterOrEqual";
-		public static readonly string lblMaxLengthExceeded = "lblMaxLengthExceeded";
-		public const string actionTransactionsdetailsLabel = "actionTransactionsdetailsLabel";
-		public static readonly string lblFileSizeExceeded = "lblFileSizeExceeded";
-		public static readonly string lblMaximumNewRowsExceeded = "lblMaximumNewRowsExceeded";
-		public static readonly string lblLoadingEvaluationPlan = "lblLoadingEvaluationPlan";
-		public static readonly string lblRenderFormGroupsNotDefined = "lblRenderFormGroupsNotDefined";
-		public static readonly string lblNotEqualValidation = "lblNotEqualValidation";
-		public static readonly string lblFailedToLoadEvaluationPlan = "lblFailedToLoadEvaluationPlan";
-		public static readonly string lblRemarkISRequired = "lblRemarkISRequired";
-		public static readonly string lblPlanUtilityNotFound = "lblPlanUtilityNotFound";
-		public static readonly string lblFileTypeNotAllowed = "lblFileTypeNotAllowed";
-		public static readonly string lblFormSubmittedSuccessfully = "lblFormSubmittedSuccessfully";
-		public static readonly string lblDefaultValidationMessage = "lblDefaultValidationMessage";
-		public static readonly string lblUnexpectedErrorOccurred = "lblUnexpectedErrorOccurred";
-		public static readonly string lblInvalidNumberFormat = "lblInvalidNumberFormat";
-		public static readonly string lblValueMustBeLessOrEqual = "lblValueMustBeLessOrEqual";
-		public static readonly string lblMinimumNewRowsRequired = "lblMinimumNewRowsRequired";
-		public static readonly string lblMinimumRowsRequired = "lblMinimumRowsRequired";
-		public static readonly string lblFailedToLoadEvaluationForm = "lblFailedToLoadEvaluationForm";
-		public static readonly string lblInvalidBase64Content = "lblInvalidBase64Content";
-		public static readonly string lblRequestCreatedSuccessfully = "lblRequestCreatedSuccessfully";
-		public static readonly string lblSaveChanges = "lblSaveChanges";
-		public static readonly string lblSaveAsDraft = "lblSaveAsDraft";
-		public static readonly string lblFailedToLoadFile = "lblFailedToLoadFile";
-		public static readonly string lblRequestSavedAsDraftSuccessfully = "lblRequestSavedAsDraftSuccessfully";
-		public static readonly string lblFailedToRenderPlanWrapper = "lblFailedToRenderPlanWrapper";
-		public static readonly string lblUnnamedGroup = "lblUnnamedGroup";
-		public static readonly string lblBase64PdfFileName = "lblBase64PdfFileName";
-		public static readonly string lblUnexpectedEmptyResponse = "lblUnexpectedEmptyResponse";
-		public static readonly string lblInvalidFormat = "lblInvalidFormat";
-		public static readonly string lblViewHistory = "lblViewHistory";
-		public static readonly string lblProcedures = "lblProcedures";
-		public static readonly string lblDateRangeInvalid = "lblDateRangeInvalid";
-		public static readonly string lblRemarks = "lblRemarks";
-		public static readonly string lblRequiredField = "lblRequiredField";
-		public static readonly string lblUnnamedFile = "lblUnnamedFile";
-		public static readonly string lblInvalidFileExtension = "lblInvalidFileExtension";
-		public static readonly string lblCloseModal = "lblCloseModal";
-		public static readonly string lblEvaluationFileScope = "lblEvaluationFileScope";
-		public static readonly string lblEvaluationFileHeader = "lblEvaluationFileHeader";
-	}
+    public static class WebAppRequest
+    {
+        public static readonly string lblDownload = "lblDownload";
+        public static readonly string lblMinLengthNotReached = "lblMinLengthNotReached";
+        public static readonly string lblMissingFormIdForEvaluationForm = "lblMissingFormIdForEvaluationForm";
+        public static readonly string lblLoadingEvaluationForm = "lblLoadingEvaluationForm";
+        public static readonly string lblMaximumRowsExceeded = "lblMaximumRowsExceeded";
+        public static readonly string lblValueMustBeGreaterOrEqual = "lblValueMustBeGreaterOrEqual";
+        public static readonly string lblMaxLengthExceeded = "lblMaxLengthExceeded";
+        public const string actionTransactionsdetailsLabel = "actionTransactionsdetailsLabel";
+        public static readonly string lblFileSizeExceeded = "lblFileSizeExceeded";
+        public static readonly string lblMaximumNewRowsExceeded = "lblMaximumNewRowsExceeded";
+        public static readonly string lblLoadingEvaluationPlan = "lblLoadingEvaluationPlan";
+        public static readonly string lblRenderFormGroupsNotDefined = "lblRenderFormGroupsNotDefined";
+        public static readonly string lblNotEqualValidation = "lblNotEqualValidation";
+        public static readonly string lblFailedToLoadEvaluationPlan = "lblFailedToLoadEvaluationPlan";
+        public static readonly string lblRemarkISRequired = "lblRemarkISRequired";
+        public static readonly string lblPlanUtilityNotFound = "lblPlanUtilityNotFound";
+        public static readonly string lblFileTypeNotAllowed = "lblFileTypeNotAllowed";
+        public static readonly string lblFormSubmittedSuccessfully = "lblFormSubmittedSuccessfully";
+        public static readonly string lblDefaultValidationMessage = "lblDefaultValidationMessage";
+        public static readonly string lblUnexpectedErrorOccurred = "lblUnexpectedErrorOccurred";
+        public static readonly string lblInvalidNumberFormat = "lblInvalidNumberFormat";
+        public static readonly string lblValueMustBeLessOrEqual = "lblValueMustBeLessOrEqual";
+        public static readonly string lblMinimumNewRowsRequired = "lblMinimumNewRowsRequired";
+        public static readonly string lblMinimumRowsRequired = "lblMinimumRowsRequired";
+        public static readonly string lblFailedToLoadEvaluationForm = "lblFailedToLoadEvaluationForm";
+        public static readonly string lblInvalidBase64Content = "lblInvalidBase64Content";
+        public static readonly string lblRequestCreatedSuccessfully = "lblRequestCreatedSuccessfully";
+        public static readonly string lblSaveChanges = "lblSaveChanges";
+        public static readonly string lblSaveAsDraft = "lblSaveAsDraft";
+        public static readonly string lblFailedToLoadFile = "lblFailedToLoadFile";
+        public static readonly string lblRequestSavedAsDraftSuccessfully = "lblRequestSavedAsDraftSuccessfully";
+        public static readonly string lblFailedToRenderPlanWrapper = "lblFailedToRenderPlanWrapper";
+        public static readonly string lblUnnamedGroup = "lblUnnamedGroup";
+        public static readonly string lblBase64PdfFileName = "lblBase64PdfFileName";
+        public static readonly string lblUnexpectedEmptyResponse = "lblUnexpectedEmptyResponse";
+        public static readonly string lblInvalidFormat = "lblInvalidFormat";
+        public static readonly string lblViewHistory = "lblViewHistory";
+        public static readonly string lblProcedures = "lblProcedures";
+        public static readonly string lblDateRangeInvalid = "lblDateRangeInvalid";
+        public static readonly string lblRemarks = "lblRemarks";
+        public static readonly string lblRequiredField = "lblRequiredField";
+        public static readonly string lblUnnamedFile = "lblUnnamedFile";
+        public static readonly string lblInvalidFileExtension = "lblInvalidFileExtension";
+        public static readonly string lblCloseModal = "lblCloseModal";
+        public static readonly string lblEvaluationFileScope = "lblEvaluationFileScope";
+        public static readonly string lblEvaluationFileHeader = "lblEvaluationFileHeader";
+    }
 
-	public static class AdminPermission
+    public static class AdminPermission
     {
         public const string VIEW_ADMIN_HOME = "VIEW_ADMIN_HOME";
 
@@ -1003,7 +1016,9 @@ public static class ConstantKeys
         public const string DELETE_WEB_SUBFORMITEMS = "DELETE_WEB_SUBFORMITEMS";
 
         #endregion
-        
+        #region FORMITEMCONFIG
+        public const string ADD_WEB_FORMITEMCONFIG = "ADD_WEB_FORMITEMCONFIG";
+        #endregion
         #region TEAM
 
         public const string VIEW_WEB_TEAM = "VIEW_WEB_TEAM";
@@ -1013,7 +1028,7 @@ public static class ConstantKeys
 
         #endregion
 
-   
+        public const string IS_SEND_USERTEAM_MAIL = "IS_SEND_USERTEAM_MAIL";
 
         #region FORMSCOPES
 
@@ -1024,6 +1039,16 @@ public static class ConstantKeys
 
         #endregion
 
+        #region Plan Module
+        //PlanType
+        public const string GET_WEB_PLAN_TYPE_REQUEST = "GET_WEB_PLAN_TYPE_REQUEST";
+        //Plan 
+        public const string ADD_WEB_PLAN_REQUEST = "ADD_WEB_PLAN_REQUEST";
+        public const string UPDATE_WEB_PLAN_REQUEST = "UPDATE_WEB_PLAN_REQUEST";
+        public const string GET_WEB_PLAN_DETAILS_REQUEST = "GET_WEB_PLAN_DETAILS_REQUEST";
+        public const string APPROVE_WEB_PLAN_REQUEST = "APPROVE_WEB_PLAN_REQUEST";
+        public const string GET_SEMESTERS_REQUEST = "GET_SEMESTERS_REQUEST";
+        #endregion
     }
     public static class WebAppSettings
     {
@@ -1042,6 +1067,8 @@ public static class ConstantKeys
         public const string LASTUPDATEDBY = "LASTUPDATEDBY";
         public const string LASTUPDATEDDATE = "LASTUPDATEDDATE";
         public const string lblDisplayAsCards = "lblDisplayAsCards";
+        public const string lblDisplayAsTable = "lblDisplayAsTable";
+
     }
     public static class CreatePlan
     {
@@ -1156,6 +1183,122 @@ public static class ConstantKeys
         public const string lblAddPlan = "lblAddPlan";
         public const string lblPlanRequests = "lblPlanRequests";
     }
+    public static class EvaluationOperations
+    {
+        private const string Prefix = "lblEvaluationOperations";
+
+        // Titles
+        public const string PlansListTitle = Prefix + nameof(PlansListTitle);
+        public const string PlanRequests = Prefix + nameof(PlanRequests);
+        public const string RequestDetails = Prefix + nameof(RequestDetails);
+
+        // Filters
+        public const string Filter = Prefix + nameof(Filter);
+        public const string Clear = Prefix + nameof(Clear);
+
+        public const string RequestNo = Prefix + nameof(RequestNo);
+        public const string Status = Prefix + nameof(Status);
+        public const string RequestService = Prefix + nameof(RequestService);
+
+        public const string CreatedDate = Prefix + nameof(CreatedDate);
+        public const string CreatedTime = Prefix + nameof(CreatedTime);
+
+        // Plan Info
+        public const string PlanName = "lblEvaluationOperationsPlanName";
+        public const string PlanStatus = Prefix + nameof(PlanStatus);
+        public const string PlanStartDate = Prefix + nameof(PlanStartDate);
+        public const string PlanEndDate = Prefix + nameof(PlanEndDate);
+        public const string PlanCreatedOn = Prefix + nameof(PlanCreatedOn);
+        public const string PlanSchoolsCount = Prefix + nameof(PlanSchoolsCount);
+
+        // Actions
+        public const string Actions = Prefix + nameof(Actions);
+        public const string View = Prefix + nameof(View);
+        public const string Edit = Prefix + nameof(Edit);
+        public const string Delete = Prefix + nameof(Delete);
+
+        // Dialogs
+        public const string ConfirmDelete = Prefix + nameof(ConfirmDelete);
+        public const string DeletePlanConfirm = Prefix + nameof(DeletePlanConfirm);
+
+        // Sections
+        public const string Statistics = Prefix + nameof(Statistics);
+        public const string School = Prefix + nameof(School);
+        public const string SupportingFiles = Prefix + nameof(SupportingFiles);
+        public const string InterviewsSchedule = Prefix + nameof(InterviewsSchedule);
+        public const string EvidenceCollection = Prefix + nameof(EvidenceCollection);
+        public const string ClassroomObservations = Prefix + nameof(ClassroomObservations);
+        public const string SchoolRounds = Prefix + nameof(SchoolRounds);
+        public const string LabsVisits = Prefix + nameof(LabsVisits);
+        public const string ResultsAnalysis = Prefix + nameof(ResultsAnalysis);
+        public const string RealtimeEvaluationSystem = Prefix + nameof(RealtimeEvaluationSystem);
+        public const string PeriodicReport = Prefix + nameof(PeriodicReport);
+
+        // Buttons
+        public const string CloseModal = Prefix + nameof(CloseModal);
+        public const string AddPlan = Prefix + nameof(AddPlan);
+        public const string CardView = Prefix + nameof(CardView);
+        public const string TableView = Prefix + nameof(TableView);
+        public const string All = Prefix + nameof(All);
+    }
+    public static class EvaluationPlans
+    {
+        private const string Prefix = "lblEvaluationPlans";
+
+        // Filters
+        public const string AcademicYear = Prefix + "AcademicYear";
+        public const string SchoolName = Prefix + "SchoolName";
+        public const string Search = Prefix + "Search";
+        public const string Clear = Prefix + "Clear";
+        public const string All = Prefix + "All";
+
+        // View Mode
+        public const string CardView = Prefix + "CardView";
+        public const string TableView = Prefix + "TableView";
+
+        // Table
+        public const string PlanName = Prefix + "PlanName";
+        public const string SchoolsCount = Prefix + "SchoolsCount";
+        public const string Period = Prefix + "Period";
+        public const string Status = Prefix + "Status";
+        public const string View = Prefix + "View";
+        public const string Actions = Prefix + "Actions";
+    }
+    public static class EvaluationForm
+    {
+        private const string Prefix = "lblEvaluationForm"; 
+
+        public const string PageTitle = Prefix + "PageTitle";
+        public const string PageDescription = Prefix + "PageDescription";
+
+        public const string TabEvaluationPlans = Prefix + "TabEvaluationPlans";
+        public const string TabEvaluationOperations = Prefix + "TabEvaluationOperations";
+        public const string TabSchools = Prefix + "TabSchools";
+
+        public const string SubTabPlanRequests = Prefix + "SubTabPlanRequests";
+        public const string SubTabPlanDetails = Prefix + "SubTabPlanDetails";
+
+        public const string BreadcrumbSchool = Prefix + "BreadcrumbSchool";
+        public const string BreadcrumbRequestNo = Prefix + "BreadcrumbRequestNo";
+
+        public const string AccordionSchoolBasicData = Prefix + "AccordionSchoolBasicData";
+        public const string AccordionSchoolData = Prefix + "AccordionSchoolData";
+
+        public const string PlanDetailsTitle = Prefix + "PlanDetailsTitle";
+        public const string PlanDetailsClose = Prefix + "PlanDetailsClose";
+
+        public const string BreadcrumbPlans = Prefix + "BreadcrumbPlans";
+        public const string BreadcrumbRequestDetails = Prefix + "BreadcrumbRequestDetails";
+
+        public const string CreateRequestTitle = Prefix + "CreateRequestTitle";
+        public const string CreateRequestBreadcrumb = Prefix + "CreateRequestBreadcrumb";
+
+        public const string ActionDetailsHeader = Prefix + "ActionDetailsHeader";
+        public const string ActionCloseBtn = Prefix + "ActionCloseBtn";
+
+        public const string AccordionRequestDetails = Prefix + "AccordionRequestDetails";
+        public const string AccordionActionLog = Prefix + "AccordionActionLog";
+    }
 
 
     public static class WebAppLoginPage
@@ -1192,6 +1335,10 @@ public static class ConstantKeys
         public static readonly string CACHE_DROPDOWNVALUE = "CACHE_DROPDOWNVALUE";
         public static readonly string CACHE_ACADEMICYEAR = "CACHE_ACADEMICYEAR";
     }
+    //public static class AssignmentUserTeam
+    //{
+
+    //}
 
     public static class LanguageConst
     {
@@ -1216,6 +1363,11 @@ public static class ConstantKeys
         public static readonly string AddAttachment_FILE_SIZE = "AddAttachment_FILE_SIZE"; // in MB
         public static readonly string AddAttachment_FILE_COUNT = "AddAttachment_FILE_COUNT";
         public static readonly string useAsposeLib = "useAsposeLib";
+        public static readonly string TemplateSendReminderToUser = "TemplateSendReminderToUser";
+    }
+    public static class EvalFormSettings
+    {
+        public static readonly string Eval_WEB_From_PageSize = "Eval_WEB_From_PageSize";
     }
 
     public static class FieldTypeConstant
@@ -1250,7 +1402,25 @@ public static class ConstantKeys
         public static readonly string Alert = "AlertModule";
         public static readonly string EvaluationModule = "EvaluationModule";
     }
+    public static class ActionTypeIds
+    {
+        public static readonly Guid Draft = Guid.Parse("f328d31b-86ca-4994-b2ae-4c2d6b3dfec3");
+        public static readonly Guid Info = Guid.Parse("7227bc28-d11b-4885-a6c0-ad402471d9e3");
+        public static readonly Guid INFO_Override_Approve = Guid.Parse("2a9e6657-2122-46da-8790-7dd41a391276");
+        public static readonly Guid Edit = Guid.Parse("b8c6d1b0-d915-442f-a7b4-18f9cd8d6a10");
+        public static readonly Guid Approve = Guid.Parse("e4c923d1-b9fa-4f59-94bc-dae7c90bcf4f");
+        public static readonly Guid Reject = Guid.Parse("9c7a6f74-bb19-41d1-929d-15a12372ff1d");
+        public static readonly Guid Assign = Guid.Parse("b163ef2d-fdf4-43c3-8488-22544f5643ae");
+        public static readonly Guid ASSIGNT_TEAM = Guid.Parse("b163ef2d-fdf4-43c3-8488-22544f564311");
+        public static readonly Guid ApproveAndAssign = Guid.Parse("8ab3257e-748f-4207-89f7-407e4175b9a7");
+        public static readonly Guid RETURNBACK = Guid.Parse("d71bba64-9e7f-4e19-948f-03f08d0243f7");
+        public static readonly Guid SubmitMissingData = Guid.Parse("6d697ec3-cc8c-485a-bdf3-ef2e9c24c512");
+        public static readonly Guid RequestDataChange = Guid.Parse("cfeb4c71-d1a7-4d35-9a77-5f90e1f8768b");
+        public static readonly Guid CreatePlan = Guid.Parse("3e6d8fd3-76f9-479f-94f9-14b8b4a7d589");
+        public static readonly Guid ReserveVacancy = Guid.Parse("423dbe7b-3e9d-4f10-bcf4-6d232de5ec39");
+        public static readonly Guid INFO_WITH_DRAFT = Guid.Parse("d71bba64-9e7f-4e19-948f-03f08d024311");
 
+    }
     public static class ActionTypeKeys
     {
         public const string Approve = "APPROVE";
@@ -1318,5 +1488,60 @@ public static class ConstantKeys
     {
         public static string Pending = "PENDING";
         public static string Objection = "OBJECTION";
+    }
+    public static class EvaluationDetailsModal
+    {
+        private const string Prefix = "EvaluationDetailsModal.";
+
+        public const string Title = Prefix + "Title";
+        public const string Statistics = Prefix + "Statistics";
+    }
+    public static class WebSchools
+    {
+        private const string Prefix = "lblWebSchools";
+
+        // Header
+        public const string Schools = Prefix + "Schools";
+
+        // Filters
+        public const string SchoolName = Prefix + "SchoolName";
+        public const string SchoolCode = Prefix + "SchoolCode";
+        public const string Phase = Prefix + "Phase";
+        public const string Type = Prefix + "Type";
+        public const string Region = Prefix + "Region";
+        public const string CurrentPlanStatus = Prefix + "CurrentPlanStatus";
+
+        // Buttons
+        public const string Search = Prefix + "Search";
+        public const string ClearFilter = Prefix + "ClearFilter";
+
+        // Table
+        public const string Name = Prefix + "Name";
+        public const string Code = Prefix + "Code";
+        public const string TypeCol = Prefix + "TypeCol";
+        public const string PhaseCol = Prefix + "PhaseCol";
+        public const string RegionCol = Prefix + "RegionCol";
+        public const string StatusCol = Prefix + "StatusCol";
+
+        // Modal
+        public const string SchoolDetails = Prefix + "SchoolDetails";
+    }
+    public static class UserGenderIds
+    {
+        public static readonly Guid MALE = Guid.Parse("550e8400-e29b-41d4-a716-446655440001");
+        public static readonly Guid FEMALE = Guid.Parse("550e8400-e29b-41d4-a716-446655440002");
+    }
+    public static class FormGroupTypeKeyIds
+    {
+        public static readonly Guid FormGroup = Guid.Parse("b8c6d1b0-d915-442f-a7b4-18f9cd8d6a10");
+        public static readonly Guid List = Guid.Parse("e4c923d1-b9fa-4f59-94bc-dae7c90bcf4f");
+    }
+    public static class TransactionTypeGuidIds
+    {
+        public static readonly Guid INSERT = Guid.Parse("550e8400-e29b-41d4-a716-446655440001");
+        public static readonly Guid APPROVE = Guid.Parse("550e8400-e29b-41d4-a716-446655440002");
+        public static readonly Guid REJECT = Guid.Parse("550e8400-e29b-41d4-a716-446655440003");
+        public static readonly Guid UPDATE = Guid.Parse("550e8400-e29b-41d4-a716-446655440004");
+        public static readonly Guid REQUESTMISSING = Guid.Parse("550e8400-e29b-41d4-a716-446655440005");
     }
 }

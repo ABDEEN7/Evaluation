@@ -10,5 +10,5 @@ API_ENDPOINTS.GET_PENDING_STATUS = `/NDA/${deprouting}/GetPendingStatus`;
 API_ENDPOINTS.GET_TEAM_MEMBERS_BY_EVALUATION_REQUEST = `/Assignment/${deprouting}/GetAssignmentByEvaluationRequest`;
 API_ENDPOINTS.SUBMIT_EVALUATION_REQUEST_ASSIGNMENT = `/Assignment/${deprouting}/Submit`;
 API_ENDPOINTS.DELETE_EVALUATION_REQUEST_ASSIGNMENT = `/Assignment/${deprouting}/Delete`;
-
+API_ENDPOINTS.SEND_MAIL_NOTIFICATION = `/Assignment/${deprouting}/SendNotificationMailUser`;
 window.API_ENDPOINTS = API_ENDPOINTS;

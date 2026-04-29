@@ -185,7 +185,8 @@ const sharedUtility = () => {
 
     const baseApiUrl = () => getCookie('webApiBaseURL'); //"https://localhost:14066/api";
 
-    const baseAppUrl = () => "https://localhost:7221/en";// getCookie("webAppBaseURL") //
+    //const baseAppUrl = () => "https://localhost:7221/en";// getCookie("webAppBaseURL") //
+    const baseAppUrl = () => getCookie("webAppBaseURL");//"https://localhost:44375";
 
     const displayAlert = (msg, icon = null) => {
         if (msg) {

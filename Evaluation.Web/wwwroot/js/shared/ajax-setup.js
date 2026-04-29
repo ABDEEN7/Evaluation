@@ -68,7 +68,7 @@ const handleAjaxError = (jqXHR, textStatus, errorThrown, redirectUrl = false) =>
     if (uiControlsSetup().AnyUiBackendLabel(message)) {
         notificationUtil.error(uiControlsSetup().GetUiControlText(message));
     } else {
-        //notificationUtil.error(message);
+        notificationUtil.error(message);
     }
 };
 
@@ -101,7 +101,9 @@ $.ajaxSetup({
                 options.headers = sharedUtility().SharedHeader();
 
                 
-            } catch (e) { console.error(e); return false; }
+            } catch (e) {
+                console.error(e); return false;
+            }
         
     },
 

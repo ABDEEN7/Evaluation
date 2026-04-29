@@ -84,7 +84,8 @@
         INSERTORUPDATEPLAN: `/Plan/${deprouting}/InsertOrUpdatePlan`,
         UPDATE_PLAN: `/Plan/${deprouting}/UpdatePlan`,
         GET_PLAN_DETAILS: `/Plan/${deprouting}/GetPlansWithunSelectedSchoolsDetails`,
-        GET_PARNT_ORGTREE: `/Org/${deprouting}/GetParentOrgTree`
+        GET_PARNT_ORGTREE: `/Org/${deprouting}/GetParentOrgTree`,
+        GetFomrEvalMatrixValue: `/Plan/${deprouting}/GetFomrEvalMatrixValueList`
     };
 
     // Export all constants

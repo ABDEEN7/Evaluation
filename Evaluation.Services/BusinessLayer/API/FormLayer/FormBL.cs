@@ -25,7 +25,7 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
     {
 
         var evalForm = await formService.GetEvalForm(FormId);
-        var mappedEvalForm = mapper.Map<EvaluationFormDto>(evalForm);
+        var mappedEvalForm = mapper.Map<TemplateFormDto>(evalForm);
 
         var formItems = await formService.GetFormItems(FormId);
         var mappedData = mapper.Map<List<FormItemDto>>(formItems);

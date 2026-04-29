@@ -25,12 +25,31 @@ public class OrgnizationService(IServiceScopeFactory serviceScopeFactory,
     RequestInfo requestInfo
     ) : ApiBase(serviceScopeFactory, cacheDataProvider, unitOfWork, loggingServices, mapper, userInfo, serviceProvider, requestInfo)
 {
-    public async Task<PaginatedResult<OrgTree>> GetOrgnizationAsync(SchoolRequest request, List<Guid?> targetOrgTreeIds, List<Guid> currentOrganizations)
+    public async Task<PaginatedResult<ResponseOrgsPlans>> GetOrgnizationAsync(
+      SchoolRequest request,
+      List<Guid?> targetOrgTreeIds,
+      List<Guid> currentOrganizations)
     {
         var filter = BuildFilterExpression(request, targetOrgTreeIds, currentOrganizations);
+
         var query = unitOfWork.GetRepository<OrgTree>()
-                    .GetAllNonDeleted(filter)
-                    .Include(x=>x.OrgParent);
+            .GetAllNonDeleted(filter)
+            .Select(o => new
+            {
+                Org = o,
+                LastEval = o.EvaluationRequests
+                    .OrderByDescending(e => e.EvaluationDate)
+                    .FirstOrDefault()
+            })
+            .Select(x => new ResponseOrgsPlans
+            {
+                Id = x.Org.Id,
+                Name = x.Org.NameEn,
+
+                LastEvaluationDate = x.LastEval.EvaluationDate,
+                AcademicYear = x.LastEval.NextEvaluationDate
+            });
+
         return await query.GetPaginatedResult(request.PageNumber, request.PageSize);
     }
     public async Task<PaginatedResult<OrgTree>> GetMultipleOrgAsync(SchoolRequest request, List<Guid?> targetOrgTreeIds, List<Guid> currentOrganizations)
@@ -57,6 +76,11 @@ public class OrgnizationService(IServiceScopeFactory serviceScopeFactory,
 
         if (!string.IsNullOrWhiteSpace(request.Name))
             filter = filter.And(s => s.NameEn.Contains(request.Name) || s.NameAr.Contains(request.Name));
+        if (request.FomrEvalMatrixValueId != Guid.Empty && request.FomrEvalMatrixValueId != null)
+        {
+            filter = filter.And(s => s.EvaluationRequests != null &&
+                                     s.EvaluationRequests.Any(er => er.FormEvalMatrixValueId == request.FomrEvalMatrixValueId));
+        }
         return filter;
     }
 }
