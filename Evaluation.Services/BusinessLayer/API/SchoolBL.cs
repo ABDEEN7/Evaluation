@@ -10,6 +10,7 @@ using Evaluation.Services.BusinessLayer.API.OrganizationLayer;
 using Evaluation.Services.BusinessLayer.API.SchooLayer;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Consts;
+using Evaluation.SharedHelper.Dtos.AcademicYearDto;
 using Evaluation.SharedHelper.Dtos.SchoolDto;
 using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Exceptions;
@@ -78,10 +79,10 @@ public class SchoolBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvide
             .GroupBy(s => s.Category?.BackendName)
             .Select(x => x.Key)
             .ToList();
-
+        PaginatedResult<ResponseOrgsPlans> result;
         if (dep.Count == 1)
         {
-            return dep.First() switch
+            result = dep.First() switch
             {
                 DepartmentCateogry.Schools =>
                     await schoolRepository.GetSchoolsAsync(request, targetOrgTreeIds, currentOrgTree),
@@ -95,8 +96,34 @@ public class SchoolBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvide
                 _ => throw new BusinessException(ConstantKeys.ExceptionMessage.UnsupportedDepartmentCategory)
             };
         }
+        else
+        {
+            result = await orgnizationService.GetOrgnizationAsync(request, targetOrgTreeIds, currentOrgTree);
+        }
+        await FillAcademicYear(result);
+        return result;
+    }
+    private async Task FillAcademicYear(PaginatedResult<ResponseOrgsPlans> result)
+    {
+        var academicYears = await uow.GetRepository<AcademicYear>()
+            .GetAllActiveNonDeleted(x => x.DepartmentId == requestInfo.DepId)
+            .Select(x => new AcademicYearLite
+            {
+                StartDate = x.StartDate,
+                EndDate = x.EndDate,
+                Year = x.Year
+            })
+            .OrderBy(x => x.StartDate)
+            .ToListAsync();
 
-        return await orgnizationService.GetOrgnizationAsync(request, targetOrgTreeIds, currentOrgTree);
+        foreach (var item in result.Items)
+        {
+            item.YearAcdemicYear = ConstantLogic.ResolveAcademicYear(
+                item.AcademicYear,
+                academicYears
+            );
+        }
+
     }
 
     public async Task<List<SchoolVisits>> GetVisitsAsync()

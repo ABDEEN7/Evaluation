@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Evaluation.DAL.Helper;
+using Evaluation.DAL.Models.Calendars;
 using Evaluation.DAL.Models.DepartementEntites;
 using Evaluation.DAL.Models.Org;
 using Evaluation.DAL.Models.Planing;
@@ -8,6 +9,7 @@ using Evaluation.Services.BusinessLayer.API.AcademicYearLayer;
 using Evaluation.Services.BusinessLayer.API.DepartmentLayer;
 using Evaluation.Services.Extensions;
 using Evaluation.Services.Special;
+using Evaluation.SharedHelper.Dtos.AcademicYearDto;
 using Evaluation.SharedHelper.Dtos.SchoolDto;
 using Evaluation.SharedHelper.Extensions;
 using Evaluation.SharedHelper.Helper;
@@ -39,7 +41,7 @@ public class SchoolRepository(IServiceScopeFactory serviceScopeFactory,
         using var uow = serviceScopeFactory.CreateScopedUow();
 
         var filter = BuildFilterExpression(request, targetOrgTreeIds, currentSelectedSchools);
-
+        
         var query = uow.GetRepository<School>()
             .GetAllNonDeleted(filter)
             .Select(s => new
@@ -73,7 +75,7 @@ public class SchoolRepository(IServiceScopeFactory serviceScopeFactory,
     {
         var department = await serviceProvider.CreateScopedUow().GetRepository<Department>()
              .GetAllQueryFiltered()
-             .AsNoTracking().Include(c=>c.DepTargetOrgTrees)
+             .AsNoTracking().Include(c => c.DepTargetOrgTrees)
              .Where(c => c.Id == depId)
              .FirstOrDefaultAsync();
 
