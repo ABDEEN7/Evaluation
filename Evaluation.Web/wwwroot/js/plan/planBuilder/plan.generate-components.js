@@ -395,7 +395,15 @@
 
         // Academic year cell
         const academicYearCell = $('<td>');
-        academicYearCell.text(school.academicYear || '-');
+        const academicYearText = school.academicYear || '-';
+        const yearAcdemicYearText = school.yearAcdemicYear;
+
+        academicYearCell.text(
+            yearAcdemicYearText
+                ? `${academicYearText} (${yearAcdemicYearText})`
+                : academicYearText
+        );
+
         row.append(academicYearCell);
 
         // Actions cell

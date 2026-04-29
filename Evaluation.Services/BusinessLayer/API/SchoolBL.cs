@@ -106,7 +106,7 @@ public class SchoolBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvide
     private async Task FillAcademicYear(PaginatedResult<ResponseOrgsPlans> result)
     {
         var academicYears = await uow.GetRepository<AcademicYear>()
-            .GetAllActiveNonDeleted(x => x.DepartmentId == requestInfo.DepId)
+            .GetAllActiveNonDeleted(x => x.DepartmentId == requestInfo.DepId && x.Year >= DateTime.UtcNow.Year)
             .Select(x => new AcademicYearLite
             {
                 StartDate = x.StartDate,
