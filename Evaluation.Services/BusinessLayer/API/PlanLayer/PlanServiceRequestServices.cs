@@ -218,7 +218,7 @@ public class PlanServiceRequestServices(
                 .FirstOrDefaultAsync();
 
             if (plan == null)
-                throw new BusinessException("Plan not found");
+                throw new BusinessException(ConstantKeys.ExceptionMessage.PlanIsNotFound);
 
             modelDto.AcademicYearId = plan.AcademicYearId;
             modelDto.PlanStatusId = plan.PlanStatusId;
@@ -334,7 +334,7 @@ public class PlanServiceRequestServices(
                 .FirstOrDefaultAsync();
 
             if (string.IsNullOrWhiteSpace(json))
-                throw new BusinessException("Plan not found");
+                throw new BusinessException(ConstantKeys.ExceptionMessage.PlanIsNotFound);
 
             return json;
         });

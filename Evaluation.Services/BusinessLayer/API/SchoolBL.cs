@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Evaluation.DAL;
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.Calendars;
 using Evaluation.DAL.Models.DepartementEntites;
@@ -10,10 +11,12 @@ using Evaluation.Services.BusinessLayer.API.SchooLayer;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Consts;
 using Evaluation.SharedHelper.Dtos.SchoolDto;
+using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.VisualBasic;
 
 namespace Evaluation.Services.BusinessLayer.API;
 
@@ -89,7 +92,7 @@ public class SchoolBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvide
                 DepartmentCateogry.Orgnization =>
                     await orgnizationService.GetOrgnizationAsync(request, targetOrgTreeIds, currentOrgTree),
 
-                _ => throw new BusinessException("Unsupported department category")
+                _ => throw new BusinessException(ConstantKeys.ExceptionMessage.UnsupportedDepartmentCategory)
             };
         }
 
