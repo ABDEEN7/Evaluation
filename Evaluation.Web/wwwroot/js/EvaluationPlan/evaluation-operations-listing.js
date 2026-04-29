@@ -84,13 +84,13 @@
                 render: function (data, type, row) {
 
                     if (row.StatusISOPen === false) {
-                        return ` <span class="badge bg-success-light ms-auto me-2 fw-semibold br-0">
+                        return ` <span class="badge bg-success-light me-2 fw-semibold br-0">
                                     <i class="la la-check fs-14"></i>
                                     مكتمل
                                 </span>`;
                     }
                     else
-                        return `<span class="badge bg-danger-light ms-auto me-2 fw-semibold br-0">
+                        return `<span class="badge bg-danger-light me-2 fw-semibold br-0">
                             <i class="las la-times fs-14"></i>
                             غير مكتمل
                         </span>`;
@@ -128,28 +128,7 @@
                 title: uiControlsSetup().GetUiControlText("lblRequestCreatedTime"),
                 className: "td-right bg-grey justify-content-end"
             },
-
-            {
-                data: null,
-                title: uiControlsSetup().GetUiControlText("lblActions") || "",
-                orderable: false,
-                searchable: false,
-                className: "td-full",
-                render: function (data, type, row) {
-
-                    return `
-            <div class="d-flex justify-content-center gap-1">
-
-                <button class="btn btn-outline-primary btn-sm"
-                        title="تصفح عملية التقييم"
-                        onclick="openEvaluation('${row.Id}')">
-                    <i class="la la-arrow-left"></i>
-                </button>
-
-            </div>
-        `;
-                }
-            }
+            
         ],
 
         onRowClick: function (rowData) {
