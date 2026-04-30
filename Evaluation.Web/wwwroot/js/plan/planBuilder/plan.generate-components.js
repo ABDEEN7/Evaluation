@@ -354,7 +354,7 @@
             .addClass('text-dark')
             .attr('type', 'button')
             .attr('data-bs-toggle', 'modal')
-            .attr('data-bs-target', '#schoolDetailsModal')
+            .attr('data-bs-target', '#SCHOOL')
             .attr('data-id', school.id)
             .html('<i class="la la-eye"></i>');
 

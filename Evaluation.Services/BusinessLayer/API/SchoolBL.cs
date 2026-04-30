@@ -15,6 +15,7 @@ using Evaluation.SharedHelper.Dtos.SchoolDto;
 using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Models;
+using Evaluation.SharedHelper.Models.Api.ServiceRequestEntitiesDTO;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualBasic;
@@ -48,14 +49,22 @@ public class SchoolBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvide
 
         return schoolsResponse;
     }
-	public async Task<List<ResponseSchools>> GetSchools()
+	public async Task<SchoolRequestDTO> GetSchools()
 	{
 
 		var result = await schoolRepository.GetSchoolsByDepartmentId(requestInfo.DepId.Value);
 
 		var schoolsResponse = mapper.Map<List<ResponseSchools>>(result);
 
-		return schoolsResponse;
+        SchoolRequestDTO schoolRequestDTO = new SchoolRequestDTO();
+
+        schoolRequestDTO.Data = schoolsResponse;
+        //schoolRequestDTO.PageNumber = 1;
+        //schoolRequestDTO.PageSize = 1;
+        //schoolRequestDTO.TotalDataCount = 0;
+        //schoolRequestDTO.IsRemainingData = true;
+
+        return schoolRequestDTO;
 	}
     //public async Task<PaginatedResult<ResponseSchools>> GetSchools(SchoolRequest request)
     //{

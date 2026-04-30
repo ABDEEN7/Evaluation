@@ -517,6 +517,8 @@
 </div>
 <partial name="_PartialFileModal" />
 
+@await Component.InvokeAsync("SchoolDetailsModal", new { modalId = "SCHOOL", title = "تفاصيل المدرسة", body = "" })
+
 @section Scripts {
     <!-- Tables -->
     <script src="~/lib/dropzone/dist/dropzone.js" asp-append-version="true"></script>

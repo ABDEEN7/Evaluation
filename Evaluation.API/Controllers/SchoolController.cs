@@ -3,6 +3,7 @@ using Evaluation.Services.BusinessLayer;
 using Evaluation.Services.BusinessLayer.API;
 using Evaluation.Services.Integration;
 using Evaluation.SharedHelper.Dtos.SchoolDto;
+using Evaluation.SharedHelper.Models.Api.ServiceRequestEntitiesDTO;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Evaluation.API.Controllers;
@@ -70,11 +71,10 @@ public class SchoolController : ControllerBase
         return Ok(result);
     }
 	[HttpPost]
-	public async Task<IActionResult> GetSchools()
+	public async Task<SchoolRequestDTO> GetSchools()
 	{
-		var result = await _masterBl.GetApiService<SchoolBL>().GetSchools();
-		return Ok(result);
-	}
+        return await _masterBl.GetApiService<SchoolBL>().GetSchools();
+    }
 	[HttpGet]
     public async Task<IActionResult> GetSchoolsPlan([FromQuery] SchoolRequest request)
     {

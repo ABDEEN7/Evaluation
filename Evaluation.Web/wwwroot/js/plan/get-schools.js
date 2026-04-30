@@ -201,7 +201,7 @@ function renderSchoolsTable(schools) {
             <td>${school.academicYear || '-'}</td>
             <td>
                 <p class="m-0">
-                    <a href="#" class="text-dark" type="button" data-bs-toggle="modal" data-bs-target="#schoolDetailsModal" data-id="${school.id}">
+                    <a href="#" class="text-dark" type="button" data-bs-toggle="modal" data-bs-target="#SCHOOL" data-id="${school.id}">
                         <i class="la la-eye"></i>
                     </a>
                 </p>
