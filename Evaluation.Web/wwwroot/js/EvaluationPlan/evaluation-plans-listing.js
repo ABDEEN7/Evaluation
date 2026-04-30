@@ -279,6 +279,7 @@
             // Show the modal
             const el = document.getElementById("PlanDetailsModal");
             const modal = bootstrap.Modal.getOrCreateInstance(el);
+            formUtility.addQueryParameter('planId', planId);
             modal.show();
 
             // Clear any previous content in modal body
