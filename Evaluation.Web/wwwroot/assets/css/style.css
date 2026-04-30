@@ -149,9 +149,34 @@ a, a:hover {
     color: rgba(14, 107, 50, 1);
 }
 
+.bg-success-light-no-color {
+    background-color: rgba(216, 244, 221, 0.5) !important;
+}
+
+.success-color {
+    color: rgba(14, 107, 50, 1) !important;
+}
+
+.success-color-custom {
+    color: rgba(14, 107, 50, 1) !important;
+    border: 1px solid rgba(14, 107, 50, 0.3) !important;
+    border-radius: 4px;
+    font-size: 25px;
+    font-weight: 700;
+    background-color: rgba(14, 107, 50, 0.1) !important;
+    padding: 0.16rem 0.9rem;
+    width: fit-content;
+}
+
 .bg-danger-light {
     background-color: rgba(248, 230, 233, 1) !important;
     color: rgba(180, 4, 30, 1);
+}
+
+.primary-bg {
+    background-color: #8a153820;
+    border-radius: 4px;
+    padding: 0.3rem 0.5rem;
 }
 
 .btn-primary:hover,
@@ -212,8 +237,13 @@ section, .section {
     padding: 3rem 0;
 }
 
+.color-primary {
+    color: var(--color-primary);
+}
 
-
+.justify-items-end {
+    justify-items: end !important;
+}
 /*--------------------------------------------------------------
 # Enhance Layout
 --------------------------------------------------------------*/
