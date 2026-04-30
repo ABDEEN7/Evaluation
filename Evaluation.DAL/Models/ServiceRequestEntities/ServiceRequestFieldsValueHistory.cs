@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Evaluation.DAL.Models.ServiceRequestEntities
 {
-	public class ServiceRequestFieldsValue : EntityBase, IAuditLogEntity
+	public class ServiceRequestFieldsValueHistory : EntityBase, IAuditLogEntity
 	{
 		public Guid RefId { get; set; }
 		public string? RequestType { get; set; }

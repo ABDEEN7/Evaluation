@@ -610,6 +610,7 @@
                 const reqId = searchParams.get('id');
                 const serviceId = searchParams.get('serviceId');
                 const EvlId = searchParams.get('Evlid');
+                const SerReqid = searchParams.get('SerReqid');
 
                  if (reqId) {
                  openPlanRequestDetails(reqId);
@@ -617,6 +618,9 @@
 
                 if (EvlId) {
                       openEvaluationRequestDetails(EvlId);
+                }
+                if (SerReqid) {
+                      openRequestDetails(EvlId);
                 }
 
          $('#evaluationRequestDetailsModal').on('hidden.bs.modal', function () {
