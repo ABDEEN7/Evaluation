@@ -163,7 +163,7 @@ public class TemplateFormController : ControllerBase
         return Ok(data);
     }
     [HttpPost]
-    public async Task<IActionResult> SaveAllFormItemConfig()
+    public async Task<IActionResult> SaveFormItemConfig()
     {
         var request = Request.Form["request"][0]?.StringToObject<List<FormItemConfigDto>>();
         return Ok(await _masterBl.GetApiService<EvaluationFormBL>().SaveFormItemConfig(request!));
