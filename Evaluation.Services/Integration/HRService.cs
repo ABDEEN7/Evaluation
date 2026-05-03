@@ -131,6 +131,58 @@ public class HRService : ApiBase
         return orgs;
     }
 
+    public async Task<List<HROrganizationInfoDto>> GetAllHRSchoolsAsync(int page)
+    {
+        Int32.TryParse(await cacheDataProvider.GetSystemSettingValue(ConstantKeys.WebAppSettings.PAGE_SIZE), out int recordsPerPage);
+
+        var top = recordsPerPage;
+        var skip = (page - 1) * recordsPerPage;
+        var orgs = new List<HROrganizationInfoDto>();
+
+        using (var con = new OracleConnection(ClsAppSetting.OracleDBConnection))
+        {
+            try
+            {
+                using (var cmd = con.CreateCommand())
+                {
+                    await con.OpenAsync();
+
+
+                    cmd.BindByName = true;
+
+                    cmd.CommandText = @"
+                    SELECT *
+                    FROM TEMP_HR.ORGANIZATION_EVALAPP_V
+                    WHERE Email IS NOT NULL AND ORG_TYPE = 2
+                    OFFSET :Skip ROWS FETCH NEXT :Top ROWS ONLY";
+
+                    cmd.Parameters.Add(new OracleParameter("Skip", skip));
+                    cmd.Parameters.Add(new OracleParameter("Top", top));
+
+
+                    using (var reader = await cmd.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            orgs.Add(reader.ToOrganizationInfoDto());
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading orgs: {ex.Message}");
+            }
+            finally
+            {
+                con.Dispose();
+                con.Close();
+            }
+        }
+
+        return orgs;
+    }
+
     public async Task<List<HREmployeeInfoDto>> GetHRUsersAsync(long? qID = null, string? email = null, string? orgNo = null)
     {
         var employees = new List<HREmployeeInfoDto>();

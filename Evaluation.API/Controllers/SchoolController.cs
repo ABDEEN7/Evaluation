@@ -53,6 +53,12 @@ public class SchoolController : ControllerBase
     }
 
     [HttpGet]
+    public async Task<List<HROrganizationInfoDto>> GetAllHRSchoolsAsync(int page)
+    {
+        return await _hrService.GetAllHRSchoolsAsync(page);
+    }
+
+    [HttpGet]
     public async Task<IActionResult> GetVisits()
         => Ok(new { result = await _masterBl.GetApiService<SchoolBL>().GetVisitsAsync() });
 
