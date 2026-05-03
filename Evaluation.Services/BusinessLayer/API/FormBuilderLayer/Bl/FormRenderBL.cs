@@ -94,11 +94,11 @@ namespace Evaluation.Services.BusinessLayer.API
 							actionFieldsList);
 					}
 
-					var isEditable = action.ActionFields!
-						.FirstOrDefault(x => x.FieldId == field.Id)?.IsEditable ?? true;
-
 					var fieldValue = requestFieldValues.FirstOrDefault(x => x.FieldId == field.Id);
 					var value = fieldValue?.Value;
+
+					var isEditable = fieldValue?.IsAPI == true? false: action.ActionFields!
+										                                 .FirstOrDefault(x => x.FieldId == field.Id)?.IsEditable ?? true;
 
 					string fieldType = field.FieldType!.NameEn;
 					var attributes = (await fieldAttributesTask ?? [])!;
@@ -183,6 +183,7 @@ namespace Evaluation.Services.BusinessLayer.API
 						if (target != null && updated.Value != null && updated.Value != "")
 						{
 							target.Value = updated.Value;
+							target.IsApi = true;
 							target.IsApproved = true;
 							target.IsEditable = false;
 						}
