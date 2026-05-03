@@ -151,21 +151,46 @@ a, a:hover {
 
 .bg-success-light-no-color {
     background-color: rgba(216, 244, 221, 0.5) !important;
+    border: 1px solid #E5E7EB !important;
 }
 
 .success-color {
     color: rgba(14, 107, 50, 1) !important;
 }
 
+.old-status-color {
+    color: #6B7280 !important;
+}
+
+.bg-old-status-light-no-color {
+    border: 1px solid #E5E7EB !important;
+    background-color: #fff !important;
+}
+
+.old-status-color-custom {
+    background-color: #F3F4F6 !important;
+    color: #6B7280 !important;
+    border: 1px solid #6B728050 !important;
+    border-radius: 4px;
+    font-size: 25px;
+    font-weight: 700;
+    padding: 0.16rem 0.9rem;
+    width: fit-content;
+}
+
 .success-color-custom {
     color: rgba(14, 107, 50, 1) !important;
     border: 1px solid rgba(14, 107, 50, 0.3) !important;
     border-radius: 4px;
-    font-size: 25px;
-    font-weight: 700;
-    background-color: rgba(14, 107, 50, 0.1) !important;
+    font-size: 24px;
+    font-weight: 600;
+    background-color: rgba(216, 244, 221, 1) !important;
     padding: 0.16rem 0.9rem;
     width: fit-content;
+}
+
+.colored-card {
+    background-color: #f7f7f7 !important;
 }
 
 .bg-danger-light {
