@@ -222,7 +222,7 @@ window.formUtility = window.formUtility || {};
     const validateList = (field, fieldValue) => {
         let errors = [];
 
-       
+
         const data = fieldValue?.value || [];
         const rows = Array.isArray(data) ? data : [];
 
@@ -274,7 +274,7 @@ window.formUtility = window.formUtility || {};
             errors.push(createError(field.fieldId, msg));
         }
 
-     
+
 
         return errors;
     };
@@ -636,19 +636,56 @@ window.formUtility = window.formUtility || {};
 
     // #region ===============  Field Validators Registry
 
+
+    const validateEvaluationPlan = (field, fieldValue) => {
+
+        const errors = [];
+
+        const fieldId = `field_${field.fieldId}`;
+
+        const data = window.SubmitPlanHandler?.getFormPlanJson(fieldId);
+
+        const validation = window.SubmitPlanHandler?.validatePlan(data);
+
+        if (validation && !validation.isValid) {
+
+            validation.errors.forEach(msg => {
+
+                errors.push(createError(fieldId, msg));
+
+            });
+
+        }
+
+        return errors;
+
+    };
+
     const fieldValidators = {
+
         number: validateNumber,
+
         checkbox: validateCheckbox,
+
         file: validateFile,
+
         fileV2: validateFile,
+
         date: validateDate,
+
         datetime: validateDate,
+
         textarea: validateTextareaLength,
+
         list: validateList,
-        //'evaluationPlan': validateEvaluationPlanField,
+
+        'evaluationPlan': validateEvaluationPlan,
+
         evl_form: validateForm,
-}
-    
+
+    }
+
+
     // #endregion
 
     // #region ===============  Core validateField / validateFields / validateInput
