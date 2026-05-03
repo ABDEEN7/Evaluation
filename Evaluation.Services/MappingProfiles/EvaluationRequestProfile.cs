@@ -21,6 +21,7 @@ public class EvaluationRequestProfile : Profile
             .ForMember(d => d.Id, opt => opt.MapFrom(src => src.Id))
             .ForMember(d => d.Color, opt => opt.MapFrom(src => !src.ServiceStatus.ColorCode.IsNullOrEmpty()? src.ServiceStatus.ColorCode : "#f85a40"))
             .ForMember(d => d.Source, opt => opt.MapFrom(_ => "EvaluationRequest"))
+            .ForMember(d => d.Url, opt => opt.MapFrom(_ => "https://www.google.com"))
             .ReverseMap();
 
         CreateMap<ServiceRequest, EvaluationRequestCalenderDto>()
@@ -31,6 +32,7 @@ public class EvaluationRequestProfile : Profile
             .ForMember(d => d.End, opt => opt.MapFrom(src => src.VisitDateTo!.Value.ToString("yyyy-MM-dd'T'HH:mm:ss")))
             .ForMember(d => d.Color, opt => opt.MapFrom(src => !src.Status.ColorCode.IsNullOrEmpty()? src.Status.ColorCode : "#dfff00"))
             .ForMember(d => d.Source, opt => opt.MapFrom(_ => "ServiceRequest"))
+            .ForMember(d => d.Url, opt => opt.MapFrom(_ => "https://www.google.com"))
          .ReverseMap();
 
     }
