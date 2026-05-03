@@ -220,6 +220,8 @@
 
             const el = document.getElementById("CreateRequestModal");
             const modal = bootstrap.Modal.getOrCreateInstance(el);
+            formUtility.addQueryParameter('serviceId', serviceId);
+            formUtility.addQueryParameter('planId', planId);
             modal.show();
 
             const serviceName = createPlanRequestService.name;
