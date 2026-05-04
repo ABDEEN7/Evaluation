@@ -171,6 +171,9 @@
                                 </div>
                             </div>
 
+                         
+                            <div id="evaluationPartiesContainer"></div>
+
                             <div class="accordion-item mb-3 rounded">
                                 <h2 class="accordion-header">
                                     <button class="accordion-button collapsed d-flex align-items-center justify-content-between"
@@ -179,7 +182,7 @@
                                             data-bs-target="#itemAllOpenRequests">
                                         <div class="d-flex align-items-center gap-2 fs-18">
                                             <i class="las la-list-alt text-primary fs-25"></i>
-                                            <span class="fw-semibold">كل الطلبات المفتوحة</span>
+                                            <span class="fw-semibold @ConstantKeys.EvaluationForm.lblAllOpenRequests"></span>
                                         </div>
                                         <span class="toggle-icon"><i class="la la-angle-up fs-22"></i></span>
                                     </button>
@@ -189,14 +192,13 @@
                                     <div class="accordion-body">
                                         <input id="allOpenRequestsSearch"
                                                type="text"
-                                               class="form-control mb-3"
+                                               class="form-control mb-3 "
                                                placeholder="بحث..." />
 
                                         <div id="allOpenRequestsTable"></div>
                                     </div>
                                 </div>
                             </div>
-                            <div id="evaluationPartiesContainer"></div>
                         </div>
                     </div>
                 </div>

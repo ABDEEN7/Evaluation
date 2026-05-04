@@ -1298,6 +1298,8 @@ public static class ConstantKeys
 
         public const string AccordionRequestDetails = Prefix + "AccordionRequestDetails";
         public const string AccordionActionLog = Prefix + "AccordionActionLog";
+        public const string lblAllOpenRequests = Prefix + "lblAllOpenRequests";
+
     }
 
 

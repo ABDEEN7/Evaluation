@@ -21,7 +21,9 @@ namespace Evaluation.DAL.Models.FormBuilder
         public string? InfoEn { get; set; }
         public Guid FieldTypeId { get; set; }
         public FieldType? FieldType { get; set; } = null!;
-        public string? Description { get; set; }
+		public Guid? FieldInfoTypeId { get; set; }
+		public FieldInfoType? FieldInfoType { get; set; } = null!;
+		public string? Description { get; set; }
 
         public int Column { get; set; } = 1;
         public int Row { get; set; } = 1;

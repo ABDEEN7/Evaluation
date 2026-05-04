@@ -9,14 +9,13 @@
 
         (parties || []).forEach(party => {
 
-            // ignore support files party
             if (party.isSupportFiles) return;
 
             (party.services || []).forEach(service => {
 
                 (service.requests || []).forEach(request => {
 
-                    if (request.statusISOPen === true) {
+                    //if (request.statusISOPen === true) {
 
                         result.push({
                             id: request.id,
@@ -27,7 +26,7 @@
                             createDate: request.createDate
                         });
 
-                    }
+                    //}
 
                 });
 
@@ -54,47 +53,73 @@
 
             columns: [
                 {
-                    title: "رقم الطلب",
+                    title: uiControlsSetup().GetUiControlText("lblRequestNo"),
                     field: "requestNumber",
                     formatter: function (cell) {
                         const row = cell.getRow().getData();
 
                         return `
-                            <a href="javascript:void(0)" 
-                               class="fw-bold text-primary">
-                                ${row.requestNumber || ""}
-                            </a>`;
+                <a href="javascript:void(0)" 
+                   class="fw-bold text-primary">
+                    ${row.requestNumber || ""}
+                </a>`;
                     },
                     cellClick: function (e, cell) {
                         const row = cell.getRow().getData();
-
-                        // ✅ reuse existing function
                         window.openRequestDetails(row.id);
                     }
                 },
                 {
-                    title: "الخدمة",
+                    title: uiControlsSetup().GetUiControlText("lblRequestService"),
                     field: "serviceName"
                 },
                 {
-                    title: "الحالة",
+                    title: uiControlsSetup().GetUiControlText("lblRequestStatus"),
                     field: "status"
                 },
                 {
-                    title: "المنشئ",
+                    title: uiControlsSetup().GetUiControlText("lblCreatedBy"),
                     field: "createBy"
                 },
                 {
-                    title: "تاريخ الإنشاء",
-                    field: "createDate",
+                    title: uiControlsSetup().GetUiControlText("lblVisitDate") || "Visit Date",
+                    field: "visitDate",
                     formatter: function (cell) {
-                        return formatDate(cell.getValue());
+                        const row = cell.getRow().getData();
+
+                        return formatVisitDate(
+                            row.visitFrom,
+                            row.visitTo,
+                            row.createDate
+                        );
                     }
                 }
             ]
         });
     }
 
+    function formatVisitDate(from, to, createDate) {
+
+        if (!from && !to) {
+            return formatDate(createDate);
+        }
+
+        if (from && !to) {
+            return formatDate(from);
+        }
+
+        if (!from && to) {
+            return formatDate(to);
+        }
+        const f = formatDate(from);
+        const t = formatDate(to);
+
+        if (f === t) {
+            return f;
+        }
+
+        return `${f} - ${t}`;
+    }
     function bindSearch() {
 
         $(document)
@@ -134,7 +159,6 @@
 
         return `${day}/${month}/${year}`;
     }
-
     function render(parties) {
 
         const data = extractOpenRequests(parties);
