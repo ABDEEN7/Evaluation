@@ -607,7 +607,7 @@ const deleteData = (id) => {
     else if (popupname == 'FormScope') {
         deleteurl = API_ROUTES.deleteFormScope();
     }
-    if (popupname == 'FormItemConfig') {
+    else if (popupname == 'FormItemConfig') {
         notificationUtil.confirmation({
             title: sharedFn().GetUiControlText('WEB_WARNING_DELETE'),
             okText: sharedFn().GetUiControlText('WEB_DELETE_BUTTON'),

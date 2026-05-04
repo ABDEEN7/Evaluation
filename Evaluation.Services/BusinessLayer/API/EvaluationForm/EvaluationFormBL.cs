@@ -189,6 +189,18 @@ public class EvaluationFormBL(IServiceScopeFactory serviceScopeFactory, CacheDat
             .AsNoTracking()
             .ToListAsync();
     }
+    //public async Task<IReadOnlyList<DropdownItem>> GetUsersListAsync()
+    //{
+    //    return await uow.GetRepository<MinistryUser>()
+    //        .GetAllActiveNonDeleted(x=>x.)
+    //        .Select(x => new DropdownItem
+    //        {
+    //            Id = x.Id,
+    //            Name = requestInfo.Lang == "ar" ? x.NameAr : x.NameEn
+    //        })
+    //        .AsNoTracking()
+    //        .ToListAsync();
+    //}
     public async Task<List<FormItemConfigDto>> GetAllFormItemConfig(Guid? evalFormId)
     {
         var result = await evaluationFormService.GetAllFormItemConfigAsync(evalFormId);

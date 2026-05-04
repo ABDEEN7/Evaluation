@@ -52,7 +52,7 @@ public class TemplateFormController : ControllerBase
 
     [HttpPost]
     //[CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.ADD_WEB_TemplateFormS })]
-    public async Task<IActionResult> SaveEvaluationForm()
+    public async Task<IActionResult> SaveTemplateForm()
     {
         var request = Request.Form["request"][0]?.StringToObject<TemplateFormDto>();
         return Ok(await _masterBl.GetApiService<EvaluationFormBL>().SaveEvaluationForm(request!));
@@ -60,14 +60,14 @@ public class TemplateFormController : ControllerBase
 
     [HttpPost]
     //[CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.EDIT_WEB_TemplateFormS })]
-    public async Task<IActionResult> UpdateEvaluationForm()
+    public async Task<IActionResult> UpdateTemplateForm()
     {
         var request = Request.Form["request"][0]?.StringToObject<TemplateFormDto>();
         return Ok(await _masterBl.GetApiService<EvaluationFormBL>().UpdateEvaluationForm(request!));
     }
     [HttpPost]
     // [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.DELETE_WEB_TemplateFormS })]
-    public async Task<IActionResult> DeleteEvaluationForm(Guid Id)
+    public async Task<IActionResult> DeleteTemplateForm(Guid Id)
     {
 
         return Ok(await _masterBl.GetApiService<EvaluationFormBL>().DeleteEvaluationForm(Id!));
@@ -76,7 +76,7 @@ public class TemplateFormController : ControllerBase
 
     [HttpPost]
     //[CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.ADD_WEB_FORMITEMS })]
-    public async Task<IActionResult> SaveEvaluationFormItem()
+    public async Task<IActionResult> SaveTemplateFormItem()
     {
         var request = Request.Form["request"][0]?.StringToObject<EvaluationFormItemDto>();
         return Ok(await _masterBl.GetApiService<EvaluationFormBL>().SaveEvaluationFormItem(request!));
@@ -84,14 +84,14 @@ public class TemplateFormController : ControllerBase
 
     [HttpPost]
     //[CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.EDIT_WEB_FORMITEMS })]
-    public async Task<IActionResult> UpdateEvaluationFormItem()
+    public async Task<IActionResult> UpdateTemplateFormItem()
     {
         var request = Request.Form["request"][0]?.StringToObject<EvaluationFormItemDto>();
         return Ok(await _masterBl.GetApiService<EvaluationFormBL>().UpdateEvaluationFormItem(request!));
     }
     [HttpPost]
     //[CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.DELETE_WEB_FORMITEMS })]
-    public async Task<IActionResult> DeleteEvaluationFormItem(Guid Id)
+    public async Task<IActionResult> DeleteTemplateFormItem(Guid Id)
     {
 
         return Ok(await _masterBl.GetApiService<EvaluationFormBL>().DeleteEvaluationFormItem(Id!));
@@ -146,6 +146,18 @@ public class TemplateFormController : ControllerBase
     }
     [HttpGet]
     public async Task<IActionResult> GetEvalFormItemLists(Guid formId)
+    {
+        Dictionary<string, object> response = new Dictionary<string, object>();
+        var PartyTypeList = await _masterBl.GetApiService<EvaluationFormBL>().GetPartyTypeListAsync();
+        var FormItemList = await _masterBl.GetApiService<EvaluationFormBL>().GetFormItemListAsync(formId);
+        var CalcMethodsList = await _masterBl.GetApiService<EvaluationFormBL>().GetCalcMethodsListAsync();
+        response.Add("PartyTypeList", PartyTypeList);
+        response.Add("FormItemList", FormItemList);
+        response.Add("CalcMethodsList", CalcMethodsList);
+        return Ok(new ResponseEntity(response));
+    }
+    [HttpGet]
+    public async Task<IActionResult> GetReassignLists(Guid formId)
     {
         Dictionary<string, object> response = new Dictionary<string, object>();
         var PartyTypeList = await _masterBl.GetApiService<EvaluationFormBL>().GetPartyTypeListAsync();
