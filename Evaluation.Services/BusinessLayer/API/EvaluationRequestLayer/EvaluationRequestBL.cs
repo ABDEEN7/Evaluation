@@ -44,7 +44,7 @@ public class EvaluationRequestBL(IServiceScopeFactory serviceScopeFactory, Cache
 
         foreach (var item in mappedEvaluationRequest)
         {
-            item.Url = $"https://localhost:7221/en/evaluationplan{requestInfo.DepRouting}?Evlid={item.Id}";
+            item.Url = $"/{requestInfo.Lang}/evaluationplan{requestInfo.DepRouting}?Evlid={item.Id}";
         }
 
         
