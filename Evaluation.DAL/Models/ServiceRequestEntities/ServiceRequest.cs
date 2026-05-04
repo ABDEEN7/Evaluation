@@ -6,6 +6,7 @@ using Evaluation.DAL.Models.Planing;
 using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
 using Evaluation.DAL.Models.ServiceEnities;
 using Evaluation.DAL.Models.StatusEntities;
+using Evaluation.DAL.Models.UserEntiy;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -40,6 +41,8 @@ namespace Evaluation.DAL.Models.ServiceRequestEntities
 		public PlanHistory? PlanHistory { get; set; }
         public DateTime? VisitDateFrom { get; set; }
         public DateTime? VisitDateTo { get; set; }
+        public string? Name { get; set; }
+        
 
         public virtual ICollection<ServiceRequestFieldsValue>? ServiceRequestFieldsValues { get; set; }
 		public virtual ICollection<RequestAssignment>? Assignments { get; set; }

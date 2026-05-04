@@ -2,54 +2,57 @@
 <link href="~/assets/css/application-requests.css" rel="stylesheet" asp-append-version="true" />
 
 <div class="filter-section g-3 align-item-end">
-	<div class="row p-2 mb-5">
-        <div class="col-lg-5 col-sm-12">
-            <label class="form-label">رقم الطلب</label>
-            <input id="planRequestNoFilter" style="height: 45px;" class="form-control filter-enter" />
+    <div class="row p-2 mb-5">
+        <form id="plan-request-filter-form-id">
+            <div class="row g-3">
+                <div class="col-lg-5 col-sm-12">
+                    <label class="form-label @ConstantKeys.EvaluationPlanRequests.lblRequestNo"></label>
+                    <input id="planRequestNoFilter" style="height: 45px;" class="form-control filter-enter" />
+                </div>
+                <div class="col-lg-5 col-sm-12 mb-sm-4">
+                    <label class="form-label @ConstantKeys.EvaluationOperations.Status"></label>
+                    <select id="planRequestStatusFilter" class="form-select w-100">
+                    </select>
+                </div>
+            </div>
+        </form>
+        <div class="col-lg-2 col-sm-12 d-flex align-items-center justify-content-end align-self-center ms-auto gap-2">
+            <button id="filterPlanRequestBtnsId" class="btn btn-primary @ConstantKeys.EvaluationPlanRequests.lblSearchPlan"></button>
+            <button id="clearFilterPlanRequestBtnId" class="btn btn-outline-secondary @ConstantKeys.EvaluationPlanRequests.lblClear">
+            </button>
         </div>
-        <div class="col-lg-5 col-sm-12 mb-sm-4">
-            <label class="form-label">الحالة</label>
-            <select id="planRequestStatusFilter" class="form-select w-100">
-            </select>
-        </div>
-        <div class="col-md-2 d-flex align-items-center justify-content-end ms-auto gap-2">
-			<button id="filterPlanBtnsId" class="btn btn-primary">بحث</button>
-			<button id="clearFilterPlanBtnId" class="btn btn-outline-secondary">
-                @ConstantKeys.EvaluationPlanRequests.lblClear
-			</button>
-		</div>
 
-	</div>
+    </div>
 </div>
 <div class="card mb-4">
     <div class="card-header">
         <div class="row my-4">
             <div class="col-lg-10 col-sm-12">
-                <h4 class="m-0">@ConstantKeys.EvaluationPlanRequests.lblPlanRequests</h4>
-              </div>
+                <h4 class="m-0 @ConstantKeys.EvaluationPlanRequests.lblPlanRequests"></h4>
+            </div>
             <div class="col-lg-2 col-sm-12 text-align-end">
                 <button id="btnAddEvaluationPlanRequest"
                         class="add-request-btn">
-                    + @ConstantKeys.EvaluationPlanRequests.lblAddPlan
+                    <i class="la la-plus @ConstantKeys.EvaluationPlanRequests.lblAddPlan"></i>
                 </button>
-              </div>
-         </div>
-         <div class="row mb-4">
-             <div class="col-lg-8"></div>
+            </div>
+        </div>
+        <div class="row mb-4">
+            <div class="col-lg-8"></div>
             <div class="col-lg-4 col-sm-12">
                 <div class=" d-flex justify-content-end align-items-center gap-3">
                     <div class="btn-group" role="group" aria-label="View mode">
                         <button id="cardViewPlanRequest" type="button" class="btn btn-outline-primary active">
-                            <i class="la la-th-large"></i> عرض كبطاقات
+                            <i class="la la-th-large @ConstantKeys.WebAppCommon.lblDisplayAsCards"></i>
                         </button>
                         <button id="tblViewPlanRequest" type="button" class="btn btn-outline-secondary">
-                            <i class="la la-list"></i> عرض كجدول
+                            <i class="la la-list @ConstantKeys.WebAppCommon.lblDisplayAsTable"></i>
                         </button>
                     </div>
                 </div>
             </div>
-         </div>
-        
+        </div>
+
     </div>
     <div class="card-body">
         <div class="filter-section">
@@ -59,8 +62,8 @@
                         <div class="d-flex gap-3">
                             <h5 class="m-0 p-0">
                                 @*  <button id="advancedSearchBtnRequestsId" class="btn btn-primary">
-                            <i class="fa-solid fa-filter"></i>
-                        </button> *@
+                                <i class="fa-solid fa-filter"></i>
+                                </button> *@
                                 @* <span id="lblAdvancedSearchRequestId" class="@ConstantKeys.EvaluationPlanRequests.lblAdvancedSearch"></span> *@
                             </h5>
                         </div>
@@ -87,8 +90,7 @@
                                 <th class="@ConstantKeys.EvaluationPlanRequests.lblRequestService"></th>
                                 <th class="@ConstantKeys.EvaluationPlanRequests.lblScholarships"></th>
                                 <th class="@ConstantKeys.EvaluationPlanRequests.lblRequestCreatedDate"></th>
-                                <th class="@ConstantKeys.EvaluationPlanRequests.lblRequestCreatedTime"></th>
-                                <th></th>
+                                @* <th class="@ConstantKeys.EvaluationPlanRequests.lblRequestCreatedTime"></th> *@
                             </tr>
                         </thead>
                         <tbody id="requeststableBody" class="requeststableBody"></tbody>

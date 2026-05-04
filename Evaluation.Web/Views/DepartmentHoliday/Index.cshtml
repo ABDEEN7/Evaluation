@@ -9,9 +9,10 @@
     <!-- Custom Styles -->
     <link href="assets/css/style.css" rel="stylesheet">
     <link href="assets/css/style-ar.css" rel="stylesheet">
-
     <link href="assets/css/istemara-styles.css" rel="stylesheet">
-
+    <link href="~/lib/tabulator/css/tabulator.min.css" rel="stylesheet" />
+    <link href="~/lib/tabulator/css/tabulator.css" rel="stylesheet" />
+    <link href="~/assets/css/tabulator-styling.css.css" rel="stylesheet" />
 }
 <div class="department-holiday-page-container">
     <section id="tbltemplatecontainer" class="section-container">
@@ -54,8 +55,9 @@
 </div>
 @section Scripts {
     <script src="/plan-assets/vendor/flatpickr/js/flatpickr.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="~/js/DepartmentHoliday/department-holiday.js" asp-append-version="true"></script>
+    <script src="~/lib/tabulator/js/tabulator.js" asp-append-version="true"></script>
+
     <script>
         $(document).ready(async function () {
 
@@ -72,7 +74,10 @@
                     '@nameof(ConstantKeys.WebAppPages.WebDepartmentHoliday)'
                 ],
                  permissions: [
-                    '@nameof(ConstantKeys.WebPermissions.ADD_WEB_DEPARTMENT_HOLIDAY)'
+                    '@nameof(ConstantKeys.WebPermissions.VIEW_WEB_DEPARTMENT_HOLIDAY)',
+                    '@nameof(ConstantKeys.WebPermissions.ADD_WEB_DEPARTMENT_HOLIDAY)',
+                    '@nameof(ConstantKeys.WebPermissions.EDIT_WEB_DEPARTMENT_HOLIDAY)',
+                    '@nameof(ConstantKeys.WebPermissions.DELETE_WEB_DEPARTMENT_HOLIDAY)'
                 ],
             }).then((result) => {
 
@@ -80,16 +85,12 @@
                 textDir = result.currentlanguage === "ar" ? "RTL" : "LTR";
                 permissionsList = result.permissionsList;
                 controlsList = result.controlsList;
-                columnList = uiControlItems.filter(x => x.constraint.showInGrid === true && x.control).map(c => ({
-                    ...c.constraint,
-                    pageName: c.control.pageName
-                }));
-
-                settingList = result.settingList;
-                targetSetting = result.targetSetting;
-                containsOrderNo = result.containsOrderNo;
-                controlvalidationlist = uiControlItems;
-
+                columnList = uiControlItems.filter(x => x.constraint?.showInGrid === true && x.control)
+                    .map(c => ({
+                        ...c.constraint,
+                        pageName: c.control.pageName
+                    }));
+                console.log('columnList after map:', columnList);
                 //DepartmentHoliday
                  IsEdit = permissionsList?.some(p => p === '@ConstantKeys.WebPermissions.EDIT_WEB_DEPARTMENT_HOLIDAY') ?? false;
                  IsDelete = permissionsList?.some(p => p === '@ConstantKeys.WebPermissions.DELETE_WEB_DEPARTMENT_HOLIDAY') ?? false;

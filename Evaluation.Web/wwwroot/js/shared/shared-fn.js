@@ -1939,7 +1939,7 @@ const sharedFn = (options) => {
     };
 
     //===========================================================
-    const InitialPopup = async (modaltitle, ControlItems, groupObject, tablecolumnlist, settingList) => {
+    const InitialPopup = async (modaltitle, ControlItems, groupObject, tablecolumnlist, settingList, onlyTable = 0) => {
         $("#PopupId").val('');
         $('#ModalPopup .modal-body #PopupForm').empty();
         $('#ModalPopup .modal-title').empty();
@@ -1961,8 +1961,13 @@ const sharedFn = (options) => {
                 Mode: 'APP',
                 success: function (response) {
                     if (response) {
-                        popupdivcontent = popupdivcontent + `${response}` + `</div>`;
+                        if (onlyTable == 0) {
+                            popupdivcontent = popupdivcontent + `${response}` + `</div>`;
+
+                        }
+
                         if (popupdivcontent) {
+
                             if (tablecolumnlist) {
                                 popupdivcontent = popupdivcontent + '<div class="tabulator-wrapper"> <div id="divtable"></div> </div>';
                                 $('#ModalPopup .modal-body #PopupForm').html(popupdivcontent);
@@ -2013,9 +2018,9 @@ const sharedFn = (options) => {
        
     };
     //===========================================================
-    const OpenFormPopup = (modaltitle, ControlItems, groupObject = null, tablecolumnlist = null, settingList = null) => {
+    const OpenFormPopup = (modaltitle, ControlItems, groupObject = null, tablecolumnlist = null, settingList = null, hasOnlyTable = 0) => {
         (async () => {
-            await InitialPopup(modaltitle, ControlItems, groupObject, tablecolumnlist, settingList);
+            await InitialPopup(modaltitle, ControlItems, groupObject, tablecolumnlist, settingList, hasOnlyTable);
         })();
 
         $("#ModalPopup").modal("show");

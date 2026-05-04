@@ -36,7 +36,11 @@ window.serviceRequestForm = window.serviceRequestForm || {};
     }
     const getRequestId = () => {
         const id = getUrlParam("id");
-        return id ? id : getUrlParam("Evlid");
+        return id ;
+    };
+    const getRequestOrEvalId = () => {
+        const id = getUrlParam("id");
+        return id || getUrlParam("Evlid");
     };
     const getEvlRequestId = () => {
         const id = getUrlParam("Evlid");
@@ -176,19 +180,14 @@ window.serviceRequestForm = window.serviceRequestForm || {};
 
         let errors = [];
 
-        if (typeof fu.validateFields === "function") {
             errors = fu.validateFields(fields, valuesMap) || [];
-        }
 
-        if (typeof fu.validateDateGroups === "function") {
-            const dateErrors = fu.validateDateGroups() || [];
-            errors = errors.concat(dateErrors);
-        }
-
-        if (typeof fu.validateNotEqualFields === "function") {
-            const notEqualErrors = fu.validateNotEqualFields(fields) || [];
-            errors = errors.concat(notEqualErrors);
-        }
+            //const dateErrors = fu.validateDateGroups() || [];
+            //errors = errors.concat(dateErrors);
+       
+            //const notEqualErrors = fu.validateNotEqualFields(fields) || [];
+            //errors = errors.concat(notEqualErrors);
+    
 
         if (errors.length) {
             if (typeof fu.showFieldErrors === "function") {
@@ -211,6 +210,7 @@ window.serviceRequestForm = window.serviceRequestForm || {};
 
         const payloadFields = fields.map(f => ({
             fieldId: f.fieldId,
+            isApi: f.isApi,
             type: f.type,
             value: valuesMap[f.fieldId]
         }));
@@ -284,12 +284,14 @@ window.serviceRequestForm = window.serviceRequestForm || {};
                 DisplayAlert("Unexpected empty response.", "danger");
                 return;
             }
-            let RequestId  = getRequestId();
+            let RequestId = getRequestOrEvalId();
             if (RequestId) {
                 window.tempFileStorage = {};
                DisplayAlert('Form submitted successfully!', 'success');
                 setTimeout(() => {
-                    sharedUtility().RedirectToModuleOrDefault();
+                    sharedUtility().RedirectToModuleOrDefault({
+                        Evlid: getEvlRequestId()
+                    });
                 }, 1000);
             } else {
                 let message = saveAsDraft

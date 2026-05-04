@@ -1,4 +1,5 @@
-﻿using Evaluation.Services.Models.SMTP;
+﻿using AutoMapper;
+using Evaluation.Services.Models.SMTP;
 using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Models.Api.TemplatesDTO;
@@ -17,13 +18,14 @@ namespace Evaluation.Services.Special
 		private readonly IEmailServices emailServices;
 		private readonly CacheDataProvider cacheDataProvider;
 		private readonly LoggingServices loggingServices;
-
+		private readonly IMapper mapper;
 		public EmailTemplateProvider(IEmailServices emailServices,
-			CacheDataProvider cacheDataProvider, LoggingServices loggingServices)
+			CacheDataProvider cacheDataProvider, LoggingServices loggingServices, IMapper mapper)
 		{
 			this.emailServices = emailServices;
 			this.cacheDataProvider = cacheDataProvider;
 			this.loggingServices = loggingServices;
+			this.mapper = mapper;
 		}
 
 

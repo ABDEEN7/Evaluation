@@ -59,7 +59,8 @@ public class SrvTeamBL : AdminBase
     {
 
         var result = await uow.GetRepository<MinistryUser>()
-                    .GetAllActiveNonDeleted()
+                    .GetAllQueryFiltered()
+                    .Where(x => x.UserPartTypes != null && x.UserPartTypes.Any())
                     .Select(x=>new DropdownItem
                     {
                         Id=x.Id,

@@ -245,6 +245,7 @@
             <th>${t('lblDomain')}</th>
             <th>${t('lblPartyType')}</th>
             <th>${t('lblTeamLeader')}</th>
+            ${state.evaluationRequestId ? `<th>${t('lblSendMail')}</th>` : ''}
         `;
 
         $thead.html(headerHTML);
@@ -358,48 +359,59 @@
             // Check if this member is team leader
             const isLeaderChecked = member.id === state.teamLeaderId || member.isLeader ? 'checked' : '';
 
+            const sendMailBtnHTML = state.evaluationRequestId ? `
+    <td>
+        <button class="btn btn-sm btn-outline-primary send-mail-btn"
+                data-member-id="${member.id}"
+                data-member-name="${memberName}">
+            <i class="las la-envelope"></i>
+        </button>
+    </td>
+` : ``;
+
             return `
-                <tr data-selected-id="${member.id}">
-                    <td>
-                        <label class="custom-checkbox1 ${isPending ? 'minus' : 'plus'}">
-                            <input type="checkbox" class="selected-row-checkbox" 
-                                   ${isPending ? 'checked' : ''}>
-                            <span class="checkmark"></span>
-                        </label>
-                    </td>
-                    <td>
-                        <h6>${memberName}</h6>
-                        <small class="text-muted">${memberPosition}</small>
-                    </td>
-                    ${ndaCellHTML}
-                    <td>
-                        <div class="mb-3 w-100">
-                            <select multiple class="form-control multiCheckSelect-dynamic" 
-                                    data-member-id="${member.id}">
-                                ${state.scopes.map(scope => `
-                                    <option value="${scope.id}">${scope.name}</option>
-                                `).join('')}
-                            </select>
-                        </div>
-                    </td>
-                    <td>
-                        <select class="form-select party-type-select" data-member-id="${member.id}">
-                            ${partyTypeOptionsHTML}
-                        </select>
-                    </td>
-                    <td>
-                        <label class="custom-checkbox1 radio">
-                            <input type="radio"
-                                   class="team-leader-radio"
-                                   name="${state.fieldId}_teamLeader"
-                                   value="${member.id}"
-                                   data-member-id="${member.id}"
-                                   ${isLeaderChecked}>
-                            <span class="checkmark"></span>
-                        </label>
-                    </td>
-                </tr>
-            `;
+    <tr data-selected-id="${member.id}">
+        <td>
+            <label class="custom-checkbox1 ${isPending ? 'minus' : 'plus'}">
+                <input type="checkbox" class="selected-row-checkbox" 
+                       ${isPending ? 'checked' : ''}>
+                <span class="checkmark"></span>
+            </label>
+        </td>
+        <td>
+            <h6>${memberName}</h6>
+            <small class="text-muted">${memberPosition}</small>
+        </td>
+        ${ndaCellHTML}
+        <td>
+            <div class="mb-3 w-100">
+                <select multiple class="form-control multiCheckSelect-dynamic" 
+                        data-member-id="${member.id}">
+                    ${state.scopes.map(scope => `
+                        <option value="${scope.id}">${scope.name}</option>
+                    `).join('')}
+                </select>
+            </div>
+        </td>
+        <td>
+            <select class="form-select party-type-select" data-member-id="${member.id}">
+                ${partyTypeOptionsHTML}
+            </select>
+        </td>
+        <td>
+            <label class="custom-checkbox1 radio">
+                <input type="radio"
+                       class="team-leader-radio"
+                       name="${state.fieldId}_teamLeader"
+                       value="${member.id}"
+                       data-member-id="${member.id}"
+                       ${isLeaderChecked}>
+                <span class="checkmark"></span>
+            </label>
+        </td>
+        ${sendMailBtnHTML}
+    </tr>
+`;
         }).join('');
 
         $tbody.html(rows);
@@ -609,8 +621,6 @@
                 state.selectedAssignments.forEach(member => {
                     member.isLeader = member.id === leaderId;
                 });
-
-                console.log('👑 قائد الفريق:', leaderId);
             });
 
         // Party Type Selection
@@ -799,6 +809,26 @@
                 renderMembersTable();
                 showSuccess('تم حذف الأعضاء المحددين بنجاح');
             });
+        $(document).off('click', '.send-mail-btn')
+            .on('click', '.send-mail-btn', function () {
+                const memberId = $(this).data('member-id');
+                notificationUtil.confirmation({
+                    title: sharedFn().GetUiControlText("WEB_WARNING_CONFIRM"),
+                    okText: sharedFn().GetUiControlText("WEB_CONFIRM_BUTTON"),
+                    cancelText: sharedFn().GetUiControlText('WEB_CANCEL')
+                },
+                    result => {
+                        
+                        const response = jqClient().Post(API_ENDPOINTS.SEND_MAIL_NOTIFICATION,
+                            { userId: memberId, evaluationRequestId: state.evaluationRequestId });
+
+                        if (response.success || response.isSuccess) {
+                            showSuccess(t('msgMailSentSuccess', 'تم إرسال البريد بنجاح'));
+                        } else {
+                            throw new Error(response.message || 'فشل في إرسال البريد');
+                        }
+                    });
+            });
     }
 
     // ================== HELPERS ==================
@@ -844,7 +874,7 @@
 
     // ================== INIT ==================
 
-    ns.init = async function (fieldId, evaluationRequestId = null, elementId=null) {
+    ns.init = async function (fieldId, evaluationRequestId = null, elementId = null) {
         state.fieldId = fieldId;
         state.evaluationRequestId = evaluationRequestId;
 

@@ -14,7 +14,7 @@ public class EvalFormProfile : Profile
 {
     public EvalFormProfile()
     {
-        CreateMap<EvalForm, EvaluationFormDto>()
+        CreateMap<EvalForm, TemplateFormDto>()
            .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive))
                 .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => src.IsDeleted))
                  .ForMember(dest => dest.CreateBy, opt => opt.MapFrom<UserProfileResolver, Guid?>(src => src.CreateById))

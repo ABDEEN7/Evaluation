@@ -1,4 +1,5 @@
 ﻿using Evaluation.DAL.Models.Calendars;
+using Evaluation.DAL.Models.FormsModules;
 using Evaluation.DAL.Models.Org;
 using Evaluation.DAL.Models.Planing;
 using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
@@ -6,6 +7,7 @@ using Evaluation.DAL.Repositories;
 using Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices;
 using Evaluation.SharedHelper;
 using Evaluation.SharedHelper.Consts;
+using Evaluation.SharedHelper.Dtos.Form;
 using Evaluation.SharedHelper.Dtos.PlanDto;
 using Evaluation.SharedHelper.Dtos.PlanDto.EditDto;
 using Evaluation.SharedHelper.Enums;
@@ -217,13 +219,14 @@ public class PlanRequestRepository(IServiceScopeFactory serviceScopeFactory, Srv
     public async Task<PaginatedResult<PlanListDto>> GetPlans(PlanDetailsRequestDto request)
     {
         IQueryable<Plan> plans = unitOfWork.GetRepository<Plan>()
-            .GetAllQueryFiltered(x => x.PlanStatus.BackendName == StatusBackEnds.ApprovedPlans && x.PlanTypeDep.DepartmentId == requestInfo.DepId);
+            .GetAllQueryFiltered(x => x.PlanStatus.BackendName == StatusBackEnds.ApprovedPlans && x.PlanTypeDep.DepartmentId == requestInfo.DepId)
+            .Include(x => x.EvaluationRequests);
 
         if (request.YearId != null)
             plans = plans.Where(x => x.AcademicYearId == request.YearId);
 
         if (!string.IsNullOrEmpty(request.SchoolName))
-            plans = plans.Where(x => x.EvaluationRequests.Any(er => er.OrgTree.NameAr.Contains(request.SchoolName)));
+            plans = plans.Where(x => x.EvaluationRequests.Any(er => er.OrgTree.NameAr.Contains(request.SchoolName) || er.OrgTree.NameEn.Contains(request.SchoolName)));
 
         var query = plans
             .Select(x => new PlanListDto

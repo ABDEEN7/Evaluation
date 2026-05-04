@@ -80,7 +80,7 @@
         }
     });
 
-    function openPlanRequestDetails(requestId) {
+    window.openPlanRequestDetails = function (requestId) {
         const options = {
             success: function (response) {
 
@@ -122,8 +122,10 @@
         };
 
         jqClient(options).Get(`/ServiceRequest/${DepartmentRouting}/GetApplicationDetails?requestId=${requestId}`);
-    }
-
+    };
+    $('#filterPlanRequestBtnsId').on('click', function () {
+        planRequestsListing.reload();
+    });
 
     $('#btnAddEvaluationPlanRequest').on('click', function () {
 
