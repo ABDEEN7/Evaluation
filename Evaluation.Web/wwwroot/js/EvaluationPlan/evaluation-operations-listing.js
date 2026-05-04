@@ -194,6 +194,7 @@
                 }
                 else {
                     renderEvaluationPartiesSection(response, requestId);
+                    window.openRequestsModule.render(response.evaluationParties || []);
                 }
 
                 bindSchoolDetails(response);
