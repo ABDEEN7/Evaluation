@@ -151,31 +151,7 @@ namespace Evaluation.Services.Models.API
                 case ActionTypeKeys.RequestDataChange:
                     await HandleRequestMissingAction(existingFields, Fields, actiondb.Id);
                     break;
-                case ActionTypeKeys.CreateEvaluationPlan:
-                    {
-                        {
-                            var updatedFields = await PrepareAndUpdateFields(application.ServiceId, RequestType, application.Id, FieldsToUpdates, existingFields, lang, actiondb.Id);
-
-                            existingFields.AddRange(updatedFields);
-                        }
-
-                        var planField = existingFields
-                            .Where(x => x.IsApproved)
-                            .FirstOrDefault(x =>
-                                x.Field?.FieldType?.BackendName == FieldTypeConstant.EvaluationPlan &&
-                                !string.IsNullOrWhiteSpace(x.Value)
-                            );
-
-                        if (planField == null)
-                            break;
-
-							var dto = JsonConvert.DeserializeObject<CreateEvaluationPlanDto>(planField.Value!);
-							if (dto == null) throw new BusinessException(ExceptionMessage.msgInvalidEvaluationPlan);
-
-                            await planServiceRequestServices.InsertOrUpdatePlan(dto);
-
-						break;
-					}
+           
 				case ActionTypeKeys.CLOSE_AND_UPDATE_PLAN:
 					{
 						if (FieldsToUpdates.Count > 0)
@@ -183,7 +159,8 @@ namespace Evaluation.Services.Models.API
 							var updatedFields = await PrepareAndUpdateFields(application.ServiceId,RequestType,application.Id,FieldsToUpdates,existingFields,lang,actiondb.Id);
 
                             existingFields.AddRange(updatedFields);
-                        }
+							InsertFieldsHistory(existingFields);
+						}
 
                         var planField = existingFields
                             .Where(x => x.IsApproved)
@@ -202,34 +179,7 @@ namespace Evaluation.Services.Models.API
 
 						break;
 					}
-				case ActionTypeKeys.CLOSE_AND_UPDATE_FORM:
-					{
-						if (FieldsToUpdates.Count > 0)
-						{
-							var updatedFields = await PrepareAndUpdateFields(application.ServiceId,RequestType,application.Id,FieldsToUpdates,existingFields,lang,actiondb.Id);
-
-                            existingFields.AddRange(updatedFields);
-                        }
-
-                        var FormField = existingFields
-                            .Where(x => x.IsApproved)
-                            .FirstOrDefault(x =>
-                                x.Field?.FieldType?.BackendName == FieldTypeConstant.Evl_Form &&
-                                !string.IsNullOrWhiteSpace(x.Value)
-                            );
-
-                        if (FormField == null)
-                            break;
-
-
-						var dto = JsonConvert.DeserializeObject<TemplateFormDto>(FormField.Value!);
-
-						if (dto == null) throw new BusinessException(ExceptionMessage.msgInvalidEvaluationForm);
-
-                        await _EvaluationFormBL.SaveEvaluationForm(dto);
-
-                        break;
-                    }
+			
                 case ActionTypeKeys.CLOSE_AND_DELETE_PLAN:
                     {
                         if (FieldsToUpdates.Count > 0)
@@ -237,7 +187,8 @@ namespace Evaluation.Services.Models.API
                             var updatedFields = await PrepareAndUpdateFields(application.ServiceId, RequestType, application.Id, FieldsToUpdates, existingFields, lang, actiondb.Id);
 
                             existingFields.AddRange(updatedFields);
-                        }
+							InsertFieldsHistory(existingFields);
+						}
 
                         var planField = existingFields
                             .Where(x => x.IsApproved)
@@ -258,18 +209,36 @@ namespace Evaluation.Services.Models.API
                         break;
                     }
 
-                //case ActionTypeKeys.CloseAndUpdate:
-                //	if (FieldsToUpdates.Count > 0)
-                //	{
-                //		var updatedfiels = await AddOrUpdateFields(FieldsToUpdates, existingFields, application.Id, lang, actiondb.Id);
-                //		existingFields.AddRange(updatedfiels);
-                //	}
-                //	//await ApproveFields(existingFields.Where(x => Fields.Any(f => f.FieldId == x.FieldId)).ToList(), actiondb.Id);
-                //	var ApprovedOrActionFields = existingFields.Where(x => x.IsApproved == true || Fields.Any(f => f.FieldId == x.FieldId) || x.Field?.MappingSystemField?.BackendName == "EntityContractId" || x.Field?.MappingSystemField?.BackendName == "SectorId").ToList();
+				case ActionTypeKeys.CloseAndUpdate:
+					{
+						if (FieldsToUpdates.Count > 0)
+						{
+							var updatedFields = await PrepareAndUpdateFields(application.ServiceId, RequestType, application.Id, FieldsToUpdates, existingFields, lang, actiondb.Id);
 
-                //	await srvScholarship.UpdateScholarship(serviceObj, application, actiondb, ApprovedOrActionFields, lang);
-                //	break;
-                case ActionTypeKeys.Close:
+							existingFields.AddRange(updatedFields);
+							InsertFieldsHistory(existingFields);
+						}
+
+						var FormField = existingFields
+							.Where(x => x.IsApproved)
+							.FirstOrDefault(x =>
+								x.Field?.FieldType?.BackendName == FieldTypeConstant.Evl_Form &&
+								!string.IsNullOrWhiteSpace(x.Value)
+							);
+
+						if (FormField == null)
+							break;
+
+
+						var dto = JsonConvert.DeserializeObject<TemplateFormDto>(FormField.Value!);
+
+						if (dto == null) throw new BusinessException(ExceptionMessage.msgInvalidEvaluationForm);
+
+						await _EvaluationFormBL.SaveEvaluationForm(dto);
+
+						break;
+					}
+				case ActionTypeKeys.Close:
                     await AddOrUpdateFields(FieldsToUpdates, RequestType, existingFields, application.Id, lang, actiondb.Id);
                     break;
                 case ActionTypeKeys.UPDATE_ITEGRATION_FIELDS:
@@ -589,6 +558,7 @@ namespace Evaluation.Services.Models.API
                     FieldId = field.FieldId!.Value,
                     Value = field.Value,
                     IsActive = true,
+                    IsAPI = field.IsApi,
                     RefId = requestId,
                     RequestType = RequestType.ToString(),
                     IsApproved = isApproved
@@ -624,9 +594,9 @@ namespace Evaluation.Services.Models.API
                     }
                 }
             });
-            return newDBFields;
+			return UnApprovedFields.Concat(newDBFields).ToList();
 
-        }
+		}
 
         private string SoftMerge(string oldJson, string newJson)
         {
@@ -659,5 +629,28 @@ namespace Evaluation.Services.Models.API
             return JsonConvert.SerializeObject(mergedPartners);
         }
 
-    }
+		private void InsertFieldsHistory(List<ServiceRequestFieldsValue> fields)
+		{
+			if (fields == null || fields.Count == 0)
+				return;
+
+			foreach (var field in fields)
+			{
+				uow.GetRepository<ServiceRequestFieldsValueHistory>().Insert(
+					new ServiceRequestFieldsValueHistory
+					{
+						RefId = field.RefId,
+						RequestType = field.RequestType,
+						FieldId = field.FieldId,
+						Value = field.Value,
+						IsMissing = field.IsMissing,
+						IsAPI = field.IsAPI,
+						IsApproved = field.IsApproved,
+						IsActive = field.IsActive
+					}
+				);
+			}
+		}
+
+	}
 }

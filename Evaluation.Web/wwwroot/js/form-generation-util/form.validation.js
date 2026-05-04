@@ -331,6 +331,24 @@ window.formUtility = window.formUtility || {};
         validateForm(field.formId)
         return errors;
     };
+
+    const validateEvaluationPlan = (field, fieldValue) => {
+        const errors = [];
+
+        const fieldId = field.fieldId;
+
+        const data = window.SubmitPlanHandler?.getFormPlanJson(fieldId);
+
+        const validation = window.SubmitPlanHandler?.validatePlan(data);
+
+        if (validation && !validation.isValid) {
+            validation.errors.forEach(msg => {
+                errors.push(createError(fieldId, msg));
+            });
+        }
+
+        return errors;
+    };
     // #endregion
 
     // #region ===============  Date Attribute Validation
@@ -678,9 +696,7 @@ window.formUtility = window.formUtility || {};
         textarea: validateTextareaLength,
 
         list: validateList,
-
         'evaluationPlan': validateEvaluationPlan,
-
         evl_form: validateForm,
 
     }

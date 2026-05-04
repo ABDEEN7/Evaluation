@@ -23,6 +23,8 @@ public class FormItem : EntityBase, IAuditLogEntity
     public bool NoteRequired { get; set; }
     public int OrderNo { get; set; } = 0;
     public string? ColorCode { get; set; }
+    public bool HasMuliEvaluation { get; set; }
+
 
     public virtual ICollection<SubFormItem>? SubFormItems { get; set; }
     public ICollection<FormItemRelated>? RelatedFrom { get; set; }

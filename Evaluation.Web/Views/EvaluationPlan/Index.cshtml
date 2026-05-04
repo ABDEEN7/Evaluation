@@ -609,11 +609,12 @@
             });
             additional_keys: [];
             window.formUtility = window.formUtility || {};
-            const searchParams = new URLSearchParams(window.location.search);
-            const reqId = searchParams.get('id');
-            const serviceId = searchParams.get('serviceId');
-            const EvlId = searchParams.get('Evlid');
-            const planId = searchParams.get('planId');
+             const searchParams = new URLSearchParams(window.location.search);
+                const reqId = searchParams.get('id');
+                const serviceId = searchParams.get('serviceId');
+                const EvlId = searchParams.get('Evlid');
+                const planId = searchParams.get('planId');
+                const SerReqid = searchParams.get('SerReqid');
 
             if (reqId) {
                 openPlanRequestDetails(reqId);
@@ -622,6 +623,9 @@
             if (EvlId) {
                 openEvaluationRequestDetails(EvlId);
             }
+         if (SerReqid) {
+       openRequestDetails(EvlId);
+ }
             if (planId) {
                 if (IsCanUpdatePlan) {
                     InitializeCreatePlanRequestService(serviceId, planId);

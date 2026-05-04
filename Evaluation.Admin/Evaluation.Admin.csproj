@@ -19,5 +19,11 @@
     <ProjectReference Include="..\Evaluation.API\Evaluation.API.csproj" />
     <ProjectReference Include="..\Evaluation.Services\Evaluation.Services.csproj" />
   </ItemGroup>
+  
+<ItemGroup>
+  <Content Update="appsettings.json">
+    <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+  </Content>
+</ItemGroup>
 
 </Project>

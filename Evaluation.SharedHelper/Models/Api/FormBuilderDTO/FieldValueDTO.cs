@@ -29,6 +29,7 @@ namespace Evaluation.SharedHelper.Models.Api.FormBuilderDTO
         public string? Label { get; set; }
         public string? FieldTypeInfo { get; set; }
         public bool?  IsApproved { get; set; }
+        public bool?  IsApi { get; set; }
         public bool? IsEditable { get; set; }
         public bool? Visible { get; set; }
        
