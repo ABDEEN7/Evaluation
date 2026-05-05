@@ -46,6 +46,13 @@ public class SchoolController : ControllerBase
         return await _hrService.AddUpdateOrgTree(hrCode, qID);
     }
 
+    [HttpPost]
+    public async Task<bool> AddUpdateAllSchools()
+    {
+        return await _hrService.AddUpdateAllSchools();
+    }
+
+
     [HttpGet]
     public async Task<List<HROrganizationInfoDto>> GetHROrgDetailsAsync(int page)
     {

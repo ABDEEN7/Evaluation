@@ -4,18 +4,22 @@ using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.Master;
 using Evaluation.DAL.Models.Org;
 using Evaluation.DAL.Models.Planing;
+using Evaluation.DAL.Models.SystemSetting;
 using Evaluation.DAL.Repositories;
 using Evaluation.Services.BusinessLayer.API;
 using Evaluation.Services.Extensions;
 using Evaluation.Services.Mapping;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Enums;
+using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Helper;
 using Evaluation.SharedHelper.Models;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Oracle.ManagedDataAccess.Client;
 using System.Text;
 using System.Text.RegularExpressions;
+using static Evaluation.SharedHelper.Enums.ConstantKeys;
 
 namespace Evaluation.Services.Integration;
 
@@ -353,6 +357,74 @@ public class HRService : ApiBase
         }
 
 
+        return true;
+    }
+    public async Task<bool> AddUpdateAllSchools()
+    {
+
+        //////////////////CHECK WITH FATOUH///////////////////// 
+        var OrgTypeBackend = await uow.GetRepository<SystemSetting>()
+                                  .GetAllNonDeleted()
+                                  .Where(x => x.SettingKey == AdminSettings.SchoolOrgType.ToString())
+                                  .Select(x => x.SettingValue)
+                                  .FirstOrDefaultAsync();
+        if (OrgTypeBackend == null)
+        {
+            throw new BusinessException(ConstantKeys.ExceptionMessage.OrgTypeDoesNotExists);
+        }
+
+        var orgtypeid = await uow.GetRepository<OrgType>()
+                                 .GetAllNonDeleted()
+                                 .Where(x => x.BackendName == OrgTypeBackend)
+                                 .Select(x => x.Id)
+                                 .FirstOrDefaultAsync();
+
+        ////////////////////////CHECK WITH FATOUH////////////////////////
+        DateOnly today = DateOnly.FromDateTime(DateTime.Now);
+
+        List<HROrganizationInfoDto> allHrSchools = await GetAllHRSchoolsAsync();
+
+        if (allHrSchools.Count == 0)
+            return false;
+
+        using (var uow = serviceScopeFactory.CreateScopedUow())
+        {
+            List<School> schools = new List<School>();
+
+            foreach (var school in allHrSchools)
+            {
+
+                School obj = new School();
+                obj.NameAr = school.OrgDescA;
+                obj.NameEn = school.OrgDescE;
+                obj.OrgTypeId = orgtypeid;
+                //obj.OrgClassId = message.OrgClassId;
+                obj.EstablishmentDate = today;
+                //obj.TypeId = message.TypeId;
+                obj.ManagerQID = school.ManagerIdNo;
+                obj.ManageEmail = school.Email;
+                obj.OrgEmail = school.Email;
+                obj.Address = school.Address;
+                //obj.Phone = school.Phone;//IS NOT EXIST IN HR & NSIS
+                //obj.Mobile = message.Mobile;//IS NOT EXIST IN HR & NSIS
+                //obj.Code = message.Code;//IS NOT EXIST IN HR & NSIS
+                //obj.Region = message.Region;//IS NOT EXIST IN HR & NSIS
+
+                obj.IsAccredited = false;
+                obj.SupportIdentity = false;
+                obj.AcceditedDate = today;
+                obj.SupportIdentityDate = today;
+                obj.IsActive = true;
+
+                schools.Add(obj);
+            }
+
+            var schoolsResult = await uow.GetRepository<School>().InsertRange(schools);
+
+
+            await uow.CommitAsync();
+
+        }
         return true;
     }
 
