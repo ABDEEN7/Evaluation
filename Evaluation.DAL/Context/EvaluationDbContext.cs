@@ -125,6 +125,7 @@ public partial class EvaluationDbContext : DbContext
     public virtual DbSet<PartyTypeEvalPartyStatus> PartyTypeEvalPartyStatus { get; set; }
     public virtual DbSet<ServiceStatusType> ServiceStatusType { get; set; }
     public virtual DbSet<FormItemConfig> FormItemConfig { get; set; }
+    public virtual DbSet<FieldInfoType> FieldInfoType { get; set; }
 
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
