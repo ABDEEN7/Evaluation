@@ -39,8 +39,23 @@ public class EvaluationRequestBL(IServiceScopeFactory serviceScopeFactory, Cache
 
         List<EvaluationRequestCalenderDto> evaluationRequestCalenderDtos = new List<EvaluationRequestCalenderDto>();
 
-        evaluationRequestCalenderDtos.AddRange(mapper.Map<List<EvaluationRequestCalenderDto>>(evaluationRequestResult));
-        evaluationRequestCalenderDtos.AddRange(mapper.Map<List<EvaluationRequestCalenderDto>>(serviceRequestResult));
+        var mappedEvaluationRequest = mapper.Map<List<EvaluationRequestCalenderDto>>(evaluationRequestResult);
+        var mappedServiceRequest = mapper.Map<List<EvaluationRequestCalenderDto>>(serviceRequestResult);
+
+        foreach (var item in mappedEvaluationRequest)
+        {
+            item.Url = $"/{requestInfo.Lang}/evaluationplan{requestInfo.DepRouting}?Evlid={item.Id}";
+        }
+
+        
+        //TODO: waiting until complete the routing url
+        //foreach (var item in mappedServiceRequest)
+        //{
+        //    item.Url = $"https://localhost:7221/en/evaluationplan/{requestInfo.DepRouting}?Evlid={item.Id}";
+        //}
+
+        evaluationRequestCalenderDtos.AddRange(mappedEvaluationRequest);
+        evaluationRequestCalenderDtos.AddRange(mappedServiceRequest);
 
         return evaluationRequestCalenderDtos;
     }

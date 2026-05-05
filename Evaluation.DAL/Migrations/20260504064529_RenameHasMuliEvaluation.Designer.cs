@@ -4,6 +4,7 @@ using Evaluation.DAL.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Evaluation.DAL.Migrations
 {
     [DbContext(typeof(EvaluationDbContext))]
-    partial class EvaluationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260504064529_RenameHasMuliEvaluation")]
+    partial class RenameHasMuliEvaluation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -2739,9 +2742,6 @@ namespace Evaluation.DAL.Migrations
                     b.Property<Guid?>("EvalFormId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("FieldInfoTypeId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<Guid>("FieldTypeId")
                         .HasColumnType("uniqueidentifier");
 
@@ -2807,8 +2807,6 @@ namespace Evaluation.DAL.Migrations
                     b.HasIndex("DropDownTypeId");
 
                     b.HasIndex("EvalFormId");
-
-                    b.HasIndex("FieldInfoTypeId");
 
                     b.HasIndex("FieldTypeId");
 
@@ -2966,73 +2964,6 @@ namespace Evaluation.DAL.Migrations
                     b.HasIndex("UpdateById");
 
                     b.ToTable("FieldDropDownValue");
-                });
-
-            modelBuilder.Entity("Evaluation.DAL.Models.FormBuilder.FieldInfoType", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("BackendName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("CreateById")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreateDate")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("getdate()");
-
-                    b.Property<Guid?>("DeleteById")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("DeleteDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsActive")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(true);
-
-                    b.Property<bool>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false);
-
-                    b.Property<string>("NameAr")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NameEn")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("OrderNo")
-                        .HasColumnType("int");
-
-                    b.Property<Guid>("SystemModuleId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("UpdateById")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("UpdateDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreateById");
-
-                    b.HasIndex("DeleteById");
-
-                    b.HasIndex("SystemModuleId");
-
-                    b.HasIndex("UpdateById");
-
-                    b.ToTable("FieldInfoType");
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.FormBuilder.FieldPartyType", b =>
@@ -12375,11 +12306,6 @@ namespace Evaluation.DAL.Migrations
                         .HasForeignKey("EvalFormId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Evaluation.DAL.Models.FormBuilder.FieldInfoType", "FieldInfoType")
-                        .WithMany()
-                        .HasForeignKey("FieldInfoTypeId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("Evaluation.DAL.Models.FormBuilder.FieldType", "FieldType")
                         .WithMany()
                         .HasForeignKey("FieldTypeId")
@@ -12432,8 +12358,6 @@ namespace Evaluation.DAL.Migrations
                     b.Navigation("DropDownType");
 
                     b.Navigation("EvalForm");
-
-                    b.Navigation("FieldInfoType");
 
                     b.Navigation("FieldType");
 
@@ -12523,39 +12447,6 @@ namespace Evaluation.DAL.Migrations
                     b.Navigation("UpdateBy");
 
                     b.Navigation("dropDownType");
-                });
-
-            modelBuilder.Entity("Evaluation.DAL.Models.FormBuilder.FieldInfoType", b =>
-                {
-                    b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "CreateBy")
-                        .WithMany()
-                        .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "DeleteBy")
-                        .WithMany()
-                        .HasForeignKey("DeleteById")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Evaluation.DAL.Models.DepartementEntites.SystemModule", "SystemModule")
-                        .WithMany()
-                        .HasForeignKey("SystemModuleId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "UpdateBy")
-                        .WithMany()
-                        .HasForeignKey("UpdateById")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("CreateBy");
-
-                    b.Navigation("DeleteBy");
-
-                    b.Navigation("SystemModule");
-
-                    b.Navigation("UpdateBy");
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.FormBuilder.FieldPartyType", b =>

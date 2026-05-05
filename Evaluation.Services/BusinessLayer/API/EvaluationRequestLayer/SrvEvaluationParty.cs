@@ -156,7 +156,9 @@ namespace Evaluation.Services.BusinessLayer.API.EvaluationRequestLayer
 					r.CreateDate,
 					r.CreateBy,
 					r.UpdateDate,
-					r.Service
+					r.Service,
+					r.VisitDateFrom,
+					r.VisitDateTo
 				})
 				.ToListAsync();
 
