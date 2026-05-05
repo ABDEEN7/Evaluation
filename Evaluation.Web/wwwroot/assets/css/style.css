@@ -1656,3 +1656,43 @@ input.auto-fill {
     opacity: 0 !important;
     pointer-events: none !important;
 }
+
+.btn-with-text-icon i {
+    font-size: 16px;
+    font-family: var(--font-primary) !important;
+    font-weight: 500 !important;
+}
+
+    .btn-with-text-icon i::before {
+        font-family: "Line Awesome Free";
+        font-weight: 900;
+        font-size: 16px;
+        margin-inline-end: 6px;
+    }
+
+
+
+
+
+
+.filter-section .form-label {
+    margin-bottom: 6px;
+    white-space: nowrap;
+}
+
+.filter-section .btn {
+    height: 45px;
+    min-width: 90px;
+    white-space: nowrap;
+}
+
+.filter-section .form-control,
+.filter-section .form-select {
+    height: 45px;
+}
+
+@media (max-width: 991.98px) {
+    .filter-section .btn {
+        flex: 1;
+    }
+}
