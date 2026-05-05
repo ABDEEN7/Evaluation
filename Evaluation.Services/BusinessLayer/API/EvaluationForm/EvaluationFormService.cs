@@ -174,6 +174,14 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
         {
             throw new BusinessException(ConstantKeys.ExceptionMessage.Max_Final_Evaluation_Forms_Exceeded);
         }
+        if (message.IsFinalEval)
+        {
+            obj.HasOneValue = true;
+        }
+        else
+        {
+            obj.HasOneValue = message.HasOneValue;
+        }
         uow.GetRepository<EvalForm>().Insert(obj);
 
 
@@ -198,7 +206,6 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
             obj.FormEvalMatrixId = message.FormEvalMatrixId;
             obj.NameAr = message.NameAr;
             obj.NameEn = message.NameEn;
-            obj.HasOneValue = message.HasOneValue;
             obj.EvaluationPartyId = message.EvaluationPartyId;
             obj.HasEvaluation = message.HasEvaluation;
             obj.CalcMethodId = message.CalcMethodId;
@@ -212,6 +219,14 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
             else
             {
                 throw new BusinessException(ConstantKeys.ExceptionMessage.Final_Evaluation_Form_Limit);
+            }
+            if (message.IsFinalEval)
+            {
+                obj.HasOneValue = true;
+            }
+            else
+            {
+                obj.HasOneValue = message.HasOneValue;
             }
             uow.GetRepository<EvalForm>().Update(obj);
             await uow.CommitAsync();
@@ -280,6 +295,7 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
         obj.NoteRequired = message.NoteRequired;
         obj.DropDownTypeId = message.DropDownTypeId;
         obj.IsActive = message.IsActive;
+        obj.HasMuliEvaluation = message.HasMulitEvaluation;
 
         uow.GetRepository<FormItem>().Insert(obj);
         //insert values to FormItemRelated
@@ -329,6 +345,7 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
             obj.NoteRequired = message.NoteRequired;
             obj.DropDownTypeId = message.DropDownTypeId;
             obj.IsActive = message.IsActive;
+            obj.HasMuliEvaluation = message.HasMulitEvaluation;
             uow.GetRepository<FormItem>().Update(obj);
             //update values to FormItemRelated
             List<FormItemRelated> objFormItemRelateddelete = await uow.GetRepository<FormItemRelated>()
