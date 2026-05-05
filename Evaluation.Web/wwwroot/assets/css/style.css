@@ -173,7 +173,7 @@ a, a:hover {
     border: 1px solid #6B728050 !important;
     border-radius: 4px;
     font-size: 25px;
-    font-weight: 700;
+    font-weight: 600;
     padding: 0.16rem 0.9rem;
     width: fit-content;
 }
@@ -1618,4 +1618,32 @@ main {
     font-size: 16px;
 }
 
+.btn-close-custom {
+    background-color: #fff !important;
+    color: #3d3d3d !important;
+    font-size: 40px !important;
+    border: #fff !important;
+}
 
+.soft-gray-bg {
+    background-color: #6B728020 !important;
+    border-radius: 4px;
+    padding: 0.3rem 0.5rem;
+}
+
+
+.btn-close-custom i {
+    font-size: 30px;
+    font-weight: 700;
+    -webkit-text-stroke: 0.7px;
+}
+
+
+.btn-close-custom {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: none;
+    background: transparent;
+}

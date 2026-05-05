@@ -104,41 +104,86 @@
 
 <div class="modal fade" id="evaluationRequestDetailsModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-fullscreen modal-dialog-scrollable">
-        <div class="modal-content">
+        <div class="modal-content p-4">
 
-            <div class="modal-header align-items-start border-0 justify-content-between">
+            @* <div class="modal-header border-0">
                
-                    <div>
-                    <h4 class="fw-bold m-0" id="breadcrumbSchoolName"></h4>
+                    <div class="d-flex gap-2">
+                    <button type="button" class="btn-close-custom" data-bs-dismiss="modal" aria-label="Close">
+                        <i class="las la-angle-left"></i>
+                    </button>
+                    <h4 class="fw-bold m-0 align-content-center" id="breadcrumbSchoolName"></h4>
 
-                        <nav aria-label="breadcrumb">
-                            <ol class="breadcrumb">
-                                <li class="breadcrumb-item">
-                                <a href="#" id="evaluationRequeststatus">مدرسة</a>
-                                </li>
-                                <li class="breadcrumb-item active" aria-current="page">
-                                    رقم الطلب:
-                                    <strong id="evaluationRequestNoText"></strong>
-                                </li>
-                            </ol>
-                        </nav>
                     </div>
+                    <br/>
+                    <br/>
+                  
 
-                    <div class="d-flex justify-content-end align-items-center gap-3">
-                            <div class="dropdown" id="actions-container"></div>
 
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
-                                <i class="la la-close mt-1"></i>
-                            </button>
-                        </div>
+                    <div>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item">
+                                <a href="#" id="evaluationRequeststatus">مدرسة</a>
+                            </li>
+                            <li class="breadcrumb-item active" aria-current="page">
+                                رقم الطلب:
+                                <strong id="evaluationRequestNoText"></strong>
+                            </li>
+                        </ol>
+                    </nav>
+                    </div>
+                  
+
+                 
+                    <div class="dropdown" id="actions-container"></div>
+
+                          
+               
                    
                 
+            </div> *@
+
+
+
+
+            <div class="modal-header border-0 flex-column align-items-start">
+
+
+
+                <!-- Top row (close + title) -->
+                <div class="d-flex align-items-center w-100">
+                    <button type="button" class="btn-close-custom me-3" data-bs-dismiss="modal" aria-label="Close">
+                        <i class="las la-angle-left"></i>
+                    </button>
+
+
+
+                    <h4 class="fw-bold m-0" id="breadcrumbSchoolName"></h4>
+                </div>
+
+
+
+                <!-- Breadcrumb UNDER title -->
+                <nav aria-label="breadcrumb" class="my-3 w-100">
+                    <ol class="breadcrumb mb-0">
+                        <li class="breadcrumb-item">
+                            <a href="#" id="evaluationRequestStatus">الطلبات</a>
+                        </li>
+                        <li class="breadcrumb-item active" aria-current="page">
+                            <strong id="evaluationRequestNoText"></strong>
+                        </li>
+                    </ol>
+                </nav>
+
+
+
             </div>
 
             <div class="modal-body py-0">
 
-                <div class="card card-table mb-4">
-                    <div class="card-body">
+              
+                    
 
                         <div class="accordion" id="customAccordion">
 
@@ -195,8 +240,8 @@
 
                         </div>
 
-                    </div>
-                </div>
+                    
+               
 
             </div>
 
