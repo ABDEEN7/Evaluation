@@ -9,5 +9,6 @@ public class EvaluationRequestCalenderDto
     public string End { get; set; }
     public string? Color { get; set; } = "#8a1538";
     public string? Source { get; set; }
+    public string? Url { get; set; }
     public Guid ParentId { get; set; }
 }

@@ -1,12 +1,12 @@
 ﻿// ==============================
 // API Endpoints
 // ==============================
-const API = {
+const GET_FORMS_API = {
     getItems: (depRoutePath, formId) =>
         `/Form/${depRoutePath}/GetItems?formId=${formId}`,
 
     getMatrixValues: (depRoutePath, formId) =>
-        `/Form/${depRoutePath}/GetFormEvalMarixValues?formId=${formId}`
+        `/Form/${depRoutePath}/GetFormEvalMarixValues?formId=${formId}`,
 };
 
 // ==============================
@@ -34,6 +34,8 @@ const ItemPropertyType = Object.freeze({
     SELECT: 1,
     NOTE: 2
 });
+
+let evalForm;
 
 // ==============================
 // Utilities
@@ -101,7 +103,14 @@ const generateFormAccordionItem = (rowsHtml, hasAnyNote, hasAnyChildren, fieldId
                     ${rowsHtml}
                 </tbody>
             </table>
-            ${allowAdd ?`<div><button type="button" onclick="addNewRow(this)" class="btn btn-sm add-btn"><i class="la la-plus"></i> Add New</button></div>`:''}
+            ${allowAdd ? `<div><button type="button" onclick="addNewRow(this)" class="btn btn-sm add-btn"><i class="la la-plus"></i> Add New</button></div>` : ''}
+           
+<div id="${fieldId}-result-div" class="d-none bg-primary d-flex justify-content-between align-items-center py-2">
+  <div class="text-white">Result:</div>
+  <div class="text-white" id="${fieldId}-result-value"></div>
+</div>
+           
+           </div>
         </div>
     </div>
 </div>
@@ -391,9 +400,10 @@ function buildHorizontalTable(data) {
 const generateFullFormPageHtml = async ({ formId, fieldId, readOnly, allowRename, allowDelete, allowAdd, namingResult = null }) => {
 
     itemsResult = await jqClient().Get(
-        API.getItems(depRoutePath, formId)
+        GET_FORMS_API.getItems(depRoutePath, formId)
     );
 
+    evalForm = itemsResult?.value.evalForm;
     let items = itemsResult?.value.items ?? [];
 
     if (readOnly) {
@@ -492,7 +502,7 @@ const relatedItemPopup = (rowsHtml) => `<div class="modal fade" id="RealatedItem
 async function initializeControls(formId, fieldId, controlValues) {
 
     const matrixResponse = await jqClient().Get(
-        API.getMatrixValues(depRoutePath, formId)
+        GET_FORMS_API.getMatrixValues(depRoutePath, formId)
     );
 
     const items = itemsResult?.value ?? [];
