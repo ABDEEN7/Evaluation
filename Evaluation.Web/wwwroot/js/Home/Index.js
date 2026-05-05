@@ -116,7 +116,9 @@ function renderDepartmentsTable(departments) {
                 <div class="card-body">
                     <div class="card-link"><a href="#">${item.name}</a></div>
                     <div class="main-card">
-                        <div class="card-icon shadow-sm"><i class="la la-star"></i></div>
+                        <div class="card-img shadow-sm">
+                            <img src="${item.imgBlobUrl ?? '/assets/img/login-bg.png'}" alt="Department Four" class="card-img">
+                        </div>
                         <div class="card-content">
                             <h5 class="card-title">${item.name}</h5>
                             <p class="card-text text-muted">${item.desc ?? ''}</p>
