@@ -3,6 +3,7 @@ using Evaluation.DAL.Dtos.Form;
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.FormsModules;
 using Evaluation.DAL.Repositories;
+using Evaluation.Services.Enums;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Dtos.EvalFormDto;
 using Evaluation.SharedHelper.Dtos.Form;
@@ -272,4 +273,36 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
 
         return mapper.Map<List<FormEvalMarixValueDto>>(formEvalMatrixValues);
     }
+
+    public async Task<Result<CalculationFormResult>> CalculateFormResult(FormEvaluationDto formEvaluationDto)
+    {
+        var evalForm = await formService.GetEvalForm(formEvaluationDto.Id, IncludeCalcMethod: true);
+        var formEvalMatrixValues = await formService.GetFormEvalMatrixValues(evalForm.FormEvalMatrixId);
+
+        CalculationFormResult result = new();
+
+        switch (evalForm.CalcMethod.BackendName)
+        {
+            case CalcMethodsEnum.AVERAGE:
+
+                decimal total = 0;
+                foreach (var item in formEvaluationDto.Items)
+                {
+                    total += item.Value;
+                }
+
+                result.Value = total / formEvaluationDto.Items.Count;
+
+                result.Name = formEvalMatrixValues.Where(v => v.MinValue <= result.Value && v.MaxValue >= result.Value).Select(v => v.NameAr).FirstOrDefault();
+
+                break;
+            case CalcMethodsEnum.SUM:
+                break;
+            case CalcMethodsEnum.WithoutCalc:
+                break;     
+        }
+
+        return result;
+    }
+
 }

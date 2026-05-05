@@ -1,7 +1,7 @@
 ﻿// ==============================
 // API Endpoints
 // ==============================
-const API = {
+const SUBMIT_FORM_API = {
     calculateEvaluationResult: (departmentPath) =>
         `/Form/${departmentPath}/CalculateEvaluationFormResult`,
 
@@ -36,7 +36,7 @@ function evaluationFormResult(formId) {
         const mainObj = {
             id: mainId,
             valueId: selectedValue,
-            //value: selectedValue,
+            value: $("option:selected", select).text(),
             note: note,
             subItems: []
         };
@@ -60,7 +60,7 @@ function evaluationFormResult(formId) {
             mainObj.subItems.push({
                 id: childId,
                 valueId: childValue,
-                //value: selectedValue,
+                value: $("option:selected", select).text(),
                 note: childnote
             });
         });
@@ -76,7 +76,6 @@ function evaluationFormResult(formId) {
         id: formId,
         items: mainItems,
         formSettings: evalForm,
-        //results:,
     };
 
     console.log("FINAL NESTED JSON:", payload);
@@ -85,24 +84,26 @@ function evaluationFormResult(formId) {
 }
 async function evaluationFormWithCalculationResult(formId) {
     var result = evaluationFormResult(formId);
+    var calculation = await calculate(result);
     var finalResult = {
         id: result.id,
         items: result.items,
         formSettings: result.formSettings,
-        results: await calculate(formId),
+        results: calculation.value,
     };
 
     console.log(finalResult);
+
+    $(`#${P_fieldId}-result-value`).text(`${finalResult.results.name}/${finalResult.results.value}`);
+    $(`#${P_fieldId}-result-div`).removeClass("d-none");
+
     return finalResult;
 
-
 }
-async function calculate(formId) {
-    var result = evaluationFormResult(formId);
-
+async function calculate(result) {
     return new Promise((resolve, reject) => {
         jqClient().Post(
-            API.calculateEvaluationResult(depRoutePath)
+            SUBMIT_FORM_API.calculateEvaluationResult(depRoutePath)
             , result)
         .done((res) => {
             console.log(res);
@@ -116,7 +117,7 @@ async function calculate(formId) {
 function validateForm(formId) {
     var result = evaluationFormResult(formId);
     jqClient().Post(
-        API.validateEvaluationForm(depRoutePath)
+        SUBMIT_FORM_API.validateEvaluationForm(depRoutePath)
         , result)
         .done((res) => {
 
@@ -170,7 +171,7 @@ function renameFormItems(formId) {
 function submitForm(formId) {
     var result = evaluationFormResult(formId);
     jqClient().Post(
-        API.saveEvaluationForm(depRoutePath)
+        SUBMIT_FORM_API.saveEvaluationForm(depRoutePath)
         , result)
         .done((res) => {
             Swal.fire({

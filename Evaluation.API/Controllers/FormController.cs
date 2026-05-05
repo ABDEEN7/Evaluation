@@ -9,6 +9,7 @@ using Evaluation.SharedHelper.Dtos.Shared;
 using Evaluation.SharedHelper.Enums;
 using FluentResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.SqlServer.Server;
 
 namespace Evaluation.API.Controllers;
 
@@ -65,7 +66,9 @@ public class FormController : ControllerBase
     [HttpPost]
     public async Task<Result<CalculationFormResult>> CalculateEvaluationFormResult([FromBody] FormEvaluationDto formEvaluation)
     {
-        return new CalculationFormResult() { };
+
+        return await _masterBl.GetApiService<FormBL>().CalculateFormResult(formEvaluation);
+
     }
 
 }
