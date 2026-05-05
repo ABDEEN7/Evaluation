@@ -29,7 +29,8 @@ public class DepartmentBL(IServiceScopeFactory serviceScopeFactory, CacheDataPro
 
         var departments = await departmentService.GetDepartmentsByWebGroupId(webGroup.Id);
 
-        return mapper.Map<List<DepartmentDto>>(departments);
+        return mapper.Map<List<DepartmentDto>>(departments, opts => opts.Items["lang"] = requestInfo.Lang);
+
     }
 
     public async Task<DepartmentDto> GetDepartmentByRoutingPath(string routingPath, string lang = "ar")

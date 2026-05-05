@@ -1,0 +1,58 @@
+﻿@using Evaluation.SharedHelper.Enums
+@{
+    Layout = "_Layout";
+}
+
+
+<!-- Banner Section -->
+<section class="banner p-0 ">
+    <div class="swiper mySwiper">
+        <div class="swiper-wrapper" id="banner-swiper-wrapper">
+            <div class="swiper-pagination"></div>
+
+        </div>
+    </div>
+    <div class="swiper-button-prev"></div>
+    <div class="swiper-button-next"></div>
+</section>
+<section>
+    <div class="container">
+        <div class="row mb-3">
+            <div class="col-md-9">
+                <h4 class="fw-bold mb-3">@ConstantKeys.WebAppPages.FormEducationalEntitiesTitle</h4>
+                <p>@ConstantKeys.WebAppPages.EducationalEntitiesDescription </p>
+            </div>
+            <div class="col-md-3 text-md-end mt-3 mt-md-0">
+                <!-- Single Toggle Buttons -->
+                <div class="btn-group toggle-btns" role="group">
+                    <button class="btn toggle-btn active" data-view="card">
+                        <i class="las la-border-all"></i>
+                    </button>
+                    <button class="btn toggle-btn" data-view="list">
+                        <i class="las la-list-ul"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <!-- Bootstrap Tabs -->
+                <ul class="nav nav-tabs mb-4 row g-0" id="viewTabs" role="tablist">
+                </ul>
+
+                <!-- Tab Content -->
+                <div class="tab-content" id="viewTabsContent">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        const webgroup = "@ViewBag.Webgroup";
+    </script>
+    <script src="~/assets/vendor/swiper/swiper-bundle.min.js" asp-append-version="true"></script>
+    <script src="~/js/TemplateForm/index.js"></script>
+}

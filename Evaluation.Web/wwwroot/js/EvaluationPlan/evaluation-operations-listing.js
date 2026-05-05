@@ -136,14 +136,14 @@
         }
     });
 
-    function openEvaluationRequestDetails(requestId) {
+    window.openEvaluationRequestDetails = function (requestId) {
         const options = {
             success: function (response) {
 
                 formUtility.attachments = response.attachments || [];
                 $('#evaluationRequeststatus').text(response.status || '');
                 $('#evaluationRequestNoText').text(response.requestNumber || '');
-               
+
                 $('#breadcrumbSchoolName').text((window.currentLang === "ar" ? response.school.nameAr : response.school.nameEn) || '');
                 $('#evaluationRequestDetailsModal').modal('show');
 
@@ -166,13 +166,12 @@
                 //formUtility.addQueryParameter('serviceId', response.serviceId)
                 if (response.isNdaApprovalPending) {
                     const container =
-                        document.getElementById('NDAContainerDiv') ;
+                        document.getElementById('NDAContainerDiv');
 
                     container.insertAdjacentHTML('afterbegin', generateNdaApprovalDiv());
                     NdaSubmit(response, requestId);
                 }
-                else
-                {
+                else {
                     renderEvaluationPartiesSection(response, requestId);
                 }
 
@@ -181,7 +180,7 @@
         };
 
         jqClient(options).Get(`/ServiceRequest/${DepartmentRouting}/GetEvaluationDetails?requestId=${requestId}`);
-    }
+    };
     function bindSchoolDetails_old(response) {
         const s = response && response.school ? response.school : null;
         if (!s) return;

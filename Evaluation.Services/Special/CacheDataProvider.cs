@@ -14,8 +14,6 @@ using Evaluation.SharedHelper.Models.Api.ActionEntitiesDTOs;
 using Evaluation.SharedHelper.Models.Api.ProfileDTO;
 using Evaluation.SharedHelper.Models.Api.ServiceDTOs;
 using Evaluation.SharedHelper.Models.Api.TemplatesDTO;
-using Mapster;
-using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -33,13 +31,15 @@ namespace Evaluation.Services.Special
         private readonly UnitOfWork uow;
         private readonly IServiceScopeFactory serviceScopeFactory;
         private readonly ILogger<CacheDataProvider> logger;
+		private readonly IMapper mapper;
         public CacheDataProvider(CacheManager cacheManager, UnitOfWork uow, 
-            IServiceScopeFactory serviceScopeFactory, ILogger<CacheDataProvider> logger)
+            IServiceScopeFactory serviceScopeFactory, ILogger<CacheDataProvider> logger, IMapper mapper)
         {
             this.cacheManager = cacheManager;
             this.uow = uow;
             this.serviceScopeFactory = serviceScopeFactory;
             this.logger = logger;
+            this.mapper = mapper;
         }
 
         // -------------------------- Utility Methods -------------------------- //
@@ -215,7 +215,7 @@ namespace Evaluation.Services.Special
 				using var scopedUow = serviceScopeFactory.CreateScopedUow();
 				var repo = scopedUow.GetRepository<EmailProfile>();
 				var list = await repo.GetAllActiveNonDeleted().ToListAsync();
-				return list.Adapt<List<EmailProfileDTO>>();
+				return mapper.Map<List<EmailProfileDTO>>(list);
 			});
 		}
 
@@ -231,7 +231,7 @@ namespace Evaluation.Services.Special
 				using var scopedUow = serviceScopeFactory.CreateScopedUow();
 				var repo = scopedUow.GetRepository<SMSProfile>();
 				var list = await repo.GetAllActiveNonDeleted().ToListAsync();
-				return list.Adapt<List<SMSProfileDTO>>();
+				return mapper.Map<List<SMSProfileDTO>>(list);
 			});
 		}
 
@@ -247,7 +247,7 @@ namespace Evaluation.Services.Special
 				using var scopedUow = serviceScopeFactory.CreateScopedUow();
 				var repo = scopedUow.GetRepository<EmailTemplate>();
 				var list = await repo.GetAllActiveNonDeleted().ToListAsync();
-				return list.Adapt<List<EmailTemplateDTO>>();
+				return mapper.Map<List<EmailTemplateDTO>>(list);
 			});
 		}
 
@@ -263,7 +263,7 @@ namespace Evaluation.Services.Special
 				using var scopedUow = serviceScopeFactory.CreateScopedUow();
 				var repo = scopedUow.GetRepository<SMSTemplate>();
 				var list = await repo.GetAllActiveNonDeleted().ToListAsync();
-				return list.Adapt<List<SMSTemplateDTO>>();
+				return mapper.Map<List<SMSTemplateDTO>>(list);
 			});
 		}
 
@@ -284,7 +284,7 @@ namespace Evaluation.Services.Special
 									 .Include(c => c.Service)
 									 .ToListAsync();
 
-				return list.Adapt<List<ServiceStatusConfigurationDTO>>();
+				return mapper.Map<List<ServiceStatusConfigurationDTO>>(list);
 			});
 		}
 

@@ -88,7 +88,7 @@ namespace Evaluation.API.Middlewares
         {
             "ServiceRequest",
             "FormRender",
-            "Evaluation",
+            "TemplateForm",
             "EvaluationRequest",
             "Form",
             "School",

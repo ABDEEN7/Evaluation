@@ -17,6 +17,7 @@ namespace Evaluation.DAL.Models.ServiceRequestEntities
 		public Field? Field { get; set; }
 		public string? Value { get; set; }
 		public bool? IsMissing { get; set; }
+		public bool? IsAPI { get; set; }
 		public bool IsApproved { get; set; }
 	}
 	

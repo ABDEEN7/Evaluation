@@ -10,6 +10,9 @@ namespace Evaluation.DAL.Models.FormsModules
         public string NameEn { get; set; } = null!;
 
         public bool IsOption { get; set; }
+        public bool HasNote { get; set; }
+        public bool NoteRequired { get; set; }
+        public int OrderNo { get; set; }
 
         public Guid? DropDownTypeId { get; set; }
         public string? DropDownType { get; set; }
