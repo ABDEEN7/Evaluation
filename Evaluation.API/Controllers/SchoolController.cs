@@ -53,9 +53,9 @@ public class SchoolController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<List<HROrganizationInfoDto>> GetAllHRSchoolsAsync(int page)
+    public async Task<List<HROrganizationInfoDto>> GetAllHRSchoolsAsync()
     {
-        return await _hrService.GetAllHRSchoolsAsync(page);
+        return await _hrService.GetAllHRSchoolsAsync();
     }
 
     [HttpGet]
