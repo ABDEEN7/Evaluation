@@ -89,21 +89,32 @@
         },
 
         columns: [
-            {
-                data: "name",
-                className: "td-left py-1",
-                render: function (data) {
-                    return `
-                    <div class="plan-title-row">
-                    <i class="las la-file-signature card-only-icon title-icon"></i>
-                    <div>
+           {
+    data: "name",
+          className: "td-left py-1",
+          render: function(data, type, row) {
+                const isApproved = row.statusCode === "Approved";
+                return `
+                    <div class="plan-title-row mb-3">
+ 
+                        <i class="las la-file-signature card-only-icon title-icon"></i>
+ 
+                        <span class="plan-text-wrap px-2">
                     <span class="card-only-label title-label">Plan: </span>
                     <span class="plan-title-text">${data || ""}</span>
-                    </div>
+                    </span>
+ 
+                        ${isApproved ? `
+                    <span class="request-status approved-status mx-2 p-1">
+                    <i class="las la-check"></i>
+                                ${row.statusCode}
+                    </span>
+                        ` : ''}
+ 
                     </div>
                     `;
-                }
-            },
+                              }
+                        },
             {
                 data: "countSchools",
                 className: "td-left py-1",
@@ -127,29 +138,6 @@
                 }
             },
             {
-                data: "statusCode",
-                className: "td-right p-1",
-                render: function (data) {
-                    return `<span class="request-status w-100 mt-3 py-1">${data || ""}</span>`;
-                }
-            },
-            {
-                data: null,
-                orderable: false,
-                className: "td-center p-1",
-                render: function (data, type, row) {
-                    return `
-                <button
-                    type="button"
-                    class="btn btn-sm btn-secondary view-plan w-100 mt-1 p-2"
-                    data-plan-id="${row.id}"
-                    onclick="InitializePlanDetails('${row.id}'); return false;">
-                    عرض
-                </button>
-            `;
-                }
-            },
-            {
                 data: 'services',
                 className: "td-full p-0 process",
                 title: uiControlsSetup().GetUiControlText('lblActions'),
@@ -164,18 +152,18 @@
                     let actionsHtml = `<div class="dropdown d-block w-100 p-1">`;
 
                     actionsHtml += `
-            <button
-                class="btn dropdown-toggle w-100 btn-primary mt-1 py-2"
-                type="button"
-                id="${dropdownId}"
-                data-bs-toggle="dropdown"
-                aria-haspopup="true"
-                aria-expanded="false"
-                onclick="event.stopPropagation();"
-            >
-                <span>${uiControlsSetup().GetUiControlText('lblProcedures')}</span>
-            </button>
-        `;
+                                <button
+                                    class="btn dropdown-toggle w-100 btn-primary mt-1 py-2"
+                                    type="button"
+                                    id="${dropdownId}"
+                                    data-bs-toggle="dropdown"
+                                    aria-haspopup="true"
+                                    aria-expanded="false"
+                                    onclick="event.stopPropagation();"
+                                >
+                                    <span>${uiControlsSetup().GetUiControlText('lblProcedures')}</span>
+                                </button>
+                            `;
 
                     actionsHtml += `<div class="dropdown-menu w-100" aria-labelledby="${dropdownId}" onclick="event.stopPropagation();">`;
 
@@ -215,10 +203,15 @@
 
         ],
 
-        //onRowClick: function (rowData, e) {
-        //    if (e && $(e.target).closest('.dropdown, .dropdown-menu, .create-plan-request').length) return;
-        //    openPlanDetails(rowData.id);
-        //}
+        onRowClick: function(rowData, e) {
+
+          // prevent dropdown clicks from opening details
+          if ($(e.target).closest('.dropdown, .dropdown-menu, .dropdown-item').length) {
+                return;
+          }
+          InitializePlanDetails(rowData.id);
+    }
+
     });
 
     /* =========================
