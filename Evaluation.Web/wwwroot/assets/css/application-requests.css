@@ -603,7 +603,7 @@ table#requesttable.dataTable thead th.card-img {
 .application-request .requeststableBody .request-status {
     font-size: 0.9rem;
     font-weight: 700;
-    background-color: #D8F4DD70;
+    background-color: #D8F4DD;
     color: #0E6B32;
     border-radius: 4px;
     display: inline-block;
