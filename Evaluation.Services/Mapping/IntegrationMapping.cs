@@ -25,6 +25,9 @@ public static class IntegrationMapping
             Email = reader["email"]?.ToString(),
             ManagerEngName = reader["ManagerNameE"]?.ToString(),
             ManagerAraName = reader["ManagerNameA"]?.ToString(),
+            SchoolEmail = reader["Email_SCHOOL"]?.ToString(),
+            Phone = reader["TEL1"]?.ToString(),
+            Mobile = reader["TEL2"]?.ToString(),
         };
     }
 

@@ -398,23 +398,21 @@ public class HRService : ApiBase
                 obj.NameAr = school.OrgDescA;
                 obj.NameEn = school.OrgDescE;
                 obj.OrgTypeId = orgtypeid;
-                //obj.OrgClassId = message.OrgClassId;
+                obj.OrgClassId = new Guid("3a1dac48-3d50-45a4-a1e9-10000c73a5b2");
                 obj.EstablishmentDate = today;
-                //obj.TypeId = message.TypeId;
+                obj.TypeId = new Guid("11111111-1111-1111-1111-111111111111");
                 obj.ManagerQID = school.ManagerIdNo;
                 obj.ManageEmail = school.Email;
-                obj.OrgEmail = school.Email;
+                obj.OrgEmail = school.SchoolEmail;
                 obj.Address = school.Address;
-                //obj.Phone = school.Phone;//IS NOT EXIST IN HR & NSIS
-                //obj.Mobile = message.Mobile;//IS NOT EXIST IN HR & NSIS
-                //obj.Code = message.Code;//IS NOT EXIST IN HR & NSIS
-                //obj.Region = message.Region;//IS NOT EXIST IN HR & NSIS
-
+                obj.Phone = school.Phone;
+                obj.Mobile = school.Mobile;
                 obj.IsAccredited = false;
                 obj.SupportIdentity = false;
                 obj.AcceditedDate = today;
                 obj.SupportIdentityDate = today;
                 obj.IsActive = true;
+                obj.HrCode = school.OrgNo;
 
                 schools.Add(obj);
             }
