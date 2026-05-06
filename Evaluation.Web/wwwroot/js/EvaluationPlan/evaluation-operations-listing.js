@@ -84,13 +84,13 @@
                 render: function (data, type, row) {
 
                     if (row.StatusISOPen === false) {
-                        return ` <span class="badge bg-success-light ms-auto me-2 fw-semibold br-0">
+                        return ` <span class="badge bg-success-light me-2 fw-semibold br-0">
                                     <i class="la la-check fs-14"></i>
                                     مكتمل
                                 </span>`;
                     }
                     else
-                        return `<span class="badge bg-danger-light ms-auto me-2 fw-semibold br-0">
+                        return `<span class="badge bg-danger-light me-2 fw-semibold br-0">
                             <i class="las la-times fs-14"></i>
                             غير مكتمل
                         </span>`;
@@ -128,28 +128,7 @@
                 title: uiControlsSetup().GetUiControlText("lblRequestCreatedTime"),
                 className: "td-right bg-grey justify-content-end"
             },
-
-            {
-                data: null,
-                title: uiControlsSetup().GetUiControlText("lblActions") || "",
-                orderable: false,
-                searchable: false,
-                className: "td-full",
-                render: function (data, type, row) {
-
-                    return `
-            <div class="d-flex justify-content-center gap-1">
-
-                <button class="btn btn-outline-primary btn-sm"
-                        title="تصفح عملية التقييم"
-                        onclick="openEvaluation('${row.Id}')">
-                    <i class="la la-arrow-left"></i>
-                </button>
-
-            </div>
-        `;
-                }
-            }
+            
         ],
 
         onRowClick: function (rowData) {
@@ -194,6 +173,7 @@
                 }
                 else {
                     renderEvaluationPartiesSection(response, requestId);
+                    window.openRequestsModule.render(response.evaluationParties || []);
                 }
 
                 bindSchoolDetails(response);
@@ -202,53 +182,7 @@
 
         jqClient(options).Get(`/ServiceRequest/${DepartmentRouting}/GetEvaluationDetails?requestId=${requestId}`);
     };
-    function bindSchoolDetails_old(response) {
-        const s = response && response.school ? response.school : null;
-        if (!s) return;
-
-        const $root = $("#school-details-container");
-
-        const formatDate = (val) => {
-            if (!val) return "";
-            const d = new Date(val);
-            if (isNaN(d.getTime())) return val;
-            const dd = String(d.getDate()).padStart(2, "0");
-            const mm = String(d.getMonth() + 1).padStart(2, "0");
-            const yyyy = d.getFullYear();
-            return `${dd}-${mm}-${yyyy}`;
-        };
-
-        const schoolName =
-            (window.currentLang === "ar" ? s.nameAr : s.nameEn) ||
-            s.nameAr ||
-            s.nameEn ||
-            "";
-
-        $root.find("#schoolName").text(schoolName);
-
-        $root.find("#managerName").text(s.managerQID || "");
-        $root.find("#establishmentDate").text(formatDate(s.establishmentDate));
-        $root.find("#teachers").text(s.teachersCount ?? s.teachers ?? "-");
-        $root.find("#students").text(s.studentsCount ?? s.students ?? "-");
-
-        const phone = s.phone || s.mobile || "";
-        $root.find("#phone").text(phone).attr("href", phone ? `tel:${phone}` : "#");
-
-        const email = s.orgEmail || s.manageEmail || "";
-        $root.find("#email").text(email).attr("href", email ? `mailto:${email}` : "#");
-
-        $root.find("#address").text(s.address || "");
-
-        $root.find("#currentRating").text(s.rating ?? "-");
-        $root.find("#currentRatingDate").text(
-            s.lastEvaluationDate ? formatDate(s.lastEvaluationDate) : ""
-        );
-
-        $root.find("#previousRating").text(response.previousRating ?? "-");
-        $root.find("#previousRatingDate").text(
-            response.previousRatingDate ? formatDate(response.previousRatingDate) : ""
-        );
-    }
+  
     function bindSchoolDetails(response) {
         const $root = $("#school-details-container");
         const s = response.school || {};

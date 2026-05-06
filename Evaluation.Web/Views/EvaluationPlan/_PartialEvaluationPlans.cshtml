@@ -9,38 +9,59 @@
         padding-bottom: 0.5rem !important;
     }
 </style>
-<div class="filter-section g-3 align-item-end">
-    <div class="row p-2 m-2">
-        <form id="plan-filter-form-id">
-            <div class="row g-3">
-                <div class="col-lg-5 col-sm-12">
-                    <label class="mb-2 @ConstantKeys.EvaluationPlans.AcademicYear"></label>
-                    <select id="planYearFilter" class="form-select">
-                        <option value="" class="@ConstantKeys.EvaluationPlans.All"></option>
-                    </select>
-                </div>
-                <div class="col-lg-5 col-sm-12 mb-sm-4">
-                    <label class="mb-2 @ConstantKeys.EvaluationPlans.SchoolName"></label>
-                    <input type="text" id="schoolName" class="form-control" />
+
+
+
+
+<div class="filter-section m-4">
+    <form id="plan-filter-form-id">
+        <div class="row g-3 align-items-end">
+
+            <div class="col-lg-4 col-md-6 col-sm-12">
+                <label class="form-label @ConstantKeys.EvaluationPlans.AcademicYear"></label>
+                <select id="planYearFilter" class="form-select w-100">
+                    <option value="" class="@ConstantKeys.EvaluationPlans.All"></option>
+                </select>
+            </div>
+
+            <div class="col-lg-4 col-md-6 col-sm-12">
+                <label class="form-label @ConstantKeys.EvaluationPlans.SchoolName"></label>
+                <input type="text" id="schoolName" class="form-control" />
+            </div>
+
+            <div class="col-lg-4 col-md-12 col-sm-12">
+                <div class="d-flex gap-2 justify-content-lg-end justify-content-md-end justify-content-start flex-wrap">
+                    <button id="filterPlanBtnId"
+                                                       type="button"
+                                                       class="btn btn-primary @ConstantKeys.EvaluationPlans.Search">
+                    </button>
+
+
+
+                    <button id="clearFilterPlanBtnId"
+                                                       type="button"
+                                                       class="btn btn-outline-secondary @ConstantKeys.EvaluationPlans.Clear">
+                    </button>
                 </div>
             </div>
-        </form>
-        <div class="col-lg-2 col-sm-12 d-flex align-items-end justify-content-end align-self-center ms-auto gap-2">
-            <button id="filterPlanBtnId" class="btn btn-primary @ConstantKeys.EvaluationPlans.Search"></button>
-            <button id="clearFilterPlanBtnId" class="btn btn-outline-secondary @ConstantKeys.EvaluationPlans.Clear"></button>
+
         </div>
-    </div>
+    </form>
 </div>
+
+
+
+
 <div class="btn-group m-4" role="group" aria-label="View mode">
-    <button id="cardViewEvaluationPlans" type="button" class="btn btn-outline-primary active">
+    <button id="cardViewEvaluationPlans" type="button" class="btn btn-outline-primary active btn-with-text-icon">
         <i class="la la-th-large @ConstantKeys.WebAppCommon.lblDisplayAsCards"></i>
     </button>
-    <button id="tblViewEvaluationPlans" type="button" class="btn btn-outline-secondary">
+    <button id="tblViewEvaluationPlans" type="button" class="btn btn-outline-secondary btn-with-text-icon">
         <i class="la la-list @ConstantKeys.WebAppCommon.lblDisplayAsTable"></i>
     </button>
 </div>
-<div class="row p-4">
-    <div class="col-md-12">
+<div class="row m-4">
+    <div class="col-md-12 m-0 p-0">
         <table class="table table-striped table-bordered w-100 application-request card" id="evaluationPlansTable">
             <thead>
                 <tr>

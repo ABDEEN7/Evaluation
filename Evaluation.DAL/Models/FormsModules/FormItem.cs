@@ -12,9 +12,7 @@ public class FormItem : EntityBase, IAuditLogEntity
     public string NameEn { get; set; } = null!;
     public decimal Min { get; set; } = 0;
     public decimal Max { get; set; } = 0;
-    public bool IsEvaluation{ get; set; }
-    public decimal Weight { get; set; } = 0;
-    
+    public decimal Weight { get; set; } = 0;    
     public Guid ScopeId { get; set; }
     public Scope? Scope { get; set; }
     public Guid? DropDownTypeId { get; set; } // if activate Min Max or not and if mkae questioning or not

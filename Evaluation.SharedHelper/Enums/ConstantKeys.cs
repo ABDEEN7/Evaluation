@@ -247,8 +247,12 @@ public static class ConstantKeys
 
 
     }
-
-    public static class AdminBackendUI
+    public static class WebsiteSettings
+    {
+        public static readonly string PictureProfileSizeAllow = "PictureProfileSizeAllow";
+        public static readonly string PictureProfileExtensions = "PictureProfileExtensions";
+    }
+		public static class AdminBackendUI
     {
         public static readonly string ADMIN_MSG_FILE_SIZE = "ADMIN_MSG_FILE_SIZE";
         public static readonly string VALID_UPLOAD_TYPE = "VALID_UPLOAD_TYPE";
@@ -1055,7 +1059,30 @@ public static class ConstantKeys
         public static readonly string DefaultWebsiteBannerImage = "DefaultWebsiteBannerImage";
     }
 
-    public static class WebAppCommon
+    public static class WebHomePage
+    {
+    }
+	public static class WebAppUserProfilePage
+	{
+		// TO DO ADD IN UI CONTROLS
+		public static readonly string lblEmail = "lblEmail";
+		public static readonly string lblQID = "lblQID";
+		public static readonly string lblFullNameEn = "lblFullNameEn";
+		public static readonly string lblFullNameAr = "lblFullNameAr";
+		public static readonly string lblLastLoginDate = "lblLastLoginDate";
+		public static readonly string lblMobile = "lblMobile";
+		public static readonly string lblSecondMobile = "lblSecondMobile";
+		public static readonly string lblOccupation = "lblOccupation";
+		public static readonly string lblNationality = "lblNationality";
+		public static readonly string lblSwitchLanguage = "lblSwitchLanguage";
+		public static readonly string lblPrefferedlang = "lblPrefferedlang";
+		public static readonly string lblVerfiyMobile = "lblVerfiyMobile";
+		public static readonly string lblOTP = "lblOTP";
+		public static readonly string lblRefreshOTP = "lblRefreshOTP";
+		public static readonly string lblValidateOTP = "lblValidateOTP";
+		public static readonly string lblSendOTP = "lblSendOTP";
+	}
+	public static class WebAppCommon
     {
         public const string lblOk = "lblOk";
         public const string lblCancel = "lblCancel";
@@ -1297,6 +1324,8 @@ public static class ConstantKeys
 
         public const string AccordionRequestDetails = Prefix + "AccordionRequestDetails";
         public const string AccordionActionLog = Prefix + "AccordionActionLog";
+        public const string lblAllOpenRequests = Prefix + "lblAllOpenRequests";
+
     }
 
 

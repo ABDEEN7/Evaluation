@@ -17,6 +17,6 @@ namespace Evaluation.DAL.Models.IntegrationEntity
 		public string? URLParameter { get; set; } = null!;
 		public string ResponseSchema { get; set; } = null!;
 		public bool IsInternal { get; set; }
-
-	}
+        public string? Config { get; set; }
+    }
 }
