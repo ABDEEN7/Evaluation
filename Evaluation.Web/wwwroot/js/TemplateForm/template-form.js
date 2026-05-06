@@ -834,16 +834,16 @@ $("#btn-submit_popup").click(function (e) {
             const dataToSave = allRows.map(obj => ({
                 Id: obj.id === "00000000-0000-0000-0000-000000000000" ? null : obj.id,
                 EvalFormId: $("#evalformidvalue").val(),
-                NameAr: obj.nameAr || null,
-                NameEn: obj.nameEn || null,
-                PartyTypeId: obj.partyTypeId || obj.partyType,
-                FormItemIds: (obj.formItemId || obj.formItem)
-                    ? (Array.isArray(obj.formItemId || obj.formItem)
-                        ? (obj.formItemId || obj.formItem)
-                        : [obj.formItemId || obj.formItem])
+                NameAr: obj.formItemConfig_NameAr || null,
+                NameEn: obj.formItemConfig_NameEn || null,
+                PartyTypeId: obj.formItemConfig_PartyTypeId || obj.formItemConfig_PartyType,
+                FormItemIds: (obj.formItemConfig_FormItemId || obj.formItemConfig_FormItem)
+                    ? (Array.isArray(obj.formItemConfig_FormItemId || obj.formItemConfig_FormItem)
+                        ? (obj.formItemConfig_FormItemId || obj.formItemConfig_FormItem)
+                        : [obj.formItemConfig_FormItemId || obj.formItemConfig_FormItem])
                     : null,
-                CalcMethodId: obj.calcMethodId || obj.calcMethod,
-                Percentage: obj.percentage || 0
+                CalcMethodId: obj.formItemConfig_CalcMethodId || obj.formItemConfig_CalcMethod,
+                Percentage: obj.formItemConfig_Percentage || 0
             }));
 
             var formData = new FormData();
@@ -1099,7 +1099,9 @@ async function InitFormItemConfigPopup(
             currentrowclicked = row.getPosition();
         }
     });
-
+    setTimeout(() => {
+        $("#FormItemConfigRelationtabulator .tabulator-header-filter").hide();
+    }, 100);
     tableFormItemConfig.setData([]);
 
 
@@ -1133,9 +1135,9 @@ function LoadFormItemConfigData() {
             if (data && data.length > 0) {
 
                 data.forEach(x => {
-                    x.formItem = Array.isArray(x.formItemIds) ? x.formItemIds : (x.formItemIds ? [x.formItemIds] : []);
-                    x.calcMethod = x.calcMethodId || null;
-                    x.partyType = x.partyTypeId || null;
+                    x.formItemConfig_FormItem = Array.isArray(x.formItemConfig_FormItemIds) ? x.formItemConfig_FormItemIds : (x.formItemConfig_FormItemIds ? [x.formItemConfig_FormItemIds] : []);
+                    x.formItemConfig_CalcMethod = x.formItemConfig_CalcMethodId || null;
+                    x.formItemConfig_PartyType = x.formItemConfig_PartyTypeId || null;
                     
                 });
 
@@ -1151,12 +1153,6 @@ function LoadFormItemConfigData() {
         `${API_ROUTES.getAllFormItemConfig(evalformId)}`
     );
 }
-function SaveFormItemConfig(event) {
-    const cellElem = event.closest('section');
-    const id = cellElem.getAttribute('data-key');
-    const obj = tableFormItemConfig.getData().find(f => f.id == id);
-
-    if (!obj) {
         notificationUtil.error('Row data not found');
         return;
     }

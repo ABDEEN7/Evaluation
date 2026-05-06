@@ -177,13 +177,13 @@ public class TemplateFormController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> SaveFormItemConfig()
     {
-        var request = Request.Form["request"][0]?.StringToObject<List<FormItemConfigDto>>();
+        var request = Request.Form["request"][0]?.StringToObject<List<CreateFormItemConfigDto>>();
         return Ok(await _masterBl.GetApiService<EvaluationFormBL>().SaveFormItemConfig(request!));
     }
     [HttpPost]
     public async Task<IActionResult> UpdateFormItemConfig()
     {
-        var request = Request.Form["request"][0]?.StringToObject<FormItemConfigDto>();
+        var request = Request.Form["request"][0]?.StringToObject<CreateFormItemConfigDto>();
         return Ok(await _masterBl.GetApiService<EvaluationFormBL>().UpdateFormItemConfig(request!));
     }
 }
