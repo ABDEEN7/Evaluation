@@ -526,16 +526,157 @@ $(document).on("click", ".deleteChild", function () {
 });
 
 // FormItem Edit button
-$(document).on("click", ".editParent", function () {
+$(document).on("click", ".editParent", async function () {
     var row = $(this).closest("tr");
     var id = $(this).data("id");
     var jsonString = row.find("td:last").text();
     var objdata = JSON.parse(jsonString);
     popupname = "EvalFormItem";
+
+    await getlookup();
+
     var modaltitle = sharedFn().GetUiControlText('FormItemHeader');
     sharedFn().OpenFormPopup(modaltitle, FormItemcontrolvalidationlist, objdata, null, null);
+
     $("#PopupId").val(id);
+    $("#evalformidvalue").val($("#Id").val());
+
+    
+    setTimeout(() => {
+        BuildFormItemConfigTable(id, objdata.calcMethodId);
+    }, 800);
 });
+
+
+function BuildFormItemConfigTable(formItemId, formItemCalcMethodId) {
+    if ($('#FormItemConfigRelationtabulator').length) return;
+
+    var filteredColList = FormItemConfigCollist.filter(c =>
+        c.constraint.controlType !== 'TEXT_BOX_HIDDEN' &&
+        c.controlName !== 'FormItemConfig_FormItemId' &&
+        c.controlName !== 'FormItemConfig_CalcMethodId'
+    );
+
+    IsEdit = IsEditFormItemConfig ? true : "";
+    IsDelete = IsDeleteFormItemConfig ? true : "";
+    IsView = '';
+
+    
+    var tableColumns = sharedFn().PopulateColumn(filteredColList, '', true);
+
+    $('#ModalPopup .modal-body #PopupForm').append(`
+        <div class="row mt-3">
+            <div class="card-header justify-content-end d-flex align-items-center bg-light">
+                <button type="button" id="FormItemConfigRelationbutton" class="btn btn-primary">
+                    ${sharedFn().GetUiControlText('FormItemConfigAddButton')}
+                </button>
+            </div>
+            <div id="FormItemConfigRelationdiv">
+                <div id="FormItemConfigRelationtabulator"></div>
+            </div>
+            
+            <div class="d-flex justify-content-end mt-2">
+                <button type="button" id="FormItemConfigSaveButton" class="btn btn-success">
+                    ${sharedFn().GetUiControlText('SAVE_BUTTON')}
+                </button>
+            </div>
+        </div>
+    `);
+
+    tableFormItemConfig = tableUtil.createTabulator({
+        id: "FormItemConfigRelationtabulator",
+        config: {
+            textDirection: txtDir,
+            pagination: "local",
+            paginationSize: 10,
+            placeholder: sharedFn().GetUiControlText('NO_DATA_FOUND'),
+            movableRows: true,
+            editable: true,
+            lookupSources: lookupSources
+        },
+        uniqueRowId: 'id',
+        columns: tableColumns,
+        rowClick: function (e, row) {
+            currentrowclicked = row.getPosition();
+        }
+    });
+
+    tableFormItemConfig.setData([]);
+
+    jqClient({
+        success: function (data) {
+            if (data && data.length > 0) {
+
+                // ✅ فلتر بـ prefix الصحيح + formItemId
+                var filtered = data.filter(x =>
+                    x.formItemConfig_FormItemIds &&
+                    x.formItemConfig_FormItemIds.includes(formItemId)
+                );
+
+                filtered.forEach(x => {
+                    x.formItemConfig_CalcMethod = x.formItemConfig_CalcMethodId || null;
+                    x.formItemConfig_PartyType = x.formItemConfig_PartyTypeId || null;
+                    x.formItemConfig_FormItem = Array.isArray(x.formItemConfig_FormItemIds)
+                        ? x.formItemConfig_FormItemIds
+                        : (x.formItemConfig_FormItemIds ? [x.formItemConfig_FormItemIds] : []);
+                });
+
+                tableFormItemConfig.setData(filtered);
+            }
+        }
+    }).Get(API_ROUTES.getAllFormItemConfig($("#evalformidvalue").val()));
+
+    $("#FormItemConfigRelationbutton").off("click").on("click", function () {
+        tableFormItemConfig.addRow({
+            id: "00000000-0000-0000-0000-000000000000",
+            evalFormId: null,
+            formItemId: formItemId,
+            formItemIds: [formItemId],
+            calcMethodId: formItemCalcMethodId,
+            partyTypeId: null,
+            nameAr: "",
+            nameEn: "",
+            percentage: 0,
+            isActive: true
+        });
+    });
+
+    
+    $("#FormItemConfigSaveButton").off("click").on("click", function () {
+        const allRows = tableFormItemConfig.getData();
+        if (!allRows || allRows.length === 0) {
+            notificationUtil.error('No data to save');
+            return;
+        }
+
+        const dataToSave = allRows.map(obj => ({
+            Id: obj.id === "00000000-0000-0000-0000-000000000000" ? null : obj.id,
+            EvalFormId: $("#evalformidvalue").val(),
+            NameAr: obj.formItemConfig_NameAr || null,
+            NameEn: obj.formItemConfig_NameEn || null,
+            PartyTypeId: obj.formItemConfig_PartyTypeId || obj.formItemConfig_PartyType || null,
+            FormItemIds: [formItemId],
+            CalcMethodId: formItemCalcMethodId,
+            Percentage: obj.formItemConfig_Percentage || 0
+        }));
+
+        var formData = new FormData();
+        formData.append('request', JSON.stringify(dataToSave));
+
+        jqClient({
+            success: function (response) {
+                if (response?.responseStatus == 1 || response?.responseStatus == 2) {
+                    notificationUtil.success(sharedFn().GetUiControlText('WEB_MSG_SAVE'));
+                } else {
+                    notificationUtil.error(response?.message);
+                }
+            },
+            error: function () {
+                notificationUtil.error('Request failed');
+            }
+        }).PostFormData(API_ROUTES.saveFormItemConfig(), formData);
+    });
+}
 CommonLogicAfterInitial();
 $(document).on("click", "#formItemConfig", async function () {
     popupname = "FormItemConfig";
@@ -590,7 +731,7 @@ $(document).on("click", ".edit", function () {
     const cellElem = $(this).closest('section')[0];
     const id = cellElem.getAttribute('data-key');
     const obj = tableFormItemConfig.getData().find(f => f.id == id);
-
+    
     if (!obj) return;
 
     var data = {
@@ -678,7 +819,6 @@ const deleteData = (id) => {
         const options = {
             success: function (data) {
                 if (data) {
-
 
                     if (data.responseStatus == '3') {
                         if (popupname == 'EvalFormItem' || popupname == 'EvalSubFormItem') {
@@ -1138,7 +1278,7 @@ function LoadFormItemConfigData() {
                     x.formItemConfig_FormItem = Array.isArray(x.formItemConfig_FormItemIds) ? x.formItemConfig_FormItemIds : (x.formItemConfig_FormItemIds ? [x.formItemConfig_FormItemIds] : []);
                     x.formItemConfig_CalcMethod = x.formItemConfig_CalcMethodId || null;
                     x.formItemConfig_PartyType = x.formItemConfig_PartyTypeId || null;
-                    
+
                 });
 
                 tableFormItemConfig.setData(data);
@@ -1151,64 +1291,5 @@ function LoadFormItemConfigData() {
 
     jqClient(options).Get(
         `${API_ROUTES.getAllFormItemConfig(evalformId)}`
-    );
-}
-        notificationUtil.error('Row data not found');
-        return;
-    }
-
-    var data = {
-        Id: id === "00000000-0000-0000-0000-000000000000" ? null : id,
-        EvalFormId: $("#evalformidvalue").val(),
-        NameAr: obj.nameAr || null,
-        NameEn: obj.nameEn || null,
-        PartyTypeId: obj.partyTypeId || null,
-        FormItemIds: obj.formItemId
-            ? (Array.isArray(obj.formItemId) ? obj.formItemId : [obj.formItemId])
-            : null,
-        CalcMethodId: obj.calcMethodId || null,
-        Percentage: obj.percentage || 0
-    };
-
-    var formData = new FormData();
-    formData.append('request', JSON.stringify(data));
-
-    const options = {
-        success: function (response) {
-            if (response) {
-                switch (response.responseStatus) {
-                    case 1:
-                        const rows = tableFormItemConfig.getRows();
-                        const row = rows[currentrowclicked];
-                        if (row) {
-                            const rowData = row.getData();
-                            const rowElement = row.getElement();
-                            const section = rowElement.querySelector('.sec-center');
-                            if (section) {
-                                section.setAttribute('data-key', response.id);
-                                section.id = `action__section__${response.id}`;
-                            }
-                            rowData.id = response.id;
-                            row.update(rowData);
-                        }
-                        notificationUtil.success(sharedFn().GetUiControlText('WEB_MSG_SAVE'));
-                        break;
-                    case 2: // Update
-                        notificationUtil.success(sharedFn().GetUiControlText('WEB_MSG_UPDATE'));
-                        break;
-                    default:
-                        notificationUtil.error(response.message);
-                        break;
-                }
-            }
-        },
-        error: function () {
-            notificationUtil.error('Request failed');
-        }
-    };
-
-    jqClient(options).PostFormData(
-        `${API_ROUTES.saveFormItemConfig()}`,
-        formData
     );
 }

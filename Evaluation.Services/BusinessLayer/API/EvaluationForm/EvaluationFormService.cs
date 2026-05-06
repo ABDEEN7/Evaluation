@@ -73,7 +73,7 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
             HasNote = x.HasNote,
             NoteRequired = x.NoteRequired,
             DropDownTypeId = x.DropDownTypeId,
-
+            HasMulitEvaluation = x.HasMuliEvaluation,
             SubFormItems = x.SubFormItems
         .Select(s => new EvaluationFormSubItemDto
         {
@@ -166,14 +166,18 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
         obj.FormStatusId = message.FormStatusId;
         obj.IsActive = message.IsActive;
         obj.AllowRename = message.AllowRename;
-        if (!await CheckEvaluationForm())
+        if (message.IsFinalEval)
         {
-            obj.IsFinalEval = message.IsFinalEval;
+            if (!await CheckEvaluationForm())
+            {
+                obj.IsFinalEval = message.IsFinalEval;
+            }
+            else
+            {
+                throw new BusinessException(ConstantKeys.ExceptionMessage.Max_Final_Evaluation_Forms_Exceeded);
+            }
         }
-        else
-        {
-            throw new BusinessException(ConstantKeys.ExceptionMessage.Max_Final_Evaluation_Forms_Exceeded);
-        }
+
         if (message.IsFinalEval)
         {
             obj.HasOneValue = true;
@@ -694,7 +698,7 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
         repo.InsertRange(formItemsConfig);
 
         await uow.CommitAsync();
-        var result = mapper.Map<FormItemConfigDto>(formItemsConfig, opts => opts.Items["Language"] = requestInfo.Lang);
+        var result = mapper.Map<CreateFormItemConfigDto>(formItemsConfig, opts => opts.Items["Language"] = requestInfo.Lang);
         result.ResponseStatus = DBResult.Inserted;
         return messages;
     }
@@ -760,13 +764,13 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
                 x.Id != record.Id)
             .SumAsync(x => (decimal?)x.Percentage) ?? 0;
 
-        
+
         if (remainingTotal != 100)
             throw new InvalidOperationException(
                string.Format(ConstantKeys.ExceptionMessage.Exception_Invalid_Total_Percentage_After_Delete, remainingTotal)
             );
 
-        
+
         repo.Delete(record);
 
         await uow.CommitAsync();
