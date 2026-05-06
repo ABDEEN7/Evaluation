@@ -1696,3 +1696,54 @@ input.auto-fill {
         flex: 1;
     }
 }
+
+
+
+
+#evaluationPlansTable tbody tr:not(.card):not(.card-row) .card-only-icon,
+#evaluationPlansTable tbody tr:not(.card):not(.card-row) .card-only-label {
+    display: none !important;
+}
+
+
+.card-only-icon {
+    color: #666;
+    font-size: 18px;
+    vertical-align: middle;
+}
+
+.card-only-label {
+    font-weight: 600;
+    color: #666;
+}
+
+.plan-title-row {
+    display: flex;
+    align-items: center; 
+    gap: 10px;
+    margin-bottom: 1rem;
+}
+
+.title-icon {
+    background-color: var(--color-primary);
+    color: #fff;
+    padding: 0.7rem;
+    border-radius: 6px;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.title-label {
+    font-size: 20px !important;
+    font-weight: 600;
+    color: #666;
+}
+
+.plan-title-text {
+    font-size: 20px;
+    font-weight: 600; 
+    color: #222;
+}
+
