@@ -91,17 +91,39 @@
         columns: [
             {
                 data: "name",
-                className: "td-left py-1"
+                className: "td-left py-1",
+                render: function (data) {
+                    return `
+                    <div class="plan-title-row">
+                    <i class="las la-file-signature card-only-icon title-icon"></i>
+                    <div>
+                    <span class="card-only-label title-label">Plan: </span>
+                    <span class="plan-title-text">${data || ""}</span>
+                    </div>
+                    </div>
+                    `;
+                }
             },
             {
                 data: "countSchools",
-                className: "td-left py-1"
+                className: "td-left py-1",
+                render: function(data) {
+                    return `
+                    <i class="las la-school card-only-icon"></i>
+                    <span class="card-only-label">Schools count: </span>
+                    ${data || ""}
+                    `;
+                }
             },
             {
-                data: null,
-                className: "td-left py-1",
-                render: function (data, type, row) {
-                    return `${row.startDate} - ${row.endDate}`;
+            data: null,
+            className: "td-left py-1",
+                render: function(data, type, row) {
+                    return `
+                    <i class="las la-calendar-week card-only-icon"></i>
+                    <span class="card-only-label">Period: </span>
+                    من ${row.startDate} إلى ${row.endDate}
+                    `;
                 }
             },
             {
