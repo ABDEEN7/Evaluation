@@ -71,7 +71,7 @@ function CreateEditForFormGroup(pkId) {
 function CommonLogicAfterInitial() {
     $(document).off("change", "#EvalFormsIsFinalEval")
         .on("change", "#EvalFormsIsFinalEval", function () {
-            if (this.checked) {
+            if (!this.checked) {
                 $("label[for='EvalFormsHasOneValue']").show();
                 $("#EvalFormsHasOneValue").parent().show();
             } else {
@@ -355,7 +355,7 @@ function SetPopupMode() {
             }
         })
     }
-    if (popupname = "EvalSubFormItem") {
+    if (popupname == "EvalSubFormItem") {
         $("#EvalSubFormItemHasNote").on("change", function () {
             if (this.checked) {
                 $("label[for='EvalSubFormItemNoteRequired']").show();
