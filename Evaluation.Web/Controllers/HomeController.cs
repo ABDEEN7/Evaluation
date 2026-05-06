@@ -31,8 +31,25 @@ namespace Evaluation.Web.Controllers
         }
 
 
-      
 
-        
-    }
+		public IActionResult SetLanguage()
+		{
+
+
+			string URLpath = HttpContext.Request.Headers["Referer"].ToString();
+			if (URLpath.Contains("/ar"))
+			{
+				URLpath = URLpath.Replace("/ar", "/en");
+			}
+			else if (URLpath.Contains("/en"))
+			{
+				URLpath = URLpath.Replace("/en", "/ar");
+			}
+
+			return Redirect(URLpath);
+
+		}
+
+
+	}
 }

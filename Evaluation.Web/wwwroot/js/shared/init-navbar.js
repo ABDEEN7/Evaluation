@@ -1,19 +1,30 @@
 ﻿
 const InitNavbarSection = () => {
 
-    if (sharedUtility().ExistingToken()) {
+    const hasToken = sharedUtility().ExistingToken();
 
-        let lang = sharedUtility().GetCookie('lang');
-        $(".dropdownsection1").show();
-        $(".dropdownsection2").hide();
+    if (hasToken) {
+
+        let lang = sharedUtility().GetCookie('lang') || 'ar';
         tokenData = sharedUtility().ParseJwt(GetLocalStorageValue(LocalStorageKeys.Token));
-        $('#navbarDropdown').html(getFirstName(lang == 'ar' ? tokenData[Enums.UserProfileClaim.FullNameAr] : tokenData[Enums.UserProfileClaim.FullNameEn], lang == 'ar'));
 
-        let userType = sharedUtility().ParseJwt(GetLocalStorageValue(LocalStorageKeys.Token))[Enums.UserProfileClaim.UserType];
+        const fullName = lang === 'ar'
+            ? tokenData[Enums.UserProfileClaim.FullNameAr]
+            : tokenData[Enums.UserProfileClaim.FullNameEn];
+
+        const firstName = getFirstName(fullName, lang === 'ar');
+
+        $('#navbarDropdown').html(`
+            <i class="fa-solid fa-circle-user me-1"></i>
+            <span>${firstName}</span>
+        `);
+
+        let userType = tokenData[Enums.UserProfileClaim.UserType];
 
         if (userType !== Enums.UserType.Student) {
             $('.student-parts-only').remove();
-        } 
+        }
+
         if (userType !== Enums.UserType.Ministry) {
             $('.ministry-parts-only').remove();
         }
@@ -21,18 +32,16 @@ const InitNavbarSection = () => {
         $("#profileDropdown").show();
         $(".login-or-register").hide();
 
-
     } else {
-       
         $("#profileDropdown").hide();
         $(".login-or-register").show();
     }
 
-    $("#logoutBtn").click(function () {
-      
+    $("#logoutBtn").off('click').on('click', function (e) {
+        e.preventDefault();
         sharedUtility().RedirectUnauthorized();
     });
-}
+};
 const InitializeTooltip = () => {
     $(function () {
         $('[data-toggle="tooltip"]').tooltip();

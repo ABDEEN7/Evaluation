@@ -24,7 +24,8 @@ namespace Evaluation.API.Middlewares
 
         public async Task InvokeAsync(HttpContext context, RequestInfo requestInfo)
         {
-            var segments = context.Request.Path.Value.Split('/');
+			
+			var segments = context.Request.Path.Value.Split('/');
             requestInfo.Lang = context.Request.Headers?.TryGetValue("lang", out var requestLang) == true
                 ? requestLang.ToString()
                 : "ar";
