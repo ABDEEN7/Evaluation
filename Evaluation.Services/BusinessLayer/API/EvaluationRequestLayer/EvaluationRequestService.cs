@@ -61,8 +61,9 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
                     .Include(d => d.DepEvaluationType)
                     .Include(d => d.ServiceStatus)
                      .Where(er =>
-            monthInts.Contains(er.FromDate.Year * 100 + er.FromDate.Month) ||
-            monthInts.Contains(er.ToDate.Year * 100 + er.ToDate.Month))
+            (monthInts.Contains(er.FromDate.Year * 100 + er.FromDate.Month) ||
+            monthInts.Contains(er.ToDate.Year * 100 + er.ToDate.Month)) && 
+			er.DepEvaluationType.DepartmentId == requestInfo.DepId)
         .ToList();
     }
 

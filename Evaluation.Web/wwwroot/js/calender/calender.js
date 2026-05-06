@@ -3,7 +3,7 @@
  *****************************/
 const loadedMonths = new Set();   // faster lookups than array
 let calendarResults = [];
-//let departmentRoutePath = sharedUtility().extractDepartmentName();
+let departmentRoutePath = sharedUtility().extractDepartmentName();
 
 /*****************************
  * Date Utilities
