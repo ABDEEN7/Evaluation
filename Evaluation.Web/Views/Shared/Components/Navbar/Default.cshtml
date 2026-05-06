@@ -1,34 +1,105 @@
 ﻿@using Evaluation.SharedHelper.Enums
 @{
-    // var Title = "{{#Register#}}";
-    // ViewData["Title"] = Title;
-
     var lang = responseInfo.Lang;
     var showlang = lang == "ar" ? "EN" : "AR";
 }
 
-<!-- ======= Top Bar ======= -->
 <div id="topbar"></div>
-<!-- ======= Header ======= -->
 <header id="header" class="fixed-top wow slideInDown animated" data-wow-duration="0.75s" data-wow-delay="0s">
     <div class="container-fluid border-top-primary">
         <div class="row align-items-center py-lg-2 bg-white">
-            <div class="col-lg-3 col-md-8 col-7"><div class="d-flex align-items-center"><i class="bi bi-list mobile-nav-toggle"></i><a href="/@responseInfo.Lang/Home/Index" class="logo"><img src="~/assets/img/logo-en.png" alt="" class="hero-image img-fluid"></a></div></div>
+
+            <!-- Logo (نفس القديم) -->
+            <div class="col-lg-3 col-md-8 col-7">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-list mobile-nav-toggle"></i>
+                    <a href="/@responseInfo.Lang/Home/Index" class="logo">
+                        <img id="WebLogo" src="/assets/img/logo-en.png" class="hero-image img-fluid" alt="">
+                    </a>
+                </div>
+            </div>
+
+            <!-- Right Side -->
             <div class="col-lg-9 col-md-4 col-5">
                 <div class="new-main-navbar d-flex align-items-center justify-content-between">
+
+                    <!-- Navbar -->
                     <nav id="navbar" class="navbar new-navbar">
                         <ul class="px-5 gap-4">
-
+                            <!-- Dynamic menu -->
                         </ul>
-                    </nav><!-- .navbar -->
-                    <div class="social-media px-3">
-                        <a href="/@responseInfo.Lang/Home/Index" class="btn text-black-50"> <span class="d-none d-md-block"><i class="la la-globe" style="vertical-align: middle;"></i>&nbsp;&nbsp;Arabic</span><span class="d-block d-md-none">Ar</span></a>
-                        <a id="loginLink" href="/@responseInfo.Lang/Account/Login" class="btn btn-primary btn-sm text-white">تسجيل دخول</a>
+                    </nav>
+
+                    <!-- Buttons (نفس social-media class) -->
+                    <div class="social-media px-3 d-flex align-items-center gap-2">
+
+                        <!-- Search -->
+                        <a class="btn btn-outline-primary btn-sm"
+                           data-bs-toggle="offcanvas"
+                           data-bs-target="#offcanvasTop">
+                            <i class="las la-search"></i>
+                        </a>
+
+                        <!-- Language -->
+                        <a href="/@responseInfo.Lang/Home/SetLanguage"
+                           class="btn btn-outline-primary btn-sm">
+                            @showlang
+                        </a>
+
+                        <!-- Notifications -->
+                        <a id="notificationsListId"
+                           href="#"
+                           data-bs-toggle="offcanvas"
+                           data-bs-target="#offcanvasRight3"
+                           class="btn btn-outline-primary btn-sm position-relative">
+
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                <span id="notificationsCount"></span>
+                            </span>
+
+                            <i class="las la-bell"></i>
+                        </a>
+
+                        <!-- Login -->
+                        <a id="loginLink"
+                           href="/@responseInfo.Lang/Account/Login"
+                           class="btn btn-primary btn-sm login-or-register text-white">
+                            تسجيل دخول
+                        </a>
+
+                        <!-- Profile -->
+                        <div class="dropdown" id="profileDropdown" style="display:none;">
+                            <a class="btn btn-outline-primary btn-sm dropdown-toggle"
+                               href="#"
+                               id="navbarDropdown"
+                               data-bs-toggle="dropdown">
+                                <i class="las la-user-circle me-1"></i>
+                            </a>
+
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li>
+                                    <a class="dropdown-item"
+                                       href="/@responseInfo.Lang/Account/UserProfile">
+                                        Profile
+                                    </a>
+                                </li>
+
+                                <li><hr class="dropdown-divider"></li>
+
+                                <li>
+                                    <a href="#"
+                                       class="dropdown-item text-danger"
+                                       id="logoutBtn">
+                                        Logout
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+
                     </div>
                 </div>
-
             </div>
+
         </div>
     </div>
-</header><!-- End Header -->
-<!-- End Header -->
+</header>

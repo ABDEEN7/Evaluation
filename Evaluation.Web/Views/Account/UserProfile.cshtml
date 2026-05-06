@@ -1,0 +1,161 @@
+﻿@using Evaluation.SharedHelper.Enums
+@using Evaluation.Web.Models.Account
+@model UserProfilelViewModel
+
+@{
+    const string title = "{{#User Profile Info#}}";
+    ViewData["Title"] = title;
+}
+@section Styles{
+    <link rel="stylesheet" href="~/lib/tel-input/css/intlTelInput.css" asp-append-version="true">
+}
+<section class="login-wrapper section userProfile">
+<div class="login-signup py-5 mt-2">
+    <div class="container mt-5">
+        <div class="row align-items-center justify-content-center  mt-5">
+            <div class="col-md-6">
+                <div class="card">
+                        <div class="card-body mx-xl-3 mx-lg-2 mt-5 py-4">
+                        <div id="userProfileDetailsDivId">
+                            <div class="icon position-absolute top-0 start-50 translate-middle">
+                                <img id="previewImage" alt="Profile Preview"
+                                     src="/assets/img/registeration.png"
+                                     class="img-fluid"
+                                     style="object-fit: cover; cursor: pointer;">
+                                <input type="file" id="fileInput" style="display: none;">
+                            </div>
+                            <form>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label @ConstantKeys.WebAppUserProfilePage.lblEmail" for="Email"></label>
+                                        <input asp-for="Email" placeholder="{{#lblEmail#}}" class="form-control @ConstantKeys.WebAppUserProfilePage.lblEmail" id="EmailId" disabled="disabled" />
+                                    </div>
+
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label @ConstantKeys.WebAppUserProfilePage.lblQID"></label>
+                                        <input asp-for="QID" placeholder="{{#lblQID#}}" class="form-control @ConstantKeys.WebAppUserProfilePage.lblQID" id="QIDId" disabled="disabled" />
+                                    </div>
+
+
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label @ConstantKeys.WebAppUserProfilePage.lblFullNameEn"></label>
+                                        <input asp-for="FullNameEn" placeholder="{{#lblFullNameEn#}}" class="form-control @ConstantKeys.WebAppUserProfilePage.lblFullNameEn" id="FullNameEnId" disabled="disabled" />
+                                    </div>
+
+
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label @ConstantKeys.WebAppUserProfilePage.lblFullNameAr"></label>
+                                        <input asp-for="FullNameAr" placeholder="{{#lblFullNameAr#}}" class="form-control @ConstantKeys.WebAppUserProfilePage.lblFullNameAr" id="FullNameArId" disabled="disabled" />
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label @ConstantKeys.WebAppUserProfilePage.lblLastLoginDate"></label>
+                                        <input asp-for="LastLoginDate" placeholder="{{#lblLastLoginDate#}}" class="form-control @ConstantKeys.WebAppUserProfilePage.lblLastLoginDate" id="LastLoginDateID" disabled="disabled" />
+                                    </div>
+
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label @ConstantKeys.WebAppUserProfilePage.lblMobile"></label>
+                                        <input type="tel"  placeholder="" class="form-control @ConstantKeys.WebAppUserProfilePage.lblMobile" id="UserProfileMobile" disabled="disabled" />
+                                    </div>
+
+                                    <div class="col-md-6 mb-3" id="OccupationDivId">
+                                        <label class="form-label @ConstantKeys.WebAppUserProfilePage.lblOccupation"></label>
+                                        <input placeholder="" class="form-control @ConstantKeys.WebAppUserProfilePage.lblOccupation" id="UserProfileOccupation" disabled="disabled" />
+                                    </div>
+
+                                    <div class="col-md-6 mb-3" id="NationalityDivId" style="display:none;">
+                                        <label class="form-label @ConstantKeys.WebAppUserProfilePage.lblNationality"></label>
+                                        <input placeholder="" class="form-control @ConstantKeys.WebAppUserProfilePage.lblNationality" id="UserProfileNationality" disabled="disabled" />
+                                    </div>
+
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label @ConstantKeys.WebAppUserProfilePage.lblPrefferedlang"></label>
+                                        <input placeholder="" class="form-control @ConstantKeys.WebAppUserProfilePage.lblPrefferedlang" id="PrefferedLang" disabled="disabled" />
+                                    </div>
+
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label @ConstantKeys.WebAppUserProfilePage.lblSwitchLanguage w-100"></label>
+
+                                        <div class=" switch-lang">
+                                            <input id="change-language-toggler" class="check-toggle check-toggle-round-flat" type="checkbox">
+                                            <label for="change-language-toggler"></label>
+                                            <span class="toggler-on">EN</span>
+                                            <span class="toggler-off">ع</span>
+                                        </div>
+                                    </div>
+
+                                    <div id="second-mobile-div" class="col-md-6 mb-3">
+                                        <label class="form-label @ConstantKeys.WebAppUserProfilePage.lblSecondMobile"></label>
+                                        <input type="tel" placeholder="XXX XXX XXXX" class="form-control" id="UserProfileSecondMobile" />
+                                        <span id="error-msg" class="hide"></span>
+                                    </div>
+                                </div>
+                            </form>
+                            <button id="updateVerifyMobileNumberBtn" style="display: none;" class="btn btn-primary @ConstantKeys.WebAppUserProfilePage.lblVerfiyMobile" onclick="verifySecondMobileNumber()">
+                                @ConstantKeys.WebAppUserProfilePage.lblVerfiyMobile
+                            </button>
+
+                        </div>
+                    </div>
+                    <div id="validateOTPDivId" class="p-3" style="display:none;">
+                        <div id="ValidateOTPId">
+                            <input type="hidden" id="OTPId" />
+                            <div class="row">
+                                <div class="col-md-12 mb-3">
+                                    <div class="form-group">
+                                        <label class="@ConstantKeys.WebAppUserProfilePage.lblOTP">{{#OTP}}</label>
+                                            <input class="form-control @ConstantKeys.WebAppUserProfilePage.lblOTP" required id="OTP" inputmode="numeric"
+                                                   autocomplete="one-time-code" />
+                                    </div>
+                                </div>
+                                <div class="col-md-12 mb-3" id="timerDivId" style="display:none;">
+                                    <div class="form-group">
+                                        <span class="@ConstantKeys.WebAppUserProfilePage.lblValidateOTP">{{#Time left =#}}</span>  <span id="timer"></span>
+                                    </div>
+                                </div>
+
+                                <div class="d-flex mb-3 justify-content-between">
+                                    <button type="button" class="btn btn-primary btn-m-width @ConstantKeys.WebAppUserProfilePage.lblValidateOTP" id="ValidateOTPBtnId">{{#Validate OTP#}}</button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</section>
+@section Scripts {
+    <script src="~/lib/intltelinput/js/utils.js" asp-append-version="true"></script>
+    <script src="~/lib/intltelinput/js/intltelinput.js" asp-append-version="true"></script>
+
+
+    <script type="text/javascript">
+        $(document).ready(async function () {
+            if (!sharedUtility().ExistingToken()) {
+                sharedUtility().RedirectUnauthorized();
+            }
+
+            webAppConfigsSetup().Init({
+                pageNames: [
+                    'Exceptions',
+                    '@nameof(ConstantKeys.WebAppCommon)',
+                    '@nameof(ConstantKeys.WebAppUserProfilePage)'
+                ],
+                additional_keys: [
+                    '@nameof(ConstantKeys.WebsiteSettings.PictureProfileSizeAllow)',
+                    '@nameof(ConstantKeys.WebsiteSettings.PictureProfileExtensions)'
+                ]
+            }).then(() => {
+                uiControlsSetup().UpdatPageTitle('WebAppUserProfilePage');
+                InitNavbarSection();
+              
+                LoadUserDetails();
+                allowPictureSize = systemSettingsSetup().GetSystemSettingValue('@nameof(ConstantKeys.WebsiteSettings.PictureProfileSizeAllow)');
+                allowedExtensions = systemSettingsSetup().GetSystemSettingValue('@nameof(ConstantKeys.WebsiteSettings.PictureProfileExtensions)');
+                $fileInput.attr('accept', allowedExtensions);
+            });
+        });
+    </script>
+}
