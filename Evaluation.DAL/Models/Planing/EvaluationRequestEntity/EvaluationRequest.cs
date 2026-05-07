@@ -27,7 +27,7 @@ public class EvaluationRequest : EntityBase, IAuditLogEntity
 	public Service? Service { get; set; }
 	public Guid ServiceStatusId { get; set; }
 	public ServiceStatus? ServiceStatus { get; set; }
-    public string? RequestNumber  { get; set; }
+    public string RequestNumber { get; set; } = null!;
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public long Sequence { get; set; }
     public Guid? FormEvalMatrixValueId { get; set; }

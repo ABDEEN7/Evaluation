@@ -65,7 +65,6 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
             NameEn = x.NameEn,
             Min = x.Min,
             Max = x.Max,
-            IsEvaluation = x.IsEvaluation,
             Weight = x.Weight,
             EvalFormId = x.EvalFormId,
             ScopeId = x.ScopeId,
@@ -161,7 +160,6 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
         obj.NameEn = message.NameEn;
         obj.HasOneValue = message.HasOneValue;
         obj.EvaluationPartyId = message.EvaluationPartyId;
-        obj.HasEvaluation = message.HasEvaluation;
         obj.CalcMethodId = message.CalcMethodId;
         obj.FormStatusId = message.FormStatusId;
         obj.IsActive = message.IsActive;
@@ -200,7 +198,6 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
             obj.NameEn = message.NameEn;
             obj.HasOneValue = message.HasOneValue;
             obj.EvaluationPartyId = message.EvaluationPartyId;
-            obj.HasEvaluation = message.HasEvaluation;
             obj.CalcMethodId = message.CalcMethodId;
             obj.FormStatusId = message.FormStatusId;
             obj.IsActive = message.IsActive;
@@ -272,7 +269,6 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
         obj.NameEn = message.NameEn;
         obj.Min = message.Min;
         obj.Max = message.Max;
-        obj.IsEvaluation = message.IsEvaluation;
         obj.Weight = message.Weight;
         obj.EvalFormId = message.EvalFormId;
         obj.ScopeId = message.ScopeId;
@@ -321,7 +317,6 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
             obj.NameEn = message.NameEn;
             obj.Min = message.Min;
             obj.Max = message.Max;
-            obj.IsEvaluation = message.IsEvaluation;
             obj.Weight = message.Weight;
             obj.EvalFormId = obj.EvalFormId;
             obj.ScopeId = message.ScopeId;

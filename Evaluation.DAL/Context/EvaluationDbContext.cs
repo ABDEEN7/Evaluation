@@ -8,6 +8,7 @@ using Evaluation.DAL.Models.DepartementEntites;
 using Evaluation.DAL.Models.EvalResult;
 using Evaluation.DAL.Models.FormBuilder;
 using Evaluation.DAL.Models.FormsModules;
+using Evaluation.DAL.Models.IntegrationEntity;
 using Evaluation.DAL.Models.Master;
 using Evaluation.DAL.Models.Org;
 using Evaluation.DAL.Models.PermissionEntity;
@@ -126,6 +127,8 @@ public partial class EvaluationDbContext : DbContext
     public virtual DbSet<ServiceStatusType> ServiceStatusType { get; set; }
     public virtual DbSet<FormItemConfig> FormItemConfig { get; set; }
     public virtual DbSet<FieldInfoType> FieldInfoType { get; set; }
+    public virtual DbSet<IntegrationPointLog> IntegrationPointLog { get; set; }
+    public virtual DbSet<IntegrationPointDataLog> IntegrationPointDataLog { get; set; }
 
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

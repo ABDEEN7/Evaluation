@@ -4,48 +4,95 @@
 
     var Type = (modalId == "ORGANIZATION") ? "SCHOOL" : modalId;
 
+
     Func<object, Microsoft.AspNetCore.Html.IHtmlContent> content = @<text>
     @if (Type == "SCHOOL")
     {
             <div class="col-md-6">
-                <div class="card card-table  mb-4">
-                    <div class="card-body">
-                        <h5 class="fw-bold text-primary mb-3"> <i class="la la-building"></i> معلومات أساسية</h5>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <p class="text-light">المدير</p>
-                                <h5 class="fw-bold" id="managerName"></h5>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <p class="text-light">تاريخ الإنشاء</p>
-                                <h5 class="fw-bold" id="establishmentDate"></h5>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <p class="text-light">المدرسون</p>
-                                <h5 class="fw-bold" id="teachers"></h5>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <p class="text-light">الطلاب</p>
-                                <h5 class="fw-bold" id="students"></h5>
-                            </div>
+                <div class="card card-table mb-3">
+                        <div class="card-body">
+                        <h5 class="fw-bold mb-4">معلومات أساسية</h5>
+                        <div>
+                                <div class="row my-3">
+                                    <div class="col-md-6">
+                                            <h6 class="fw-bold">
+                                            <span class="primary-bg">
+                                                <i class="las la-user color-primary"></i>
+                                            </span>
+
+                                            <span class="mx-2">المدير</span>
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6 class="text-light" id="managerName">
+                                
+                                        </h6>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <h6 class="fw-bold">
+                                            <span class="primary-bg">
+                                                <i class="las la-calendar-check color-primary"></i>
+                                            </span>
+
+                                            <span class="mx-2">تاريخ الإنشاء</span>
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-6 justify-items-end">
+                                        <h6 class="text-light" id="establishmentDate"></h6>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <h6 class="fw-bold">
+                                            <span class="primary-bg">
+                                                <i class="las la-user-friends color-primary"></i>
+                                            </span>
+
+                                            <span class="mx-2">المدرسون</span>
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-6 justify-items-end">
+                                        <h6 class="text-light" id="teachers"></h6>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <h6 class="fw-bold">
+                                            <span class="primary-bg">
+                                                <i class="las la-graduation-cap color-primary"></i>
+                                            </span>
+
+                                            <span class="mx-2">الطلاب</span>
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-6 justify-items-end">
+                                        <h6 class="text-light" id="students"></h6>
+                                    </div>
+                                </div>
                         </div>
-                        <hr class="mt-0">
-                        <div class="row">
-                            <div class="col-md-12">
+                        <hr class="my-4">
                                 <div class=" d-flex gap-2 align-items-center mb-3">
-                                    <div class="social-icon"><i class="la la-phone-volume"></i></div>
+                                    <span class="soft-gray-bg mp2">
+                                        <i class="las la-phone-volume color-primary"></i>
+                                    </span>
                                     <div><a id="phone" href="#" class="text-dark"></a></div>
                                 </div>
+                            
                                 <div class=" d-flex gap-2 align-items-center mb-3">
-                                    <div class="social-icon"><i class="la la-envelope"></i></div>
+                                    <span class="soft-gray-bg mp2">
+                                        <i class="las la-envelope color-primary"></i>
+                                    </span>
                                     <div><a id="email" href="" class="text-dark"></a></div>
                                 </div>
+                           
                                 <div class=" d-flex gap-2 align-items-center mb-3">
-                                    <div class="social-icon"><i class="la la-location-arrow"></i></div>
+                                    <span class="soft-gray-bg mp2">
+                                        <i class="las la-location-arrow color-primary"></i>
+                                    </span>
                                     <div><p id="address" class="text-dark m-0"></p></div>
                                 </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -53,27 +100,28 @@
     else if (Type == "EMPLOYEE")
     {
             <div class="col-md-6">
-                <div class="card card-table  mb-4">
+                <div class="card card-table mb-3">
                     <div class="card-body">
-                        <h5 class="fw-bold text-primary mb-3"> <i class="la la-building"></i> معلومات أساسية</h5>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <p class="text-light">الرقم الوظيفي</p>
-                                <h5 class="fw-bold" id="employeeNo"></h5>
+                            <h5 class="fw-bold mb-4">معلومات أساسية</h5>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <p class="text-light">الرقم الوظيفي</p>
+                                    <h5 class="fw-bold" id="employeeNo"></h5>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <p class="text-light">تاريخ الميلاد</p>
+                                    <h5 class="fw-bold" id="birthDate"></h5>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <p class="text-light">الجنسية</p>
+                                    <h5 class="fw-bold" id="nationalityCode"></h5>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <p class="text-light">تاريخ الالتحاق</p>
+                                    <h5 class="fw-bold" id="joinDate"></h5>
+                                </div>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <p class="text-light">تاريخ الميلاد</p>
-                                <h5 class="fw-bold" id="birthDate"></h5>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <p class="text-light">الجنسية</p>
-                                <h5 class="fw-bold" id="nationalityCode"></h5>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <p class="text-light">تاريخ الالتحاق</p>
-                                <h5 class="fw-bold" id="joinDate"></h5>
-                            </div>
-                        </div>
+               
                         <hr class="mt-0">
                         <div class="row">
                             <div class="col-md-12">
@@ -98,24 +146,39 @@
 
         <div class="col-md-6">
             <div class="card card-table  mb-4">
-                <div class="card-body">
-                    <h5 class="fw-bold text-primary mb-3"> <i class="la la-chart-bar"></i> الوضع الحالي</h5>
-                    <div class="row">
-                        <div class="col-md-12 mb-3">
-                            <div class="bg-success-light p-3 text-center br-8 ">
-                                <p>التقييم الحالي</p>
-                                <h3>ممتاز</h3>
-                                <p>10-02-2025</p>
+                <div class="card-body colored-card">
+                <h5 class="fw-bold mb-4">الوضع الحالي</h5>
+                        <div class="bg-success-light-no-color p-3 br-8">
+                            <div class="row m-3">
+                                <div class="col-md-8">
+                                     <p><i class="las la-check-circle success-color"></i>
+                                            التقييم
+                                            الحالي
+                                     </p>
+                                </div>
+                                <div class="col-md-4 justify-items-end"><p>10-02-2025</p></div>
+                          
+                               
+                                 <p class="success-color-custom mx-3 my-1">ممتاز</p>
+                           
                             </div>
                         </div>
-                        <div class="col-md-12 mb-3">
-                            <div class="bg-danger-light p-3 text-center br-8 ">
-                                <p>التقييم السابق</p>
-                                <h3>ضعيف</h3>
-                                <p>10-02-2025</p>
+
+                         <div class="bg-old-status-light-no-color p-3 br-8 mt-3">
+                            <div class="row m-3">
+                                <div class="col-md-8">
+                                     <p><i class="las la-check-circle old-status-color"></i>
+                                              التقييم السابق
+                                     </p>
+                                </div>
+                                <div class="col-md-4 justify-items-end"><p>02-02-2024</p></div>
+                          
+                               
+                                 <p class="old-status-color-custom mx-3 my-1">ضعيف</p>
+                           
                             </div>
                         </div>
-                    </div>
+ 
                 </div>
             </div>
         </div>
