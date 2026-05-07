@@ -728,9 +728,7 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
 
 
         var result = mapper.Map<List<CreateFormItemConfigDto>>(
-            formItemsConfig,
-            opts => opts.Items["Language"] = requestInfo.Lang
-        );
+            formItemsConfig);
 
         result.ForEach(r => r.ResponseStatus = DBResult.Updated);
 
@@ -778,7 +776,7 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
         repo.Update(existingRecord);
 
         await uow.CommitAsync();
-        var result = mapper.Map<TemplateFormDto>(existingRecord, opts => opts.Items["Language"] = requestInfo.Lang);
+        var result = mapper.Map<TemplateFormDto>(existingRecord);
         result.ResponseStatus = DBResult.Updated;
         return dto;
     }
