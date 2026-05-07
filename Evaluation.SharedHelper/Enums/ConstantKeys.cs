@@ -1475,8 +1475,16 @@ public static class ConstantKeys
         public const string CLOSE_AND_UPDATE_PLAN = "CLOSE_AND_UPDATE_PLAN";
         public const string CLOSE_AND_UPDATE_FORM = "CLOSE_AND_UPDATE_FORM";
     }
+	public static class FieldInfoTypeKeys
+	{
 
-    public static class ServiceSettings
+		public const string VisitDateFrom = "VisitDateFrom";
+		public const string VisitDateTo = "VisitDateTo";
+		public const string VisitName = "VisitName";
+
+
+	}
+	public static class ServiceSettings
     {
         public static readonly string MaxCountOpen = "50";
     }
