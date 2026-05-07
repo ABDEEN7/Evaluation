@@ -25,6 +25,7 @@ using Evaluation.SharedHelper.Models.Api.ServiceRequestEntitiesDTO;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
+using System.Globalization;
 using static Evaluation.SharedHelper.Enums.ConstantKeys;
 
 namespace Evaluation.Services.Models.API
@@ -235,7 +236,7 @@ namespace Evaluation.Services.Models.API
 						if (dto == null) throw new BusinessException(ExceptionMessage.msgInvalidEvaluationForm);
 
 						await _EvaluationFormBL.SaveEvaluationForm(dto);
-
+						 UpdateVisitInfoFromFields(application, existingFields);
 						break;
 					}
 				case ActionTypeKeys.Close:
@@ -287,7 +288,54 @@ namespace Evaluation.Services.Models.API
 
             return result;
         }
-        private Guid? TryGetGuidFieldValue(Guid fieldId, IList<FieldValueDTO> primaryList, IList<ServiceRequestFieldsValue> fallbackList)
+
+		private void UpdateVisitInfoFromFields(ServiceRequest application,List<ServiceRequestFieldsValue> existingFields)
+		{
+			var visitName = existingFields
+				.FirstOrDefault(x => x.Field?.FieldInfoType?.BackendName == ConstantKeys.FieldInfoTypeKeys.VisitName)
+				?.Value;
+
+			var visitDateFromValue = existingFields
+				.FirstOrDefault(x => x.Field?.FieldInfoType?.BackendName == ConstantKeys.FieldInfoTypeKeys.VisitDateFrom)
+				?.Value;
+
+			var visitDateToValue = existingFields
+				.FirstOrDefault(x => x.Field?.FieldInfoType?.BackendName == ConstantKeys.FieldInfoTypeKeys.VisitDateTo)
+				?.Value;
+
+			if (!string.IsNullOrWhiteSpace(visitName))
+				application.Name = visitName;
+
+			application.VisitDateFrom = ParseNullableDateTime(visitDateFromValue);
+			application.VisitDateTo = ParseNullableDateTime(visitDateToValue);
+		}
+		private DateTime? ParseNullableDateTime(string? value)
+		{
+			if (string.IsNullOrWhiteSpace(value))
+				return null;
+
+			string[] formats =
+			{
+		        "dd/MM/yyyy",
+		        "dd/MM/yyyy HH:mm",
+		        "yyyy-MM-dd",
+		        "yyyy-MM-ddTHH:mm",
+		        "yyyy-MM-ddTHH:mm:ss"
+	        };
+
+			if (DateTime.TryParseExact(
+					value,
+					formats,
+					CultureInfo.InvariantCulture,
+					DateTimeStyles.None,
+					out var result))
+			{
+				return result;
+			}
+
+			throw new BusinessException("Date Format is wrong");
+		}
+		private Guid? TryGetGuidFieldValue(Guid fieldId, IList<FieldValueDTO> primaryList, IList<ServiceRequestFieldsValue> fallbackList)
         {
             var valueStr = primaryList.FirstOrDefault(x => x.FieldId == fieldId)?.Value
                         ?? fallbackList.FirstOrDefault(x => x.FieldId == fieldId)?.Value;
