@@ -99,35 +99,7 @@ function renderDepartmentsTable(departments) {
     tabsContainer.empty();
     tabContentContainer.empty();
 
-    // Group departments by typeName
-  const educationTypes = [
-        "مدارس حكومية",
-        "مدارس خاصة",
-        "رياض أطفال و دور الحضانة"
-    ];
-
-    const educationDepartments = departments.filter(item =>
-        educationTypes.includes(item.name)
-    );
-
-    const otherDepartments = departments.filter(item =>
-        !educationTypes.includes(item.name)
-    );
-
-    const grouped = {};
-
-    if (otherDepartments.length > 0) {
-        grouped["Other"] = otherDepartments;
-    }
-
     // Helper: render a department card  <img src="${item.imgBlobUrl}"/>
-    const getDepartmentIcon = (name) => {
-        if (name.includes("حكومية")) return "las la-school";
-        if (name.includes("خاصة")) return "las la-shapes";
-        if (name.includes("رياض") || name.includes("حضانة")) return "las la-baby-carriage";
-        return "las la-school";
-    };
-
     const createDepartmentCard = (item) => `
         <div class="col-md-4 mb-4">
             <div class="card item-card shadow-sm border-0"
@@ -144,7 +116,7 @@ function renderDepartmentsTable(departments) {
                         </div>
 
                         <div class="card-icon-circle shadow-sm">
-                            <i class="${getDepartmentIcon(item.name)}"></i>
+                           <i class="las ${item.depIcon}"></i>
                         </div>
 
                         <div class="card-content">
@@ -177,30 +149,6 @@ function renderDepartmentsTable(departments) {
             </div>
         </div>
     `);
-
-    // --- Create tabs for each typeName dynamically ---
-    Object.keys(grouped).forEach((typeName) => {
-        const safeId = typeName.replace(/\s+/g, '-').toLowerCase();
-
-        tabsContainer.append(`
-            <li class="col-md-4 nav-item" role="presentation">
-                <button class="nav-link fw-semibold" id="${safeId}-tab"
-                    data-bs-toggle="tab" data-bs-target="#${safeId}"
-                    type="button" role="tab" aria-controls="${safeId}" aria-selected="false">
-                    ${typeName}
-                </button>
-            </li>
-        `);
-
-        const cardsHTML = grouped[typeName].map(createDepartmentCard).join('');
-        tabContentContainer.append(`
-            <div class="tab-pane fade" id="${safeId}" role="tabpanel" aria-labelledby="${safeId}-tab">
-                <div id="${safeId}Container" class="row card-view fade-switch active">
-                    ${cardsHTML || '<p class="text-muted">لا توجد إدارات متاحة.</p>'}
-                </div>
-            </div>
-        `);
-    });
 }
 
 const loadMainBanner = () => {

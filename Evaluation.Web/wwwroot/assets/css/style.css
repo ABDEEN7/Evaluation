@@ -1827,4 +1827,76 @@ input.auto-fill {
 .card-text {
     font-size: 14px;
     line-height: 1.8;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+
+.list-view .item-card {
+    display: flex;
+    align-items: center;
+    padding: 20px;
+}
+
+.list-view .main-card {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    text-align: start !important;
+    gap: 24px;
+}
+
+.list-view .card-img-wrapper {
+    width: 260px;
+    flex-shrink: 0;
+}
+
+.list-view .card-img {
+    height: 160px;
+    width: 100%;
+    object-fit: cover;
+    border-radius: 12px;
+}
+
+.list-view .card-icon-circle {
+    position: static;
+    transform: none;
+    margin: 0;
+}
+
+.list-view .card-content {
+    flex: 1;
+}
+
+.list-view .card-text {
+    display: block;
+    overflow: visible;
+    -webkit-line-clamp: unset;
+}
+
+.social-media .btn:not(.login-or-register) {
+    width: 30px;
+    height: 30px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    font-size: 16px;
+    transition: 0.2s ease;
+}
+
+    .social-media .btn:not(.login-or-register):hover {
+        transform: translateY(-2px);
+    }
+
+    .social-media .btn:not(.login-or-register) i {
+        font-size: 20px;
+        line-height: 1;
+    }
+
+.social-media .badge {
+    font-size: 10px;
 }
