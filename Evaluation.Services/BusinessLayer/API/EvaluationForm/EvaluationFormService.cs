@@ -188,7 +188,7 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
 
 
         await uow.CommitAsync();
-        var result = mapper.Map<TemplateFormDto>(obj, opts => opts.Items["Language"] = requestInfo.Lang);
+        var result = mapper.Map<TemplateFormDto>(obj);
         result.ResponseStatus = DBResult.Inserted;
         return result;
 
@@ -622,7 +622,7 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
 
         return result;
     }
-    public async Task<List<CreateFormItemConfigDto>> SaveFormItemConfig(List<CreateFormItemConfigDto> messages)
+    public async Task<CreateFormItemConfigDto> SaveFormItemConfig(List<CreateFormItemConfigDto> messages)
     {
         if (messages == null || !messages.Any())
             throw new ArgumentException(ConstantKeys.ExceptionMessage.Exception_No_Data_Provided);
@@ -727,11 +727,10 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
         await uow.CommitAsync();
 
 
-        var result = mapper.Map<List<CreateFormItemConfigDto>>(
-            formItemsConfig);
+        var result = new CreateFormItemConfigDto();
 
-        result.ForEach(r => r.ResponseStatus = DBResult.Updated);
-
+       
+        result.ResponseStatus = DBResult.Inserted;
         return result;
     }
     public async Task<CreateFormItemConfigDto> UpdateFormItemConfig(CreateFormItemConfigDto dto)

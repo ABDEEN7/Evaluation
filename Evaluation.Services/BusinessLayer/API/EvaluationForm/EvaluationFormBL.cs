@@ -206,9 +206,9 @@ public class EvaluationFormBL(IServiceScopeFactory serviceScopeFactory, CacheDat
         var result = await evaluationFormService.GetAllFormItemConfigAsync(evalFormId);
         return result;
     }
-    public async Task<List<CreateFormItemConfigDto>> SaveFormItemConfig(List<CreateFormItemConfigDto> model)
+    public async Task<CreateFormItemConfigDto> SaveFormItemConfig(List<CreateFormItemConfigDto> model)
     {
-        var result = new List<CreateFormItemConfigDto>();
+        var result = new CreateFormItemConfigDto();
         bool validateObject = await ValidateObject(model!, ConstantKeys.WebPermissions.ADD_WEB_FORMITEMCONFIG);
         if (validateObject)
         {
