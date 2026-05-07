@@ -239,7 +239,31 @@ window.formUtility = window.formUtility || {};
                     });
                     break;
                 }
+                case 'time': {
+                    const isDisabledTime =
+                        field.isApproved
+                            ? true
+                            : (typeof field.isEditable == "undefined" ? false : !field.isEditable);
 
+                    const inputElement = $(`#${prefield}${field.fieldId}`);
+
+                    if (field.value) {
+                        inputElement.val(field.value);
+                    }
+
+                    const defaultAttr = field.attributes?.find(attr =>
+                        attr.name.trim().toLowerCase() === 'default');
+
+                    if (!field.value && defaultAttr?.value) {
+                        inputElement.val(defaultAttr.value);
+                    }
+
+                    if (isDisabledTime) {
+                        inputElement.prop('readonly', true).prop('disabled', true);
+                    }
+
+                    break;
+                }
                 case 'jqte': {
                     const jqteValue =
                         field.value ||

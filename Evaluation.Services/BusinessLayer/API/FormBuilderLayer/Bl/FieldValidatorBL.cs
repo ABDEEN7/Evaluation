@@ -363,6 +363,55 @@ namespace Evaluation.Services.BusinessLayer.API
 			return errors;
 		}
 
+		internal IList<string> ValidateTime(FieldValueDTO field, List<FieldAttributeValue> attributes, string lang)
+		{
+			var timeErrors = new List<string>();
+
+			if (string.IsNullOrWhiteSpace(field?.Value))
+				return timeErrors;
+
+			if (!TimeSpan.TryParseExact(
+					field.Value,
+					@"hh\:mm",
+					CultureInfo.InvariantCulture,
+					out var currentTime))
+			{
+				var msg = lang == "ar"
+					? "صيغة الوقت غير صحيحة"
+					: "Invalid time format";
+
+				timeErrors.Add($"{field.FieldName}: {msg}");
+				return timeErrors;
+			}
+
+			foreach (var attr in attributes)
+			{
+				var attrName = attr.AttributeKey?.Trim().ToLower();
+				var errorMessage = lang == "ar" ? attr.MessageAr : attr.MessageEn;
+
+				switch (attrName)
+				{
+					case "min":
+						if (TimeSpan.TryParseExact(attr.AttributeValue, @"hh\:mm", CultureInfo.InvariantCulture, out var minTime)
+							&& currentTime < minTime)
+						{
+							timeErrors.Add($"{field.FieldName}: {errorMessage}");
+						}
+						break;
+
+					case "max":
+						if (TimeSpan.TryParseExact(attr.AttributeValue, @"hh\:mm", CultureInfo.InvariantCulture, out var maxTime)
+							&& currentTime > maxTime)
+						{
+							timeErrors.Add($"{field.FieldName}: {errorMessage}");
+						}
+						break;
+				}
+			}
+
+			return timeErrors;
+		}
+
 	}
 
 
