@@ -143,6 +143,6 @@
         width: '100%',
         multiple: true
     });
-    Evaluation.Loaders.loadServiceStatus('planRequestStatusFilter');
+    //Evaluation.Loaders.loadServiceStatus('planRequestStatusFilter');
     planRequestsListing.reload();
 });

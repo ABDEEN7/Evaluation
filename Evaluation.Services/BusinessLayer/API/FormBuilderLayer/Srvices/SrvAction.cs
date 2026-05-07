@@ -443,6 +443,9 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 									case "datetime":
 										errors.AddRange(WrapErrors(field.Id, validator.ValidateDate(tempField, attributes, lang)));
 										break;
+									case "time":
+										errors.AddRange(WrapErrors(field.Id, validator.ValidateTime(tempField, attributes, lang)));
+										break;
 									case "file":
 									case "filev2":
 										errors.AddRange(WrapErrors(field.Id, validator.ValidateFile(tempField, files, attributes, lang)));
@@ -515,7 +518,9 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 							case "datetime":
 								errors.AddRange(WrapErrors(item.FieldId, validator.ValidateDate(item, attributes, lang)));
 								break;
-
+							case "time":
+								errors.AddRange(WrapErrors(item.FieldId, validator.ValidateTime(item, attributes, lang)));
+								break;
 							case "file":
 							case "filev2":
 								errors.AddRange(WrapErrors(item.FieldId, validator.ValidateFile(item, files, attributes, lang)));

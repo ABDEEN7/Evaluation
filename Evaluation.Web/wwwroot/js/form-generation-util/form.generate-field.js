@@ -757,7 +757,30 @@ var formGenerateFieldUtility = window.formUtility;
         field.type = 'datetime';
         return dateTimeInputElement;
     };
+    const generateTimeField = (field, readonly) => {
+        const inputElement = $('<input>')
+            .attr('type', 'time')
+            .addClass('form-control')
+            .attr('placeholder', field.fieldName)
+            .attr('aria-label', field.fieldName);
 
+        if (field.value) {
+            inputElement.val(field.value);
+        }
+
+        if (readonly) {
+            setReadOnlyAttribute(inputElement, field);
+        }
+
+        inputElement.on('keydown', (e) => {
+            if (e.keyCode === 13) {
+                e.preventDefault();
+                return;
+            }
+        });
+
+        return inputElement;
+    };
     const generateListTable = (field, readonly, renderType) => {
         const tableId = renderType === RENDER_TYPE.PREVIEW
             ? `table_View_${field.fieldId}`
@@ -821,6 +844,7 @@ var formGenerateFieldUtility = window.formUtility;
         'phone': generatePhoneField,
         'evaluationPlan': generateEvaluationPlanField,
         'evl_Form': generateEvlFormField,
+        'Time': generateTimeField,
     };
 
     const generateField = (field, renderType, actionType = null, options = {}) => {
