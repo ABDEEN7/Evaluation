@@ -247,14 +247,14 @@ internal class Program
 
             app.UseCors("AllowWebAndAdmin");
 
-            app.UseMiddleware<PopulateUserInfoMiddleware>();
-            app.UseMiddleware<PopulateRequestInfoMiddleware>();
-
+           
             app.UseAuthentication();
             app.UseAuthorization();
 
+			app.UseMiddleware<PopulateUserInfoMiddleware>();
+			app.UseMiddleware<PopulateRequestInfoMiddleware>();
 
-            app.MapControllers();
+			app.MapControllers();
             app.MapControllerRoute(
             name: "default",
             pattern: "api/{controller=Home}/{action=Index}/{id?}");

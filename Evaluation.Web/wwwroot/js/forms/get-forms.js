@@ -19,12 +19,15 @@ let depRoutePath = sharedUtility().extractDepartmentName();
 let itemsResult = [];
 let renameItems = [];
 let lastOrder;
-let P_fieldId;
 let P_readOnly;
 let P_allowRename;
 let P_isRename;
 let P_allowDelete;
 let P_allowAdd;
+let P_evaluationRequestId;
+let P_serviceRequestId;
+let P_matrixResponse;
+let evalForm;
 
 const SELECTORS = {
     tbody: 'tbodyRows'
@@ -35,7 +38,6 @@ const ItemPropertyType = Object.freeze({
     NOTE: 2
 });
 
-let evalForm;
 
 // ==============================
 // Utilities
@@ -397,7 +399,18 @@ function buildHorizontalTable(data) {
 // ==============================
 // Page Generator 
 // ==============================
-const generateFullFormPageHtml = async ({ formId, fieldId, readOnly, allowRename, allowDelete, allowAdd, namingResult = null }) => {
+const generateFullFormPageHtml = async ({ formId,
+    fieldId,
+    evaluationRequestId,
+    serviceRequestId,
+    readOnly,
+    allowRename,
+    allowDelete,
+    allowAdd,
+    namingResult = null }) => {
+
+    P_evaluationRequestId = evaluationRequestId;
+    P_serviceRequestId = serviceRequestId;
 
     itemsResult = await jqClient().Get(
         GET_FORMS_API.getItems(depRoutePath, formId)
@@ -505,6 +518,8 @@ async function initializeControls(formId, fieldId, controlValues) {
         GET_FORMS_API.getMatrixValues(depRoutePath, formId)
     );
 
+    P_matrixResponse = matrixResponse;
+
     const items = itemsResult?.value ?? [];
     const matrixValues = matrixResponse?.value ?? matrixResponse ?? [];
 
@@ -550,6 +565,11 @@ async function initializeControls(formId, fieldId, controlValues) {
             select.value = valueSource.valueId ?? "";
             if (note) note.value = valueSource.note ?? "";
         }
+
+        $(select).on("change", function () {
+            calculateFE(select, formId);
+        });
+
     }
 
     // Populate main items and sub-items

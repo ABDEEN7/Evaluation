@@ -2,6 +2,8 @@
 using Evaluation.DAL.Models.Audit;
 using Evaluation.DAL.Models.BaseModule;
 using Evaluation.DAL.Models.EvalResult;
+using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
+using Evaluation.DAL.Models.ServiceRequestEntities;
 using Evaluation.DAL.Models.UserEntiy;
 
 namespace Evaluation.DAL.Models.FormsModules;
@@ -23,4 +25,9 @@ public class FormItemValue : EntityBase ,IAuditLogEntity
     public string? RenameItem { get; set; }
     public Guid? FormItemConfigId { get; set; }
     public FormItemConfig? FormItemConfig { get; set; }
+    public Guid? ServiceRequestId { get; set; }
+    public ServiceRequest? ServiceRequest { get; set; }
+
+    public Guid? EvaluationRequestId { get; set; }
+    public EvaluationRequest? EvaluationRequest { get; set; }
 }

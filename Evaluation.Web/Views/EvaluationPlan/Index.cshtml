@@ -30,7 +30,7 @@
     <div class="card container-fluid container-xxxl p-4">
         <h2 class="@ConstantKeys.EvaluationForm.PageTitle"></h2>
         <h6 class="@ConstantKeys.EvaluationForm.PageDescription"></h6>
-        <div class="row py-4">
+        <div class="row pt-4">
             <div class="col-lg-12 mb-3">
                 <ul class="nav nav-tabs row main-tabs bg-grey">
                     <li id="tabEvaluationPlans" class="nav-item col-md-4">
@@ -51,7 +51,7 @@
                 </ul>
             </div>
 
-            <div class="card col-lg-12">
+            <div class="col-lg-12">
                 <div class="tab-content p-0">
 
                     <!-- Tab: Evaluation Plans -->
@@ -66,7 +66,7 @@
                                    data-bs-toggle="tab" href="#tab-plan-details"></a>
                             </li>
                         </ul>
-                        <div class="card tab-content p-3">
+                        <div class="card tab-content px-3 pt-3">
                             <div id="tab-plan-requests" class="tab-pane fade show active">
                                 <partial name="_PartialEvaluationPlanRequests" />
                             </div>
@@ -670,11 +670,11 @@
             if (sharedUtility().ExistingToken()) {
                 uiControlsSetup().UpdatPageTitle('WebAppScholarship');
                 $('body').show();
-                GetScopes();
+               
                 // await LoadUserDetails();
-                // InitNavbarSection();
+                 InitNavbarSection();
 
-
+                  GetScopes();
 
                 // activateTabFromUrl();
                 // CheckAndResumeSessionTimer();

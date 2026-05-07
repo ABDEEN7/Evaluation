@@ -149,9 +149,59 @@ a, a:hover {
     color: rgba(14, 107, 50, 1);
 }
 
+.bg-success-light-no-color {
+    background-color: rgba(216, 244, 221, 0.5) !important;
+    border: 1px solid #E5E7EB !important;
+}
+
+.success-color {
+    color: rgba(14, 107, 50, 1) !important;
+}
+
+.old-status-color {
+    color: #6B7280 !important;
+}
+
+.bg-old-status-light-no-color {
+    border: 1px solid #E5E7EB !important;
+    background-color: #fff !important;
+}
+
+.old-status-color-custom {
+    background-color: #F3F4F6 !important;
+    color: #6B7280 !important;
+    border: 1px solid #6B728050 !important;
+    border-radius: 4px;
+    font-size: 25px;
+    font-weight: 600;
+    padding: 0.16rem 0.9rem;
+    width: fit-content;
+}
+
+.success-color-custom {
+    color: rgba(14, 107, 50, 1) !important;
+    border: 1px solid rgba(14, 107, 50, 0.3) !important;
+    border-radius: 4px;
+    font-size: 24px;
+    font-weight: 600;
+    background-color: rgba(216, 244, 221, 1) !important;
+    padding: 0.16rem 0.9rem;
+    width: fit-content;
+}
+
+.colored-card {
+    background-color: #f7f7f7 !important;
+}
+
 .bg-danger-light {
     background-color: rgba(248, 230, 233, 1) !important;
     color: rgba(180, 4, 30, 1);
+}
+
+.primary-bg {
+    background-color: #8a153820;
+    border-radius: 4px;
+    padding: 0.3rem 0.5rem;
 }
 
 .btn-primary:hover,
@@ -184,10 +234,12 @@ button:focus:not(:focus-visible) {
     outline: 0;
     box-shadow: none;
 }
+
 .btn-primary.show {
     background-color: #8a1538;
     border-color: #8a1538;
 }
+
 .br-0 {
     border-radius: 0 !important;
 }
@@ -208,12 +260,18 @@ button:focus:not(:focus-visible) {
     display: flex;
     align-items: center;
 }
+
 section, .section {
     padding: 3rem 0;
 }
 
+.color-primary {
+    color: var(--color-primary);
+}
 
-
+.justify-items-end {
+    justify-items: end !important;
+}
 /*--------------------------------------------------------------
 # Enhance Layout
 --------------------------------------------------------------*/
@@ -265,6 +323,7 @@ header.topbar {
         min-height: 135px;
     }
 }
+
 .navbar {
     padding: 0;
 }
@@ -352,6 +411,7 @@ header.topbar {
         left: -100%;
     }
 }
+
 .layout {
     display: flex;
     flex: 1;
@@ -1539,6 +1599,7 @@ main {
 .modal-backdrop.show {
     opacity: 0.75;
 }
+
 .toast-success {
     background-color: #16a34a;
 }
@@ -1554,6 +1615,7 @@ main {
 .toast-info {
     background-color: #2563eb;
 }
+
 .action-items {
     display: flex;
     align-items: center;
@@ -1561,6 +1623,36 @@ main {
     justify-content: center;
     color: #333;
     font-size: 16px;
+}
+
+.btn-close-custom {
+    background-color: #fff !important;
+    color: #3d3d3d !important;
+    font-size: 40px !important;
+    border: #fff !important;
+}
+
+.soft-gray-bg {
+    background-color: #6B728020 !important;
+    border-radius: 4px;
+    padding: 0.3rem 0.5rem;
+}
+
+
+.btn-close-custom i {
+    font-size: 30px;
+    font-weight: 700;
+    -webkit-text-stroke: 0.7px;
+}
+
+
+.btn-close-custom {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: none;
+    background: transparent;
 }
 
 input.auto-fill {
@@ -1571,4 +1663,117 @@ input.auto-fill {
     height: 1px !important;
     opacity: 0 !important;
     pointer-events: none !important;
+}
+
+.btn-with-text-icon i {
+    font-size: 16px;
+    font-family: var(--font-primary) !important;
+    font-weight: 500 !important;
+}
+
+    .btn-with-text-icon i::before {
+        font-family: "Line Awesome Free";
+        font-weight: 900;
+        font-size: 16px;
+        margin-inline-end: 6px;
+    }
+
+
+.filter-section .form-label {
+    margin-bottom: 6px;
+    white-space: nowrap;
+}
+
+.filter-section .btn {
+    height: 45px;
+    min-width: 90px;
+    white-space: nowrap;
+}
+
+.filter-section .form-control,
+.filter-section .form-select {
+    height: 45px;
+}
+
+@media (max-width: 991.98px) {
+    .filter-section .btn {
+        flex: 1;
+    }
+}
+
+
+#evaluationPlansTable tbody tr:not(.card):not(.card-row) .card-only-icon,
+#evaluationPlansTable tbody tr:not(.card):not(.card-row) .card-only-label,
+#evaluationPlansTable tbody tr:not(.card):not(.card-row) .title-icon {
+    display: none !important;
+}
+
+#evaluationPlansTable tbody tr:not(.card):not(.card-row) .plan-title-text {
+    font-size: inherit !important;
+    font-weight: inherit !important;
+}
+
+
+.card-only-icon {
+    color: #666;
+    font-size: 18px;
+    vertical-align: middle;
+}
+
+.card-only-label {
+    font-weight: 600;
+    color: #666;
+}
+
+
+
+.title-icon {
+    background-color: var(--color-primary);
+    color: #fff;
+    padding: 0.7rem;
+    border-radius: 6px;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.title-label {
+    font-size: 20px !important;
+    font-weight: 600;
+    color: #666;
+}
+
+.plan-title-text {
+    font-size: 20px;
+    font-weight: 600;
+    color: #222;
+}
+
+#evaluationPlansTable .process .dropdown {
+    margin-top: 14px;
+}
+
+
+
+
+
+.plan-title-row {
+    display: grid !important;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    column-gap: 5px !important;
+}
+
+.plan-text-wrap {
+    min-width: 0;
+}
+
+.approved-status {
+    justify-self: end;
+    display: inline-grid !important;
+    grid-template-columns: auto auto;
+    align-items: center;
+    column-gap: 3px !important;
+    white-space: nowrap;
 }

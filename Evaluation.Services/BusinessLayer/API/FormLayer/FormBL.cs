@@ -293,7 +293,16 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
 
                 result.Value = total / formEvaluationDto.Items.Count;
 
-                result.Name = formEvalMatrixValues.Where(v => v.MinValue <= result.Value && v.MaxValue >= result.Value).Select(v => v.NameAr).FirstOrDefault();
+                var evalMatrixValue = formEvalMatrixValues.Where(v => v.MinValue <= result.Value && v.MaxValue >= result.Value);
+
+
+                bool isArabic = string.Equals(requestInfo.Lang, "ar", StringComparison.OrdinalIgnoreCase);
+
+                result.Name = evalMatrixValue
+                    .Select(v => isArabic ? v.NameAr : v.NameEn)
+                    .FirstOrDefault();
+
+                result.Id = evalMatrixValue.Select(v => v.Id).FirstOrDefault();
 
                 break;
             case CalcMethodsEnum.SUM:

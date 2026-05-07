@@ -3802,9 +3802,6 @@ namespace Evaluation.DAL.Migrations
                     b.Property<Guid>("FormStatusId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<bool>("HasEvaluation")
-                        .HasColumnType("bit");
-
                     b.Property<bool>("HasOneValue")
                         .HasColumnType("bit");
 
@@ -4183,9 +4180,6 @@ namespace Evaluation.DAL.Migrations
                         .HasColumnType("bit")
                         .HasDefaultValue(false);
 
-                    b.Property<bool>("IsEvaluation")
-                        .HasColumnType("bit");
-
                     b.Property<decimal>("Max")
                         .HasColumnType("decimal(18,2)");
 
@@ -4399,6 +4393,9 @@ namespace Evaluation.DAL.Migrations
                     b.Property<string>("DepEvalMatrixValueName")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid?>("EvaluationRequestId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid?>("FormEvalMatrixValueId")
                         .HasColumnType("uniqueidentifier");
 
@@ -4424,6 +4421,9 @@ namespace Evaluation.DAL.Migrations
                     b.Property<string>("RenameItem")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid?>("ServiceRequestId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid?>("UpdateById")
                         .HasColumnType("uniqueidentifier");
 
@@ -4443,11 +4443,15 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("DepEvalMatrixId");
 
+                    b.HasIndex("EvaluationRequestId");
+
                     b.HasIndex("FormEvalMatrixValueId");
 
                     b.HasIndex("FormItemConfigId");
 
                     b.HasIndex("FormItemId");
+
+                    b.HasIndex("ServiceRequestId");
 
                     b.HasIndex("UpdateById");
 
@@ -5043,6 +5047,9 @@ namespace Evaluation.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Config")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<Guid>("CreateById")
                         .HasColumnType("uniqueidentifier");
 
@@ -5104,6 +5111,128 @@ namespace Evaluation.DAL.Migrations
                     b.HasIndex("UpdateById");
 
                     b.ToTable("IntegrationPoint");
+                });
+
+            modelBuilder.Entity("Evaluation.DAL.Models.IntegrationEntity.IntegrationPointDataLog", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CreateById")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreateDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("getdate()");
+
+                    b.Property<string>("DataResponse")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("DeleteById")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("DeleteDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("IntegrationPointLogId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("Note")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("OrgTreeId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("UpdateById")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("UpdateDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreateById");
+
+                    b.HasIndex("DeleteById");
+
+                    b.HasIndex("IntegrationPointLogId");
+
+                    b.HasIndex("OrgTreeId");
+
+                    b.HasIndex("UpdateById");
+
+                    b.ToTable("IntegrationPointDataLog");
+                });
+
+            modelBuilder.Entity("Evaluation.DAL.Models.IntegrationEntity.IntegrationPointLog", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CreateById")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreateDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("getdate()");
+
+                    b.Property<Guid?>("DeleteById")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("DeleteDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("IntegrationPointId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("UpdateById")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("UpdateDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreateById");
+
+                    b.HasIndex("DeleteById");
+
+                    b.HasIndex("IntegrationPointId");
+
+                    b.HasIndex("UpdateById");
+
+                    b.ToTable("IntegrationPointLog");
                 });
 
             modelBuilder.Entity("Evaluation.DAL.Models.Master.Country", b =>
@@ -6623,6 +6752,7 @@ namespace Evaluation.DAL.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("RequestNumber")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<long>("Sequence")
@@ -13288,6 +13418,11 @@ namespace Evaluation.DAL.Migrations
                         .HasForeignKey("DepEvalMatrixId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("Evaluation.DAL.Models.Planing.EvaluationRequestEntity.EvaluationRequest", "EvaluationRequest")
+                        .WithMany()
+                        .HasForeignKey("EvaluationRequestId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("Evaluation.DAL.Models.FormsModules.FormEvalMatrixValue", "FormEvalMatrixValue")
                         .WithMany()
                         .HasForeignKey("FormEvalMatrixValueId")
@@ -13303,6 +13438,11 @@ namespace Evaluation.DAL.Migrations
                         .HasForeignKey("FormItemId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.HasOne("Evaluation.DAL.Models.ServiceRequestEntities.ServiceRequest", "ServiceRequest")
+                        .WithMany()
+                        .HasForeignKey("ServiceRequestId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "UpdateBy")
                         .WithMany()
@@ -13323,11 +13463,15 @@ namespace Evaluation.DAL.Migrations
 
                     b.Navigation("DepEvalMatrix");
 
+                    b.Navigation("EvaluationRequest");
+
                     b.Navigation("FormEvalMatrixValue");
 
                     b.Navigation("FormItem");
 
                     b.Navigation("FormItemConfig");
+
+                    b.Navigation("ServiceRequest");
 
                     b.Navigation("UpdateBy");
 
@@ -13697,20 +13841,95 @@ namespace Evaluation.DAL.Migrations
                     b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "CreateBy")
                         .WithMany()
                         .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "DeleteBy")
                         .WithMany()
-                        .HasForeignKey("DeleteById");
+                        .HasForeignKey("DeleteById")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "UpdateBy")
                         .WithMany()
-                        .HasForeignKey("UpdateById");
+                        .HasForeignKey("UpdateById")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("CreateBy");
 
                     b.Navigation("DeleteBy");
+
+                    b.Navigation("UpdateBy");
+                });
+
+            modelBuilder.Entity("Evaluation.DAL.Models.IntegrationEntity.IntegrationPointDataLog", b =>
+                {
+                    b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "CreateBy")
+                        .WithMany()
+                        .HasForeignKey("CreateById")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "DeleteBy")
+                        .WithMany()
+                        .HasForeignKey("DeleteById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Evaluation.DAL.Models.IntegrationEntity.IntegrationPointLog", "IntegrationPointLog")
+                        .WithMany()
+                        .HasForeignKey("IntegrationPointLogId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Evaluation.DAL.Models.Org.OrgTree", "OrgTree")
+                        .WithMany()
+                        .HasForeignKey("OrgTreeId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "UpdateBy")
+                        .WithMany()
+                        .HasForeignKey("UpdateById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("CreateBy");
+
+                    b.Navigation("DeleteBy");
+
+                    b.Navigation("IntegrationPointLog");
+
+                    b.Navigation("OrgTree");
+
+                    b.Navigation("UpdateBy");
+                });
+
+            modelBuilder.Entity("Evaluation.DAL.Models.IntegrationEntity.IntegrationPointLog", b =>
+                {
+                    b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "CreateBy")
+                        .WithMany()
+                        .HasForeignKey("CreateById")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "DeleteBy")
+                        .WithMany()
+                        .HasForeignKey("DeleteById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Evaluation.DAL.Models.IntegrationEntity.IntegrationPoint", "IntegrationPoint")
+                        .WithMany()
+                        .HasForeignKey("IntegrationPointId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "UpdateBy")
+                        .WithMany()
+                        .HasForeignKey("UpdateById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("CreateBy");
+
+                    b.Navigation("DeleteBy");
+
+                    b.Navigation("IntegrationPoint");
 
                     b.Navigation("UpdateBy");
                 });
