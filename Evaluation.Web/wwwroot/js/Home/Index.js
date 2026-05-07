@@ -100,29 +100,58 @@ function renderDepartmentsTable(departments) {
     tabContentContainer.empty();
 
     // Group departments by typeName
-    const grouped = departments.reduce((acc, item) => {
-        const key = item.typeName || 'Other';
-        if (!acc[key]) acc[key] = [];
-        acc[key].push(item);
-        return acc;
-    }, {});
+  const educationTypes = [
+        "مدارس حكومية",
+        "مدارس خاصة",
+        "رياض أطفال و دور الحضانة"
+    ];
+
+    const educationDepartments = departments.filter(item =>
+        educationTypes.includes(item.name)
+    );
+
+    const otherDepartments = departments.filter(item =>
+        !educationTypes.includes(item.name)
+    );
+
+    const grouped = {};
+
+    if (otherDepartments.length > 0) {
+        grouped["Other"] = otherDepartments;
+    }
 
     // Helper: render a department card  <img src="${item.imgBlobUrl}"/>
+    const getDepartmentIcon = (name) => {
+        if (name.includes("حكومية")) return "las la-school";
+        if (name.includes("خاصة")) return "las la-shapes";
+        if (name.includes("رياض") || name.includes("حضانة")) return "las la-baby-carriage";
+        return "las la-school";
+    };
+
     const createDepartmentCard = (item) => `
         <div class="col-md-4 mb-4">
             <div class="card item-card shadow-sm border-0"
-            onclick="window.location.href='/evaluationplan/${item.routingPath}'"
-            style="cursor: pointer;">
-                <div class="card-body">
-                    <div class="card-link"><a href="#">${item.name}</a></div>
-                    <div class="main-card">
-                        <div class="card-img shadow-sm">
-                            <img src="${item.imgBlobUrl ?? '/assets/img/login-bg.png'}" alt="Department Four" class="card-img">
+                 onclick="window.location.href='/evaluationplan/${item.routingPath}'"
+                 style="cursor: pointer;">
+
+                <div class="card-body p-0">
+                    <div class="main-card text-center">
+
+                        <div class="card-img-wrapper">
+                            <img src="${item.imgBlobUrl ?? '/assets/img/login-bg.png'}" 
+                                 alt="${item.name}" 
+                                 class="card-img">
                         </div>
+
+                        <div class="card-icon-circle shadow-sm">
+                            <i class="${getDepartmentIcon(item.name)}"></i>
+                        </div>
+
                         <div class="card-content">
                             <h5 class="card-title">${item.name}</h5>
                             <p class="card-text text-muted">${item.desc ?? ''}</p>
                         </div>
+
                     </div>
                 </div>
             </div>

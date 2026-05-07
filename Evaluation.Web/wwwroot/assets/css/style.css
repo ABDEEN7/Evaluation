@@ -1777,3 +1777,54 @@ input.auto-fill {
     column-gap: 3px !important;
     white-space: nowrap;
 }
+
+.item-card {
+    border-radius: 6px;
+    overflow: hidden;
+    background: #fff;
+}
+
+.card-img-wrapper {
+    height: 180px;
+    margin: 18px 18px 0;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+    .card-img-wrapper .card-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+.card-icon-circle {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: #fff;
+    color: #9b174c;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: -23px auto 16px;
+    position: relative;
+    z-index: 2;
+}
+
+    .card-icon-circle i {
+        font-size: 20px;
+    }
+
+.card-content {
+    padding: 0 22px 24px;
+}
+
+.card-title {
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+
+.card-text {
+    font-size: 14px;
+    line-height: 1.8;
+}
