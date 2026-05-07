@@ -151,6 +151,7 @@ window.serviceRequestForm = window.serviceRequestForm || {};
                     }
                    
                 }
+                case "time":
                 case "datetime":
                 case "date":
                 case "phone":
@@ -182,12 +183,13 @@ window.serviceRequestForm = window.serviceRequestForm || {};
 
             errors = fu.validateFields(fields, valuesMap) || [];
 
-            //const dateErrors = fu.validateDateGroups() || [];
-            //errors = errors.concat(dateErrors);
+            const dateErrors = fu.validateDateGroups() || [];
+            errors = errors.concat(dateErrors);
        
-            //const notEqualErrors = fu.validateNotEqualFields(fields) || [];
-            //errors = errors.concat(notEqualErrors);
+            const notEqualErrors = fu.validateNotEqualFields(fields) || [];
+            errors = errors.concat(notEqualErrors);
     
+             errors = errors.concat(validateTimeRange(fields, valuesMap));
 
         if (errors.length) {
             if (typeof fu.showFieldErrors === "function") {

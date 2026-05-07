@@ -85,17 +85,17 @@ function evaluationFormResult(formId) {
 async function evaluationFormWithCalculationResult(formId) {
     var result = evaluationFormResult(formId);
     var calculation = await calculate(result);
+
     var finalResult = {
         id: result.id,
         items: result.items,
         formSettings: result.formSettings,
         results: calculation.value,
+        evaluationRequestId: P_evaluationRequestId,
+        serviceRequestId: P_serviceRequestId
     };
 
     console.log(finalResult);
-
-    $(`#${P_fieldId}-result-value`).text(`${finalResult.results.name}/${finalResult.results.value}`);
-    $(`#${P_fieldId}-result-div`).removeClass("d-none");
 
     return finalResult;
 
@@ -112,6 +112,44 @@ async function calculate(result) {
             reject(err);
         });
     });
+}
+
+function calculateFE(select, formId) {
+    let formResult = evaluationFormResult(formId);
+    let result = { Value: 0, Name: "", Id:"00000000-0000-0000-0000-000000000000"};
+
+    switch (evalForm.calcMethod) {
+        case "AVERAGE": {
+
+            let total = 0;
+
+            formResult.items.forEach((item) => {
+                total += parseInt(item.value, 10) || 0;
+            });
+
+            result.Value = total / formResult.items.length;
+
+            const evalMatrixValue = P_matrixResponse.value.find(
+                v => v.minValue <= result.Value && v.maxValue >= result.Value
+            );
+
+            result.Name = evalMatrixValue?.name ?? null;
+            result.Id = evalMatrixValue?.id ?? null;
+
+            break;
+        }
+
+        case "SUM":
+            break;
+
+        case "WithoutCalc":
+            break;
+    }
+
+    $(`#${P_fieldId}-result-value`).text(`${result.Name}/${result.Value}`);
+    $(`#${P_fieldId}-result-div`).removeClass("d-none");
+
+    return result
 }
 
 function validateForm(formId) {
@@ -182,8 +220,19 @@ function submitForm(formId) {
         });
 }
 
-function saveForm(formId) {
-    return evaluationFormResult(formId);
+async function saveForm(formId) {
+    var result = evaluationFormResult(formId);
+    var calculation = await calculate(result);
+
+    var finalResult = {
+        id: result.id,
+        items: result.items,
+        formSettings: result.formSettings,
+        results: calculation.value,
+        evaluationRequestId: P_evaluationRequestId,
+        serviceRequestId: P_serviceRequestId
+    };
+    return finalResult;
 }
 
 function showValidation(itemId, message, itemPropertyType) {

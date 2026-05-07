@@ -27,7 +27,7 @@ async function LoadUserDetails() {
         }
     };
    
-    await jqClient(options).Get("/User/UserDetails");
+    await jqClient(options).Get("/UserInfo/UserDetails");
 }
 
 function initIntlTelInput() {
@@ -116,13 +116,8 @@ const getNumberPhone = () => iti.getNumber().replace("+", "00");
 
 
 // Manage Language
-const pathParts = window.location.pathname.split("/");
-let currentLang = pathParts[1];
+const pathPart = window.location.pathname.split("/");
+let currentLang = pathPart[1];
 if (!["ar", "en"].includes(currentLang)) currentLang = "en";
 
-$langToggler.prop("checked", currentLang === "ar").change(() => {
-    const newLang = $langToggler.is(":checked") ? "ar" : "en";
-    sharedUtility().SetCookie("lang", newLang, 30);
-    pathParts[1] = newLang;
-    window.location.href = window.location.origin + pathParts.join("/");
-});
+
