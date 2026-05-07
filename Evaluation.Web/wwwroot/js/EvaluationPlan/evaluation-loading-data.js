@@ -49,7 +49,6 @@ Evaluation.Loaders = (function () {
             .done(function (response) {
                 $ddl.prop('disabled', false);
 
-                //if (response && response.result && response.result.length > 0) {
                 if (response) {
                     response.forEach(function (status) {
                         $ddl.append(`

@@ -3,7 +3,7 @@ using Evaluation.DAL.Helper;
 using Evaluation.Services.BusinessLayer;
 using Evaluation.Services.BusinessLayer.API;
 using Evaluation.SharedHelper.Models;
-using Evaluation.SharedHelper.Models.Admin;
+using Evaluation.SharedHelper.Models.Api.Authentication;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Evaluation.API.Controllers
@@ -11,13 +11,13 @@ namespace Evaluation.API.Controllers
 
 	[ApiController]
 	[Route("api/[controller]")]
-	public class UserController : ControllerBase
+	public class UserInfoController : ControllerBase
 	{
 		private readonly MasterBL masterBL;
 		private readonly RequestInfo requestInfo;
 		private readonly UserInfo userInfo;
 
-		public UserController(MasterBL masterBL, RequestInfo requestInfo, UserInfo userInfo)
+		public UserInfoController(MasterBL masterBL, RequestInfo requestInfo, UserInfo userInfo)
 		{
 			this.masterBL = masterBL;
 			this.requestInfo = requestInfo;
@@ -26,7 +26,7 @@ namespace Evaluation.API.Controllers
 		
 
 
-		[HttpGet]
+		[HttpGet("UserDetails")]
 		public async Task<ApiResponse<UserProfileDTO>> UserDetails()
 		{
 			var result = await masterBL.GetApiService<UserBL>().GetUserDetails();
