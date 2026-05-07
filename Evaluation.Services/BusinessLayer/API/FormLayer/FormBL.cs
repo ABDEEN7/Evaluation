@@ -295,7 +295,12 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
 
                 var evalMatrixValue = formEvalMatrixValues.Where(v => v.MinValue <= result.Value && v.MaxValue >= result.Value);
 
-                result.Name = evalMatrixValue.Select(v => v.NameAr).FirstOrDefault();
+
+                bool isArabic = string.Equals(requestInfo.Lang, "ar", StringComparison.OrdinalIgnoreCase);
+
+                result.Name = evalMatrixValue
+                    .Select(v => isArabic ? v.NameAr : v.NameEn)
+                    .FirstOrDefault();
 
                 result.Id = evalMatrixValue.Select(v => v.Id).FirstOrDefault();
 
