@@ -99,30 +99,31 @@ function renderDepartmentsTable(departments) {
     tabsContainer.empty();
     tabContentContainer.empty();
 
-    // Group departments by typeName
-    const grouped = departments.reduce((acc, item) => {
-        const key = item.typeName || 'Other';
-        if (!acc[key]) acc[key] = [];
-        acc[key].push(item);
-        return acc;
-    }, {});
-
     // Helper: render a department card  <img src="${item.imgBlobUrl}"/>
     const createDepartmentCard = (item) => `
         <div class="col-md-4 mb-4">
             <div class="card item-card shadow-sm border-0"
-            onclick="window.location.href='/evaluationplan/${item.routingPath}'"
-            style="cursor: pointer;">
-                <div class="card-body">
-                    <div class="card-link"><a href="#">${item.name}</a></div>
-                    <div class="main-card">
-                        <div class="card-img shadow-sm">
-                            <img src="${item.imgBlobUrl ?? '/assets/img/login-bg.png'}" alt="Department Four" class="card-img">
+                 onclick="window.location.href='/evaluationplan/${item.routingPath}'"
+                 style="cursor: pointer;">
+
+                <div class="card-body p-0">
+                    <div class="main-card text-center">
+
+                        <div class="card-img-wrapper">
+                            <img src="${item.imgBlobUrl ?? '/assets/img/login-bg.png'}" 
+                                 alt="${item.name}" 
+                                 class="card-img">
                         </div>
+
+                        <div class="card-icon-circle shadow-sm">
+                           <i class="las ${item.depIcon}"></i>
+                        </div>
+
                         <div class="card-content">
                             <h5 class="card-title">${item.name}</h5>
                             <p class="card-text text-muted">${item.desc ?? ''}</p>
                         </div>
+
                     </div>
                 </div>
             </div>
@@ -148,30 +149,6 @@ function renderDepartmentsTable(departments) {
             </div>
         </div>
     `);
-
-    // --- Create tabs for each typeName dynamically ---
-    Object.keys(grouped).forEach((typeName) => {
-        const safeId = typeName.replace(/\s+/g, '-').toLowerCase();
-
-        tabsContainer.append(`
-            <li class="col-md-4 nav-item" role="presentation">
-                <button class="nav-link fw-semibold" id="${safeId}-tab"
-                    data-bs-toggle="tab" data-bs-target="#${safeId}"
-                    type="button" role="tab" aria-controls="${safeId}" aria-selected="false">
-                    ${typeName}
-                </button>
-            </li>
-        `);
-
-        const cardsHTML = grouped[typeName].map(createDepartmentCard).join('');
-        tabContentContainer.append(`
-            <div class="tab-pane fade" id="${safeId}" role="tabpanel" aria-labelledby="${safeId}-tab">
-                <div id="${safeId}Container" class="row card-view fade-switch active">
-                    ${cardsHTML || '<p class="text-muted">لا توجد إدارات متاحة.</p>'}
-                </div>
-            </div>
-        `);
-    });
 }
 
 const loadMainBanner = () => {
