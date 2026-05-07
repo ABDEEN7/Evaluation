@@ -360,7 +360,7 @@
         allowInput: true
     });
     Evaluation.Loaders.loadPlans('evaluationPlanIdFilter');
-    Evaluation.Loaders.loadServiceStatus('evaluationRequestStatusFilter');
+    //Evaluation.Loaders.loadServiceStatus('evaluationRequestStatusFilter');
     evaluationRequestsListing.reload();
 });
 
