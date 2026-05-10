@@ -177,6 +177,17 @@
                 }
 
                 bindSchoolDetails(response);
+
+                if (response.assignment && response.assignment.length > 0) {
+
+                    $("#forceAssignmentAccordion").removeClass("d-none");
+                    renderForceAssignments(response.assignment, "forceAssignmentDiv");
+
+                } else {
+
+                    $("#forceAssignmentAccordion").addClass("d-none");
+                }
+
             }
         };
 

@@ -5,6 +5,7 @@ using Evaluation.Services.BusinessLayer.API.FormLayer;
 using Evaluation.Services.Models.API;
 using Evaluation.SharedHelper.Dtos.PlanDto;
 using FluentResults;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Evaluation.API.Controllers;
@@ -12,6 +13,7 @@ namespace Evaluation.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]/{depRouting}/[action]")]
+[Authorize]
 
 public class EvaluationRequestController : ControllerBase
 {

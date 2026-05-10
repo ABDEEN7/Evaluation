@@ -52,4 +52,10 @@ public class AssignmentController : ControllerBase
         var result = await _masterBl.GetApiService<AssignmentBL>().SendNotificationMailUser(notificationUserMail);
         return result;
     }
+
+	[HttpPost]
+	public async Task<Result<bool>> ForceAssignmentStatus([FromBody] ForceAssignmentStatusDto model)
+	{
+		return await _masterBl.GetApiService<AssignmentBL>().ForceAssignmentStatus(model);
+	}
 }
