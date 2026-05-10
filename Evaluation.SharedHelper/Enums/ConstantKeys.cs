@@ -1522,12 +1522,29 @@ public static class ConstantKeys
 
         public static readonly Guid EvaluationParty = Guid.Parse("281E98ED-9ED5-4AF3-8C08-4A659BE99DC8");
     }
-    public static class NDAStatic
-    {
-        public static string Pending = "PENDING";
-        public static string Objection = "OBJECTION";
-    }
-    public static class EvaluationDetailsModal
+	public static class NDAStatic
+	{
+		public static string Pending = "PENDING";
+		public static string Approved = "APPROVED";
+		public static string Objection = "OBJECTION";
+		public static string Suspended = "SUSPENDED";
+		public static string Forced = "FORCED";
+	}
+	public static class NDAStatusIds
+	{
+		public static readonly Guid Objection =Guid.Parse("466D8F62-F8F9-4A3F-B364-82C77D7DE72D");
+
+		public static readonly Guid Approve =Guid.Parse("E679F265-2BDA-4A36-8C4C-8911EE26BB7B");
+
+		public static readonly Guid Suspended =Guid.Parse("8F017EEF-84C1-46B9-9E89-9698BAB996CF");
+
+		public static readonly Guid Pending =Guid.Parse("B08F866B-52E7-4B98-966B-B16F0C4FCCE7");
+
+		public static readonly Guid Approved =Guid.Parse("2E30F24C-A86D-48A5-B922-DB59859AB617");
+
+		public static readonly Guid Forced =Guid.Parse("D3CCAB02-789D-4D44-A8BC-EBEFABCCF2C4");
+	}
+	public static class EvaluationDetailsModal
     {
         private const string Prefix = "EvaluationDetailsModal.";
 

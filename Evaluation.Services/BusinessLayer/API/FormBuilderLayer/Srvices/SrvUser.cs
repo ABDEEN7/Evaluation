@@ -26,7 +26,11 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
         {
             using var scope = serviceScopeFactory.CreateScopedUow();
 
-			var UserProfile = await scope.GetRepository<MinistryUser>().GetByIDActiveNonDeleted(userId);
+			var UserProfile = await scope.GetRepository<MinistryUser>()
+                                    .GetAllQueryFiltered(x=>x.Id== userId)
+                                    .Include(x=>x.UserPartTypes)
+                                    .ThenInclude(x=>x.PartyType)
+                                    .FirstOrDefaultAsync();
 
             return UserProfile;
         }
