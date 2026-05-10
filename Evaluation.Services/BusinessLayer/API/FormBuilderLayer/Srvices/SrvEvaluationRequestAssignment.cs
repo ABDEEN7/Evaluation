@@ -18,6 +18,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System.Net.NetworkInformation;
 using System.Threading.Tasks;
+using static Evaluation.SharedHelper.Enums.ConstantKeys;
 
 
 namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
@@ -327,7 +328,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             assignment.Note = dto.ConflictReason;
             assignment.IsNDA =! dto.HasConflict;
             assignment.NdaDate = DateTime.UtcNow;
-            //assignment.NdaStatusId = dto.NDAStatusId;
+            assignment.NdaStatusId = NDAStatusIds.Approve;
 
             await scope.CommitAsync();
 

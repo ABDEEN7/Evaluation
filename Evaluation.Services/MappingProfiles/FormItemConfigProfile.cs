@@ -10,5 +10,6 @@ public class FormItemConfigProfile : Profile
     {
         CreateMap<FormItemConfigDto, FormItemConfig>();
         CreateMap<FormItemConfig, FormItemConfigDto>();
+        CreateMap<FormItemConfig, CreateFormItemConfigDto>();
     }
 }

@@ -211,7 +211,7 @@ const sharedFn = (options) => {
             if (AlldropdownList.length > 0) {
                 let dropdownInitializer = jqDropdownInitializer({
                     dropdowns: AlldropdownList,
-                    url: `/Home/GetDropDownValues`,
+                    url: `Home/GetDropDownValues`,
                     lang: lang,
                 });
                 dropdownInitializer.InitParents();
@@ -433,7 +433,7 @@ const sharedFn = (options) => {
                 if (AlldropdownList.length > 0) {
                     let dropdownInitializer = jqDropdownInitializer({
                         dropdowns: AlldropdownList,
-                        url: `/Home/GetDropDownValues`,
+                        url: `Home/GetDropDownValues`,
                         lang: lang,
                     });
                     dropdownInitializer.InitParents();
@@ -501,7 +501,7 @@ const sharedFn = (options) => {
             if (AlldropdownList.length > 0) {
                 let dropdownInitializer = jqDropdownInitializer({
                     dropdowns: AlldropdownList,
-                    url: `/Home/GetDropDownValues`,
+                    url: `Home/GetDropDownValues`,
                     lang: lang,
                 });
                 dropdownInitializer.InitParents(true);
@@ -722,7 +722,7 @@ const sharedFn = (options) => {
                 if (AlldropdownList.length > 0) {
                     let dropdownInitializer = jqDropdownInitializer({
                         dropdowns: AlldropdownList,
-                        url: `/Home/GetDropDownValues`,
+                        url: `Home/GetDropDownValues`,
                         lang: lang,
                     });
                     dropdownInitializer.InitParents(true);

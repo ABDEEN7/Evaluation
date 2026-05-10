@@ -26,7 +26,7 @@ const API_ROUTES = {
     saveFormItem: () => `/TemplateForm/${deprouting}/SaveTemplateFormItem`,
     updateFormItem: () => `/TemplateForm/${deprouting}/UpdateTemplateFormItem`,
     deleteFormItem: () => `/TemplateForm/${deprouting}/DeleteTemplateFormItem`,
-    getFormItemsFromDepartment: (id) => `/TemplateForm/${deprouting}/GetAllFormItemsFromDepartment?EvalformId=${id}`,
+    getFormItemsFromDepartment: (id) => `/TemplateForm/${deprouting}/GetAllFormItemsFromDepartment?TemplateFormId=${id}`,
 
     // SubFormItem
     saveSubFormItem: () => `/TemplateForm/${deprouting}/SaveEvaluationSubFormItem`,
@@ -42,7 +42,6 @@ const API_ROUTES = {
     // FormItemConfig
     getAllFormItemConfig: (id) => `/TemplateForm/${deprouting}/GetAllFormItemConfig?evalFormId=${id}`,
     saveFormItemConfig: () => `/TemplateForm/${deprouting}/SaveFormItemConfig`,
-    saveAllFormItemConfig: () => `/TemplateForm/${deprouting}/SaveAllFormItemConfig`,
     updateFormItemConfig: () => `/TemplateForm/${deprouting}/UpdateFormItemConfig`,
 
     // Lookups

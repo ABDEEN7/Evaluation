@@ -11,4 +11,5 @@ API_ENDPOINTS.GET_TEAM_MEMBERS_BY_EVALUATION_REQUEST = `/Assignment/${deprouting
 API_ENDPOINTS.SUBMIT_EVALUATION_REQUEST_ASSIGNMENT = `/Assignment/${deprouting}/Submit`;
 API_ENDPOINTS.DELETE_EVALUATION_REQUEST_ASSIGNMENT = `/Assignment/${deprouting}/Delete`;
 API_ENDPOINTS.SEND_MAIL_NOTIFICATION = `/Assignment/${deprouting}/SendNotificationMailUser`;
+API_ENDPOINTS.FORCE_ASSIGNMENT_STATUS =`/Assignment/${deprouting}/ForceAssignmentStatus`;
 window.API_ENDPOINTS = API_ENDPOINTS;

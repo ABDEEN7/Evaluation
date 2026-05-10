@@ -171,7 +171,36 @@
                                 </div>
                             </div>
 
-                         
+                            <div class="accordion-item mb-3 rounded d-none" id="forceAssignmentAccordion">
+
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed d-flex align-items-center justify-content-between"
+                                            type="button"
+                                            data-bs-toggle="collapse"
+                                            data-bs-target="#itemForceAssignments">
+
+                                        <div class="d-flex align-items-center gap-2 fs-18">
+                                            <i class="las la-user-shield text-primary fs-25"></i>
+                                            <span class="fw-semibold">
+                                                 Assignments
+                                            </span>
+                                        </div>
+
+                                        <span class="toggle-icon">
+                                            <i class="la la-angle-up fs-22"></i>
+                                        </span>
+                                    </button>
+                                </h2>
+
+                                <div id="itemForceAssignments" class="accordion-collapse collapse">
+                                    <div class="accordion-body">
+
+                                        <div id="forceAssignmentDiv"></div>
+
+                                    </div>
+                                </div>
+
+                            </div>
                             <div id="evaluationPartiesContainer"></div>
 
                             <div class="accordion-item mb-3 rounded">
@@ -599,6 +628,7 @@
     <script src="~/js/assignments/generate-request-assignment.js"></script>
     <script src="~/js/assignments/get-request-assignments.js"></script>
     <script src="~/js/assignments/submit-request-assignments.js"></script>
+    <script src="~/js/assignments/force-assignment-status.js"></script>
 
     <script src="~/js/evaluationplan/createrequest.js"></script>
     <script src="~/lib/uuid/uuid.min.js"></script>
@@ -619,7 +649,8 @@
                     '@nameof(ConstantKeys.EvaluationOperations)',
                     '@nameof(ConstantKeys.EvaluationDetailsModal)',
                     '@nameof(ConstantKeys.EvaluationForm)',
-                    '@nameof(ConstantKeys.WebSchools)'
+                    '@nameof(ConstantKeys.WebSchools)',
+                    '@nameof(ConstantKeys.Assignment)'
 
 
                 ],
@@ -629,9 +660,12 @@
                     '@nameof(ConstantKeys.EvaluationOperations)'
 
                 ],
-                additional_keys: []
-            });
 
+            }).then((result) => {
+                permissionsList = result.permissionsList;
+                IsCanUpdatePlan = permissionsList?.some(p => p === '@ConstantKeys.WebPermissions.EDIT_WEB_PLAN') ?? false;
+            });
+            additional_keys: [];
             window.formUtility = window.formUtility || {};
              const searchParams = new URLSearchParams(window.location.search);
                 const reqId = searchParams.get('id');
@@ -640,22 +674,27 @@
                 const planId = searchParams.get('planId');
                 const SerReqid = searchParams.get('SerReqid');
 
-                 if (reqId) {
-                 openPlanRequestDetails(reqId);
-                }
+            if (reqId) {
+                openPlanRequestDetails(reqId);
+            }
 
-                if (EvlId) {
-                      openEvaluationRequestDetails(EvlId);
-                }
-                if (SerReqid) {
-                      openRequestDetails(EvlId);
-                }
-                if(planId){
+            if (EvlId) {
+                openEvaluationRequestDetails(EvlId);
+            }
+         if (SerReqid) {
+       openRequestDetails(EvlId);
+ }
+            if (planId) {
+                if (IsCanUpdatePlan) {
+                    InitializeCreatePlanRequestService(serviceId, planId);
+                } else {
                     InitializePlanDetails(planId);
                 }
+            }
+            // if()
 
-         $('#evaluationRequestDetailsModal').on('hidden.bs.modal', function () {
-            formUtility.removeQueryParameter(['Evlid', 'serviceId']);
+            $('#evaluationRequestDetailsModal').on('hidden.bs.modal', function () {
+                formUtility.removeQueryParameter(['Evlid', 'serviceId']);
             });
             $('#planRequestModal').on('hidden.bs.modal', function () {
                 formUtility.removeQueryParameter(['id', 'serviceId']);
@@ -665,7 +704,11 @@
                 formUtility.removeQueryParameter(['id', 'serviceId']);
             });
             $('#PlanDetailsModal').on('hidden.bs.modal', function () {
-                formUtility.removeQueryParameter(['planId', 'serviceId']);
+                formUtility.removeQueryParameter(['planId', 'planId']);
+            });
+            $('#PlanDetailsModal').on('hidden.bs.modal', function () {
+                formUtility.removeQueryParameter(['planId', 'planId']);
+                formUtility.removeQueryParameter(['serviceId', 'serviceId']);
             });
             if (sharedUtility().ExistingToken()) {
                 uiControlsSetup().UpdatPageTitle('WebAppScholarship');
@@ -697,7 +740,7 @@
                 // });
 
 
-        }
+            }
 
         });
     </script>

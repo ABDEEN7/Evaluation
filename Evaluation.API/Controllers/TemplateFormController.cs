@@ -52,7 +52,7 @@ public class TemplateFormController : ControllerBase
 
     [HttpPost]
     //[CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.ADD_WEB_TemplateFormS })]
-    public async Task<IActionResult> SaveEvaluationForm()
+    public async Task<IActionResult> SaveTemplateForm()
     {
         var request = Request.Form["request"][0]?.StringToObject<TemplateFormDto>();
         return Ok(await _masterBl.GetApiService<EvaluationFormBL>().SaveEvaluationForm(request!));
@@ -60,14 +60,14 @@ public class TemplateFormController : ControllerBase
 
     [HttpPost]
     //[CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.EDIT_WEB_TemplateFormS })]
-    public async Task<IActionResult> UpdateEvaluationForm()
+    public async Task<IActionResult> UpdateTemplateForm()
     {
         var request = Request.Form["request"][0]?.StringToObject<TemplateFormDto>();
         return Ok(await _masterBl.GetApiService<EvaluationFormBL>().UpdateEvaluationForm(request!));
     }
     [HttpPost]
     // [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.DELETE_WEB_TemplateFormS })]
-    public async Task<IActionResult> DeleteEvaluationForm(Guid Id)
+    public async Task<IActionResult> DeleteTemplateForm(Guid Id)
     {
 
         return Ok(await _masterBl.GetApiService<EvaluationFormBL>().DeleteEvaluationForm(Id!));
@@ -76,7 +76,7 @@ public class TemplateFormController : ControllerBase
 
     [HttpPost]
     //[CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.ADD_WEB_FORMITEMS })]
-    public async Task<IActionResult> SaveEvaluationFormItem()
+    public async Task<IActionResult> SaveTemplateFormItem()
     {
         var request = Request.Form["request"][0]?.StringToObject<EvaluationFormItemDto>();
         return Ok(await _masterBl.GetApiService<EvaluationFormBL>().SaveEvaluationFormItem(request!));
@@ -84,14 +84,14 @@ public class TemplateFormController : ControllerBase
 
     [HttpPost]
     //[CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.EDIT_WEB_FORMITEMS })]
-    public async Task<IActionResult> UpdateEvaluationFormItem()
+    public async Task<IActionResult> UpdateTemplateFormItem()
     {
         var request = Request.Form["request"][0]?.StringToObject<EvaluationFormItemDto>();
         return Ok(await _masterBl.GetApiService<EvaluationFormBL>().UpdateEvaluationFormItem(request!));
     }
     [HttpPost]
     //[CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.DELETE_WEB_FORMITEMS })]
-    public async Task<IActionResult> DeleteEvaluationFormItem(Guid Id)
+    public async Task<IActionResult> DeleteTemplateFormItem(Guid Id)
     {
 
         return Ok(await _masterBl.GetApiService<EvaluationFormBL>().DeleteEvaluationFormItem(Id!));
@@ -156,6 +156,7 @@ public class TemplateFormController : ControllerBase
         response.Add("CalcMethodsList", CalcMethodsList);
         return Ok(new ResponseEntity(response));
     }
+   
     [HttpGet]
     public async Task<IActionResult> GetAllFormItemConfig(Guid? evalFormId)
     {
@@ -163,15 +164,15 @@ public class TemplateFormController : ControllerBase
         return Ok(data);
     }
     [HttpPost]
-    public async Task<IActionResult> SaveAllFormItemConfig()
+    public async Task<IActionResult> SaveFormItemConfig()
     {
-        var request = Request.Form["request"][0]?.StringToObject<List<FormItemConfigDto>>();
+        var request = Request.Form["request"][0]?.StringToObject<List<CreateFormItemConfigDto>>();
         return Ok(await _masterBl.GetApiService<EvaluationFormBL>().SaveFormItemConfig(request!));
     }
     [HttpPost]
     public async Task<IActionResult> UpdateFormItemConfig()
     {
-        var request = Request.Form["request"][0]?.StringToObject<FormItemConfigDto>();
+        var request = Request.Form["request"][0]?.StringToObject<CreateFormItemConfigDto>();
         return Ok(await _masterBl.GetApiService<EvaluationFormBL>().UpdateFormItemConfig(request!));
     }
 }
