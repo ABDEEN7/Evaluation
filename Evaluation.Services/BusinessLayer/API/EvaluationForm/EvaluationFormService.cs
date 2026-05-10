@@ -660,7 +660,7 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
         var invalid = formItemsConfig
             .Where(x => x.FormItemId != null)
             .GroupBy(x => x.FormItemId)
-            .Where(g => g.Sum(x => x.Percentage) != 100)
+            .Where(g => g.Sum(x => x.WeightPercentage) != 100)
             .Select(g => g.Key);
 
         if (invalid.Any())
@@ -705,7 +705,7 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
                 existingItem.NameAr = item.NameAr;
                 existingItem.NameEn = item.NameEn;
                 existingItem.CalcMethodId = item.CalcMethodId;
-                existingItem.Percentage = item.Percentage;
+                existingItem.WeightPercentage = item.WeightPercentage;
             }
             else
             {
