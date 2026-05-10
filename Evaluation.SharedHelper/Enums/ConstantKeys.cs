@@ -208,6 +208,7 @@ public static class ConstantKeys
         public static readonly string Max_Final_Evaluation_Forms_Exceeded = "Max_Final_Evaluation_Forms_Exceeded";
         public static readonly string UserNotExsistInThisEvaluationRequest = "UserNotExsistInThisEvaluationRequest";
         public static readonly string UnsupportedDepartmentCategory = "UnsupportedDepartmentCategory";
+        public static readonly string lblNoPartyTypeFound = "lblNoPartyTypeFound";
     }
 
     public static class AdminSettings
