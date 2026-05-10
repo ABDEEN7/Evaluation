@@ -156,18 +156,7 @@ public class TemplateFormController : ControllerBase
         response.Add("CalcMethodsList", CalcMethodsList);
         return Ok(new ResponseEntity(response));
     }
-    [HttpGet]
-    public async Task<IActionResult> GetReassignLists(Guid formId)
-    {
-        Dictionary<string, object> response = new Dictionary<string, object>();
-        var PartyTypeList = await _masterBl.GetApiService<EvaluationFormBL>().GetPartyTypeListAsync();
-        var FormItemList = await _masterBl.GetApiService<EvaluationFormBL>().GetFormItemListAsync(formId);
-        var CalcMethodsList = await _masterBl.GetApiService<EvaluationFormBL>().GetCalcMethodsListAsync();
-        response.Add("PartyTypeList", PartyTypeList);
-        response.Add("FormItemList", FormItemList);
-        response.Add("CalcMethodsList", CalcMethodsList);
-        return Ok(new ResponseEntity(response));
-    }
+   
     [HttpGet]
     public async Task<IActionResult> GetAllFormItemConfig(Guid? evalFormId)
     {
