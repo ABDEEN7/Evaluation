@@ -660,9 +660,12 @@
                     '@nameof(ConstantKeys.EvaluationOperations)'
 
                 ],
-                additional_keys: []
-            });
 
+            }).then((result) => {
+                permissionsList = result.permissionsList;
+                IsCanUpdatePlan = permissionsList?.some(p => p === '@ConstantKeys.WebPermissions.EDIT_WEB_PLAN') ?? false;
+            });
+            additional_keys: [];
             window.formUtility = window.formUtility || {};
              const searchParams = new URLSearchParams(window.location.search);
                 const reqId = searchParams.get('id');
@@ -671,22 +674,27 @@
                 const planId = searchParams.get('planId');
                 const SerReqid = searchParams.get('SerReqid');
 
-                 if (reqId) {
-                 openPlanRequestDetails(reqId);
-                }
+            if (reqId) {
+                openPlanRequestDetails(reqId);
+            }
 
-                if (EvlId) {
-                      openEvaluationRequestDetails(EvlId);
-                }
-                if (SerReqid) {
-                      openRequestDetails(EvlId);
-                }
-                if(planId){
+            if (EvlId) {
+                openEvaluationRequestDetails(EvlId);
+            }
+         if (SerReqid) {
+       openRequestDetails(EvlId);
+ }
+            if (planId) {
+                if (IsCanUpdatePlan) {
+                    InitializeCreatePlanRequestService(serviceId, planId);
+                } else {
                     InitializePlanDetails(planId);
                 }
+            }
+            // if()
 
-         $('#evaluationRequestDetailsModal').on('hidden.bs.modal', function () {
-            formUtility.removeQueryParameter(['Evlid', 'serviceId']);
+            $('#evaluationRequestDetailsModal').on('hidden.bs.modal', function () {
+                formUtility.removeQueryParameter(['Evlid', 'serviceId']);
             });
             $('#planRequestModal').on('hidden.bs.modal', function () {
                 formUtility.removeQueryParameter(['id', 'serviceId']);
@@ -696,7 +704,11 @@
                 formUtility.removeQueryParameter(['id', 'serviceId']);
             });
             $('#PlanDetailsModal').on('hidden.bs.modal', function () {
-                formUtility.removeQueryParameter(['planId', 'serviceId']);
+                formUtility.removeQueryParameter(['planId', 'planId']);
+            });
+            $('#PlanDetailsModal').on('hidden.bs.modal', function () {
+                formUtility.removeQueryParameter(['planId', 'planId']);
+                formUtility.removeQueryParameter(['serviceId', 'serviceId']);
             });
             if (sharedUtility().ExistingToken()) {
                 uiControlsSetup().UpdatPageTitle('WebAppScholarship');
@@ -728,7 +740,7 @@
                 // });
 
 
-        }
+            }
 
         });
     </script>

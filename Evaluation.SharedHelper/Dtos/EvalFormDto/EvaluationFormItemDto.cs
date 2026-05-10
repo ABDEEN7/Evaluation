@@ -24,4 +24,5 @@ public class EvaluationFormItemDto : EntityBaseDTO
     public bool NoteRequired { get; set; }
     public virtual ICollection<EvaluationFormSubItemDto>? SubFormItems { get; set; }
     public Guid[]? FormItemRelated { get; set; }
+    public bool HasMulitEvaluation { get; set; }
 }
