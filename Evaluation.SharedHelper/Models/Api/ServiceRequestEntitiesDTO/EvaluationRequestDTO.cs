@@ -1,6 +1,7 @@
 ﻿using Azure;
 using Evaluation.DAL.Models.Org;
 using Evaluation.SharedHelper.Dtos.SchoolDto;
+using Evaluation.SharedHelper.Dtos.TeamMemberDto;
 using Evaluation.SharedHelper.Models.Api.ActionEntitiesDTOs;
 using Evaluation.SharedHelper.Models.Api.AttachmentsDTOs;
 using Evaluation.SharedHelper.Models.Api.EvaluationRequestEntities;
@@ -73,5 +74,6 @@ namespace Evaluation.SharedHelper.Models.Api.ServiceRequestEntitiesDTO
 		public bool IsNdaApprovalPending { get; set; }
 
 		public List<EvaluationPartyDTO> EvaluationParties { get; set; }
+		public List<EvaluationRequestAssignmentDto> Assignment { get; set; }
 	}
 }

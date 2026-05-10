@@ -5,6 +5,7 @@ using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
 using Evaluation.DAL.Models.Template;
 using Evaluation.DAL.Models.UserEntiy;
 using Evaluation.DAL.Repositories;
+using Evaluation.Services.Extensions;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Dtos.TeamMemberDto;
 using Evaluation.SharedHelper.Enums;
@@ -109,12 +110,17 @@ public class AssignmentBL(IServiceScopeFactory serviceScopeFactory,
     }
     public async Task<Result<List<EvaluationRequestAssignmentDto>>> GetTeamByEvaluationRequestId(Guid evaluationRequestId)
     {
-        var team = unitOfWork
-            .GetRepository<EvaluationRequestAssignment>()
-            .GetAllQueryFiltered(x => x.EvaluationRequestId == evaluationRequestId)
-            .Include(x => x.EvalRequestAssignmentScopies)
-            .ToList();
-        var evaluationRequestAssignmentDto = mapper.Map<List<EvaluationRequestAssignmentDto>>(team);
+		using var scopeUow = serviceScopeFactory.CreateScopedUow();
+
+		var team = await scopeUow.GetRepository<EvaluationRequestAssignment>()
+		            .GetAllQueryFiltered(x => x.EvaluationRequestId == evaluationRequestId)
+		            .Include(x => x.NdaStatus)
+		            .Include(x => x.MinistryUser)
+		            .Include(x => x.PartyType)
+		            .Include(x => x.EvalRequestAssignmentScopies)
+			            .ThenInclude(x => x.Scope)
+		            .ToListAsync();
+		var evaluationRequestAssignmentDto = mapper.Map<List<EvaluationRequestAssignmentDto>>(team);
         return evaluationRequestAssignmentDto;
     }
     private async Task AddAssignments(Guid evaluationRequestId, List<EvalTeamRequestDto> model)
@@ -146,7 +152,9 @@ public class AssignmentBL(IServiceScopeFactory serviceScopeFactory,
             PartyTypeId = dto.PartyTypeId,
             IsLeader = dto.IsLeader,
             Note = dto.Note,
-            EvalRequestAssignmentScopies = dto.Scopes?.Select(scope =>
+            NdaStatusId= NDAStatusIds.Pending,
+
+			EvalRequestAssignmentScopies = dto.Scopes?.Select(scope =>
                 new EvalRequestAssignmentScope
                 {
                     CreateById = userInfo.UserId.Value,
@@ -325,4 +333,29 @@ public class AssignmentBL(IServiceScopeFactory serviceScopeFactory,
         var result = await emailServices.SendEmail(config.messageModel);
         return Result.Ok(result);
     }
+
+	public async Task<Result<bool>> ForceAssignmentStatus(ForceAssignmentStatusDto model)
+	{
+		var assignment = await unitOfWork
+			.GetRepository<EvaluationRequestAssignment>()
+			.GetAllQueryFiltered(x =>
+				x.MinistryUserId == model.MinistryUserId &&
+				x.EvaluationRequestId == model.EvaluationRequestId)
+			.FirstOrDefaultAsync();
+
+		if (assignment == null)
+			return Result.Fail("Assignment not found");
+
+		assignment.IsNDA = true;
+		assignment.NdaStatusId = NDAStatusIds.Forced;
+		assignment.NdaDate = DateTime.Now;
+
+		unitOfWork
+			.GetRepository<EvaluationRequestAssignment>()
+			.Update(assignment);
+
+		await unitOfWork.CommitAsync();
+
+		return Result.Ok(true);
+	}
 }
