@@ -10,6 +10,8 @@ public class FormItemDto
     public bool NoteRequired { get; set; }
 
     public List<RelatedItemDto>? RelatedItems { get; set; }
+    public bool HasMultiEvaluation { get; set; }
+
     //public Guid RelatedItemId { get; set; } 
     //public string RelatedItemName { get; set; } = null!;
 

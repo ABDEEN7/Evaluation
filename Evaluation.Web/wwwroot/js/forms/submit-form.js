@@ -21,51 +21,99 @@ function evaluationFormResult(formId) {
     $(`#${P_fieldId}-${SELECTORS.tbody} tr.main-row`).each(function () {
 
         const row = $(this);
-        const select = row.find("select.eval-select");
+        const selects = row.find("select.eval-select");
+        let mainObj;
 
-        const mainId = select.data("id");
+        selects.each(function (index, element) {
 
-        const selectedValue =
-            select.find("option:selected").data("id") ||
-            select.val() ||
-            null;
+            const $select = $(element);
 
-        const note =
-            row.find("textarea.note-input").val() || null;
 
-        const mainObj = {
-            id: mainId,
-            valueId: selectedValue,
-            value: $("option:selected", select).text(),
-            note: note,
-            subItems: []
-        };
 
-        // ========== LOOP SUB ITEMS RELATED TO THIS MAIN ==========
-        $(`tr.child-row[data-parent-id="${mainId}"]`).each(function () {
+            const mainId = $select.data("id");
 
-            const childRow = $(this);
-            const childSelect = childRow.find("select.eval-select");
-
-            const childId = childSelect.data("id");
-
-            const childValue =
-                childSelect.find("option:selected").data("id") ||
-                childSelect.val() ||
+            const selectedValue =
+                $select.find("option:selected").data("id") ||
+                $select.val() ||
                 null;
 
-            const childnote =
-                childRow.find("textarea.note-input").val() || null;
+            const note =
+                row.find("textarea.note-input").val() || null;
 
-            mainObj.subItems.push({
-                id: childId,
-                valueId: childValue,
-                value: $("option:selected", select).text(),
-                note: childnote
+            mainObj = {
+                id: mainId,
+                valueId: selectedValue,
+                value: $("option:selected", $select).text(),
+                note: note,
+                subItems: []
+            };
+
+            // ========== LOOP SUB ITEMS RELATED TO THIS MAIN ==========
+            $(`tr.child-row[data-parent-id="${mainId}"]`).each(function () {
+
+                const childRow = $(this);
+                const childSelect = childRow.find("select.eval-select");
+
+                const childId = childSelect.data("id");
+
+                const childValue =
+                    childSelect.find("option:selected").data("id") ||
+                    childSelect.val() ||
+                    null;
+
+                const childnote =
+                    childRow.find("textarea.note-input").val() || null;
+
+                mainObj.subItems.push({
+                    id: childId,
+                    valueId: childValue,
+                    value: $("option:selected", $select).text(),
+                    note: childnote
+                });
             });
+
+
+            mainItems.push(mainObj);
         });
 
-        mainItems.push(mainObj);
+      
+
+        //const note =
+        //    row.find("textarea.note-input").val() || null;
+
+        //const mainObj = {
+        //    id: mainId,
+        //    valueId: selectedValue,
+        //    value: $("option:selected", select).text(),
+        //    note: note,
+        //    subItems: []
+        //};
+
+        //// ========== LOOP SUB ITEMS RELATED TO THIS MAIN ==========
+        //$(`tr.child-row[data-parent-id="${mainId}"]`).each(function () {
+
+        //    const childRow = $(this);
+        //    const childSelect = childRow.find("select.eval-select");
+
+        //    const childId = childSelect.data("id");
+
+        //    const childValue =
+        //        childSelect.find("option:selected").data("id") ||
+        //        childSelect.val() ||
+        //        null;
+
+        //    const childnote =
+        //        childRow.find("textarea.note-input").val() || null;
+
+        //    mainObj.subItems.push({
+        //        id: childId,
+        //        valueId: childValue,
+        //        value: $("option:selected", select).text(),
+        //        note: childnote
+        //    });
+        //});
+
+        //mainItems.push(mainObj);
     });
 
     // Strengths & Improvements

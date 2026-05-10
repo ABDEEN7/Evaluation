@@ -96,6 +96,8 @@ const generateFormAccordionItem = (rowsHtml, hasAnyNote, hasAnyChildren, fieldId
                         `
                         <th>المعايير</th>
                         <th>اختر التقييم</th>
+                         <th>اختر التقييم</th>
+
                         ${hasAnyNote ? '<th>الشواهد وأثرها</th>' : ''}
                         ` : ` <th>الاولويات</th> ${allowDelete ?'<th></th>':''}`}
                    
@@ -121,9 +123,9 @@ const generateFormAccordionItem = (rowsHtml, hasAnyNote, hasAnyChildren, fieldId
 // ==============================
 // Field Builders
 // ==============================
-const buildSelection = ({ id }, fieldId, readOnly) => `
+const buildSelection = ({ id }, fieldId, readOnly, index) => `
 <select class="form-select eval-select"
-        id="${fieldId}_${id}_Select"
+        id="${fieldId}_${id}_Select_${index}"
         data-id="${id}"
         ${readOnly ? 'disabled' : ''}>
 </select>
@@ -178,9 +180,18 @@ const createRow = ({
     </td>
     ${!isRename ?
         `
-    <td>${buildSelection(item, fieldId, readOnly)}
-        <span class="validation-message text-danger small mt-1" id="validation-${item.id}-${ItemPropertyType.SELECT}"style="display:none;"></span>
+
+
+    ${Array.from({ length: 2 }, (_, index) => `
+    <td>
+        ${buildSelection(item, fieldId, readOnly, index)}
+        <span 
+            class="validation-message text-danger small mt-1"
+            id="validation-${item.id}-${ItemPropertyType.SELECT}_${index}"
+            style="display:none;">
+        </span>
     </td>
+`).join('')}
     ${hasAnyNote ? `<td>${buildNote(item, fieldId, readOnly)}
         <span class="validation-message text-danger small mt-1" id="validation-${item.id}-${ItemPropertyType.NOTE}"style="display:none;"></span>
     </td>` : ''}
@@ -190,6 +201,30 @@ const createRow = ({
     
 </tr>
 `;
+
+/*
+
+ ${Array.from({ length: 2 }, (_, index) => `
+    <td>
+        ${buildSelection(item, fieldId, readOnly, index)}
+        <span 
+            class="validation-message text-danger small mt-1"
+            id="validation-${item.id}-${ItemPropertyType.SELECT}_${index}"
+            style="display:none;">
+        </span>
+    </td>
+`).join('')}
+
+
+
+        <td>${buildSelection(item, fieldId, readOnly, index = 0)}
+        <span class="validation-message text-danger small mt-1" id="validation-${item.id}-${ItemPropertyType.SELECT}_${index}"style="display:none;"></span>
+    </td>
+     <td>${buildSelection(item, fieldId, readOnly, index = 1)}
+        <span class="validation-message text-danger small mt-1" id="validation-${item.id}-${ItemPropertyType.SELECT}_${index}"style="display:none;"></span>
+    </td>
+   
+ */
 
 const createRowRelatedItem = ({
     item,
@@ -542,33 +577,72 @@ async function initializeControls(formId, fieldId, controlValues) {
     );
 
     function populateForm(itemId, isSubItem = false) {
-        const select = document.getElementById(`${fieldId}_${itemId}_Select`);
-        const note = document.getElementById(`${fieldId}_${itemId}_Note`);
 
-        if (!select) return;
+        let length = 2;
 
-        // Reset select
-        select.length = 0;
-        select.add(createPlaceholderOption());
-
-        // Add matrix options
-        matrixOptions.forEach(option =>
-            select.add(option.cloneNode(true))
-        );
-
-        // Apply saved values
-        const valueSource = isSubItem
-            ? subItemValueMap.get(itemId)
-            : itemValueMap.get(itemId);
-
-        if (valueSource) {
-            select.value = valueSource.valueId ?? "";
-            if (note) note.value = valueSource.note ?? "";
+        if (isSubItem) {
+            length = 1;
         }
 
-        $(select).on("change", function () {
-            calculateFE(select, formId);
-        });
+        for (var i = 0; i < length; i++) {
+            const select = document.getElementById(`${fieldId}_${itemId}_Select_${i}`);
+
+            if (!select) return;
+
+            // Reset select
+            select.length = 0;
+            select.add(createPlaceholderOption());
+
+            // Add matrix options
+            matrixOptions.forEach(option =>
+                select.add(option.cloneNode(true))
+            );
+
+            // Apply saved values
+            const valueSource = isSubItem
+                ? subItemValueMap.get(itemId)
+                : itemValueMap.get(itemId);
+
+            if (valueSource) {
+                select.value = valueSource.valueId ?? "";
+            }
+
+            $(select).on("change", function () {
+                calculateFE(select, formId);
+            });
+        }
+        //const select = document.getElementById(`${fieldId}_${itemId}_Select`);
+
+        //if (!select) return;
+
+        //// Reset select
+        //select.length = 0;
+        //select.add(createPlaceholderOption());
+
+        //// Add matrix options
+        //matrixOptions.forEach(option =>
+        //    select.add(option.cloneNode(true))
+        //);
+
+        //// Apply saved values
+        //const valueSource = isSubItem
+        //    ? subItemValueMap.get(itemId)
+        //    : itemValueMap.get(itemId);
+
+        //if (valueSource) {
+        //    select.value = valueSource.valueId ?? "";
+        //}
+
+        //$(select).on("change", function () {
+        //    calculateFE(select, formId);
+        //});
+
+
+        const note = document.getElementById(`${fieldId}_${itemId}_Note`);
+
+        //if (valueSource) {
+        //    if (note) note.value = valueSource.note ?? "";
+        //}
 
     }
 
