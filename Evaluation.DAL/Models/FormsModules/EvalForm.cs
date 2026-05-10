@@ -20,5 +20,7 @@ public class EvalForm : EntityBase , IAuditLogEntity
     public FormStatus? FormStatus { get; set; } 
     public bool IsFinalEval { get; set; }
     public bool AllowRename { get; set; }
+    public bool HasMuliEvaluation { get; set; }
+    public int CountOfColumnsValue { get; set; } = 1;
 
 }
