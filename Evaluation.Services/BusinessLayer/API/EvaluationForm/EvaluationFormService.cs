@@ -610,7 +610,7 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
                 FormItemConfig_NameAr = g.First().NameAr,
                 FormItemConfig_NameEn = g.First().NameEn,
                 FormItemConfig_CalcMethodId = g.First().CalcMethodId,
-                FormItemConfig_Percentage = g.First().Percentage,
+                FormItemConfig_Percentage = g.First().WeightPercentage,
 
                 FormItemConfig_FormItemIds = g
                     .Where(x => x.FormItemId.HasValue)
@@ -651,7 +651,7 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
                     NameAr = m.NameAr,
                     NameEn = m.NameEn,
                     CalcMethodId = m.CalcMethodId,
-                    Percentage = m.Percentage
+                    WeightPercentage = m.Percentage
                 });
             })
             .ToList();
@@ -759,7 +759,7 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
         x.PartyTypeId == existingRecord.PartyTypeId &&
         x.FormItemId == existingRecord.FormItemId &&
         x.Id != existingRecord.Id)
-    .SumAsync(x => (decimal?)x.Percentage) ?? 0;
+    .SumAsync(x => (decimal?)x.WeightPercentage) ?? 0;
 
         total += dto.Percentage;
 
@@ -770,7 +770,7 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
         existingRecord.NameAr = dto.NameAr;
         existingRecord.NameEn = dto.NameEn;
         existingRecord.CalcMethodId = dto.CalcMethodId;
-        existingRecord.Percentage = dto.Percentage;
+        existingRecord.WeightPercentage = dto.Percentage;
 
         repo.Update(existingRecord);
 
@@ -793,7 +793,7 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
                 x.EvalFormId == record.EvalFormId &&
                 x.PartyTypeId == record.PartyTypeId &&
                 x.Id != record.Id)
-            .SumAsync(x => (decimal?)x.Percentage) ?? 0;
+            .SumAsync(x => (decimal?)x.WeightPercentage) ?? 0;
 
 
         if (remainingTotal != 100)
