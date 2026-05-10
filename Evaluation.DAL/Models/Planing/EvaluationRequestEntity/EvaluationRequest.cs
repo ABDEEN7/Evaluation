@@ -37,6 +37,7 @@ public class EvaluationRequest : EntityBase, IAuditLogEntity
     public DateOnly? EvaluationDate { get; set; }
     public DateOnly? NextEvaluationDate { get; set; }
     public virtual ICollection<ServiceRequestFieldsValue>? ServiceRequestFieldsValues { get; set; }
+    public virtual ICollection<EvaluationRequestAssignment>? EvaluationRequestAssignments { get; set; }
 
 
 
