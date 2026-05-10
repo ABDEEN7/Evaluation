@@ -1791,11 +1791,16 @@ input.auto-fill {
     overflow: hidden;
 }
 
-    .card-img-wrapper .card-img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
+.card-img-wrapper .card-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+
+
+
+
 
 .card-icon-circle {
     width: 46px;
@@ -1899,4 +1904,11 @@ input.auto-fill {
 
 .social-media .badge {
     font-size: 10px;
+}
+
+.requeststableBody tr:has(.dataTables_empty) {
+    width: 100% !important;
+    display: table-row !important;
+    place-items: center;
+    padding: 2rem 0 !important;
 }
