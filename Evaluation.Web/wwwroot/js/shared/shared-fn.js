@@ -435,7 +435,7 @@ const sharedFn = (options) => {
                 if (AlldropdownList.length > 0) {
                     let dropdownInitializer = jqDropdownInitializer({
                         dropdowns: AlldropdownList,
-                        url: `Home/GetDropDownValues`,
+                        url: `/Home/GetDropDownValues`,
                         lang: lang,
                     });
                     dropdownInitializer.InitParents();
@@ -503,7 +503,7 @@ const sharedFn = (options) => {
             if (AlldropdownList.length > 0) {
                 let dropdownInitializer = jqDropdownInitializer({
                     dropdowns: AlldropdownList,
-                    url: `Home/GetDropDownValues`,
+                    url: `/Home/GetDropDownValues`,
                     lang: lang,
                 });
                 dropdownInitializer.InitParents(true);
@@ -724,7 +724,7 @@ const sharedFn = (options) => {
                 if (AlldropdownList.length > 0) {
                     let dropdownInitializer = jqDropdownInitializer({
                         dropdowns: AlldropdownList,
-                        url: `Home/GetDropDownValues`,
+                        url: `/Home/GetDropDownValues`,
                         lang: lang,
                     });
                     dropdownInitializer.InitParents(true);
@@ -1348,7 +1348,7 @@ const sharedFn = (options) => {
                         error: function (err) {
                             reject(err); // Reject on error
                         }
-                    }).Post("Home/GetDropDownValues", data);
+                    }).Post("/Home/GetDropDownValues", data);
                 });
             }
         }
@@ -1412,7 +1412,7 @@ const sharedFn = (options) => {
                     controlUibackendName: uibackendName,
                     parentReferenceValue: null
                 };
-                jqClient(options).Post("Home/GetDropDownValues", data);
+                jqClient(options).Post("/Home/GetDropDownValues", data);
 
             }
             else {
@@ -1484,7 +1484,7 @@ const sharedFn = (options) => {
                     controlUibackendName: uibackendName,
                     parentReferenceValue: null
                 };
-                jqClient(options).Post("Home/GetDropDownValues", data);
+                jqClient(options).Post("/Home/GetDropDownValues", data);
 
             }
            

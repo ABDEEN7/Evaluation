@@ -164,6 +164,11 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
         obj.FormStatusId = message.FormStatusId;
         obj.IsActive = message.IsActive;
         obj.AllowRename = message.AllowRename;
+        obj.HasMuliEvaluation = message.HasMuliEvaluation;
+        if (message.HasMuliEvaluation)
+        { 
+            obj.CountOfColumnsValue = message.EvalCountOfColumnsValue;
+        }
         if (message.IsFinalEval)
         {
             if (!await CheckEvaluationForm())
@@ -213,6 +218,11 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
             obj.FormStatusId = message.FormStatusId;
             obj.IsActive = message.IsActive;
             obj.AllowRename = message.AllowRename;
+            obj.HasMuliEvaluation = message.HasMuliEvaluation;
+            if (message.HasMuliEvaluation)
+            {
+                obj.CountOfColumnsValue = message.EvalCountOfColumnsValue;
+            }
             if (!await CheckEvaluationForm(message.Id))
             {
                 obj.IsFinalEval = message.IsFinalEval;
