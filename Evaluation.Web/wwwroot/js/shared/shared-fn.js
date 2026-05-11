@@ -23,7 +23,7 @@ const sharedFn = (options) => {
             var formData = new FormData();
             formData.append('request', JSON.stringify(ControlItems));
             $.ajax({
-                url: "/UiControl/UiControlList",
+                url: `/UiControl/${deprouting}/UiControlList`,
                 type: "POST",
                 dataType: "html",
                 processData: false,

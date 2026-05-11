@@ -7,13 +7,14 @@ using Evaluation.Services.BusinessLayer.API.EvaluationForm;
 using Evaluation.SharedHelper.Dtos.EvalFormDto;
 using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Models.Admin;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Evaluation.API.Controllers;
 
-
-[Route("api/[controller]/{depRouting}/[action]")]
+[AllowAnonymous]
 [ApiController]
+[Route("api/[controller]/{depRouting}/[action]")]
 public class TemplateFormController : ControllerBase
 {
     private readonly MasterBL _masterBl;
