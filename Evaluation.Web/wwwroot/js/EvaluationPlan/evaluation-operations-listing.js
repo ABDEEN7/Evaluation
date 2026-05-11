@@ -76,58 +76,69 @@
         rowClass: 'plan-request-card',
 
         columns: [
-           {
-                data: "evaluationType",
+          {
+            data: "evaluationType",
                 title: uiControlsSetup().GetUiControlText("lblEvaluationPlan"),
-                className: "td-full py-1",
-                render: function(data, type, row) {
-
-                    const isCompleted = row.StatusISOPen === false;
+                className: "td-left py-1 td-70",
+                render: function(data) {
 
                     return `
-                    <div class="plan-title-row my-2">
+                <div class="plan-title-row">
+                    <i class="las la-certificate card-only-icon title-icon"></i>
 
-                        <i class="las la-certificate card-only-icon title-icon"></i>
+                    <span class="plan-text-wrap px-1">
+                        <span class="card-only-label title-label">Operation: </span>
+                        <span class="plan-title-text">${data || ""}</span>
+                    </span>
+                </div>
+                `;
+                }
+            },
+            {
+            data: "Status",
+            title: uiControlsSetup().GetUiControlText("lblRequestStatus"),
+            className: "td-right py-1 place-content-end td-30",
+            render: function(data, type, row) {
 
-                        <span class="plan-text-wrap px-1">
-                            <span class="card-only-label title-label">Operation: </span>
-                            <span class="plan-title-text">${data || ""}</span>
-                        </span>
+                const isCompleted = row.StatusISOPen === false;
 
-                        ${isCompleted ? `
-                        <span class="request-status approved-status py-1 px-2">
-                            <i class="las la-check"></i>
-                            مكتمل
-                        </span>
-                        ` : `
-                        <span class="request-status approved-status py-1 px-2">
-                            <i class="las la-times"></i>
-                            غير مكتمل
-                        </span>
-                        `}
-
-                    </div>
+               return `
+                <div class="d-flex justify-content-end">
+                    ${isCompleted ? `
+                    <span class="request-status approved-status bg-success-light py-1 px-2">
+                        <i class="las la-check"></i>
+                        مكتمل
+                    </span>
+                    ` : `
+                    <span class="request-status approved-status bg-danger-light text-danger py-1 px-2">
+                        <i class="las la-times"></i>
+                        غير مكتمل
+                    </span>
+                    `}
+                </div>
                 `;
                 }
             },
             {
                 data: "orgTreeName",
                 title: uiControlsSetup().GetUiControlText("lblSchoolName"),
-                className: "td-full py-0 my-0",
+                className: "td-left py-0 status-break-row  align-content-end",
                 render: function(data) {
 
                     if (!data) return "_";
 
-                    return `
-                <i class="las la-school card-only-icon me-1"></i>
-                <strong class="text-truncate-2">${data}</strong>
+                    return `  
+                    
+                        <i class="las la-school card-only-icon me-1"></i>
+                        <strong class ="text-truncate-2">${data}</strong>
+                    
                 `;
                 }
              },
              {
                 data: "status",
                 title: uiControlsSetup().GetUiControlText("lblRequestNo"),
-                className: "td-full py-0 my-0",
+                className: "td-left status-break-row py-0 align-content-end",
                 render: function(data) {
 
                     if (!data) return "_";
@@ -141,7 +152,7 @@
             {
                 data: "createOn",
                 title: uiControlsSetup().GetUiControlText("lblRequestCreatedDate"),
-                className: "td-left py-0 my-0",
+                className: "td-left py-0",
                 render: function(data) {
 
                     if (!data) return "_";
@@ -156,7 +167,7 @@
             {
                 data: "createOn",
                 title: uiControlsSetup().GetUiControlText("lblRequestCreatedTime"),
-                className: "td-right bg-grey justify-content-end py-0 my-0",
+                className: "td-right bg-grey justify-content-end py-0",
                 render: function(data) {
 
                     if (!data) return "_";
