@@ -9,6 +9,7 @@ using Evaluation.Services.BusinessLayer.API.DepartmentLayer;
 using Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices;
 using Evaluation.Services.Extensions;
 using Evaluation.Services.Models.API;
+using Evaluation.Services.Shared;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Api.EvaluationRequestEntities;
@@ -24,18 +25,17 @@ using System.Threading.Tasks;
 namespace Evaluation.Services.BusinessLayer.API.EvaluationRequestLayer
 {
 	public class SrvEvaluationParty(
-		IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow, SrvNotification SrvNotification, SrvUser SrvUser,
-		LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, SrvAction SrvAction,
-		SrvStatus SrvStatus, SrvAssignment SrvAssignment, SrvActionTransactionsLog SrvActionTransactionsLog, PerformActionBL _performActionBL,
-		SrvService SrvService,   SrvAttachments _srvAttachments, IServiceProvider serviceProvider, RequestInfo _requestInfo)
+		IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow, 
+		LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, RequestAccessService requestAccessService,
+	   IServiceProvider serviceProvider, RequestInfo _requestInfo)
 			: ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, _requestInfo)
 	
 	{
 
 		public async Task<List<EvaluationParty>> GetAllEvaluationPartiesAsync(Guid DepartmentId)
 		{
-			var EvaluationParty=  serviceScopeFactory.CreateScopedUow()
-										.GetRepository<EvaluationParty>()
+			using var ScopedUow = serviceScopeFactory.CreateScopedUow();
+			var EvaluationParty= await ScopedUow.GetRepository<EvaluationParty>()
 				.GetAllActiveNonDeleted()
 				.Where(x=>x.DepartmentId== DepartmentId)
 				.Select(d => new EvaluationParty
@@ -44,7 +44,7 @@ namespace Evaluation.Services.BusinessLayer.API.EvaluationRequestLayer
 					NameAr = d.NameAr,
 					NameEn = d.NameEn,
 				
-				}).ToList();
+				}).ToListAsync();
 
 			return EvaluationParty;
 
@@ -52,9 +52,8 @@ namespace Evaluation.Services.BusinessLayer.API.EvaluationRequestLayer
 
 		public async Task<EvaluationParty?> GetEvaluationPartyByIdAsync(Guid evaluationPartyId)
 		{
-			return await serviceScopeFactory
-				.CreateScopedUow()
-				.GetRepository<EvaluationParty>()
+			using var ScopedUow = serviceScopeFactory.CreateScopedUow();
+			return await ScopedUow.GetRepository<EvaluationParty>()
 				.GetAllActiveNonDeleted(x => x.Id == evaluationPartyId)
 				.Select(d => new EvaluationParty
 				{
@@ -66,19 +65,26 @@ namespace Evaluation.Services.BusinessLayer.API.EvaluationRequestLayer
 				})
 				.FirstOrDefaultAsync();
 		}
-		public async Task<List<EvaluationPartyDTO>> GetPartiesWithServicesAndRequestsAsync(Guid evaluationRequestId,Guid DepartementId, Guid? requestStatusId,List<Guid> partyTypeIds)
+		public async Task<List<EvaluationPartyDTO>> GetPartiesWithServicesAndRequestsAsync(Guid evaluationRequestId,Guid DepartementId,Guid? requestStatusId,List<Guid> partyTypeIds)
 		{
-			var Lang=requestInfo.Lang;
+			var Lang = requestInfo.Lang;
+
 			using var uow = serviceScopeFactory.CreateScopedUow();
+
 			var parties = await uow
 				.GetRepository<EvaluationParty>()
 				.GetAllQueryFiltered()
-				.Include(x=>x.PartyTypeEvalParties)
-				.ThenInclude(x=>x.PartyTypeEvalPartyStatuses)
-				.Where(p => p.DepartmentId== DepartementId  && (
-							!partyTypeIds.Any() ||requestStatusId == null ||
-							p.PartyTypeEvalParties.Any(pt =>partyTypeIds.Contains(pt.PartyTypeId) &&
-															pt.PartyTypeEvalPartyStatuses.Any(s => s.ServiceStatusId == requestStatusId))
+				.Include(x => x.PartyTypeEvalParties)
+					.ThenInclude(x => x.PartyTypeEvalPartyStatuses)
+				.Where(p =>
+					p.DepartmentId == DepartementId &&
+					(
+						!partyTypeIds.Any() ||
+						requestStatusId == null ||
+						p.PartyTypeEvalParties.Any(pt =>
+							partyTypeIds.Contains(pt.PartyTypeId) &&
+							pt.PartyTypeEvalPartyStatuses.Any(s =>
+								s.ServiceStatusId == requestStatusId))
 					))
 				.OrderBy(p => p.OrderNo)
 				.Select(p => new EvaluationPartyDTO
@@ -88,9 +94,10 @@ namespace Evaluation.Services.BusinessLayer.API.EvaluationRequestLayer
 					NameAr = p.NameAr,
 					NameEn = p.NameEn,
 					OrderNo = p.OrderNo,
-                    IsSupportFiles = p.IsSupportFiles,
-                    Services = new List<EvaluationPartyServiceDTO>()
-				}).ToListAsync();
+					IsSupportFiles = p.IsSupportFiles,
+					Services = new List<EvaluationPartyServiceDTO>()
+				})
+				.ToListAsync();
 
 			if (!parties.Any())
 				return parties;
@@ -99,7 +106,9 @@ namespace Evaluation.Services.BusinessLayer.API.EvaluationRequestLayer
 
 			var services = await uow
 				.GetRepository<Service>()
-				.GetAllActiveNonDeleted(s => s.EvaluationPartyId != null && partyIds.Contains(s.EvaluationPartyId.Value))
+				.GetAllActiveNonDeleted(s =>
+					s.EvaluationPartyId != null &&
+					partyIds.Contains(s.EvaluationPartyId.Value))
 				.OrderBy(s => s.OrderNo)
 				.Select(s => new
 				{
@@ -130,7 +139,8 @@ namespace Evaluation.Services.BusinessLayer.API.EvaluationRequestLayer
 						IsFreez = s.IsFreez,
 						ShowInWebSite = s.ShowInWebSite,
 						StartDate = s.StartDate,
-						EndDate = s.EndDate
+						EndDate = s.EndDate,
+						Requests = new List<ServiceRequestDTO>()
 					}).ToList()
 				);
 
@@ -140,23 +150,31 @@ namespace Evaluation.Services.BusinessLayer.API.EvaluationRequestLayer
 					party.Services = list;
 			}
 
-			var requests = await uow
+			IQueryable<ServiceRequest> requestsQuery = uow
 				.GetRepository<ServiceRequest>()
-				.GetAllActiveNonDeleted(r => r.EvaluationRequestId == evaluationRequestId).Include(x=>x.Status)
+				.GetAllActiveNonDeleted(r => r.EvaluationRequestId == evaluationRequestId)
+				.Include(x => x.Status)
+					.ThenInclude(x => x!.ServiceStatusType)
+				.Include(x => x.Service)
+				.Include(x => x.CreateBy);
+
+			requestsQuery = await requestAccessService.ApplyServiceRequestAccess(requestsQuery);
+
+			var requests = await requestsQuery
 				.Select(r => new
 				{
 					r.Id,
 					r.RequestNumber,
 					r.StatusId,
-					r.Status!.ServiceStatusType!.IsOpen,
+					IsOpen = r.Status!.ServiceStatusType!.IsOpen,
 					StatusNameAr = r.Status!.NameAr,
 					StatusNameEn = r.Status!.NameEn,
 					r.ServiceId,
 					r.EvaluationPartyId,
 					r.CreateDate,
-					r.CreateBy,
 					r.UpdateDate,
 					r.Service,
+					r.CreateBy,
 					r.VisitDateFrom,
 					r.VisitDateTo
 				})
@@ -172,15 +190,18 @@ namespace Evaluation.Services.BusinessLayer.API.EvaluationRequestLayer
 						RequestNumber = r.RequestNumber,
 						StatusId = r.StatusId,
 						Service = Lang == "ar" ? r.Service!.NameAr : r.Service!.NameEn,
-                        StatusISOPen = r.IsOpen,
+						StatusISOPen = r.IsOpen,
 						Status = Lang == "ar" ? r.StatusNameAr : r.StatusNameEn,
 						ServiceId = r.ServiceId,
 						EvaluationPartyId = r.EvaluationPartyId,
 						CreateDate = r.CreateDate,
 						UpdateDate = r.UpdateDate,
-                        CreateBy=Lang == "ar" ? r.CreateBy.NameAr : r.CreateBy.NameEn
-
-                    })
+						CreateBy = r.CreateBy != null
+							? (Lang == "ar" ? r.CreateBy.NameAr : r.CreateBy.NameEn)
+							: "",
+						VisitDateFrom = r.VisitDateFrom,
+						VisitDateTo = r.VisitDateTo
+					})
 					.OrderByDescending(x => x.CreateDate)
 					.ToList()
 				);
@@ -196,7 +217,5 @@ namespace Evaluation.Services.BusinessLayer.API.EvaluationRequestLayer
 
 			return parties;
 		}
-
-
 	}
 }
