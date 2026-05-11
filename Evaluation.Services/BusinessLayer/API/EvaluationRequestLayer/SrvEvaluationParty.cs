@@ -68,6 +68,7 @@ namespace Evaluation.Services.BusinessLayer.API.EvaluationRequestLayer
 		public async Task<List<EvaluationPartyDTO>> GetPartiesWithServicesAndRequestsAsync(Guid evaluationRequestId,Guid DepartementId,Guid? requestStatusId,List<Guid> partyTypeIds)
 		{
 			var Lang = requestInfo.Lang;
+			var today = DateTime.Now;
 
 			using var uow = serviceScopeFactory.CreateScopedUow();
 
@@ -108,7 +109,10 @@ namespace Evaluation.Services.BusinessLayer.API.EvaluationRequestLayer
 				.GetRepository<Service>()
 				.GetAllActiveNonDeleted(s =>
 					s.EvaluationPartyId != null &&
-					partyIds.Contains(s.EvaluationPartyId.Value))
+					partyIds.Contains(s.EvaluationPartyId.Value) &&
+					s.RequestShowPartyType != null &&
+					s.RequestShowPartyType.Any(pt =>
+						partyTypeIds.Contains(pt.PartyTypeId)))
 				.OrderBy(s => s.OrderNo)
 				.Select(s => new
 				{
@@ -121,7 +125,13 @@ namespace Evaluation.Services.BusinessLayer.API.EvaluationRequestLayer
 					s.ShowInWebSite,
 					s.StartDate,
 					s.EndDate,
-					s.EvaluationPartyId
+					s.EvaluationPartyId,
+					CanCreate =
+						(s.StartDate == null || s.StartDate <= today) &&
+						(s.EndDate == null || s.EndDate >= today) &&
+						s.ServiceInitiatorPartyType != null &&
+						s.ServiceInitiatorPartyType.Any(pt =>
+							partyTypeIds.Contains(pt.PartyTypeId))
 				})
 				.ToListAsync();
 
@@ -140,6 +150,7 @@ namespace Evaluation.Services.BusinessLayer.API.EvaluationRequestLayer
 						ShowInWebSite = s.ShowInWebSite,
 						StartDate = s.StartDate,
 						EndDate = s.EndDate,
+						CanCreate = s.CanCreate,
 						Requests = new List<ServiceRequestDTO>()
 					}).ToList()
 				);
