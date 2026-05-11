@@ -1048,11 +1048,10 @@ public static class ConstantKeys
         //PlanType
         public const string GET_WEB_PLAN_TYPE_REQUEST = "GET_WEB_PLAN_TYPE_REQUEST";
         //Plan 
-        public const string ADD_WEB_PLAN_REQUEST = "ADD_WEB_PLAN_REQUEST";
-        public const string UPDATE_WEB_PLAN_REQUEST = "UPDATE_WEB_PLAN_REQUEST";
-        public const string GET_WEB_PLAN_DETAILS_REQUEST = "GET_WEB_PLAN_DETAILS_REQUEST";
-        public const string APPROVE_WEB_PLAN_REQUEST = "APPROVE_WEB_PLAN_REQUEST";
-        public const string GET_SEMESTERS_REQUEST = "GET_SEMESTERS_REQUEST";
+        public const string ADD_WEB_PLAN = "ADD_WEB_PLAN";
+        public const string EDIT_WEB_PLAN = "EDIT_WEB_PLAN";
+        public const string VIEW_WEB_PLAN = "VIEW_WEB_PLAN";
+        public const string DELETE_WEB_PLAN = "DELETE_WEB_PLAN";
         #endregion
     }
     public static class WebAppSettings

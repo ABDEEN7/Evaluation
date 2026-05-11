@@ -267,17 +267,10 @@ public class PlanServiceRequestServices(
         Guid serviceId = serviceObj.Id;
         Guid serviceStatusId = await GetServiceStatus(serviceId);
 
-        int lastSequence = await unitOfWork.GetRepository<EvaluationRequest>()
-            .GetAllNonDeleted(x => x.ServiceId == serviceId)
-            .Select(x => (int?)x.Sequence)
-            .MaxAsync() ?? 0;
 
         var requests = modelDto.Schools.Select(school =>
         {
-            lastSequence++;
-            var requestNumber = DateTime.Now.ToString(serviceObj.ReqNumberDef ?? "", new CultureInfo("en-US"))
-                                + lastSequence;
-
+      
             return new EvaluationRequest
             {
                 Id = Guid.NewGuid(),
@@ -288,17 +281,23 @@ public class PlanServiceRequestServices(
                 FromDate = school.StartEvaluationDate,
                 ToDate = school.EndEvaluationDate,
                 ServiceStatusId = serviceStatusId,
-                Sequence = lastSequence,
-                RequestNumber = requestNumber,
+                RequestNumber = "",
                 CreateDate = DateTime.UtcNow,
                 IsDeleted = false
             };
         }).ToList();
 
         await unitOfWork.GetRepository<EvaluationRequest>()
-            .InsertRange(requests);
+     .InsertRange(requests);
 
-
+        foreach (var request in requests)
+        {
+            request.RequestNumber =
+                DateTime.Now.ToString(
+                    serviceObj.ReqNumberDef ?? "",
+                    new CultureInfo("en-US"))
+                + request.Sequence;
+        }
     }
     private async Task ReplaceEvaluationRequests(
     Guid planId,

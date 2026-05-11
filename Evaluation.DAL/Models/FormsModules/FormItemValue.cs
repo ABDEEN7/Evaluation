@@ -30,4 +30,6 @@ public class FormItemValue : EntityBase ,IAuditLogEntity
 
     public Guid? EvaluationRequestId { get; set; }
     public EvaluationRequest? EvaluationRequest { get; set; }
+    public decimal ItemWeight { get; set; } = 0;
+    public decimal ItemConfigWeight { get; set; } = 0;
 }
