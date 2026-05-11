@@ -1169,10 +1169,10 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
 			using var scopedUow = serviceScopeFactory.CreateScopedUow();
 
-            var initiators = (await cacheDataProvider.GetServiceIntiator())
-                .Where(c => userInfo.PartyTypes.Contains(c.PartyTypeId) && c.service?.SystemModule?.DepartmentId == requestInfo.DepId)
-                .Select(c => c.serviceId)
-                .ToHashSet();
+            //var initiators = (await cacheDataProvider.GetServiceIntiator())
+            //    .Where(c => userInfo.PartyTypes.Contains(c.PartyTypeId) && c.service?.SystemModule?.DepartmentId == requestInfo.DepId)
+            //    .Select(c => c.serviceId)
+            //    .ToHashSet();
 
             //var statusConfig = (await cacheDataProvider.GetServiceStatusConfiguration())
             //	.Where(c => distinctStatusIds.Contains(c.CurrentStatusId)
