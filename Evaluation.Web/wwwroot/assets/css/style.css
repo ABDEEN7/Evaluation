@@ -2084,7 +2084,7 @@ input.auto-fill {
         }
 }
 
-@media (min-width: 1201px) and (max-width: 1527px) {
+/*@media (min-width: 1201px) and (max-width: 1527px) {
 
     .table-card-seperate-styling .card-row .td-right,
     .table-card-seperate-styling .card .td-right {
@@ -2112,7 +2112,7 @@ input.auto-fill {
         .table-card-seperate-styling .card .td-right > div {
             justify-content: flex-start !important;
         }
-}
+}*/
 
 .table-card-seperate-styling .card-row .status-break-row,
 .table-card-seperate-styling .card .status-break-row {
