@@ -43,7 +43,7 @@ function evaluationFormResult(formId) {
             mainObj = {
                 id: mainId,
                 valueId: selectedValue,
-                value: $("option:selected", $select).text(),
+                value: $("option:selected", $select).data("actual-value") || 0,
                 note: note,
                 subItems: []
             };
@@ -67,7 +67,7 @@ function evaluationFormResult(formId) {
                 mainObj.subItems.push({
                     id: childId,
                     valueId: childValue,
-                    value: $("option:selected", $select).text(),
+                    value: $("option:selected", $select).text(),//NEED TO CHECK
                     note: childnote
                 });
             });
@@ -172,7 +172,7 @@ function calculateFE(select, formId) {
             let total = 0;
 
             formResult.items.forEach((item) => {
-                total += parseInt(item.value, 10) || 0;
+                total += item.value || 0;
             });
 
             result.Value = total / formResult.items.length;
@@ -194,7 +194,7 @@ function calculateFE(select, formId) {
             break;
     }
 
-    $(`#${P_fieldId}-result-value`).text(`${result.Name}/${result.Value}`);
+    $(`#${P_fieldId}-result-value`).text(`(${Number(result.Value).toFixed(2)})${result.Name}`);
     $(`#${P_fieldId}-result-div`).removeClass("d-none");
 
     return result

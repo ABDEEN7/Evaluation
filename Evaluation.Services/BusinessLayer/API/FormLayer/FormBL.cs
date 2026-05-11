@@ -13,6 +13,8 @@ using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Models;
 using FluentResults;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json.Linq;
+using System;
 using ValidationResult = Evaluation.SharedHelper.Dtos.Shared.ValidationResult;
 
 namespace Evaluation.Services.BusinessLayer.API.FormLayer;
@@ -288,10 +290,10 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
                 decimal total = 0;
                 foreach (var item in formEvaluationDto.Items)
                 {
-                    total += item.Value;
+                    total += formEvalMatrixValues.Where(v => v.Id == item.ValueId).Select(v => v.ActualMatrixValue).FirstOrDefault();
                 }
 
-                result.Value = total / formEvaluationDto.Items.Count;
+                result.Value = Math.Round((total / formEvaluationDto.Items.Count), 2);
 
                 var evalMatrixValue = formEvalMatrixValues.Where(v => v.MinValue <= result.Value && v.MaxValue >= result.Value);
 

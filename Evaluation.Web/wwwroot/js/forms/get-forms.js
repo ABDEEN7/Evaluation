@@ -44,7 +44,7 @@ const ItemPropertyType = Object.freeze({
 // ==============================
 
 
-const escapeHtml = (text = '', isRename, { id }, fieldId, allowRename) => {
+const escapeHtml = (text = '', isRename = false, itemId = null, fieldId = null, allowRename = false) => {
 
     if (!isRename) {
         const div = document.createElement('div');
@@ -56,8 +56,8 @@ const escapeHtml = (text = '', isRename, { id }, fieldId, allowRename) => {
         const input = document.createElement("input");
         input.type = "text";
         input.className = "form-control form-control-sm item-name";
-        input.id = `${fieldId}_${id}_ItemName`;
-        input.setAttribute("data-id", id);
+        input.id = `${fieldId}_${itemId}_ItemName`;
+        input.setAttribute("data-id", itemId);
 
         if (!allowRename) {
 
@@ -82,7 +82,7 @@ const createPlaceholderOption = (text = 'Please select') => {
 // Accordion Builders
 // ==============================
 
-const generateFormAccordionItem = (rowsHtml, hasAnyNote, hasAnyChildren, fieldId, isRename, allowDelete, allowAdd) => `
+const generateFormAccordionItem = (rowsHtml, hasAnyNote, hasAnyChildren, fieldId, isRename, allowDelete, allowAdd, hasMuliEvaluation, countOfColumnsValue) => `
 <div class="accordion-item mb-3 rounded">
     <div id="item3" class="accordion-collapse collapse show">
         <div class="accordion-body">
@@ -95,10 +95,13 @@ const generateFormAccordionItem = (rowsHtml, hasAnyNote, hasAnyChildren, fieldId
                          ${!isRename ?
                         `
                         <th>المعايير</th>
-                        <th>اختر التقييم</th>
-                         <th>اختر التقييم</th>
-
-                        ${hasAnyNote ? '<th>الشواهد وأثرها</th>' : ''}
+                       
+                        ${hasMuliEvaluation
+                                ? Array.from({ length: countOfColumnsValue }, (_, i) =>
+                                    `<th>اختر التقييم ${i + 1}</th>`
+                                ).join('')
+                                : '<th>اختر التقييم</th>'}
+                                ${hasAnyNote ? '<th>الشواهد وأثرها</th>' : ''}
                         ` : ` <th>الاولويات</th> ${allowDelete ?'<th></th>':''}`}
                    
                     </tr>
@@ -163,6 +166,8 @@ const createRow = ({
     isRename,
     allowRename,
     allowDelete,
+    hasMuliEvaluation,
+    countOfColumnsValue
 }) => `
 <tr class="${isChild ? 'child-row collapse' : 'main-row'} align-middle"
     ${isChild ? `id="${collapseId}" data-parent-id="${item.parentId}"` : ''}>
@@ -171,7 +176,7 @@ const createRow = ({
         <td>${!isChild && item.subFormItems?.length ? createToggleButton(collapseId) : ''}</td>
     ` : ''}
     <td>${order}</td>
-    <td class="text-start">${escapeHtml(item.name, isRename, item, fieldId, allowRename)} 
+    <td class="text-start">${escapeHtml(item.name, isRename, item.id, fieldId, allowRename)} 
     ${Array.isArray(item.relatedItems) && item.relatedItems.length > 0
         ? `<span class="info-icon" onclick="openRelatedItemModal('${item.id}')">ⓘ</span>`
         : ''
@@ -182,7 +187,7 @@ const createRow = ({
         `
 
 
-    ${Array.from({ length: 2 }, (_, index) => `
+    ${Array.from({ length: countOfColumnsValue }, (_, index) => `
     <td>
         ${buildSelection(item, fieldId, readOnly, index)}
         <span 
@@ -239,7 +244,7 @@ const createRowRelatedItem = ({
 </tr>
 `;
 
-// ============================== 
+// ==============================
 // Table Generator
 // ==============================
 const generateTableBodyHtml = async (
@@ -250,7 +255,10 @@ const generateTableBodyHtml = async (
     readOnly,
     isRename,
     allowRename,
-    allowDelete) => {
+    allowDelete,
+    allowAdd,
+    hasMuliEvaluation,
+    countOfColumnsValue) => {
 
     let firstitem = items[0];
     const firstitemCollapseId = `collapse-${firstitem.id}`;
@@ -260,14 +268,16 @@ const generateTableBodyHtml = async (
         let firstRow = createRow({
             item: firstitem,
             order: lastOrder,
-            firstitemCollapseId,
+            collapseId:firstitemCollapseId,
             hasChildrenColumn: hasAnyChildren,
-            hasAnyNote,
-            fieldId,
-            readOnly,
-            isRename,
-            allowRename,
-            allowDelete
+            hasAnyNote:hasAnyNote,
+            fieldId:fieldId,
+            readOnly:readOnly,
+            isRename:isRename,
+            allowRename:allowRename,
+            allowDelete:allowDelete,
+            hasMuliEvaluation:hasMuliEvaluation,
+            countOfColumnsValue:countOfColumnsValue
         });
 
         renameItems.shift()
@@ -280,29 +290,33 @@ const generateTableBodyHtml = async (
 
             const collapseId = `collapse-${item.id}`;
             const mainRow = createRow({
-                item,
+                item:item,
                 order: i + 1,
-                collapseId,
+                collapseId:collapseId,
                 hasChildrenColumn: hasAnyChildren,
-                hasAnyNote,
-                fieldId,
-                readOnly,
-                isRename,
-                allowRename,
-                allowDelete
+                hasAnyNote:hasAnyNote,
+                fieldId:fieldId,
+                readOnly:readOnly,
+                isRename:isRename,
+                allowRename:allowRename,
+                allowDelete:allowDelete,
+                hasMuliEvaluation:hasMuliEvaluation,
+                countOfColumnsValue: countOfColumnsValue
             });
 
             const childrenRows = (item.subFormItems || []).map((child, idx) =>
                 createRow({
                     item: { ...child, parentId: item.id },
                     order: `${i + 1}.${idx + 1}`,
-                    collapseId,
+                    collapseId:collapseId,
                     isChild: true,
                     hasChildrenColumn: hasAnyChildren,
-                    hasAnyNote,
-                    fieldId,
-                    readOnly,
-                    isRename
+                    hasAnyNote:hasAnyNote,
+                    fieldId:fieldId,
+                    readOnly:readOnly,
+                    isRename:isRename,
+                    hasMuliEvaluation:hasMuliEvaluation,
+                    countOfColumnsValue:countOfColumnsValue
                 })
             ).join('');
 
@@ -315,7 +329,20 @@ const generateTableBodyHtml = async (
     }
 
 };
-
+/*
+item:
+order:
+collapseId:
+hasChildrenColumn:
+hasAnyNote:
+fieldId:
+readOnly:
+isRename:
+allowRename:
+allowDelete:
+hasMuliEvaluation:
+countOfColumnsValue:
+ */
 function addNewRow(button)
 {
     if (renameItems.length > 0) {
@@ -327,14 +354,14 @@ function addNewRow(button)
         let row = createRow({
             item: firstitem,
             order: lastOrder,
-            firstitemCollapseId,
+            collapseId: firstitemCollapseId,
             hasChildrenColumn: false,
             hasAnyNote: false,
             fieldId: P_fieldId,
             readOnly: false,
             isRename: P_isRename,
             allowRename: P_allowRename,
-            allowDelete: P_allowDelete
+            allowDelete: P_allowDelete,
         });
 
         const tbody = document.getElementById(`${P_fieldId}-${SELECTORS.tbody}`);
@@ -461,6 +488,10 @@ const generateFullFormPageHtml = async ({ formId,
     }
 
     let isRename = itemsResult?.value.evalForm.allowRename
+    let hasMuliEvaluation = evalForm.hasMuliEvaluation;
+    let countOfColumnsValue = evalForm.countOfColumnsValue;
+
+
 
     let isRenamedEvaluation = false;
 
@@ -505,10 +536,12 @@ const generateFullFormPageHtml = async ({ formId,
         isRename,
         allowRename,
         allowDelete,
-        allowAdd
+        allowAdd,
+        hasMuliEvaluation,
+        countOfColumnsValue
     );
 
-    return `${generateFormAccordionItem(rowsHtml, hasAnyNote, hasAnyChildren, fieldId, isRename, allowDelete, allowAdd)}`;
+    return `${generateFormAccordionItem(rowsHtml, hasAnyNote, hasAnyChildren, fieldId, isRename, allowDelete, allowAdd, evalForm.hasMuliEvaluation, evalForm.countOfColumnsValue)}`;
 };
 
 
@@ -572,9 +605,17 @@ async function initializeControls(formId, fieldId, controlValues) {
     }
 
     // Pre-create matrix options (cloned later)
-    const matrixOptions = matrixValues.map(
-        ({ id, name }) => new Option(name, id)
-    );
+    //const matrixOptions = matrixValues.map(
+    //    ({ id, name, actualMatrixValue }) => new Option(name, id)
+    //);
+
+    const matrixOptions = matrixValues.map(({ id, name, actualMatrixValue }) => {
+        const option = new Option(name, id);
+
+        option.setAttribute('data-actual-value', actualMatrixValue);
+
+        return option;
+    });
 
     function populateForm(itemId, isSubItem = false) {
 
@@ -665,7 +706,7 @@ async function initializeControls(formId, fieldId, controlValues) {
 async function openRelatedItemModal(id) {
 
 
-    let relatedItems = itemsResult?.value.find(r => r.id == id)?.relatedItems ?? [];
+    let relatedItems = itemsResult?.value.items.find(r => r.id == id)?.relatedItems ?? [];
 
     const relatedItemsRowsHtml = await generateTableBodyHtmlForRelatedItems(
         relatedItems
