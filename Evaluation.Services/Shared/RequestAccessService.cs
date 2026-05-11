@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Evaluation.DAL.Helper;
+using Evaluation.DAL.Models.Planing;
 using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
 using Evaluation.DAL.Models.ServiceRequestEntities;
 using Evaluation.DAL.Models.UserEntiy;
@@ -22,11 +23,9 @@ using static Evaluation.SharedHelper.Enums.ConstantKeys;
 namespace Evaluation.Services.Shared
 {
 	public class RequestAccessService(
-		IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow, SrvNotification SrvNotification, SrvUser SrvUser,
-		LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, SrvUser srvUser, SrvAction SrvAction,
-		SrvStatus SrvStatus, SrvAssignment SrvAssignment, SrvEvaluationRequestAssignment _srvEvaluationRequestAssignment, SrvActionTransactionsLog SrvActionTransactionsLog, PerformActionBL _performActionBL,
-
-		SrvService SrvService, SrvServiceRequest _srvServiceRequest, EvaluationRequestService _evaluationRequestService, SrvAttachments _srvAttachments, IServiceProvider serviceProvider, RequestInfo _requestInfo)
+		IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow, 
+		LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, SrvUser srvUser, 
+		  IServiceProvider serviceProvider, RequestInfo _requestInfo)
 			: ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, _requestInfo)
 	
 	{
@@ -37,7 +36,7 @@ namespace Evaluation.Services.Shared
 
 			var user =await srvUser.GetByIDActiveNonDeleted(userId);
 
-			var userPartyTypeIds = user.UserPartTypes?
+			var userPartyTypeIds = user!.UserPartTypes?
 				.Select(x => x.PartyTypeId)
 				.Distinct()
 				.ToList() ?? new List<Guid>();
@@ -48,9 +47,9 @@ namespace Evaluation.Services.Shared
 
 			query = query
 				.Include(x => x.Service)
-					.ThenInclude(x => x.RequestShowPartyType)
+					.ThenInclude(x => x!.RequestShowPartyType)
 				.Include(x => x.ServiceStatus)
-					.ThenInclude(x => x.StatusPreventPartyTypes)
+					.ThenInclude(x => x!.StatusPreventPartyTypes)
 				.Include(x => x.EvaluationRequestAssignments);
 
 			if (!canViewAllRequests)
@@ -97,9 +96,9 @@ namespace Evaluation.Services.Shared
 
 			query = query
 				.Include(x => x.Service)
-					.ThenInclude(x => x.RequestShowPartyType)
+					.ThenInclude(x => x!.RequestShowPartyType)
 				.Include(x => x.Status)
-					.ThenInclude(x => x.StatusPreventPartyTypes);
+					.ThenInclude(x => x!.StatusPreventPartyTypes);
 
 			if (!canViewAllRequests)
 			{
@@ -121,6 +120,44 @@ namespace Evaluation.Services.Shared
 				x.Status.StatusPreventPartyTypes != null &&
 				!x.Status.StatusPreventPartyTypes.Any(p =>
 					userPartyTypeIds.Contains(p.PartyTypeId)));
+
+			return query;
+		}
+
+		public async Task<IQueryable<Plan>> ApplyPlanAccess(IQueryable<Plan> query)
+		{
+			var userId = userInfo.UserId
+				?? throw new BusinessException(ExceptionMessage.UserNotFound);
+
+			var user = await srvUser.GetByIDActiveNonDeleted(userId);
+
+			if (user == null)
+				throw new BusinessException(ExceptionMessage.UserNotFound);
+
+			var canViewAllPlans = user.UserPartTypes?
+				.Any(x => x.PartyType != null &&
+						  x.PartyType.CanViewAllPlan == true) == true;
+
+			var canViewEvlRequestPlan = user.UserPartTypes?
+				.Any(x => x.PartyType != null &&
+						  x.PartyType.CanViewEvlRequetPlan == true) == true;
+
+			if (canViewAllPlans)
+				return query;
+
+			if (canViewEvlRequestPlan)
+			{
+				query = query.Where(plan =>
+					plan.EvaluationRequests != null &&
+					plan.EvaluationRequests.Any(ev =>
+						ev.EvaluationRequestAssignments != null &&
+						ev.EvaluationRequestAssignments.Any(a =>
+							a.MinistryUserId == userId)));
+			}
+			else
+			{
+				query = query.Where(x => false);
+			}
 
 			return query;
 		}
