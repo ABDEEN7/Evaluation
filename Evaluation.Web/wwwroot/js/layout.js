@@ -112,9 +112,15 @@ $(document).on('select2:open', () => {
 
 $langToggler.prop("checked", currentLang === "ar").change(() => {
     const newLang = $langToggler.is(":checked") ? "ar" : "en";
+
     sharedUtility().SetCookie("lang", newLang, 30);
-    pathPart[1] = newLang;
-    window.location.href = window.location.origin + pathPart.join("/");
+
+    pathParts[1] = newLang;
+
+    window.location.href =
+        window.location.origin +
+        pathParts.join("/") +
+        window.location.search;
 });
 
 

@@ -1156,11 +1156,18 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             var result = new Dictionary<Guid, List<ServiceDTO>>();
             var today = DateTime.Today;
 
-            var distinctStatusIds = statusIds.Distinct().ToList();
+			if (userInfo.PartyTypes == null || !userInfo.PartyTypes.Any())
+			{
+				throw new BusinessException(ExceptionMessage.lblNoPartyTypeFound);
+			}
+
+			var distinctStatusIds = statusIds.Distinct().ToList();
             if (!distinctStatusIds.Any())
                 return result;
 
-            using var scopedUow = serviceScopeFactory.CreateScopedUow();
+			
+
+			using var scopedUow = serviceScopeFactory.CreateScopedUow();
 
             //var initiators = (await cacheDataProvider.GetServiceIntiator())
             //    .Where(c => userInfo.PartyTypes.Contains(c.PartyTypeId) && c.service?.SystemModule?.DepartmentId == requestInfo.DepId)

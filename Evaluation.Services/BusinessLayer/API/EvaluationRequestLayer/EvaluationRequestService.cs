@@ -10,9 +10,12 @@ using Evaluation.DAL.Repositories;
 using Evaluation.Services.BusinessLayer.API.EvaluationRequestLayer;
 using Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices;
 using Evaluation.Services.BusinessLayer.API.SchooLayer;
+using Evaluation.Services.BusinessLayer.API.TeamMemberBL;
 using Evaluation.Services.Extensions;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Dtos.SchoolDto;
+using Evaluation.SharedHelper.Dtos.TeamMemberDto;
+using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Api.AttachmentsDTOs;
@@ -44,6 +47,7 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 	SrvDropdown srvDropdown,
 	SchoolRepository schoolRepository,
 	SrvPartyType SrvPartyType,
+	AssignmentBL AssignmentBL,
 	SrvActionTransactionsLog SrvActionTransactionsLog,
 	SrvStatus SrvStatus, SrvEvaluationParty srvEvaluationParty
 
@@ -218,7 +222,7 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 	public async Task<EvaluationRequestDTO> GetEvaluationDetailsAsync(Guid id)
 	{
 		var lang = requestInfo.Lang;
-		var userId = userInfo.UserId ??  Guid.Parse("C2536611-576B-4EB8-84F4-747F4ECE9A23");// throw new BusinessException(ExceptionMessage.UserNotFound);
+		var userId = userInfo.UserId ??  throw new BusinessException(ExceptionMessage.UserNotFound);
 
 		var request = await GetEvaluationRequestByIdAsync(id);
 		if (request == null)
@@ -230,15 +234,19 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 		var userTask = srvUser.GetByIDActiveNonDeleted(userId);
 		var moduleTask = SrvSystemModule.GetSystemModuleByIdAsync(request.Service.SystemModuleId);
 		var fieldsTask = GetEvaluationRequestFieldsValueAsync(request);
-		var assignmentTask = GetEvaluationRequestAssignmentAsync(request.Id);
+		var assignmentTask =AssignmentBL.GetTeamByEvaluationRequestId(request.Id);
 		await Task.WhenAll(userTask, moduleTask, fieldsTask, assignmentTask);
 
 		var user = await userTask;
 		if (user == null)
 			throw new BusinessException(ExceptionMessage.UserNotFound);
 
+
+		var showAllRequestsPermission = user.UserPartTypes?.Any(x => x.PartyType!.CanViewAllRequests == true) == true;
+
 		var module = await moduleTask;
-		var assignment = await assignmentTask;
+		var assignmentResult = await assignmentTask;
+		var assignment = assignmentResult.Value ?? new List<EvaluationRequestAssignmentDto>();
 		bool departmentRequiresNda =  module?.Department?.IsNDA == true;
 		bool userAssignmentRequiresNda = departmentRequiresNda && assignment.Any(x=>x.MinistryUserId== userId && x.IsNDA == false && (x.NdaDate == null || x.NdaStatusId == null));
 
@@ -299,7 +307,9 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 			//CanViewFieldHistory = hasFieldHistoryPermission,
 			//CanViewAllFieldHistory = hasAllFieldHistoryPermission
 			IsNdaApprovalPending= userAssignmentRequiresNda,
+			Assignment= showAllRequestsPermission ? assignment: null,
 		};
+		
 		return requestDetails;
 	}
 	public async Task<bool> ValidateMinistryUserAccessAsync(Guid userId, Guid? moduleId, Guid? requestId)
@@ -362,8 +372,8 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 		string lang = requestInfo.Lang;
 		var stepFieldsListTask = SrvField.GetFieldsListByActionIdAsync(request.ServiceId);
 		var hiddenFieldsIds = await SrvField.GetHiddenFields(request.ServiceId);
-
-		var requestFieldsValue = await serviceScopeFactory.CreateScopedUow()
+		using var scopeUow =  serviceScopeFactory.CreateScopedUow();
+		var requestFieldsValue = await scopeUow
 			.GetRepository<ServiceRequestFieldsValue>()
 			.GetAllActiveNonDeleted()
 			.Include(x => x.Field)

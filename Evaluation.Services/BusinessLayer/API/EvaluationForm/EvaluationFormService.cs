@@ -72,7 +72,7 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
             HasNote = x.HasNote,
             NoteRequired = x.NoteRequired,
             DropDownTypeId = x.DropDownTypeId,
-
+            HasMulitEvaluation = x.HasMuliEvaluation,
             SubFormItems = x.SubFormItems
         .Select(s => new EvaluationFormSubItemDto
         {
@@ -164,19 +164,31 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
         obj.FormStatusId = message.FormStatusId;
         obj.IsActive = message.IsActive;
         obj.AllowRename = message.AllowRename;
-        if (!await CheckEvaluationForm())
+        if (message.IsFinalEval)
         {
-            obj.IsFinalEval = message.IsFinalEval;
+            if (!await CheckEvaluationForm())
+            {
+                obj.IsFinalEval = message.IsFinalEval;
+            }
+            else
+            {
+                throw new BusinessException(ConstantKeys.ExceptionMessage.Max_Final_Evaluation_Forms_Exceeded);
+            }
+        }
+
+        if (message.IsFinalEval)
+        {
+            obj.HasOneValue = true;
         }
         else
         {
-            throw new BusinessException(ConstantKeys.ExceptionMessage.Max_Final_Evaluation_Forms_Exceeded);
+            obj.HasOneValue = message.HasOneValue;
         }
         uow.GetRepository<EvalForm>().Insert(obj);
 
 
         await uow.CommitAsync();
-        var result = mapper.Map<TemplateFormDto>(obj, opts => opts.Items["Language"] = requestInfo.Lang);
+        var result = mapper.Map<TemplateFormDto>(obj);
         result.ResponseStatus = DBResult.Inserted;
         return result;
 
@@ -196,7 +208,6 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
             obj.FormEvalMatrixId = message.FormEvalMatrixId;
             obj.NameAr = message.NameAr;
             obj.NameEn = message.NameEn;
-            obj.HasOneValue = message.HasOneValue;
             obj.EvaluationPartyId = message.EvaluationPartyId;
             obj.CalcMethodId = message.CalcMethodId;
             obj.FormStatusId = message.FormStatusId;
@@ -209,6 +220,14 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
             else
             {
                 throw new BusinessException(ConstantKeys.ExceptionMessage.Final_Evaluation_Form_Limit);
+            }
+            if (message.IsFinalEval)
+            {
+                obj.HasOneValue = true;
+            }
+            else
+            {
+                obj.HasOneValue = message.HasOneValue;
             }
             uow.GetRepository<EvalForm>().Update(obj);
             await uow.CommitAsync();
@@ -276,6 +295,7 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
         obj.NoteRequired = message.NoteRequired;
         obj.DropDownTypeId = message.DropDownTypeId;
         obj.IsActive = message.IsActive;
+        obj.HasMuliEvaluation = message.HasMulitEvaluation;
 
         uow.GetRepository<FormItem>().Insert(obj);
         //insert values to FormItemRelated
@@ -324,6 +344,7 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
             obj.NoteRequired = message.NoteRequired;
             obj.DropDownTypeId = message.DropDownTypeId;
             obj.IsActive = message.IsActive;
+            obj.HasMuliEvaluation = message.HasMulitEvaluation;
             uow.GetRepository<FormItem>().Update(obj);
             //update values to FormItemRelated
             List<FormItemRelated> objFormItemRelateddelete = await uow.GetRepository<FormItemRelated>()
@@ -583,15 +604,15 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
             {
                 Id = g.First().Id,
 
-                EvalFormId = g.Key.EvalFormId,
-                PartyTypeId = g.Key.PartyTypeId,
+                FormItemConfig_EvalFormId = g.Key.EvalFormId,
+                FormItemConfig_PartyTypeId = g.Key.PartyTypeId,
 
-                NameAr = g.First().NameAr,
-                NameEn = g.First().NameEn,
-                CalcMethodId = g.First().CalcMethodId,
-                Percentage = g.First().WeightPercentage,
+                FormItemConfig_NameAr = g.First().NameAr,
+                FormItemConfig_NameEn = g.First().NameEn,
+                FormItemConfig_CalcMethodId = g.First().CalcMethodId,
+                FormItemConfig_Percentage = g.First().WeightPercentage,
 
-                FormItemIds = g
+                FormItemConfig_FormItemIds = g
                     .Where(x => x.FormItemId.HasValue)
                     .Select(x => x.FormItemId.Value)
                     .ToList()
@@ -601,57 +622,62 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
 
         return result;
     }
-    public async Task<List<FormItemConfigDto>> SaveFormItemConfig(List<FormItemConfigDto> messages)
+    public async Task<CreateFormItemConfigDto> SaveFormItemConfig(List<CreateFormItemConfigDto> messages)
     {
         if (messages == null || !messages.Any())
             throw new ArgumentException(ConstantKeys.ExceptionMessage.Exception_No_Data_Provided);
-        var total = messages.Sum(x => x.Percentage);
-        if (total != 100)
-            throw new BusinessException(ConstantKeys.ExceptionMessage.FormItemConfigPercentageMax);
-        var repo = uow.GetRepository<FormItemConfig>();
 
-        var newRecords = messages.SelectMany(m =>
+        var hasFormItems = messages.Any(x => x.FormItemIds != null && x.FormItemIds.Any());
+
+        if (!hasFormItems)
         {
-            if (m.FormItemIds == null || !m.FormItemIds.Any())
+            if (messages.Sum(x => x.Percentage) != 100)
+                throw new BusinessException(ConstantKeys.ExceptionMessage.FormItemConfigPercentageMax);
+        }
+
+   
+        var formItemsConfig = messages
+            .SelectMany(m =>
             {
-                return new List<FormItemConfig>
-            {
-                new FormItemConfig
+                var ids = (m.FormItemIds == null || !m.FormItemIds.Any())
+                    ? new Guid?[] { null }
+                    : m.FormItemIds.Select(id => (Guid?)id);
+
+                return ids.Select(id => new FormItemConfig
                 {
                     EvalFormId = m.EvalFormId,
                     PartyTypeId = m.PartyTypeId,
-                    FormItemId = null,
+                    FormItemId = id,
                     NameAr = m.NameAr,
                     NameEn = m.NameEn,
                     CalcMethodId = m.CalcMethodId,
                     WeightPercentage = m.Percentage
-                }
-            };
-            }
+                });
+            })
+            .ToList();
 
-            return m.FormItemIds.Select(id => new FormItemConfig
-            {
-                EvalFormId = m.EvalFormId,
-                PartyTypeId = m.PartyTypeId,
-                FormItemId = id,
-                NameAr = m.NameAr,
-                NameEn = m.NameEn,
-                CalcMethodId = m.CalcMethodId,
-                WeightPercentage = m.Percentage
-            });
-        }).ToList();
+       
+        var invalid = formItemsConfig
+            .Where(x => x.FormItemId != null)
+            .GroupBy(x => x.FormItemId)
+            .Where(g => g.Sum(x => x.WeightPercentage) != 100)
+            .Select(g => g.Key);
 
-        var evalFormId = newRecords.First().EvalFormId;
-        var partyTypeId = newRecords.First().PartyTypeId;
+        if (invalid.Any())
+            throw new BusinessException(ConstantKeys.ExceptionMessage.FormItemConfigPercentageMax);
 
-
-        var duplicates = newRecords
+        var hasDuplicates = formItemsConfig
             .GroupBy(x => new { x.FormItemId, x.PartyTypeId, x.EvalFormId })
-            .Where(g => g.Count() > 1)
-            .Any();
+            .Any(g => g.Count() > 1);
 
-        if (duplicates)
+        if (hasDuplicates)
             throw new InvalidOperationException(ConstantKeys.ExceptionMessage.DuplicateRecordsinRequest);
+
+
+        var evalFormId = formItemsConfig.First().EvalFormId;
+        var partyTypeId = formItemsConfig.First().PartyTypeId;
+
+        var repo = uow.GetRepository<FormItemConfig>();
 
 
         var existing = await repo.GetAllActiveNonDeleted()
@@ -659,18 +685,55 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
             .ToListAsync();
 
 
-        if (existing.Any())
-            repo.DeleteRange(existing);
+        var existingMap = existing.ToDictionary(
+            x => (x.FormItemId, x.PartyTypeId, x.EvalFormId)
+        );
+
+        var newKeys = formItemsConfig
+            .Select(x => (x.FormItemId, x.PartyTypeId, x.EvalFormId))
+            .ToHashSet();
+
+        var toInsert = new List<FormItemConfig>();
 
 
-        repo.InsertRange(newRecords);
+        foreach (var item in formItemsConfig)
+        {
+            var key = (item.FormItemId, item.PartyTypeId, item.EvalFormId);
+
+            if (existingMap.TryGetValue(key, out var existingItem))
+            {
+                existingItem.NameAr = item.NameAr;
+                existingItem.NameEn = item.NameEn;
+                existingItem.CalcMethodId = item.CalcMethodId;
+                existingItem.WeightPercentage = item.WeightPercentage;
+            }
+            else
+            {
+                toInsert.Add(item);
+            }
+        }
+
+       
+        var toDelete = existing
+            .Where(x => !newKeys.Contains((x.FormItemId, x.PartyTypeId, x.EvalFormId)))
+            .ToList();
+
+        if (toDelete.Any())
+            repo.DeleteRange(toDelete);
+
+        if (toInsert.Any())
+            repo.InsertRange(toInsert);
 
         await uow.CommitAsync();
-        var result = mapper.Map<FormItemConfigDto>(newRecords, opts => opts.Items["Language"] = requestInfo.Lang);
+
+
+        var result = new CreateFormItemConfigDto();
+
+       
         result.ResponseStatus = DBResult.Inserted;
-        return messages;
+        return result;
     }
-    public async Task<FormItemConfigDto> UpdateFormItemConfig(FormItemConfigDto dto)
+    public async Task<CreateFormItemConfigDto> UpdateFormItemConfig(CreateFormItemConfigDto dto)
     {
         if (dto == null)
             throw new ArgumentNullException(nameof(dto));
@@ -712,7 +775,7 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
         repo.Update(existingRecord);
 
         await uow.CommitAsync();
-        var result = mapper.Map<TemplateFormDto>(existingRecord, opts => opts.Items["Language"] = requestInfo.Lang);
+        var result = mapper.Map<TemplateFormDto>(existingRecord);
         result.ResponseStatus = DBResult.Updated;
         return dto;
     }
@@ -732,13 +795,13 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
                 x.Id != record.Id)
             .SumAsync(x => (decimal?)x.WeightPercentage) ?? 0;
 
-        // 3. تحقق
+
         if (remainingTotal != 100)
             throw new InvalidOperationException(
                string.Format(ConstantKeys.ExceptionMessage.Exception_Invalid_Total_Percentage_After_Delete, remainingTotal)
             );
 
-        // 4. حذف
+
         repo.Delete(record);
 
         await uow.CommitAsync();

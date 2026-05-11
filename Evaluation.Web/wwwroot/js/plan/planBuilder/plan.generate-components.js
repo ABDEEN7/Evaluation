@@ -415,7 +415,6 @@
     };
 
     // ================== RENDER FUNCTIONS ==================
-    // ✅ renderPlanForm: fieldId أول بارامتر
 
     const renderPlanForm = (fieldId, planData, isReadOnly) => {
         const readonly = isReadOnly;
@@ -435,6 +434,8 @@
         if (!readonly) {
             titleGroup.append($('<div>').addClass('invalid-feedback').text(`${t('lblPleaseEnterPlanTitle')}`));
         }
+        titleGroup.append(
+            $('<div>').attr('id', `${fieldId}_planTitle_error`).addClass('error-message text-danger'));
 
         titleCol.append(titleGroup);
         form.append(titleCol);
@@ -453,7 +454,8 @@
         if (!readonly) {
             planTypeGroup.append($('<div>').addClass('invalid-feedback').text(`${t('lblPleaseChoosePlanType')}`));
         }
-
+        planTypeGroup.append(
+            $('<div>').attr('id', `${fieldId}_ddlPlanType_error`).addClass('error-message text-danger'));
         planTypeCol.append(planTypeGroup);
         form.append(planTypeCol);
 
@@ -478,6 +480,9 @@
         if (!readonly) {
             dateRangeGroup.append($('<div>').addClass('invalid-feedback').text(`${t('lblPleaseChooseTimePeriod')}`));
         }
+        dateRangeGroup.append(
+            $('<div>').attr('id', `${fieldId}_parentDate_error`).addClass('error-message text-danger')
+        );
 
         dateRangeCol.append(dateRangeGroup);
         form.append(dateRangeCol);

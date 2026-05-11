@@ -29,65 +29,59 @@ function $p(selector) {
      * @returns {Object|null} Evaluation data object or null if validation fails
      */
     function getFormPlanJson(fieldId) {
-        try {
-            // Get plan name from the title input
-            var fieldScore = `${fieldId}_`;
-            const name = $('#' + fieldScore + 'planTitle').val()?.trim() || '';
-            // Get plan type from the select dropdown
-            const planTypeSelect = $('#' + fieldScore + 'ddlPlanType');
-            const selectedPlanType = planTypeSelect.select2('data')[0];
-            const PlanTypeDepId = selectedPlanType?.id || '';
-            const planTypeBackendName = selectedPlanType?.backendName ||
-                selectedPlanType?.element?.dataset?.backendname || '';
+        const fieldScore = `${fieldId}_`;
 
-            // Get date range and parse start/end dates
-            const dateRangeInput = $('#' + fieldScore + 'parentDate');
-            let startDate = '';
-            let endDate = '';
+        // Name
+        const name = $('#' + fieldScore + 'planTitle').val()?.trim() || '';
 
-            if (dateRangeInput.val()) {
-                const parsedDates = parseDateRange(dateRangeInput.val());
-                startDate = parsedDates.startDate;
-                endDate = parsedDates.endDate;
-            }
 
-            // Get semester Id if plan type is semester
-            let semesterId = null;
-            if (planTypeBackendName === PLAN_TYPE_BACKEND.SEMESTER) {
-                const semesterSelect = $('#' + fieldScore + 'ddlSemester');
-                semesterId = semesterSelect.val() || null;
-            }
+        const planTypeSelect = $('#' + fieldScore + 'ddlPlanType');
+        const selectedPlanType = planTypeSelect.select2('data')?.[0] || null;
 
-            // Get selected schools only
-            const selectedSchools = getSchools(fieldScore);
+        const planTypeDepId = selectedPlanType?.id || null;
+        const planTypeBackendName =
+            selectedPlanType?.backendName ||
+            selectedPlanType?.element?.dataset?.backendname ||
+            '';
 
-            // Return structured data object
-            const evaluationData = {
-                name,
-                PlanTypeDepId,
-                startDate,
-                endDate,
-                schools: selectedSchools
-            };
+        // Date Range
+        const dateRangeInput = $('#' + fieldScore + 'parentDate');
+        let startDate = '';
+        let endDate = '';
 
-            if (planTypeBackendName === PLAN_TYPE_BACKEND.SEMESTER && semesterId) {
-                evaluationData.semesterId = semesterId;
-            }
-
-            // Add plan ID if editing an existing plan
-            const instance = window.PlanHandler?.getInstance(fieldId);
-            if (instance?.planId) {
-                evaluationData.id = instance.planId;
-            }
-
-            return evaluationData;
-
-        } catch (error) {
-            console.error('Error collecting evaluation data:', error);
-            return null;
+        if (dateRangeInput.val()) {
+            const parsedDates = parseDateRange(dateRangeInput.val());
+            startDate = parsedDates.startDate;
+            endDate = parsedDates.endDate;
         }
-    }
 
+        // Semester
+        let semesterId = null;
+        if (planTypeBackendName === PLAN_TYPE_BACKEND.SEMESTER) {
+            const semesterSelect = $('#' + fieldScore + 'ddlSemester');
+            semesterId = semesterSelect.val() || null;
+        }
+
+        // Schools
+        const selectedSchools = getSchools(fieldScore) || [];
+
+        // Final Object
+        const evaluationData = {
+            name,
+            planTypeDepId,
+            startDate,
+            endDate,
+            schools: selectedSchools,
+            semesterId
+        };
+
+        // Edit Mode
+        const instance = window.PlanHandler?.getInstance(fieldId);
+        if (instance?.planId) {
+            evaluationData.id = instance.planId;
+        }
+        return evaluationData;
+    }
     /**
      * Parses date range string into start and end dates
      * @param {string} dateRangeValue - Date range in format "YYYY-MM-DD to YYYY-MM-DD"
@@ -148,17 +142,15 @@ function $p(selector) {
     function validatePlan(data) {
         const errors = [];
 
-        if (!data) {
-            errors.push('Failed to collect form data');
-            return { isValid: false, errors };
+        if (!data.name) {
+            errors.push( 'Name Required');
+        }
+        if (!data.planTypeDepId) {
+            errors.push('Plan Type Required');
         }
 
         if (!data.name || data.name.length < 3) {
             errors.push('Plan title is required and must be at least 3 characters');
-        }
-
-        if (!data.PlanTypeDepId) {
-            errors.push('Plan type is required');
         }
 
         if (!data.startDate || !data.endDate) {
@@ -169,7 +161,6 @@ function $p(selector) {
             errors.push('At least one school must be selected');
         }
 
-        // Validate each school has required fields
         if (data.schools && data.schools.length > 0) {
             data.schools.forEach((school, index) => {
                 if (!school.startEvaluationDate || !school.endEvaluationDate) {

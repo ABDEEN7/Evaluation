@@ -5,12 +5,14 @@ using Evaluation.SharedHelper.Models.Api.FormBuilderDTO;
 using Evaluation.SharedHelper.Models.Api.ServiceDTOs;
 using Evaluation.SharedHelper.Models.Api.ServiceRequestEntitiesDTO;
 using Evaluation.SharedHelper.Models.Api.TemplatesDTO;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Evaluation.API.Controllers
 {
 	[ApiController]
 	[Route("api/[controller]/{depRouting}/[action]")]
+	[Authorize]
 	public class FormRenderController : ControllerBase
 	{
 		private readonly ServiceRequestBL _serviceRequestBL;

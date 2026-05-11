@@ -79,6 +79,7 @@ const planUtility = window.planUtility;
                                    placeholder="${t('plhEnterPlanTitle')}"
                                    ${VALIDATION_RULES?.TITLE?.required ? 'required' : ''}>
                         </div>
+                            <div id="${pid(fieldId, 'planTitle_error')}" class="error-message text-danger"></div>
 
                     <!-- Plan Type -->
                     <div class="col-md-4">
@@ -93,6 +94,7 @@ const planUtility = window.planUtility;
                                 <option value="">${t('lblChoosePlanType')}</option>
                             </select>
                         </div>
+                            <div id="${pid(fieldId, 'ddlPlanType_error')}" class="error-message text-danger"></div>
                     </div>
 
                     <!-- Semester -->
@@ -106,6 +108,7 @@ const planUtility = window.planUtility;
                                     class="form-control">
                                 <option value="">${t('lblChooseSemester')}</option>
                             </select>
+                            <div id="${pid(fieldId, 'ddlSemester_error')}" class="error-message text-danger"></div>
                         </div>
                     </div>
 
@@ -125,6 +128,7 @@ const planUtility = window.planUtility;
                                     <i class="la la-calendar"></i>
                                 </span>
                             </div>
+                            <div id="${pid(fieldId, 'parentDate_error')}" class="error-message text-danger"></div>
                         </div>
                     </div>
 
@@ -203,6 +207,8 @@ const planUtility = window.planUtility;
                     </tbody>
                 </table>
             </div>
+                <div id="${pid(fieldId, 'selectAll_error')}" class="error-message text-danger"></div>
+
         `;
     }
 
