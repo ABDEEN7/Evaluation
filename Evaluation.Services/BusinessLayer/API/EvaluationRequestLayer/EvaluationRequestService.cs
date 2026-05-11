@@ -12,6 +12,7 @@ using Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices;
 using Evaluation.Services.BusinessLayer.API.SchooLayer;
 using Evaluation.Services.BusinessLayer.API.TeamMemberBL;
 using Evaluation.Services.Extensions;
+using Evaluation.Services.Shared;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Dtos.SchoolDto;
 using Evaluation.SharedHelper.Dtos.TeamMemberDto;
@@ -49,8 +50,8 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 	SrvPartyType SrvPartyType,
 	AssignmentBL AssignmentBL,
 	SrvActionTransactionsLog SrvActionTransactionsLog,
-	SrvStatus SrvStatus, SrvEvaluationParty srvEvaluationParty
-
+	SrvStatus SrvStatus, SrvEvaluationParty srvEvaluationParty,
+	 RequestAccessService requestAccessService
 
 	) : ApiBase(serviceScopeFactory, cacheDataProvider, unitOfWork, loggingServices, mapper, userInfo, serviceProvider, requestInfo)
 {
@@ -104,58 +105,33 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 
 		return result;
 	}
-	private async Task<IQueryable<EvaluationRequestDTO>> GetDepEvaluationRequestsAsync(UnitOfWork uow, Guid userId, SystemModule module, string lang, string timeFormat, string dateFormat)
+	private async Task<IQueryable<EvaluationRequestDTO>> GetDepEvaluationRequestsAsync(UnitOfWork uow,Guid userId,SystemModule module,string lang,string timeFormat,string dateFormat)
 	{
-		var permissionTasks = new
-		{
-			IsAllowedToViewAllRequests =
-				SrvPartyType.IsAllowedToViewAllRequestsAsync(userId, module.Id),
-
-			IsAllowedToViewAllRequestsWithoutFiltration =
-				SrvPartyType.IsAllowedToViewAllRequestsWitoutFilterationAsync(userId, module.Id),
-
-			UserPartyTypeData =
-				SrvPartyType.GetUserPartyTypeData(userInfo.UserId!)
-		};
-
 		IQueryable<EvaluationRequest> baseQuery = uow
 			.GetRepository<EvaluationRequest>()
 			.GetAllActiveNonDeleted()
 			.Include(x => x.Service)
-			.ThenInclude(x => x.SystemModule)
+				.ThenInclude(x => x!.SystemModule)
 			.Include(x => x.ServiceStatus)
+				.ThenInclude(x => x!.ServiceStatusType)
 			.Include(x => x.OrgTree)
 			.Include(x => x.DepEvaluationType)
 			.Include(x => x.Plan)
-				.ThenInclude(p => p!.PlanStatus);
+				.ThenInclude(p => p!.PlanStatus)
+			.AsSplitQuery()
+			.Where(x => x.Service != null && x.Service.SystemModuleId == module.Id);
 
-		baseQuery = baseQuery.AsSplitQuery()
-			.Where(x => x.Service!.SystemModuleId == module.Id);
-
-		var permissions = new
-		{
-			IsAllowedToViewAllRequests = await permissionTasks.IsAllowedToViewAllRequests,
-			IsAllowedToViewAllRequestsWithoutFiltration = await permissionTasks.IsAllowedToViewAllRequestsWithoutFiltration,
-			UserPartyTypeData = await permissionTasks.UserPartyTypeData
-		};
-
-		//if (!permissions.IsAllowedToViewAllRequestsWithoutFiltration)
-		//{
-		//	baseQuery = ApplyUserAccessFiltersForEvaluationRequests(
-		//		baseQuery,
-		//		permissions.UserPartyTypeData,
-		//		userId,
-		//		permissions.IsAllowedToViewAllRequests
-		//	);
-		//}
+		baseQuery = await requestAccessService.ApplyEvaluationRequestAccess(baseQuery);
 
 		return baseQuery.Select(x => new EvaluationRequestDTO
 		{
 			Id = x.Id,
 			ServiceId = x.Service!.Id,
-			Service = lang == "ar" ? x.Service!.NameAr : x.Service!.NameEn,
-			icon = x.Service!.Icon,
+			Service = lang == "ar" ? x.Service.NameAr : x.Service.NameEn,
+			icon = x.Service.Icon,
+
 			RequestNumber = "1234",
+
 			StatusId = x.ServiceStatusId,
 			Status = lang == "ar" ? x.ServiceStatus!.NameAr : x.ServiceStatus!.NameEn,
 			StatusColor = x.ServiceStatus!.ColorCode,
@@ -167,12 +143,17 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 
 			PlanId = x.PlanId,
 			PlanName = x.Plan != null ? x.Plan.PlanName : "",
-			EvaluationType = x.DepEvaluationType != null ? (lang == "ar" ? x.DepEvaluationType.NameAr : x.DepEvaluationType.NameAr) : "",
+
+			EvaluationType = x.DepEvaluationType != null
+				? (lang == "ar" ? x.DepEvaluationType.NameAr : x.DepEvaluationType.NameEn)
+				: "",
+
 			OrgTreeId = x.OrgTreeId,
-			OrgTreeName = x.OrgTree != null ? (lang == "ar" ? x.OrgTree.NameAr : x.OrgTree.NameEn) : ""
+			OrgTreeName = x.OrgTree != null
+				? (lang == "ar" ? x.OrgTree.NameAr : x.OrgTree.NameEn)
+				: ""
 		});
 	}
-
 	public async Task<EvaluationRequest?> GetEvaluationRequestByIdAsync(Guid requestId, bool useMainUow = false)
 	{
 		if (useMainUow)
