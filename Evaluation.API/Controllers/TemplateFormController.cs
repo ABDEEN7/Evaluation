@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Evaluation.API.Controllers;
 
-[AllowAnonymous]
+
 [ApiController]
 [Route("api/[controller]/{depRouting}/[action]")]
 public class TemplateFormController : ControllerBase
