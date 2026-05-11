@@ -90,9 +90,9 @@
 
         columns: [
            {
-    data: "name",
-          className: "td-left py-1",
-          render: function(data, type, row) {
+            data: "name",
+            className: "td-left py-1",
+            render: function(data, type, row) {
                 const isApproved = row.statusCode === "Approved";
                 return `
                     <div class="plan-title-row mb-3">
@@ -114,14 +114,14 @@
                     </div>
                     `;
                               }
-                        },
+            },
             {
                 data: "countSchools",
                 className: "td-left py-1",
                 render: function(data) {
                     return `
                     <i class="las la-school card-only-icon"></i>
-                    <span class="card-only-label">Schools count: </span>
+                    <span class="card-only-label me-1">Schools count: </span>
                     ${data || ""}
                     `;
                 }
@@ -132,7 +132,7 @@
                 render: function(data, type, row) {
                     return `
                     <i class="las la-calendar-week card-only-icon"></i>
-                    <span class="card-only-label">Period: </span>
+                    <span class="card-only-label me-1">Period: </span>
                     من ${row.startDate} إلى ${row.endDate}
                     `;
                 }

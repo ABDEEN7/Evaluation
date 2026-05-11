@@ -1763,10 +1763,15 @@ input.auto-fill {
     grid-template-columns: auto 1fr auto;
     align-items: center;
     column-gap: 5px !important;
+
+    display: flex;
+    align-items: center;
+    width: 100%;
 }
 
 .plan-text-wrap {
     min-width: 0;
+    flex: 1;
 }
 
 .approved-status {
@@ -1776,6 +1781,8 @@ input.auto-fill {
     align-items: center;
     column-gap: 3px !important;
     white-space: nowrap;
+
+    margin-inline-start: auto;
 }
 
 .item-card {
@@ -1911,4 +1918,10 @@ input.auto-fill {
     display: table-row !important;
     place-items: center;
     padding: 2rem 0 !important;
+}
+
+.card-only-icon i,
+.card-only-icon {
+    position: relative !important;
+    top: 0.5px !important;
 }

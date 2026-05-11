@@ -76,57 +76,99 @@
         rowClass: 'plan-request-card',
 
         columns: [
-
-            {
-                data: "Status",
-                title: uiControlsSetup().GetUiControlText("lblRequestStatus"),
-                className: "header-left status",
-                render: function (data, type, row) {
-
-                    if (row.StatusISOPen === false) {
-                        return ` <span class="badge bg-success-light me-2 fw-semibold br-0">
-                                    <i class="la la-check fs-14"></i>
-                                    مكتمل
-                                </span>`;
-                    }
-                    else
-                        return `<span class="badge bg-danger-light me-2 fw-semibold br-0">
-                            <i class="las la-times fs-14"></i>
-                            غير مكتمل
-                        </span>`;
-                }
-            }
-            ,
-            {
+           {
                 data: "evaluationType",
                 title: uiControlsSetup().GetUiControlText("lblEvaluationPlan"),
-                className: "header-right",
-                render: function (data) {
-                    return `<strong class="text-truncate-2">${data || ""}</strong>`;
+                className: "td-full py-1",
+                render: function(data, type, row) {
+
+                    const isCompleted = row.StatusISOPen === false;
+
+                    return `
+                    <div class="plan-title-row my-2">
+
+                        <i class="las la-certificate card-only-icon title-icon"></i>
+
+                        <span class="plan-text-wrap px-1">
+                            <span class="card-only-label title-label">Operation: </span>
+                            <span class="plan-title-text">${data || ""}</span>
+                        </span>
+
+                        ${isCompleted ? `
+                        <span class="request-status approved-status py-1 px-2">
+                            <i class="las la-check"></i>
+                            مكتمل
+                        </span>
+                        ` : `
+                        <span class="request-status approved-status py-1 px-2">
+                            <i class="las la-times"></i>
+                            غير مكتمل
+                        </span>
+                        `}
+
+                    </div>
+                `;
                 }
             },
             {
                 data: "orgTreeName",
                 title: uiControlsSetup().GetUiControlText("lblSchoolName"),
-                className: "td-full",
-                render: function (data) {
-                    return `<strong class="text-truncate-2">${data || ""}</strong>`;
+                className: "td-full py-0 my-0",
+                render: function(data) {
+
+                    if (!data) return "_";
+
+                    return `
+                <i class="las la-school card-only-icon me-1"></i>
+                <strong class="text-truncate-2">${data}</strong>
+                `;
                 }
-            },
-            {
+             },
+             {
                 data: "status",
                 title: uiControlsSetup().GetUiControlText("lblRequestNo"),
-                className: "td-full"
+                className: "td-full py-0 my-0",
+                render: function(data) {
+
+                    if (!data) return "_";
+
+                    return `
+                <i class="las la-edit card-only-icon me-1"></i>
+                ${data}
+                `;
+                }
             },
             {
                 data: "createOn",
                 title: uiControlsSetup().GetUiControlText("lblRequestCreatedDate"),
-                className: "td-left bg-grey"
+                className: "td-left py-0 my-0",
+                render: function(data) {
+
+                    if (!data) return "_";
+
+                    return `
+                <i class="las la-calendar card-only-icon"></i>
+                <span class="card-only-label mx-1"> Created on:  </span>
+                ${moment(data).format("DD-MM-YYYY")}
+                `;
+                }
             },
             {
-                data: "createOnTime",
+                data: "createOn",
                 title: uiControlsSetup().GetUiControlText("lblRequestCreatedTime"),
-                className: "td-right bg-grey justify-content-end"
+                className: "td-right bg-grey justify-content-end py-0 my-0",
+                render: function(data) {
+
+                    if (!data) return "_";
+
+                    return `
+                <div class="d-flex justify-content-end align-items-center">
+                    <i class="las la-clock card-only-icon"></i>
+                    <span class="card-only-label mx-1">Created at: </span>
+                    ${moment(data).format("hh:mm A")}
+                </div>
+                `;
+                }
             },
             
         ],
