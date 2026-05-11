@@ -4,6 +4,7 @@ const uiControl = {
 }
 
 let popupdivcontent = "";
+var deprouting = sharedUtility().extractDepartmentName();
 const sharedFn = (options) => {
 
     //===========================================================
@@ -22,7 +23,7 @@ const sharedFn = (options) => {
             var formData = new FormData();
             formData.append('request', JSON.stringify(ControlItems));
             $.ajax({
-                url: "/UiControl/UiControlList",
+                url: `/UiControl/${deprouting}/UiControlList`,
                 type: "POST",
                 dataType: "html",
                 processData: false,
@@ -209,9 +210,10 @@ const sharedFn = (options) => {
                 }
             }
             if (AlldropdownList.length > 0) {
+                
                 let dropdownInitializer = jqDropdownInitializer({
                     dropdowns: AlldropdownList,
-                    url: `Home/GetDropDownValues`,
+                    url: `/Home/GetDropDownValues`,
                     lang: lang,
                 });
                 dropdownInitializer.InitParents();
@@ -433,7 +435,7 @@ const sharedFn = (options) => {
                 if (AlldropdownList.length > 0) {
                     let dropdownInitializer = jqDropdownInitializer({
                         dropdowns: AlldropdownList,
-                        url: `Home/GetDropDownValues`,
+                        url: `/Home/GetDropDownValues`,
                         lang: lang,
                     });
                     dropdownInitializer.InitParents();
@@ -501,7 +503,7 @@ const sharedFn = (options) => {
             if (AlldropdownList.length > 0) {
                 let dropdownInitializer = jqDropdownInitializer({
                     dropdowns: AlldropdownList,
-                    url: `Home/GetDropDownValues`,
+                    url: `/Home/GetDropDownValues`,
                     lang: lang,
                 });
                 dropdownInitializer.InitParents(true);
@@ -722,7 +724,7 @@ const sharedFn = (options) => {
                 if (AlldropdownList.length > 0) {
                     let dropdownInitializer = jqDropdownInitializer({
                         dropdowns: AlldropdownList,
-                        url: `Home/GetDropDownValues`,
+                        url: `/Home/GetDropDownValues`,
                         lang: lang,
                     });
                     dropdownInitializer.InitParents(true);
@@ -1346,7 +1348,7 @@ const sharedFn = (options) => {
                         error: function (err) {
                             reject(err); // Reject on error
                         }
-                    }).Post("Home/GetDropDownValues", data);
+                    }).Post("/Home/GetDropDownValues", data);
                 });
             }
         }
@@ -1410,7 +1412,7 @@ const sharedFn = (options) => {
                     controlUibackendName: uibackendName,
                     parentReferenceValue: null
                 };
-                jqClient(options).Post("Home/GetDropDownValues", data);
+                jqClient(options).Post("/Home/GetDropDownValues", data);
 
             }
             else {
@@ -1482,7 +1484,7 @@ const sharedFn = (options) => {
                     controlUibackendName: uibackendName,
                     parentReferenceValue: null
                 };
-                jqClient(options).Post("Home/GetDropDownValues", data);
+                jqClient(options).Post("/Home/GetDropDownValues", data);
 
             }
            
@@ -1952,7 +1954,7 @@ const sharedFn = (options) => {
             var formData = new FormData();
             formData.append('request', JSON.stringify(ControlItems));
             $.ajax({
-                url: "/UiControl/UiControlList",
+                url: `/UiControl/${deprouting}/UiControlList`,
                 type: "POST",
                 dataType: "html",
                 processData: false,
