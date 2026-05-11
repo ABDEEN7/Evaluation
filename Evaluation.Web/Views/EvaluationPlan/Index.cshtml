@@ -636,7 +636,6 @@
 
 
     <script>
-        const departmentRoutePath = sharedUtility().extractDepartmentName();
         $(document).ready(async function () {
 
             await webAppConfigsSetup().Init({
@@ -651,28 +650,38 @@
                     '@nameof(ConstantKeys.EvaluationForm)',
                     '@nameof(ConstantKeys.WebSchools)',
                     '@nameof(ConstantKeys.Assignment)'
-
-
                 ],
                 pages: [
                     '@nameof(ConstantKeys.WebAppCommon)',
                     '@nameof(ConstantKeys.CreatePlan)',
                     '@nameof(ConstantKeys.EvaluationOperations)'
-
-                ],
-
+                ]
             }).then((result) => {
                 permissionsList = result.permissionsList;
-                IsCanUpdatePlan = permissionsList?.some(p => p === '@ConstantKeys.WebPermissions.EDIT_WEB_PLAN') ?? false;
+
+                IsCanUpdatePlan = permissionsList?.some(p =>
+                    p === '@ConstantKeys.WebPermissions.EDIT_WEB_PLAN'
+                ) ?? false;
+
+                uiControlsSetup().UpdatPageTitle('WebAppScholarship');
+                 InitNavbarSection();
+                $('body').show();
             });
-            additional_keys: [];
+
+            if (!sharedUtility().ExistingToken()) {
+                sharedUtility().RedirectUnauthorized();
+                return;
+            }
+
             window.formUtility = window.formUtility || {};
-             const searchParams = new URLSearchParams(window.location.search);
-                const reqId = searchParams.get('id');
-                const serviceId = searchParams.get('serviceId');
-                const EvlId = searchParams.get('Evlid');
-                const planId = searchParams.get('planId');
-                const SerReqid = searchParams.get('SerReqid');
+
+            const searchParams = new URLSearchParams(window.location.search);
+
+            const reqId = searchParams.get('id');
+            const serviceId = searchParams.get('serviceId');
+            const EvlId = searchParams.get('Evlid');
+            const planId = searchParams.get('planId');
+            const SerReqid = searchParams.get('SerReqid');
 
             if (reqId) {
                 openPlanRequestDetails(reqId);
@@ -681,9 +690,11 @@
             if (EvlId) {
                 openEvaluationRequestDetails(EvlId);
             }
-         if (SerReqid) {
-       openRequestDetails(EvlId);
- }
+
+            if (SerReqid) {
+                openRequestDetails(SerReqid);
+            }
+
             if (planId) {
                 if (IsCanUpdatePlan) {
                     InitializeCreatePlanRequestService(serviceId, planId);
@@ -691,61 +702,29 @@
                     InitializePlanDetails(planId);
                 }
             }
-            // if()
 
             $('#evaluationRequestDetailsModal').on('hidden.bs.modal', function () {
                 formUtility.removeQueryParameter(['Evlid', 'serviceId']);
             });
+
             $('#planRequestModal').on('hidden.bs.modal', function () {
                 formUtility.removeQueryParameter(['id', 'serviceId']);
             });
 
             $('#RequestModal').on('hidden.bs.modal', function () {
-                formUtility.removeQueryParameter(['id', 'serviceId']);
+                formUtility.removeQueryParameter(['SerReqid', 'serviceId']);
             });
+
             $('#PlanDetailsModal').on('hidden.bs.modal', function () {
-                formUtility.removeQueryParameter(['planId', 'planId']);
+                formUtility.removeQueryParameter(['planId', 'serviceId']);
             });
-            $('#PlanDetailsModal').on('hidden.bs.modal', function () {
-                formUtility.removeQueryParameter(['planId', 'planId']);
-                formUtility.removeQueryParameter(['serviceId', 'serviceId']);
-            });
-            if (sharedUtility().ExistingToken()) {
-                uiControlsSetup().UpdatPageTitle('WebAppScholarship');
-                $('body').show();
-               
-                // await LoadUserDetails();
-                 InitNavbarSection();
 
-                  GetScopes();
-
-                // activateTabFromUrl();
-                // CheckAndResumeSessionTimer();
-                // GetServices();
-                // GetRequests();
-                // GetScholarships();
-                // CheckRequiredEmailOrMobileVerification();
-                //InitializeAdvancedSearch();
-
-
-                //     InitializeAdvancedSearch();
-                // } else {
-                //     sharedUtility().RedirectToUrl(ConstantUrls.LoginURL);
-                // }
-
-                // $(document).on('click', '.more-details-btn', ServiceCardBuilder.handleCardClick);
-                // $(document).on('click', 'a[data-role="trigger-card-click"]', function (e) {
-                //     e.preventDefault();
-                //     ServiceCardBuilder.handleCardClick.call(this, e);
-                // });
-
-
-            }
-
+            await LoadUserDetails();
+           
+            GetScopes();
+            CheckAndResumeSessionTimer();
         });
     </script>
-
-
 
 
 }
