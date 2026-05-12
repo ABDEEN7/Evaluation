@@ -68,6 +68,14 @@ $btnAddbutton.click(function () {
 function CreateEditForFormGroup(pkId) {
     CommonLogicAfterInitial();
 }
+function toggleFormItemColumn(disabled) {
+    if (!tableFormItemConfig) return;
+    if (disabled) {
+        setTimeout(() => tableFormItemConfig.hideColumn("formItemConfig_Percentage"), 100);
+    } else {
+        setTimeout(() => tableFormItemConfig.showColumn("formItemConfig_Percentage"), 100);
+    }
+}
 function CommonLogicAfterInitial() {
     $(document).off("change", "#EvalFormsIsFinalEval")
         .on("change", "#EvalFormsIsFinalEval", function () {
@@ -84,9 +92,10 @@ function CommonLogicAfterInitial() {
             if (this.checked) {
                 $('label[for=EvalCountOfColumnsValue').show();
                 $("#EvalCountOfColumnsValue").parent().show();
+                $("#IsMultipleEvaluationWrapper").show();
             }
-            else
-            {
+            else {
+                $("#IsMultipleEvaluationWrapper").hide();
                 $("label[for='EvalCountOfColumnsValue']").hide();
                 $("#EvalCountOfColumnsValue").parent().hide();
             }
@@ -716,7 +725,16 @@ $(document).on("click", "#formItemConfig", async function () {
         tableColumns,
         settingList
     );
+
+    // show/hide IsMultipleEvaluationWrapper based on EvalFormHasMuliEvaluation
+    if ($("#EvalFormHasMuliEvaluation").prop("checked")) {
+        $("#IsMultipleEvaluationWrapper").show();
+    } else {
+        $("#IsMultipleEvaluationWrapper").hide();
+        $("#IsMultipleEvaluation").prop("checked", false);
+    }
 });
+
 // SubFormItem Add button
 $(document).on("click", ".addSub", function () {
     var id = $(this).data("id");
@@ -978,26 +996,52 @@ $("#btn-submit_popup").click(function (e) {
 
         if (popupname == "FormItemConfig") {
             const allRows = tableFormItemConfig.getData();
+
             if (!allRows || allRows.length === 0) {
-                notificationUtil.error('No data to save');
-                commonUtil.btnProgress(btnpopupSubmitId, true);
+                const formId = $("#evalformidvalue").val();
+                jqClient({
+                    success: function (response) {
+                        commonUtil.btnProgress(btnpopupSubmitId, true);
+                        if (response?.responseStatus == 3) {
+                            notificationUtil.success(sharedFn().GetUiControlText('WEB_MSG_DELETE'));
+                        } else {
+                            notificationUtil.error(response?.responseMessage);
+                        }
+                    },
+                    error: function () {
+                        commonUtil.btnProgress(btnpopupSubmitId, true);
+                        notificationUtil.error('Request failed');
+                    }
+                }).Post(API_ROUTES.deleteFormItemConfig() + `?formId=${formId}`);
                 return;
             }
 
-            const dataToSave = allRows.map(obj => ({
-                Id: obj.id === "00000000-0000-0000-0000-000000000000" ? null : obj.id,
-                EvalFormId: $("#evalformidvalue").val(),
-                NameAr: obj.formItemConfig_NameAr || null,
-                NameEn: obj.formItemConfig_NameEn || null,
-                PartyTypeId: obj.formItemConfig_PartyTypeId || obj.formItemConfig_PartyType,
-                FormItemIds: (obj.formItemConfig_FormItemId || obj.formItemConfig_FormItem)
-                    ? (Array.isArray(obj.formItemConfig_FormItemId || obj.formItemConfig_FormItem)
-                        ? (obj.formItemConfig_FormItemId || obj.formItemConfig_FormItem)
-                        : [obj.formItemConfig_FormItemId || obj.formItemConfig_FormItem])
-                    : null,
-                CalcMethodId: obj.formItemConfig_CalcMethodId || obj.formItemConfig_CalcMethod,
-                Percentage: obj.formItemConfig_Percentage || 0
-            }));
+            const isMultipleEvaluation = $("#EvalFormHasMuliEvaluation").prop("checked");
+
+            const dataToSave = allRows.map(obj => {
+                const isAdd = obj.id === "00000000-0000-0000-0000-000000000000" || !obj.id;
+
+                const item = {
+                    Id: isAdd ? null : obj.id,
+                    EvalFormId: $("#evalformidvalue").val(),
+                    NameAr: obj.formItemConfig_NameAr || null,
+                    NameEn: obj.formItemConfig_NameEn || null,
+                    PartyTypeId: obj.formItemConfig_PartyTypeId || obj.formItemConfig_PartyType || null,
+                    FormItemIds: (obj.formItemConfig_FormItemId || obj.formItemConfig_FormItem)
+                        ? (Array.isArray(obj.formItemConfig_FormItemId || obj.formItemConfig_FormItem)
+                            ? (obj.formItemConfig_FormItemId || obj.formItemConfig_FormItem)
+                            : [obj.formItemConfig_FormItemId || obj.formItemConfig_FormItem])
+                        : null,
+                    CalcMethodId: obj.formItemConfig_CalcMethodId || obj.formItemConfig_CalcMethod || null,
+                    Percentage: obj.formItemConfig_Percentage || 0
+                };
+
+                if (isAdd) {
+                    item.EvalFormHasMuliEvaluation = isMultipleEvaluation;
+                }
+
+                return item;
+            });
 
             var formData = new FormData();
             formData.append('request', JSON.stringify(dataToSave));
@@ -1189,11 +1233,33 @@ function OpenFormItemConfigPopup(
         tablecolumnlist,
         settingList
     );
+    $("#IsMultipleEvaluation").off("change").on("change", function () {
+        if (this.checked) {
+            setTimeout(() => tableFormItemConfig.hideColumn("formItemConfig_Percentage"), 100);
+            setTimeout(() => {
+                $("#FormItemConfigRelationtabulator .tabulator-cell[tabulator-field='formItemConfig_FormItem']")
+                    .css("pointer-events", "none")
+                    .css("opacity", "0.5");
+            }, 150);
+        } else {
+            setTimeout(() => tableFormItemConfig.showColumn("formItemConfig_Percentage"), 100);
+            setTimeout(() => {
+                $("#FormItemConfigRelationtabulator .tabulator-cell[tabulator-field='formItemConfig_FormItem']")
+                    .css("pointer-events", "")
+                    .css("opacity", "");
+            }, 150);
+        }
+    });
+    //if ($("#IsMultipleEvaluation").prop("checked")) {
+    //    tableFormItemConfig.hideColumn("formItemConfig_Percentage");
+    //}
 
     $("#ModalPopup").modal("show");
 
     $("#PopupForm").trigger("reset");
 }
+
+
 async function InitFormItemConfigPopup(
     modaltitle,
     ControlItems,
@@ -1208,17 +1274,25 @@ async function InitFormItemConfigPopup(
     $("#btn-clear_popup").html(sharedFn().GetUiControlText("CLEAR_BUTTON"));
 
     let popupdivcontent = `
-        <div class="row">
-            <div class="card-header justify-content-end d-flex align-items-center bg-light">
-                <button type="button" id="FormItemConfigRelationbutton" class="btn btn-primary">
-                    ${sharedFn().GetUiControlText('FormItemConfigAddButton')}
-                </button>
-            </div>
-            <div id="FormItemConfigRelationdiv">
-                <div id="FormItemConfigRelationtabulator"></div>
-            </div>
+    <div class="row">
+        <div class="card-header justify-content-end d-flex align-items-center bg-light">
+            <div id="IsMultipleEvaluationWrapper" class="me-auto d-flex align-items-center gap-2" style="display:none;">
+    <div class="form-check form-switch mb-0">
+        <input class="form-check-input" type="checkbox" role="switch" id="IsMultipleEvaluation" />
+        <label class="form-check-label" for="IsMultipleEvaluation">
+            ${sharedFn().GetUiControlText('IsMultipleEvaluation')}
+        </label>
+    </div>
+</div>
+            <button type="button" id="FormItemConfigRelationbutton" class="btn btn-primary">
+                ${sharedFn().GetUiControlText('FormItemConfigAddButton')}
+            </button>
         </div>
-    `;
+        <div id="FormItemConfigRelationdiv">
+            <div id="FormItemConfigRelationtabulator"></div>
+        </div>
+    </div>
+`;
 
     $('#ModalPopup .modal-body #PopupForm').html(popupdivcontent);
 
@@ -1279,6 +1353,24 @@ async function InitFormItemConfigPopup(
     });
 
     LoadFormItemConfigData();
+    // handle Percentage column visibility based on IsMultipleEvaluation
+    $(document).off("change", "#IsMultipleEvaluation")
+        .on("change", "#IsMultipleEvaluation", function () {
+            if (this.checked) {
+                setTimeout(() => tableFormItemConfig.hideColumn("formItemConfig_Percentage"), 100);
+            } else {
+                setTimeout(() => tableFormItemConfig.showColumn("formItemConfig_Percentage"), 100);
+            }
+        });
+
+    // apply initial state after tabulator renders
+    setTimeout(() => {
+        if ($("#IsMultipleEvaluation").prop("checked")) {
+            tableFormItemConfig.hideColumn("formItemConfig_Percentage");
+        } else {
+            tableFormItemConfig.showColumn("formItemConfig_Percentage");
+        }
+    }, 200);
 }
 function LoadFormItemConfigData() {
     const evalformId = $("#evalformidvalue").val();

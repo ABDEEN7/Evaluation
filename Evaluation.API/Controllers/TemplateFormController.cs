@@ -176,4 +176,9 @@ public class TemplateFormController : ControllerBase
         var request = Request.Form["request"][0]?.StringToObject<CreateFormItemConfigDto>();
         return Ok(await _masterBl.GetApiService<EvaluationFormBL>().UpdateFormItemConfig(request!));
     }
+    [HttpPost]
+    public async Task<IActionResult> DeleteFormItemConfig(Guid formId)
+    {
+        return Ok(await _masterBl.GetApiService<EvaluationFormBL>().DeleteFormItemConfig(formId));
+    }
 }

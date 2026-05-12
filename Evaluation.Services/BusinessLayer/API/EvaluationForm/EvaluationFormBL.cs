@@ -227,4 +227,9 @@ public class EvaluationFormBL(IServiceScopeFactory serviceScopeFactory, CacheDat
         }
         return result;
     }
+    public async Task<ResponseDto> DeleteFormItemConfig(Guid formId)
+    {
+     var result = await evaluationFormService.DeleteFormItemConfig(formId);
+        return result;
+    }
 }

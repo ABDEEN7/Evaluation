@@ -42,6 +42,7 @@ const API_ROUTES = {
     // FormItemConfig
     getAllFormItemConfig: (id) => `/TemplateForm/${deprouting}/GetAllFormItemConfig?evalFormId=${id}`,
     saveFormItemConfig: () => `/TemplateForm/${deprouting}/SaveFormItemConfig`,
+    deleteFormItemConfig: () => `/TemplateForm/${deprouting}/DeleteFormItemConfig`,
     updateFormItemConfig: () => `/TemplateForm/${deprouting}/UpdateFormItemConfig`,
 
     // Lookups
