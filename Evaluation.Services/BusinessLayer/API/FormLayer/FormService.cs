@@ -58,6 +58,7 @@ public class FormService(IServiceScopeFactory serviceScopeFactory,
         var formItems = await unitOfWork.GetRepository<FormItem>()
                   .GetAllActiveNonDeleted()
                   .Where(s => s.EvalFormId == formId)
+                  .Include(f => f.FormItemConfigs)
                   .Include(d => d.SubFormItems)
                   .Include(f => f.RelatedFrom)
                   .ThenInclude(y => y.RelatedItem)

@@ -207,8 +207,8 @@
   border-bottom: 6px solid #666;
 }
 
-.tabulator .tabulator-header .tabulator-col.tabulator-sortable[aria-sort="descending"] .tabulator-col-content .tabulator-col-sorter {
-  color: #666;
+ .tabulator .tabulator-header .tabulator-col.tabulator-sortable[aria-sort="descending"] .tabulator-col-content .tabulator-col-sorter {
+  color: #ffffff30;
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -220,7 +220,7 @@
 
 .tabulator .tabulator-header .tabulator-col.tabulator-sortable[aria-sort="descending"] .tabulator-col-content .tabulator-col-sorter .tabulator-arrow {
   border-bottom: none;
-  border-top: 6px solid #666;
+  border-top: 6px solid #ffffff30;
   color: #666;
 }
 
