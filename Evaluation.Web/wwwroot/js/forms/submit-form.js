@@ -135,10 +135,21 @@ function calculateFE(select, formId) {
             let total = 0;
 
             formResult.items.forEach((item) => {
-                total += (item.value * (item.weightPercentage / 100)) || 0;
+                if (P_hasMuliEvaluation) {
+                    total += (item.value * (item.weightPercentage / 100)) || 0;
+                }
+                else {
+                    total += item.value || 0;
+                }
             });
 
-            result.Value = total / (formResult.items.length / P_countOfColumnsValue);
+            if (P_hasMuliEvaluation) {
+                result.Value = total / (formResult.items.length / P_countOfColumnsValue);
+
+            }
+            else {
+                result.Value = total / formResult.items.length;
+            }
 
             const evalMatrixValue = P_matrixResponse.value.find(
                 v => v.minValue <= result.Value && v.maxValue >= result.Value

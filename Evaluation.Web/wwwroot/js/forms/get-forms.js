@@ -29,6 +29,7 @@ let P_serviceRequestId;
 let P_matrixResponse;
 let evalForm;
 let P_countOfColumnsValue;
+let P_hasMuliEvaluation;
 
 const SELECTORS = {
     tbody: 'tbodyRows'
@@ -127,11 +128,11 @@ const generateFormAccordionItem = (rowsHtml, hasAnyNote, hasAnyChildren, fieldId
 // ==============================
 // Field Builders
 // ==============================
-const buildSelection = (item, fieldId, readOnly, index) => `
+const buildSelection = (item, fieldId, readOnly, index=0) => `
 <select class="form-select eval-select"
         id="${fieldId}_${item.id}_Select_${index}"
         data-id="${item.id}"
-        data-config-weight-percentage="${item.formItemConfigs[index].formItemConfig_Percentage}"
+        ${P_hasMuliEvaluation ? `data-config-weight-percentage= "${item.formItemConfigs[index].formItemConfig_Percentage}"`:``}
         ${readOnly ? 'disabled' : ''}>
 </select>
 `;
@@ -188,7 +189,7 @@ const createRow = ({
     ${!isRename ?
         `
 
-
+         ${hasMuliEvaluation?`
     ${Array.from({ length: countOfColumnsValue }, (_, index) => `
     <td>
         ${buildSelection(item, fieldId, readOnly, index)}
@@ -198,7 +199,10 @@ const createRow = ({
             style="display:none;">
         </span>
     </td>
-`).join('')}
+`).join('')}` : `<td>${buildSelection(item, fieldId, readOnly, 0)}
+    <span class="validation-message text-danger small mt-1" id="validation-${item.id}-${ItemPropertyType.SELECT}"style="display:none;"></span>
+</td>
+`}
     ${hasAnyNote ? `<td>${buildNote(item, fieldId, readOnly)}
         <span class="validation-message text-danger small mt-1" id="validation-${item.id}-${ItemPropertyType.NOTE}"style="display:none;"></span>
     </td>` : ''}
@@ -458,8 +462,8 @@ const generateFullFormPageHtml = async ({ formId,
     let isRename = itemsResult?.value.evalForm.allowRename
     let hasMuliEvaluation = evalForm.hasMuliEvaluation;
     let countOfColumnsValue = evalForm.evalCountOfColumnsValue;
-    P_countOfColumnsValue = evalForm.countOfColumnsValue;
-
+    P_countOfColumnsValue = evalForm.evalCountOfColumnsValue;
+    P_hasMuliEvaluation = evalForm.hasMuliEvaluation
 
     let isRenamedEvaluation = false;
 
@@ -581,8 +585,12 @@ async function initializeControls(formId, fieldId, controlValues) {
     });
 
     function populateForm(itemId, isSubItem = false) {
+        let length = 1;
 
-        let length = 2;
+        if (P_hasMuliEvaluation)
+        {
+            length = P_countOfColumnsValue;
+        }
 
         if (isSubItem) {
             length = 1;
