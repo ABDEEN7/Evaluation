@@ -79,7 +79,20 @@ function CommonLogicAfterInitial() {
                 $("#EvalFormsHasOneValue").parent().hide();
             }
         });
+    $(document).off("change", "#EvalFormHasMuliEvaluation")
+        .on("change", "#EvalFormHasMuliEvaluation", function () {
+            if (this.checked) {
+                $('label[for=EvalCountOfColumnsValue').show();
+                $("#EvalCountOfColumnsValue").parent().show();
+            }
+            else
+            {
+                $("label[for='EvalCountOfColumnsValue']").hide();
+                $("#EvalCountOfColumnsValue").parent().hide();
+            }
+        });
 }
+
 function ClearControlByPage() {
     if (popupname == "FormScope") {
         var id = $('#PopupId').val();
@@ -541,7 +554,7 @@ $(document).on("click", ".editParent", async function () {
     $("#PopupId").val(id);
     $("#evalformidvalue").val($("#Id").val());
 
-    
+
     setTimeout(() => {
         BuildFormItemConfigTable(id, objdata.calcMethodId);
     }, 800);
@@ -561,7 +574,7 @@ function BuildFormItemConfigTable(formItemId, formItemCalcMethodId) {
     IsDelete = IsDeleteFormItemConfig ? true : "";
     IsView = '';
 
-    
+
     var tableColumns = sharedFn().PopulateColumn(filteredColList, '', true);
 
     $('#ModalPopup .modal-body #PopupForm').append(`
@@ -641,7 +654,7 @@ function BuildFormItemConfigTable(formItemId, formItemCalcMethodId) {
         });
     });
 
-    
+
     $("#FormItemConfigSaveButton").off("click").on("click", function () {
         const allRows = tableFormItemConfig.getData();
         if (!allRows || allRows.length === 0) {
@@ -731,7 +744,7 @@ $(document).on("click", ".edit", function () {
     const cellElem = $(this).closest('section')[0];
     const id = cellElem.getAttribute('data-key');
     const obj = tableFormItemConfig.getData().find(f => f.id == id);
-    
+
     if (!obj) return;
 
     var data = {
