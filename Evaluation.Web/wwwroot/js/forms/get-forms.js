@@ -28,6 +28,7 @@ let P_evaluationRequestId;
 let P_serviceRequestId;
 let P_matrixResponse;
 let evalForm;
+let P_countOfColumnsValue;
 
 const SELECTORS = {
     tbody: 'tbodyRows'
@@ -82,7 +83,7 @@ const createPlaceholderOption = (text = 'Please select') => {
 // Accordion Builders
 // ==============================
 
-const generateFormAccordionItem = (rowsHtml, hasAnyNote, hasAnyChildren, fieldId, isRename, allowDelete, allowAdd, hasMuliEvaluation, countOfColumnsValue) => `
+const generateFormAccordionItem = (rowsHtml, hasAnyNote, hasAnyChildren, fieldId, isRename, allowDelete, allowAdd, hasMuliEvaluation, countOfColumnsValue, formItemConfigs) => `
 <div class="accordion-item mb-3 rounded">
     <div id="item3" class="accordion-collapse collapse show">
         <div class="accordion-body">
@@ -98,7 +99,7 @@ const generateFormAccordionItem = (rowsHtml, hasAnyNote, hasAnyChildren, fieldId
                        
                         ${hasMuliEvaluation
                                 ? Array.from({ length: countOfColumnsValue }, (_, i) =>
-                                    `<th>اختر التقييم ${i + 1}</th>`
+                                    `<th>${formItemConfigs[i].formItemConfig_NameAr}</th>`
                                 ).join('')
                                 : '<th>اختر التقييم</th>'}
                                 ${hasAnyNote ? '<th>الشواهد وأثرها</th>' : ''}
@@ -126,10 +127,11 @@ const generateFormAccordionItem = (rowsHtml, hasAnyNote, hasAnyChildren, fieldId
 // ==============================
 // Field Builders
 // ==============================
-const buildSelection = ({ id }, fieldId, readOnly, index) => `
+const buildSelection = (item, fieldId, readOnly, index) => `
 <select class="form-select eval-select"
-        id="${fieldId}_${id}_Select_${index}"
-        data-id="${id}"
+        id="${fieldId}_${item.id}_Select_${index}"
+        data-id="${item.id}"
+        data-config-weight-percentage="${item.formItemConfigs[index].formItemConfig_Percentage}"
         ${readOnly ? 'disabled' : ''}>
 </select>
 `;
@@ -490,7 +492,7 @@ const generateFullFormPageHtml = async ({ formId,
     let isRename = itemsResult?.value.evalForm.allowRename
     let hasMuliEvaluation = evalForm.hasMuliEvaluation;
     let countOfColumnsValue = evalForm.countOfColumnsValue;
-
+    P_countOfColumnsValue = evalForm.countOfColumnsValue;
 
 
     let isRenamedEvaluation = false;
@@ -541,7 +543,7 @@ const generateFullFormPageHtml = async ({ formId,
         countOfColumnsValue
     );
 
-    return `${generateFormAccordionItem(rowsHtml, hasAnyNote, hasAnyChildren, fieldId, isRename, allowDelete, allowAdd, evalForm.hasMuliEvaluation, evalForm.countOfColumnsValue)}`;
+    return `${generateFormAccordionItem(rowsHtml, hasAnyNote, hasAnyChildren, fieldId, isRename, allowDelete, allowAdd, evalForm.hasMuliEvaluation, evalForm.countOfColumnsValue, items[0].formItemConfigs)}`;
 };
 
 

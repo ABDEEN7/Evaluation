@@ -44,6 +44,7 @@ function evaluationFormResult(formId) {
                 id: mainId,
                 valueId: selectedValue,
                 value: $("option:selected", $select).data("actual-value") || 0,
+                weightPercentage: $select.data("config-weight-percentage") || 0,
                 note: note,
                 subItems: []
             };
@@ -172,10 +173,10 @@ function calculateFE(select, formId) {
             let total = 0;
 
             formResult.items.forEach((item) => {
-                total += item.value || 0;
+                total += (item.value * (item.weightPercentage / 100)) || 0;
             });
 
-            result.Value = total / formResult.items.length;
+            result.Value = total / (formResult.items.length / P_countOfColumnsValue);
 
             const evalMatrixValue = P_matrixResponse.value.find(
                 v => v.minValue <= result.Value && v.maxValue >= result.Value

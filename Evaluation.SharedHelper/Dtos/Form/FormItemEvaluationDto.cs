@@ -8,5 +8,6 @@ public class FormItemEvaluationDto
     public decimal Value { get; set; }
     public string? Note { get; set; }
     public string? Name{ get; set; }
+    public decimal WeightPercentage { get; set; }
     public List<SubFormItemEvaluationDto>? SubItems { get; set; }
 }

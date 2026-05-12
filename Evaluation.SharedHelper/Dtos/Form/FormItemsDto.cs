@@ -1,4 +1,6 @@
-﻿namespace Evaluation.DAL.Dtos.Form;
+﻿using Evaluation.SharedHelper.Dtos.EvalFormDto;
+
+namespace Evaluation.DAL.Dtos.Form;
 
 public class FormItemDto
 {
@@ -10,6 +12,7 @@ public class FormItemDto
     public bool NoteRequired { get; set; }
 
     public List<RelatedItemDto>? RelatedItems { get; set; }
+    public List<FormItemConfigDto>? FormItemConfigs { get; set; }
     public bool HasMultiEvaluation { get; set; }
 
     //public Guid RelatedItemId { get; set; } 
