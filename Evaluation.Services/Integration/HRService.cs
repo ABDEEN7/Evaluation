@@ -1,13 +1,17 @@
-﻿using AutoMapper;
+﻿using Aspose.Words.Bibliography;
+using AutoMapper;
 using Evaluation.DAL.DTOs;
 using Evaluation.DAL.Helper;
+using Evaluation.DAL.Models.IntegrationEntity;
 using Evaluation.DAL.Models.Master;
 using Evaluation.DAL.Models.Org;
 using Evaluation.DAL.Models.Planing;
 using Evaluation.DAL.Models.SystemSetting;
 using Evaluation.DAL.Repositories;
 using Evaluation.Services.BusinessLayer.API;
+using Evaluation.Services.Enums;
 using Evaluation.Services.Extensions;
+using Evaluation.Services.Interfaces;
 using Evaluation.Services.Mapping;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Enums;
@@ -16,7 +20,9 @@ using Evaluation.SharedHelper.Helper;
 using Evaluation.SharedHelper.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
 using Oracle.ManagedDataAccess.Client;
+using System;
 using System.Text;
 using System.Text.RegularExpressions;
 using static Evaluation.SharedHelper.Enums.ConstantKeys;
@@ -26,10 +32,12 @@ namespace Evaluation.Services.Integration;
 public class HRService : ApiBase
 {
     private readonly EmployeeService _employeeService;
-    public HRService(IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow, LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, IServiceProvider serviceProvider, RequestInfo requestInfo, EmployeeService employeeService)
+    private readonly IntegrationLogger _integrationLogger;
+    public HRService(IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow, LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, IServiceProvider serviceProvider, RequestInfo requestInfo, EmployeeService employeeService, IntegrationLogger integrationLogger)
     : base(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, requestInfo)
     {
         _employeeService = employeeService;
+        _integrationLogger = integrationLogger;
     }
 
     public async Task<List<HREmployeeInfoDto>> GetAllHRUsersAsync(int page)
@@ -382,7 +390,7 @@ public class HRService : ApiBase
         ////////////////////////CHECK WITH FATOUH////////////////////////
         DateOnly today = DateOnly.FromDateTime(DateTime.Now);
 
-        List<HROrganizationInfoDto> allHrSchools = await GetAllHRSchoolsAsync();
+        var allHrSchools = await _integrationLogger.ExecuteAsync(async () => await GetAllHRSchoolsAsync());
 
         if (allHrSchools.Count == 0)
             return false;
@@ -482,4 +490,5 @@ public class HRService : ApiBase
     }
 
     private string GenerateBackendName(string titleEn) => Regex.Replace(titleEn, "[^a-zA-Z]", "");
+
 }
