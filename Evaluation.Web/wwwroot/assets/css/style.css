@@ -2546,16 +2546,3 @@ input.auto-fill {
         }
 
 
-
-
-.tabulator .tabulator-header .tabulator-col.tabulator-sortable .tabulator-col-title {
-    text-align: start !important;
-}
-
-.tabulator .tabulator-row, .tabulator .tabulator-cell, .tabulator .tabulator-tableholder, .tabulator .tabulator-col-resize-handle {
-    text-align: start !important;
-}
-
-.tabulator .tabulator-header .tabulator-col {
-    place-content: center !important;
-}
