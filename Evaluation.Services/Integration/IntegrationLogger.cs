@@ -38,17 +38,16 @@ public class IntegrationLogger :ApiBase
             .GetRepository<IntegrationPointLog>()
             .InsertAsync(log);
 
+        await uow.CommitAsync();
+
         try
         {
-            // Execute actual business logic
             T result = await action();
 
-            // Save response
             string jsonResponse = JsonConvert.SerializeObject(
                 result,
                 Formatting.Indented);
 
-            // Update success log
             logResult.EndDate = DateTime.UtcNow;
 
             uow.GetRepository<IntegrationPointLog>()
