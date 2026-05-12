@@ -78,7 +78,11 @@ namespace Evaluation.Services.Models.API
 			string lang = _requestInfo.Lang;
 			var requestId = actionFormDTO?.RequestId;
 
-			var serviceObj = await SrvService.GetActiveAndOpenServiceById(serviceId);
+			bool IsInitalAction = false;
+			if (requestId == null || requestId == Guid.Empty)
+				IsInitalAction = true;
+
+			var serviceObj = await SrvService.GetActiveAndOpenServiceById(serviceId, IsInitalAction);
 
 			if (serviceObj == null)
 			{
@@ -139,7 +143,7 @@ namespace Evaluation.Services.Models.API
 
 				};
 
-				var validateRequestTask = ValidateCanCreateRequest(planId, serviceObj);
+				var validateRequestTask = SrvService.ValidateCanCreateRequest(planId, EvaluationRequestId, serviceObj);
 				if (actionFormDTO?.FieldValues != null)
 				{
 					var validateActionTask = SrvAction.ValidateActionAndActionFieldAsync(null, actionFormDTO?.FieldValues!, remarks, othersAttachement, serviceObj, status.Id, action, fileFields, saveAsDraft);
@@ -271,76 +275,7 @@ namespace Evaluation.Services.Models.API
 			return (null, null, null);
 		}
 	
-		public async Task<bool> ValidateCanCreateRequest(Guid? planId, Service serviceObj)
-		{
-			if (serviceObj == null)
-			{
-				throw new BusinessException(ExceptionMessage.IncompleteRequest);
-			}
-
-			#region maxCountOpen
-
-			int defaultMaxCountOpen = int.Parse(ServiceSettings.MaxCountOpen);
-			int maxCountOpen = defaultMaxCountOpen;
-
-			//var serviceSettingsJson = serviceObj.ServiceSettings ?? "{}";
-			//var serviceSettings = JsonConvert.DeserializeObject<Dictionary<string, object>>(serviceSettingsJson);
-
-			//if (!TryGetSettingValue(serviceSettings!, ServiceSettings.MaxCountOpen, out maxCountOpen))
-			//{
-			//	var systemSettingsJson = await cacheDataProvider.GetSystemSettingValue(SystemSettings.ServiceSettings);
-			//	if (!string.IsNullOrEmpty(systemSettingsJson))
-			//	{
-			//		var systemSettings = JsonConvert.DeserializeObject<Dictionary<string, object>>(systemSettingsJson);
-			//		if (systemSettings == null || !TryGetSettingValue(systemSettings, ServiceSettings.MaxCountOpen, out maxCountOpen))
-			//		{
-			//			SrvService.UpdateServiceSettingsAsync(serviceObj, ServiceSettings.MaxCountOpen, maxCountOpen);
-			//		}
-			//	}
-			//}
-
-			await ValidateIfThereIsOpenedRequestForServiceAsync(planId, serviceObj, maxCountOpen);
-
-			#endregion
-
-			return true;
-		}
-
-		private bool TryGetSettingValue(Dictionary<string, object> settings, string settingKey, out int result)
-		{
-			result = 0;
-
-			if (settings != null && settings.TryGetValue(settingKey, out var settingValue))
-			{
-				return int.TryParse(settingValue?.ToString(), out result);
-			}
-			return false;
-		}
-		private async Task ValidateIfThereIsOpenedRequestForServiceAsync(Guid? PlanId, Service serviceObj, int maxCountOpen)
-		{
-
-			var user = await SrvUser.GetByIDActiveNonDeleted(userInfo!.UserId!.Value);
-
-
-			var isMinistry = user is MinistryUser;
-
-			using var scope = serviceScopeFactory.CreateScopedUow();
-
-			var openRequests = await scope.GetRepository<ServiceRequest>()
-										.GetAllQueryFiltered()
-										.Include(c => c.Status)
-										.Where(c => c.PlanId == PlanId || serviceObj.Initialservice)
-										.Where(c => c.ServiceId == serviceObj.Id && c.Status!.ServiceStatusType!.IsOpen && !c.IsDeleted)
-										//.Where(c => c.OrgTreeId == userInfo!.UserId || isMinistry)
-										.CountAsync();
-
-
-			if (openRequests >= maxCountOpen)
-			{
-				throw new BusinessException(ExceptionMessage.lblRequestAlreadyOpened);
-			}
-		}
-
+	
 		public async Task<string> GetAttachmentUrlAsync(Guid attachmentId, Guid requestId, Guid EvlReqtId )
 		{
 			if (requestId != Guid.Empty && EvlReqtId  != Guid.Empty)
