@@ -74,15 +74,20 @@
                     </select>
                 </div>
 
-                <button id="filterSchoolBtnId" class="btn btn-primary">
-                    <i class="la la-search @ConstantKeys.WebSchools.Search"></i>
+                <div class="col-md-8"></div>
+                <div class="col-md-2">
+                    <button id="filterSchoolBtnId" class="btn btn-primary btn-with-text-icon w-100 mt-2">
+                        <i class="la la-search @ConstantKeys.WebSchools.Search"></i>
                     
-                </button>
-
-                <button id="clearFilterSchoolBtnId" class="btn btn-outline-secondary">
-                    <i class="la la-undo @ConstantKeys.WebSchools.ClearFilter"></i>
+                    </button>
+                </div>
+                <div class="col-md-2">
+                    <button id="clearFilterSchoolBtnId" class="btn btn-outline-secondary btn-with-text-icon w-100 mt-2">
+                        <i class="la la-undo @ConstantKeys.WebSchools.ClearFilter"></i>
                     
-                </button>
+                    </button>
+                </div>
+                <hr/>
             </div>
         </form>
 
@@ -99,7 +104,7 @@
                         <th @ConstantKeys.WebSchools.StatusCol></th>
                     </tr>
                 </thead>
-                <tbody class="requeststableBody"></tbody>
+                <tbody class="requeststableBody w-100"></tbody>
             </table>
         </div>
 

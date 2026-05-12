@@ -76,7 +76,7 @@
         enableCardView: true,
         cardViewBtnId: 'cardViewEvaluationPlans',
         tableViewBtnId: 'tblViewEvaluationPlans',
-        rowClass: 'plan-row',
+        rowClass: 'plan-request-card',
 
         // Transform API response to match expected format
         transformResponse: function (response) {
@@ -90,9 +90,9 @@
 
         columns: [
            {
-    data: "name",
-          className: "td-left py-1",
-          render: function(data, type, row) {
+            data: "name",
+           className: "td-left td-70 mt-1",
+            render: function(data, type, row) {
                 const isApproved = row.statusCode === "Approved";
                 return `
                     <div class="plan-title-row mb-3">
@@ -104,35 +104,49 @@
                     <span class="plan-title-text">${data || ""}</span>
                     </span>
  
-                        ${isApproved ? `
-                    <span class="request-status approved-status mx-2 p-1">
-                    <i class="las la-check"></i>
-                                ${row.statusCode}
-                    </span>
-                        ` : ''}
+                     
  
                     </div>
                     `;
                               }
-                        },
+            },
+            {
+        data: "statusCode",
+        className: "td-right td-30",
+        render: function(data, type, row) {
+
+            const isApproved = row.statusCode === "Approved";
+
+            if (!isApproved) return "";
+
+            return `
+        <div class="d-flex justify-content-end">
+            <span class="request-status approved-status bg-success-light py-1 px-2">
+                <i class="las la-check"></i>
+                ${row.statusCode}
+            </span>
+        </div>
+        `;
+        }
+    },
             {
                 data: "countSchools",
-                className: "td-left py-1",
+                className: "td-left status-break-row align-content-center",
                 render: function(data) {
                     return `
                     <i class="las la-school card-only-icon"></i>
-                    <span class="card-only-label">Schools count: </span>
+                    <span class="card-only-label me-1"> Schools count: </span>
                     ${data || ""}
                     `;
                 }
             },
             {
             data: null,
-            className: "td-left py-1",
+            className: "td-left status-break-row",
                 render: function(data, type, row) {
                     return `
                     <i class="las la-calendar-week card-only-icon"></i>
-                    <span class="card-only-label">Period: </span>
+                    <span class="card-only-label me-1"> Period: </span>
                     من ${row.startDate} إلى ${row.endDate}
                     `;
                 }
@@ -149,7 +163,7 @@
 
                     const dropdownId = `dropdownMenuButton_${row?.id || meta?.row || Math.random().toString(36).slice(2)}`;
 
-                    let actionsHtml = `<div class="dropdown d-block w-100 p-1">`;
+                    let actionsHtml = `<div class="dropdown d-block w-100 p-1 mb-1">`;
 
                     actionsHtml += `
                                 <button

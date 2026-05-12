@@ -23,5 +23,5 @@ public class TemplateFormDto : EntityBaseDTO
     public Guid FormStatusId { get; set; }
     public bool AllowRename { get; set; }
     public bool HasMuliEvaluation { get; set; }
-    public int CountOfColumnsValue { get; set; }
+    public int EvalCountOfColumnsValue { get; set; }
 }

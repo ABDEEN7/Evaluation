@@ -27,7 +27,7 @@ public class EvalFormProfile : Profile
                  .ForMember(dest => dest.CalcMethod, opt => opt.MapFrom(src => src.CalcMethod.BackendName))
                   .ForMember(dest => dest.AllowRename, opt => opt.MapFrom(src => src.AllowRename))
                   .ForMember(dest => dest.HasMuliEvaluation, opt => opt.MapFrom(src => src.HasMuliEvaluation))
-                  .ForMember(dest => dest.CountOfColumnsValue, opt => opt.MapFrom(src => src.CountOfColumnsValue));
+                  .ForMember(dest => dest.EvalCountOfColumnsValue, opt => opt.MapFrom(src => src.CountOfColumnsValue));
 
     }
 }

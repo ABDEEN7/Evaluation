@@ -491,7 +491,7 @@ const generateFullFormPageHtml = async ({ formId,
 
     let isRename = itemsResult?.value.evalForm.allowRename
     let hasMuliEvaluation = evalForm.hasMuliEvaluation;
-    let countOfColumnsValue = evalForm.countOfColumnsValue;
+    let countOfColumnsValue = evalForm.evalCountOfColumnsValue;
     P_countOfColumnsValue = evalForm.countOfColumnsValue;
 
 
@@ -543,7 +543,7 @@ const generateFullFormPageHtml = async ({ formId,
         countOfColumnsValue
     );
 
-    return `${generateFormAccordionItem(rowsHtml, hasAnyNote, hasAnyChildren, fieldId, isRename, allowDelete, allowAdd, evalForm.hasMuliEvaluation, evalForm.countOfColumnsValue, items[0].formItemConfigs)}`;
+    return `${generateFormAccordionItem(rowsHtml, hasAnyNote, hasAnyChildren, fieldId, isRename, allowDelete, allowAdd, evalForm.hasMuliEvaluation, countOfColumnsValue, items[0].formItemConfigs)}`;
 };
 
 

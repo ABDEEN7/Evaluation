@@ -41,12 +41,13 @@ namespace Evaluation.Services.Models.API
 
 		public async Task<WebAppPlanRequestsDTO> GetPlanRequestsAsync(FilterRequestsDTO filter)
 		{
-			
 			return await _srvServiceRequest.GetPlanRequestsAsync(filter);
 		}
 		public async Task<WebAppEvaluationRequestsDTO> GetEvaluationRequestsAsync(FilterRequestsDTO filter)
 		{
-			var userId = userInfo.UserId ?? Guid.Parse("C2536611-576B-4EB8-84F4-747F4ECE9A23");
+			var userId = userInfo.UserId
+				?? throw new BusinessException(ExceptionMessage.UserNotFound);
+
 			return await _evaluationRequestService.GetEvaluationRequestsAsync(userId, filter);
 		}
 
@@ -62,10 +63,7 @@ namespace Evaluation.Services.Models.API
         {
             return await _srvServiceRequest.GetSupportedFiles(requestId);
         }
-        public async Task<bool> SaveSupportFiles(
-    IFormFile file,
-    Guid EvaluationRequestId,
-    Guid ScopeId)
+        public async Task<bool> SaveSupportFiles( IFormFile file, Guid EvaluationRequestId,Guid ScopeId)
         {
             return await _srvServiceRequest.SaveSupportFiles(file, EvaluationRequestId, ScopeId);
         }
