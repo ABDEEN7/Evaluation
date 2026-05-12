@@ -1,5 +1,5 @@
 ﻿window.evaluationListing = window.evaluationListing || {};
-
+let departmentRoutePath = sharedUtility().extractDepartmentName();
 (function (ns) {
     const defaultPageSize = 18;
 

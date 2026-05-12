@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Azure.Core;
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.Attachments;
 using Evaluation.DAL.Models.DepartementEntites;
@@ -12,6 +13,7 @@ using Evaluation.DAL.Repositories;
 using Evaluation.Services.BusinessLayer.API.SchooLayer;
 using Evaluation.Services.Extensions;
 using Evaluation.Services.Special;
+using Evaluation.SharedHelper.Dtos.PlanDto;
 using Evaluation.SharedHelper.Dtos.SchoolDto;
 using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Exceptions;
@@ -141,7 +143,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             {
 				var RequestsTask = await GetRequestsForMinistryUserAsync(uow, userId, module, lang, time_Format, date_Format);
 				filteredResult = await FilteredPlanRequestsAsync( isMinistry, RequestsTask, model);
-
+				await FillPlanDetailsAsync(uow, filteredResult.Data);
 				//await UpdateRequestStatusesAsync(filteredResult.Data, module?.Id);
 				return filteredResult;
 			}
@@ -152,76 +154,119 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 			}
 
         }
-        //public async Task<List<ServiceRequestSummaryDTO>> SearchServiceRequestSummary(Guid planId, string requestNumber)
-        //{
-        //	var requestsList = await serviceScopeFactory.CreateScopedUow()
-        //		.GetRepository<ServiceRequest>()
-        //		.GetAllActiveNonDeleted(x => x.RequestNumber.Contains(requestNumber) && x.planId == planId)
-        //		.Include(c => c.Plan)
-        //		.Include(c => c.InitialHistory)
-        //		.Include(x => x.Status)
-        //		.ThenInclude(x => x!.StatusPreventPartyTypes)
-        //		.Include(c => c.Service)
-        //		.Include(c => c.Student)
-        //		.ThenInclude(c => c!.UserGender)
-        //		.AsNoTracking()
-        //		.Select(x => new ServiceRequestSummaryDTO
-        //		{
-        //			RequestId = x.Id,
-        //			RequestNumber = x.RequestNumber,
-        //			ServiceName = x.Service != null ? (_requestInfo.Lang == "ar" ? x.Service.NameAr : x.Service.NameEn) : "",
-        //			QID = x.Student != null ? x.Student.QID : "",
-        //			ServiceRequestStatus = x.Status != null ? (_requestInfo.Lang == "ar" ? x.Status.NameAr : x.Status.NameEn) : ""
-        //		})
-        //		.ToListAsync();
+		private async Task FillPlanDetailsAsync(UnitOfWork uow, List<ServiceRequestDTO> requests)
+		{
+			if (requests == null || !requests.Any())
+				return;
 
-        //	return requestsList;
-        //}
-        //public async Task<ServiceRequestSummaryDTO?> GetRequestSummaryById(Guid requestId)
-        //{
-        //	var requestObj = await serviceScopeFactory.CreateScopedUow()
-        //		.GetRepository<ServiceRequest>()
-        //		.GetAllActiveNonDeleted(x => x.Id == requestId)
-        //		.Include(c => c.plan)
-        //		.Include(c => c.InitialHistory)
-        //		.Include(x => x.Status)
-        //		.ThenInclude(x => x!.StatusPreventPartyTypes)
-        //		.Include(c => c.Service)
-        //		.Include(c => c.Student)
-        //		.ThenInclude(c => c!.UserGender)
-        //		.AsNoTracking()
-        //		.Select(x => new ServiceRequestSummaryDTO
-        //		{
-        //			RequestId = x.Id,
-        //			RequestNumber = x.RequestNumber,
-        //			ServiceName = x.Service != null ? (_requestInfo.Lang == "ar" ? x.Service.NameAr : x.Service.NameEn) : "",
-        //			QID = x.Student != null ? x.Student.QID : "",
-        //			ServiceRequestStatus = x.Status != null ? (_requestInfo.Lang == "ar" ? x.Status.NameAr : x.Status.NameEn) : ""
-        //		})
-        //		.FirstOrDefaultAsync();
+			var requestIds = requests.Select(x => x.Id).ToList();
 
-        //	return requestObj;
-        //}
+			var planFields = await uow.GetRepository<ServiceRequestFieldsValue>()
+				.GetAll()
+				.Include(x => x.Field)
+					.ThenInclude(f => f!.FieldType)
+				.Where(x =>
+					requestIds.Contains(x.RefId) &&
+					x.Field != null &&
+					x.Field.FieldType != null &&
+					x.Field.FieldType.BackendName == FieldTypeConstant.EvaluationPlan &&
+					!string.IsNullOrWhiteSpace(x.Value))
+				.Select(x => new
+				{
+					x.RefId,
+					x.Value
+				})
+				.ToListAsync();
 
-        //private IQueryable<EvaluationRequest> ApplyUserAccessFiltersForEvaluationRequests(IQueryable<EvaluationRequest> query,UserPartyTypeDataDTO userPartyTypeData,Guid userId,bool isAllowedToViewAllRequests)
-        //{
-        //	if (isAllowedToViewAllRequests)
-        //		return query;
+			var planFieldsMap = planFields
+				.GroupBy(x => x.RefId)
+				.ToDictionary(x => x.Key, x => x.First().Value);
 
-        //	if (userPartyTypeData.AllowedOrgTreeIds?.Any() == true)
-        //	{
-        //		query = query.Where(e => userPartyTypeData.AllowedOrgTreeIds.Contains(e.OrgTreeId));
-        //	}
+			foreach (var item in requests)
+			{
+				if (!planFieldsMap.TryGetValue(item.Id!.Value, out var planJson) ||
+					string.IsNullOrWhiteSpace(planJson))
+				{
+					continue;
+				}
 
-        //	if (userPartyTypeData.AllowedPlanIds?.Any() == true)
-        //	{
-        //		query = query.Where(e => userPartyTypeData.AllowedPlanIds.Contains(e.PlanId));
-        //	}
+				var planDto = JsonConvert.DeserializeObject<CreateEvaluationPlanDto>(planJson);
 
-        //	return query;
-        //}
+				item.PlanDateFrom = planDto?.StartDate;
+				item.PlanDateTo = planDto?.EndDate;
+				item.SchoolsCount = planDto?.Schools?.Count ?? 0;
+			}
+		}
+		//public async Task<List<ServiceRequestSummaryDTO>> SearchServiceRequestSummary(Guid planId, string requestNumber)
+		//{
+		//	var requestsList = await serviceScopeFactory.CreateScopedUow()
+		//		.GetRepository<ServiceRequest>()
+		//		.GetAllActiveNonDeleted(x => x.RequestNumber.Contains(requestNumber) && x.planId == planId)
+		//		.Include(c => c.Plan)
+		//		.Include(c => c.InitialHistory)
+		//		.Include(x => x.Status)
+		//		.ThenInclude(x => x!.StatusPreventPartyTypes)
+		//		.Include(c => c.Service)
+		//		.Include(c => c.Student)
+		//		.ThenInclude(c => c!.UserGender)
+		//		.AsNoTracking()
+		//		.Select(x => new ServiceRequestSummaryDTO
+		//		{
+		//			RequestId = x.Id,
+		//			RequestNumber = x.RequestNumber,
+		//			ServiceName = x.Service != null ? (_requestInfo.Lang == "ar" ? x.Service.NameAr : x.Service.NameEn) : "",
+		//			QID = x.Student != null ? x.Student.QID : "",
+		//			ServiceRequestStatus = x.Status != null ? (_requestInfo.Lang == "ar" ? x.Status.NameAr : x.Status.NameEn) : ""
+		//		})
+		//		.ToListAsync();
 
-        public async Task<ServiceRequestDTO> GetRequestDetailsAsync(Guid id, CancellationToken ct = default)
+		//	return requestsList;
+		//}
+		//public async Task<ServiceRequestSummaryDTO?> GetRequestSummaryById(Guid requestId)
+		//{
+		//	var requestObj = await serviceScopeFactory.CreateScopedUow()
+		//		.GetRepository<ServiceRequest>()
+		//		.GetAllActiveNonDeleted(x => x.Id == requestId)
+		//		.Include(c => c.plan)
+		//		.Include(c => c.InitialHistory)
+		//		.Include(x => x.Status)
+		//		.ThenInclude(x => x!.StatusPreventPartyTypes)
+		//		.Include(c => c.Service)
+		//		.Include(c => c.Student)
+		//		.ThenInclude(c => c!.UserGender)
+		//		.AsNoTracking()
+		//		.Select(x => new ServiceRequestSummaryDTO
+		//		{
+		//			RequestId = x.Id,
+		//			RequestNumber = x.RequestNumber,
+		//			ServiceName = x.Service != null ? (_requestInfo.Lang == "ar" ? x.Service.NameAr : x.Service.NameEn) : "",
+		//			QID = x.Student != null ? x.Student.QID : "",
+		//			ServiceRequestStatus = x.Status != null ? (_requestInfo.Lang == "ar" ? x.Status.NameAr : x.Status.NameEn) : ""
+		//		})
+		//		.FirstOrDefaultAsync();
+
+		//	return requestObj;
+		//}
+
+		//private IQueryable<EvaluationRequest> ApplyUserAccessFiltersForEvaluationRequests(IQueryable<EvaluationRequest> query,UserPartyTypeDataDTO userPartyTypeData,Guid userId,bool isAllowedToViewAllRequests)
+		//{
+		//	if (isAllowedToViewAllRequests)
+		//		return query;
+
+		//	if (userPartyTypeData.AllowedOrgTreeIds?.Any() == true)
+		//	{
+		//		query = query.Where(e => userPartyTypeData.AllowedOrgTreeIds.Contains(e.OrgTreeId));
+		//	}
+
+		//	if (userPartyTypeData.AllowedPlanIds?.Any() == true)
+		//	{
+		//		query = query.Where(e => userPartyTypeData.AllowedPlanIds.Contains(e.PlanId));
+		//	}
+
+		//	return query;
+		//}
+
+		public async Task<ServiceRequestDTO> GetRequestDetailsAsync(Guid id, CancellationToken ct = default)
         {
             var lang = _requestInfo.Lang;
             var userId = userInfo.UserId ?? Guid.Parse("C2536611-576B-4EB8-84F4-747F4ECE9A23");// throw new BusinessException(ExceptionMessage.UserNotFound);
@@ -511,7 +556,10 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             IQueryable<ServiceRequest> baseQuery = uow
                 .GetRepository<ServiceRequest>()
                 .GetAllActiveNonDeleted()
-                .Include(c => c.Service)
+				.Include(c => c.ServiceRequestFieldsValues!)
+	                .ThenInclude(x => x.Field)
+		                .ThenInclude(f => f!.FieldType)
+				.Include(c => c.Service)
                 .Include(c => c.Service!.RequestShowPartyType)
                 .Include(c => c.Status)
                 .Include(c => c.Status!.StatusPreventPartyTypes)
@@ -539,7 +587,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             }
 
 
-            return baseQuery.Select(c => new ServiceRequestDTO
+			var requests = baseQuery.Select(c => new ServiceRequestDTO
             {
                 RequestNumber = c.RequestNumber,
                 Status = lang == "ar" ? c.Status!.NameAr : c.Status!.NameEn,
@@ -553,20 +601,13 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                 CreateDate = c.CreateDate,
                 Id = c.Id,
                 icon = c.Service.Icon,
-                //QID = c.Student != null ? c.Student.QID : "",
-                //StudentUserId = c.Student!.Id,
-                //StudentNationalityId = c.Student != null ? c.Student.NationalityCode : null,
-                //Mobile = c.Student != null ? c.Student.Mobile : "",
-                //OwnerName = c.Student != null ? (lang == "ar" ? c.Student.FullNameAr : c.Student.FullNameEn) : "",
-                //StudentIsSpecial = c.Student != null && c.Student.IsSpecial,
-                //planNo = c.plan != null ? c.plan.planNumber : "",
-                //planId = c.plan != null ? c.plan.Id : null,
-                //SchStatus = c.plan != null && c.plan.SchStatus != null
-                //	? (lang == "ar" ? c.plan.SchStatus.NameAr : c.plan.SchStatus.NameEn)
-                //	: "",
+				
 
-            });
-        }
+			});
+
+
+			return requests;
+		}
 
         public async Task<bool> IsAllowedToViewAllRequestsAsync(Guid userId)
         {
@@ -917,9 +958,12 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
         private async Task<WebAppPlanRequestsDTO> FilteredPlanRequestsAsync( bool isMinistry, IQueryable<ServiceRequestDTO> requests, FilterRequestsDTO model)
         {
-            var result = new WebAppPlanRequestsDTO();
 
-            if (model != null)
+
+            var result = new WebAppPlanRequestsDTO();
+			var query = requests.ToQueryString();
+
+			if (model != null)
             {
                 if (isMinistry)
                 {

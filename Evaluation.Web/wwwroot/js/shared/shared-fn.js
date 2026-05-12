@@ -842,20 +842,6 @@ const sharedFn = (options) => {
                 }
             }
 
-            //Adding Action column
-            tabularcolumns.push({
-
-                title: getUiControlText('ACTIONS'), field: "", cssClass: 'tbl-cell-actions',
-                frozen: false, width: 120,
-                formatter: function (cell) {
-                    const { id } = cell.getRow().getData();
-                    return getActionTemplate(id, dynamicaction);
-                },
-                cellClick: function (event, cell) {
-                    actionCellClick(event, cell);
-                }
-
-            })
             //Adding Dynamic column
             $.each(columnList, function (index, item) {
 
@@ -1010,6 +996,20 @@ const sharedFn = (options) => {
                 });
             }
 
+            //Adding Action column
+            tabularcolumns.push({
+
+                title: getUiControlText('ACTIONS'), field: "", cssClass: 'tbl-cell-actions',
+                frozen: false, width: 120,
+                formatter: function (cell) {
+                    const { id } = cell.getRow().getData();
+                    return getActionTemplate(id, dynamicaction);
+                },
+                cellClick: function (event, cell) {
+                    actionCellClick(event, cell);
+                }
+
+            })
         }
         return tabularcolumns;
     }

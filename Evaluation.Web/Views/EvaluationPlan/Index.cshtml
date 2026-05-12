@@ -676,7 +676,7 @@
             window.formUtility = window.formUtility || {};
 
             const searchParams = new URLSearchParams(window.location.search);
-
+           
             const reqId = searchParams.get('id');
             const serviceId = searchParams.get('serviceId');
             const EvlId = searchParams.get('Evlid');
@@ -721,7 +721,7 @@
 
             await LoadUserDetails();
            
-            GetScopes();
+            //GetScopes();
             CheckAndResumeSessionTimer();
         });
     </script>
