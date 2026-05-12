@@ -209,29 +209,7 @@ const createRow = ({
 </tr>
 `;
 
-/*
 
- ${Array.from({ length: 2 }, (_, index) => `
-    <td>
-        ${buildSelection(item, fieldId, readOnly, index)}
-        <span 
-            class="validation-message text-danger small mt-1"
-            id="validation-${item.id}-${ItemPropertyType.SELECT}_${index}"
-            style="display:none;">
-        </span>
-    </td>
-`).join('')}
-
-
-
-        <td>${buildSelection(item, fieldId, readOnly, index = 0)}
-        <span class="validation-message text-danger small mt-1" id="validation-${item.id}-${ItemPropertyType.SELECT}_${index}"style="display:none;"></span>
-    </td>
-     <td>${buildSelection(item, fieldId, readOnly, index = 1)}
-        <span class="validation-message text-danger small mt-1" id="validation-${item.id}-${ItemPropertyType.SELECT}_${index}"style="display:none;"></span>
-    </td>
-   
- */
 
 const createRowRelatedItem = ({
     item,
@@ -331,20 +309,8 @@ const generateTableBodyHtml = async (
     }
 
 };
-/*
-item:
-order:
-collapseId:
-hasChildrenColumn:
-hasAnyNote:
-fieldId:
-readOnly:
-isRename:
-allowRename:
-allowDelete:
-hasMuliEvaluation:
-countOfColumnsValue:
- */
+
+
 function addNewRow(button)
 {
     if (renameItems.length > 0) {
@@ -606,11 +572,6 @@ async function initializeControls(formId, fieldId, controlValues) {
         });
     }
 
-    // Pre-create matrix options (cloned later)
-    //const matrixOptions = matrixValues.map(
-    //    ({ id, name, actualMatrixValue }) => new Option(name, id)
-    //);
-
     const matrixOptions = matrixValues.map(({ id, name, actualMatrixValue }) => {
         const option = new Option(name, id);
 
@@ -654,38 +615,8 @@ async function initializeControls(formId, fieldId, controlValues) {
                 calculateFE(select, formId);
             });
         }
-        //const select = document.getElementById(`${fieldId}_${itemId}_Select`);
-
-        //if (!select) return;
-
-        //// Reset select
-        //select.length = 0;
-        //select.add(createPlaceholderOption());
-
-        //// Add matrix options
-        //matrixOptions.forEach(option =>
-        //    select.add(option.cloneNode(true))
-        //);
-
-        //// Apply saved values
-        //const valueSource = isSubItem
-        //    ? subItemValueMap.get(itemId)
-        //    : itemValueMap.get(itemId);
-
-        //if (valueSource) {
-        //    select.value = valueSource.valueId ?? "";
-        //}
-
-        //$(select).on("change", function () {
-        //    calculateFE(select, formId);
-        //});
-
-
+     
         const note = document.getElementById(`${fieldId}_${itemId}_Note`);
-
-        //if (valueSource) {
-        //    if (note) note.value = valueSource.note ?? "";
-        //}
 
     }
 

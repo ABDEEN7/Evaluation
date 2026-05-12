@@ -77,44 +77,6 @@ function evaluationFormResult(formId) {
             mainItems.push(mainObj);
         });
 
-      
-
-        //const note =
-        //    row.find("textarea.note-input").val() || null;
-
-        //const mainObj = {
-        //    id: mainId,
-        //    valueId: selectedValue,
-        //    value: $("option:selected", select).text(),
-        //    note: note,
-        //    subItems: []
-        //};
-
-        //// ========== LOOP SUB ITEMS RELATED TO THIS MAIN ==========
-        //$(`tr.child-row[data-parent-id="${mainId}"]`).each(function () {
-
-        //    const childRow = $(this);
-        //    const childSelect = childRow.find("select.eval-select");
-
-        //    const childId = childSelect.data("id");
-
-        //    const childValue =
-        //        childSelect.find("option:selected").data("id") ||
-        //        childSelect.val() ||
-        //        null;
-
-        //    const childnote =
-        //        childRow.find("textarea.note-input").val() || null;
-
-        //    mainObj.subItems.push({
-        //        id: childId,
-        //        valueId: childValue,
-        //        value: $("option:selected", select).text(),
-        //        note: childnote
-        //    });
-        //});
-
-        //mainItems.push(mainObj);
     });
 
     // Strengths & Improvements
