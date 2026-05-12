@@ -582,10 +582,20 @@ function BuildFormItemConfigTable(formItemId, formItemCalcMethodId) {
     IsEdit = IsEditFormItemConfig ? true : "";
     IsDelete = IsDeleteFormItemConfig ? true : "";
     IsView = '';
-
+    var checkboxColumn = {
+        title: "",
+        field: "selected",
+        width: 40,
+        headerSort: false,
+        formatter: "rowSelection",
+        titleFormatter: "rowSelection",
+        cellClick: function (e, cell) {
+            cell.getRow().toggleSelect();
+        }
+    };
 
     var tableColumns = sharedFn().PopulateColumn(filteredColList, '', true);
-
+    tableColumns.splice(1, 0, checkboxColumn); 
     $('#ModalPopup .modal-body #PopupForm').append(`
         <div class="row mt-3">
             <div class="card-header justify-content-end d-flex align-items-center bg-light">
@@ -614,7 +624,8 @@ function BuildFormItemConfigTable(formItemId, formItemCalcMethodId) {
             placeholder: sharedFn().GetUiControlText('NO_DATA_FOUND'),
             movableRows: true,
             editable: true,
-            lookupSources: lookupSources
+            lookupSources: lookupSources,
+            selectable: true
         },
         uniqueRowId: 'id',
         columns: tableColumns,
@@ -1174,6 +1185,7 @@ initTables = () => {
             placeholder: sharedFn().GetUiControlText('NO_DATA_FOUND'),
             headerFilterPlaceholder: sharedFn().GetUiControlText('FILTER_COLUMN'),
             movableRows: true,
+            selectable:true
         },
         isResponsiveLayout: false,
         uniqueRowId: 'id',
@@ -1284,6 +1296,18 @@ async function InitFormItemConfigPopup(
         </label>
     </div>
 </div>
+<div class="me-2 d-flex align-items-center gap-2">
+    <button type="button" id="FormItemConfigDeleteSelectedButton" class="btn btn-danger d-none">
+        <i class="las la-trash"></i>
+        <span id="FormItemConfigSelectedCount"></span>
+    </button>
+    <button type="button" id="FormItemConfigSelectAllButton" class="btn btn-secondary btn-sm">
+        ${sharedFn().GetUiControlText('SELECT_ALL') ?? 'Select All'}
+    </button>
+    <button type="button" id="FormItemConfigClearSelectionButton" class="btn btn-outline-secondary btn-sm">
+        ${sharedFn().GetUiControlText('CLEAR_SELECTION') ?? 'Clear'}
+    </button>
+</div>
             <button type="button" id="FormItemConfigRelationbutton" class="btn btn-primary">
                 ${sharedFn().GetUiControlText('FormItemConfigAddButton')}
             </button>
@@ -1305,6 +1329,36 @@ async function InitFormItemConfigPopup(
     IsEdit = IsEditFormItemConfig ? true : "";
     IsDelete = IsDeleteFormItemConfig ? true : "";
     IsView = '';
+    const checkboxColumn = {
+        title: "<input type='checkbox' id='selectAllFormItemConfig' />",
+        field: "rowSelected",
+        width: 40,
+        minWidth: 40,
+        hozAlign: "center",
+        headerHozAlign: "center",
+        headerSort: false,
+        resizable: false,
+        editable: false,
+        formatter: function (cell) {
+            const checked = cell.getRow().isSelected() ? "checked" : "";
+            return `<input type='checkbox' ${checked} />`;
+        },
+        cellClick: function (e, cell) {
+            cell.getRow().toggleSelect();
+        },
+        headerClick: function (e, column) {
+            const allSelected = column.getTable().getSelectedRows().length === column.getTable().getRows().length;
+            if (allSelected) {
+                column.getTable().deselectRow();
+                $("#selectAllFormItemConfig").prop("checked", false);
+            } else {
+                column.getTable().selectRow();
+                $("#selectAllFormItemConfig").prop("checked", true);
+            }
+        }
+    };
+    const tablecolumnlistWithCheckbox = [checkboxColumn, ...tablecolumnlist];
+
     tableFormItemConfig = tableUtil.createTabulator({
         id: "FormItemConfigRelationtabulator",
         config: {
@@ -1312,16 +1366,17 @@ async function InitFormItemConfigPopup(
             pagination: "local",
             paginationSize: 10,
             placeholder: sharedFn().GetUiControlText('NO_DATA_FOUND'),
-
             movableRows: true,
             selectable: true,
+            selectableRangeMode: "click",
             editable: true,
             lookupSources: lookupSources
         },
         uniqueRowId: 'id',
         sortColumn: "updateDate",
         sortDir: "desc",
-        columns: tablecolumnlist,
+        columns: tablecolumnlistWithCheckbox,
+
         rowClick: function (e, row) {
             currentrowclicked = row.getPosition();
         }
@@ -1349,6 +1404,55 @@ async function InitFormItemConfigPopup(
             calcMethodId: null,
             percentage: 0,
             isActive: true
+        });
+    });
+
+    // row selection logic
+    tableFormItemConfig.on("rowSelectionChanged", function (data, rows) {
+        const count = rows.length;
+        const totalRows = tableFormItemConfig.getRows().length;
+
+        // update delete button
+        if (count > 0) {
+            $("#FormItemConfigDeleteSelectedButton")
+                .removeClass("d-none")
+                .find("#FormItemConfigSelectedCount")
+                .text(` (${count})`);
+        } else {
+            $("#FormItemConfigDeleteSelectedButton").addClass("d-none");
+            $("#FormItemConfigSelectedCount").text('');
+        }
+
+        // sync header checkbox
+        $("#selectAllFormItemConfig").prop("checked", count > 0 && count === totalRows);
+
+        // refresh all row checkboxes
+        tableFormItemConfig.getRows().forEach(row => {
+            const checkbox = row.getElement().querySelector("input[type='checkbox']");
+            if (checkbox) checkbox.checked = row.isSelected();
+        });
+    });
+
+    $("#FormItemConfigSelectAllButton").off("click").on("click", function () {
+        tableFormItemConfig.selectRow();
+    });
+
+    $("#FormItemConfigClearSelectionButton").off("click").on("click", function () {
+        tableFormItemConfig.deselectRow();
+    });
+
+    $("#FormItemConfigDeleteSelectedButton").off("click").on("click", function () {
+        const selectedRows = tableFormItemConfig.getSelectedRows();
+        if (!selectedRows || selectedRows.length === 0) return;
+
+        notificationUtil.confirmation({
+            title: sharedFn().GetUiControlText('WEB_WARNING_DELETE'),
+            okText: sharedFn().GetUiControlText('WEB_DELETE_BUTTON'),
+            cancelText: sharedFn().GetUiControlText('WEB_CANCEL')
+        }, function () {
+            selectedRows.forEach(row => row.delete());
+            tableFormItemConfig.deselectRow();
+            notificationUtil.success(sharedFn().GetUiControlText('WEB_MSG_DELETE'));
         });
     });
 
