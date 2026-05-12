@@ -1293,6 +1293,7 @@ input:checked + .slider-small:before {
 }
 
 main {
+    flex: 1;
     background-color: #F6F6F3;
 }
 /*--------------------------------------------------------------
@@ -1618,11 +1619,12 @@ main {
 
 .action-items {
     display: flex;
-    align-items: center;
+    /*    align-items: center;*/
     gap: 4px;
-    justify-content: center;
+    /*    justify-content: center;*/
     color: #333;
     font-size: 16px;
+    padding: .45rem;
 }
 
 .btn-close-custom {
@@ -2542,3 +2544,18 @@ input.auto-fill {
         .profile-btn.show i {
             color: #fff !important;
         }
+
+
+
+
+.tabulator .tabulator-header .tabulator-col.tabulator-sortable .tabulator-col-title {
+    text-align: start !important;
+}
+
+.tabulator .tabulator-row, .tabulator .tabulator-cell, .tabulator .tabulator-tableholder, .tabulator .tabulator-col-resize-handle {
+    text-align: start !important;
+}
+
+.tabulator .tabulator-header .tabulator-col {
+    place-content: center !important;
+}
