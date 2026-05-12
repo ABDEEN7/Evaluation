@@ -8,6 +8,7 @@ using Evaluation.DAL.Models.UserEntiy;
 using Evaluation.DAL.Repositories;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper;
+using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Api.PartyTypeDTOs;
@@ -24,8 +25,6 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
     public class  SrvService(IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow,SrvUser srvUser, SrvActionStatusConfiguration SrvActionStatusConfiguration, LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, IServiceProvider serviceProvider, RequestInfo requestInfo)
             : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, requestInfo)
         {
-        
-
         public async Task<ServiceDTO?> GetServiceByIdAsync(Guid serviceId, string Lang)
 		{
 			using var scopedUow = serviceScopeFactory.CreateScopedUow();
@@ -54,7 +53,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             return service;
 
         }
-        public async Task<Service?> GetActiveAndOpenServiceById(Guid serviceId)
+        public async Task<Service?> GetActiveAndOpenServiceById(Guid serviceId,bool IsIntialAction)
 		{
 			using var scopedUow = serviceScopeFactory.CreateScopedUow();
 
@@ -63,11 +62,19 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                 .GetAllQueryFiltered(x => x.Id == serviceId)
                 .Include(c=>c.SystemModule)
                 .Include(c=>c.SystemModule!.SystemModuleType)
-                .Where(c =>(!c.StartDate.HasValue || today >= c.StartDate) && (null == c.EndDate || c.EndDate.Value.AddDays(1) >= today))
                 .AsNoTracking()
                 .FirstOrDefaultAsync();
 
-            return service;
+			if (IsIntialAction && service!.SystemModule?.SystemModuleType?.BackendName != ModuleType.EvaluationRequest)
+			{
+				bool isInValidDateRange = service.StartDate.HasValue
+											&& today >= service.StartDate.Value && (!service.EndDate.HasValue || service.EndDate.Value.AddDays(1) >= today);
+
+				if (!isInValidDateRange)
+					return null;
+			}
+
+			return service;
 
         }
         public async Task<Service?> GetIntialService(Guid moduleId)
@@ -82,7 +89,6 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             return service;
 
         }
-
         public async Task<List<SelectListItemDTO>> GetServiceByModuleIdAsync(Guid moduleId)
         {
             string lang = requestInfo.Lang;
@@ -109,8 +115,6 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
             return services;
         }
-
-
         public async Task<Guid> GetModuleIdForServiceAsync(Guid serviceId)
 		{
 			using var scopedUow = serviceScopeFactory.CreateScopedUow();
@@ -244,7 +248,6 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 			return dto;
 		}
 
-
 		public async Task<List<ServiceDTO>> GetServicesbyDepartementAndPartyType(string? departmentRoute, Guid? userProfileId)
         {
             List<Guid>? serviceList = null;
@@ -325,108 +328,6 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
           
         }
-      
-
-
-        //private async Task<List<ScholarshipDataDTO>> GetEligibleScholarShipsAsync(Service service, string lang)
-        //{
-        //   using var scope = serviceScopeFactory.CreateScopedUow();
-        //   using var scope1 = serviceScopeFactory.CreateScopedUow();
-
-        //        var userTask = scope.GetRepository<MinistryUser>()
-        //                            .GetAllQueryFiltered()?
-        //                            .Include(x=>x.UserPartTypes)
-        //                            .FirstAsync(c => c.Id == userInfo.UserId);
-
-        //        var departmentUserIdsTask = scope1.GetRepository<PartyType>()
-        //                                         .GetAllQueryFiltered(x => x.SystemModuleId == service.SystemModuleId)
-        //                                         .AsNoTracking()
-        //                                         .Select(x => x.Id)
-        //                                         .ToListAsync();
-
-
-        //        var allowedStatus = service!.SchServiceStatusConfiguration!
-        //                                   .Select(c => c.CurrentStatusId)
-        //                                   .ToList();
-
-        //        var departmentUserIds = await departmentUserIdsTask;
-
-        //        var partyTypeIdsList = userInfo.PartyTypes
-        //                                            .Where(id => departmentUserIds.Contains(id));
-        //        var canViewAllScholarships = false;
-
-        //        if (partyTypeIdsList != null)
-        //        {
-        //            canViewAllScholarships = await scope1.GetRepository<UserPartyType>()
-        //                                                 .GetAllQueryFiltered(x => partyTypeIdsList.Contains(x.PartyTypeId))
-        //                                                 .AsNoTracking()
-        //                                                 .Include(x => x.PartyType)
-        //                                                 .AnyAsync(x => x.PartyType!.CanViewAllEvaluations);
-        //        }
-        //        var user = await userTask!;
-        //        if (user is MinistryUser)
-        //        {
-        //            var Scholarships = await scope.GetRepository< ScholarshipData>()
-        //                                          .GetAllQueryFiltered()
-        //                                          .AsNoTracking()
-        //                                          .Include(c => c.SchStatus)
-        //                                          .Include(c=>c.SchAssignment)
-        //                                          .Include(c => c.AcademicDegree)
-        //                                          .Include(c => c.Major)
-        //                                          .Include(c => c.StudentUser)
-        //                                          .Where(c => allowedStatus.Contains(c.SchStatusId))
-        //                                          .Where(c => canViewAllScholarships || 
-        //                                                      c.SchAssignment!.Where(x=>
-        //                                                          x.IsActive==true && x.IsDeleted==false
-        //                                                          && user.UserPartTypes!.Select(p=>p.PartyTypeId)
-        //                                                              .Contains(x.PartyTypeId)).Any(x => x.MinistryUserId == user.Id)
-        //                                                      )
-        //                                          .Select(c => new ScholarshipDataDTO
-        //                                          {
-        //                                              Id = c.Id,
-        //                                              StudentQid = c.StudentUser!.QID,
-        //                                              StudentName = lang == "ar" ? c.StudentUser!.FullNameAr : c.StudentUser!.FullNameEn,
-        //                                              ScholarshipNumber = c.ScholarshipNumber,
-        //                                              SchStatus = lang == "ar" ? c.SchStatus!.NameAr : c.SchStatus!.NameEn,
-        //                                              SubDegreeName = lang == "ar" ? c.AcademicDegree!.NameAr : c.AcademicDegree!.NameEn,
-        //                                              MajorName = lang == "ar" ? c.Major!.NameAr : c.Major!.NameEn,
-        //                                          })
-        //                                          .ToListAsync();
-
-        //            return Scholarships;
-        //        }
-
-             
-        //        else if (user is StudentUser)
-        //        {
-        //            var Scholarships = await scope.GetRepository<ScholarshipData>()
-        //                                          .GetAllActiveNonDeleted()
-        //                                          .AsNoTracking()
-        //                                          .Include(c => c.SchStatus)
-        //                                          .Include(c => c.AcademicDegree)
-        //                                          .Include(c => c.Major)
-        //                                           .Include(c => c.StudentUser)
-        //                                          .Where(c => allowedStatus.Contains(c.SchStatusId))
-        //                                          .Where(c => c.StudentUserId == user.Id)
-        //                                          .Select(c => new ScholarshipDataDTO
-        //                                          {
-        //                                              Id = c.Id,
-        //                                              StudentQid = c.StudentUser!.QID,
-        //                                              StudentName = lang == "ar" ? c.StudentUser!.FullNameAr : c.StudentUser!.FullNameEn,
-        //                                              ScholarshipNumber = c.ScholarshipNumber,
-        //                                              SchStatus = lang == "ar" ? c.SchStatus!.NameAr : c.SchStatus!.NameEn,
-        //                                              SubDegreeName = lang == "ar" ? c.AcademicDegree!.NameAr : c.AcademicDegree!.NameEn,
-        //                                              MajorName = lang == "ar" ? c.Major!.NameAr : c.Major!.NameEn,
-        //                                          })
-        //                                          .ToListAsync();
-
-        //            return Scholarships;
-        //        }
-
-        //        return new List<ScholarshipDataDTO>();
-            
-        //}
-
         public async Task<bool> CanCreateDraftAsync(Guid? serviceId, Guid? ownerId)
 		{
 			using var scopedUow = serviceScopeFactory.CreateScopedUow();
@@ -461,8 +362,6 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
             return draftActionsCount > 0;
         }
-
-
         public void UpdateServiceSettingsAsync(Service serviceObj, string settingKey, int value)
         {
             if (serviceObj == null)
@@ -484,5 +383,74 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                 uow.GetRepository<Service>().Update(serviceObj);
             }
         }
-    }
+		public async Task<bool> ValidateCanCreateRequest(Guid? planId, Guid? EvlReqId, Service serviceObj)
+		{
+			if (serviceObj == null)
+			{
+				throw new BusinessException(ExceptionMessage.IncompleteRequest);
+			}
+
+			#region maxCountOpen
+
+			int defaultMaxCountOpen = int.Parse(ServiceSettings.MaxCountOpen);
+			int maxCountOpen = defaultMaxCountOpen;
+
+			var serviceSettingsJson = serviceObj.ServiceSettings ?? "{}";
+			var serviceSettings = JsonConvert.DeserializeObject<Dictionary<string, object>>(serviceSettingsJson);
+
+			if (!TryGetSettingValue(serviceSettings!, ServiceSettings.MaxCountOpen, out maxCountOpen))
+			{
+				var systemSettingsJson = await cacheDataProvider.GetSystemSettingValue(SystemSettings.ServiceSettings);
+				if (!string.IsNullOrEmpty(systemSettingsJson))
+				{
+					var systemSettings = JsonConvert.DeserializeObject<Dictionary<string, object>>(systemSettingsJson);
+					if (systemSettings == null || !TryGetSettingValue(systemSettings, ServiceSettings.MaxCountOpen, out maxCountOpen))
+					{
+						UpdateServiceSettingsAsync(serviceObj, ServiceSettings.MaxCountOpen, maxCountOpen);
+					}
+				}
+			}
+
+			await ValidateIfThereIsOpenedRequestForServiceAsync(planId, EvlReqId, serviceObj, maxCountOpen);
+
+			#endregion
+
+			return true;
+		}
+		private bool TryGetSettingValue(Dictionary<string, object> settings, string settingKey, out int result)
+		{
+			result = 0;
+
+			if (settings != null && settings.TryGetValue(settingKey, out var settingValue))
+			{
+				return int.TryParse(settingValue?.ToString(), out result);
+			}
+			return false;
+		}
+		private async Task ValidateIfThereIsOpenedRequestForServiceAsync(Guid? PlanId, Guid? EvlReqId, Service serviceObj, int maxCountOpen)
+		{
+
+			var user = await srvUser.GetByIDActiveNonDeleted(userInfo!.UserId!.Value);
+
+
+			var isMinistry = user is MinistryUser;
+
+			using var scope = serviceScopeFactory.CreateScopedUow();
+
+			var openRequests = await scope.GetRepository<ServiceRequest>()
+										.GetAllQueryFiltered()
+										.Include(c => c.Status)
+										.Where(c => c.PlanId == PlanId || (serviceObj.Initialservice && serviceObj.SystemModule!.SystemModuleTypeId == ModuleTypeIds.EvaluationPlan))
+										.Where(c => c.ServiceId == serviceObj.Id && c.Status!.ServiceStatusType!.IsOpen && !c.IsDeleted)
+										.Where(c => c.EvaluationRequestId == EvlReqId || EvlReqId == null)
+										.CountAsync();
+
+
+			if (openRequests >= maxCountOpen)
+			{
+				throw new BusinessException(ExceptionMessage.lblRequestAlreadyOpened);
+			}
+		}
+
+	}
 }
