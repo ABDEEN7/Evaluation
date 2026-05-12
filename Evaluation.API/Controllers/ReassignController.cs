@@ -27,4 +27,12 @@ public class ReassignController : ControllerBase
             .GetReAssignedDropList(userId);
         return Ok(new ResponseEntity(response));
     }
+    [HttpPost]
+    public async Task<IActionResult> UpdateReassignEvaluationRequestUser(RequestReassignDto request)
+    {
+        await _masterBl.GetApiService<ReassignBL>()
+            .UpdateReassignEvaluationRequestUser(request);
+        return Ok();
+    }
+    
 }
