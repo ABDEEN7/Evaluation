@@ -67,11 +67,17 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
 			if (IsIntialAction && service!.SystemModule?.SystemModuleType?.BackendName != ModuleType.EvaluationRequest)
 			{
-				bool isInValidDateRange = service.StartDate.HasValue
-											&& today >= service.StartDate.Value && (!service.EndDate.HasValue || service.EndDate.Value.AddDays(1) >= today);
+				bool hasDateRange = service.StartDate.HasValue || service.EndDate.HasValue;
 
-				if (!isInValidDateRange)
-					return null;
+				if (hasDateRange)
+				{
+					bool isInValidDateRange =
+						(!service.StartDate.HasValue || today >= service.StartDate.Value.Date) &&
+						(!service.EndDate.HasValue || today <= service.EndDate.Value.Date);
+
+					if (!isInValidDateRange)
+						return null;
+				}
 			}
 
 			return service;
@@ -362,69 +368,65 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
             return draftActionsCount > 0;
         }
-        public void UpdateServiceSettingsAsync(Service serviceObj, string settingKey, int value)
-        {
-            if (serviceObj == null)
-            {
-                throw new BusinessException(ExceptionMessage.ServiceNotFound);
-            }
-            if (serviceObj.ServiceSettings is not null)
-            {
-                var serviceSettings = JsonConvert.DeserializeObject<Dictionary<string, object>>(serviceObj.ServiceSettings);
-                if (serviceSettings == null)
-                {
-                    serviceSettings = new Dictionary<string, object>();
-                }
-
-                serviceSettings[settingKey] = value;
-
-                serviceObj.ServiceSettings = JsonConvert.SerializeObject(serviceSettings);
-
-                uow.GetRepository<Service>().Update(serviceObj);
-            }
-        }
-		public async Task<bool> ValidateCanCreateRequest(Guid? planId, Guid? EvlReqId, Service serviceObj)
+		public void UpdateServiceSettingsAsync(Service serviceObj, string settingKey, int value)
 		{
 			if (serviceObj == null)
 			{
-				throw new BusinessException(ExceptionMessage.IncompleteRequest);
+				throw new BusinessException(ExceptionMessage.ServiceNotFound);
 			}
 
-			#region maxCountOpen
+			var serviceSettings =
+				!string.IsNullOrWhiteSpace(serviceObj.ServiceSettings)
+					? JsonConvert.DeserializeObject<Dictionary<string, object>>(serviceObj.ServiceSettings)
+					: new Dictionary<string, object>();
 
-			int defaultMaxCountOpen = int.Parse(ServiceSettings.MaxCountOpen);
-			int maxCountOpen = defaultMaxCountOpen;
+			if (serviceSettings == null)
+			{
+				serviceSettings = new Dictionary<string, object>();
+			}
+
+			serviceSettings[settingKey] = value;
+
+			serviceObj.ServiceSettings = JsonConvert.SerializeObject(serviceSettings);
+
+			uow.GetRepository<Service>().Update(serviceObj);
+		}
+		public async Task<bool> ValidateCanCreateRequest(Guid? planId, Guid? EvlReqId, Service serviceObj)
+		{
+			if (serviceObj == null)
+				throw new BusinessException(ExceptionMessage.IncompleteRequest);
+
+			int maxCountOpen = int.Parse(ServiceSettings.MaxCountOpen);
 
 			var serviceSettingsJson = serviceObj.ServiceSettings ?? "{}";
-			var serviceSettings = JsonConvert.DeserializeObject<Dictionary<string, object>>(serviceSettingsJson);
 
-			if (!TryGetSettingValue(serviceSettings!, ServiceSettings.MaxCountOpen, out maxCountOpen))
+			var serviceSettings =
+				JsonConvert.DeserializeObject<Dictionary<string, object>>(serviceSettingsJson)
+				?? new Dictionary<string, object>();
+
+			if (!TryGetSettingValue(serviceSettings, nameof(ServiceSettings.MaxCountOpen), out maxCountOpen))
 			{
-				var systemSettingsJson = await cacheDataProvider.GetSystemSettingValue(SystemSettings.ServiceSettings);
-				if (!string.IsNullOrEmpty(systemSettingsJson))
-				{
-					var systemSettings = JsonConvert.DeserializeObject<Dictionary<string, object>>(systemSettingsJson);
-					if (systemSettings == null || !TryGetSettingValue(systemSettings, ServiceSettings.MaxCountOpen, out maxCountOpen))
-					{
-						UpdateServiceSettingsAsync(serviceObj, ServiceSettings.MaxCountOpen, maxCountOpen);
-					}
-				}
+				maxCountOpen = int.Parse(ServiceSettings.MaxCountOpen);
+
+				 UpdateServiceSettingsAsync(serviceObj,nameof(ServiceSettings.MaxCountOpen),maxCountOpen);
 			}
 
-			await ValidateIfThereIsOpenedRequestForServiceAsync(planId, EvlReqId, serviceObj, maxCountOpen);
-
-			#endregion
+			await ValidateIfThereIsOpenedRequestForServiceAsync(planId,EvlReqId,serviceObj,maxCountOpen);
 
 			return true;
 		}
-		private bool TryGetSettingValue(Dictionary<string, object> settings, string settingKey, out int result)
-		{
-			result = 0;
 
-			if (settings != null && settings.TryGetValue(settingKey, out var settingValue))
+		private bool TryGetSettingValue(Dictionary<string, object> settings,string settingKey,out int result)
+		{
+			result = default;
+
+			if (settings != null &&
+				settings.TryGetValue(settingKey, out var settingValue) &&
+				settingValue != null)
 			{
-				return int.TryParse(settingValue?.ToString(), out result);
+				return int.TryParse(settingValue.ToString(), out result);
 			}
+
 			return false;
 		}
 		private async Task ValidateIfThereIsOpenedRequestForServiceAsync(Guid? PlanId, Guid? EvlReqId, Service serviceObj, int maxCountOpen)
