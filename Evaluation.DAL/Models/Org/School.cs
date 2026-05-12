@@ -4,9 +4,9 @@ namespace Evaluation.DAL.Models.Org;
 
 public class School : OrgTree , IAuditLogEntity
 {
-    public Guid TypeId { get; set; }//بنين وبنات
+    public Guid TypeId { get; set; }//ثابت حكومي من  hr // 
     public SchoolType SchoolType { get; set; } 
-    public DateOnly EstablishmentDate { get; set; }
+    public DateOnly EstablishmentDate { get; set; } // date now 
     public string? ManagerQID { get; set; }
     public string? ManageEmail { get; set; }
     public string? OrgEmail { get; set; }
