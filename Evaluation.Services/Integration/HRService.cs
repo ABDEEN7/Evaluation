@@ -420,6 +420,7 @@ public class HRService : ApiBase
                 obj.SupportIdentityDate = today;
                 obj.IsActive = true;
                 obj.HrCode = school.OrgNo;
+                obj.Code = school.OrgNo;
 
                 schools.Add(obj);
             }
