@@ -887,7 +887,7 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
         await uow.CommitAsync();
         var result = mapper.Map<CreateFormItemConfigDto>(existingRecord);
         result.ResponseStatus = DBResult.Updated;
-        return dto;
+        return result;
     }
     public async Task<ResponseDto> DeleteFormItemConfig(Guid id)
     {
