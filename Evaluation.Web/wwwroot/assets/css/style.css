@@ -1681,6 +1681,19 @@ input.auto-fill {
     }
 
 
+.btn-icon-no-text i {
+    font-size: 16px;
+    font-family: var(--font-primary) !important;
+    font-weight: 500 !important;
+}
+
+.btn-icon-no-text i::before {
+    font-family: "Line Awesome Free";
+    font-weight: 900;
+    font-size: 16px;
+}
+
+
 .filter-section .form-label {
     margin-bottom: 6px;
     white-space: nowrap;
