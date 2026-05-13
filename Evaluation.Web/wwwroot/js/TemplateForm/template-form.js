@@ -1288,7 +1288,7 @@ async function InitFormItemConfigPopup(
     let popupdivcontent = `
     <div class="row">
         <div class="card-header justify-content-end d-flex align-items-center bg-light">
-            <div id="IsMultipleEvaluationWrapper" class="me-auto d-flex align-items-center gap-2" style="display:none;">
+           <div id="IsMultipleEvaluationWrapper" class="me-auto align-items-center gap-2" style="display:none;">
     <div class="form-check form-switch mb-0">
         <input class="form-check-input" type="checkbox" role="switch" id="IsMultipleEvaluation" />
         <label class="form-check-label" for="IsMultipleEvaluation">
