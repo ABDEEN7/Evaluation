@@ -885,7 +885,7 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
         repo.Update(existingRecord);
 
         await uow.CommitAsync();
-        var result = mapper.Map<TemplateFormDto>(existingRecord);
+        var result = mapper.Map<CreateFormItemConfigDto>(existingRecord);
         result.ResponseStatus = DBResult.Updated;
         return dto;
     }

@@ -783,19 +783,20 @@ $(document).on("click", ".edit", function () {
 
     if (!obj) return;
 
+    // read using formItemConfig_ prefix
+    const formItemIds = obj.formItemConfig_FormItemId || obj.formItemConfig_FormItem || obj.formItemConfig_FormItemIds;
+
     var data = {
         Id: obj.id,
         EvalFormId: $("#evalformidvalue").val(),
-        NameAr: obj.nameAr || null,
-        NameEn: obj.nameEn || null,
-        PartyTypeId: obj.partyTypeId || obj.partyType || null,
-        FormItemIds: obj.formItemId
-            ? (Array.isArray(obj.formItemId) ? obj.formItemId : [obj.formItemId])
-            : obj.formItem
-                ? (Array.isArray(obj.formItem) ? obj.formItem : [obj.formItem])
-                : null,
-        CalcMethodId: obj.calcMethodId || obj.calcMethod || null,
-        Percentage: obj.percentage || 0
+        NameAr: obj.formItemConfig_NameAr || null,
+        NameEn: obj.formItemConfig_NameEn || null,
+        PartyTypeId: obj.formItemConfig_PartyTypeId || obj.formItemConfig_PartyType || null,
+        FormItemIds: formItemIds
+            ? (Array.isArray(formItemIds) ? formItemIds : [formItemIds])
+            : null,
+        CalcMethodId: obj.formItemConfig_CalcMethodId || obj.formItemConfig_CalcMethod || null,
+        Percentage: obj.formItemConfig_Percentage || 0
     };
 
     var formData = new FormData();
@@ -805,16 +806,22 @@ $(document).on("click", ".edit", function () {
         success: function (response) {
             if (response?.responseStatus == 2) {
                 notificationUtil.success(sharedFn().GetUiControlText('WEB_MSG_UPDATE'));
-                const updatedRow = {
-                    ...response,
-                    calcMethod: response.calcMethodId || null,
-                    partyType: response.partyTypeId || null,
-                    formItem: Array.isArray(response.formItemIds)
-                        ? response.formItemIds
-                        : (response.formItemIds ? [response.formItemIds] : [])
+
+                // update row with correct prefixed field names
+                const updatedObj = {
+                    ...obj,
+                    formItemConfig_NameAr: data.NameAr,
+                    formItemConfig_NameEn: data.NameEn,
+                    formItemConfig_PartyTypeId: data.PartyTypeId,
+                    formItemConfig_PartyType: data.PartyTypeId,
+                    formItemConfig_FormItem: data.FormItemIds,
+                    formItemConfig_FormItemIds: data.FormItemIds,
+                    formItemConfig_CalcMethodId: data.CalcMethodId,
+                    formItemConfig_CalcMethod: data.CalcMethodId,
+                    formItemConfig_Percentage: data.Percentage
                 };
 
-                tableFormItemConfig.updateData([{ id: response.id, ...updatedRow }]);
+                tableFormItemConfig.updateData([{ id: obj.id, ...updatedObj }]);
             } else {
                 notificationUtil.error(response?.message);
             }
