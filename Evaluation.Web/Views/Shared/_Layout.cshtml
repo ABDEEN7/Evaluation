@@ -26,6 +26,11 @@
     <link href="~/assets/img/moe-logo2.png" rel="apple-touch-icon">
     <link rel="stylesheet" href="~/lib/toastr/toastr.min.css" asp-append-version="true" />
 
+  
+
+    <link href="~/lib/tabulator/css/tabulator.min.css" rel="stylesheet" />
+    <link href="~/lib/tabulator/css/tabulator.css" rel="stylesheet" />
+    <link href="~/assets/css/tabulator-styling.css.css" rel="stylesheet" />
 
     <link href="~/lib/toastr/build/toastr.min.css" rel="stylesheet" />
     <link href="~/lib/toastr/build/toastr.css" rel="stylesheet" />
@@ -120,11 +125,12 @@
     <script src="~/js/shared/jq-dropdown-util.js" asp-append-version="true"></script>
     <script src="~/js/shared/jq-table-util.js" asp-append-version="true"></script>
     <script src="~/js/shared/shared-fn.js" asp-append-version="true"></script>
-
+    <script src="~/js/shared/init-navbar.js"></script>
+    <script src="~/js/account/user-profile.js"></script>
     <!-- Layout -->
     <script src="~/assets/js/main.js"></script>
     <script src="~/js/layout.js" asp-append-version="true"></script>
-
+    <script src="~/lib/tabulator/js/tabulator.js" asp-append-version="true"></script>
     
     @await RenderSectionAsync("Scripts", required: false)
 

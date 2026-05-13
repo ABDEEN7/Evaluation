@@ -76,80 +76,112 @@
         rowClass: 'plan-request-card',
 
         columns: [
-
-            {
-                data: "Status",
-                title: uiControlsSetup().GetUiControlText("lblRequestStatus"),
-                className: "header-left status",
-                render: function (data, type, row) {
-
-                    if (row.StatusISOPen === false) {
-                        return ` <span class="badge bg-success-light ms-auto me-2 fw-semibold br-0">
-                                    <i class="la la-check fs-14"></i>
-                                    مكتمل
-                                </span>`;
-                    }
-                    else
-                        return `<span class="badge bg-danger-light ms-auto me-2 fw-semibold br-0">
-                            <i class="las la-times fs-14"></i>
-                            غير مكتمل
-                        </span>`;
-                }
-            }
-            ,
-            {
-                data: "evaluationType",
+          {
+            data: "evaluationType",
                 title: uiControlsSetup().GetUiControlText("lblEvaluationPlan"),
-                className: "header-right",
-                render: function (data) {
-                    return `<strong class="text-truncate-2">${data || ""}</strong>`;
+                className: "td-left py-1 td-70",
+                render: function(data) {
+
+                    return `
+                <div class="plan-title-row">
+                    <i class="las la-certificate card-only-icon title-icon"></i>
+
+                    <span class="plan-text-wrap px-1">
+                        <span class="card-only-label title-label">Operation: </span>
+                        <span class="plan-title-text">${data || ""}</span>
+                    </span>
+                </div>
+                `;
+                }
+            },
+            {
+            data: "Status",
+            title: uiControlsSetup().GetUiControlText("lblRequestStatus"),
+            className: "td-right py-1 place-content-end td-30",
+            render: function(data, type, row) {
+
+                const isCompleted = row.StatusISOPen === false;
+
+               return `
+                <div class="d-flex justify-content-end">
+                    ${isCompleted ? `
+                    <span class="request-status approved-status bg-success-light py-1 px-2">
+                        <i class="las la-check"></i>
+                        مكتمل
+                    </span>
+                    ` : `
+                    <span class="request-status approved-status bg-danger-light text-danger py-1 px-2">
+                        <i class="las la-times"></i>
+                        غير مكتمل
+                    </span>
+                    `}
+                </div>
+                `;
                 }
             },
             {
                 data: "orgTreeName",
                 title: uiControlsSetup().GetUiControlText("lblSchoolName"),
-                className: "td-full",
-                render: function (data) {
-                    return `<strong class="text-truncate-2">${data || ""}</strong>`;
+                className: "td-left py-0 status-break-row  align-content-end",
+                render: function(data) {
+
+                    if (!data) return "_";
+
+                    return `  
+                    
+                        <i class="las la-school card-only-icon me-1"></i>
+                        <strong class ="text-truncate-2">${data}</strong>
+                    
+                `;
                 }
-            },
-            {
+             },
+             {
                 data: "status",
                 title: uiControlsSetup().GetUiControlText("lblRequestNo"),
-                className: "td-full"
+                className: "td-left status-break-row py-0 align-content-end",
+                render: function(data) {
+
+                    if (!data) return "_";
+
+                    return `
+                <i class="las la-edit card-only-icon me-1"></i>
+                ${data}
+                `;
+                }
             },
             {
                 data: "createOn",
                 title: uiControlsSetup().GetUiControlText("lblRequestCreatedDate"),
-                className: "td-left bg-grey"
-            },
-            {
-                data: "createOnTime",
-                title: uiControlsSetup().GetUiControlText("lblRequestCreatedTime"),
-                className: "td-right bg-grey justify-content-end"
-            },
+                className: "td-left py-0",
+                render: function(data) {
 
-            {
-                data: null,
-                title: uiControlsSetup().GetUiControlText("lblActions") || "",
-                orderable: false,
-                searchable: false,
-                className: "td-full",
-                render: function (data, type, row) {
+                    if (!data) return "_";
 
                     return `
-            <div class="d-flex justify-content-center gap-1">
-
-                <button class="btn btn-outline-primary btn-sm"
-                        title="تصفح عملية التقييم"
-                        onclick="openEvaluation('${row.Id}')">
-                    <i class="la la-arrow-left"></i>
-                </button>
-
-            </div>
-        `;
+                <i class="las la-calendar card-only-icon"></i>
+                <span class="card-only-label mx-1"> Created on:  </span>
+                ${moment(data).format("DD-MM-YYYY")}
+                `;
                 }
-            }
+            },
+            {
+                data: "createOn",
+                title: uiControlsSetup().GetUiControlText("lblRequestCreatedTime"),
+                className: "td-right bg-grey justify-content-end py-0",
+                render: function(data) {
+
+                    if (!data) return "_";
+
+                    return `
+                <div class="d-flex justify-content-end align-items-center">
+                    <i class="las la-clock card-only-icon"></i>
+                    <span class="card-only-label mx-1">Created at: </span>
+                    ${moment(data).format("hh:mm A")}
+                </div>
+                `;
+                }
+            },
+            
         ],
 
         onRowClick: function (rowData) {
@@ -194,61 +226,27 @@
                 }
                 else {
                     renderEvaluationPartiesSection(response, requestId);
+                    window.openRequestsModule.render(response.evaluationParties || []);
                 }
 
                 bindSchoolDetails(response);
+
+                if (response.assignment && response.assignment.length > 0) {
+
+                    $("#forceAssignmentAccordion").removeClass("d-none");
+                    renderForceAssignments(response.assignment, "forceAssignmentDiv");
+
+                } else {
+
+                    $("#forceAssignmentAccordion").addClass("d-none");
+                }
+
             }
         };
 
         jqClient(options).Get(`/ServiceRequest/${DepartmentRouting}/GetEvaluationDetails?requestId=${requestId}`);
     };
-    function bindSchoolDetails_old(response) {
-        const s = response && response.school ? response.school : null;
-        if (!s) return;
-
-        const $root = $("#school-details-container");
-
-        const formatDate = (val) => {
-            if (!val) return "";
-            const d = new Date(val);
-            if (isNaN(d.getTime())) return val;
-            const dd = String(d.getDate()).padStart(2, "0");
-            const mm = String(d.getMonth() + 1).padStart(2, "0");
-            const yyyy = d.getFullYear();
-            return `${dd}-${mm}-${yyyy}`;
-        };
-
-        const schoolName =
-            (window.currentLang === "ar" ? s.nameAr : s.nameEn) ||
-            s.nameAr ||
-            s.nameEn ||
-            "";
-
-        $root.find("#schoolName").text(schoolName);
-
-        $root.find("#managerName").text(s.managerQID || "");
-        $root.find("#establishmentDate").text(formatDate(s.establishmentDate));
-        $root.find("#teachers").text(s.teachersCount ?? s.teachers ?? "-");
-        $root.find("#students").text(s.studentsCount ?? s.students ?? "-");
-
-        const phone = s.phone || s.mobile || "";
-        $root.find("#phone").text(phone).attr("href", phone ? `tel:${phone}` : "#");
-
-        const email = s.orgEmail || s.manageEmail || "";
-        $root.find("#email").text(email).attr("href", email ? `mailto:${email}` : "#");
-
-        $root.find("#address").text(s.address || "");
-
-        $root.find("#currentRating").text(s.rating ?? "-");
-        $root.find("#currentRatingDate").text(
-            s.lastEvaluationDate ? formatDate(s.lastEvaluationDate) : ""
-        );
-
-        $root.find("#previousRating").text(response.previousRating ?? "-");
-        $root.find("#previousRatingDate").text(
-            response.previousRatingDate ? formatDate(response.previousRatingDate) : ""
-        );
-    }
+  
     function bindSchoolDetails(response) {
         const $root = $("#school-details-container");
         const s = response.school || {};
@@ -426,7 +424,7 @@
         allowInput: true
     });
     Evaluation.Loaders.loadPlans('evaluationPlanIdFilter');
-    Evaluation.Loaders.loadServiceStatus('evaluationRequestStatusFilter');
+    //Evaluation.Loaders.loadServiceStatus('evaluationRequestStatusFilter');
     evaluationRequestsListing.reload();
 });
 

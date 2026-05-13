@@ -14,7 +14,7 @@
         const params = new URLSearchParams(w.location.search);
         return params.get(param);
     };
-
+    let departmentRoutePath = sharedUtility().extractDepartmentName();
     function redirectToDefault() {
         //if (typeof w.sharedUtility === "function") {
         //    w.sharedUtility().RedirectToModuleOrDefault();

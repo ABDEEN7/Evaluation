@@ -76,7 +76,7 @@
         enableCardView: true,
         cardViewBtnId: 'cardViewEvaluationPlans',
         tableViewBtnId: 'tblViewEvaluationPlans',
-        rowClass: 'plan-row',
+        rowClass: 'plan-request-card',
 
         // Transform API response to match expected format
         transformResponse: function (response) {
@@ -89,42 +89,66 @@
         },
 
         columns: [
-            {
-                data: "name",
-                className: "td-left py-1"
+           {
+            data: "name",
+           className: "td-left td-70 mt-1",
+            render: function(data, type, row) {
+                const isApproved = row.statusCode === "Approved";
+                return `
+                    <div class="plan-title-row mb-3">
+ 
+                        <i class="las la-file-signature card-only-icon title-icon"></i>
+ 
+                        <span class="plan-text-wrap px-2">
+                    <span class="card-only-label title-label">Plan: </span>
+                    <span class="plan-title-text">${data || ""}</span>
+                    </span>
+ 
+                     
+ 
+                    </div>
+                    `;
+                              }
             },
+            {
+        data: "statusCode",
+        className: "td-right td-30",
+        render: function(data, type, row) {
+
+            const isApproved = row.statusCode === "Approved";
+
+            if (!isApproved) return "";
+
+            return `
+        <div class="d-flex justify-content-end">
+            <span class="request-status approved-status bg-success-light py-1 px-2">
+                <i class="las la-check"></i>
+                ${row.statusCode}
+            </span>
+        </div>
+        `;
+        }
+    },
             {
                 data: "countSchools",
-                className: "td-left py-1"
-            },
-            {
-                data: null,
-                className: "td-left py-1",
-                render: function (data, type, row) {
-                    return `${row.startDate} - ${row.endDate}`;
-                }
-            },
-            {
-                data: "statusCode",
-                className: "td-right p-1",
-                render: function (data) {
-                    return `<span class="request-status w-100 mt-3 py-1">${data || ""}</span>`;
-                }
-            },
-            {
-                data: null,
-                orderable: false,
-                className: "td-center p-1",
-                render: function (data, type, row) {
+                className: "td-left status-break-row align-content-center",
+                render: function(data) {
                     return `
-                <button
-                    type="button"
-                    class="btn btn-sm btn-secondary view-plan w-100 mt-1 p-2"
-                    data-plan-id="${row.id}"
-                    onclick="InitializePlanDetails('${row.id}'); return false;">
-                    عرض
-                </button>
-            `;
+                    <i class="las la-school card-only-icon"></i>
+                    <span class="card-only-label me-1"> Schools count: </span>
+                    ${data || ""}
+                    `;
+                }
+            },
+            {
+            data: null,
+            className: "td-left status-break-row",
+                render: function(data, type, row) {
+                    return `
+                    <i class="las la-calendar-week card-only-icon"></i>
+                    <span class="card-only-label me-1"> Period: </span>
+                    من ${row.startDate} إلى ${row.endDate}
+                    `;
                 }
             },
             {
@@ -139,21 +163,21 @@
 
                     const dropdownId = `dropdownMenuButton_${row?.id || meta?.row || Math.random().toString(36).slice(2)}`;
 
-                    let actionsHtml = `<div class="dropdown d-block w-100 p-1">`;
+                    let actionsHtml = `<div class="dropdown d-block w-100 p-1 mb-1">`;
 
                     actionsHtml += `
-            <button
-                class="btn dropdown-toggle w-100 btn-primary mt-1 py-2"
-                type="button"
-                id="${dropdownId}"
-                data-bs-toggle="dropdown"
-                aria-haspopup="true"
-                aria-expanded="false"
-                onclick="event.stopPropagation();"
-            >
-                <span>${uiControlsSetup().GetUiControlText('lblProcedures')}</span>
-            </button>
-        `;
+                                <button
+                                    class="btn dropdown-toggle w-100 btn-primary mt-1 py-2"
+                                    type="button"
+                                    id="${dropdownId}"
+                                    data-bs-toggle="dropdown"
+                                    aria-haspopup="true"
+                                    aria-expanded="false"
+                                    onclick="event.stopPropagation();"
+                                >
+                                    <span>${uiControlsSetup().GetUiControlText('lblProcedures')}</span>
+                                </button>
+                            `;
 
                     actionsHtml += `<div class="dropdown-menu w-100" aria-labelledby="${dropdownId}" onclick="event.stopPropagation();">`;
 
@@ -193,10 +217,15 @@
 
         ],
 
-        //onRowClick: function (rowData, e) {
-        //    if (e && $(e.target).closest('.dropdown, .dropdown-menu, .create-plan-request').length) return;
-        //    openPlanDetails(rowData.id);
-        //}
+        onRowClick: function(rowData, e) {
+
+          // prevent dropdown clicks from opening details
+          if ($(e.target).closest('.dropdown, .dropdown-menu, .dropdown-item').length) {
+                return;
+          }
+          InitializePlanDetails(rowData.id);
+    }
+
     });
 
     /* =========================
@@ -220,6 +249,8 @@
 
             const el = document.getElementById("CreateRequestModal");
             const modal = bootstrap.Modal.getOrCreateInstance(el);
+            formUtility.addQueryParameter('serviceId', serviceId);
+            formUtility.addQueryParameter('planId', planId);
             modal.show();
 
             const serviceName = createPlanRequestService.name;
@@ -279,6 +310,7 @@
             // Show the modal
             const el = document.getElementById("PlanDetailsModal");
             const modal = bootstrap.Modal.getOrCreateInstance(el);
+            formUtility.addQueryParameter('planId', planId);
             modal.show();
 
             // Clear any previous content in modal body

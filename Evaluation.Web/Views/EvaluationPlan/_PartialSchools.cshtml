@@ -1,18 +1,18 @@
 ﻿@using Evaluation.SharedHelper.Enums
 
-<div class="card mb-4">
+<div class="card m-4">
     <div class="card-header d-flex justify-content-between align-items-center">
         <h4 class="mb-0" id="tabSchoolsAnchorTag @ConstantKeys.WebSchools.Schools">
             
         </h4>
 
         <div class="btn-group" role="group">
-            <button id="cardViewSchool" type="button" class="btn btn-outline-primary active">
+            <button id="cardViewSchool" type="button" class="btn btn-outline-primary active btn-with-text-icon">
                 <i class="la la-th-large @ConstantKeys.WebAppCommon.lblDisplayAsCards"></i>
                 
             </button>
 
-            <button id="tblViewSchool" type="button" class="btn btn-outline-secondary">
+            <button id="tblViewSchool" type="button" class="btn btn-outline-secondary btn-with-text-icon">
                 <i class="la la-list @ConstantKeys.WebAppCommon.lblDisplayAsTable"></i>
             </button>
         </div>
@@ -74,15 +74,20 @@
                     </select>
                 </div>
 
-                <button id="filterSchoolBtnId" class="btn btn-primary">
-                    <i class="la la-search @ConstantKeys.WebSchools.Search"></i>
+                <div class="col-md-8"></div>
+                <div class="col-md-2">
+                    <button id="filterSchoolBtnId" class="btn btn-primary btn-with-text-icon w-100 mt-2">
+                        <i class="la la-search @ConstantKeys.WebSchools.Search"></i>
                     
-                </button>
-
-                <button id="clearFilterSchoolBtnId" class="btn btn-outline-secondary">
-                    <i class="la la-undo @ConstantKeys.WebSchools.ClearFilter"></i>
+                    </button>
+                </div>
+                <div class="col-md-2">
+                    <button id="clearFilterSchoolBtnId" class="btn btn-outline-secondary btn-with-text-icon w-100 mt-2">
+                        <i class="la la-undo @ConstantKeys.WebSchools.ClearFilter"></i>
                     
-                </button>
+                    </button>
+                </div>
+                <hr/>
             </div>
         </form>
 
@@ -99,7 +104,7 @@
                         <th @ConstantKeys.WebSchools.StatusCol></th> *@
                     </tr>
                 </thead>
-                <tbody class="requeststableBody"></tbody>
+                <tbody class="requeststableBody w-100"></tbody>
             </table>
         </div>
 

@@ -5,8 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Evaluation.API.Controllers;
 
-	[Route("api/[controller]/{depRouting}/[action]")]
 [ApiController]
+[Route("api/[controller]/{depRouting}/[action]")]
 public class DepartmentHolidayController : ControllerBase
 {
     private readonly MasterBL _masterBL;

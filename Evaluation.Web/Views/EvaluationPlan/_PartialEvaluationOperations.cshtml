@@ -1,17 +1,17 @@
 ﻿@using Evaluation.SharedHelper.Enums
 
-<div class="card mb-3">
+<div class="card m-4">
     <div class="card-header d-flex justify-content-between align-items-center">
         <div class="btn-group" role="group" aria-label="View mode">
             <button id="cardViewEvaluationRequest"
                     type="button"
-                    class="btn btn-outline-primary active">
+                    class="btn btn-outline-primary active btn-with-text-icon">
                 <i class="la la-th-large @ConstantKeys.WebAppCommon.lblDisplayAsCards"></i>
             </button>
 
             <button id="tblViewEvaluationRequest"
                     type="button"
-                    class="btn btn-outline-secondary">
+                    class="btn btn-outline-secondary btn-with-text-icon">
                 <i class="la la-list @ConstantKeys.WebAppCommon.lblDisplayAsTable"></i>
             </button>
         </div>
@@ -84,7 +84,7 @@
 </div>
 
 <div class="table-responsive">
-    <table class="table table-striped table-bordered w-100 application-request card"
+    <table class="table table-striped table-bordered w-100 application-request card table-card-seperate-styling"
            id="evaluationRequestTable">
 
         <thead>

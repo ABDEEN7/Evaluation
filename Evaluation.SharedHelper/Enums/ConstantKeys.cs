@@ -208,6 +208,7 @@ public static class ConstantKeys
         public static readonly string Max_Final_Evaluation_Forms_Exceeded = "Max_Final_Evaluation_Forms_Exceeded";
         public static readonly string UserNotExsistInThisEvaluationRequest = "UserNotExsistInThisEvaluationRequest";
         public static readonly string UnsupportedDepartmentCategory = "UnsupportedDepartmentCategory";
+        public static readonly string lblNoPartyTypeFound = "lblNoPartyTypeFound";
     }
 
     public static class AdminSettings
@@ -247,8 +248,12 @@ public static class ConstantKeys
 
 
     }
-
-    public static class AdminBackendUI
+    public static class WebsiteSettings
+    {
+        public static readonly string PictureProfileSizeAllow = "PictureProfileSizeAllow";
+        public static readonly string PictureProfileExtensions = "PictureProfileExtensions";
+    }
+		public static class AdminBackendUI
     {
         public static readonly string ADMIN_MSG_FILE_SIZE = "ADMIN_MSG_FILE_SIZE";
         public static readonly string VALID_UPLOAD_TYPE = "VALID_UPLOAD_TYPE";
@@ -1043,11 +1048,10 @@ public static class ConstantKeys
         //PlanType
         public const string GET_WEB_PLAN_TYPE_REQUEST = "GET_WEB_PLAN_TYPE_REQUEST";
         //Plan 
-        public const string ADD_WEB_PLAN_REQUEST = "ADD_WEB_PLAN_REQUEST";
-        public const string UPDATE_WEB_PLAN_REQUEST = "UPDATE_WEB_PLAN_REQUEST";
-        public const string GET_WEB_PLAN_DETAILS_REQUEST = "GET_WEB_PLAN_DETAILS_REQUEST";
-        public const string APPROVE_WEB_PLAN_REQUEST = "APPROVE_WEB_PLAN_REQUEST";
-        public const string GET_SEMESTERS_REQUEST = "GET_SEMESTERS_REQUEST";
+        public const string ADD_WEB_PLAN = "ADD_WEB_PLAN";
+        public const string EDIT_WEB_PLAN = "EDIT_WEB_PLAN";
+        public const string VIEW_WEB_PLAN = "VIEW_WEB_PLAN";
+        public const string DELETE_WEB_PLAN = "DELETE_WEB_PLAN";
         #endregion
     }
     public static class WebAppSettings
@@ -1056,7 +1060,30 @@ public static class ConstantKeys
         public static readonly string DefaultWebsiteBannerImage = "DefaultWebsiteBannerImage";
     }
 
-    public static class WebAppCommon
+    public static class WebHomePage
+    {
+    }
+	public static class WebAppUserProfilePage
+	{
+		// TO DO ADD IN UI CONTROLS
+		public static readonly string lblEmail = "lblEmail";
+		public static readonly string lblQID = "lblQID";
+		public static readonly string lblFullNameEn = "lblFullNameEn";
+		public static readonly string lblFullNameAr = "lblFullNameAr";
+		public static readonly string lblLastLoginDate = "lblLastLoginDate";
+		public static readonly string lblMobile = "lblMobile";
+		public static readonly string lblSecondMobile = "lblSecondMobile";
+		public static readonly string lblOccupation = "lblOccupation";
+		public static readonly string lblNationality = "lblNationality";
+		public static readonly string lblSwitchLanguage = "lblSwitchLanguage";
+		public static readonly string lblPrefferedlang = "lblPrefferedlang";
+		public static readonly string lblVerfiyMobile = "lblVerfiyMobile";
+		public static readonly string lblOTP = "lblOTP";
+		public static readonly string lblRefreshOTP = "lblRefreshOTP";
+		public static readonly string lblValidateOTP = "lblValidateOTP";
+		public static readonly string lblSendOTP = "lblSendOTP";
+	}
+	public static class WebAppCommon
     {
         public const string lblOk = "lblOk";
         public const string lblCancel = "lblCancel";
@@ -1298,6 +1325,8 @@ public static class ConstantKeys
 
         public const string AccordionRequestDetails = Prefix + "AccordionRequestDetails";
         public const string AccordionActionLog = Prefix + "AccordionActionLog";
+        public const string lblAllOpenRequests = Prefix + "lblAllOpenRequests";
+
     }
 
 
@@ -1392,6 +1421,7 @@ public static class ConstantKeys
         public const string list = "list";
         public const string EvaluationPlan = "EvaluationPlan";
         public const string Evl_Form = "Evl_Form";
+        public const string Time = "Time";
     }
 
     public static class Module
@@ -1445,8 +1475,16 @@ public static class ConstantKeys
         public const string CLOSE_AND_UPDATE_PLAN = "CLOSE_AND_UPDATE_PLAN";
         public const string CLOSE_AND_UPDATE_FORM = "CLOSE_AND_UPDATE_FORM";
     }
+	public static class FieldInfoTypeKeys
+	{
 
-    public static class ServiceSettings
+		public const string VisitDateFrom = "VisitDateFrom";
+		public const string VisitDateTo = "VisitDateTo";
+		public const string VisitName = "VisitName";
+
+
+	}
+	public static class ServiceSettings
     {
         public static readonly string MaxCountOpen = "50";
     }
@@ -1484,12 +1522,29 @@ public static class ConstantKeys
 
         public static readonly Guid EvaluationParty = Guid.Parse("281E98ED-9ED5-4AF3-8C08-4A659BE99DC8");
     }
-    public static class NDAStatic
-    {
-        public static string Pending = "PENDING";
-        public static string Objection = "OBJECTION";
-    }
-    public static class EvaluationDetailsModal
+	public static class NDAStatic
+	{
+		public static string Pending = "PENDING";
+		public static string Approved = "APPROVED";
+		public static string Objection = "OBJECTION";
+		public static string Suspended = "SUSPENDED";
+		public static string Forced = "FORCED";
+	}
+	public static class NDAStatusIds
+	{
+		public static readonly Guid Objection =Guid.Parse("466D8F62-F8F9-4A3F-B364-82C77D7DE72D");
+
+		public static readonly Guid Approve =Guid.Parse("E679F265-2BDA-4A36-8C4C-8911EE26BB7B");
+
+		public static readonly Guid Suspended =Guid.Parse("8F017EEF-84C1-46B9-9E89-9698BAB996CF");
+
+		public static readonly Guid Pending =Guid.Parse("B08F866B-52E7-4B98-966B-B16F0C4FCCE7");
+
+		public static readonly Guid Approved =Guid.Parse("2E30F24C-A86D-48A5-B922-DB59859AB617");
+
+		public static readonly Guid Forced =Guid.Parse("D3CCAB02-789D-4D44-A8BC-EBEFABCCF2C4");
+	}
+	public static class EvaluationDetailsModal
     {
         private const string Prefix = "EvaluationDetailsModal.";
 

@@ -142,9 +142,13 @@ a:hover{color: rgba(13, 67, 97, 1);}
   background-color:rgba(216, 244, 221, 0.5) !important;
   color: rgba(14, 107, 50, 1);
 }
-.bg-danger-light{
+.bg-success-light {
+    background-color: rgba(216, 244, 221, 0.5) !important;
+    color: rgba(14, 107, 50, 1);
+}
+.bg-danger-light-no-color{
    background-color:rgba(248, 230, 233, 1) !important;
-  color: rgba(180, 4, 30, 1);
+/*  color: rgba(180, 4, 30, 1);*/
 }
 .btn-primary:hover,
 .btn-primary:focus-visible,
@@ -909,3 +913,9 @@ td.td-center.view-plan {
     background-color: #F1E6E5;
     border-color: var(--bs-primary);
 }
+
+
+.justify-items-end {
+    justify-items: end !important;
+}
+

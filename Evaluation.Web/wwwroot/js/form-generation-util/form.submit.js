@@ -151,6 +151,7 @@ window.serviceRequestForm = window.serviceRequestForm || {};
                     }
                    
                 }
+                case "time":
                 case "datetime":
                 case "date":
                 case "phone":
@@ -180,27 +181,17 @@ window.serviceRequestForm = window.serviceRequestForm || {};
 
         let errors = [];
 
-        if (typeof fu.validateFields === "function") {
             errors = fu.validateFields(fields, valuesMap) || [];
-        }
 
-        if (typeof fu.validateDateGroups === "function") {
-            const dateErrors = fu.validateDateGroups() || [];
+        const dateErrors = fu.validateDateFields() || [];
             errors = errors.concat(dateErrors);
-        }
-
-        if (typeof fu.validateNotEqualFields === "function") {
+       
             const notEqualErrors = fu.validateNotEqualFields(fields) || [];
             errors = errors.concat(notEqualErrors);
-        }
+    
+        errors = errors.concat(fu.validateTimeRange(fields, valuesMap));
 
-        if (errors.length) {
-            if (typeof fu.showFieldErrors === "function") {
-                fu.showFieldErrors(errors);
-            } else if (typeof fu.showFieldError === "function") {
-                errors.forEach(err => fu.showFieldError(err));
-            }
-        }
+        fu.showErrors(errors);
 
         return { isValid: errors.length === 0, fields, valuesMap, errors };
     }
@@ -215,6 +206,7 @@ window.serviceRequestForm = window.serviceRequestForm || {};
 
         const payloadFields = fields.map(f => ({
             fieldId: f.fieldId,
+            isApi: f.isApi,
             type: f.type,
             value: valuesMap[f.fieldId]
         }));

@@ -49,7 +49,22 @@ window.formUtility = window.formUtility || {};
         const el = $(selector);
         el.addClass("d-block").text(message || "");
     };
+    const showErrors = (errorMessages) => {
+        if (errorMessages && errorMessages.length > 0) {
+            errorMessages.forEach(message => {
+                const errorElement = $(`#error_${message.fieldId}`);
+                errorElement.text(message.error).addClass('d-block');
+            });
 
+            const firstError = $(".d-block[id^='error_']").first();
+            if (firstError.length) {
+                const fieldId = firstError.attr("id").replace("error_", "field_");
+                const input = $(`#${fieldId}`);
+                input[0]?.scrollIntoView({ behavior: "smooth", block: "center" });
+                input.focus();
+            }
+        }
+    };
     const clearError = (selector) => {
         $(selector).removeClass("d-block").empty();
     };
@@ -222,7 +237,7 @@ window.formUtility = window.formUtility || {};
     const validateList = (field, fieldValue) => {
         let errors = [];
 
-       
+
         const data = fieldValue?.value || [];
         const rows = Array.isArray(data) ? data : [];
 
@@ -274,7 +289,7 @@ window.formUtility = window.formUtility || {};
             errors.push(createError(field.fieldId, msg));
         }
 
-     
+
 
         return errors;
     };
@@ -330,6 +345,30 @@ window.formUtility = window.formUtility || {};
     const validateForm = (field, fieldValue) => {
         validateForm(field.formId)
         return errors;
+    };
+
+    const validateEvaluationPlan = (field, fieldValue) => {
+
+        const errors = [];
+
+        const fieldId = `field_${field.fieldId}`;
+
+        const data = window.SubmitPlanHandler?.getFormPlanJson(fieldId);
+
+        const validation = window.SubmitPlanHandler?.validatePlan(data, fieldId);
+
+        if (validation && !validation.isValid) {
+
+            validation.errors.forEach(msg => {
+
+                errors.push( msg);
+
+            });
+
+        }
+
+        return errors;
+
     };
     // #endregion
 
@@ -526,6 +565,62 @@ window.formUtility = window.formUtility || {};
 
         return errors;
     };
+
+    const validateTime = (field, fieldValue) => {
+        const errors = [];
+
+        const value = fieldValue?.value;
+
+        if (!value) return errors;
+
+        const isValidFormat = /^([01]\d|2[0-3]):([0-5]\d)$/.test(value);
+
+        if (!isValidFormat) {
+            const msg =
+                getFieldAttribute(field, "timemessage")?.message ||
+                GetUiControlText("lblInvalidTimeFormat") ||
+                "Invalid time format";
+
+            errors.push(createError(field.fieldId, msg));
+            return errors;
+        }
+
+        const minAttr = getFieldAttribute(field, "min");
+        if (minAttr && value < minAttr.value) {
+            const msg =
+                minAttr.message ||
+                "Time must be greater than minimum";
+
+            errors.push(createError(field.fieldId, msg));
+        }
+
+        const maxAttr = getFieldAttribute(field, "max");
+        if (maxAttr && value > maxAttr.value) {
+            const msg =
+                maxAttr.message ||
+                "Time must be less than maximum";
+
+            errors.push(createError(field.fieldId, msg));
+        }
+
+        return errors;
+    };
+
+    const validateTimeRange = (fields, valuesObj) => {
+        let errors = [];
+
+        const from = valuesObj["TimeFrom"];
+        const to = valuesObj["TimeTo"];
+
+        if (from && to && from >= to) {
+            errors.push({
+                fieldId: "TimeTo",
+                error: "Time To must be greater than Time From"
+            });
+        }
+
+        return errors;
+    };
     // #endregion
 
     // #region ===============  Date Group (Sequence) Validation (dategroup + dategroupindex)
@@ -632,23 +727,33 @@ window.formUtility = window.formUtility || {};
 
         return errors;
     };
-    // #endregion
+   
 
-    // #region ===============  Field Validators Registry
+
 
     const fieldValidators = {
+
         number: validateNumber,
+
         checkbox: validateCheckbox,
+
         file: validateFile,
+
         fileV2: validateFile,
+
         date: validateDate,
+
         datetime: validateDate,
+        time: validateTime,
         textarea: validateTextareaLength,
+
         list: validateList,
-        //'evaluationPlan': validateEvaluationPlanField,
+        'evaluationPlan': validateEvaluationPlan,
         evl_form: validateForm,
-}
-    
+
+    }
+
+
     // #endregion
 
     // #region ===============  Core validateField / validateFields / validateInput
@@ -735,6 +840,8 @@ window.formUtility = window.formUtility || {};
 
     ns.validateNotEqualFields = validateNotEqualFields;
     ns.validateDateFields = validateDateFields; // dategroup + dategroupindex
-    //ns.validateDateGroups = validateDateGroups; // from/to style
+    ns.validateTimeRange = validateTimeRange; 
+    ns.showError = showError; 
+    ns.showErrors = showErrors; 
 
 })(window.formUtility);

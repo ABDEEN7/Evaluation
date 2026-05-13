@@ -7,6 +7,7 @@ using Evaluation.SharedHelper.Models.Api.ActionEntitiesDTOs;
 using Evaluation.SharedHelper.Models.Api.EvaluationRequestEntities;
 using Evaluation.SharedHelper.Models.Api.FormBuilderDTO;
 using Evaluation.SharedHelper.Models.Api.ServiceRequestEntitiesDTO;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
@@ -14,7 +15,9 @@ namespace Evaluation.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]/{depRouting}/[action]")]
-    public class ServiceRequestController : ControllerBase
+	[Authorize]
+
+	public class ServiceRequestController : ControllerBase
     {
         private readonly ServiceRequestBL _serviceRequestBL;
 
@@ -38,29 +41,14 @@ namespace Evaluation.API.Controllers
 		{
 			return await _serviceRequestBL.GetApplicationDetailsAsync(requestId);
 		}
-        [HttpGet]
-        public async Task<List<JsTreeNodeDto>> GetScopes(Guid partyId)
-        {
-            return await _serviceRequestBL.GetScopesList(partyId);
-        }
-        [HttpGet]
-        public async Task<List<SupportedFileDto>> GetSupportedFiles(Guid requestId)
-        {
-            return await _serviceRequestBL.GetSupportedFiles(requestId);
-        }
-        [HttpPost]
-        public async Task<bool> SaveSupportFiles()
-        {
-            var file = Request.Form.Files[0];
-            Guid EvaluationRequestId = Guid.Parse(Request?.Form!["EvaluationRequestId"].FirstOrDefault());
-            Guid ScopeId = Guid.Parse(Request?.Form!["ScopeId"].FirstOrDefault());
-            return await _serviceRequestBL.SaveSupportFiles(file, EvaluationRequestId, ScopeId);
-        }
+       
         [HttpGet]
 		public async Task<EvaluationRequestDTO> GetEvaluationDetails(Guid requestId)
 		{
 			return await _serviceRequestBL.GetEvaluationDetailsAsync(requestId);
 		}
+
+	
 		[HttpPost]
 		public async Task<ServiceRequestDTO> HandleRequest(
 			[FromForm] ActionFormDTO dto,
@@ -108,7 +96,25 @@ namespace Evaluation.API.Controllers
             return response;
         }
 
-        [HttpGet]
+		[HttpGet]
+		public async Task<List<JsTreeNodeDto>> GetScopes(Guid partyId)
+		{
+			return await _serviceRequestBL.GetScopesList(partyId);
+		}
+		[HttpGet]
+		public async Task<List<SupportedFileDto>> GetSupportedFiles(Guid requestId)
+		{
+			return await _serviceRequestBL.GetSupportedFiles(requestId);
+		}
+		[HttpPost]
+		public async Task<bool> SaveSupportFiles()
+		{
+			var file = Request.Form.Files[0];
+			Guid EvaluationRequestId = Guid.Parse(Request?.Form!["EvaluationRequestId"].FirstOrDefault());
+			Guid ScopeId = Guid.Parse(Request?.Form!["ScopeId"].FirstOrDefault());
+			return await _serviceRequestBL.SaveSupportFiles(file, EvaluationRequestId, ScopeId);
+		}
+		[HttpGet]
         public async Task<string> GetAttachmentUrl(Guid attachmentId, Guid requestId, Guid schId)
         {
             return await _serviceRequestBL.GetAttachmentUrlAsync(attachmentId, requestId, schId);
@@ -120,5 +126,11 @@ namespace Evaluation.API.Controllers
             var result = await _serviceRequestBL.ApproveNda(dto);
             return Ok(result);
         }
-    }
+		[HttpGet]
+		public async Task<IActionResult> CanCreateEvaluationPlanRequest()
+		{
+			var result = await _serviceRequestBL.CanCreateEvaluationPlanRequestAsync();
+			return Ok(new { canCreate = result });
+		}
+	}
 }

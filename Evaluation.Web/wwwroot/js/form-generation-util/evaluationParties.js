@@ -231,29 +231,32 @@
                 ? `
                   <div class="table-card rounded overflow-hidden">
                     <div class="table-responsive">
-                      <div class="table-header">الخدمات</div>
+                      <div class="table-header">${uiControlsSetup().GetUiControlText('lblServices')}</div>
                       <ul class="list-group list-group-flush">
                         ${services.map(s => {
                     const sName =
                         (lang === "ar" ? s.nameAr : s.nameEn) ||
                         s.nameAr || s.nameEn || "";
 
-                    return `
-                              <li class="list-group-item d-flex align-items-center justify-content-between">
-                                <span>${escapeHtml(sName)}</span>
-                                <button type="button"
-                                        class="btn btn-sm btn-primary btn-add-eval-request"
-                                        data-service-id="${escapeHtml(s.id)}">
-                                  <i class="la la-plus"></i> إنشاء استمارة
-                                </button>
-                              </li>
-                            `;
+                            return `
+                                  <li class="list-group-item d-flex align-items-center justify-content-between">
+                                    <span>${escapeHtml(sName)}</span>
+
+                                    ${s.canCreate === true ? `
+                                        <button type="button"
+                                                class="btn btn-sm btn-primary btn-add-eval-request"
+                                                data-service-id="${escapeHtml(s.id)}">
+                                                <i class="la la-plus"></i> ${uiControlsSetup().GetUiControlText('lblCreateEvaluationForm')}                                        </button>
+                                    ` : ``}
+
+                                  </li>
+                                `;
                 }).join("")}
                       </ul>
                     </div>
                   </div>
                 `
-                : `<div class="text-muted">لا توجد خدمات</div>`;
+                : `<div class="text-muted">${uiControlsSetup().GetUiControlText('lblNoServices')}</div>`;
 
             const cardsHtml = Object.keys(grouped).length
                 ? `

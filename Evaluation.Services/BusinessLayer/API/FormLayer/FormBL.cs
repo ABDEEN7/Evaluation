@@ -3,6 +3,7 @@ using Evaluation.DAL.Dtos.Form;
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.FormsModules;
 using Evaluation.DAL.Repositories;
+using Evaluation.Services.Enums;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Dtos.EvalFormDto;
 using Evaluation.SharedHelper.Dtos.Form;
@@ -12,6 +13,8 @@ using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Models;
 using FluentResults;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json.Linq;
+using System;
 using ValidationResult = Evaluation.SharedHelper.Dtos.Shared.ValidationResult;
 
 namespace Evaluation.Services.BusinessLayer.API.FormLayer;
@@ -24,7 +27,7 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
     public async Task<Result<FormDto>> GetFormItems(Guid FormId)
     {
 
-        var evalForm = await formService.GetEvalForm(FormId);
+        var evalForm = await formService.GetEvalForm(FormId, IncludeCalcMethod: true);
         var mappedEvalForm = mapper.Map<TemplateFormDto>(evalForm);
 
         var formItems = await formService.GetFormItems(FormId);
@@ -272,4 +275,59 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
 
         return mapper.Map<List<FormEvalMarixValueDto>>(formEvalMatrixValues);
     }
+
+    public async Task<Result<CalculationFormResult>> CalculateFormResult(FormEvaluationDto formEvaluationDto)
+    {
+        var evalForm = await formService.GetEvalForm(formEvaluationDto.Id, IncludeCalcMethod: true);
+        var formEvalMatrixValues = await formService.GetFormEvalMatrixValues(evalForm.FormEvalMatrixId);
+
+        CalculationFormResult result = new();
+
+        switch (evalForm.CalcMethod.BackendName)
+        {
+            case CalcMethodsEnum.AVERAGE:
+
+                decimal total = 0;
+                foreach (var item in formEvaluationDto.Items)
+                {
+                    if (evalForm.HasMuliEvaluation)
+                    {
+                        total += (formEvalMatrixValues.Where(v => v.Id == item.ValueId).Select(v => v.ActualMatrixValue).FirstOrDefault() * (item.WeightPercentage / 100));
+                    }
+                    else
+                    {
+                        total += (formEvalMatrixValues.Where(v => v.Id == item.ValueId).Select(v => v.ActualMatrixValue).FirstOrDefault());
+                    }
+                }
+
+                if (evalForm.HasMuliEvaluation)
+                {
+                    result.Value = Math.Round((total / (formEvaluationDto.Items.Count / evalForm.CountOfColumnsValue)), 2);
+                }
+                else
+                {
+                    result.Value = Math.Round((total / formEvaluationDto.Items.Count ), 2);
+                }
+
+                var evalMatrixValue = formEvalMatrixValues.Where(v => v.MinValue <= result.Value && v.MaxValue >= result.Value);
+
+
+                bool isArabic = string.Equals(requestInfo.Lang, "ar", StringComparison.OrdinalIgnoreCase);
+
+                result.Name = evalMatrixValue
+                    .Select(v => isArabic ? v.NameAr : v.NameEn)
+                    .FirstOrDefault();
+
+                result.Id = evalMatrixValue.Select(v => v.Id).FirstOrDefault();
+
+                break;
+            case CalcMethodsEnum.SUM:
+                break;
+            case CalcMethodsEnum.WithoutCalc:
+                break;     
+        }
+
+        return result;
+    }
+
 }

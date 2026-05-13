@@ -7,6 +7,7 @@ using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.SqlServer.Server;
 
 namespace Evaluation.Services.BusinessLayer.API.FormLayer;
 
@@ -26,6 +27,17 @@ public class FormService(IServiceScopeFactory serviceScopeFactory,
             .GetByIdAsync(id);
     }
 
+    public async Task<EvalForm> GetEvalForm(Guid id, bool IncludeCalcMethod)
+    {
+        var query = unitOfWork.GetRepository<EvalForm>()
+            .GetAllQueryFiltered();
+
+        if (IncludeCalcMethod)
+            query = query.Include(d => d.CalcMethod);
+
+        return await query.Where(f => f.Id == id).FirstOrDefaultAsync();
+    }
+
     public async Task<FormEvalMatrix> GetFormEvalMatrix(Guid id)
     {
         return await unitOfWork.GetRepository<FormEvalMatrix>()
@@ -36,23 +48,24 @@ public class FormService(IServiceScopeFactory serviceScopeFactory,
     {
         return await unitOfWork.GetRepository<FormEvalMatrixValue>()
             .GetAllActiveNonDeleted()
-            .Where(x=>x.FormEvalMatrixId == id)
-            .OrderBy(x=>x.OrderNo)
+            .Where(x => x.FormEvalMatrixId == id)
+            .OrderBy(x => x.OrderNo)
             .ToListAsync();
     }
 
     public async Task<List<FormItem>> GetFormItems(Guid formId)
     {
-            var formItems = await unitOfWork.GetRepository<FormItem>()
-                      .GetAllActiveNonDeleted()
-                      .Where(s => s.EvalFormId == formId)
-                      .Include(d => d.SubFormItems)
-                      .Include(f => f.RelatedFrom)
-                      .ThenInclude(y=>y.RelatedItem)
-                      .OrderBy(x => x.OrderNo)
-                      .ToListAsync();
+        var formItems = await unitOfWork.GetRepository<FormItem>()
+                  .GetAllActiveNonDeleted()
+                  .Where(s => s.EvalFormId == formId)
+                  .Include(f => f.FormItemConfigs)
+                  .Include(d => d.SubFormItems)
+                  .Include(f => f.RelatedFrom)
+                  .ThenInclude(y => y.RelatedItem)
+                  .OrderBy(x => x.OrderNo)
+                  .ToListAsync();
 
-            return formItems;
+        return formItems;
     }
 
     public async Task<FormItem> GetFormItem(Guid Id)
@@ -81,7 +94,7 @@ public class FormService(IServiceScopeFactory serviceScopeFactory,
 
     public async Task<FormEvaluationValue> SaveFormItemsAndSubs(FormEvaluationValue form)
     {
-        if(form.Items.Count > 0)
+        if (form.Items.Count > 0)
             await unitOfWork.GetRepository<FormItemValue>().InsertRange(form.Items);
         if (form.SubItems.Count > 0)
             await unitOfWork.GetRepository<SubFormItemValue>().InsertRange(form.SubItems);
@@ -97,7 +110,7 @@ public class FormService(IServiceScopeFactory serviceScopeFactory,
 
     public async Task<FormItemValue> GetFormItemValueByItemId(Guid ItemId)
     {
-        return await unitOfWork.GetRepository<FormItemValue>().GetAllActiveNonDeleted().Where(x=>x.FormItemId == ItemId).FirstOrDefaultAsync();
+        return await unitOfWork.GetRepository<FormItemValue>().GetAllActiveNonDeleted().Where(x => x.FormItemId == ItemId).FirstOrDefaultAsync();
     }
 
     public async Task<SubFormItemValue> GetSubFormItemValue(Guid ValueId)

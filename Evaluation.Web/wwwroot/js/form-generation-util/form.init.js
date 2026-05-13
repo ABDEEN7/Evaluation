@@ -239,7 +239,31 @@ window.formUtility = window.formUtility || {};
                     });
                     break;
                 }
+                case 'time': {
+                    const isDisabledTime =
+                        field.isApproved
+                            ? true
+                            : (typeof field.isEditable == "undefined" ? false : !field.isEditable);
 
+                    const inputElement = $(`#${prefield}${field.fieldId}`);
+
+                    if (field.value) {
+                        inputElement.val(field.value);
+                    }
+
+                    const defaultAttr = field.attributes?.find(attr =>
+                        attr.name.trim().toLowerCase() === 'default');
+
+                    if (!field.value && defaultAttr?.value) {
+                        inputElement.val(defaultAttr.value);
+                    }
+
+                    if (isDisabledTime) {
+                        inputElement.prop('readonly', true).prop('disabled', true);
+                    }
+
+                    break;
+                }
                 case 'jqte': {
                     const jqteValue =
                         field.value ||
@@ -1594,33 +1618,21 @@ window.formUtility = window.formUtility || {};
                                 .map(e => e.trim().toLowerCase());
 
                             if (!allowedExts.includes(fileExtension)) {
-                                if (typeof ns.showFieldError === "function") {
-                                    ns.showFieldError(fieldId, 'lblInvalidFileExtension');
-                                } else if (typeof ns.showError === "function") {
-                                    ns.showError(`#error_${fieldId}`, getUiText('lblInvalidFileExtension'));
-                                }
+                                 ns.showError(`#error_${fieldId}`, getUiText('lblInvalidFileExtension'));
                                 dz.removeFile(file);
                                 return;
                             }
                         }
 
                         if (dropzone.maxFilesize && fileSizeInMB > parseFloat(dropzone.maxFilesize)) {
-                            if (typeof ns.showFieldError === "function") {
-                                ns.showFieldError(fieldId, 'lblFileSizeExceeded');
-                            } else if (typeof ns.showError === "function") {
                                 ns.showError(`#error_${fieldId}`, getUiText('lblFileSizeExceeded'));
-                            }
                             dz.removeFile(file);
                             return;
                         }
                     });
 
                     dz.on("error", function (file, _serverMessage) {
-                        if (typeof ns.showFieldError === "function") {
-                            ns.showFieldError(fieldId, 'lblFileUploadError');
-                        } else if (typeof ns.showError === "function") {
                             ns.showError(`#error_${fieldId}`, getUiText('lblFileUploadError'));
-                        }
                         dz.removeFile(file);
                     });
 

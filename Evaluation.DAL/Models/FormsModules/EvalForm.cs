@@ -14,12 +14,13 @@ public class EvalForm : EntityBase , IAuditLogEntity
     public bool HasOneValue { get; set; }
     public Guid EvaluationPartyId { get; set; }
     public EvaluationParty? EvaluationParties { get; set; }
-    public bool HasEvaluation { get; set; }
     public Guid CalcMethodId { get; set; }
     public CalcMethod? CalcMethod { get; set; }
     public Guid FormStatusId { get; set; }
     public FormStatus? FormStatus { get; set; } 
     public bool IsFinalEval { get; set; }
     public bool AllowRename { get; set; }
+    public bool HasMuliEvaluation { get; set; }
+    public int CountOfColumnsValue { get; set; } = 1;
 
 }

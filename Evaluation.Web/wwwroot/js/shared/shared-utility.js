@@ -4,20 +4,19 @@
 
 const sharedUtility = () => {
     const createAuthorizationAjaxHeader = (isMultipart = false) => {
-        
+
         if (isMultipart)
             return {
-                "Authorization": "Bearer " + "",// GetLocalStorageValue(LocalStorageKeys.Token),
-                "type": "",// GetLocalStorageValue(LocalStorageKeys.Type),
-                'lang': getCookie('lang') ? getCookie('lang') : 'en',
+                "Authorization": "Bearer " + GetLocalStorageValue(LocalStorageKeys.Token),
+                "type": GetLocalStorageValue(LocalStorageKeys.Type),
+                'lang': getCookie('lang') ? getCookie('lang') : 'en'
             }
 
         else
             return {
-                "Authorization": "Bearer " + "",// GetLocalStorageValue(LocalStorageKeys.Token),
-                "type": "",//GetLocalStorageValue(LocalStorageKeys.Type),
-                'Content-Type': 'application/json',
-                'lang': getCookie('lang') ? getCookie('lang') : 'en',
+                "Authorization": "Bearer " + GetLocalStorageValue(LocalStorageKeys.Token),
+                "type": GetLocalStorageValue(LocalStorageKeys.Type), 'Content-Type': 'application/json',
+                'lang': getCookie('lang') ? getCookie('lang') : 'en'
             }
     }
 
@@ -121,11 +120,20 @@ const sharedUtility = () => {
     }
 
 
+    const getLoginUrl = () => {
 
+        const lang = window.location.pathname.split('/')[1] || 'ar';
+
+        const depRoute = sharedUtility().extractDepartmentName();
+
+        return depRoute
+            ? `/Account/${depRoute}/Login`
+            : `/Account/Login`;
+    };
 
     const redirectUnauthorized = (isRedirectToUrl = true) => {
 
-        let url = ConstantUrls.LoginURL;
+        let url = getLoginUrl()
 
         // Check if `redirectUrl` is already in the current URL before appending
         if (isRedirectToUrl && !window.location.href.includes('redirectUrl=')) {
@@ -133,9 +141,8 @@ const sharedUtility = () => {
             SetLocalStorageValue(LocalStorageKeys.RedirectUrl, window.location.href);
         }
 
-
-        //if (existingToken()) {
-            if (false) {
+        if (existingToken()) {
+          
             let data = { token: '' };
             const options = {
                 success: function (result) {

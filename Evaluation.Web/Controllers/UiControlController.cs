@@ -3,7 +3,7 @@ using Evaluation.SharedHelper.Models.Api;
 using Microsoft.AspNetCore.Mvc;
 namespace Evaluation.Web.Controllers
 {
-    [Route("{language=ar}/{depRouting}/[controller]")]
+    [Route("{language=ar}/[controller]/{depRouting}")]
     public class UiControlController : Controller
     {
         private readonly ILogger<HomeController> _logger;

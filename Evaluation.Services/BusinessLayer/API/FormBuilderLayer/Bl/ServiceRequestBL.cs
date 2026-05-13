@@ -33,7 +33,7 @@ namespace Evaluation.Services.Models.API
     public class ServiceRequestBL(
         IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow, SrvNotification SrvNotification, SrvUser SrvUser, 
         LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, SystemModuleSrv systemModuleSrv, SrvAction SrvAction, 
-        SrvStatus SrvStatus, SrvAssignment SrvAssignment,SrvEvaluationRequestAssignment _srvEvaluationRequestAssignment, SrvActionTransactionsLog SrvActionTransactionsLog,  PerformActionBL _performActionBL,
+        SrvStatus SrvStatus, SystemModuleSrv SrvSystemModule, SrvAssignment SrvAssignment,SrvEvaluationRequestAssignment _srvEvaluationRequestAssignment, SrvActionTransactionsLog SrvActionTransactionsLog,  PerformActionBL _performActionBL,
 
 		SrvService SrvService, SrvServiceRequest _srvServiceRequest, EvaluationRequestService _evaluationRequestService, SrvAttachments _srvAttachments, IServiceProvider serviceProvider,RequestInfo _requestInfo)
             : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, _requestInfo)
@@ -41,12 +41,13 @@ namespace Evaluation.Services.Models.API
 
 		public async Task<WebAppPlanRequestsDTO> GetPlanRequestsAsync(FilterRequestsDTO filter)
 		{
-			
 			return await _srvServiceRequest.GetPlanRequestsAsync(filter);
 		}
 		public async Task<WebAppEvaluationRequestsDTO> GetEvaluationRequestsAsync(FilterRequestsDTO filter)
 		{
-			var userId = userInfo.UserId ?? Guid.Parse("C2536611-576B-4EB8-84F4-747F4ECE9A23");
+			var userId = userInfo.UserId
+				?? throw new BusinessException(ExceptionMessage.UserNotFound);
+
 			return await _evaluationRequestService.GetEvaluationRequestsAsync(userId, filter);
 		}
 
@@ -62,10 +63,7 @@ namespace Evaluation.Services.Models.API
         {
             return await _srvServiceRequest.GetSupportedFiles(requestId);
         }
-        public async Task<bool> SaveSupportFiles(
-    IFormFile file,
-    Guid EvaluationRequestId,
-    Guid ScopeId)
+        public async Task<bool> SaveSupportFiles( IFormFile file, Guid EvaluationRequestId,Guid ScopeId)
         {
             return await _srvServiceRequest.SaveSupportFiles(file, EvaluationRequestId, ScopeId);
         }
@@ -80,7 +78,11 @@ namespace Evaluation.Services.Models.API
 			string lang = _requestInfo.Lang;
 			var requestId = actionFormDTO?.RequestId;
 
-			var serviceObj = await SrvService.GetActiveAndOpenServiceById(serviceId);
+			bool IsInitalAction = false;
+			if (requestId == null || requestId == Guid.Empty)
+				IsInitalAction = true;
+
+			var serviceObj = await SrvService.GetActiveAndOpenServiceById(serviceId, IsInitalAction);
 
 			if (serviceObj == null)
 			{
@@ -141,7 +143,7 @@ namespace Evaluation.Services.Models.API
 
 				};
 
-				var validateRequestTask = ValidateCanCreateRequest(planId, serviceObj);
+				var validateRequestTask = SrvService.ValidateCanCreateRequest(planId, EvaluationRequestId, serviceObj);
 				if (actionFormDTO?.FieldValues != null)
 				{
 					var validateActionTask = SrvAction.ValidateActionAndActionFieldAsync(null, actionFormDTO?.FieldValues!, remarks, othersAttachement, serviceObj, status.Id, action, fileFields, saveAsDraft);
@@ -273,76 +275,7 @@ namespace Evaluation.Services.Models.API
 			return (null, null, null);
 		}
 	
-		public async Task<bool> ValidateCanCreateRequest(Guid? planId, Service serviceObj)
-		{
-			if (serviceObj == null)
-			{
-				throw new BusinessException(ExceptionMessage.IncompleteRequest);
-			}
-
-			#region maxCountOpen
-
-			int defaultMaxCountOpen = int.Parse(ServiceSettings.MaxCountOpen);
-			int maxCountOpen = defaultMaxCountOpen;
-
-			//var serviceSettingsJson = serviceObj.ServiceSettings ?? "{}";
-			//var serviceSettings = JsonConvert.DeserializeObject<Dictionary<string, object>>(serviceSettingsJson);
-
-			//if (!TryGetSettingValue(serviceSettings!, ServiceSettings.MaxCountOpen, out maxCountOpen))
-			//{
-			//	var systemSettingsJson = await cacheDataProvider.GetSystemSettingValue(SystemSettings.ServiceSettings);
-			//	if (!string.IsNullOrEmpty(systemSettingsJson))
-			//	{
-			//		var systemSettings = JsonConvert.DeserializeObject<Dictionary<string, object>>(systemSettingsJson);
-			//		if (systemSettings == null || !TryGetSettingValue(systemSettings, ServiceSettings.MaxCountOpen, out maxCountOpen))
-			//		{
-			//			SrvService.UpdateServiceSettingsAsync(serviceObj, ServiceSettings.MaxCountOpen, maxCountOpen);
-			//		}
-			//	}
-			//}
-
-			await ValidateIfThereIsOpenedRequestForServiceAsync(planId, serviceObj, maxCountOpen);
-
-			#endregion
-
-			return true;
-		}
-
-		private bool TryGetSettingValue(Dictionary<string, object> settings, string settingKey, out int result)
-		{
-			result = 0;
-
-			if (settings != null && settings.TryGetValue(settingKey, out var settingValue))
-			{
-				return int.TryParse(settingValue?.ToString(), out result);
-			}
-			return false;
-		}
-		private async Task ValidateIfThereIsOpenedRequestForServiceAsync(Guid? PlanId, Service serviceObj, int maxCountOpen)
-		{
-
-			var user = await SrvUser.GetByIDActiveNonDeleted(userInfo!.UserId!.Value);
-
-
-			var isMinistry = user is MinistryUser;
-
-			using var scope = serviceScopeFactory.CreateScopedUow();
-
-			var openRequests = await scope.GetRepository<ServiceRequest>()
-										.GetAllQueryFiltered()
-										.Include(c => c.Status)
-										.Where(c => c.PlanId == PlanId || serviceObj.Initialservice)
-										.Where(c => c.ServiceId == serviceObj.Id && c.Status!.ServiceStatusType!.IsOpen && !c.IsDeleted)
-										//.Where(c => c.OrgTreeId == userInfo!.UserId || isMinistry)
-										.CountAsync();
-
-
-			if (openRequests >= maxCountOpen)
-			{
-				throw new BusinessException(ExceptionMessage.lblRequestAlreadyOpened);
-			}
-		}
-
+	
 		public async Task<string> GetAttachmentUrlAsync(Guid attachmentId, Guid requestId, Guid EvlReqtId )
 		{
 			if (requestId != Guid.Empty && EvlReqtId  != Guid.Empty)
@@ -377,5 +310,43 @@ namespace Evaluation.Services.Models.API
 			return await _srvEvaluationRequestAssignment.GetServiceStatus();
 		}
 
-    }
+		public async Task<bool> CanCreateEvaluationPlanRequestAsync()
+		{
+			if (userInfo.UserId == null)
+				return false;
+
+			using var uow = serviceScopeFactory.CreateScopedUow();
+
+			var module = await SrvSystemModule.GetSystemModuleByRoutingAsync(ModuleType.EvaluationPlan);
+
+			if (module == null)
+				return false;
+
+			var service = await uow.GetRepository<Service>()
+				.GetAllActiveNonDeleted()
+				.Include(x => x.ServiceInitiatorPartyType)
+				.FirstOrDefaultAsync(x => x.SystemModuleId == module.Id);
+
+			if (service == null)
+				return false;
+
+			var today = DateTime.Today;
+
+			var isValidDate =
+					(!service.StartDate.HasValue || today >= service.StartDate.Value.Date) &&
+					(!service.EndDate.HasValue || today <= service.EndDate.Value.Date);
+
+			if (!isValidDate)
+				return false;
+
+			var isInitiator = service.ServiceInitiatorPartyType != null &&
+				service.ServiceInitiatorPartyType.Any(x =>
+					userInfo.PartyTypes.Contains(x.PartyTypeId) &&
+					x.IsActive == true &&
+					x.IsDeleted == false);
+
+			return isInitiator;
+		}
+
+	}
 }

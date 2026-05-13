@@ -4,6 +4,7 @@ const uiControl = {
 }
 
 let popupdivcontent = "";
+var deprouting = sharedUtility().extractDepartmentName();
 const sharedFn = (options) => {
 
     //===========================================================
@@ -22,7 +23,7 @@ const sharedFn = (options) => {
             var formData = new FormData();
             formData.append('request', JSON.stringify(ControlItems));
             $.ajax({
-                url: "/UiControl/UiControlList",
+                url: `/UiControl/${deprouting}/UiControlList`,
                 type: "POST",
                 dataType: "html",
                 processData: false,
@@ -209,6 +210,7 @@ const sharedFn = (options) => {
                 }
             }
             if (AlldropdownList.length > 0) {
+                
                 let dropdownInitializer = jqDropdownInitializer({
                     dropdowns: AlldropdownList,
                     url: `/Home/GetDropDownValues`,
@@ -840,20 +842,6 @@ const sharedFn = (options) => {
                 }
             }
 
-            //Adding Action column
-            tabularcolumns.push({
-
-                title: getUiControlText('ACTIONS'), field: "", cssClass: 'tbl-cell-actions',
-                frozen: false, width: 120,
-                formatter: function (cell) {
-                    const { id } = cell.getRow().getData();
-                    return getActionTemplate(id, dynamicaction);
-                },
-                cellClick: function (event, cell) {
-                    actionCellClick(event, cell);
-                }
-
-            })
             //Adding Dynamic column
             $.each(columnList, function (index, item) {
 
@@ -1008,6 +996,20 @@ const sharedFn = (options) => {
                 });
             }
 
+            //Adding Action column
+            tabularcolumns.push({
+
+                title: getUiControlText('ACTIONS'), field: "", cssClass: 'tbl-cell-actions',
+                frozen: false, width: 120,
+                formatter: function (cell) {
+                    const { id } = cell.getRow().getData();
+                    return getActionTemplate(id, dynamicaction);
+                },
+                cellClick: function (event, cell) {
+                    actionCellClick(event, cell);
+                }
+
+            })
         }
         return tabularcolumns;
     }
@@ -1346,7 +1348,7 @@ const sharedFn = (options) => {
                         error: function (err) {
                             reject(err); // Reject on error
                         }
-                    }).Post("Home/GetDropDownValues", data);
+                    }).Post("/Home/GetDropDownValues", data);
                 });
             }
         }
@@ -1410,7 +1412,7 @@ const sharedFn = (options) => {
                     controlUibackendName: uibackendName,
                     parentReferenceValue: null
                 };
-                jqClient(options).Post("Home/GetDropDownValues", data);
+                jqClient(options).Post("/Home/GetDropDownValues", data);
 
             }
             else {
@@ -1482,7 +1484,7 @@ const sharedFn = (options) => {
                     controlUibackendName: uibackendName,
                     parentReferenceValue: null
                 };
-                jqClient(options).Post("Home/GetDropDownValues", data);
+                jqClient(options).Post("/Home/GetDropDownValues", data);
 
             }
            
@@ -1952,7 +1954,7 @@ const sharedFn = (options) => {
             var formData = new FormData();
             formData.append('request', JSON.stringify(ControlItems));
             $.ajax({
-                url: "/UiControl/UiControlList",
+                url: `/UiControl/${deprouting}/UiControlList`,
                 type: "POST",
                 dataType: "html",
                 processData: false,

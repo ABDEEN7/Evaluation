@@ -1,18 +1,19 @@
-﻿let departmentPath = sharedUtility().extractDepartmentName();
+﻿// ==============================
+// API Endpoints
+// ==============================
+const SUBMIT_FORM_API = {
+    calculateEvaluationResult: (departmentPath) =>
+        `/Form/${departmentPath}/CalculateEvaluationFormResult`,
 
-$(document).ready(function () {
-    $("#btnSubmitForm").on("click", function (e) {
-        e.preventDefault();
-        submitForm();
-    });
-});
+    validateEvaluationForm: (departmentPath) =>
+        `/Form/${departmentPath}/ValidateEvaluationForm`,
 
-$(document).ready(function () {
-    $("#btnSaveForm").on("click", function (e) {
-        e.preventDefault();
-        validateForm();
-    });
-});
+    saveEvaluationForm: (departmentPath) =>
+        `/Form/${departmentPath}/SaveEvaluationForm`,
+};
+
+let departmentPath = sharedUtility().extractDepartmentName();
+
 function evaluationFormResult(formId) { 
     const mainItems = [];
 
@@ -20,51 +21,62 @@ function evaluationFormResult(formId) {
     $(`#${P_fieldId}-${SELECTORS.tbody} tr.main-row`).each(function () {
 
         const row = $(this);
-        const select = row.find("select.eval-select");
+        const selects = row.find("select.eval-select");
+        let mainObj;
 
-        const mainId = select.data("id");
+        selects.each(function (index, element) {
 
-        const selectedValue =
-            select.find("option:selected").data("id") ||
-            select.val() ||
-            null;
+            const $select = $(element);
 
-        const note =
-            row.find("textarea.note-input").val() || null;
 
-        const mainObj = {
-            id: mainId,
-            valueId: selectedValue,
-            //value: selectedValue,
-            note: note,
-            subItems: []
-        };
 
-        // ========== LOOP SUB ITEMS RELATED TO THIS MAIN ==========
-        $(`tr.child-row[data-parent-id="${mainId}"]`).each(function () {
+            const mainId = $select.data("id");
 
-            const childRow = $(this);
-            const childSelect = childRow.find("select.eval-select");
-
-            const childId = childSelect.data("id");
-
-            const childValue =
-                childSelect.find("option:selected").data("id") ||
-                childSelect.val() ||
+            const selectedValue =
+                $select.find("option:selected").data("id") ||
+                $select.val() ||
                 null;
 
-            const childnote =
-                childRow.find("textarea.note-input").val() || null;
+            const note =
+                row.find("textarea.note-input").val() || null;
 
-            mainObj.subItems.push({
-                id: childId,
-                valueId: childValue,
-                //value: selectedValue,
-                note: childnote
+            mainObj = {
+                id: mainId,
+                valueId: selectedValue,
+                value: $("option:selected", $select).data("actual-value") || 0,
+                weightPercentage: $select.data("config-weight-percentage") || 0,
+                note: note,
+                subItems: []
+            };
+
+            // ========== LOOP SUB ITEMS RELATED TO THIS MAIN ==========
+            $(`tr.child-row[data-parent-id="${mainId}"]`).each(function () {
+
+                const childRow = $(this);
+                const childSelect = childRow.find("select.eval-select");
+
+                const childId = childSelect.data("id");
+
+                const childValue =
+                    childSelect.find("option:selected").data("id") ||
+                    childSelect.val() ||
+                    null;
+
+                const childnote =
+                    childRow.find("textarea.note-input").val() || null;
+
+                mainObj.subItems.push({
+                    id: childId,
+                    valueId: childValue,
+                    value: $("option:selected", $select).text(),//NEED TO CHECK
+                    note: childnote
+                });
             });
+
+
+            mainItems.push(mainObj);
         });
 
-        mainItems.push(mainObj);
     });
 
     // Strengths & Improvements
@@ -73,15 +85,114 @@ function evaluationFormResult(formId) {
 
     const payload = {
         id: formId,
-        items: mainItems
+        items: mainItems,
+        formSettings: evalForm,
     };
 
     console.log("FINAL NESTED JSON:", payload);
 
     return payload;
 }
+async function evaluationFormWithCalculationResult(formId) {
+    var result = evaluationFormResult(formId);
+    var calculation = await calculate(result);
 
+    var finalResult = {
+        id: result.id,
+        items: result.items,
+        formSettings: result.formSettings,
+        results: calculation.value,
+        evaluationRequestId: P_evaluationRequestId,
+        serviceRequestId: P_serviceRequestId
+    };
 
+    console.log(finalResult);
+
+    return finalResult;
+
+}
+async function calculate(result) {
+    return new Promise((resolve, reject) => {
+        jqClient().Post(
+            SUBMIT_FORM_API.calculateEvaluationResult(depRoutePath)
+            , result)
+        .done((res) => {
+            console.log(res);
+            resolve(res); 
+        }).fail((err) => {
+            reject(err);
+        });
+    });
+}
+
+function calculateFE(select, formId) {
+    let formResult = evaluationFormResult(formId);
+    let result = { Value: 0, Name: "", Id:"00000000-0000-0000-0000-000000000000"};
+
+    switch (evalForm.calcMethod) {
+        case "AVERAGE": {
+
+            let total = 0;
+
+            formResult.items.forEach((item) => {
+                if (P_hasMuliEvaluation) {
+                    total += (item.value * (item.weightPercentage / 100)) || 0;
+                }
+                else {
+                    total += item.value || 0;
+                }
+            });
+
+            if (P_hasMuliEvaluation) {
+                result.Value = total / (formResult.items.length / P_countOfColumnsValue);
+
+            }
+            else {
+                result.Value = total / formResult.items.length;
+            }
+
+            const evalMatrixValue = P_matrixResponse.value.find(
+                v => v.minValue <= result.Value && v.maxValue >= result.Value
+            );
+
+            result.Name = evalMatrixValue?.name ?? null;
+            result.Id = evalMatrixValue?.id ?? null;
+
+            break;
+        }
+
+        case "SUM":
+            break;
+
+        case "WithoutCalc":
+            break;
+    }
+
+    $(`#${P_fieldId}-result-value`).text(`(${Number(result.Value).toFixed(2)})${result.Name}`);
+    $(`#${P_fieldId}-result-div`).removeClass("d-none");
+
+    return result
+}
+
+function validateForm(formId) {
+    var result = evaluationFormResult(formId);
+    jqClient().Post(
+        SUBMIT_FORM_API.validateEvaluationForm(depRoutePath)
+        , result)
+        .done((res) => {
+
+            if (res.value.isValid) {
+                return res.value.isValid;
+            }
+            else {
+                clearValidation();
+                res.value.errors.forEach(error => {
+                    showValidation(error.itemId, error.message, error.itemPropertyType);
+                });
+                return res.value.isValid;
+            }
+        });
+}
 function renameFormItems(formId) {
     const mainItems = [];
 
@@ -117,21 +228,11 @@ function renameFormItems(formId) {
     return payload;
 }
 
-//function renameitemForm(formId) {
-//    var result = renameFormItems(formId);
-//    jqClient().Post(`/Form/${departmentPath}/RenameFormItems`, result)
-//        .done((res) => {
-//            Swal.fire({
-//                icon: "success",
-//                title: "تم الإرسال",
-//                text: "تم الإرسال بنجاح"
-//            });
-//        });
-//}
-
 function submitForm(formId) {
     var result = evaluationFormResult(formId);
-    jqClient().Post(`/Form/${departmentPath}/SaveEvaluationForm`, result)
+    jqClient().Post(
+        SUBMIT_FORM_API.saveEvaluationForm(depRoutePath)
+        , result)
         .done((res) => {
             Swal.fire({
                 icon: "success",
@@ -140,25 +241,20 @@ function submitForm(formId) {
             });
         });
 }
-function validateForm(formId) {
-    var result = evaluationFormResult(formId);
-    jqClient().Post(`/Form/${departmentPath}/ValidateEvaluationForm`, result)
-        .done((res) => {
 
-            if (res.value.isValid) {
-                return res.value.isValid;
-            }
-            else {
-                clearValidation();
-                res.value.errors.forEach(error => {
-                    showValidation(error.itemId, error.message, error.itemPropertyType);
-                });
-                return res.value.isValid;
-            }
-        });
-}
-function saveForm(formId) {
-    return evaluationFormResult(formId);
+async function saveForm(formId) {
+    var result = evaluationFormResult(formId);
+    var calculation = await calculate(result);
+
+    var finalResult = {
+        id: result.id,
+        items: result.items,
+        formSettings: result.formSettings,
+        results: calculation.value,
+        evaluationRequestId: P_evaluationRequestId,
+        serviceRequestId: P_serviceRequestId
+    };
+    return finalResult;
 }
 
 function showValidation(itemId, message, itemPropertyType) {

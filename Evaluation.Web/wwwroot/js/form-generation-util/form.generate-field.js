@@ -163,10 +163,14 @@ var formGenerateFieldUtility = window.formUtility;
                 const allowDeleteFormItem = field.attributes?.find(c => c.name === 'allowDeleteFormItem');
                 const allowRenameFormItem = field.attributes?.find(c => c.name === 'allowRenameFormItem');
                 //const allowRename = field.attributes?.find(c => c.name === 'allowRename');
-
+                const params = new URLSearchParams(window.location.search);
+                var evaluationRequestId = (params.get("Evlid") ).replace("#", "");
+                var serviceRequestId = (params.get("id") ).replace("#", "");
                 const controlValues = JSON.parse(field.value);
                 const html = await generateFullFormPageHtml({
                     formId,
+                    evaluationRequestId,
+                    serviceRequestId,
                     fieldId: fieldId,
                     readOnly: readonly,
                     allowRename: allowRenameFormItem != undefined && (!allowRenameFormItem || allowRenameFormItem.value == true || allowRenameFormItem.value == "true"),
@@ -757,7 +761,30 @@ var formGenerateFieldUtility = window.formUtility;
         field.type = 'datetime';
         return dateTimeInputElement;
     };
+    const generateTimeField = (field, readonly) => {
+        const inputElement = $('<input>')
+            .attr('type', 'time')
+            .addClass('form-control')
+            .attr('placeholder', field.fieldName)
+            .attr('aria-label', field.fieldName);
 
+        if (field.value) {
+            inputElement.val(field.value);
+        }
+
+        if (readonly) {
+            setReadOnlyAttribute(inputElement, field);
+        }
+
+        inputElement.on('keydown', (e) => {
+            if (e.keyCode === 13) {
+                e.preventDefault();
+                return;
+            }
+        });
+
+        return inputElement;
+    };
     const generateListTable = (field, readonly, renderType) => {
         const tableId = renderType === RENDER_TYPE.PREVIEW
             ? `table_View_${field.fieldId}`
@@ -821,6 +848,7 @@ var formGenerateFieldUtility = window.formUtility;
         'phone': generatePhoneField,
         'evaluationPlan': generateEvaluationPlanField,
         'evl_Form': generateEvlFormField,
+        'Time': generateTimeField,
     };
 
     const generateField = (field, renderType, actionType = null, options = {}) => {

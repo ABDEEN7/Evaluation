@@ -15,11 +15,23 @@ public class EvaluationRequestAssignmentProfile : Profile
         CreateMap<EvaluationRequestAssignment, EvalTeamRequestDto>()
             .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.MinistryUserId));
 
-        CreateMap<EvaluationRequestAssignment, EvaluationRequestAssignmentDto>()
-            .ForMember(dest => dest.EvalRequestAssignmentScopies,
-                       opt => opt.MapFrom(src => src.EvalRequestAssignmentScopies));
+		CreateMap<EvaluationRequestAssignment, EvaluationRequestAssignmentDto>()
+			   .ForMember(dest => dest.MinistryUser,
+				   opt => opt.MapFrom(src => src.MinistryUser != null
+					   ? src.MinistryUser.NameAr
+					   : null))
+			   .ForMember(dest => dest.PartyType,
+				   opt => opt.MapFrom(src => src.PartyType != null
+					   ? src.PartyType.NameAr
+					   : null))
+			   .ForMember(dest => dest.NdaStatus,
+				   opt => opt.MapFrom(src => src.NdaStatus != null
+					   ? src.NdaStatus.NameAr
+					   : null))
+			   .ForMember(dest => dest.EvalRequestAssignmentScopies,
+				   opt => opt.MapFrom(src => src.EvalRequestAssignmentScopies));
 
-        CreateMap<EvalRequestAssignmentScope, EvalRequestAssignmentScopeDto>();
+		CreateMap<EvalRequestAssignmentScope, EvalRequestAssignmentScopeDto>();
 
     }
 }

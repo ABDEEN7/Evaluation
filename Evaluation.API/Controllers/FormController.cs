@@ -1,12 +1,8 @@
-﻿using AutoMapper;
-using Evaluation.API.ActionFilter;
-using Evaluation.DAL.Dtos.Form;
-using Evaluation.DAL.Models.FormsModules;
+﻿using Evaluation.DAL.Dtos.Form;
 using Evaluation.Services.BusinessLayer;
 using Evaluation.Services.BusinessLayer.API.FormLayer;
 using Evaluation.SharedHelper.Dtos.Form;
 using Evaluation.SharedHelper.Dtos.Shared;
-using Evaluation.SharedHelper.Enums;
 using FluentResults;
 using Microsoft.AspNetCore.Mvc;
 
@@ -59,6 +55,15 @@ public class FormController : ControllerBase
     public async Task<Result<ValidationResult>> ValidateEvaluationForm([FromBody] FormEvaluationDto formEvaluation)
     {
         return await _masterBl.GetApiService<FormBL>().ValidateEvaluationForm(formEvaluation);
+    }
+
+
+    [HttpPost]
+    public async Task<Result<CalculationFormResult>> CalculateEvaluationFormResult([FromBody] FormEvaluationDto formEvaluation)
+    {
+
+        return await _masterBl.GetApiService<FormBL>().CalculateFormResult(formEvaluation);
+
     }
 
 }

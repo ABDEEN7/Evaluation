@@ -30,7 +30,7 @@
     <div class="card container-fluid container-xxxl p-4">
         <h2 class="@ConstantKeys.EvaluationForm.PageTitle"></h2>
         <h6 class="@ConstantKeys.EvaluationForm.PageDescription"></h6>
-        <div class="row py-4">
+        <div class="row pt-4">
             <div class="col-lg-12 mb-3">
                 <ul class="nav nav-tabs row main-tabs bg-grey">
                     <li id="tabEvaluationPlans" class="nav-item col-md-4">
@@ -51,12 +51,12 @@
                 </ul>
             </div>
 
-            <div class="card col-lg-12">
-                <div class="tab-content p-0">
+            <div class="col-lg-12">
+                <div class="tab-content">
 
                     <!-- Tab: Evaluation Plans -->
                     <div id="tab-plans" class="tab-pane fade show active">
-                        <ul class="nav nav-tabs sub-tabs my-3">
+                        <ul class="nav nav-tabs sub-tabs m-4">
                             <li class="nav-item">
                                 <a class="nav-link active fs-6 @ConstantKeys.EvaluationForm.SubTabPlanRequests"
                                    data-bs-toggle="tab" href="#tab-plan-requests"></a>
@@ -66,7 +66,7 @@
                                    data-bs-toggle="tab" href="#tab-plan-details"></a>
                             </li>
                         </ul>
-                        <div class="card tab-content p-3">
+                        <div class="card tab-content m-4">
                             <div id="tab-plan-requests" class="tab-pane fade show active">
                                 <partial name="_PartialEvaluationPlanRequests" />
                             </div>
@@ -171,7 +171,63 @@
                                 </div>
                             </div>
 
+                            <div class="accordion-item mb-3 rounded d-none" id="forceAssignmentAccordion">
+
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed d-flex align-items-center justify-content-between"
+                                            type="button"
+                                            data-bs-toggle="collapse"
+                                            data-bs-target="#itemForceAssignments">
+
+                                        <div class="d-flex align-items-center gap-2 fs-18">
+                                            <i class="las la-user-shield text-primary fs-25"></i>
+                                            <span class="fw-semibold">
+                                                 Assignments
+                                            </span>
+                                        </div>
+
+                                        <span class="toggle-icon">
+                                            <i class="la la-angle-up fs-22"></i>
+                                        </span>
+                                    </button>
+                                </h2>
+
+                                <div id="itemForceAssignments" class="accordion-collapse collapse">
+                                    <div class="accordion-body">
+
+                                        <div id="forceAssignmentDiv"></div>
+
+                                    </div>
+                                </div>
+
+                            </div>
                             <div id="evaluationPartiesContainer"></div>
+
+                            <div class="accordion-item mb-3 rounded">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed d-flex align-items-center justify-content-between"
+                                            type="button"
+                                            data-bs-toggle="collapse"
+                                            data-bs-target="#itemAllOpenRequests">
+                                        <div class="d-flex align-items-center gap-2 fs-18">
+                                            <i class="las la-list-alt text-primary fs-25"></i>
+                                            <span class="fw-semibold @ConstantKeys.EvaluationForm.lblAllOpenRequests"></span>
+                                        </div>
+                                        <span class="toggle-icon"><i class="la la-angle-up fs-22"></i></span>
+                                    </button>
+                                </h2>
+
+                                <div id="itemAllOpenRequests" class="accordion-collapse collapse">
+                                    <div class="accordion-body">
+                                        <input id="allOpenRequestsSearch"
+                                               type="text"
+                                               class="form-control mb-3 "
+                                               placeholder="بحث..." />
+
+                                        <div id="allOpenRequestsTable"></div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -569,11 +625,12 @@
     <script src="/js/form-generation-util/form.init.js"></script>
     <script src="/js/form-generation-util/form.namespace.js"></script>
     <script src="~/js/form-generation-util/evaluationparties.js"></script>
-
+    <script src="~/js/evaluationplan/evaluation-open-requests.js"></script>
     <script src="~/js/assignments/request-assignment-const.js"></script>
     <script src="~/js/assignments/generate-request-assignment.js"></script>
     <script src="~/js/assignments/get-request-assignments.js"></script>
     <script src="~/js/assignments/submit-request-assignments.js"></script>
+    <script src="~/js/assignments/force-assignment-status.js"></script>
 
     <script src="~/js/evaluationplan/createrequest.js"></script>
     <script src="~/lib/uuid/uuid.min.js"></script>
@@ -581,7 +638,6 @@
 
 
     <script>
-        const departmentRoutePath = sharedUtility().extractDepartmentName();
         $(document).ready(async function () {
 
             await webAppConfigsSetup().Init({
@@ -594,79 +650,83 @@
                     '@nameof(ConstantKeys.EvaluationOperations)',
                     '@nameof(ConstantKeys.EvaluationDetailsModal)',
                     '@nameof(ConstantKeys.EvaluationForm)',
-                    '@nameof(ConstantKeys.WebSchools)'
-
-
+                    '@nameof(ConstantKeys.WebSchools)',
+                    '@nameof(ConstantKeys.Assignment)'
                 ],
                 pages: [
                     '@nameof(ConstantKeys.WebAppCommon)',
                     '@nameof(ConstantKeys.CreatePlan)',
                     '@nameof(ConstantKeys.EvaluationOperations)'
+                ]
+            }).then((result) => {
+                permissionsList = result.permissionsList;
 
-                ],
-                additional_keys: []
+                IsCanUpdatePlan = permissionsList?.some(p =>
+                    p === '@ConstantKeys.WebPermissions.EDIT_WEB_PLAN'
+                ) ?? false;
+
+                uiControlsSetup().UpdatPageTitle('WebAppScholarship');
+                 InitNavbarSection();
+                $('body').show();
             });
+
+            if (!sharedUtility().ExistingToken()) {
+                sharedUtility().RedirectUnauthorized();
+                return;
+            }
 
             window.formUtility = window.formUtility || {};
-             const searchParams = new URLSearchParams(window.location.search);
-                const reqId = searchParams.get('id');
-                const serviceId = searchParams.get('serviceId');
-                const EvlId = searchParams.get('Evlid');
 
-                 if (reqId) {
-                 openPlanRequestDetails(reqId);
+            const searchParams = new URLSearchParams(window.location.search);
+           
+            const reqId = searchParams.get('id');
+            const serviceId = searchParams.get('serviceId');
+            const EvlId = searchParams.get('Evlid');
+            const planId = searchParams.get('planId');
+            const SerReqid = searchParams.get('SerReqid');
+
+            if (reqId) {
+                openPlanRequestDetails(reqId);
+            }
+
+            if (EvlId) {
+                openEvaluationRequestDetails(EvlId);
+            }
+
+            if (SerReqid) {
+                openRequestDetails(SerReqid);
+            }
+
+            if (planId) {
+                if (IsCanUpdatePlan) {
+                    InitializeCreatePlanRequestService(serviceId, planId);
+                } else {
+                    InitializePlanDetails(planId);
                 }
+            }
 
-                if (EvlId) {
-                      openEvaluationRequestDetails(EvlId);
-                }
-
-         $('#evaluationRequestDetailsModal').on('hidden.bs.modal', function () {
-            formUtility.removeQueryParameter(['Evlid', 'serviceId']);
+            $('#evaluationRequestDetailsModal').on('hidden.bs.modal', function () {
+                formUtility.removeQueryParameter(['Evlid', 'serviceId']);
             });
+
             $('#planRequestModal').on('hidden.bs.modal', function () {
                 formUtility.removeQueryParameter(['id', 'serviceId']);
             });
 
             $('#RequestModal').on('hidden.bs.modal', function () {
-                formUtility.removeQueryParameter(['id', 'serviceId']);
+                formUtility.removeQueryParameter(['SerReqid', 'serviceId']);
             });
-            if (sharedUtility().ExistingToken()) {
-                uiControlsSetup().UpdatPageTitle('WebAppScholarship');
-                $('body').show();
-                GetScopes();
-                // await LoadUserDetails();
-                // InitNavbarSection();
 
+            $('#PlanDetailsModal').on('hidden.bs.modal', function () {
+                formUtility.removeQueryParameter(['planId', 'serviceId']);
+            });
 
-
-                // activateTabFromUrl();
-                // CheckAndResumeSessionTimer();
-                // GetServices();
-                // GetRequests();
-                // GetScholarships();
-                // CheckRequiredEmailOrMobileVerification();
-                //InitializeAdvancedSearch();
-
-
-                //     InitializeAdvancedSearch();
-                // } else {
-                //     sharedUtility().RedirectToUrl(ConstantUrls.LoginURL);
-                // }
-
-                // $(document).on('click', '.more-details-btn', ServiceCardBuilder.handleCardClick);
-                // $(document).on('click', 'a[data-role="trigger-card-click"]', function (e) {
-                //     e.preventDefault();
-                //     ServiceCardBuilder.handleCardClick.call(this, e);
-                // });
-
-
-        }
-
+            await LoadUserDetails();
+           toggleAddEvaluationPlanRequestButton();
+            //GetScopes();
+            CheckAndResumeSessionTimer();
         });
     </script>
-
-
 
 
 }

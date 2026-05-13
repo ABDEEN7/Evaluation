@@ -10,9 +10,13 @@ using Evaluation.DAL.Repositories;
 using Evaluation.Services.BusinessLayer.API.EvaluationRequestLayer;
 using Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices;
 using Evaluation.Services.BusinessLayer.API.SchooLayer;
+using Evaluation.Services.BusinessLayer.API.TeamMemberBL;
 using Evaluation.Services.Extensions;
+using Evaluation.Services.Shared;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Dtos.SchoolDto;
+using Evaluation.SharedHelper.Dtos.TeamMemberDto;
+using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Api.AttachmentsDTOs;
@@ -44,9 +48,10 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 	SrvDropdown srvDropdown,
 	SchoolRepository schoolRepository,
 	SrvPartyType SrvPartyType,
+	AssignmentBL AssignmentBL,
 	SrvActionTransactionsLog SrvActionTransactionsLog,
-	SrvStatus SrvStatus, SrvEvaluationParty srvEvaluationParty
-
+	SrvStatus SrvStatus, SrvEvaluationParty srvEvaluationParty,
+	 RequestAccessService requestAccessService
 
 	) : ApiBase(serviceScopeFactory, cacheDataProvider, unitOfWork, loggingServices, mapper, userInfo, serviceProvider, requestInfo)
 {
@@ -61,8 +66,9 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
                     .Include(d => d.DepEvaluationType)
                     .Include(d => d.ServiceStatus)
                      .Where(er =>
-            monthInts.Contains(er.FromDate.Year * 100 + er.FromDate.Month) ||
-            monthInts.Contains(er.ToDate.Year * 100 + er.ToDate.Month))
+            (monthInts.Contains(er.FromDate.Year * 100 + er.FromDate.Month) ||
+            monthInts.Contains(er.ToDate.Year * 100 + er.ToDate.Month)) && 
+			er.DepEvaluationType.DepartmentId == requestInfo.DepId)
         .ToList();
     }
 
@@ -99,58 +105,33 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 
 		return result;
 	}
-	private async Task<IQueryable<EvaluationRequestDTO>> GetDepEvaluationRequestsAsync(UnitOfWork uow, Guid userId, SystemModule module, string lang, string timeFormat, string dateFormat)
+	private async Task<IQueryable<EvaluationRequestDTO>> GetDepEvaluationRequestsAsync(UnitOfWork uow,Guid userId,SystemModule module,string lang,string timeFormat,string dateFormat)
 	{
-		var permissionTasks = new
-		{
-			IsAllowedToViewAllRequests =
-				SrvPartyType.IsAllowedToViewAllRequestsAsync(userId, module.Id),
-
-			IsAllowedToViewAllRequestsWithoutFiltration =
-				SrvPartyType.IsAllowedToViewAllRequestsWitoutFilterationAsync(userId, module.Id),
-
-			UserPartyTypeData =
-				SrvPartyType.GetUserPartyTypeData(userInfo.UserId!)
-		};
-
 		IQueryable<EvaluationRequest> baseQuery = uow
 			.GetRepository<EvaluationRequest>()
 			.GetAllActiveNonDeleted()
 			.Include(x => x.Service)
-			.ThenInclude(x => x.SystemModule)
+				.ThenInclude(x => x!.SystemModule)
 			.Include(x => x.ServiceStatus)
+				.ThenInclude(x => x!.ServiceStatusType)
 			.Include(x => x.OrgTree)
 			.Include(x => x.DepEvaluationType)
 			.Include(x => x.Plan)
-				.ThenInclude(p => p!.PlanStatus);
+				.ThenInclude(p => p!.PlanStatus)
+			.AsSplitQuery()
+			.Where(x => x.Service != null && x.Service.SystemModuleId == module.Id);
 
-		baseQuery = baseQuery.AsSplitQuery()
-			.Where(x => x.Service!.SystemModuleId == module.Id);
-
-		var permissions = new
-		{
-			IsAllowedToViewAllRequests = await permissionTasks.IsAllowedToViewAllRequests,
-			IsAllowedToViewAllRequestsWithoutFiltration = await permissionTasks.IsAllowedToViewAllRequestsWithoutFiltration,
-			UserPartyTypeData = await permissionTasks.UserPartyTypeData
-		};
-
-		//if (!permissions.IsAllowedToViewAllRequestsWithoutFiltration)
-		//{
-		//	baseQuery = ApplyUserAccessFiltersForEvaluationRequests(
-		//		baseQuery,
-		//		permissions.UserPartyTypeData,
-		//		userId,
-		//		permissions.IsAllowedToViewAllRequests
-		//	);
-		//}
+		baseQuery = await requestAccessService.ApplyEvaluationRequestAccess(baseQuery);
 
 		return baseQuery.Select(x => new EvaluationRequestDTO
 		{
 			Id = x.Id,
 			ServiceId = x.Service!.Id,
-			Service = lang == "ar" ? x.Service!.NameAr : x.Service!.NameEn,
-			icon = x.Service!.Icon,
+			Service = lang == "ar" ? x.Service.NameAr : x.Service.NameEn,
+			icon = x.Service.Icon,
+
 			RequestNumber = "1234",
+
 			StatusId = x.ServiceStatusId,
 			Status = lang == "ar" ? x.ServiceStatus!.NameAr : x.ServiceStatus!.NameEn,
 			StatusColor = x.ServiceStatus!.ColorCode,
@@ -162,12 +143,17 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 
 			PlanId = x.PlanId,
 			PlanName = x.Plan != null ? x.Plan.PlanName : "",
-			EvaluationType = x.DepEvaluationType != null ? (lang == "ar" ? x.DepEvaluationType.NameAr : x.DepEvaluationType.NameAr) : "",
+
+			EvaluationType = x.DepEvaluationType != null
+				? (lang == "ar" ? x.DepEvaluationType.NameAr : x.DepEvaluationType.NameEn)
+				: "",
+
 			OrgTreeId = x.OrgTreeId,
-			OrgTreeName = x.OrgTree != null ? (lang == "ar" ? x.OrgTree.NameAr : x.OrgTree.NameEn) : ""
+			OrgTreeName = x.OrgTree != null
+				? (lang == "ar" ? x.OrgTree.NameAr : x.OrgTree.NameEn)
+				: ""
 		});
 	}
-
 	public async Task<EvaluationRequest?> GetEvaluationRequestByIdAsync(Guid requestId, bool useMainUow = false)
 	{
 		if (useMainUow)
@@ -217,7 +203,7 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 	public async Task<EvaluationRequestDTO> GetEvaluationDetailsAsync(Guid id)
 	{
 		var lang = requestInfo.Lang;
-		var userId = userInfo.UserId ??  Guid.Parse("C2536611-576B-4EB8-84F4-747F4ECE9A23");// throw new BusinessException(ExceptionMessage.UserNotFound);
+		var userId = userInfo.UserId ??  throw new BusinessException(ExceptionMessage.UserNotFound);
 
 		var request = await GetEvaluationRequestByIdAsync(id);
 		if (request == null)
@@ -229,15 +215,19 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 		var userTask = srvUser.GetByIDActiveNonDeleted(userId);
 		var moduleTask = SrvSystemModule.GetSystemModuleByIdAsync(request.Service.SystemModuleId);
 		var fieldsTask = GetEvaluationRequestFieldsValueAsync(request);
-		var assignmentTask = GetEvaluationRequestAssignmentAsync(request.Id);
+		var assignmentTask =AssignmentBL.GetTeamByEvaluationRequestId(request.Id);
 		await Task.WhenAll(userTask, moduleTask, fieldsTask, assignmentTask);
 
 		var user = await userTask;
 		if (user == null)
 			throw new BusinessException(ExceptionMessage.UserNotFound);
 
+
+		var showAllRequestsPermission = user.UserPartTypes?.Any(x => x.PartyType!.CanViewAllRequests == true) == true;
+
 		var module = await moduleTask;
-		var assignment = await assignmentTask;
+		var assignmentResult = await assignmentTask;
+		var assignment = assignmentResult.Value ?? new List<EvaluationRequestAssignmentDto>();
 		bool departmentRequiresNda =  module?.Department?.IsNDA == true;
 		bool userAssignmentRequiresNda = departmentRequiresNda && assignment.Any(x=>x.MinistryUserId== userId && x.IsNDA == false && (x.NdaDate == null || x.NdaStatusId == null));
 
@@ -298,7 +288,9 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 			//CanViewFieldHistory = hasFieldHistoryPermission,
 			//CanViewAllFieldHistory = hasAllFieldHistoryPermission
 			IsNdaApprovalPending= userAssignmentRequiresNda,
+			Assignment= showAllRequestsPermission ? assignment: null,
 		};
+		
 		return requestDetails;
 	}
 	public async Task<bool> ValidateMinistryUserAccessAsync(Guid userId, Guid? moduleId, Guid? requestId)
@@ -361,8 +353,8 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 		string lang = requestInfo.Lang;
 		var stepFieldsListTask = SrvField.GetFieldsListByActionIdAsync(request.ServiceId);
 		var hiddenFieldsIds = await SrvField.GetHiddenFields(request.ServiceId);
-
-		var requestFieldsValue = await serviceScopeFactory.CreateScopedUow()
+		using var scopeUow =  serviceScopeFactory.CreateScopedUow();
+		var requestFieldsValue = await scopeUow
 			.GetRepository<ServiceRequestFieldsValue>()
 			.GetAllActiveNonDeleted()
 			.Include(x => x.Field)
@@ -653,8 +645,9 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
                 requests = requests.Where(x =>x.OrgTreeName.ToLower().Contains(model.OrgTree.ToLower()));
             }
 
+			var x = requests.ToQueryString();
 
-            result.TotalDataCount = await requests.CountAsync();
+			result.TotalDataCount = await requests.CountAsync();
 
 			if (model.PageNumber != null)
 			{
