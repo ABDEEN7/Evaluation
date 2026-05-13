@@ -112,7 +112,7 @@
             },
             {
         data: "statusCode",
-        className: "td-right td-30",
+        className: "td-right td-30 justify-content-end",
         render: function(data, type, row) {
 
             const isApproved = row.statusCode === "Approved";
