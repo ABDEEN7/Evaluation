@@ -33,7 +33,7 @@ namespace Evaluation.Services.Models.API
     public class ServiceRequestBL(
         IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow, SrvNotification SrvNotification, SrvUser SrvUser, 
         LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, SystemModuleSrv systemModuleSrv, SrvAction SrvAction, 
-        SrvStatus SrvStatus, SrvAssignment SrvAssignment,SrvEvaluationRequestAssignment _srvEvaluationRequestAssignment, SrvActionTransactionsLog SrvActionTransactionsLog,  PerformActionBL _performActionBL,
+        SrvStatus SrvStatus, SystemModuleSrv SrvSystemModule, SrvAssignment SrvAssignment,SrvEvaluationRequestAssignment _srvEvaluationRequestAssignment, SrvActionTransactionsLog SrvActionTransactionsLog,  PerformActionBL _performActionBL,
 
 		SrvService SrvService, SrvServiceRequest _srvServiceRequest, EvaluationRequestService _evaluationRequestService, SrvAttachments _srvAttachments, IServiceProvider serviceProvider,RequestInfo _requestInfo)
             : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, _requestInfo)
@@ -310,5 +310,43 @@ namespace Evaluation.Services.Models.API
 			return await _srvEvaluationRequestAssignment.GetServiceStatus();
 		}
 
-    }
+		public async Task<bool> CanCreateEvaluationPlanRequestAsync()
+		{
+			if (userInfo.UserId == null)
+				return false;
+
+			using var uow = serviceScopeFactory.CreateScopedUow();
+
+			var module = await SrvSystemModule.GetSystemModuleByRoutingAsync(ModuleType.EvaluationPlan);
+
+			if (module == null)
+				return false;
+
+			var service = await uow.GetRepository<Service>()
+				.GetAllActiveNonDeleted()
+				.Include(x => x.ServiceInitiatorPartyType)
+				.FirstOrDefaultAsync(x => x.SystemModuleId == module.Id);
+
+			if (service == null)
+				return false;
+
+			var today = DateTime.Today;
+
+			var isValidDate =
+					(!service.StartDate.HasValue || today >= service.StartDate.Value.Date) &&
+					(!service.EndDate.HasValue || today <= service.EndDate.Value.Date);
+
+			if (!isValidDate)
+				return false;
+
+			var isInitiator = service.ServiceInitiatorPartyType != null &&
+				service.ServiceInitiatorPartyType.Any(x =>
+					userInfo.PartyTypes.Contains(x.PartyTypeId) &&
+					x.IsActive == true &&
+					x.IsDeleted == false);
+
+			return isInitiator;
+		}
+
+	}
 }
