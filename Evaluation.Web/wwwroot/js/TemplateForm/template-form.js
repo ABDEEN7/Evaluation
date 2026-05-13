@@ -1301,12 +1301,6 @@ async function InitFormItemConfigPopup(
         <i class="las la-trash"></i>
         <span id="FormItemConfigSelectedCount"></span>
     </button>
-    <button type="button" id="FormItemConfigSelectAllButton" class="btn btn-secondary btn-sm">
-        ${sharedFn().GetUiControlText('SELECT_ALL') ?? 'Select All'}
-    </button>
-    <button type="button" id="FormItemConfigClearSelectionButton" class="btn btn-outline-secondary btn-sm">
-        ${sharedFn().GetUiControlText('CLEAR_SELECTION') ?? 'Clear'}
-    </button>
 </div>
             <button type="button" id="FormItemConfigRelationbutton" class="btn btn-primary">
                 ${sharedFn().GetUiControlText('FormItemConfigAddButton')}
@@ -1330,7 +1324,6 @@ async function InitFormItemConfigPopup(
     IsDelete = IsDeleteFormItemConfig ? true : "";
     IsView = '';
     const checkboxColumn = {
-        title: "<input type='checkbox' id='selectAllFormItemConfig' />",
         field: "rowSelected",
         width: 40,
         minWidth: 40,
@@ -1339,23 +1332,8 @@ async function InitFormItemConfigPopup(
         headerSort: false,
         resizable: false,
         editable: false,
-        formatter: function (cell) {
-            const checked = cell.getRow().isSelected() ? "checked" : "";
-            return `<input type='checkbox' ${checked} />`;
-        },
-        cellClick: function (e, cell) {
-            cell.getRow().toggleSelect();
-        },
-        headerClick: function (e, column) {
-            const allSelected = column.getTable().getSelectedRows().length === column.getTable().getRows().length;
-            if (allSelected) {
-                column.getTable().deselectRow();
-                $("#selectAllFormItemConfig").prop("checked", false);
-            } else {
-                column.getTable().selectRow();
-                $("#selectAllFormItemConfig").prop("checked", true);
-            }
-        }
+        formatter: "rowSelection",
+        titleFormatter: "rowSelection"
     };
     const tablecolumnlistWithCheckbox = [checkboxColumn, ...tablecolumnlist];
 
