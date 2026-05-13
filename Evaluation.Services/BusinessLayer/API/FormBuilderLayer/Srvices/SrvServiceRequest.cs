@@ -41,7 +41,6 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 {
     public class SrvServiceRequest(AzureBlobStorageService StorageService,SystemModuleSrv SrvSystemModule, SrvAction SrvAction, SrvActionTransactionsLog SrvActionTransactionsLog, SrvField SrvField, SrvAttachments SrvAttachments, SrvPartyType SrvPartyType, SrvDropdown SrvDropdown, SrvActionStatusConfiguration SrvActionStatusConfiguration, SrvStatus SrvStatus, SrvUser srvUser, IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow, LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, IServiceProvider serviceProvider, RequestInfo _requestInfo)
              : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, _requestInfo)
-
     {
         public async Task<ServiceRequest?> GetSrvServiceRequestByIdAsync(Guid requestId, bool useMainUow = false)
         {
@@ -62,7 +61,6 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                 .Include(x => x.Service)
                 .FirstOrDefaultAsync();
         }
-
         public async Task<ServiceRequest?> GetRequestByIdAsync(Guid RequestId, bool UseMainUow = false)
         {
             UnitOfWork Scope;
@@ -113,7 +111,6 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
         public async Task<WebAppPlanRequestsDTO?> GetPlanRequestsAsync( FilterRequestsDTO model)
         {
             string lang = _requestInfo!.Lang;
-            //model.ModuleName = "/evaluation-plan";
             if (userInfo.UserId is null)
             {
                 throw new UnauthorizedAccessException("UnAuthorized Data");
@@ -144,7 +141,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 				var RequestsTask = await GetRequestsForMinistryUserAsync(uow, userId, module, lang, time_Format, date_Format);
 				filteredResult = await FilteredPlanRequestsAsync( isMinistry, RequestsTask, model);
 				await FillPlanDetailsAsync(uow, filteredResult.Data);
-				//await UpdateRequestStatusesAsync(filteredResult.Data, module?.Id);
+				await UpdateRequestStatusesAsync(filteredResult.Data, module?.Id);
 				return filteredResult;
 			}
             else
@@ -194,82 +191,14 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
 				item.PlanDateFrom = planDto?.StartDate;
 				item.PlanDateTo = planDto?.EndDate;
+				item.PlanName = planDto?.Name;
 				item.SchoolsCount = planDto?.Schools?.Count ?? 0;
 			}
 		}
-		//public async Task<List<ServiceRequestSummaryDTO>> SearchServiceRequestSummary(Guid planId, string requestNumber)
-		//{
-		//	var requestsList = await serviceScopeFactory.CreateScopedUow()
-		//		.GetRepository<ServiceRequest>()
-		//		.GetAllActiveNonDeleted(x => x.RequestNumber.Contains(requestNumber) && x.planId == planId)
-		//		.Include(c => c.Plan)
-		//		.Include(c => c.InitialHistory)
-		//		.Include(x => x.Status)
-		//		.ThenInclude(x => x!.StatusPreventPartyTypes)
-		//		.Include(c => c.Service)
-		//		.Include(c => c.Student)
-		//		.ThenInclude(c => c!.UserGender)
-		//		.AsNoTracking()
-		//		.Select(x => new ServiceRequestSummaryDTO
-		//		{
-		//			RequestId = x.Id,
-		//			RequestNumber = x.RequestNumber,
-		//			ServiceName = x.Service != null ? (_requestInfo.Lang == "ar" ? x.Service.NameAr : x.Service.NameEn) : "",
-		//			QID = x.Student != null ? x.Student.QID : "",
-		//			ServiceRequestStatus = x.Status != null ? (_requestInfo.Lang == "ar" ? x.Status.NameAr : x.Status.NameEn) : ""
-		//		})
-		//		.ToListAsync();
-
-		//	return requestsList;
-		//}
-		//public async Task<ServiceRequestSummaryDTO?> GetRequestSummaryById(Guid requestId)
-		//{
-		//	var requestObj = await serviceScopeFactory.CreateScopedUow()
-		//		.GetRepository<ServiceRequest>()
-		//		.GetAllActiveNonDeleted(x => x.Id == requestId)
-		//		.Include(c => c.plan)
-		//		.Include(c => c.InitialHistory)
-		//		.Include(x => x.Status)
-		//		.ThenInclude(x => x!.StatusPreventPartyTypes)
-		//		.Include(c => c.Service)
-		//		.Include(c => c.Student)
-		//		.ThenInclude(c => c!.UserGender)
-		//		.AsNoTracking()
-		//		.Select(x => new ServiceRequestSummaryDTO
-		//		{
-		//			RequestId = x.Id,
-		//			RequestNumber = x.RequestNumber,
-		//			ServiceName = x.Service != null ? (_requestInfo.Lang == "ar" ? x.Service.NameAr : x.Service.NameEn) : "",
-		//			QID = x.Student != null ? x.Student.QID : "",
-		//			ServiceRequestStatus = x.Status != null ? (_requestInfo.Lang == "ar" ? x.Status.NameAr : x.Status.NameEn) : ""
-		//		})
-		//		.FirstOrDefaultAsync();
-
-		//	return requestObj;
-		//}
-
-		//private IQueryable<EvaluationRequest> ApplyUserAccessFiltersForEvaluationRequests(IQueryable<EvaluationRequest> query,UserPartyTypeDataDTO userPartyTypeData,Guid userId,bool isAllowedToViewAllRequests)
-		//{
-		//	if (isAllowedToViewAllRequests)
-		//		return query;
-
-		//	if (userPartyTypeData.AllowedOrgTreeIds?.Any() == true)
-		//	{
-		//		query = query.Where(e => userPartyTypeData.AllowedOrgTreeIds.Contains(e.OrgTreeId));
-		//	}
-
-		//	if (userPartyTypeData.AllowedPlanIds?.Any() == true)
-		//	{
-		//		query = query.Where(e => userPartyTypeData.AllowedPlanIds.Contains(e.PlanId));
-		//	}
-
-		//	return query;
-		//}
-
 		public async Task<ServiceRequestDTO> GetRequestDetailsAsync(Guid id, CancellationToken ct = default)
         {
             var lang = _requestInfo.Lang;
-            var userId = userInfo.UserId ?? Guid.Parse("C2536611-576B-4EB8-84F4-747F4ECE9A23");// throw new BusinessException(ExceptionMessage.UserNotFound);
+            var userId = userInfo.UserId ??  throw new BusinessException(ExceptionMessage.UserNotFound);
 
             var request = await GetRequestByIdAsync(id);
             if (request == null)
@@ -331,7 +260,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 				ActionTransactions = await actionTransactionsTask,
 				Actions = await actionsTask,
 				RequestNumber = request.RequestNumber,
-				Status = request.Status.NameEn,// SrvStatus.GetStatusDisplayName(request.StatusId, module?.Id),
+				Status =  SrvStatus.GetStatusDisplayName(request.StatusId, module?.Id),
 				ServiceId = request.ServiceId,
 				Service = lang == "ar" ? request.Service.NameAr : request.Service.NameEn,
 				CanViewFieldHistory = hasFieldHistoryPermission,
@@ -341,13 +270,13 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 		}
         public async Task<List<JsTreeNodeDto>> GetScopeList(Guid partyId)
         {
-            var uow = serviceScopeFactory.CreateScopedUow();
+           using var uow = serviceScopeFactory.CreateScopedUow();
             var departmentid=await uow.GetRepository<EvaluationParty>().GetAllNonDeleted().Where(x=>x.Id==partyId).Select(x=>x.DepartmentId).FirstOrDefaultAsync();
 
             var scopes = await uow.GetRepository<Scope>()
-    .GetAllNonDeleted()
-    .Include(x => x.ScopeType)
-    .ToListAsync();
+                                .GetAllNonDeleted()
+                                .Include(x => x.ScopeType)
+                                .ToListAsync();
             var treeData = new List<JsTreeNodeDto>();
 
             foreach (var scope in scopes)
@@ -369,7 +298,6 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             return treeData;
 
         }
-
         public async Task<List<SupportedFileDto>> GetSupportedFiles(Guid requestId)
         {
             using var uow = serviceScopeFactory.CreateScopedUow();
@@ -390,7 +318,6 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                 }).ToListAsync();
             return attachments;
         }
-
         public async Task<bool> HasAccessToRequestAsync(Guid requestId, Guid userId)
         {
             var requestTask = GetRequestByIdAsync(requestId);
@@ -432,10 +359,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                 return false;
             }
         }
-
-        public async Task<bool> SaveSupportFiles(IFormFile file,
-    Guid EvaluationRequestId,
-    Guid ScopeId)
+        public async Task<bool> SaveSupportFiles(IFormFile file,Guid EvaluationRequestId,Guid ScopeId)
         {
             if (file!=null)
             {
@@ -490,60 +414,6 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                 item.Status = SrvStatus.GetStatusDisplayName(item.StatusId, moduleId);
             }
         }
-
-        //private IQueryable<ServiceRequestDTO> GetRequestsForStudentUser(UnitOfWork uow, Guid userId, SystemModule module, string lang, string timeFormat, string dateFormat)
-        //{
-        //	var query =
-        //					 uow.GetRepository<ServiceRequest>()
-        //					  .GetAllActiveNonDeleted()
-        //					  .Include(c => c.Service)
-        //					  .Include(c => c.Service!.RequestShowPartyType)
-        //					 .Include(c => c.Status!.StatusPreventPartyTypes)
-        //					 .Include(c => c.plan)
-        //					 .ThenInclude(c => c!.SchStatus)
-        //					 .Include(c => c.InitialHistory)
-        //					 .Include(c => c.Status)
-        //					 .Include(c => c.Country)
-        //					 .Include(c => c.University)
-        //					 .AsSplitQuery()
-        //					 .Where(c => c.Service!.SystemModuleId == module.Id)
-        //					 .Where(c => c.CreateById == userId || c.StudentId == userId
-        //					   || c.plan!.StudentUserId == userId
-        //					   && c.Service!.RequestShowPartyType!.Any(x => userInfo.PartyTypes.Contains(x.PartyTypeId)))
-        //					 .Where(c =>
-        //					 !c.Status!.StatusPreventPartyTypes.Any(sp => userInfo.PartyTypes.Contains(sp.PartyTypeId) && sp.IsActive == true && sp.IsDeleted == false))
-        //					 .Select(c => new ServiceRequestDTO
-        //					 {
-        //						 RequestNumber = c.RequestNumber,
-        //						 Status = lang == "ar" ? c.Status!.NameAr : c.Status!.NameEn,
-        //						 StatusColor = lang == "ar" ? c.Status.ColorCode : c.Status.ColorCode,
-        //						 StatusISOPen = c.Status.IsOpen,
-        //						 ServiceId = c.Service!.Id,
-        //						 Service = lang == "ar" ? c.Service.NameAr : c.Service.NameEn,
-        //						 CreateOn = c.CreateDate.ToString(dateFormat),
-        //						 CreateOnTime = c.CreateDate.ToString(timeFormat),
-        //						 CreateDate = c.CreateDate,
-        //						 Id = c.Id,
-        //						 StatusId = c.StatusId,
-        //						 icon = c.Service.Icon,
-        //						 OwnerName = lang == "ar" ? c.Student!.FullNameAr : c.Student!.FullNameEn,
-        //						 StudentNationalityId = c.Student.NationalityCode,
-        //						 StudentIsSpecial = c.Student.IsSpecial,
-        //						 planNo = c.plan!.planNumber,
-        //						 planId = c.plan.Id,
-        //						 SchStatus = lang == "ar" ? c.plan.SchStatus!.NameAr : c.plan.SchStatus!.NameEn,
-        //						 CountryId = c.CountryId,
-        //						 UniversityId = c.UniversityId,
-        //						 CountryName = lang == "ar"
-        //										? (c.Country != null ? c.Country.NameAr : null)
-        //										: (c.Country != null ? c.Country.NameEn : null),
-        //						 CountryCode = c.Country!.ISOCode,
-        //						 UniversityCode = c.University!.Code,
-        //						 UniversityName = lang == "ar" ? c.University.NameAr : c.University.NameEn,
-        //					 });
-        //	string x = query.ToQueryString();
-        //	return query;
-        //}
         private async Task<IQueryable<ServiceRequestDTO>> GetRequestsForMinistryUserAsync(UnitOfWork uow, Guid userId, SystemModule module, string lang, string timeFormat, string dateFormat)
         {
             var permissionTasks = new
@@ -608,7 +478,6 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
 			return requests;
 		}
-
         public async Task<bool> IsAllowedToViewAllRequestsAsync(Guid userId)
         {
 			using var Scope = serviceScopeFactory.CreateScopedUow();
@@ -623,11 +492,8 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
             return result;
         }
-
         private IQueryable<ServiceRequest> ApplyUserAccessFilters(IQueryable<ServiceRequest> baseQuery, IEnumerable<UserPartyTypeDTO> userPartyTypeData, Guid userId, bool isAllowedToViewAllRequests)
         {
-
-            // User-specific filtering (created by or assigned to)
             if (!isAllowedToViewAllRequests)
             {
                 return ApplyUserSpecificFilter(baseQuery, userId);
@@ -635,7 +501,6 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
             return baseQuery;
         }
-
         private IQueryable<ServiceRequest> ApplyUserSpecificFilter(IQueryable<ServiceRequest> baseQuery, Guid userId)
         {
             return baseQuery
@@ -646,7 +511,6 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                         a.MinistryUserId == userId && userInfo.PartyTypes.Contains(a.PartyTypeId))));
 
         }
-
         private async Task<bool> ValidateMinistryUserAccessAsync(Guid userId, Guid? moduleId, Guid? requestId)
         {
             if (moduleId is null)
@@ -710,7 +574,6 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                                        }).ToListAsync();
             return attachments!;
         }
-
         public async Task<List<AttachementDTO?>> GetAllRequestAttachmentsAsync(Guid id, string lang)
         {
            using var uow = serviceScopeFactory.CreateScopedUow();
@@ -955,7 +818,6 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
             return RequestFieldsValue;
         }
-
         private async Task<WebAppPlanRequestsDTO> FilteredPlanRequestsAsync( bool isMinistry, IQueryable<ServiceRequestDTO> requests, FilterRequestsDTO model)
         {
 
@@ -1096,7 +958,6 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
             return result;
         }
-
         public async Task<IList<FieldTransactionDTO>> GetFieldHistoryAsync(Guid fieldId, Guid requestId, string lang = "ar")
         {
             var user = await srvUser.GetByIDActiveNonDeleted(userInfo.UserId!.Value);
@@ -1192,9 +1053,6 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             }
             return transactions;
         }
-
-
-
         public async Task<Dictionary<Guid, List<ServiceDTO>>> GetServicesByStatusesAsync(List<Guid> statusIds, Guid moduleId, string lang)
         {
             var result = new Dictionary<Guid, List<ServiceDTO>>();
@@ -1265,7 +1123,5 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
             return result;
         }
-
-
     }
 }

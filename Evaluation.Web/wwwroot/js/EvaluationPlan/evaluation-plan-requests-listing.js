@@ -40,14 +40,14 @@
                     return `<strong class="text-truncate-2">${data || ""}</strong>`;
                 }
             },
-            //{
-            //    data: "planName",
-            //    title: uiControlsSetup().GetUiControlText("lblEvaluationPlan"),
-            //    className: "header-left status",
-            //    render: function (data) {
-            //        return `<strong class="text-truncate-2">${data || ""}</strong>`;
-            //    }
-            //},
+            {
+                data: "planName",
+                title: uiControlsSetup().GetUiControlText("lblEvaluationPlan"),
+                className: "header-left status",
+                render: function (data) {
+                    return `<strong class="text-truncate-2">${data || ""}</strong>`;
+                }
+            },
             {
                 data: "status",
                 title: uiControlsSetup().GetUiControlText("lblRequestStatus"),
@@ -63,6 +63,35 @@
                 data: "requestNumber",
                 title: uiControlsSetup().GetUiControlText("lblRequestNo"),
                 className: "td-full"
+            },
+
+            {
+                data: "planDateFrom",
+                title: uiControlsSetup().GetUiControlText("lblPlanDateFrom"),
+                className: "td-left",
+                render: function (data) {
+                    if (!data) return "-";
+
+                    return moment(data).format("DD/MM/YYYY");
+                }
+            },
+            {
+                data: "planDateTo",
+                title: uiControlsSetup().GetUiControlText("lblPlanDateTo"),
+                className: "td-left",
+                render: function (data) {
+                    if (!data) return "-";
+
+                    return moment(data).format("DD/MM/YYYY");
+                }
+            },
+            {
+                data: "schoolsCount",
+                title: uiControlsSetup().GetUiControlText("lblSchoolsCount"),
+                className: "td-center",
+                render: function (data) {
+                    return `<span class="badge bg-primary">${data || 0}</span>`;
+                }
             },
             {
                 data: "createOn",
@@ -145,4 +174,24 @@
     });
     //Evaluation.Loaders.loadServiceStatus('planRequestStatusFilter');
     planRequestsListing.reload();
+
+    async function toggleAddEvaluationPlanRequestButton() {
+
+        $('#btnAddEvaluationPlanRequest').hide();
+
+        const options = {
+            success: function (response) {
+
+                if (response?.canCreate === true) {
+                    $('#btnAddEvaluationPlanRequest').show();
+                }
+                else {
+                    $('#btnAddEvaluationPlanRequest').hide();
+                }
+            }
+        };
+
+        jqClient(options)
+            .Get(`/ServiceRequest/${DepartmentRouting}/CanCreateEvaluationPlanRequest`);
+    }
 });
