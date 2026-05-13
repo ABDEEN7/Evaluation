@@ -139,13 +139,8 @@
                                 <div id="itemSchool" class="accordion-collapse collapse show">
                                     <div class="accordion-body">
                                         <div id="school-details-container">
-                                            @await Component.InvokeAsync("SchoolDetailsModal", new
-                                                {
-                                                    modalId = "SCHOOL",
-                                                    title = "تفاصيل المدرسة",
-                                                    body = "",
-                                                    isModal = false
-                                                })
+                                 
+                                            @await Component.InvokeAsync("SchoolDetailsModal", new { modalId = "schoolDetailsPopupEvaluationRequestDetailsModal", title = "School Details", body = "Hello from modal body!", isModal = false, type = "SCHOOL" })
                                         </div>
                                         <div id="NDAContainerDiv"></div>
                                     </div>
@@ -573,7 +568,6 @@
 </div>
 <partial name="_PartialFileModal" />
 
-@await Component.InvokeAsync("SchoolDetailsModal", new { modalId = "SCHOOL", title = "تفاصيل المدرسة", body = "" })
 
 @section Scripts {
     <!-- Tables -->

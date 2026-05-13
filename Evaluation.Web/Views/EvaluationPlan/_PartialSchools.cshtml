@@ -99,8 +99,8 @@
                         <th class="@ConstantKeys.WebSchools.Name"></th>
                         <th class="@ConstantKeys.WebSchools.Code"></th>
                         <th class="@ConstantKeys.WebSchools.TypeCol"></th>
-               @*          <th class="@ConstantKeys.WebSchools.PhaseCol"></th>
-                        <th class="@ConstantKeys.WebSchools.RegionCol"></th>
+                        <th class="@ConstantKeys.WebSchools.LevelsCol"></th>
+               @*         <th class="@ConstantKeys.WebSchools.RegionCol"></th>
                         <th @ConstantKeys.WebSchools.StatusCol></th> *@
                     </tr>
                 </thead>
@@ -112,6 +112,7 @@
 </div>
 @* @await Component.InvokeAsync("SchoolDetailsModal", new { modalId = "SCHOOL", title = "تفاصيل المدرسة", body = "" }) *@
 
+@await Component.InvokeAsync("SchoolDetailsModal", new { modalId = "schoolDetailsPopup", title = "تفاصيل المدرسة", body = "", isModal = true, type = "SCHOOL" })
 
 
 

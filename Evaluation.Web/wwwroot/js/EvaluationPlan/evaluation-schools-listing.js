@@ -1,7 +1,7 @@
 ﻿$(document).ready(function () {
     function getSchoolFilterInput() {
         return {
-            SchoolName: $('#schoolNameFilter').val(),
+            Name: $('#schoolNameFilter').val(),
             SchoolCode: $('#schoolCodeFilter').val(),
             PhaseId: $('#schoolPhaseFilter').val(),
             TypeId: $('#schoolTypeFilter').val(),
@@ -10,9 +10,8 @@
             //DepartmentRoutingPath: departmentName
         };
     }
-    //let departmentRoutePath = sharedUtility().extractDepartmentName();
 
-    const schoolsListing = evaluationListing.createListing({
+    const schoolsListing = getevaluationListing.createListing({
         tableId: 'schoolTable',
         ajaxUrl: `/School/${departmentRoutePath}/GetSchools`,
         getFilterInput: getSchoolFilterInput,
@@ -33,7 +32,7 @@
                
                 render: function (data, type, row) {
                     const safe = data || "";
-                    return `<a href="javascript:void(0)" data-bs-toggle= 'modal' data-bs-target= '#SCHOOL' class="text-decoration-none text-primary fw-bold school-details-link" data-id="${row.id}">${safe}</a>`;
+                    return `<a href="javascript:void(0)" data-bs-toggle= 'modal' data-bs-target= '#schoolDetailsPopup' class="text-decoration-none text-primary fw-bold school-details-link" data-id="${row.id}">${safe}</a>`;
                 }
             },
             {
@@ -47,10 +46,16 @@
                 className: "td-left type"
             },
             //{
-            //    data: "phaseName",
-            //    title: uiControlsSetup().GetUiControlText("lblSchoolPhase"),
-            //    className: "td-left phase"
+            //    data: "levelName",
+            //    title: uiControlsSetup().GetUiControlText("lblSchoolLevel"),
+            //    className: "td-left level"
             //},
+            {
+                data: null,
+                title: uiControlsSetup().GetUiControlText("lblSchoolLevel"),
+                className: "td-left level",
+                defaultContent: "Primary"
+            }
             //{
             //    data: "region",
             //    title: uiControlsSetup().GetUiControlText("lblRegion"),
