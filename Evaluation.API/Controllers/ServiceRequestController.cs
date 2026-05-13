@@ -126,5 +126,11 @@ namespace Evaluation.API.Controllers
             var result = await _serviceRequestBL.ApproveNda(dto);
             return Ok(result);
         }
-    }
+		[HttpGet]
+		public async Task<IActionResult> CanCreateEvaluationPlanRequest()
+		{
+			var result = await _serviceRequestBL.CanCreateEvaluationPlanRequestAsync();
+			return Ok(new { canCreate = result });
+		}
+	}
 }
