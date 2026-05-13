@@ -92,10 +92,17 @@ function CommonLogicAfterInitial() {
             if (this.checked) {
                 $('label[for=EvalCountOfColumnsValue').show();
                 $("#EvalCountOfColumnsValue").parent().show();
-                $("#IsMultipleEvaluationWrapper").show();
+                // only show wrapper if popup is open and no existing data
+                if (popupname === "FormItemConfig" && tableFormItemConfig) {
+                    const hasData = tableFormItemConfig.getData().length > 0;
+                    if (!hasData) {
+                        $("#IsMultipleEvaluationWrapper").show();
+                    }
+                }
             }
             else {
                 $("#IsMultipleEvaluationWrapper").hide();
+                $("#IsMultipleEvaluation").prop("checked", false);
                 $("label[for='EvalCountOfColumnsValue']").hide();
                 $("#EvalCountOfColumnsValue").parent().hide();
             }
@@ -1460,18 +1467,25 @@ function LoadFormItemConfigData() {
     const options = {
         success: function (data) {
             if (data && data.length > 0) {
-
                 data.forEach(x => {
                     x.formItemConfig_FormItem = Array.isArray(x.formItemConfig_FormItemIds) ? x.formItemConfig_FormItemIds : (x.formItemConfig_FormItemIds ? [x.formItemConfig_FormItemIds] : []);
                     x.formItemConfig_CalcMethod = x.formItemConfig_CalcMethodId || null;
                     x.formItemConfig_PartyType = x.formItemConfig_PartyTypeId || null;
-
                 });
 
                 tableFormItemConfig.setData(data);
 
+                $("#IsMultipleEvaluationWrapper").hide();
+                $("#IsMultipleEvaluation").prop("checked", false);
+
             } else {
                 tableFormItemConfig.setData([]);
+                if ($("#EvalFormHasMuliEvaluation").prop("checked")) {
+                    $("#IsMultipleEvaluationWrapper").show();
+                } else {
+                    $("#IsMultipleEvaluationWrapper").hide();
+                    $("#IsMultipleEvaluation").prop("checked", false);
+                }
             }
         }
     };
