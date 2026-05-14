@@ -613,7 +613,7 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
                 Id = g.First().Id,
 
                 FormItemConfig_EvalFormId = g.Key.EvalFormId,
-                //FormItemConfig_PartyTypeId = g.Key.PartyTypeId,
+                FormItemConfig_PartyTypeId = g.Key.PartyTypeId,
 
                 FormItemConfig_NameAr = g.First().NameAr,
                 FormItemConfig_NameEn = g.First().NameEn,
