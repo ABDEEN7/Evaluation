@@ -381,6 +381,7 @@ public static class ConstantKeys
         public static readonly string AssignmentUserTeam = "AssignmentUserTeam";
         public static readonly string EducationalEntitiesDescription = "EducationalEntitiesDescription";
         public static readonly string FormEducationalEntitiesTitle = "FormEducationalEntitiesTitle";
+        public static readonly string ReassignAssignment = "WebReassignAssignment";
     }
     public static class WebAppRequest
     {
@@ -1052,6 +1053,12 @@ public static class ConstantKeys
         public const string VIEW_WEB_PLAN = "VIEW_WEB_PLAN";
         public const string DELETE_WEB_PLAN = "DELETE_WEB_PLAN";
         #endregion
+        #region Reassign
+        public const string VIEW_WEB_ReassignAssignment = "VIEW_WEB_ReassignAssignment";
+        public const string ADD_WEB_ReassignAssignment = "ADD_WEB_ReassignAssignment";
+        public const string EDIT_WEB_ReassignAssignment = "EDIT_WEB_ReassignAssignment";
+        public const string DELETE_WEB_ReassignAssignment = "DELETE_WEB_ReassignAssignment";
+        #endregion
     }
     public static class WebAppSettings
     {
@@ -1597,5 +1604,9 @@ public static class ConstantKeys
         public static readonly Guid REJECT = Guid.Parse("550e8400-e29b-41d4-a716-446655440003");
         public static readonly Guid UPDATE = Guid.Parse("550e8400-e29b-41d4-a716-446655440004");
         public static readonly Guid REQUESTMISSING = Guid.Parse("550e8400-e29b-41d4-a716-446655440005");
+    }
+    public static class WebReassign
+    {
+        public static readonly Guid 
     }
 }

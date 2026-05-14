@@ -1,17 +1,16 @@
 ﻿using Evaluation.Services.BusinessLayer;
-using Evaluation.Services.BusinessLayer.API.EvaluationForm;
 using Evaluation.Services.BusinessLayer.API.ReassignLayer;
 using Evaluation.SharedHelper.Dtos.TeamMemberDto.ReassignDto;
 using Evaluation.SharedHelper.Models.Admin;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Evaluation.API.Controllers;
-
-public class ReassignController : ControllerBase
+[Route("api/[controller]/{depRouting}/[action]")]
+public class ReassignAssignmentController : ControllerBase
 {
     private readonly MasterBL _masterBl;
 
-    public ReassignController(MasterBL masterBL)
+    public ReassignAssignmentController(MasterBL masterBL)
     {
         _masterBl = masterBL;
     }
@@ -23,8 +22,15 @@ public class ReassignController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetEvalFormItemLists(Guid? userId)
     {
-        var response =await _masterBl.GetApiService<ReassignBL>()
+        var response = await _masterBl.GetApiService<ReassignBL>()
             .GetReAssignedDropList(userId);
+        return Ok(new ResponseEntity(response));
+    }
+    [HttpGet]
+    public async Task<IActionResult> GetUserAssignments(Guid userId)
+    {
+        var response = await _masterBl.GetApiService<ReassignBL>()
+            .GetEvaluationUserAssignments(userId);
         return Ok(new ResponseEntity(response));
     }
     [HttpPost]
@@ -34,5 +40,5 @@ public class ReassignController : ControllerBase
             .UpdateReassignEvaluationRequestUser(request);
         return Ok();
     }
-    
+
 }

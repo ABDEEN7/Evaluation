@@ -1,0 +1,181 @@
+﻿@using Evaluation.SharedHelper.Enums
+@{
+    ViewData["Title"] = "إعادة تعيين طلبات التقييم";
+    Layout = "_Layout";
+}
+
+@section Styles {
+    <style>
+        body {
+            direction: rtl;
+        }
+
+        .table thead {
+            --bs-table-bg: #0d3b6e;
+            color: #fff;
+        }
+    </style>
+}
+
+<!-- ── Page Header ── -->
+<div class="d-flex align-items-center gap-2 mb-4">
+    <i class="fas fa-exchange-alt fs-4 text-primary"></i>
+    <div>
+        <h5 class="mb-0 fw-bold">إعادة تعيين طلبات التقييم</h5>
+        <small class="text-muted">نقل طلبات التقييم من موظف إلى آخر</small>
+    </div>
+</div>
+
+<!-- ── Users Card ── -->
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-white border-bottom fw-semibold text-primary">
+        <i class="fas fa-users me-1"></i> تحديد المستخدمين
+    </div>
+    <div class="card-body">
+        <div class="row g-2 align-items-end">
+
+            <!-- From User — 5 cols -->
+            <div class="col-md-5">
+                <label class="form-label fw-semibold">
+                    المستخدم المصدر <span class="text-danger">*</span>
+                </label>
+                <select id="fromUser" class="form-select" onchange="onFromUserChange()">
+                    <option value="">— اختر المستخدم —</option>
+                </select>
+            </div>
+
+            <!-- Arrow — 1 col, centered -->
+            <div class="col-md-1 text-center">
+                <span class="badge rounded-pill bg-warning text-dark px-3 py-2">
+                    <i class="fas fa-arrow-left"></i>
+                </span>
+            </div>
+
+            <!-- To User — 4 cols -->
+            <div class="col-md-4">
+                <label class="form-label fw-semibold">
+                    المستخدم الهدف <span class="text-danger">*</span>
+                </label>
+                <select id="toUser" class="form-select" onchange="updateLoadBtn()">
+                    <option value="">— اختر المستخدم —</option>
+                </select>
+            </div>
+
+            <!-- Load Button — 2 cols -->
+            <div class="col-md-2 d-flex align-items-end">
+                <button class="btn btn-primary w-100" id="btnLoad"
+                        onclick="loadAssignments()" disabled>
+                    <span id="btnLoadText">
+                        <i class="fas fa-search me-1"></i>عرض
+                    </span>
+                    <span id="loadSpinner" class="spinner-border spinner-border-sm d-none"></span>
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- ── Table Card ── -->
+<div class="card shadow-sm d-none" id="tableCard">
+    <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
+        <span class="fw-semibold text-primary">
+            <i class="fas fa-list-alt me-1"></i> طلبات التقييم المعيّنة
+        </span>
+        <span class="badge bg-primary rounded-pill" id="badgeCount">0</span>
+    </div>
+
+    <div class="card-body pb-2">
+
+        <!-- Selection toolbar -->
+        <div class="d-flex justify-content-between align-items-center mb-3 p-2 rounded bg-light border">
+            <span class="small text-muted">
+                تم تحديد
+                <strong id="selectedCount" class="text-primary">0</strong>
+                من أصل
+                <strong id="totalCount">0</strong>
+            </span>
+            <div class="d-flex gap-2">
+                <button class="btn btn-outline-secondary btn-sm" onclick="selectAll()">
+                    <i class="fas fa-check-double me-1"></i>تحديد الكل
+                </button>
+                <button class="btn btn-outline-secondary btn-sm" onclick="clearAll()">
+                    <i class="fas fa-times me-1"></i>إلغاء الكل
+                </button>
+            </div>
+        </div>
+
+        <!-- Table -->
+        <div class="table-responsive rounded border">
+            <table class="table table-hover table-bordered mb-0">
+                <thead>
+                    <tr>
+                        <th class="text-center" style="width:50px">
+                            <input type="checkbox" id="checkAll" class="form-check-input"
+                                   onchange="toggleAll(this)">
+                        </th>
+                        <th style="width:50px">#</th>
+                        <th>رقم الطلب</th>
+                        <th>اسم الخدمة (عربي)</th>
+                        <th>اسم الخدمة (إنجليزي)</th>
+                    </tr>
+                </thead>
+                <tbody id="assignmentsBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="card-footer bg-white d-flex justify-content-end gap-2">
+        <button class="btn btn-outline-secondary" onclick="clearTable()">
+            <i class="fas fa-undo me-1"></i>إعادة تعيين
+        </button>
+        <button class="btn btn-success" id="btnSave" onclick="saveReassign()" disabled>
+            <span id="btnSaveText">
+                <i class="fas fa-save me-1"></i>حفظ إعادة التعيين
+            </span>
+            <span id="saveSpinner" class="spinner-border spinner-border-sm d-none"></span>
+        </button>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script src="~/plan-assets/vendor/jquery/jquery.min.js"></script>
+    <script src="~/plan-assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
+    <script src="~/plan-assets/vendor/select2/js/select2.min.js"></script>
+
+    <script>
+        $(document).ready(async function () {
+            await webAppConfigsSetup().Init({
+                pageNames: [
+                    '@nameof(ConstantKeys.WebAppCommon)',
+                    '@nameof(ConstantKeys.WebAppPages.ReassignAssignment)'
+                ],
+                pages: [
+                    '@nameof(ConstantKeys.WebAppCommon)',
+                    '@nameof(ConstantKeys.WebAppPages.ReassignAssignment)'
+                ],
+                permissions: [
+                    '@nameof(ConstantKeys.WebPermissions.VIEW_WEB_ReassignAssignment)',
+                    '@nameof(ConstantKeys.WebPermissions.ADD_WEB_ReassignAssignment)',
+                    '@nameof(ConstantKeys.WebPermissions.EDIT_WEB_ReassignAssignment)',
+                    '@nameof(ConstantKeys.WebPermissions.DELETE_WEB_ReassignAssignment)'
+                ],
+            }).then((result) => {
+
+                uiControlItems = result.uiControlItems.filter(x => x.rowOrder > 0 && x.permissionBackendName == '@ConstantKeys.WebPermissions.ADD_WEB_DEPARTMENT_HOLIDAY');
+                textDir = result.currentlanguage === "ar" ? "RTL" : "LTR";
+                permissionsList = result.permissionsList;
+                controlsList = result.controlsList;
+                columnList = uiControlItems.filter(x => x.constraint?.showInGrid === true && x.control)
+                    .map(c => ({
+                        ...c.constraint,
+                        pageName: c.control.pageName
+                    }));
+    </script>
+    <script src="~/js/reassign-assignment/reassign-const.js"></script>
+    <script src="~/js/reassign-assignment/reassign-init.js"></script>
+    <script src="~/js/reassign-assignment/reassign-write.js"></script>
+
+}
