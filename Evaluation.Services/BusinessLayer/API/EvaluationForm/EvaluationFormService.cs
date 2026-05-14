@@ -826,7 +826,7 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
             repo.DeleteRange(toDelete);
 
         if (toInsert.Any())
-            repo.InsertRange(toInsert);
+            await repo.InsertRange(toInsert);
 
         await uow.CommitAsync();
 
