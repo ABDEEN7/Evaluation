@@ -1022,7 +1022,10 @@ public static class ConstantKeys
 
         #endregion
         #region FORMITEMCONFIG
+        public const string VIEW_WEB_FORMITEMCONFIG = "VIEW_WEB_FORMITEMCONFIG";
         public const string ADD_WEB_FORMITEMCONFIG = "ADD_WEB_FORMITEMCONFIG";
+        public const string EDIT_WEB_FORMITEMCONFIG = "EDIT_WEB_FORMITEMCONFIG";
+        public const string DELETE_WEB_FORMITEMCONFIG = "DELETE_WEB_FORMITEMCONFIG";
         #endregion
         #region TEAM
 
