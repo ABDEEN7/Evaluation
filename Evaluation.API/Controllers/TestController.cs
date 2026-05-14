@@ -1,5 +1,7 @@
 ﻿using Evaluation.DAL.DTOs;
 using Evaluation.Services.Integration;
+using Evaluation.Services.Models.SMTP;
+using Evaluation.Services.Special;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Evaluation.API.Controllers
@@ -9,13 +11,16 @@ namespace Evaluation.API.Controllers
     public class TestController :  ControllerBase
     {
         private readonly HRService _hrService;
+		private readonly IEmailServices EmailServices;
 
-        public TestController(HRService hrService)
-        {
-            this._hrService = hrService;
-
-        }
-        [HttpGet]
+		public TestController(
+		   HRService hrService,
+		   IEmailServices EmailServices)
+		{
+			_hrService = hrService;
+			this.EmailServices = EmailServices;
+		}
+		[HttpGet]
         public async Task<List<HREmployeeInfoDto>> GetHREmployeesDetails(int page)
         {
             return await _hrService.GetAllHRUsersAsync(page);
@@ -51,5 +56,12 @@ namespace Evaluation.API.Controllers
         {
             return await _hrService.GetAllHRSchoolsAsync();
         }
-    }
+
+		[HttpGet]
+		public async Task<bool> SendTestEmail(string email)
+		{
+			
+			return await EmailServices.SendTestEmail(email);
+		}
+	}
 }
