@@ -647,14 +647,12 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
             x.FormItemIds != null &&
             x.FormItemIds.Any());
 
-        var hasMultiValue = messages.Any(x => x.EvalFormHasMuliEvaluation);
-
         // =====================================================
         // PATH 1:
         // No FormItemIds + NOT MultiValue
         // =====================================================
 
-        if (!hasFormItems && !hasMultiValue)
+        if (!hasFormItems)
         {
             if (messages.Sum(x => x.Percentage) != 100)
             {
@@ -663,8 +661,6 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
                         .FormItemConfigPercentageMax);
             }
         }
-
-
         var formItemsConfig = new List<FormItemConfig>();
 
 
@@ -686,12 +682,11 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
                     formItemIds.Select(id => new FormItemConfig
                     {
                         EvalFormId = message.EvalFormId,
-                        PartyTypeId = message.PartyTypeId,
                         FormItemId = id,
                         NameAr = message.NameAr,
                         NameEn = message.NameEn,
                         CalcMethodId = message.CalcMethodId,
-                        WeightPercentage = 0
+                        WeightPercentage = message.Percentage
                     }));
 
                 continue;
