@@ -23,7 +23,7 @@ public class EvalFormProfile : Profile
                 .ForMember(dest => dest.EvalFormType, opt => opt.MapFrom<EvalFormTypeResolver, Guid?>(src => src.EvalFormTypeId))
                 .ForMember(dest => dest.FormEvalMatrix, opt => opt.MapFrom<FormEvalMatrixResolver, Guid?>(src => src.FormEvalMatrixId))
                 .ForMember(dest => dest.EvaluationParty, opt => opt.MapFrom<EvaluationPartyResolver, Guid?>(src => src.EvaluationPartyId))
-                 .ForMember(dest => dest.FormStatus, opt => opt.MapFrom<FormStatusResolver, Guid?>(src => src.FormStatusId))
+                
                  .ForMember(dest => dest.CalcMethod, opt => opt.MapFrom(src => src.CalcMethod.BackendName))
                   .ForMember(dest => dest.AllowRename, opt => opt.MapFrom(src => src.AllowRename))
                   .ForMember(dest => dest.HasMuliEvaluation, opt => opt.MapFrom(src => src.HasMuliEvaluation))
@@ -96,25 +96,5 @@ public class EvaluationPartyResolver : IMemberValueResolver<object, object, Guid
     }
 }
 
-public class FormStatusResolver : IMemberValueResolver<object, object, Guid?, string?>
-{
-    private readonly UnitOfWork _uow;
-    private readonly RequestInfo _requestInfo;
 
-    public FormStatusResolver(UnitOfWork uow, RequestInfo requestInfo)
-    {
-        _uow = uow;
-        _requestInfo = requestInfo;
-    }
-
-    public string? Resolve(object source, object destination, Guid? sourceMember, string? destMember, ResolutionContext context)
-    {
-        if (!sourceMember.HasValue) return "";
-        var status = _uow.GetRepository<FormStatus>()
-                         .GetAllNonDeleted()
-                         .FirstOrDefault(x => x.Id == sourceMember);
-
-        return _requestInfo.Lang == "ar" ? status?.NameAr ?? string.Empty : status?.NameEn ?? string.Empty;
-    }
-}
 
