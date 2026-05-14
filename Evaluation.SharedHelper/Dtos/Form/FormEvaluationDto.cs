@@ -4,4 +4,6 @@ public class FormEvaluationDto
 {
     public Guid Id { get; set; }
     public List<FormItemEvaluationDto>? Items { get; set; }
+    public Guid? EvaluationRequestId { get; set; }
+    public Guid? ServiceRequestId { get; set; }
 }

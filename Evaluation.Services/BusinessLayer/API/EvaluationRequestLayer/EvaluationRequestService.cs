@@ -183,7 +183,16 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 			.AsNoTracking()
 			.FirstOrDefaultAsync(x => x.IsActive && !x.IsDeleted);
 	}
-	public  ServiceRequest MapEvaluationToServiceRequest(EvaluationRequest er)
+
+    public async Task<EvaluationRequest> UpdateEvaluationRequest(EvaluationRequest request)
+    {
+        uow.GetRepository<EvaluationRequest>().Update(request);
+        await uow.CommitAsync();
+
+        return request;
+    }
+
+    public  ServiceRequest MapEvaluationToServiceRequest(EvaluationRequest er)
 	{
 		return new ServiceRequest
 		{
