@@ -50,6 +50,8 @@
 
     @await RenderSectionAsync("Styles", required: false)
 
+    <script src='~/assets/js/jquery.min.js'></script>
+
 </head>
 
 <body>
@@ -91,7 +93,6 @@
     <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i class="fa-solid fa-arrow-up"></i></a>
 
     <!-- Core Libraries -->
-    <script src='~/assets/js/jquery.min.js'></script>
     <script src="~/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
     <!-- Date & Time -->
@@ -133,6 +134,7 @@
     <script src="~/lib/tabulator/js/tabulator.js" asp-append-version="true"></script>
     
     @await RenderSectionAsync("Scripts", required: false)
+    <script src="~/js/org/orgdetails.js" asp-append-version="true"></script>
 
 
 </body>

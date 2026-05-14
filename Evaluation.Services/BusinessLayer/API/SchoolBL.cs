@@ -15,6 +15,8 @@ using Evaluation.SharedHelper.Dtos.SchoolDto;
 using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Models;
+using Evaluation.SharedHelper.Models.Api.ServiceRequestEntitiesDTO;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualBasic;
@@ -48,22 +50,15 @@ public class SchoolBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvide
 
         return schoolsResponse;
     }
-	public async Task<List<ResponseSchools>> GetSchools()
-	{
+	
+    [HttpPost]
+    public async Task<PaginatedResult<ResponseSchools>> GetSchools([FromBody]SchoolRequest request)
+    {
+        //TODO: Get Department Id by Department Routing Path
 
-		var result = await schoolRepository.GetSchoolsByDepartmentId(requestInfo.DepId.Value);
-
-		var schoolsResponse = mapper.Map<List<ResponseSchools>>(result);
-
-		return schoolsResponse;
-	}
-    //public async Task<PaginatedResult<ResponseSchools>> GetSchools(SchoolRequest request)
-    //{
-    //    //TODO: Get Department Id by Department Routing Path
-
-    //    var result = await schoolRepository.GetSchoolsAsync(request);
-    //    return mapper.Map<PaginatedResult<ResponseSchools>>(result);
-    //}
+        var result = await schoolRepository.GetSchoolsAsyncOld(request);
+        return mapper.Map<PaginatedResult<ResponseSchools>>(result);
+    }
     public async Task<PaginatedResult<ResponseOrgsPlans>> GetSchoolsPlan(SchoolRequest request)
     {
         var depTargetOrgTrees = await orgService.GetDepTargetOrgTree();

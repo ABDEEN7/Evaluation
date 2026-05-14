@@ -33,6 +33,19 @@ public class SchoolRepository(IServiceScopeFactory serviceScopeFactory,
     ) : ApiBase(serviceScopeFactory, cacheDataProvider, unitOfWork, loggingServices, mapper, userInfo,
         serviceProvider, requestInfo)
 {
+    public async Task<PaginatedResult<School>> GetSchoolsAsyncOld(SchoolRequest request)
+    {
+        var filter = BuildFilterExpressionOld(request);
+
+        var query = serviceScopeFactory
+             .CreateScopedUow()
+             .GetRepository<School>()
+             .GetAllNonDeleted(filter)
+             .Include(x => x.SchoolType)
+             .Include(x => x.SchoolLevel)
+             .ThenInclude(x => x.EducationLevel);
+        return await query.GetPaginatedResult(request.PageNumber, request.PageSize = 10);
+    }
     public async Task<PaginatedResult<ResponseOrgsPlans>> GetSchoolsAsync(
     SchoolRequest request,
     List<Guid?> targetOrgTreeIds,
@@ -131,6 +144,23 @@ public class SchoolRepository(IServiceScopeFactory serviceScopeFactory,
         {
             filter = filter.And(s => s.EvaluationRequests != null &&
                                      s.EvaluationRequests.Any(er => er.FormEvalMatrixValueId == request.FomrEvalMatrixValueId));
+        }
+        //if(request.VisitType != null)
+        //    filter = filter.And(x=>x.)
+        return filter;
+
+    }
+
+
+    private Expression<Func<School, bool>> BuildFilterExpressionOld(SchoolRequest request)
+    {
+        Expression<Func<School, bool>> filter = s => true;
+        if (!string.IsNullOrWhiteSpace(request.Name))
+            filter = filter.And(s => s.NameEn.Contains(request.Name) || s.NameAr.Contains(request.Name));
+        if (request.EstablishmentDate != null)
+        {
+            int year = request.EstablishmentDate.Value.Year;
+            filter = filter.And(s => s.EstablishmentDate.Year == year);
         }
         //if(request.VisitType != null)
         //    filter = filter.And(x=>x.)

@@ -1578,7 +1578,7 @@ public static class ConstantKeys
         public const string Name = Prefix + "Name";
         public const string Code = Prefix + "Code";
         public const string TypeCol = Prefix + "TypeCol";
-        public const string PhaseCol = Prefix + "PhaseCol";
+        public const string LevelsCol = Prefix + "LevelsCol";
         public const string RegionCol = Prefix + "RegionCol";
         public const string StatusCol = Prefix + "StatusCol";
 

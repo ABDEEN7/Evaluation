@@ -3,6 +3,7 @@ using Evaluation.Services.BusinessLayer;
 using Evaluation.Services.BusinessLayer.API;
 using Evaluation.Services.Integration;
 using Evaluation.SharedHelper.Dtos.SchoolDto;
+using Evaluation.SharedHelper.Models.Api.ServiceRequestEntitiesDTO;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Evaluation.API.Controllers;
@@ -29,12 +30,12 @@ public class SchoolController : ControllerBase
     public async Task<IActionResult> GetVisits()
         => Ok(new { result = await _masterBl.GetApiService<SchoolBL>().GetVisitsAsync() });
 
-    //[HttpPost]
-    //public async Task<IActionResult> GetSchools([FromQuery] SchoolRequest request)
-    //{
-    //    var result = await _masterBl.GetApiService<SchoolBL>().GetSchools(request);
-    //    return Ok(result);
-    //}
+   [HttpGet]
+    public async Task<IActionResult> GetSchools([FromQuery] SchoolRequest request)
+    {
+        var result = await _masterBl.GetApiService<SchoolBL>().GetSchools(request);
+        return Ok(result);
+    }
 
     [HttpGet]
     public async Task<IActionResult> GetSchoolsByDepartment([FromQuery] Guid depId)
@@ -42,12 +43,7 @@ public class SchoolController : ControllerBase
         var result = await _masterBl.GetApiService<SchoolBL>().GetSchoolsByDepartmentId(depId);
         return Ok(result);
     }
-	[HttpPost]
-	public async Task<IActionResult> GetSchools()
-	{
-		var result = await _masterBl.GetApiService<SchoolBL>().GetSchools();
-		return Ok(result);
-	}
+
 	[HttpGet]
     public async Task<IActionResult> GetSchoolsPlan([FromQuery] SchoolRequest request)
     {
