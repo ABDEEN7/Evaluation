@@ -1220,6 +1220,7 @@ public static class ConstantKeys
         public const string RequestDetails = Prefix + nameof(RequestDetails);
 
         // Filters
+        public const string AdvancedSearch = Prefix + nameof(AdvancedSearch);
         public const string Filter = Prefix + nameof(Filter);
         public const string Clear = Prefix + nameof(Clear);
 
