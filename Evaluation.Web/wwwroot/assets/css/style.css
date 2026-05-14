@@ -1681,6 +1681,19 @@ input.auto-fill {
     }
 
 
+.btn-icon-no-text i {
+    font-size: 16px;
+    font-family: var(--font-primary) !important;
+    font-weight: 500 !important;
+}
+
+.btn-icon-no-text i::before {
+    font-family: "Line Awesome Free";
+    font-weight: 900;
+    font-size: 16px;
+}
+
+
 .filter-section .form-label {
     margin-bottom: 6px;
     white-space: nowrap;
@@ -1745,14 +1758,14 @@ input.auto-fill {
 }
 
 .title-label {
-    font-size: 20px !important;
+    font-size: 18px !important;
     font-weight: 600;
     color: #666;
 }
 
 .plan-title-text {
-    font-size: 20px;
-    font-weight: 600;
+    font-size: 18px;
+    font-weight: 700;
     color: #222;
 }
 
@@ -2545,4 +2558,8 @@ input.auto-fill {
             color: #fff !important;
         }
 
+
+.table-responsive {
+    margin: 0rem 1.4rem !important;
+}
 
