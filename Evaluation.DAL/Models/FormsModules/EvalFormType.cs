@@ -11,7 +11,7 @@ namespace Evaluation.DAL.Models.FormsModules
 {
     public class EvalFormType : EntityBase, IAuditLogEntity
     {
-        public Guid? DepartmentId { get; set; }
+        public Guid DepartmentId { get; set; }
         public Department? Department { get; set; }
         public string NameAr { get; set; } = null!;
         public string NameEn { get; set; } = null!;
