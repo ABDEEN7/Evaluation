@@ -5,6 +5,7 @@ using Evaluation.DAL.Models.Planing;
 using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
 using Evaluation.DAL.Repositories;
 using Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices;
+using Evaluation.Services.Shared;
 using Evaluation.SharedHelper;
 using Evaluation.SharedHelper.Consts;
 using Evaluation.SharedHelper.Dtos.Form;
@@ -22,7 +23,8 @@ namespace Evaluation.Services.BusinessLayer.API.PlanLayer;
 
 public class PlanRequestRepository(IServiceScopeFactory serviceScopeFactory, SrvServiceRequest _srvServiceRequest,
     UnitOfWork unitOfWork,
-    RequestInfo requestInfo
+    RequestInfo requestInfo,
+    RequestAccessService requestAccessService
     ) : ApiServiceBase
 {
     public async Task<Plan?> GetPlanAsync(Guid id)
@@ -221,7 +223,7 @@ public class PlanRequestRepository(IServiceScopeFactory serviceScopeFactory, Srv
         IQueryable<Plan> plans = unitOfWork.GetRepository<Plan>()
             .GetAllQueryFiltered(x => x.PlanStatus.BackendName == StatusBackEnds.ApprovedPlans && x.PlanTypeDep.DepartmentId == requestInfo.DepId)
             .Include(x => x.EvaluationRequests);
-
+        plans = await requestAccessService.ApplyPlanAccess(plans);
         if (request.YearId != null)
             plans = plans.Where(x => x.AcademicYearId == request.YearId);
 

@@ -1,35 +1,7 @@
 ﻿@using Evaluation.SharedHelper.Enums
 
-<div class="card m-4">
-    <div class="card-header d-flex justify-content-between align-items-center">
-        <div class="btn-group" role="group" aria-label="View mode">
-            <button id="cardViewEvaluationRequest"
-                    type="button"
-                    class="btn btn-outline-primary active btn-with-text-icon">
-                <i class="la la-th-large @ConstantKeys.WebAppCommon.lblDisplayAsCards"></i>
-            </button>
+<div class="m-4">
 
-            <button id="tblViewEvaluationRequest"
-                    type="button"
-                    class="btn btn-outline-secondary btn-with-text-icon">
-                <i class="la la-list @ConstantKeys.WebAppCommon.lblDisplayAsTable"></i>
-            </button>
-        </div>
-
-        <div class="d-flex gap-2">
-            <button id="filterEvaluationRequestBtnId"
-                    class="btn btn-primary @ConstantKeys.EvaluationPlanRequests.lblApplyFilter">
-            </button>
-
-            <button id="clearFilterEvaluationRequestBtnId"
-                    class="btn btn-outline-secondary @ConstantKeys.EvaluationPlanRequests.lblClear">
-                
-            </button>
-        </div>
-
-    </div>
-
-    <div class="card-body">
         <form id="evaluation-request-filter-form-id">
             <div class="row g-3">
 
@@ -80,7 +52,46 @@
 
             </div>
         </form>
+
+
+
+
+
+
+
+
+    <div class="p-0 mb-3">
+        <div class="row">
+            <div class="col-lg-4 col-sm-12 text-align-end">
+                <div class=" d-flex justify-content-start align-items-center">
+                    <div class="btn-group" role="group" aria-label="View mode">
+                        <button id="cardViewEvaluationRequest" type="button" class="btn btn-outline-primary active btn-icon-no-textn">
+                            <i class="la la-th-large"></i>
+                        </button>
+                        <button id="tblViewEvaluationRequest" type="button" class="btn btn-outline-secondary btn-icon-no-text">
+                            <i class="la la-list"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-sm-12"></div>
+            <div class="col-lg-4 col-sm-12 justify-content-end align-items-center">
+                <div class="d-flex gap-2 justify-content-end">
+                    <button id="filterEvaluationRequestBtnId"
+                            class="btn btn-primary @ConstantKeys.EvaluationPlanRequests.lblApplyFilter">
+                    </button>
+
+                    <button id="clearFilterEvaluationRequestBtnId"
+                            class="btn btn-outline-secondary @ConstantKeys.EvaluationPlanRequests.lblClear">
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
+
+
+
+
 </div>
 
 <div class="table-responsive">
