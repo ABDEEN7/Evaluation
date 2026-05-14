@@ -5,8 +5,7 @@ const gridContainerId = "view-container",
     $formContent = $('#formcontent'),
     $btnAddbutton = $('#btnaddHoliday'),
     btnSubmitId = "btn-submit";
-let lang = sharedUtility().GetCookie('lang');
-let txtDir = lang === "ar" ? "RTL" : "LTR";
+let txtDir = window.currentLang === "ar" ? "RTL" : "LTR";
 
 const loadData = () => {
     isLoading = true;

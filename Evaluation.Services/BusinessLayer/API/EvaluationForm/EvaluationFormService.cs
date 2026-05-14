@@ -161,13 +161,12 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
         obj.HasOneValue = message.HasOneValue;
         obj.EvaluationPartyId = message.EvaluationPartyId;
         obj.CalcMethodId = message.CalcMethodId;
-        obj.FormStatusId = message.FormStatusId;
         obj.IsActive = message.IsActive;
         obj.AllowRename = message.AllowRename;
         obj.HasMuliEvaluation = message.HasMuliEvaluation;
         if (message.HasMuliEvaluation)
-        { 
-            obj.CountOfColumnsValue = message.EvalCountOfColumnsValue;
+        {
+            obj.CountOfColumnsValue = message.EvalCountOfColumnsValue.Value;
         }
         if (message.IsFinalEval)
         {
@@ -215,13 +214,12 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
             obj.NameEn = message.NameEn;
             obj.EvaluationPartyId = message.EvaluationPartyId;
             obj.CalcMethodId = message.CalcMethodId;
-            obj.FormStatusId = message.FormStatusId;
             obj.IsActive = message.IsActive;
             obj.AllowRename = message.AllowRename;
             obj.HasMuliEvaluation = message.HasMuliEvaluation;
             if (message.HasMuliEvaluation)
             {
-                obj.CountOfColumnsValue = message.EvalCountOfColumnsValue;
+                obj.CountOfColumnsValue = message.EvalCountOfColumnsValue.Value;
             }
             if (!await CheckEvaluationForm(message.Id))
             {
@@ -632,90 +630,178 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
 
         return result;
     }
-    public async Task<CreateFormItemConfigDto> SaveFormItemConfig(List<CreateFormItemConfigDto> messages)
+    public async Task<CreateFormItemConfigDto> SaveFormItemConfig(
+     List<CreateFormItemConfigDto> messages)
     {
         if (messages == null || !messages.Any())
-            throw new ArgumentException(ConstantKeys.ExceptionMessage.Exception_No_Data_Provided);
+            throw new ArgumentException(
+                ConstantKeys.ExceptionMessage.Exception_No_Data_Provided);
 
-        var hasFormItems = messages.Any(x => x.FormItemIds != null && x.FormItemIds.Any());
+        var repo = uow.GetRepository<FormItemConfig>();
+        var formItemRepo = uow.GetRepository<FormItem>();
+
+
+        var hasFormItems = messages.Any(x =>
+            x.FormItemIds != null &&
+            x.FormItemIds.Any());
+
+        // =====================================================
+        // PATH 1:
+        // No FormItemIds + NOT MultiValue
+        // =====================================================
 
         if (!hasFormItems)
         {
             if (messages.Sum(x => x.Percentage) != 100)
-                throw new BusinessException(ConstantKeys.ExceptionMessage.FormItemConfigPercentageMax);
-        }
-
-   
-        var formItemsConfig = messages
-            .SelectMany(m =>
             {
-                var ids = (m.FormItemIds == null || !m.FormItemIds.Any())
+                throw new BusinessException(
+                    ConstantKeys.ExceptionMessage
+                        .FormItemConfigPercentageMax);
+            }
+        }
+        var formItemsConfig = new List<FormItemConfig>();
+
+
+        foreach (var message in messages)
+        {
+            // =====================================================
+            // MultiValue Path
+            // =====================================================
+
+            if (message.EvalFormHasMuliEvaluation)
+            {
+                var formItemIds = await formItemRepo
+                    .GetAllActiveNonDeleted()
+                    .Where(x => x.EvalFormId == message.EvalFormId)
+                    .Select(x => x.Id)
+                    .ToListAsync();
+
+                formItemsConfig.AddRange(
+                    formItemIds.Select(id => new FormItemConfig
+                    {
+                        EvalFormId = message.EvalFormId,
+                        FormItemId = id,
+                        NameAr = message.NameAr,
+                        NameEn = message.NameEn,
+                        CalcMethodId = message.CalcMethodId,
+                        WeightPercentage = message.Percentage
+                    }));
+
+                continue;
+            }
+            // =====================================================
+            // Normal Path
+            // =====================================================
+            var ids =
+                message.FormItemIds == null ||
+                !message.FormItemIds.Any()
                     ? new Guid?[] { null }
-                    : m.FormItemIds.Select(id => (Guid?)id);
+                    : message.FormItemIds.Select(x => (Guid?)x);
 
-                return ids.Select(id => new FormItemConfig
+            formItemsConfig.AddRange(
+                ids.Select(id => new FormItemConfig
                 {
-                    EvalFormId = m.EvalFormId,
-                    PartyTypeId = m.PartyTypeId,
+                    EvalFormId = message.EvalFormId,
+                    PartyTypeId = message.PartyTypeId,
                     FormItemId = id,
-                    NameAr = m.NameAr,
-                    NameEn = m.NameEn,
-                    CalcMethodId = m.CalcMethodId,
-                    WeightPercentage = m.Percentage
-                });
-            })
-            .ToList();
+                    NameAr = message.NameAr,
+                    NameEn = message.NameEn,
+                    CalcMethodId = message.CalcMethodId,
+                    WeightPercentage = message.Percentage
+                }));
+        }
+        // =====================================================
+        // PATH 2:
+        // Has FormItemIds
+        // =====================================================
+        if (hasFormItems)
+        {
+            var invalid = formItemsConfig
+                .Where(x => x.FormItemId != null)
+                .GroupBy(x => x.FormItemId)
+                .Where(g => g.Sum(x => x.WeightPercentage) != 100)
+                .Any();
 
-       
-        var invalid = formItemsConfig
-            .Where(x => x.FormItemId != null)
-            .GroupBy(x => x.FormItemId)
-            .Where(g => g.Sum(x => x.WeightPercentage) != 100)
-            .Select(g => g.Key);
+            if (invalid)
+            {
+                throw new BusinessException(
+                    ConstantKeys.ExceptionMessage
+                        .FormItemConfigPercentageMax);
+            }
 
-        if (invalid.Any())
-            throw new BusinessException(ConstantKeys.ExceptionMessage.FormItemConfigPercentageMax);
 
-        var hasDuplicates = formItemsConfig
-            .GroupBy(x => new { x.FormItemId, x.PartyTypeId, x.EvalFormId })
-            .Any(g => g.Count() > 1);
+            var hasDuplicates = formItemsConfig
+                .GroupBy(x => new
+                {
+                    x.FormItemId,
+                    x.PartyTypeId,
+                    x.EvalFormId
+                })
+                .Any(g => g.Count() > 1);
 
-        if (hasDuplicates)
-            throw new InvalidOperationException(ConstantKeys.ExceptionMessage.DuplicateRecordsinRequest);
+            if (hasDuplicates)
+            {
+                throw new InvalidOperationException(
+                    ConstantKeys.ExceptionMessage
+                        .DuplicateRecordsinRequest);
+            }
+        }
 
 
         var evalFormId = formItemsConfig.First().EvalFormId;
         var partyTypeId = formItemsConfig.First().PartyTypeId;
 
-        var repo = uow.GetRepository<FormItemConfig>();
-
 
         var existing = await repo.GetAllActiveNonDeleted()
-            .Where(x => x.EvalFormId == evalFormId && x.PartyTypeId == partyTypeId)
+            .Where(x =>
+                x.EvalFormId == evalFormId &&
+                x.PartyTypeId == partyTypeId)
             .ToListAsync();
 
 
-        var existingMap = existing.ToDictionary(
-            x => (x.FormItemId, x.PartyTypeId, x.EvalFormId)
-        );
+        HashSet<string> newKeys;
 
-        var newKeys = formItemsConfig
-            .Select(x => (x.FormItemId, x.PartyTypeId, x.EvalFormId))
-            .ToHashSet();
+        Dictionary<string, FormItemConfig> existingMap;
+
+
+        if (hasFormItems)
+        {
+            existingMap = existing.ToDictionary(
+                x => $"{x.FormItemId}_{x.PartyTypeId}_{x.EvalFormId}");
+
+            newKeys = formItemsConfig
+                .Select(x =>
+                    $"{x.PartyTypeId}_{x.EvalFormId}_{x.NameEn}_{x.NameAr}")
+                .ToHashSet();
+        }
+        else
+        {
+            existingMap = existing.ToDictionary(
+            x => $"{x.PartyTypeId}_{x.EvalFormId}_{x.NameEn}_{x.NameAr}");
+
+            newKeys = formItemsConfig
+    .Select(x =>
+        $"{x.PartyTypeId}_{x.EvalFormId}_{x.NameEn}_{x.NameAr}")
+    .ToHashSet();
+        }
+
 
         var toInsert = new List<FormItemConfig>();
 
 
         foreach (var item in formItemsConfig)
         {
-            var key = (item.FormItemId, item.PartyTypeId, item.EvalFormId);
+            var key = hasFormItems
+                ? $"{item.FormItemId}_{item.PartyTypeId}_{item.EvalFormId}"
+                : $"{item.PartyTypeId}_{item.EvalFormId}_{item.NameEn}_{item.NameAr}";
 
             if (existingMap.TryGetValue(key, out var existingItem))
             {
                 existingItem.NameAr = item.NameAr;
                 existingItem.NameEn = item.NameEn;
                 existingItem.CalcMethodId = item.CalcMethodId;
-                existingItem.WeightPercentage = item.WeightPercentage;
+                existingItem.WeightPercentage =
+                    item.WeightPercentage;
             }
             else
             {
@@ -723,25 +809,32 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
             }
         }
 
-       
+
         var toDelete = existing
-            .Where(x => !newKeys.Contains((x.FormItemId, x.PartyTypeId, x.EvalFormId)))
+            .Where(x =>
+            {
+                var key = hasFormItems
+                    ? $"{x.FormItemId}_{x.PartyTypeId}_{x.EvalFormId}"
+                    : $"{x.PartyTypeId}_{x.EvalFormId}_{x.NameEn}_{x.NameAr}";
+
+                return !newKeys.Contains(key);
+            })
             .ToList();
+
 
         if (toDelete.Any())
             repo.DeleteRange(toDelete);
 
         if (toInsert.Any())
-            repo.InsertRange(toInsert);
+            await repo.InsertRange(toInsert);
 
         await uow.CommitAsync();
 
 
-        var result = new CreateFormItemConfigDto();
-
-       
-        result.ResponseStatus = DBResult.Inserted;
-        return result;
+        return new CreateFormItemConfigDto
+        {
+            ResponseStatus = DBResult.Inserted
+        };
     }
     public async Task<CreateFormItemConfigDto> UpdateFormItemConfig(CreateFormItemConfigDto dto)
     {
@@ -785,35 +878,25 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
         repo.Update(existingRecord);
 
         await uow.CommitAsync();
-        var result = mapper.Map<TemplateFormDto>(existingRecord);
+        var result = mapper.Map<CreateFormItemConfigDto>(existingRecord);
         result.ResponseStatus = DBResult.Updated;
-        return dto;
+        return result;
     }
-    public async Task DeleteFormItemConfig(Guid id)
+    public async Task<ResponseDto> DeleteFormItemConfig(Guid id)
     {
         var repo = uow.GetRepository<FormItemConfig>();
-        var record = await repo.GetAllActiveNonDeleted()
-            .FirstOrDefaultAsync(x => x.Id == id);
+        var records = await repo.GetAllActiveNonDeleted(x => x.EvalFormId == id)
+            .ToListAsync();
 
-        if (record == null)
+        if (records == null)
             throw new InvalidOperationException(ConstantKeys.ExceptionMessage.RECORD_NOT_FOUND);
-
-        var remainingTotal = await repo.GetAll()
-            .Where(x =>
-                x.EvalFormId == record.EvalFormId &&
-                x.PartyTypeId == record.PartyTypeId &&
-                x.Id != record.Id)
-            .SumAsync(x => (decimal?)x.WeightPercentage) ?? 0;
-
-
-        if (remainingTotal != 100)
-            throw new InvalidOperationException(
-               string.Format(ConstantKeys.ExceptionMessage.Exception_Invalid_Total_Percentage_After_Delete, remainingTotal)
-            );
-
-
-        repo.Delete(record);
-
+        repo.DeleteRange(records);
         await uow.CommitAsync();
+
+        return new ResponseDto
+        {
+            ResponseStatus = DBResult.Deleted,
+            ResponseState = true
+        };
     }
 }

@@ -406,7 +406,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
         }
 
 
-        public async Task<DropDownValueDTO?> GetDropDownValue(string lang, Guid? fieldValueId, Guid? dropDownTypeId, Guid? StudentId, Guid? SchId)
+        public async Task<DropDownValueDTO?> GetDropDownValue(string lang, Guid? fieldValueId, Guid? dropDownTypeId, Guid? EvalId, Guid? SchId)
         {
             using var scopedUow = serviceScopeFactory.CreateScopedUow();
             var fieldDropdownRepo = cacheDataProvider.GetFromCache<List<FieldDropDownValue>>(ConstantKeys.WebAppCacheTableName.CACHE_DROPDOWNVALUE);
@@ -441,7 +441,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             if (!string.IsNullOrEmpty(dropdownType.DataSourceTable))
             {
                 var tableName = dropdownType.DataSourceTable;
-                var rawData = await GetDataFromTable(tableName, StudentId,SchId, lang, fieldValueId);
+                var rawData = await GetDataFromTable(tableName, EvalId,SchId, lang, fieldValueId);
 
                 if (rawData != null && rawData.Any())
                 {
@@ -560,7 +560,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 					}
 				case "teamMember":
 					{
-						result = await GetTeamMembersData(requestInfo.DepId!.Value, fieldValueId);
+						result = await GetTeamMembersData(EvalId.Value, fieldValueId);
 						break;
 					}
 				default:
@@ -805,7 +805,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 				})
 				.ToList();
 		}
-		private async Task<List<Dictionary<string, object>>> GetTeamMembersData(Guid evaluationRequestId,Guid? fieldValueId = null)
+		private async Task<List<Dictionary<string, object>>> GetTeamMembersData(Guid? evaluationRequestId,Guid? fieldValueId = null)
 		{
 			if (evaluationRequestId == Guid.Empty)
 				return new List<Dictionary<string, object>>();
@@ -817,7 +817,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 			IQueryable<EvaluationRequestAssignment> query = repository
 				.GetAllQueryFiltered()
 				.Include(x => x.MinistryUser)
-				.Where(x => x.EvaluationRequestId == evaluationRequestId && x.MinistryUser != null);
+				.Where(x => x.EvaluationRequestId == evaluationRequestId );
 
 			if (fieldValueId.HasValue && fieldValueId != Guid.Empty)
 			{

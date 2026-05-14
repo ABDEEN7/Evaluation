@@ -206,6 +206,15 @@
                 $('#breadcrumbSchoolName').text((window.currentLang === "ar" ? response.school.nameAr : response.school.nameEn) || '');
                 $('#evaluationRequestDetailsModal').modal('show');
 
+
+                const formAccordionItem = document.getElementById("formAccordionItem");
+
+                if (!response.formGroups || response.formGroups.length === 0) {
+                    if (formAccordionItem) formAccordionItem.style.display = "none";
+                } else {
+                    if (formAccordionItem) formAccordionItem.style.display = "block";
+                }
+
                 formUtility.renderPreviewView(
                     'formGroupsAccordion',
                     response.formGroups,

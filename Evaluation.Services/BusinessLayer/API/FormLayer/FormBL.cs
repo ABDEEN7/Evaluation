@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
+using Azure.Core;
 using Evaluation.DAL.Dtos.Form;
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.FormsModules;
+using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
 using Evaluation.DAL.Repositories;
 using Evaluation.Services.Enums;
 using Evaluation.Services.Special;
@@ -21,7 +23,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormLayer;
 
 public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider,
         UnitOfWork uow, LoggingServices loggingServices, IMapper mapper, UserInfo userInfo,
-        IServiceProvider serviceProvider, RequestInfo requestInfo, FormService formService)
+        IServiceProvider serviceProvider, RequestInfo requestInfo, FormService formService, EvaluationRequestService _evaluationRequestService)
         : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, requestInfo)
 {
     public async Task<Result<FormDto>> GetFormItems(Guid FormId)
@@ -148,6 +150,11 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
 
         var evalForm = await formService.GetEvalForm(formEvaluationDto.Id);
 
+        if (evalForm.IsFinalEval)
+            if(formEvaluationDto.EvaluationRequestId == null || formEvaluationDto.EvaluationRequestId == Guid.Empty)
+                throw new BusinessException(ConstantKeys.ExceptionMessage.InvalidJson);
+
+
         if (evalForm != null)
         {
             if (evalForm.HasOneValue)
@@ -189,6 +196,21 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
             }
 
             await formService.SaveFormItemsAndSubs(form);
+
+            if (evalForm.IsFinalEval)
+            {
+                var calculationResult = await CalculateFormResult(formEvaluationDto);
+
+                var evaluationRequest = await _evaluationRequestService.GetEvaluationRequestByIdAsync((Guid)formEvaluationDto.EvaluationRequestId);
+
+                evaluationRequest.FormEvalMatrixValueId = calculationResult.Value.Id;
+                evaluationRequest.EvalDays = calculationResult.Value.NextEvalDays;
+                evaluationRequest.EvaluationDate = DateOnly.Parse(DateTime.Now.ToString());
+                evaluationRequest.NextEvaluationDate = DateOnly.Parse(DateTime.Now.AddDays(calculationResult.Value.NextEvalDays).ToString());
+
+                await _evaluationRequestService.UpdateEvaluationRequest(evaluationRequest);
+
+            }
         }
 
         return Result.Ok(formEvaluationDto);
@@ -319,6 +341,8 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
                     .FirstOrDefault();
 
                 result.Id = evalMatrixValue.Select(v => v.Id).FirstOrDefault();
+
+                result.NextEvalDays = evalMatrixValue.Select(v => v.NextEvalDays).FirstOrDefault();
 
                 break;
             case CalcMethodsEnum.SUM:
