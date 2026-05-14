@@ -147,32 +147,47 @@
 
     <script>
         $(document).ready(async function () {
-            await webAppConfigsSetup().Init({
-                pageNames: [
-                    '@nameof(ConstantKeys.WebAppCommon)',
-                    '@nameof(ConstantKeys.WebAppPages.ReassignAssignment)'
-                ],
-                pages: [
-                    '@nameof(ConstantKeys.WebAppCommon)',
-                    '@nameof(ConstantKeys.WebAppPages.ReassignAssignment)'
-                ],
-                permissions: [
-                    '@nameof(ConstantKeys.WebPermissions.VIEW_WEB_ReassignAssignment)',
-                    '@nameof(ConstantKeys.WebPermissions.ADD_WEB_ReassignAssignment)',
-                    '@nameof(ConstantKeys.WebPermissions.EDIT_WEB_ReassignAssignment)',
-                    '@nameof(ConstantKeys.WebPermissions.DELETE_WEB_ReassignAssignment)'
-                ],
-            }).then((result) => {
 
-                uiControlItems = result.uiControlItems.filter(x => x.rowOrder > 0 && x.permissionBackendName == '@ConstantKeys.WebPermissions.ADD_WEB_DEPARTMENT_HOLIDAY');
+            try {
+                const result = await webAppConfigsSetup().Init({
+                    pageNames: [
+                        '@nameof(ConstantKeys.WebAppCommon)',
+                        '@nameof(ConstantKeys.WebAppPages.ReassignAssignment)'
+                    ],
+                    pages: [
+                        '@nameof(ConstantKeys.WebAppCommon)',
+                        '@nameof(ConstantKeys.WebAppPages.ReassignAssignment)'
+                    ],
+                    permissions: [
+                        '@nameof(ConstantKeys.WebPermissions.VIEW_WEB_ReassignAssignment)',
+                        '@nameof(ConstantKeys.WebPermissions.ADD_WEB_ReassignAssignment)',
+                        '@nameof(ConstantKeys.WebPermissions.EDIT_WEB_ReassignAssignment)',
+                        '@nameof(ConstantKeys.WebPermissions.DELETE_WEB_ReassignAssignment)'
+                    ]
+                });
+
+                uiControlItems = result.uiControlItems.filter(x =>
+                    x.rowOrder > 0 &&
+                    x.permissionBackendName === '@nameof(ConstantKeys.WebPermissions.ADD_WEB_ReassignAssignment)'
+                );
+
                 textDir = result.currentlanguage === "ar" ? "RTL" : "LTR";
+
                 permissionsList = result.permissionsList;
                 controlsList = result.controlsList;
-                columnList = uiControlItems.filter(x => x.constraint?.showInGrid === true && x.control)
+
+                columnList = uiControlItems
+                    .filter(x => x.constraint?.showInGrid === true && x.control)
                     .map(c => ({
                         ...c.constraint,
                         pageName: c.control.pageName
                     }));
+
+            } catch (error) {
+                console.error("Initialization failed:", error);
+            }
+
+        });
     </script>
     <script src="~/js/reassign-assignment/reassign-const.js"></script>
     <script src="~/js/reassign-assignment/reassign-init.js"></script>

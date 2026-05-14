@@ -2,7 +2,7 @@
 
 namespace Evaluation.Web.Controllers;
 
-public class ReassignController : Controller
+public class ReassignAssignmentController : Controller
 {
     public IActionResult ReassignPage()
     {
