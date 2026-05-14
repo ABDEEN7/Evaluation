@@ -167,7 +167,7 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
         obj.HasMuliEvaluation = message.HasMuliEvaluation;
         if (message.HasMuliEvaluation)
         {
-            obj.CountOfColumnsValue = message.EvalCountOfColumnsValue;
+            obj.CountOfColumnsValue = message.EvalCountOfColumnsValue.Value;
         }
         if (message.IsFinalEval)
         {
@@ -221,7 +221,7 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
             obj.HasMuliEvaluation = message.HasMuliEvaluation;
             if (message.HasMuliEvaluation)
             {
-                obj.CountOfColumnsValue = message.EvalCountOfColumnsValue;
+                obj.CountOfColumnsValue = message.EvalCountOfColumnsValue.Value;
             }
             if (!await CheckEvaluationForm(message.Id))
             {
