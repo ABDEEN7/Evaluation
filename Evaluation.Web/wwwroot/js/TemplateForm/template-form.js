@@ -68,14 +68,6 @@ $btnAddbutton.click(function () {
 function CreateEditForFormGroup(pkId) {
     CommonLogicAfterInitial();
 }
-function toggleFormItemColumn(disabled) {
-    if (!tableFormItemConfig) return;
-    if (disabled) {
-        setTimeout(() => tableFormItemConfig.hideColumn("formItemConfig_Percentage"), 100);
-    } else {
-        setTimeout(() => tableFormItemConfig.showColumn("formItemConfig_Percentage"), 100);
-    }
-}
 function CommonLogicAfterInitial() {
     $(document).off("change", "#EvalFormsIsFinalEval")
         .on("change", "#EvalFormsIsFinalEval", function () {
@@ -647,7 +639,6 @@ function BuildFormItemConfigTable(formItemId, formItemCalcMethodId) {
         success: function (data) {
             if (data && data.length > 0) {
 
-                // ✅ فلتر بـ prefix الصحيح + formItemId
                 var filtered = data.filter(x =>
                     x.formItemConfig_FormItemIds &&
                     x.formItemConfig_FormItemIds.includes(formItemId)
@@ -744,7 +735,6 @@ $(document).on("click", "#formItemConfig", async function () {
         settingList
     );
 
-    // show/hide IsMultipleEvaluationWrapper based on EvalFormHasMuliEvaluation
     if ($("#EvalFormHasMuliEvaluation").prop("checked")) {
         $("#IsMultipleEvaluationWrapper").show();
     } else {
@@ -1261,16 +1251,20 @@ function OpenFormItemConfigPopup(
     );
     $("#IsMultipleEvaluation").off("change").on("change", function () {
         if (this.checked) {
-            setTimeout(() => tableFormItemConfig.hideColumn("formItemConfig_Percentage"), 100);
             setTimeout(() => {
                 $("#FormItemConfigRelationtabulator .tabulator-cell[tabulator-field='formItemConfig_FormItem']")
                     .css("pointer-events", "none")
                     .css("opacity", "0.5");
+                $("#FormItemConfigRelationtabulator .tabulator-cell[tabulator-field='formItemConfig_PartyType']")
+                    .css("pointer-events", "none")
+                    .css("opacity", "0.5");
             }, 150);
         } else {
-            setTimeout(() => tableFormItemConfig.showColumn("formItemConfig_Percentage"), 100);
             setTimeout(() => {
                 $("#FormItemConfigRelationtabulator .tabulator-cell[tabulator-field='formItemConfig_FormItem']")
+                    .css("pointer-events", "")
+                    .css("opacity", "");
+                $("#FormItemConfigRelationtabulator .tabulator-cell[tabulator-field='formItemConfig_PartyType']")
                     .css("pointer-events", "")
                     .css("opacity", "");
             }, 150);
@@ -1449,24 +1443,9 @@ async function InitFormItemConfigPopup(
     });
 
     LoadFormItemConfigData();
-    // handle Percentage column visibility based on IsMultipleEvaluation
-    $(document).off("change", "#IsMultipleEvaluation")
-        .on("change", "#IsMultipleEvaluation", function () {
-            if (this.checked) {
-                setTimeout(() => tableFormItemConfig.hideColumn("formItemConfig_Percentage"), 100);
-            } else {
-                setTimeout(() => tableFormItemConfig.showColumn("formItemConfig_Percentage"), 100);
-            }
-        });
+   
 
     // apply initial state after tabulator renders
-    setTimeout(() => {
-        if ($("#IsMultipleEvaluation").prop("checked")) {
-            tableFormItemConfig.hideColumn("formItemConfig_Percentage");
-        } else {
-            tableFormItemConfig.showColumn("formItemConfig_Percentage");
-        }
-    }, 200);
 }
 function LoadFormItemConfigData() {
     const evalformId = $("#evalformidvalue").val();
@@ -1485,15 +1464,7 @@ function LoadFormItemConfigData() {
                 $("#IsMultipleEvaluationWrapper").hide();
                 $("#IsMultipleEvaluation").prop("checked", false);
 
-            } else {
-                tableFormItemConfig.setData([]);
-                if ($("#EvalFormHasMuliEvaluation").prop("checked")) {
-                    $("#IsMultipleEvaluationWrapper").show();
-                } else {
-                    $("#IsMultipleEvaluationWrapper").hide();
-                    $("#IsMultipleEvaluation").prop("checked", false);
-                }
-            }
+            } 
         }
     };
 
