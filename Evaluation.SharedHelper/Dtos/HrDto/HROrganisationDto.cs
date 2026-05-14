@@ -18,4 +18,7 @@ public class HROrganizationInfoDto
     public string OrgSectorDesc { get; set; }
     public string ManagerEngName { get; set; }
     public string ManagerAraName { get; set; }
+    public string SchoolEmail { get; set; }
+    public string Phone { get; set; }
+    public string Mobile { get; set; }
 }

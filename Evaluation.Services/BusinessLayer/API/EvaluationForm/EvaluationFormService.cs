@@ -161,7 +161,6 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
         obj.HasOneValue = message.HasOneValue;
         obj.EvaluationPartyId = message.EvaluationPartyId;
         obj.CalcMethodId = message.CalcMethodId;
-        obj.FormStatusId = message.FormStatusId;
         obj.IsActive = message.IsActive;
         obj.AllowRename = message.AllowRename;
         obj.HasMuliEvaluation = message.HasMuliEvaluation;
@@ -215,7 +214,6 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
             obj.NameEn = message.NameEn;
             obj.EvaluationPartyId = message.EvaluationPartyId;
             obj.CalcMethodId = message.CalcMethodId;
-            obj.FormStatusId = message.FormStatusId;
             obj.IsActive = message.IsActive;
             obj.AllowRename = message.AllowRename;
             obj.HasMuliEvaluation = message.HasMuliEvaluation;
@@ -615,7 +613,7 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
                 Id = g.First().Id,
 
                 FormItemConfig_EvalFormId = g.Key.EvalFormId,
-                FormItemConfig_PartyTypeId = g.Key.PartyTypeId,
+                //FormItemConfig_PartyTypeId = g.Key.PartyTypeId,
 
                 FormItemConfig_NameAr = g.First().NameAr,
                 FormItemConfig_NameEn = g.First().NameEn,

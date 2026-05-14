@@ -11,6 +11,7 @@ using Evaluation.Services.Extensions;
 using Evaluation.Services.Models.API;
 using Evaluation.Services.Shared;
 using Evaluation.Services.Special;
+using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Api.EvaluationRequestEntities;
 using Evaluation.SharedHelper.Models.Api.ServiceRequestEntitiesDTO;
@@ -27,7 +28,7 @@ namespace Evaluation.Services.BusinessLayer.API.EvaluationRequestLayer
 	public class SrvEvaluationParty(
 		IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow, 
 		LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, RequestAccessService requestAccessService,
-	   IServiceProvider serviceProvider, RequestInfo _requestInfo)
+	   IServiceProvider serviceProvider, RequestInfo _requestInfo, SrvService SrvService)
 			: ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, _requestInfo)
 	
 	{
@@ -105,7 +106,7 @@ namespace Evaluation.Services.BusinessLayer.API.EvaluationRequestLayer
 
 			var partyIds = parties.Select(p => p.Id).ToList();
 
-			var services = await uow
+			var servicesData = await uow
 				.GetRepository<Service>()
 				.GetAllActiveNonDeleted(s =>
 					s.EvaluationPartyId != null &&
@@ -113,47 +114,60 @@ namespace Evaluation.Services.BusinessLayer.API.EvaluationRequestLayer
 					s.RequestShowPartyType != null &&
 					s.RequestShowPartyType.Any(pt =>
 						partyTypeIds.Contains(pt.PartyTypeId)))
+				.Include(s => s.SystemModule)
+					.ThenInclude(x => x!.SystemModuleType)
+				.Include(s => s.ServiceInitiatorPartyType)
 				.OrderBy(s => s.OrderNo)
-				.Select(s => new
-				{
-					s.Id,
-					s.NameAr,
-					s.NameEn,
-					s.BackendName,
-					s.OrderNo,
-					s.IsFreez,
-					s.ShowInWebSite,
-					s.StartDate,
-					s.EndDate,
-					s.EvaluationPartyId,
-					CanCreate =
-						(s.StartDate == null || s.StartDate <= today) &&
-						(s.EndDate == null || s.EndDate >= today) &&
-						s.ServiceInitiatorPartyType != null &&
-						s.ServiceInitiatorPartyType.Any(pt =>
-							partyTypeIds.Contains(pt.PartyTypeId))
-				})
 				.ToListAsync();
 
-			var servicesByParty = services
-				.GroupBy(s => s.EvaluationPartyId!.Value)
-				.ToDictionary(
-					g => g.Key,
-					g => g.Select(s => new EvaluationPartyServiceDTO
+			var services = new List<EvaluationPartyServiceDTO>();
+
+			foreach (var s in servicesData)
+			{
+				var canCreate =
+					(s.StartDate == null || s.StartDate <= today) &&
+					(s.EndDate == null || s.EndDate.Value.AddDays(1) >= today) &&
+					s.ServiceInitiatorPartyType != null &&
+					s.ServiceInitiatorPartyType.Any(pt =>
+						partyTypeIds.Contains(pt.PartyTypeId));
+
+				if (canCreate)
+				{
+					try
 					{
-						Id = s.Id,
-						NameAr = s.NameAr,
-						NameEn = s.NameEn,
-						BackendName = s.BackendName,
-						OrderNo = s.OrderNo,
-						IsFreez = s.IsFreez,
-						ShowInWebSite = s.ShowInWebSite,
-						StartDate = s.StartDate,
-						EndDate = s.EndDate,
-						CanCreate = s.CanCreate,
-						Requests = new List<ServiceRequestDTO>()
-					}).ToList()
-				);
+						await SrvService.ValidateCanCreateRequest(
+							planId: null,
+							EvlReqId: evaluationRequestId,
+							serviceObj: s
+						);
+					}
+					catch (BusinessException)
+					{
+						canCreate = false;
+					}
+				}
+
+				services.Add(new EvaluationPartyServiceDTO
+				{
+					Id = s.Id,
+					NameAr = s.NameAr,
+					NameEn = s.NameEn,
+					BackendName = s.BackendName,
+					OrderNo = s.OrderNo,
+					IsFreez = s.IsFreez,
+					ShowInWebSite = s.ShowInWebSite,
+					StartDate = s.StartDate,
+					EndDate = s.EndDate,
+					EvaluationPartyId = s.EvaluationPartyId,
+					CanCreate = canCreate,
+					Requests = new List<ServiceRequestDTO>()
+				});
+			}
+
+			var servicesByParty = services
+				.Where(s => s.EvaluationPartyId.HasValue)
+				.GroupBy(s => s.EvaluationPartyId!.Value)
+				.ToDictionary(g => g.Key, g => g.ToList());
 
 			foreach (var party in parties)
 			{

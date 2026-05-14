@@ -1293,6 +1293,7 @@ input:checked + .slider-small:before {
 }
 
 main {
+    flex: 1;
     background-color: #F6F6F3;
 }
 /*--------------------------------------------------------------
@@ -1618,11 +1619,12 @@ main {
 
 .action-items {
     display: flex;
-    align-items: center;
+    /*    align-items: center;*/
     gap: 4px;
-    justify-content: center;
+    /*    justify-content: center;*/
     color: #333;
     font-size: 16px;
+    padding: .45rem;
 }
 
 .btn-close-custom {
@@ -1677,6 +1679,19 @@ input.auto-fill {
         font-size: 16px;
         margin-inline-end: 6px;
     }
+
+
+.btn-icon-no-text i {
+    font-size: 16px;
+    font-family: var(--font-primary) !important;
+    font-weight: 500 !important;
+}
+
+.btn-icon-no-text i::before {
+    font-family: "Line Awesome Free";
+    font-weight: 900;
+    font-size: 16px;
+}
 
 
 .filter-section .form-label {
@@ -1743,14 +1758,14 @@ input.auto-fill {
 }
 
 .title-label {
-    font-size: 20px !important;
+    font-size: 18px !important;
     font-weight: 600;
     color: #666;
 }
 
 .plan-title-text {
-    font-size: 20px;
-    font-weight: 600;
+    font-size: 18px;
+    font-weight: 700;
     color: #222;
 }
 
@@ -2542,3 +2557,9 @@ input.auto-fill {
         .profile-btn.show i {
             color: #fff !important;
         }
+
+
+.table-responsive {
+    margin: 0rem 1.4rem !important;
+}
+

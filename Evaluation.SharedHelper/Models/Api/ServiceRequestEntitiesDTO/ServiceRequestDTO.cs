@@ -72,6 +72,11 @@ namespace Evaluation.SharedHelper.Models.Api.ServiceRequestEntitiesDTO
 		public List<string>? AssignedToIdsList { get; set; }
 		public DateTime? VisitDateFrom { get; set; }
 		public DateTime? VisitDateTo { get; set; }
+		public string? PlanJson { get; set; }
+		public string? PlanName { get; set; }
+		public DateTime? PlanDateFrom { get; set; }
+		public DateTime? PlanDateTo { get; set; }
+		public int SchoolsCount { get; set; }
 
 	}
 }

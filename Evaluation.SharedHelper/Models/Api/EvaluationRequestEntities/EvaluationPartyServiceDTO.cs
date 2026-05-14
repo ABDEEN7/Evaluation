@@ -10,6 +10,7 @@ namespace Evaluation.SharedHelper.Models.Api.EvaluationRequestEntities
 	public class EvaluationPartyServiceDTO
 	{
 		public Guid Id { get; set; }
+		public Guid? EvaluationPartyId { get; set; }
 		public string NameAr { get; set; } = null!;
 		public string NameEn { get; set; } = null!;
 		public string BackendName { get; set; } = null!;

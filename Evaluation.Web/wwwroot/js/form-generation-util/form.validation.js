@@ -49,7 +49,22 @@ window.formUtility = window.formUtility || {};
         const el = $(selector);
         el.addClass("d-block").text(message || "");
     };
+    const showErrors = (errorMessages) => {
+        if (errorMessages && errorMessages.length > 0) {
+            errorMessages.forEach(message => {
+                const errorElement = $(`#error_${message.fieldId}`);
+                errorElement.text(message.error).addClass('d-block');
+            });
 
+            const firstError = $(".d-block[id^='error_']").first();
+            if (firstError.length) {
+                const fieldId = firstError.attr("id").replace("error_", "field_");
+                const input = $(`#${fieldId}`);
+                input[0]?.scrollIntoView({ behavior: "smooth", block: "center" });
+                input.focus();
+            }
+        }
+    };
     const clearError = (selector) => {
         $(selector).removeClass("d-block").empty();
     };
@@ -333,21 +348,27 @@ window.formUtility = window.formUtility || {};
     };
 
     const validateEvaluationPlan = (field, fieldValue) => {
+
         const errors = [];
 
-        const fieldId = field.fieldId;
+        const fieldId = `field_${field.fieldId}`;
 
         const data = window.SubmitPlanHandler?.getFormPlanJson(fieldId);
 
-        const validation = window.SubmitPlanHandler?.validatePlan(data);
+        const validation = window.SubmitPlanHandler?.validatePlan(data, fieldId);
 
         if (validation && !validation.isValid) {
+
             validation.errors.forEach(msg => {
-                errors.push(createError(fieldId, msg));
+
+                errors.push( msg);
+
             });
+
         }
 
         return errors;
+
     };
     // #endregion
 
@@ -706,34 +727,9 @@ window.formUtility = window.formUtility || {};
 
         return errors;
     };
-    // #endregion
-
-    // #region ===============  Field Validators Registry
+   
 
 
-    const validateEvaluationPlan = (field, fieldValue) => {
-
-        const errors = [];
-
-        const fieldId = `field_${field.fieldId}`;
-
-        const data = window.SubmitPlanHandler?.getFormPlanJson(fieldId);
-
-        const validation = window.SubmitPlanHandler?.validatePlan(data);
-
-        if (validation && !validation.isValid) {
-
-            validation.errors.forEach(msg => {
-
-                errors.push(createError(fieldId, msg));
-
-            });
-
-        }
-
-        return errors;
-
-    };
 
     const fieldValidators = {
 
@@ -844,6 +840,8 @@ window.formUtility = window.formUtility || {};
 
     ns.validateNotEqualFields = validateNotEqualFields;
     ns.validateDateFields = validateDateFields; // dategroup + dategroupindex
-    //ns.validateDateGroups = validateDateGroups; // from/to style
+    ns.validateTimeRange = validateTimeRange; 
+    ns.showError = showError; 
+    ns.showErrors = showErrors; 
 
 })(window.formUtility);

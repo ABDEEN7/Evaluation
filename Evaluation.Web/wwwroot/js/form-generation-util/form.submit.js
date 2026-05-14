@@ -183,21 +183,15 @@ window.serviceRequestForm = window.serviceRequestForm || {};
 
             errors = fu.validateFields(fields, valuesMap) || [];
 
-            const dateErrors = fu.validateDateGroups() || [];
+        const dateErrors = fu.validateDateFields() || [];
             errors = errors.concat(dateErrors);
        
             const notEqualErrors = fu.validateNotEqualFields(fields) || [];
             errors = errors.concat(notEqualErrors);
     
-             errors = errors.concat(validateTimeRange(fields, valuesMap));
+        errors = errors.concat(fu.validateTimeRange(fields, valuesMap));
 
-        if (errors.length) {
-            if (typeof fu.showFieldErrors === "function") {
-                fu.showFieldErrors(errors);
-            } else if (typeof fu.showFieldError === "function") {
-                errors.forEach(err => fu.showFieldError(err));
-            }
-        }
+        fu.showErrors(errors);
 
         return { isValid: errors.length === 0, fields, valuesMap, errors };
     }
