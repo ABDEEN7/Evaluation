@@ -54,7 +54,7 @@
                 className: "header-right",
                 render: function (data, type, row) {
                     const statusColor = row.statusColor || "#cccccc";
-                    const textColor = "#000";// getContrastingTextColor(statusColor);
+                    const textColor =  getContrastingTextColor(statusColor);
                     return `<span class="request-status m-0" style="background-color:${statusColor};color:${textColor};">${data || ""}</span>`;
                 }
             },

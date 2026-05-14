@@ -135,17 +135,23 @@
                 `;
                 }
              },
-             {
+            {
                 data: "status",
                 title: uiControlsSetup().GetUiControlText("lblRequestNo"),
                 className: "td-left status-break-row py-0 align-content-end",
-                render: function(data) {
+                render: function (data, type, row) {
 
                     if (!data) return "_";
 
+                    const statusColor = row.statusColor || "#cccccc";
+                    const textColor = getContrastingTextColor(statusColor);
+
                     return `
-                <i class="las la-edit card-only-icon me-1"></i>
-                ${data}
+                    <span class="request-status m-0"
+                          style="background-color:${statusColor};color:${textColor};">
+                        <i class="las la-edit card-only-icon me-1"></i>
+                        ${data}
+                    </span>
                 `;
                 }
             },
