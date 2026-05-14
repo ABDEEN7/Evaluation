@@ -37,8 +37,6 @@ public class OrgBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider c
                 var schoolManager = await employeeService.GetEmployee(school.ManagerQID);
                 orgDetails = mapper.Map<OrgDetailsDto>(school);
                 orgDetails.ManagerName = schoolManager?.NameEn;
-                //orgDetails.EmployeeNo = await employeeService.GetEmployeesBySchoolId(id).Result; 
-                orgDetails.ManagerName = schoolManager?.NameEn;
                 break;
             case DepartmentCateogry.Employee:
                 orgDetails = mapper.Map<OrgDetailsDto>(await employeeService.GetEmployeeById(id));

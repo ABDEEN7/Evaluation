@@ -54,7 +54,7 @@
                 data: null,
                 title: uiControlsSetup().GetUiControlText("lblSchoolLevel"),
                 className: "td-left level",
-                defaultContent: "Primary"
+                defaultContent: "ابتدائي, اعدادي"
             }
             //{
             //    data: "region",
