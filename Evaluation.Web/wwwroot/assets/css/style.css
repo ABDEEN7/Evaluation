@@ -2563,3 +2563,63 @@ input.auto-fill {
     margin: 0rem 1.4rem !important;
 }
 
+
+.plan-request-card .td-60 {
+    width: 60% !important;
+    display: inline-block !important;
+    vertical-align: top;
+}
+
+.plan-request-card .td-40 {
+    width: 40% !important;
+    display: inline-block !important;
+    vertical-align: top;
+    text-align: end !important;
+}
+
+.small-width {
+    height: 30px !important;
+    padding-top: 3px !important;
+    padding-bottom: 3px !important;
+}
+
+
+.plan-request-card .request-divider {
+    width: 100% !important;
+    padding: 4px 0 !important;
+}
+
+.plan-request-card .request-divider-line {
+    width: 100%;
+    height: 1px;
+    background-color: #e5e5e5;
+    margin: 4px 0;
+}
+
+
+
+.table-card-seperate-styling tbody tr:not(.card):not(.card-row) .card-only-row {
+    display: none !important;
+}
+
+
+/* keep your working card styles above */
+
+/* TABLE MODE RESET ONLY */
+.table-card-seperate-styling tbody tr:not(.card):not(.card-row).plan-request-card .td-60,
+.table-card-seperate-styling tbody tr:not(.card):not(.card-row).plan-request-card .td-40 {
+    width: auto !important;
+    display: table-cell !important;
+    vertical-align: middle !important;
+    text-align: inherit !important;
+}
+
+.table-card-seperate-styling tbody tr:not(.card):not(.card-row).plan-request-card .small-width {
+    height: auto !important;
+    padding-top: inherit !important;
+    padding-bottom: inherit !important;
+}
+
+.table-card-seperate-styling tbody tr:not(.card):not(.card-row).plan-request-card .request-divider {
+    display: none !important;
+}
