@@ -82,6 +82,7 @@
             }).then(() => {
               
                 uiControlsSetup().UpdatPageTitle("WebAppLoginPage");
+                InitNavbarSection();
                 if (sharedUtility().ExistingToken()) {
                  
                     let TempMessage = GetLocalStorageValue(LocalStorageKeys.TempMessage);
