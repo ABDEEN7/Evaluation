@@ -2,130 +2,157 @@
 
 <div class="m-4">
 
+    <!-- Toolbar Row -->
+    <div class="mb-3">
+        <div class="d-flex justify-content-between align-items-center">
 
-        <!-- Filter Section -->
-        <form id="school-filter-form-id">
-            <div class="row g-3">
-
-                <div class="col-md-4">
-                    <label for="schoolNameFilter" class="form-label @ConstantKeys.WebSchools.SchoolName"></label>
-                    <input id="schoolNameFilter" class="form-control filter-enter" />
-                </div>
-
-                <div class="col-md-4">
-                    <label for="schoolCodeFilter" class="form-label @ConstantKeys.WebSchools.SchoolCode"></label>
-                    <input id="schoolCodeFilter" class="form-control filter-enter" />
-                </div>
-
-                <div class="col-md-4">
-                    <label for="schoolPhaseFilter" class="form-label @ConstantKeys.WebSchools.Phase"></label>
-                    <select id="schoolPhaseFilter" class="form-select filter-enter">
-                        <option value="">الكل</option>
-                        <option value="1">ابتدائية</option>
-                        <option value="2">إعدادية</option>
-                        <option value="3">ثانوية</option>
-                    </select>
-                </div>
-
-                <div class="col-md-4">
-                    <label for="schoolTypeFilter" class="form-label @ConstantKeys.WebSchools.Type"></label>
-                    <select id="schoolTypeFilter" class="form-select filter-enter">
-                        <option value="">الكل</option>
-                        <option value="1">حكومية</option>
-                        <option value="2">خاصة</option>
-                        <option value="3">دولية</option>
-                    </select>
-                </div>
-
-                <div class="col-md-4">
-                    <label for="schoolRegionFilter" class="form-label @ConstantKeys.WebSchools.Region"></label>
-                    <select id="schoolRegionFilter" class="form-select filter-enter">
-                        <option value="">الكل</option>
-                        <option value="1">الدوحة</option>
-                        <option value="2">الريان</option>
-                        <option value="3">الوكرة</option>
-                    </select>
-                </div>
-
-                <div class="col-md-4">
-                    <label for="schoolStatusFilter" class="form-label @ConstantKeys.WebSchools.CurrentPlanStatus"></label>
-                    <select id="schoolStatusFilter" class="form-select filter-enter">
-                        <option value="">الكل</option>
-                        <option value="1">لم تبدأ</option>
-                        <option value="2">جارية</option>
-                        <option value="3">مكتملة</option>
-                    </select>
-                </div>
+            <!-- Left: View Toggle -->
+            <div class="btn-group" role="group" aria-label="View mode">
+                <button id="cardViewSchool" type="button"
+                        class="btn btn-outline-primary active btn-icon-no-text">
+                    <i class="la la-th-large"></i>
+                </button>
+                <button id="tblViewSchool" type="button"
+                        class="btn btn-outline-secondary btn-icon-no-text">
+                    <i class="la la-list"></i>
+                </button>
             </div>
-        </form>
 
+            <!-- Right: Filter Toggle Button -->
+            <button id="advancedSearchSchoolBtn"
+                    type="button"
+                    class="btn btn-outline-secondary d-flex align-items-center gap-2 px-3 py-2">
+                <i class="la la-filter"></i>
+                <span class="@ConstantKeys.WebSchools.Search"></span>
+            </button>
 
-
-
-
-
-
-
-
-
-
-
-    <div class="p-0 my-4">
-        <div class="row">
-            <div class="col-lg-4 col-sm-12 text-align-end">
-                <div class=" d-flex justify-content-start align-items-center">
-                    <div class="btn-group" role="group" aria-label="View mode">
-                        <button id="cardViewSchool" type="button" class="btn btn-outline-primary active btn-icon-no-textn">
-                            <i class="la la-th-large"></i>
-                        </button>
-                        <button id="tblViewSchool" type="button" class="btn btn-outline-secondary btn-icon-no-text">
-                            <i class="la la-list"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-4 col-sm-12"></div>
-            <div class="col-lg-4 col-sm-12 justify-content-end align-items-center">
-                <div class="d-flex gap-3">
-                    <button id="filterSchoolBtnId" class="btn btn-primary btn-with-text-icon w-100 mt-2">
-                        <i class="la la-search @ConstantKeys.WebSchools.Search"></i>
-
-                    </button>
-                    <button id="clearFilterSchoolBtnId" class="btn btn-outline-secondary btn-with-text-icon w-100 mt-2">
-                        <i class="la la-undo @ConstantKeys.WebSchools.ClearFilter"></i>
-
-                    </button>
-                </div>
-            </div>
         </div>
     </div>
 
+    <!-- Filter Form: hidden by default -->
+    <div id="school-filter-wrapper" style="display:none;">
+        <div class="filter-section p-3 mb-3">
+            <form id="school-filter-form-id">
+                <div class="row g-3">
 
+                    <div class="col-md-4">
+                        <label for="schoolNameFilter"
+                               class="form-label @ConstantKeys.WebSchools.SchoolName"></label>
+                        <input id="schoolNameFilter" class="form-control filter-enter" />
+                    </div>
 
+                    <div class="col-md-4">
+                        <label for="schoolCodeFilter"
+                               class="form-label @ConstantKeys.WebSchools.SchoolCode"></label>
+                        <input id="schoolCodeFilter" class="form-control filter-enter" />
+                    </div>
 
+                    <div class="col-md-4">
+                        <label for="schoolPhaseFilter"
+                               class="form-label @ConstantKeys.WebSchools.Phase"></label>
+                        <select id="schoolPhaseFilter" class="form-select filter-enter">
+                            <option value="">الكل</option>
+                            <option value="1">ابتدائية</option>
+                            <option value="2">إعدادية</option>
+                            <option value="3">ثانوية</option>
+                        </select>
+                    </div>
 
+                    <div class="col-md-4">
+                        <label for="schoolTypeFilter"
+                               class="form-label @ConstantKeys.WebSchools.Type"></label>
+                        <select id="schoolTypeFilter" class="form-select filter-enter">
+                            <option value="">الكل</option>
+                            <option value="1">حكومية</option>
+                            <option value="2">خاصة</option>
+                            <option value="3">دولية</option>
+                        </select>
+                    </div>
 
+                    <div class="col-md-4">
+                        <label for="schoolRegionFilter"
+                               class="form-label @ConstantKeys.WebSchools.Region"></label>
+                        <select id="schoolRegionFilter" class="form-select filter-enter">
+                            <option value="">الكل</option>
+                            <option value="1">الدوحة</option>
+                            <option value="2">الريان</option>
+                            <option value="3">الوكرة</option>
+                        </select>
+                    </div>
 
-        <!-- Schools Table -->
-        <div class="table-responsive" id="schoolsTableWrapper">
-            <table id="schoolTable" class="table table-striped table-bordered w-100 application-request card">
-                <thead>
-                    <tr>
-                        <th class="@ConstantKeys.WebSchools.Name"></th>
-                        <th class="@ConstantKeys.WebSchools.Code"></th>
-                        <th class="@ConstantKeys.WebSchools.TypeCol"></th>
-                        <th class="@ConstantKeys.WebSchools.PhaseCol"></th>
-                        <th class="@ConstantKeys.WebSchools.RegionCol"></th>
-                        <th @ConstantKeys.WebSchools.StatusCol></th>
-                    </tr>
-                </thead>
-                <tbody class="requeststableBody w-100"></tbody>
-            </table>
+                    <div class="col-md-4">
+                        <label for="schoolStatusFilter"
+                               class="form-label @ConstantKeys.WebSchools.CurrentPlanStatus"></label>
+                        <select id="schoolStatusFilter" class="form-select filter-enter">
+                            <option value="">الكل</option>
+                            <option value="1">لم تبدأ</option>
+                            <option value="2">جارية</option>
+                            <option value="3">مكتملة</option>
+                        </select>
+                    </div>
+
+                </div>
+
+                <!-- Filter Action Buttons -->
+                <div class="row mt-4">
+                    <div class="col-lg-8 col-sm-12"></div>
+                    <div class="col-lg-4 col-sm-12">
+                        <div class="d-flex gap-2 justify-content-end">
+                            <button id="filterSchoolBtnId"
+                                    type="button"
+                                    class="btn btn-primary @ConstantKeys.WebSchools.Search">
+                            </button>
+                            <button id="clearFilterSchoolBtnId"
+                                    type="button"
+                                    class="btn btn-outline-secondary @ConstantKeys.WebSchools.ClearFilter">
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </form>
         </div>
+    </div>
+
+    <!-- Schools Table -->
+    <div class="table-responsive" id="schoolsTableWrapper">
+        <table id="schoolTable"
+               class="table table-striped table-bordered w-100 application-request card">
+            <thead>
+                <tr>
+                    <th class="@ConstantKeys.WebSchools.Name"></th>
+                    <th class="@ConstantKeys.WebSchools.Code"></th>
+                    <th class="@ConstantKeys.WebSchools.TypeCol"></th>
+                    <th class="@ConstantKeys.WebSchools.PhaseCol"></th>
+                    <th class="@ConstantKeys.WebSchools.RegionCol"></th>
+                    <th @ConstantKeys.WebSchools.StatusCol></th>
+                </tr>
+            </thead>
+            <tbody class="requeststableBody w-100"></tbody>
+        </table>
+    </div>
 
 </div>
+
 @await Component.InvokeAsync("SchoolDetailsModal", new { modalId = "SCHOOL", title = "تفاصيل المدرسة", body = "" })
 
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
 
+        var btn = document.getElementById("advancedSearchSchoolBtn");
+        var wrapper = document.getElementById("school-filter-wrapper");
 
+        if (btn && wrapper) {
+            btn.addEventListener("click", function () {
+                if (wrapper.style.display === "none" || wrapper.style.display === "") {
+                    wrapper.style.display = "block";
+                    btn.classList.add("active");
+                } else {
+                    wrapper.style.display = "none";
+                    btn.classList.remove("active");
+                }
+            });
+        }
 
+    });
+</script>
