@@ -163,10 +163,16 @@
 
         const data = extractOpenRequests(parties);
 
-        console.log("Open Requests:", data); // debug
+        const accordion = document.querySelector('[data-bs-target="#itemAllOpenRequests"]')
+            ?.closest('.accordion-item');
+
+        if (accordion) {
+            accordion.style.display = data.length === 0 ? "none" : "block";
+        }
+
+        if (data.length === 0) return;
 
         initTable(data);
-
         bindSearch();
     }
 

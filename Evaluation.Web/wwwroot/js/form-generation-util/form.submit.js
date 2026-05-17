@@ -217,12 +217,21 @@ window.serviceRequestForm = window.serviceRequestForm || {};
         formData.append("fieldValues", JSON.stringify(payloadFields));
 
         if (actionTypeName === ACTION_TYPE.ASSIGNT_TEAM) {
-            const teamData = getAssignmentsDataByFieldId('assign');
-            if (!teamData) return { formData, ok: false };
-            formData.append("teamUsers", JSON.stringify(teamData));
 
+            const validation = validateTeamByFieldId('assign');
+            if (!validation.isValid) {
+
+                DisplayAlert('يرجى تصحيح الأخطاء التالية:\n' + validation.errors.join('\n'), "danger");
+                return {
+                    formData: null,
+                    ok: false
+                };
+            }
+
+            const teamData = getAssignmentsDataByFieldId('assign');
+
+            formData.append("teamUsers", JSON.stringify(teamData));
         }
-        
 
          //formData.append("ActionRemarks", remarksValue);
 

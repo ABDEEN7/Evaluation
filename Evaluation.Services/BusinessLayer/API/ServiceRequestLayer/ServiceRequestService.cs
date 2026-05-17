@@ -3,6 +3,7 @@ using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
 using Evaluation.DAL.Models.ServiceRequestEntities;
 using Evaluation.DAL.Repositories;
+using Evaluation.Services.Shared;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Exceptions;
@@ -19,16 +20,21 @@ public class ServiceRequestService(IServiceScopeFactory serviceScopeFactory,
     IMapper mapper,
     UserInfo userInfo,
     IServiceProvider serviceProvider,
-    RequestInfo requestInfo
+    RequestInfo requestInfo,
+    RequestAccessService requestAccessService
     ) : ApiBase(serviceScopeFactory, cacheDataProvider, unitOfWork, loggingServices, mapper, userInfo, serviceProvider, requestInfo)
 {
     public async Task<List<ServiceRequest>> GetServiceRequestsByEvaluationRequestIds(List<Guid> Ids)
     {
-        return await unitOfWork.GetRepository<ServiceRequest>()
+        IQueryable<ServiceRequest> query = unitOfWork.GetRepository<ServiceRequest>()
             .GetAllActiveNonDeleted()
             .Where(x => Ids.Contains(x.EvaluationRequestId.Value))
-            .Include(d => d.Status)
-            .ToListAsync();
+            .Include(d => d.Status);
+
+        query = await requestAccessService.ApplyServiceRequestAccess(query);
+
+        return query.ToList();
+            
     }
 
     public async Task<ServiceRequest> UpdateEvaluationServiceRequest(ServiceRequest serviceRequest)
