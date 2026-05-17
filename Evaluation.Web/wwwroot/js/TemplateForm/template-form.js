@@ -12,8 +12,7 @@ const gridContainerId = "view-container",
     btnSubmitId = "btn-submit",
     btnpopupSubmitId = "btn-submit_popup";
 
-let lang = sharedUtility().GetCookie('lang');
-let txtDir = lang === "ar" ? "RTL" : "LTR";
+let txtDir = window.currentLang === "ar" ? "RTL" : "LTR";
 const loadData = () => {
     isLoading = true;
 
@@ -79,7 +78,28 @@ function CommonLogicAfterInitial() {
                 $("#EvalFormsHasOneValue").parent().hide();
             }
         });
+    $(document).off("change", "#EvalFormHasMuliEvaluation")
+        .on("change", "#EvalFormHasMuliEvaluation", function () {
+            if (this.checked) {
+                $('label[for=EvalCountOfColumnsValue').show();
+                $("#EvalCountOfColumnsValue").parent().show();
+                // only show wrapper if popup is open and no existing data
+                if (popupname === "FormItemConfig" && tableFormItemConfig) {
+                    const hasData = tableFormItemConfig.getData().length > 0;
+                    if (!hasData) {
+                        $("#IsMultipleEvaluationWrapper").show();
+                    }
+                }
+            }
+            else {
+                $("#IsMultipleEvaluationWrapper").hide();
+                $("#IsMultipleEvaluation").prop("checked", false);
+                $("label[for='EvalCountOfColumnsValue']").hide();
+                $("#EvalCountOfColumnsValue").parent().hide();
+            }
+        });
 }
+
 function ClearControlByPage() {
     if (popupname == "FormScope") {
         var id = $('#PopupId').val();
@@ -541,7 +561,7 @@ $(document).on("click", ".editParent", async function () {
     $("#PopupId").val(id);
     $("#evalformidvalue").val($("#Id").val());
 
-    
+
     setTimeout(() => {
         BuildFormItemConfigTable(id, objdata.calcMethodId);
     }, 800);
@@ -560,10 +580,20 @@ function BuildFormItemConfigTable(formItemId, formItemCalcMethodId) {
     IsEdit = IsEditFormItemConfig ? true : "";
     IsDelete = IsDeleteFormItemConfig ? true : "";
     IsView = '';
+    var checkboxColumn = {
+        title: "",
+        field: "selected",
+        width: 40,
+        headerSort: false,
+        formatter: "rowSelection",
+        titleFormatter: "rowSelection",
+        cellClick: function (e, cell) {
+            cell.getRow().toggleSelect();
+        }
+    };
 
-    
     var tableColumns = sharedFn().PopulateColumn(filteredColList, '', true);
-
+    tableColumns.splice(1, 0, checkboxColumn); 
     $('#ModalPopup .modal-body #PopupForm').append(`
         <div class="row mt-3">
             <div class="card-header justify-content-end d-flex align-items-center bg-light">
@@ -592,7 +622,8 @@ function BuildFormItemConfigTable(formItemId, formItemCalcMethodId) {
             placeholder: sharedFn().GetUiControlText('NO_DATA_FOUND'),
             movableRows: true,
             editable: true,
-            lookupSources: lookupSources
+            lookupSources: lookupSources,
+            selectable: true
         },
         uniqueRowId: 'id',
         columns: tableColumns,
@@ -607,7 +638,6 @@ function BuildFormItemConfigTable(formItemId, formItemCalcMethodId) {
         success: function (data) {
             if (data && data.length > 0) {
 
-                // ✅ فلتر بـ prefix الصحيح + formItemId
                 var filtered = data.filter(x =>
                     x.formItemConfig_FormItemIds &&
                     x.formItemConfig_FormItemIds.includes(formItemId)
@@ -641,7 +671,7 @@ function BuildFormItemConfigTable(formItemId, formItemCalcMethodId) {
         });
     });
 
-    
+
     $("#FormItemConfigSaveButton").off("click").on("click", function () {
         const allRows = tableFormItemConfig.getData();
         if (!allRows || allRows.length === 0) {
@@ -703,7 +733,15 @@ $(document).on("click", "#formItemConfig", async function () {
         tableColumns,
         settingList
     );
+
+    if ($("#EvalFormHasMuliEvaluation").prop("checked")) {
+        $("#IsMultipleEvaluationWrapper").show();
+    } else {
+        $("#IsMultipleEvaluationWrapper").hide();
+        $("#IsMultipleEvaluation").prop("checked", false);
+    }
 });
+
 // SubFormItem Add button
 $(document).on("click", ".addSub", function () {
     var id = $(this).data("id");
@@ -731,22 +769,23 @@ $(document).on("click", ".edit", function () {
     const cellElem = $(this).closest('section')[0];
     const id = cellElem.getAttribute('data-key');
     const obj = tableFormItemConfig.getData().find(f => f.id == id);
-    
+
     if (!obj) return;
+
+    // read using formItemConfig_ prefix
+    const formItemIds = obj.formItemConfig_FormItemId || obj.formItemConfig_FormItem || obj.formItemConfig_FormItemIds;
 
     var data = {
         Id: obj.id,
         EvalFormId: $("#evalformidvalue").val(),
-        NameAr: obj.nameAr || null,
-        NameEn: obj.nameEn || null,
-        PartyTypeId: obj.partyTypeId || obj.partyType || null,
-        FormItemIds: obj.formItemId
-            ? (Array.isArray(obj.formItemId) ? obj.formItemId : [obj.formItemId])
-            : obj.formItem
-                ? (Array.isArray(obj.formItem) ? obj.formItem : [obj.formItem])
-                : null,
-        CalcMethodId: obj.calcMethodId || obj.calcMethod || null,
-        Percentage: obj.percentage || 0
+        NameAr: obj.formItemConfig_NameAr || null,
+        NameEn: obj.formItemConfig_NameEn || null,
+        PartyTypeId: obj.formItemConfig_PartyTypeId || obj.formItemConfig_PartyType || null,
+        FormItemIds: formItemIds
+            ? (Array.isArray(formItemIds) ? formItemIds : [formItemIds])
+            : null,
+        CalcMethodId: obj.formItemConfig_CalcMethodId || obj.formItemConfig_CalcMethod || null,
+        Percentage: obj.formItemConfig_Percentage || 0
     };
 
     var formData = new FormData();
@@ -756,16 +795,22 @@ $(document).on("click", ".edit", function () {
         success: function (response) {
             if (response?.responseStatus == 2) {
                 notificationUtil.success(sharedFn().GetUiControlText('WEB_MSG_UPDATE'));
-                const updatedRow = {
-                    ...response,
-                    calcMethod: response.calcMethodId || null,
-                    partyType: response.partyTypeId || null,
-                    formItem: Array.isArray(response.formItemIds)
-                        ? response.formItemIds
-                        : (response.formItemIds ? [response.formItemIds] : [])
+
+                // update row with correct prefixed field names
+                const updatedObj = {
+                    ...obj,
+                    formItemConfig_NameAr: data.NameAr,
+                    formItemConfig_NameEn: data.NameEn,
+                    formItemConfig_PartyTypeId: data.PartyTypeId,
+                    formItemConfig_PartyType: data.PartyTypeId,
+                    formItemConfig_FormItem: data.FormItemIds,
+                    formItemConfig_FormItemIds: data.FormItemIds,
+                    formItemConfig_CalcMethodId: data.CalcMethodId,
+                    formItemConfig_CalcMethod: data.CalcMethodId,
+                    formItemConfig_Percentage: data.Percentage
                 };
 
-                tableFormItemConfig.updateData([{ id: response.id, ...updatedRow }]);
+                tableFormItemConfig.updateData([{ id: obj.id, ...updatedObj }]);
             } else {
                 notificationUtil.error(response?.message);
             }
@@ -965,26 +1010,52 @@ $("#btn-submit_popup").click(function (e) {
 
         if (popupname == "FormItemConfig") {
             const allRows = tableFormItemConfig.getData();
+
             if (!allRows || allRows.length === 0) {
-                notificationUtil.error('No data to save');
-                commonUtil.btnProgress(btnpopupSubmitId, true);
+                const formId = $("#evalformidvalue").val();
+                jqClient({
+                    success: function (response) {
+                        commonUtil.btnProgress(btnpopupSubmitId, true);
+                        if (response?.responseStatus == 3) {
+                            notificationUtil.success(sharedFn().GetUiControlText('WEB_MSG_DELETE'));
+                        } else {
+                            notificationUtil.error(response?.responseMessage);
+                        }
+                    },
+                    error: function () {
+                        commonUtil.btnProgress(btnpopupSubmitId, true);
+                        notificationUtil.error('Request failed');
+                    }
+                }).Post(API_ROUTES.deleteFormItemConfig() + `?formId=${formId}`);
                 return;
             }
 
-            const dataToSave = allRows.map(obj => ({
-                Id: obj.id === "00000000-0000-0000-0000-000000000000" ? null : obj.id,
-                EvalFormId: $("#evalformidvalue").val(),
-                NameAr: obj.formItemConfig_NameAr || null,
-                NameEn: obj.formItemConfig_NameEn || null,
-                PartyTypeId: obj.formItemConfig_PartyTypeId || obj.formItemConfig_PartyType,
-                FormItemIds: (obj.formItemConfig_FormItemId || obj.formItemConfig_FormItem)
-                    ? (Array.isArray(obj.formItemConfig_FormItemId || obj.formItemConfig_FormItem)
-                        ? (obj.formItemConfig_FormItemId || obj.formItemConfig_FormItem)
-                        : [obj.formItemConfig_FormItemId || obj.formItemConfig_FormItem])
-                    : null,
-                CalcMethodId: obj.formItemConfig_CalcMethodId || obj.formItemConfig_CalcMethod,
-                Percentage: obj.formItemConfig_Percentage || 0
-            }));
+            const isMultipleEvaluation = $("#EvalFormHasMuliEvaluation").prop("checked");
+
+            const dataToSave = allRows.map(obj => {
+                const isAdd = obj.id === "00000000-0000-0000-0000-000000000000" || !obj.id;
+
+                const item = {
+                    Id: isAdd ? null : obj.id,
+                    EvalFormId: $("#evalformidvalue").val(),
+                    NameAr: obj.formItemConfig_NameAr || null,
+                    NameEn: obj.formItemConfig_NameEn || null,
+                    PartyTypeId: obj.formItemConfig_PartyTypeId || obj.formItemConfig_PartyType || null,
+                    FormItemIds: (obj.formItemConfig_FormItemId || obj.formItemConfig_FormItem)
+                        ? (Array.isArray(obj.formItemConfig_FormItemId || obj.formItemConfig_FormItem)
+                            ? (obj.formItemConfig_FormItemId || obj.formItemConfig_FormItem)
+                            : [obj.formItemConfig_FormItemId || obj.formItemConfig_FormItem])
+                        : null,
+                    CalcMethodId: obj.formItemConfig_CalcMethodId || obj.formItemConfig_CalcMethod || null,
+                    Percentage: obj.formItemConfig_Percentage || 0
+                };
+
+                if (isAdd) {
+                    item.EvalFormHasMuliEvaluation = isMultipleEvaluation;
+                }
+
+                return item;
+            });
 
             var formData = new FormData();
             formData.append('request', JSON.stringify(dataToSave));
@@ -1117,6 +1188,7 @@ initTables = () => {
             placeholder: sharedFn().GetUiControlText('NO_DATA_FOUND'),
             headerFilterPlaceholder: sharedFn().GetUiControlText('FILTER_COLUMN'),
             movableRows: true,
+            selectable:true
         },
         isResponsiveLayout: false,
         uniqueRowId: 'id',
@@ -1176,11 +1248,37 @@ function OpenFormItemConfigPopup(
         tablecolumnlist,
         settingList
     );
+    $("#IsMultipleEvaluation").off("change").on("change", function () {
+        if (this.checked) {
+            setTimeout(() => {
+                $("#FormItemConfigRelationtabulator .tabulator-cell[tabulator-field='formItemConfig_FormItem']")
+                    .css("pointer-events", "none")
+                    .css("opacity", "0.5");
+                $("#FormItemConfigRelationtabulator .tabulator-cell[tabulator-field='formItemConfig_PartyType']")
+                    .css("pointer-events", "none")
+                    .css("opacity", "0.5");
+            }, 150);
+        } else {
+            setTimeout(() => {
+                $("#FormItemConfigRelationtabulator .tabulator-cell[tabulator-field='formItemConfig_FormItem']")
+                    .css("pointer-events", "")
+                    .css("opacity", "");
+                $("#FormItemConfigRelationtabulator .tabulator-cell[tabulator-field='formItemConfig_PartyType']")
+                    .css("pointer-events", "")
+                    .css("opacity", "");
+            }, 150);
+        }
+    });
+    //if ($("#IsMultipleEvaluation").prop("checked")) {
+    //    tableFormItemConfig.hideColumn("formItemConfig_Percentage");
+    //}
 
     $("#ModalPopup").modal("show");
 
     $("#PopupForm").trigger("reset");
 }
+
+
 async function InitFormItemConfigPopup(
     modaltitle,
     ControlItems,
@@ -1195,17 +1293,31 @@ async function InitFormItemConfigPopup(
     $("#btn-clear_popup").html(sharedFn().GetUiControlText("CLEAR_BUTTON"));
 
     let popupdivcontent = `
-        <div class="row">
-            <div class="card-header justify-content-end d-flex align-items-center bg-light">
-                <button type="button" id="FormItemConfigRelationbutton" class="btn btn-primary">
-                    ${sharedFn().GetUiControlText('FormItemConfigAddButton')}
-                </button>
-            </div>
-            <div id="FormItemConfigRelationdiv">
-                <div id="FormItemConfigRelationtabulator"></div>
-            </div>
+    <div class="row">
+        <div class="card-header justify-content-end d-flex align-items-center bg-light">
+           <div id="IsMultipleEvaluationWrapper" class="me-auto align-items-center gap-2" style="display:none;">
+    <div class="form-check form-switch mb-0">
+        <input class="form-check-input" type="checkbox" role="switch" id="IsMultipleEvaluation" />
+        <label class="form-check-label" for="IsMultipleEvaluation">
+            ${sharedFn().GetUiControlText('IsMultipleEvaluation')}
+        </label>
+    </div>
+</div>
+<div class="me-2 d-flex align-items-center gap-2">
+    <button type="button" id="FormItemConfigDeleteSelectedButton" class="btn btn-danger d-none">
+        <i class="las la-trash"></i>
+        <span id="FormItemConfigSelectedCount"></span>
+    </button>
+</div>
+            <button type="button" id="FormItemConfigRelationbutton" class="btn btn-primary">
+                ${sharedFn().GetUiControlText('FormItemConfigAddButton')}
+            </button>
         </div>
-    `;
+        <div id="FormItemConfigRelationdiv">
+            <div id="FormItemConfigRelationtabulator"></div>
+        </div>
+    </div>
+`;
 
     $('#ModalPopup .modal-body #PopupForm').html(popupdivcontent);
 
@@ -1218,6 +1330,20 @@ async function InitFormItemConfigPopup(
     IsEdit = IsEditFormItemConfig ? true : "";
     IsDelete = IsDeleteFormItemConfig ? true : "";
     IsView = '';
+    const checkboxColumn = {
+        field: "rowSelected",
+        width: 40,
+        minWidth: 40,
+        hozAlign: "center",
+        headerHozAlign: "center",
+        headerSort: false,
+        resizable: false,
+        editable: false,
+        formatter: "rowSelection",
+        titleFormatter: "rowSelection"
+    };
+    const tablecolumnlistWithCheckbox = [checkboxColumn, ...tablecolumnlist];
+
     tableFormItemConfig = tableUtil.createTabulator({
         id: "FormItemConfigRelationtabulator",
         config: {
@@ -1225,16 +1351,17 @@ async function InitFormItemConfigPopup(
             pagination: "local",
             paginationSize: 10,
             placeholder: sharedFn().GetUiControlText('NO_DATA_FOUND'),
-
             movableRows: true,
             selectable: true,
+            selectableRangeMode: "click",
             editable: true,
             lookupSources: lookupSources
         },
         uniqueRowId: 'id',
         sortColumn: "updateDate",
         sortDir: "desc",
-        columns: tablecolumnlist,
+        columns: tablecolumnlistWithCheckbox,
+
         rowClick: function (e, row) {
             currentrowclicked = row.getPosition();
         }
@@ -1265,7 +1392,59 @@ async function InitFormItemConfigPopup(
         });
     });
 
+    // row selection logic
+    tableFormItemConfig.on("rowSelectionChanged", function (data, rows) {
+        const count = rows.length;
+        const totalRows = tableFormItemConfig.getRows().length;
+
+        // update delete button
+        if (count > 0) {
+            $("#FormItemConfigDeleteSelectedButton")
+                .removeClass("d-none")
+                .find("#FormItemConfigSelectedCount")
+                .text(` (${count})`);
+        } else {
+            $("#FormItemConfigDeleteSelectedButton").addClass("d-none");
+            $("#FormItemConfigSelectedCount").text('');
+        }
+
+        // sync header checkbox
+        $("#selectAllFormItemConfig").prop("checked", count > 0 && count === totalRows);
+
+        // refresh all row checkboxes
+        tableFormItemConfig.getRows().forEach(row => {
+            const checkbox = row.getElement().querySelector("input[type='checkbox']");
+            if (checkbox) checkbox.checked = row.isSelected();
+        });
+    });
+
+    $("#FormItemConfigSelectAllButton").off("click").on("click", function () {
+        tableFormItemConfig.selectRow();
+    });
+
+    $("#FormItemConfigClearSelectionButton").off("click").on("click", function () {
+        tableFormItemConfig.deselectRow();
+    });
+
+    $("#FormItemConfigDeleteSelectedButton").off("click").on("click", function () {
+        const selectedRows = tableFormItemConfig.getSelectedRows();
+        if (!selectedRows || selectedRows.length === 0) return;
+
+        notificationUtil.confirmation({
+            title: sharedFn().GetUiControlText('WEB_WARNING_DELETE'),
+            okText: sharedFn().GetUiControlText('WEB_DELETE_BUTTON'),
+            cancelText: sharedFn().GetUiControlText('WEB_CANCEL')
+        }, function () {
+            selectedRows.forEach(row => row.delete());
+            tableFormItemConfig.deselectRow();
+            notificationUtil.success(sharedFn().GetUiControlText('WEB_MSG_DELETE'));
+        });
+    });
+
     LoadFormItemConfigData();
+   
+
+    // apply initial state after tabulator renders
 }
 function LoadFormItemConfigData() {
     const evalformId = $("#evalformidvalue").val();
@@ -1273,19 +1452,18 @@ function LoadFormItemConfigData() {
     const options = {
         success: function (data) {
             if (data && data.length > 0) {
-
                 data.forEach(x => {
                     x.formItemConfig_FormItem = Array.isArray(x.formItemConfig_FormItemIds) ? x.formItemConfig_FormItemIds : (x.formItemConfig_FormItemIds ? [x.formItemConfig_FormItemIds] : []);
                     x.formItemConfig_CalcMethod = x.formItemConfig_CalcMethodId || null;
                     x.formItemConfig_PartyType = x.formItemConfig_PartyTypeId || null;
-
                 });
 
                 tableFormItemConfig.setData(data);
 
-            } else {
-                tableFormItemConfig.setData([]);
-            }
+                $("#IsMultipleEvaluationWrapper").hide();
+                $("#IsMultipleEvaluation").prop("checked", false);
+
+            } 
         }
     };
 

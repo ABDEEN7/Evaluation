@@ -3,6 +3,7 @@ using Evaluation.Services.BusinessLayer;
 using Evaluation.Services.BusinessLayer.API;
 using Evaluation.Services.Integration;
 using Evaluation.SharedHelper.Dtos.SchoolDto;
+using Evaluation.SharedHelper.Models.Api.ServiceRequestEntitiesDTO;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Evaluation.API.Controllers;
@@ -12,13 +13,10 @@ namespace Evaluation.API.Controllers;
 
 public class SchoolController : ControllerBase
 {
-
     private readonly MasterBL _masterBl;
-    private readonly HRService _hrService;
-    public SchoolController(MasterBL masterBl, HRService hrService)
+    public SchoolController(MasterBL masterBl)
     {
         this._masterBl = masterBl;
-        this._hrService = hrService;
     }
 
     [HttpGet]
@@ -29,39 +27,15 @@ public class SchoolController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<List<HREmployeeInfoDto>> GetHREmployeesDetails(int page)
-    {
-        return await _hrService.GetAllHRUsersAsync(page);
-    }
-
-    [HttpGet]
-    public async Task<List<HREmployeeInfoDto>> GetHREmployees(long? qID = null, string email = null, string orgno = null)
-    {
-        return await _hrService.GetHRUsersAsync(qID, email, orgno);
-    }
-
-    [HttpGet]
-    public async Task<bool> AddUpdateOrgTree(string? hrCode = null, long? qID = null)
-    {
-        return await _hrService.AddUpdateOrgTree(hrCode, qID);
-    }
-
-    [HttpGet]
-    public async Task<List<HROrganizationInfoDto>> GetHROrgDetailsAsync(int page)
-    {
-        return await _hrService.GetAllHROrgAsync(page);
-    }
-
-    [HttpGet]
     public async Task<IActionResult> GetVisits()
         => Ok(new { result = await _masterBl.GetApiService<SchoolBL>().GetVisitsAsync() });
 
-    //[HttpPost]
-    //public async Task<IActionResult> GetSchools([FromQuery] SchoolRequest request)
-    //{
-    //    var result = await _masterBl.GetApiService<SchoolBL>().GetSchools(request);
-    //    return Ok(result);
-    //}
+   [HttpGet]
+    public async Task<IActionResult> GetSchools([FromQuery] SchoolRequest request)
+    {
+        var result = await _masterBl.GetApiService<SchoolBL>().GetSchools(request);
+        return Ok(result);
+    }
 
     [HttpGet]
     public async Task<IActionResult> GetSchoolsByDepartment([FromQuery] Guid depId)
@@ -69,12 +43,7 @@ public class SchoolController : ControllerBase
         var result = await _masterBl.GetApiService<SchoolBL>().GetSchoolsByDepartmentId(depId);
         return Ok(result);
     }
-	[HttpPost]
-	public async Task<IActionResult> GetSchools()
-	{
-		var result = await _masterBl.GetApiService<SchoolBL>().GetSchools();
-		return Ok(result);
-	}
+
 	[HttpGet]
     public async Task<IActionResult> GetSchoolsPlan([FromQuery] SchoolRequest request)
     {

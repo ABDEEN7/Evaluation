@@ -1618,33 +1618,21 @@ window.formUtility = window.formUtility || {};
                                 .map(e => e.trim().toLowerCase());
 
                             if (!allowedExts.includes(fileExtension)) {
-                                if (typeof ns.showFieldError === "function") {
-                                    ns.showFieldError(fieldId, 'lblInvalidFileExtension');
-                                } else if (typeof ns.showError === "function") {
-                                    ns.showError(`#error_${fieldId}`, getUiText('lblInvalidFileExtension'));
-                                }
+                                 ns.showError(`#error_${fieldId}`, getUiText('lblInvalidFileExtension'));
                                 dz.removeFile(file);
                                 return;
                             }
                         }
 
                         if (dropzone.maxFilesize && fileSizeInMB > parseFloat(dropzone.maxFilesize)) {
-                            if (typeof ns.showFieldError === "function") {
-                                ns.showFieldError(fieldId, 'lblFileSizeExceeded');
-                            } else if (typeof ns.showError === "function") {
                                 ns.showError(`#error_${fieldId}`, getUiText('lblFileSizeExceeded'));
-                            }
                             dz.removeFile(file);
                             return;
                         }
                     });
 
                     dz.on("error", function (file, _serverMessage) {
-                        if (typeof ns.showFieldError === "function") {
-                            ns.showFieldError(fieldId, 'lblFileUploadError');
-                        } else if (typeof ns.showError === "function") {
                             ns.showError(`#error_${fieldId}`, getUiText('lblFileUploadError'));
-                        }
                         dz.removeFile(file);
                     });
 

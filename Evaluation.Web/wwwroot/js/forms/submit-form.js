@@ -21,51 +21,62 @@ function evaluationFormResult(formId) {
     $(`#${P_fieldId}-${SELECTORS.tbody} tr.main-row`).each(function () {
 
         const row = $(this);
-        const select = row.find("select.eval-select");
+        const selects = row.find("select.eval-select");
+        let mainObj;
 
-        const mainId = select.data("id");
+        selects.each(function (index, element) {
 
-        const selectedValue =
-            select.find("option:selected").data("id") ||
-            select.val() ||
-            null;
+            const $select = $(element);
 
-        const note =
-            row.find("textarea.note-input").val() || null;
 
-        const mainObj = {
-            id: mainId,
-            valueId: selectedValue,
-            value: $("option:selected", select).text(),
-            note: note,
-            subItems: []
-        };
 
-        // ========== LOOP SUB ITEMS RELATED TO THIS MAIN ==========
-        $(`tr.child-row[data-parent-id="${mainId}"]`).each(function () {
+            const mainId = $select.data("id");
 
-            const childRow = $(this);
-            const childSelect = childRow.find("select.eval-select");
-
-            const childId = childSelect.data("id");
-
-            const childValue =
-                childSelect.find("option:selected").data("id") ||
-                childSelect.val() ||
+            const selectedValue =
+                $select.find("option:selected").data("id") ||
+                $select.val() ||
                 null;
 
-            const childnote =
-                childRow.find("textarea.note-input").val() || null;
+            const note =
+                row.find("textarea.note-input").val() || null;
 
-            mainObj.subItems.push({
-                id: childId,
-                valueId: childValue,
-                value: $("option:selected", select).text(),
-                note: childnote
+            mainObj = {
+                id: mainId,
+                valueId: selectedValue,
+                value: $("option:selected", $select).data("actual-value") || 0,
+                weightPercentage: $select.data("config-weight-percentage") || 0,
+                note: note,
+                subItems: []
+            };
+
+            // ========== LOOP SUB ITEMS RELATED TO THIS MAIN ==========
+            $(`tr.child-row[data-parent-id="${mainId}"]`).each(function () {
+
+                const childRow = $(this);
+                const childSelect = childRow.find("select.eval-select");
+
+                const childId = childSelect.data("id");
+
+                const childValue =
+                    childSelect.find("option:selected").data("id") ||
+                    childSelect.val() ||
+                    null;
+
+                const childnote =
+                    childRow.find("textarea.note-input").val() || null;
+
+                mainObj.subItems.push({
+                    id: childId,
+                    valueId: childValue,
+                    value: $("option:selected", $select).text(),//NEED TO CHECK
+                    note: childnote
+                });
             });
+
+
+            mainItems.push(mainObj);
         });
 
-        mainItems.push(mainObj);
     });
 
     // Strengths & Improvements
@@ -124,10 +135,21 @@ function calculateFE(select, formId) {
             let total = 0;
 
             formResult.items.forEach((item) => {
-                total += parseInt(item.value, 10) || 0;
+                if (P_hasMuliEvaluation) {
+                    total += (item.value * (item.weightPercentage / 100)) || 0;
+                }
+                else {
+                    total += item.value || 0;
+                }
             });
 
-            result.Value = total / formResult.items.length;
+            if (P_hasMuliEvaluation) {
+                result.Value = total / (formResult.items.length / P_countOfColumnsValue);
+
+            }
+            else {
+                result.Value = total / formResult.items.length;
+            }
 
             const evalMatrixValue = P_matrixResponse.value.find(
                 v => v.minValue <= result.Value && v.maxValue >= result.Value
@@ -146,7 +168,7 @@ function calculateFE(select, formId) {
             break;
     }
 
-    $(`#${P_fieldId}-result-value`).text(`${result.Name}/${result.Value}`);
+    $(`#${P_fieldId}-result-value`).text(`(${Number(result.Value).toFixed(2)})${result.Name}`);
     $(`#${P_fieldId}-result-div`).removeClass("d-none");
 
     return result

@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
+using Evaluation.DAL.Dtos;
 using Evaluation.DAL.Models.DepartementEntites;
 using Evaluation.DAL.Models.Website;
 using Evaluation.DAL.Repositories;
+using Evaluation.SharedHelper.Dtos.WebSiteDto;
 using Evaluation.SharedHelper.Models.Admin;
 
 
@@ -20,13 +22,25 @@ namespace Evaluation.Services.Mappers.Admin
                 .ForMember(dest => dest.DepWebGroup,
            opt => opt.MapFrom<DepWebGroupResolver>());
 
+            CreateMap<WebGroup, WebGroupsDto>()
+             .ForMember(dest => dest.BackendName, opt => opt.MapFrom(src => src.BackendName))
+             .ForMember(dest => dest.RoutingPath, opt => opt.MapFrom(src => src.RoutingPath))
+             .ForMember(dest => dest.Desc, opt => opt.MapFrom<LocalizedDescResolver>());
+
         }
 
     }
 
-  
+    public class LocalizedDescResolver : IValueResolver<WebGroup, WebGroupsDto, string>
+    {
+        public string Resolve(WebGroup src, WebGroupsDto dest, string destMember, ResolutionContext context)
+        {
+            var lang = context.Items["lang"]?.ToString();
+            return lang == "ar" ? src.DescAr : src.DescEn;
+        }
+    }
 
- 
+
     public class DepWebGroupResolver
    : IValueResolver<WebGroup, WebGroupsDTO, Guid[]?>
     {

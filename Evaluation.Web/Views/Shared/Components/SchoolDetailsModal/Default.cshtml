@@ -1,12 +1,10 @@
 ﻿@{
     var modalId = ViewData["ModalId"] as string ?? "myModal";
     var isModal = ViewBag.IsModal ?? true;
-
-    var Type = (modalId == "ORGANIZATION") ? "SCHOOL" : modalId;
-
+    var type = ViewBag.type;
 
     Func<object, Microsoft.AspNetCore.Html.IHtmlContent> content = @<text>
-    @if (Type == "SCHOOL")
+    @if (type == "SCHOOL")
     {
             <div class="col-md-6">
                 <div class="card card-table mb-3">
@@ -24,7 +22,7 @@
                                         </h6>
                                     </div>
                                     <div class="col-md-6">
-                                        <h6 class="text-light" id="managerName">
+                                    <h6 class="text-light" id="managerName_@modalId">
                                 
                                         </h6>
                                     </div>
@@ -40,7 +38,7 @@
                                         </h6>
                                     </div>
                                     <div class="col-md-6 justify-items-end">
-                                        <h6 class="text-light" id="establishmentDate"></h6>
+                                    <h6 class="text-light" id="establishmentDate_@modalId"></h6>
                                     </div>
                                 </div>
                                 <div class="row mb-3">
@@ -50,54 +48,41 @@
                                                 <i class="las la-user-friends color-primary"></i>
                                             </span>
 
-                                            <span class="mx-2">المدرسون</span>
+                                            <span class="mx-2">المراحل</span>
                                         </h6>
                                     </div>
                                     <div class="col-md-6 justify-items-end">
-                                        <h6 class="text-light" id="teachers"></h6>
+                                    <h6 class="text-light" id="teachers_@modalId">ابتدائي, اعدادي</h6>
                                     </div>
                                 </div>
-                                <div class="row mb-3">
-                                    <div class="col-md-6">
-                                        <h6 class="fw-bold">
-                                            <span class="primary-bg">
-                                                <i class="las la-graduation-cap color-primary"></i>
-                                            </span>
-
-                                            <span class="mx-2">الطلاب</span>
-                                        </h6>
-                                    </div>
-                                    <div class="col-md-6 justify-items-end">
-                                        <h6 class="text-light" id="students"></h6>
-                                    </div>
-                                </div>
+                           
                         </div>
                         <hr class="my-4">
                                 <div class=" d-flex gap-2 align-items-center mb-3">
                                     <span class="soft-gray-bg mp2">
                                         <i class="las la-phone-volume color-primary"></i>
                                     </span>
-                                    <div><a id="phone" href="#" class="text-dark"></a></div>
+                            <div><a id="phone_@modalId" href="#" class="text-dark"></a></div>
                                 </div>
                             
                                 <div class=" d-flex gap-2 align-items-center mb-3">
                                     <span class="soft-gray-bg mp2">
                                         <i class="las la-envelope color-primary"></i>
                                     </span>
-                                    <div><a id="email" href="" class="text-dark"></a></div>
+                            <div><a id="email_@modalId" href="" class="text-dark"></a></div>
                                 </div>
                            
                                 <div class=" d-flex gap-2 align-items-center mb-3">
                                     <span class="soft-gray-bg mp2">
                                         <i class="las la-location-arrow color-primary"></i>
                                     </span>
-                                    <div><p id="address" class="text-dark m-0"></p></div>
+                            <div><p id="address_@modalId" class="text-dark m-0"></p></div>
                                 </div>
                     </div>
                 </div>
             </div>
     }
-    else if (Type == "EMPLOYEE")
+    else if (type == "EMPLOYEE")
     {
             <div class="col-md-6">
                 <div class="card card-table mb-3">
@@ -106,19 +91,19 @@
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <p class="text-light">الرقم الوظيفي</p>
-                                    <h5 class="fw-bold" id="employeeNo"></h5>
+                                <h5 class="fw-bold" id="employeeNo_@modalId"></h5>
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <p class="text-light">تاريخ الميلاد</p>
-                                    <h5 class="fw-bold" id="birthDate"></h5>
+                                <h5 class="fw-bold" id="birthDate_@modalId"></h5>
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <p class="text-light">الجنسية</p>
-                                    <h5 class="fw-bold" id="nationalityCode"></h5>
+                                <h5 class="fw-bold" id="nationalityCode_@modalId"></h5>
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <p class="text-light">تاريخ الالتحاق</p>
-                                    <h5 class="fw-bold" id="joinDate"></h5>
+                                <h5 class="fw-bold" id="joinDate_@modalId"></h5>
                                 </div>
                             </div>
                
@@ -127,15 +112,15 @@
                             <div class="col-md-12">
                                 <div class=" d-flex gap-2 align-items-center mb-3">
                                     <div class="social-icon"><i class="la la-phone-volume"></i></div>
-                                    <div><a id="jobTitle" href="#" class="text-dark"></a></div>
+                                    <div><a id="jobTitle_@modalId" href="#" class="text-dark"></a></div>
                                 </div>
                                 <div class=" d-flex gap-2 align-items-center mb-3">
                                     <div class="social-icon"><i class="la la-envelope"></i></div>
-                                    <div><a id="email" href="" class="text-dark"></a></div>
+                                    <div><a id="email_@modalId" href="" class="text-dark"></a></div>
                                 </div>
                                 <div class=" d-flex gap-2 align-items-center mb-3">
                                     <div class="social-icon"><i class="la la-location-arrow"></i></div>
-                                    <div><p id="qID" class="text-dark m-0"></p></div>
+                                    <div><p id="qID_@modalId class="text-dark m-0"></p></div>
                                 </div>
                             </div>
                         </div>
@@ -192,7 +177,7 @@
             <div class="modal-content">
                 <div class="modal-header align-items-start border-0">
                     <div>
-                        <h4 class="modal-title fw-semibold mb-2" id="modalLabel"></h4>
+                        <h4 class="modal-title fw-semibold mb-2" id="modalLabel_@modalId"></h4>
                     </div>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"><i class="la la-close mt-1"></i></button>
                 </div>
@@ -212,42 +197,40 @@ else
     </div>
 }
 
-@section Scripts {
 
-    <script src="~/js/org/orgdetails.js" asp-append-version="true"></script>
 
-    @if (Type == "SCHOOL")
+
+@if (type == "SCHOOL")
     {
         <script type="text/javascript">
             $(document).on('click', 'a[data-bs-target="#@modalId"]', async function () {
                 let ordId = $(this).attr('data-id');
                 console.log(ordId);
-                await initSchoolDetailsPage(ordId);
-                $("#modalLabel").text(orgDetails.name);
-                $("#managerName").text(orgDetails.manageName);
-                $("#establishmentDate").text(orgDetails.establishmentDate);
-                $("#phone").text(orgDetails.phone);
-                $("#email").text(orgDetails.orgEmail);
-                $("#address").text(orgDetails.address);
+                 let orgDetails =  await initSchoolDetailsPage(ordId);
+                $("#modalLabel_@modalId").text(orgDetails.name);
+        $("#managerName_@modalId").text(orgDetails.managerName);
+            $("#establishmentDate_@modalId").text(orgDetails.establishmentDate);
+            $("#phone_@modalId").text(orgDetails.phone);
+            $("#email_@modalId").text(orgDetails.orgEmail);
+            $("#address_@modalId").text(orgDetails.address);
             });
         </script>
     }
-    else if (Type == "EMPLOYEE")
+else if (type == "EMPLOYEE")
     {
         <script type="text/javascript">
             $(document).on('click', 'a[data-bs-target="#@modalId"]', async function () {
                 let ordId = $(this).attr('data-id');
                 console.log(ordId);
-                await initSchoolDetailsPage(ordId);
-                $("#modalLabel").text(orgDetails.name);
-                $("#employeeNo").text(orgDetails.employeeNo);
-                $("#birthDate").text(orgDetails.birthDate);
-                $("#nationalityCode").text(orgDetails.nationalityCode);
-                $("#joinDate").text(orgDetails.joinDate);
-                $("#jobTitle").text(orgDetails.jobTitle);
-                $("#email").text(orgDetails.email);
-                $("#qID").text(orgDetails.qID);
+           let orgDetails =  await initSchoolDetailsPage(ordId);
+            $("#modalLabel_@modalId").text(orgDetails.name);
+            $("#employeeNo_@modalId").text(orgDetails.employeeNo);
+            $("#birthDate_@modalId").text(orgDetails.birthDate);
+            $("#nationalityCode_@modalId").text(orgDetails.nationalityCode);
+            $("#joinDate_@modalId").text(orgDetails.joinDate);
+            $("#jobTitle_@modalId").text(orgDetails.jobTitle);
+            $("#email_@modalId").text(orgDetails.email);
+            $("#qID_@modalId").text(orgDetails.qID);
             });
         </script>
     }
-}

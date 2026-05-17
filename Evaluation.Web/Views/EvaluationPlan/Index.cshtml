@@ -27,11 +27,9 @@
 
 
 <section id="evaluation" class="banner p-4">
-    <div class="card container-fluid container-xxxl p-4">
-        <h2 class="@ConstantKeys.EvaluationForm.PageTitle"></h2>
-        <h6 class="@ConstantKeys.EvaluationForm.PageDescription"></h6>
-        <div class="row pt-4">
-            <div class="col-lg-12 mb-3">
+    <div class="card container-fluid container-xxxl px-4 pt-1">
+        <div class="row">
+            <div class="col-lg-12 p-0">
                 <ul class="nav nav-tabs row main-tabs bg-grey">
                     <li id="tabEvaluationPlans" class="nav-item col-md-4">
                         <a class="nav-link text-center active fs-6" data-bs-toggle="tab" href="#tab-plans">
@@ -51,12 +49,12 @@
                 </ul>
             </div>
 
-            <div class="col-lg-12">
-                <div class="tab-content p-0">
+            <div class="col-lg-12 p-0">
+                <div class="tab-content">
 
                     <!-- Tab: Evaluation Plans -->
                     <div id="tab-plans" class="tab-pane fade show active">
-                        <ul class="nav nav-tabs sub-tabs my-3">
+                        <ul class="nav nav-tabs sub-tabs m-4">
                             <li class="nav-item">
                                 <a class="nav-link active fs-6 @ConstantKeys.EvaluationForm.SubTabPlanRequests"
                                    data-bs-toggle="tab" href="#tab-plan-requests"></a>
@@ -66,7 +64,7 @@
                                    data-bs-toggle="tab" href="#tab-plan-details"></a>
                             </li>
                         </ul>
-                        <div class="card tab-content px-3 pt-3">
+                        <div class="card tab-content m-4">
                             <div id="tab-plan-requests" class="tab-pane fade show active">
                                 <partial name="_PartialEvaluationPlanRequests" />
                             </div>
@@ -139,20 +137,15 @@
                                 <div id="itemSchool" class="accordion-collapse collapse show">
                                     <div class="accordion-body">
                                         <div id="school-details-container">
-                                            @await Component.InvokeAsync("SchoolDetailsModal", new
-                                                {
-                                                    modalId = "SCHOOL",
-                                                    title = "تفاصيل المدرسة",
-                                                    body = "",
-                                                    isModal = false
-                                                })
+                                 
+                                            @await Component.InvokeAsync("SchoolDetailsModal", new { modalId = "schoolDetailsPopupEvaluationRequestDetailsModal", title = "School Details", body = "Hello from modal body!", isModal = false, type = "SCHOOL" })
                                         </div>
                                         <div id="NDAContainerDiv"></div>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="accordion-item mb-3 rounded">
+                            <div class="accordion-item mb-3 rounded" id="formAccordionItem">
                                 <h2 class="accordion-header">
                                     <button class="accordion-button collapsed d-flex align-items-center justify-content-between"
                                             type="button" data-bs-toggle="collapse"
@@ -170,7 +163,6 @@
                                     </div>
                                 </div>
                             </div>
-
                             <div class="accordion-item mb-3 rounded d-none" id="forceAssignmentAccordion">
 
                                 <h2 class="accordion-header">
@@ -573,13 +565,14 @@
 </div>
 <partial name="_PartialFileModal" />
 
+
 @section Scripts {
     <!-- Tables -->
     <script src="~/lib/dropzone/dist/dropzone.js" asp-append-version="true"></script>
     <script src="~/lib/datatable/jquery.dataTables.min.js"></script>
     <script src="~/lib/datatable/dataTables.buttons.min.js"></script>
     <script src="~/lib/datatable/buttons.html5.min.js"></script>
-
+    <script src="~/js/evaluationplan/index.js"></script>
     <!-- Date -->
     <script src="~/plan-assets/vendor/select2/js/select2.min.js"></script>
     <script src="~/plan-assets/vendor/flatpickr/js/flatpickr.js"></script>
@@ -636,7 +629,6 @@
 
 
     <script>
-        const departmentRoutePath = sharedUtility().extractDepartmentName();
         $(document).ready(async function () {
 
             await webAppConfigsSetup().Init({
@@ -651,28 +643,38 @@
                     '@nameof(ConstantKeys.EvaluationForm)',
                     '@nameof(ConstantKeys.WebSchools)',
                     '@nameof(ConstantKeys.Assignment)'
-
-
                 ],
                 pages: [
                     '@nameof(ConstantKeys.WebAppCommon)',
                     '@nameof(ConstantKeys.CreatePlan)',
                     '@nameof(ConstantKeys.EvaluationOperations)'
-
-                ],
-
+                ]
             }).then((result) => {
                 permissionsList = result.permissionsList;
-                IsCanUpdatePlan = permissionsList?.some(p => p === '@ConstantKeys.WebPermissions.EDIT_WEB_PLAN') ?? false;
+
+                IsCanUpdatePlan = permissionsList?.some(p =>
+                    p === '@ConstantKeys.WebPermissions.EDIT_WEB_PLAN'
+                ) ?? false;
+
+                uiControlsSetup().UpdatPageTitle('WebAppScholarship');
+                 InitNavbarSection();
+                $('body').show();
             });
-            additional_keys: [];
+
+            if (!sharedUtility().ExistingToken()) {
+                sharedUtility().RedirectUnauthorized();
+                return;
+            }
+
             window.formUtility = window.formUtility || {};
-             const searchParams = new URLSearchParams(window.location.search);
-                const reqId = searchParams.get('id');
-                const serviceId = searchParams.get('serviceId');
-                const EvlId = searchParams.get('Evlid');
-                const planId = searchParams.get('planId');
-                const SerReqid = searchParams.get('SerReqid');
+
+            const searchParams = new URLSearchParams(window.location.search);
+           
+            const reqId = searchParams.get('id');
+            const serviceId = searchParams.get('serviceId');
+            const EvlId = searchParams.get('Evlid');
+            const planId = searchParams.get('planId');
+            const SerReqid = searchParams.get('SerReqid');
 
             if (reqId) {
                 openPlanRequestDetails(reqId);
@@ -681,9 +683,11 @@
             if (EvlId) {
                 openEvaluationRequestDetails(EvlId);
             }
-         if (SerReqid) {
-       openRequestDetails(EvlId);
- }
+
+            if (SerReqid) {
+                openRequestDetails(SerReqid);
+            }
+
             if (planId) {
                 if (IsCanUpdatePlan) {
                     InitializeCreatePlanRequestService(serviceId, planId);
@@ -691,61 +695,29 @@
                     InitializePlanDetails(planId);
                 }
             }
-            // if()
 
             $('#evaluationRequestDetailsModal').on('hidden.bs.modal', function () {
                 formUtility.removeQueryParameter(['Evlid', 'serviceId']);
             });
+
             $('#planRequestModal').on('hidden.bs.modal', function () {
                 formUtility.removeQueryParameter(['id', 'serviceId']);
             });
 
             $('#RequestModal').on('hidden.bs.modal', function () {
-                formUtility.removeQueryParameter(['id', 'serviceId']);
+                formUtility.removeQueryParameter(['SerReqid', 'serviceId']);
             });
+
             $('#PlanDetailsModal').on('hidden.bs.modal', function () {
-                formUtility.removeQueryParameter(['planId', 'planId']);
+                formUtility.removeQueryParameter(['planId', 'serviceId']);
             });
-            $('#PlanDetailsModal').on('hidden.bs.modal', function () {
-                formUtility.removeQueryParameter(['planId', 'planId']);
-                formUtility.removeQueryParameter(['serviceId', 'serviceId']);
-            });
-            if (sharedUtility().ExistingToken()) {
-                uiControlsSetup().UpdatPageTitle('WebAppScholarship');
-                $('body').show();
-               
-                // await LoadUserDetails();
-                 InitNavbarSection();
 
-                  GetScopes();
-
-                // activateTabFromUrl();
-                // CheckAndResumeSessionTimer();
-                // GetServices();
-                // GetRequests();
-                // GetScholarships();
-                // CheckRequiredEmailOrMobileVerification();
-                //InitializeAdvancedSearch();
-
-
-                //     InitializeAdvancedSearch();
-                // } else {
-                //     sharedUtility().RedirectToUrl(ConstantUrls.LoginURL);
-                // }
-
-                // $(document).on('click', '.more-details-btn', ServiceCardBuilder.handleCardClick);
-                // $(document).on('click', 'a[data-role="trigger-card-click"]', function (e) {
-                //     e.preventDefault();
-                //     ServiceCardBuilder.handleCardClick.call(this, e);
-                // });
-
-
-            }
-
+            await LoadUserDetails();
+           toggleAddEvaluationPlanRequestButton();
+            //GetScopes();
+            CheckAndResumeSessionTimer();
         });
     </script>
-
-
 
 
 }

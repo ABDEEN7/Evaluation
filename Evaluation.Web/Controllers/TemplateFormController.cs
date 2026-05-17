@@ -5,7 +5,6 @@ namespace Evaluation.Web.Controllers
     [Route("{language=ar}/[controller]")]
     public class TemplateFormController : Controller
     {
-        // هذا هو الـ route الافتراضي عند الدخول بدون action
         [HttpGet("")]
         public IActionResult Default(string? id)
         {

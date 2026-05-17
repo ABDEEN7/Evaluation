@@ -139,42 +139,45 @@ function $p(selector) {
      * @param {Object} data - Evaluation data object
      * @returns {Object} Validation result with isValid flag and errors array
      */
-    function validatePlan(data) {
+
+    function validatePlan(data, fieldId) {
         const errors = [];
 
-        if (!data.name) {
-            errors.push( 'Name Required');
-        }
-        if (!data.planTypeDepId) {
-            errors.push('Plan Type Required');
-        }
+        const createError = (fieldId, message) => {
+            errors.push({ fieldId, error: message });
+        };
 
         if (!data.name || data.name.length < 3) {
-            errors.push('Plan title is required and must be at least 3 characters');
+            createError(`${fieldId}_planTitle`, 'Plan title is required and must be at least 3 characters');
+        }
+
+        if (!data.planTypeDepId) {
+            createError(`${fieldId}_ddlPlanType`, 'Plan Type Required');
         }
 
         if (!data.startDate || !data.endDate) {
-            errors.push('Date range is required');
+            createError(`${fieldId}_parentDate`, 'Date range is required');
         }
 
         if (!data.schools || data.schools.length === 0) {
-            errors.push('At least one school must be selected');
+            createError(`${fieldId}_planTable`, 'At least one school must be selected');
         }
 
-        if (data.schools && data.schools.length > 0) {
+        if (data.schools?.length > 0) {
             data.schools.forEach((school, index) => {
                 if (!school.startEvaluationDate || !school.endEvaluationDate) {
-                    errors.push(`School ${index + 1}: Visit date is required`);
+                    createError(`${fieldId}_planTable`, `School ${index + 1}: Visit date is required`);
                 }
+
                 if (!school.visitTypeId) {
-                    errors.push(`School ${index + 1}: Visit type is required`);
+                    createError(`${fieldId}_planTable_error`, `School ${index + 1}: Visit type is required`);
                 }
             });
         }
 
         return {
             isValid: errors.length === 0,
-            errors
+            errors: errors
         };
     }
 

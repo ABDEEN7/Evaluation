@@ -208,6 +208,7 @@ public static class ConstantKeys
         public static readonly string Max_Final_Evaluation_Forms_Exceeded = "Max_Final_Evaluation_Forms_Exceeded";
         public static readonly string UserNotExsistInThisEvaluationRequest = "UserNotExsistInThisEvaluationRequest";
         public static readonly string UnsupportedDepartmentCategory = "UnsupportedDepartmentCategory";
+        public static readonly string lblNoPartyTypeFound = "lblNoPartyTypeFound";
     }
 
     public static class AdminSettings
@@ -1022,7 +1023,10 @@ public static class ConstantKeys
 
         #endregion
         #region FORMITEMCONFIG
+        public const string VIEW_WEB_FORMITEMCONFIG = "VIEW_WEB_FORMITEMCONFIG";
         public const string ADD_WEB_FORMITEMCONFIG = "ADD_WEB_FORMITEMCONFIG";
+        public const string EDIT_WEB_FORMITEMCONFIG = "EDIT_WEB_FORMITEMCONFIG";
+        public const string DELETE_WEB_FORMITEMCONFIG = "DELETE_WEB_FORMITEMCONFIG";
         #endregion
         #region TEAM
 
@@ -1226,6 +1230,7 @@ public static class ConstantKeys
         public const string RequestDetails = Prefix + nameof(RequestDetails);
 
         // Filters
+        public const string AdvancedSearch = Prefix + nameof(AdvancedSearch);
         public const string Filter = Prefix + nameof(Filter);
         public const string Clear = Prefix + nameof(Clear);
 
@@ -1580,7 +1585,7 @@ public static class ConstantKeys
         public const string Name = Prefix + "Name";
         public const string Code = Prefix + "Code";
         public const string TypeCol = Prefix + "TypeCol";
-        public const string PhaseCol = Prefix + "PhaseCol";
+        public const string LevelsCol = Prefix + "LevelsCol";
         public const string RegionCol = Prefix + "RegionCol";
         public const string StatusCol = Prefix + "StatusCol";
 

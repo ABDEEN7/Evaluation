@@ -354,7 +354,7 @@
             .addClass('text-dark')
             .attr('type', 'button')
             .attr('data-bs-toggle', 'modal')
-            .attr('data-bs-target', '#schoolDetailsModal')
+            .attr('data-bs-target', '#SCHOOL')
             .attr('data-id', school.id)
             .html('<i class="la la-eye"></i>');
 
@@ -435,7 +435,7 @@
             titleGroup.append($('<div>').addClass('invalid-feedback').text(`${t('lblPleaseEnterPlanTitle')}`));
         }
         titleGroup.append(
-            $('<div>').attr('id', `${fieldId}_planTitle_error`).addClass('error-message text-danger'));
+            $('<div>').attr('id', `error_${fieldId}_planTitle`).addClass('error-message text-danger'));
 
         titleCol.append(titleGroup);
         form.append(titleCol);
@@ -455,7 +455,7 @@
             planTypeGroup.append($('<div>').addClass('invalid-feedback').text(`${t('lblPleaseChoosePlanType')}`));
         }
         planTypeGroup.append(
-            $('<div>').attr('id', `${fieldId}_ddlPlanType_error`).addClass('error-message text-danger'));
+            $('<div>').attr('id', `error_${fieldId}_ddlPlanType`).addClass('error-message text-danger'));
         planTypeCol.append(planTypeGroup);
         form.append(planTypeCol);
 
@@ -481,7 +481,7 @@
             dateRangeGroup.append($('<div>').addClass('invalid-feedback').text(`${t('lblPleaseChooseTimePeriod')}`));
         }
         dateRangeGroup.append(
-            $('<div>').attr('id', `${fieldId}_parentDate_error`).addClass('error-message text-danger')
+            $('<div>').attr('id', `error_${fieldId}_parentDate`).addClass('error-message text-danger')
         );
 
         dateRangeCol.append(dateRangeGroup);

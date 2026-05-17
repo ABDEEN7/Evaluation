@@ -2,6 +2,12 @@
 @{
     var lang = responseInfo.Lang;
     var showlang = lang == "ar" ? "EN" : "AR";
+
+    var depRoute = Context.Request.Path.Value?.Split('/', StringSplitOptions.RemoveEmptyEntries).Skip(2).FirstOrDefault();
+
+    var loginUrl = !string.IsNullOrEmpty(depRoute)
+        ? $"/{lang}/Account/{depRoute}/Login"
+        : $"/{lang}/Account/Login";
 }
 
 <div id="topbar"></div>
@@ -61,15 +67,15 @@
                         </a>
 
                         <!-- Login -->
-                        <a id="loginLink"
-                           href="/@responseInfo.Lang/Account/Login"
-                           class="btn btn-primary btn-sm login-or-register text-white">
-                            تسجيل دخول
-                        </a>
+                       <a id="loginLink"
+   href="@loginUrl"
+   class="btn btn-primary btn-sm login-or-register text-white">
+    تسجيل دخول
+</a>
 
                         <!-- Profile -->
                         <div class="dropdown" id="profileDropdown" style="display:none;">
-                            <a class="btn btn-outline-primary btn-sm dropdown-toggle"
+                            <a class="profile-btn dropdown-toggle"
                                href="#"
                                id="navbarDropdown"
                                data-bs-toggle="dropdown">

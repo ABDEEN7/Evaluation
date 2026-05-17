@@ -11,7 +11,7 @@ public class SubFormItemEvaluationDto
     public Guid Id { get; set; }
     public Guid? ValueId { get; set; }
 
-    public decimal? Value { get; set; }
+    public string? Value { get; set; }
     public string? Note { get; set; }
     public string? Name { get; set; }
 }

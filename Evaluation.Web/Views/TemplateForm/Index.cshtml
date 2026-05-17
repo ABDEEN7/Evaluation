@@ -89,8 +89,7 @@
 
     <script src="~/js/TemplateForm/template-constants.js" asp-append-version="true"></script>
     <script src="~/js/TemplateForm/template-form.js" asp-append-version="true"></script>
-   @*  <script src="~/lib/tabulator/js/tabulator.js" asp-append-version="true"></script>
- *@
+ 
     <script>
         $(document).ready(async function () {
 
@@ -123,6 +122,13 @@
                     '@nameof(ConstantKeys.WebPermissions.ADD_WEB_FORMSCOPES)',
                 ],
             }).then((result) => {
+                uiControlsSetup().UpdatPageTitle("WebAppTemplateForm");
+                InitNavbarSection();
+                $('body').show();
+                if (!sharedUtility().ExistingToken()) {
+                    sharedUtility().RedirectUnauthorized();
+                    return;
+                }
                 var data = result;
                 uiControlItems = result.uiControlItems.filter(x => x.rowOrder > 0 && x.permissionBackendName == '@ConstantKeys.WebPermissions.ADD_WEB_EVALFORMS');
                 FormItemuiControlItems = result.uiControlItems.filter(x => x.rowOrder > 0 && x.permissionBackendName == '@ConstantKeys.WebPermissions.ADD_WEB_FORMITEMS');

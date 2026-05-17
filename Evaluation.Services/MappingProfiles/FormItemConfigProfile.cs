@@ -8,8 +8,11 @@ public class FormItemConfigProfile : Profile
 {
     public FormItemConfigProfile()
     {
-        CreateMap<FormItemConfigDto, FormItemConfig>();
-        CreateMap<FormItemConfig, FormItemConfigDto>();
+        CreateMap<FormItemConfig, FormItemConfigDto>()
+            .ForMember(d => d.FormItemConfig_NameAr, opt => opt.MapFrom(src => src.NameAr))
+         .ForMember(d => d.FormItemConfig_NameEn, opt => opt.MapFrom(src => src.NameEn))
+         .ForMember(d => d.FormItemConfig_Percentage, opt => opt.MapFrom(src => src.WeightPercentage))
+         .ReverseMap();
         CreateMap<FormItemConfig, CreateFormItemConfigDto>();
     }
 }

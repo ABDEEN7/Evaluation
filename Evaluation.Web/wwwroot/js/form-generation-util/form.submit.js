@@ -183,21 +183,15 @@ window.serviceRequestForm = window.serviceRequestForm || {};
 
             errors = fu.validateFields(fields, valuesMap) || [];
 
-            const dateErrors = fu.validateDateGroups() || [];
+        const dateErrors = fu.validateDateFields() || [];
             errors = errors.concat(dateErrors);
        
             const notEqualErrors = fu.validateNotEqualFields(fields) || [];
             errors = errors.concat(notEqualErrors);
     
-             errors = errors.concat(validateTimeRange(fields, valuesMap));
+        errors = errors.concat(fu.validateTimeRange(fields, valuesMap));
 
-        if (errors.length) {
-            if (typeof fu.showFieldErrors === "function") {
-                fu.showFieldErrors(errors);
-            } else if (typeof fu.showFieldError === "function") {
-                errors.forEach(err => fu.showFieldError(err));
-            }
-        }
+        fu.showErrors(errors);
 
         return { isValid: errors.length === 0, fields, valuesMap, errors };
     }
@@ -223,12 +217,21 @@ window.serviceRequestForm = window.serviceRequestForm || {};
         formData.append("fieldValues", JSON.stringify(payloadFields));
 
         if (actionTypeName === ACTION_TYPE.ASSIGNT_TEAM) {
-            const teamData = getAssignmentsDataByFieldId('assign');
-            if (!teamData) return { formData, ok: false };
-            formData.append("teamUsers", JSON.stringify(teamData));
 
+            const validation = validateTeamByFieldId('assign');
+            if (!validation.isValid) {
+
+                DisplayAlert('يرجى تصحيح الأخطاء التالية:\n' + validation.errors.join('\n'), "danger");
+                return {
+                    formData: null,
+                    ok: false
+                };
+            }
+
+            const teamData = getAssignmentsDataByFieldId('assign');
+
+            formData.append("teamUsers", JSON.stringify(teamData));
         }
-        
 
          //formData.append("ActionRemarks", remarksValue);
 
