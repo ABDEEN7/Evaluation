@@ -2623,3 +2623,10 @@ input.auto-fill {
 .table-card-seperate-styling tbody tr:not(.card):not(.card-row).plan-request-card .request-divider {
     display: none !important;
 }
+
+
+
+.fc-h-event .fc-event-title-container {
+    background-color: var(--color-primary) !important;
+    border-color: #8a153820 !important;
+}
