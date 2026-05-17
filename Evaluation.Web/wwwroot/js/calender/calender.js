@@ -99,7 +99,9 @@ document.addEventListener("DOMContentLoaded", () => {
         },
         initialDate: today,
         navLinks: true,
-        businessHours: true,
+        businessHours: {
+        daysOfWeek: [0, 1, 2, 3, 4],
+        },
         editable: true,
         selectable: true,
 
