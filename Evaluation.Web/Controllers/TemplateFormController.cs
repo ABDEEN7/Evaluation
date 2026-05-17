@@ -13,12 +13,6 @@ namespace Evaluation.Web.Controllers
             return View();
         }
 
-        [HttpGet("{depRouting}/Calendar")]
-        public IActionResult Calendar(string depRouting)
-        {
-            return View();
-        }
-
         [HttpGet("{depRouting}")]
         public IActionResult Index(string depRouting)
         {
