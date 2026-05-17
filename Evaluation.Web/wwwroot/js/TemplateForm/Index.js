@@ -90,6 +90,20 @@ function loadDepartments() {
         });
 }
 
+function loadWebGroupDescription() {
+    let webGroupPath = webgroup;
+    jqClient().Get(`/Website/GetDepartmentsForWebGroup?webGroupPath=${webGroupPath}`)
+        .done((result) => {
+
+            const data = (result && result.result) ? result.result : [];
+
+            renderDepartmentsTable(data.result);
+        })
+        .fail((jqXHR, textStatus, err) => {
+            console.error('GetAll department failed', textStatus, err);
+        });
+}
+
 function renderDepartmentsTable(departments) {
     if (!Array.isArray(departments) || departments.length === 0) return;
 

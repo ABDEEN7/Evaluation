@@ -6,6 +6,8 @@ namespace Evaluation.SharedHelper.Models.Admin
     {
         public string NameAr { get; set; } = null!;
         public string NameEn { get; set; } = null!;
+        public string DescAr { get; set; } = null!;
+        public string DescEn { get; set; } = null!;
         public string RoutingPath { get; set; } = null!;
         public string BackendName { get; set; } = null!;
 

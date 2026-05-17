@@ -89,6 +89,21 @@ function loadDepartments() {
             console.error('GetAll department failed', textStatus, err);
         });
 }
+function loadWebGroup() {
+    let webGroupPath = webgroup;
+    jqClient().Get(`/Website/GetWebGroup?webGroupPath=${webGroupPath}`)
+        .done((result) => {
+
+            const data = (result && result.result) ? result.result : [];
+
+            let webGroupDesc = $('#web-group-desc');
+
+            webGroupDesc.append(data.result.desc);
+        })
+        .fail((jqXHR, textStatus, err) => {
+            console.error('Get web group failed', textStatus, err);
+        });
+}
 
 function renderDepartmentsTable(departments) {
     if (!Array.isArray(departments) || departments.length === 0) return;
@@ -185,6 +200,7 @@ const loadMainBanner = () => {
 };
 
 $(document).ready(function () {
+    loadWebGroup();
     loadDepartments();
     loadMainBanner().then(() => {
         new Swiper('.mySwiper', {

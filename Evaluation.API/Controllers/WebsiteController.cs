@@ -2,6 +2,8 @@
 using Evaluation.Services.BusinessLayer;
 using Evaluation.Services.BusinessLayer.API;
 using Evaluation.Services.BusinessLayer.API.DepartmentLayer;
+using Evaluation.Services.BusinessLayer.API.WebGroupLayer;
+using Evaluation.SharedHelper.Dtos.WebSiteDto;
 using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Api.WebsiteDTOs;
 using Microsoft.AspNetCore.Mvc;
@@ -31,6 +33,12 @@ namespace Evaluation.API.Controllers
         {
             var lang = _requestInfo.Lang;
             return Ok(new { result = GetDepartmentByRoutingPath(routingPath, lang) });
+        }
+
+        [HttpGet]
+        public IActionResult GetWebGroup([FromQuery] string webGroupPath)
+        {
+            return Ok(new { result = GetWebGroupByWebGroupPath(webGroupPath) });
         }
 
         [HttpGet]
@@ -68,6 +76,10 @@ namespace Evaluation.API.Controllers
         private async Task<DepartmentDto> GetDepartmentByRoutingPath(string routingPath, string lang)
         {
             return await _masterBl.GetApiService<DepartmentBL>().GetDepartmentByRoutingPath(routingPath, lang);
+        }
+        private async Task<WebGroupsDto> GetWebGroupByWebGroupPath(string webGroupPath)
+        {
+            return await _masterBl.GetApiService<WebGroupBL>().GetWebGroupByPath(webGroupPath);
         }
     }
 }

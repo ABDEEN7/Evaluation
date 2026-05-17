@@ -64,6 +64,8 @@ namespace Evaluation.Services.Models.Admin
 
                 obj.NameAr = message.NameAr;
                 obj.NameEn = message.NameEn;
+                obj.DescAr = message.DescAr;
+                obj.DescEn = message.DescEn;
                 obj.RoutingPath = message.RoutingPath;
                 obj.BackendName = BackendName;
                 obj.IsActive = message.IsActive;
@@ -115,6 +117,8 @@ namespace Evaluation.Services.Models.Admin
 
                 obj.NameAr = message.NameAr;
                 obj.NameEn = message.NameEn;
+                obj.DescAr = message.DescAr;
+                obj.DescEn = message.DescEn;
                 obj.RoutingPath = message.RoutingPath;
                 obj.BackendName = obj.BackendName;
                 obj.IsActive = message.IsActive;
