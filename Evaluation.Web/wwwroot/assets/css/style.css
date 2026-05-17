@@ -2623,3 +2623,69 @@ input.auto-fill {
 .table-card-seperate-styling tbody tr:not(.card):not(.card-row).plan-request-card .request-divider {
     display: none !important;
 }
+
+
+
+.fc-h-event .fc-event-title-container {
+    background-color: var(--color-primary) !important;
+}
+
+.fc-h-event {
+    border-color: #8a1538 !important;
+}
+
+.fc-scroller {
+    overflow: auto !important;
+}
+
+.calender-evaluation {
+    height: calc(100vh - 110px);
+    overflow: hidden;
+}
+
+    .calender-evaluation #calendar {
+        height: 100%;
+    }
+
+    .calender-evaluation .fc {
+        height: 100% !important;
+    }
+
+    .calender-evaluation .fc-view-harness,
+    .calender-evaluation .fc-scroller,
+    .calender-evaluation .fc-scroller-liquid,
+    .calender-evaluation .fc-scroller-harness {
+        overflow: hidden !important;
+    }
+
+.fc-daygrid-event {
+    min-height: 18px;
+    margin-bottom: 4px !important;
+    margin-left: 0px !important;
+}
+
+.fc .fc-event-title {
+    font-size: 14px !important;
+    padding: 2px 4px;
+}
+
+
+.fc .fc-daygrid-day.fc-day-today {
+    background-color: #8a153820 !important;
+}
+
+.fc .fc-toolbar-title {
+    font-weight: 600 !important;
+}
+
+.fc-header-toolbar {
+    padding-right: 0 !important;
+    padding-left: 0 !important;
+}
+
+
+.fc .fc-button-primary {
+    background-color: #0D4361 !important;
+    border-color: #0D4361 !important;
+}
+
