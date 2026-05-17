@@ -985,6 +985,9 @@ public static class ConstantKeys
         public const string GET_FORM_ITEMS = "GET_FORM_ITEMS";
         public const string SAVE_EVALUATION_FORM = "SAVE_EVALUATION_FORM";
         public const string UPDATE_EVALUATION_FORM = "UPDATE_EVALUATION_FORM";
+        public const string RENAME_EVALUATION_FORM = "RENAME_EVALUATION_FORM";
+        public const string VALIDATE_EVALUATION_FORM = "VALIDATE_EVALUATION_FORM";
+        public const string CALCULATE_EVALUATION_FORM = "CALCULATE_EVALUATION_FORM";
 
         #region EVALFORMS
 
@@ -1055,6 +1058,10 @@ public static class ConstantKeys
         public const string EDIT_WEB_PLAN = "EDIT_WEB_PLAN";
         public const string VIEW_WEB_PLAN = "VIEW_WEB_PLAN";
         public const string DELETE_WEB_PLAN = "DELETE_WEB_PLAN";
+        #endregion
+
+        #region School
+        public const string VIEW_WEB_SCHOOL = "VIEW_WEB_SCHOOL";
         #endregion
     }
     public static class WebAppSettings
