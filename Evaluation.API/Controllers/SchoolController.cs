@@ -43,7 +43,7 @@ public class SchoolController : ControllerBase
     }
 
     [HttpGet]
-    [CheckRolePermisionFilter(true, ConstantKeys.WebPermissions.VIEW_WEB_SCHOOL)]
+    //[CheckRolePermisionFilter(true, ConstantKeys.WebPermissions.VIEW_WEB_SCHOOL)]
     public async Task<IActionResult> GetSchoolsByDepartment([FromQuery] Guid depId)
     {
         var result = await _masterBl.GetApiService<SchoolBL>().GetSchoolsByDepartmentId(depId);
@@ -51,7 +51,7 @@ public class SchoolController : ControllerBase
     }
 
 	[HttpGet]
-    [CheckRolePermisionFilter(true, ConstantKeys.WebPermissions.VIEW_WEB_SCHOOL)]
+    //[CheckRolePermisionFilter(true, ConstantKeys.WebPermissions.VIEW_WEB_SCHOOL)]
     public async Task<IActionResult> GetSchoolsPlan([FromQuery] SchoolRequest request)
     {
         var result = await _masterBl.GetApiService<SchoolBL>().GetSchoolsPlan(request);
