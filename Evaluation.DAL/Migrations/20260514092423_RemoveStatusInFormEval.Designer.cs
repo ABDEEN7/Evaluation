@@ -4,6 +4,7 @@ using Evaluation.DAL.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Evaluation.DAL.Migrations
 {
     [DbContext(typeof(EvaluationDbContext))]
-    partial class EvaluationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260514092423_RemoveStatusInFormEval")]
+    partial class RemoveStatusInFormEval
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -3878,7 +3881,7 @@ namespace Evaluation.DAL.Migrations
                     b.Property<DateTime?>("DeleteDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid>("DepartmentId")
+                    b.Property<Guid?>("DepartmentId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("IsActive")
@@ -13102,8 +13105,7 @@ namespace Evaluation.DAL.Migrations
                     b.HasOne("Evaluation.DAL.Models.DepartementEntites.Department", "Department")
                         .WithMany()
                         .HasForeignKey("DepartmentId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "UpdateBy")
                         .WithMany()

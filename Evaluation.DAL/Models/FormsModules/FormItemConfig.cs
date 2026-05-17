@@ -15,7 +15,7 @@ namespace Evaluation.DAL.Models.FormsModules
         public EvalForm? EvalForm { get; set; }
         public Guid? FormItemId { get; set; }
         public FormItem? FormItem { get; set; }
-        public Guid PartyTypeId { get; set; }
+        public Guid? PartyTypeId { get; set; }
         public PartyType? PartyType { get; set; }
 
         public string NameAr { get; set; } = null!;

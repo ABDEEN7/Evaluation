@@ -11,5 +11,6 @@ public class CreateFormItemConfigDto : EntityBaseDTO
     public string NameEn { get; set; } = null!;
     public Guid CalcMethodId { get; set; }
     public decimal Percentage { get; set; } = 0;
-    public bool HasMultiValue { get; set; } = false;
+    public bool EvalFormHasMuliEvaluation { get; set; } = false;
+
 }

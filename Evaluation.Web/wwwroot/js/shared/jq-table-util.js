@@ -382,7 +382,7 @@ const tableUtil = (function () {
             resizableColumnGuide: config?.resizableColumnGuide ?? true,
             tooltips: config?.tooltips ?? true,
             selectable: config?.selectable ?? true,
-            selectableRangeMode: 'click',
+            selectableRangeMode: config?.selectableRangeMode ? null : 'click',
             initialSort: [
                 { column: sortColumn ?? uniqueRowId, dir: sortDir ?? "desc" },
             ],

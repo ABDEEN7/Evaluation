@@ -15,9 +15,7 @@ public class EvalForm : EntityBase , IAuditLogEntity
     public Guid EvaluationPartyId { get; set; }
     public EvaluationParty? EvaluationParties { get; set; }
     public Guid CalcMethodId { get; set; }
-    public CalcMethod? CalcMethod { get; set; }
-    //public Guid FormStatusId { get; set; }
-    //public FormStatus? FormStatus { get; set; } 
+    public CalcMethod? CalcMethod { get; set; }  
     public bool IsFinalEval { get; set; }
     public bool AllowRename { get; set; }
     public bool HasMuliEvaluation { get; set; }

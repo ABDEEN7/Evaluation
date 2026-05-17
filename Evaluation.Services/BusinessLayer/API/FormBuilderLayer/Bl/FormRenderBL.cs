@@ -703,6 +703,7 @@ namespace Evaluation.Services.BusinessLayer.API
 				if (requestType == RequestType.Evaluation)
 				{
 					var moduleId = service.SystemModuleId;
+					EvlReqId = requestId;
 					var canAccess = await _evaluationRequestService.ValidateMinistryUserAccessAsync(userId, moduleId, requestId.Value);
 					//if (!canAccess)
 					//	throw new UnauthorizedAccessException("You do not have permission to view this request.");
@@ -747,7 +748,7 @@ namespace Evaluation.Services.BusinessLayer.API
 
 			var dropDownTask = _srvDropdown.GetDropDownValuesForAction(
 				PlanId ?? requestObj?.PlanId,
-				OrgTreeId,
+				EvlReqId,
 				action.Id,
 				null,
 				lang,

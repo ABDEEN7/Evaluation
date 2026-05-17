@@ -83,7 +83,13 @@
                     '@nameof(ConstantKeys.WebPermissions.DELETE_WEB_DEPARTMENT_HOLIDAY)'
                 ],
             }).then((result) => {
-
+                uiControlsSetup().UpdatPageTitle("WebAppTemplateForm");
+                InitNavbarSection();
+                $('body').show();
+                if (!sharedUtility().ExistingToken()) {
+                    sharedUtility().RedirectUnauthorized();
+                    return;
+                }
                  uiControlItems = result.uiControlItems.filter(x => x.rowOrder > 0 && x.permissionBackendName=='@ConstantKeys.WebPermissions.ADD_WEB_DEPARTMENT_HOLIDAY');
                 textDir = result.currentlanguage === "ar" ? "RTL" : "LTR";
                 permissionsList = result.permissionsList;
