@@ -161,7 +161,7 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
         obj.HasOneValue = message.HasOneValue;
         obj.EvaluationPartyId = message.EvaluationPartyId;
         obj.CalcMethodId = message.CalcMethodId;
-        obj.FormStatusId = message.FormStatusId;
+       // obj.FormStatusId = message.FormStatusId;
         obj.IsActive = message.IsActive;
         obj.AllowRename = message.AllowRename;
         obj.HasMuliEvaluation = message.HasMuliEvaluation;
@@ -215,7 +215,7 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
             obj.NameEn = message.NameEn;
             obj.EvaluationPartyId = message.EvaluationPartyId;
             obj.CalcMethodId = message.CalcMethodId;
-            obj.FormStatusId = message.FormStatusId;
+            //obj.FormStatusId = message.FormStatusId;
             obj.IsActive = message.IsActive;
             obj.AllowRename = message.AllowRename;
             obj.HasMuliEvaluation = message.HasMuliEvaluation;
