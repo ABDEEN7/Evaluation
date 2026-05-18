@@ -720,7 +720,9 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                         lang,
                         c.Value!,
                         c.DropDownTypeId.Value,
-                        request.PlanId
+
+						request.EvaluationRequestId ?? request.Id,
+						request.PlanId
                     );
                 }
 
@@ -751,7 +753,8 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                                             lang,
                                             updatedValue,
                                             field.DropDownTypeId.Value,
-                                            request.PlanId
+											request.EvaluationRequestId ?? request.Id,
+											request.PlanId
                                         );
                                     }
                                     updatedItem[kvp.Key] = updatedValue;

@@ -36,7 +36,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
             return result.Distinct().ToList();
         }
-
+		 
         public async Task GetRelatedDropdownFields(List<Guid> list, List<Guid> result, List<Guid> processedIds)
         {
             if (!list.Any())
@@ -406,7 +406,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
         }
 
 
-        public async Task<DropDownValueDTO?> GetDropDownValue(string lang, Guid? fieldValueId, Guid? dropDownTypeId, Guid? EvalId, Guid? SchId)
+        public async Task<DropDownValueDTO?> GetDropDownValue(string lang, Guid? fieldValueId, Guid? dropDownTypeId, Guid? EvalId, Guid? PlanId)
         {
             using var scopedUow = serviceScopeFactory.CreateScopedUow();
             var fieldDropdownRepo = cacheDataProvider.GetFromCache<List<FieldDropDownValue>>(ConstantKeys.WebAppCacheTableName.CACHE_DROPDOWNVALUE);
@@ -441,7 +441,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             if (!string.IsNullOrEmpty(dropdownType.DataSourceTable))
             {
                 var tableName = dropdownType.DataSourceTable;
-                var rawData = await GetDataFromTable(tableName, EvalId,SchId, lang, fieldValueId);
+                var rawData = await GetDataFromTable(tableName, EvalId,PlanId, lang, fieldValueId);
 
                 if (rawData != null && rawData.Any())
                 {
@@ -850,11 +850,12 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 				["OrderNo"] = x.OrderNo
 			}).ToList();
 		}
-		public async Task<string> ResolveDropDownTextAsync(string lang, string rawValue, Guid dropDownTypeId, Guid? PlanId)
+
+		public async Task<string> ResolveDropDownTextAsync(string lang, string rawValue, Guid dropDownTypeId, Guid? EvalId, Guid? PlanId)
 		{
 			if (Guid.TryParse(rawValue, out var singleId) && singleId != Guid.Empty)
 			{
-				var v = await GetDropDownValue(lang, singleId, dropDownTypeId, null, PlanId);
+				var v = await GetDropDownValue(lang, singleId, dropDownTypeId, EvalId, PlanId);
 				if (v != null) return lang == "ar" ? v.TitleAr ?? "" : v.TitleEn ?? "";
 				return rawValue;
 			}
@@ -864,7 +865,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 			var titles = new List<string>(ids.Count);
 			foreach (var id in ids)
 			{
-				var v = await GetDropDownValue(lang, id, dropDownTypeId, null, PlanId);
+				var v = await GetDropDownValue(lang, id, dropDownTypeId, EvalId, PlanId);
 				titles.Add(v != null ? (lang == "ar" ? v.TitleAr ?? "" : v.TitleEn ?? "") : id.ToString());
 			}
 			var sep = lang == "ar" ? "، " : ", ";
