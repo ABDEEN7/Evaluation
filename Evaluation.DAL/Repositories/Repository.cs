@@ -219,6 +219,12 @@ public class Repository<T>(DbContext context, UserInfo userInfo) : RepositoryBas
         //    throw new Exception();
         return query;
     }
+    public async Task<bool> ExistsAsync(Expression<Func<T, bool>> filter)
+    {
+        return await _dbSet
+            .AsNoTracking()
+            .AnyAsync(filter);
+    }
     #endregion
 
     #region Audit

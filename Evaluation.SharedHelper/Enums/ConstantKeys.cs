@@ -209,6 +209,10 @@ public static class ConstantKeys
         public static readonly string UserNotExsistInThisEvaluationRequest = "UserNotExsistInThisEvaluationRequest";
         public static readonly string UnsupportedDepartmentCategory = "UnsupportedDepartmentCategory";
         public static readonly string lblNoPartyTypeFound = "lblNoPartyTypeFound";
+        public static readonly string NoEvaluationRequestsFoundForTheSelectedUser = "NoEvaluationRequestsFoundForTheSelectedUser";
+        public static readonly string NoneOfTheSelectedEvaluationRequestsWereFoundForThisUser = "NoneOfTheSelectedEvaluationRequestsWereFoundForThisUser";
+        public static readonly string UnExpectedException = "UnExpectedException";
+        public static readonly string NoEvaluationRequestsWereSelected = "NoEvaluationRequestsWereSelected";
     }
 
     public static class AdminSettings
@@ -382,6 +386,7 @@ public static class ConstantKeys
         public static readonly string AssignmentUserTeam = "AssignmentUserTeam";
         public static readonly string EducationalEntitiesDescription = "EducationalEntitiesDescription";
         public static readonly string FormEducationalEntitiesTitle = "FormEducationalEntitiesTitle";
+        public static readonly string ReassignAssignment = "WebReassignAssignment";
     }
     public static class WebAppRequest
     {
@@ -1059,6 +1064,12 @@ public static class ConstantKeys
         public const string VIEW_WEB_PLAN = "VIEW_WEB_PLAN";
         public const string DELETE_WEB_PLAN = "DELETE_WEB_PLAN";
         #endregion
+        #region Reassign
+        public const string VIEW_WEB_ReassignAssignment = "VIEW_WEB_ReassignAssignment";
+        public const string ADD_WEB_ReassignAssignment = "ADD_WEB_ReassignAssignment";
+        public const string EDIT_WEB_ReassignAssignment = "EDIT_WEB_ReassignAssignment";
+        public const string DELETE_WEB_ReassignAssignment = "DELETE_WEB_ReassignAssignment";
+        #endregion
 
         #region School
         public const string VIEW_WEB_SCHOOL = "VIEW_WEB_SCHOOL";
@@ -1278,6 +1289,55 @@ public static class ConstantKeys
         public const string CardView = Prefix + nameof(CardView);
         public const string TableView = Prefix + nameof(TableView);
         public const string All = Prefix + nameof(All);
+    }
+    public static class ReassignAssignment
+    {
+        // Page Header
+        public const string ReassignAssignmentTitle = "ReassignAssignmentTitle";
+        public const string ReassignAssignmentSubTitle = "ReassignAssignmentSubTitle";
+
+        // Sections
+        public const string SelectUsersSectionTitle = "SelectUsersSectionTitle";
+        public const string AssignmentsTableTitle = "AssignmentsTableTitle";
+
+        // Labels
+        public const string FromUserLabel = "FromUserLabel";
+        public const string ToUserLabel = "ToUserLabel";
+
+        // Placeholders
+        public const string SelectUserPlaceholder = "SelectUserPlaceholder";
+
+        // Buttons
+        public const string LoadButton = "LoadButton";
+        public const string SelectAllButton = "SelectAllButton";
+        public const string ClearAllButton = "ClearAllButton";
+        public const string ResetButton = "ResetButton";
+        public const string SaveReassignButton = "SaveReassignButton";
+
+        // Table Headers
+        public const string RowNumberHeader = "RowNumberHeader";
+        public const string RequestNumberHeader = "RequestNumberHeader";
+        public const string ServiceNameArHeader = "ServiceNameArHeader";
+        public const string ServiceNameEnHeader = "ServiceNameEnHeader";
+
+        // Selection Info
+        public const string SelectedCountText = "SelectedCountText";
+        public const string TotalCountText = "TotalCountText";
+
+        // Messages
+        public const string NoAssignmentsMessage = "NoAssignmentsMessage";
+        public const string ReassignSuccessMessage = "ReassignSuccessMessage";
+        public const string ReassignFailedMessage = "ReassignFailedMessage";
+        public const string ConfirmReassignMessage = "ConfirmReassignMessage";
+
+        // Validation Messages
+        public const string FromUserRequiredMessage = "FromUserRequiredMessage";
+        public const string ToUserRequiredMessage = "ToUserRequiredMessage";
+        public const string SelectAssignmentRequiredMessage = "SelectAssignmentRequiredMessage";
+
+        // Loading
+        public const string LoadingMessage = "LoadingMessage";
+        public const string SavingMessage = "SavingMessage";
     }
     public static class EvaluationPlans
     {
@@ -1610,4 +1670,5 @@ public static class ConstantKeys
         public static readonly Guid UPDATE = Guid.Parse("550e8400-e29b-41d4-a716-446655440004");
         public static readonly Guid REQUESTMISSING = Guid.Parse("550e8400-e29b-41d4-a716-446655440005");
     }
+
 }
