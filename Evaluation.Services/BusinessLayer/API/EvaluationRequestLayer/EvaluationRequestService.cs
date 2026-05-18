@@ -16,6 +16,7 @@ using Evaluation.Services.Shared;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Dtos.SchoolDto;
 using Evaluation.SharedHelper.Dtos.TeamMemberDto;
+using Evaluation.SharedHelper.Dtos.TeamMemberDto.ReassignDto;
 using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Models;
@@ -714,5 +715,20 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 		return result;
 	}
 
+    public async Task<IReadOnlyList<ReassignRequestTableDto>> GetUserAssignments(Guid userId)
+    {
+        return await uow.GetRepository<EvaluationRequestAssignment>()
+            .GetAllActiveNonDeleted()
+            .Where(x => x.MinistryUserId == userId && x.EvaluationRequest.DepEvaluationType.DepartmentId == requestInfo.DepId && x.EvaluationRequest.ServiceStatus.ServiceStatusType.IsOpen)
+            .Select(x => new ReassignRequestTableDto
+            {
+                EvaluationRequestId = x.EvaluationRequestId,
+                RequestNumber = x.EvaluationRequest!.RequestNumber,
 
+                ServiceNameAr = x.EvaluationRequest.Service!.NameAr,
+                ServiceNameEn = x.EvaluationRequest.Service!.NameEn,
+                PartyTypeId = x.PartyTypeId
+            })
+            .ToListAsync();
+    }
 }
