@@ -168,12 +168,17 @@
 
         if (btn && wrapper) {
             btn.addEventListener("click", function () {
+
                 if (wrapper.style.display === "none" || wrapper.style.display === "") {
                     wrapper.style.display = "block";
                     btn.classList.add("active");
                 } else {
                     wrapper.style.display = "none";
+                    btn.classList.remove("active");
+                }
+
             });
         }
 
     });
+</script>

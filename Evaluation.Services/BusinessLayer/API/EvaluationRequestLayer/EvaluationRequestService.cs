@@ -441,6 +441,7 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 					lang,
 					c.Value!,
 					c.DropDownTypeId.Value,
+					request.Id,
 					request.PlanId
 				);
 			}
@@ -472,6 +473,7 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 										lang,
 										updatedValue,
 										field.DropDownTypeId.Value,
+										request.Id,
 										request.PlanId
 									);
 								}
