@@ -209,6 +209,10 @@ public static class ConstantKeys
         public static readonly string UserNotExsistInThisEvaluationRequest = "UserNotExsistInThisEvaluationRequest";
         public static readonly string UnsupportedDepartmentCategory = "UnsupportedDepartmentCategory";
         public static readonly string lblNoPartyTypeFound = "lblNoPartyTypeFound";
+        public static readonly string NoEvaluationRequestsFoundForTheSelectedUser = "NoEvaluationRequestsFoundForTheSelectedUser";
+        public static readonly string NoneOfTheSelectedEvaluationRequestsWereFoundForThisUser = "NoneOfTheSelectedEvaluationRequestsWereFoundForThisUser";
+        public static readonly string UnExpectedException = "UnExpectedException";
+        public static readonly string NoEvaluationRequestsWereSelected = "NoEvaluationRequestsWereSelected";
     }
 
     public static class AdminSettings
@@ -1278,6 +1282,55 @@ public static class ConstantKeys
         public const string CardView = Prefix + nameof(CardView);
         public const string TableView = Prefix + nameof(TableView);
         public const string All = Prefix + nameof(All);
+    }
+    public static class ReassignAssignment
+    {
+        // Page Header
+        public const string ReassignAssignmentTitle = "ReassignAssignmentTitle";
+        public const string ReassignAssignmentSubTitle = "ReassignAssignmentSubTitle";
+
+        // Sections
+        public const string SelectUsersSectionTitle = "SelectUsersSectionTitle";
+        public const string AssignmentsTableTitle = "AssignmentsTableTitle";
+
+        // Labels
+        public const string FromUserLabel = "FromUserLabel";
+        public const string ToUserLabel = "ToUserLabel";
+
+        // Placeholders
+        public const string SelectUserPlaceholder = "SelectUserPlaceholder";
+
+        // Buttons
+        public const string LoadButton = "LoadButton";
+        public const string SelectAllButton = "SelectAllButton";
+        public const string ClearAllButton = "ClearAllButton";
+        public const string ResetButton = "ResetButton";
+        public const string SaveReassignButton = "SaveReassignButton";
+
+        // Table Headers
+        public const string RowNumberHeader = "RowNumberHeader";
+        public const string RequestNumberHeader = "RequestNumberHeader";
+        public const string ServiceNameArHeader = "ServiceNameArHeader";
+        public const string ServiceNameEnHeader = "ServiceNameEnHeader";
+
+        // Selection Info
+        public const string SelectedCountText = "SelectedCountText";
+        public const string TotalCountText = "TotalCountText";
+
+        // Messages
+        public const string NoAssignmentsMessage = "NoAssignmentsMessage";
+        public const string ReassignSuccessMessage = "ReassignSuccessMessage";
+        public const string ReassignFailedMessage = "ReassignFailedMessage";
+        public const string ConfirmReassignMessage = "ConfirmReassignMessage";
+
+        // Validation Messages
+        public const string FromUserRequiredMessage = "FromUserRequiredMessage";
+        public const string ToUserRequiredMessage = "ToUserRequiredMessage";
+        public const string SelectAssignmentRequiredMessage = "SelectAssignmentRequiredMessage";
+
+        // Loading
+        public const string LoadingMessage = "LoadingMessage";
+        public const string SavingMessage = "SavingMessage";
     }
     public static class EvaluationPlans
     {

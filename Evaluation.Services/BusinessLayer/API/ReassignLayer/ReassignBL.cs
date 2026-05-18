@@ -4,8 +4,11 @@ using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
 using Evaluation.DAL.Repositories;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Dtos.TeamMemberDto.ReassignDto;
+using Evaluation.SharedHelper.Enums;
+using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Admin;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -14,7 +17,7 @@ namespace Evaluation.Services.BusinessLayer.API.ReassignLayer;
 public class ReassignBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider,
         UnitOfWork uow, LoggingServices loggingServices, IMapper mapper, UserInfo userInfo,
             UserService userService,
-        IServiceProvider serviceProvider, RequestInfo requestInfo , EvaluationRequestService evaluationRequestService)
+        IServiceProvider serviceProvider, RequestInfo requestInfo, EvaluationRequestService evaluationRequestService)
         : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, requestInfo)
 {
 
@@ -28,46 +31,114 @@ public class ReassignBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvi
         response.Add("ToUserList", toUserList);
         return response;
     }
-
-    public async Task UpdateReassignEvaluationRequestUser(RequestReassignDto request)
+    public async Task<ResponseDto> UpdateReassignEvaluationRequestUser(
+       RequestReassignDto request)
     {
-        await userService.EnsureUserExists(request.UserId);
-        await userService.EnsureUserExists(request.ToUserId);
-
-        // 1. Get all evaluation request assignments for the source user
-        var assignments = await GetEvaluationUserAssignments(request.UserId);
-
-        if (assignments == null || !assignments.Any())
-            throw new Exception("No evaluation requests found for the selected user.");
-
-        // 2. Filter only the selected requests (if user passed specific IDs), otherwise take all
-        var selectedIds = request.EvaluationRequestIds != null && request.EvaluationRequestIds.Any()
-            ? assignments.Where(a => request.EvaluationRequestIds.Contains(a.EvaluationRequestId)).ToList()
-            : assignments.ToList();
-
-        if (!selectedIds.Any())
-            throw new Exception("None of the selected evaluation requests were found for this user.");
-
-        // 3. Reassign each request from UserId → ToUserId
-        foreach (var item in selectedIds)
+        try
         {
-            var existingAssignment = await uow.GetRepository<EvaluationRequestAssignment>()
-                .GetAllActiveNonDeleted()
-                .FirstOrDefaultAsync(x =>
-                    x.EvaluationRequestId == item.EvaluationRequestId &&
-                    x.MinistryUserId == request.UserId &&
-                    x.PartyTypeId == item.PartyTypeId);
+            await userService.EnsureUserExists(request.UserId);
 
-            if (existingAssignment == null) continue;
+            await userService.EnsureUserExists(request.ToUserId);
 
-            // Update the assigned user to the new user
-            existingAssignment.MinistryUserId = request.ToUserId;
-            uow.GetRepository<EvaluationRequestAssignment>().Update(existingAssignment);
+            if (request.EvaluationRequestIds == null ||
+                !request.EvaluationRequestIds.Any())
+            {
+                return new ResponseDto
+                {
+                    ResponseStatus = DBResult.Error,
+                    ResponseState = false,
+                    ResponseMessage =
+                        ConstantKeys.ExceptionMessage
+                            .NoEvaluationRequestsWereSelected
+                };
+            }
+
+            var assignmentRepository =
+                uow.GetRepository<EvaluationRequestAssignment>();
+
+            var scopeRepository =
+                uow.GetRepository<EvalRequestAssignmentScope>();
+
+            // Get ONLY selected assignments
+            var assignments = await assignmentRepository
+                .GetAllActiveNonDeleted(
+                    x =>
+                        x.MinistryUserId == request.UserId &&
+                        request.EvaluationRequestIds
+                            .Contains(x.EvaluationRequestId),
+
+                    includeProperties:
+                        x => x.EvalRequestAssignmentScopies!)
+                .ToListAsync();
+
+            if (!assignments.Any())
+            {
+                return new ResponseDto
+                {
+                    ResponseStatus = DBResult.Error,
+                    ResponseState = false,
+                    ResponseMessage =
+                        ConstantKeys.ExceptionMessage
+                            .NoneOfTheSelectedEvaluationRequestsWereFoundForThisUser
+                };
+            }
+
+            foreach (var oldAssignment in assignments)
+            {
+                // Create new assignment
+                var newAssignment = new EvaluationRequestAssignment
+                {
+                    MinistryUserId = request.ToUserId,
+                    EvaluationRequestId =
+                        oldAssignment.EvaluationRequestId,
+                    PartyTypeId = oldAssignment.PartyTypeId,
+                    IsLeader = oldAssignment.IsLeader,
+                    Note = oldAssignment.Note,
+                };
+
+                assignmentRepository.Insert(newAssignment);
+
+                // Copy scopes
+                if (oldAssignment.EvalRequestAssignmentScopies != null)
+                {
+                    foreach (var oldScope
+                             in oldAssignment.EvalRequestAssignmentScopies)
+                    {
+                        var newScope = new EvalRequestAssignmentScope
+                        {
+                            EvaluationRequestAssignmentId =
+                                newAssignment.Id,
+
+                            ScopeId = oldScope.ScopeId,
+                            Note = oldScope.Note,
+                        };
+                        scopeRepository.Insert(newScope);
+                    }
+                    // Delete old scopes
+                    scopeRepository.DeleteRange(
+                        oldAssignment.EvalRequestAssignmentScopies);
+                }
+                // Delete old assignment
+                assignmentRepository.Delete(oldAssignment);
+            }
+            await uow.CommitAsync();
+            return new ResponseDto
+            {
+                ResponseStatus = DBResult.Inserted,
+                ResponseState = true
+            };
         }
-
-        await uow.CommitAsync();
+        catch (Exception)
+        {
+            return new ResponseDto
+            {
+                ResponseStatus = DBResult.Error,
+                ResponseState = false,
+                ResponseMessage =
+                    ConstantKeys.ExceptionMessage.UnExpectedException
+            };
+        }
     }
-
     public async Task<IReadOnlyList<ReassignRequestTableDto>> GetEvaluationUserAssignments(Guid userId)
     {
         var response = await evaluationRequestService.GetUserAssignments(userId);

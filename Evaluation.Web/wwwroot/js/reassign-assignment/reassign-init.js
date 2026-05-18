@@ -9,8 +9,6 @@ async function fetchDropLists(excludeUserId) {
             : API.dropList;
 
         const json = await jqClient().SyncGet(url);
-
-        // ── handle all wrapper shapes: { data:{} } / { result:{} } / raw object
         const data = json.data ?? json.result ?? json;
 
         populateSelect('fromUser', data.FormUserList ?? data.formUserList, getFromUserId());
@@ -18,13 +16,14 @@ async function fetchDropLists(excludeUserId) {
 
         updateLoadBtn();
     } catch (e) {
-        showToast('فشل تحميل قوائم المستخدمين', 'danger');
+        showToast(getLang(REASSIGN_KEYS.ReassignFailedMessage), 'danger');
     }
 }
 
 function populateSelect(id, list, keepValue) {
+    const placeholder = getLang(REASSIGN_KEYS.SelectUserPlaceholder);
     const $sel = $(`#${id}`);
-    $sel.empty().append('<option value="">— اختر المستخدم —</option>');
+    $sel.empty().append(`<option value="">${placeholder}</option>`);
     (list || []).forEach(item => {
         $sel.append(
             $('<option>', { value: item.id, text: item.name })
@@ -39,12 +38,15 @@ function populateSelect(id, list, keepValue) {
 async function onFromUserChange() {
     clearTable();
     const fromId = getFromUserId();
-    if (fromId) await fetchDropLists(fromId);
+    if (!fromId) return;
+
+    await fetchDropLists(fromId);
     updateLoadBtn();
+    await loadAssignments();  // auto-load on user select
 }
 
 function updateLoadBtn() {
-    $('#btnLoad').prop('disabled', !(getFromUserId() && getToUserId()));
+    // Load button removed — loading is triggered automatically on user select
 }
 
 // ══════════════════════════════════════════════════════
@@ -65,7 +67,7 @@ async function loadAssignments() {
         $('#tableCard').removeClass('d-none');
         $('#tableCard')[0].scrollIntoView({ behavior: 'smooth', block: 'start' });
     } catch (e) {
-        showToast('فشل تحميل طلبات التقييم', 'danger');
+        showToast(getLang(REASSIGN_KEYS.ReassignFailedMessage), 'danger');
     } finally {
         setLoading('btnLoad', 'btnLoadText', 'loadSpinner', false);
     }
@@ -83,7 +85,7 @@ function renderTable(list) {
             <tr>
                 <td colspan="5" class="text-center text-muted py-5">
                     <i class="fas fa-inbox fa-2x mb-2 d-block opacity-50"></i>
-                    لا توجد طلبات تقييم معيّنة لهذا المستخدم
+                    ${getLang(REASSIGN_KEYS.NoAssignmentsMessage)}
                 </td>
             </tr>`);
         $('#btnSave').prop('disabled', true);

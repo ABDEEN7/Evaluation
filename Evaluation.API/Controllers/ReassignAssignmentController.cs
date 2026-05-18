@@ -1,6 +1,9 @@
-﻿using Evaluation.Services.BusinessLayer;
+﻿using Evaluation.API.ActionFilter;
+using Evaluation.Services.BusinessLayer;
 using Evaluation.Services.BusinessLayer.API.ReassignLayer;
 using Evaluation.SharedHelper.Dtos.TeamMemberDto.ReassignDto;
+using Evaluation.SharedHelper.Enums;
+using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Admin;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,11 +17,7 @@ public class ReassignAssignmentController : ControllerBase
     {
         _masterBl = masterBL;
     }
-    [HttpGet]
-    public async Task AddReassignEvaluationRequest(RequestReassignDto result)
-    {
-        //var result =_masterBL.GetApiService<R>
-    }
+    //[CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.VIEW_WEB_ReassignAssignment })]
     [HttpGet]
     public async Task<IActionResult> GetEvalFormItemLists(Guid? userId)
     {
@@ -26,6 +25,7 @@ public class ReassignAssignmentController : ControllerBase
             .GetReAssignedDropList(userId);
         return Ok(new ResponseEntity(response));
     }
+    //[CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.VIEW_WEB_ReassignAssignment })]
     [HttpGet]
     public async Task<IActionResult> GetUserAssignments(Guid userId)
     {
@@ -33,12 +33,13 @@ public class ReassignAssignmentController : ControllerBase
             .GetEvaluationUserAssignments(userId);
         return Ok(new ResponseEntity(response));
     }
+    //[CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.ADD_WEB_ReassignAssignment })]
     [HttpPost]
-    public async Task<IActionResult> UpdateReassignEvaluationRequestUser(RequestReassignDto request)
+    public async Task<ResponseDto> ReassignEvaluationRequestUser(
+    [FromBody] RequestReassignDto request)
     {
-        await _masterBl.GetApiService<ReassignBL>()
+        return await _masterBl.GetApiService<ReassignBL>()
             .UpdateReassignEvaluationRequestUser(request);
-        return Ok();
     }
 
 }
