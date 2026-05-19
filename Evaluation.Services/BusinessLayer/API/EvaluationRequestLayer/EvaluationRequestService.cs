@@ -78,7 +78,8 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 					.Include(d => d.ServiceStatus)
 					.Include(d => d.FormEvalMatrixValue)
 					 .Where(er => er.OrgTreeId == OrgTreeId &&
-			er.DepEvaluationType.DepartmentId == requestInfo.DepId);
+						er.DepEvaluationType.DepartmentId == requestInfo.DepId)
+					 .OrderByDescending(er => er.CreateDate);
 
         query = await requestAccessService.ApplyEvaluationRequestAccess(query);
 
