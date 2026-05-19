@@ -1,4 +1,6 @@
 ﻿$(document).ready(function () {
+
+    let currentLang = sharedUtility().GetCookie('lang');
     function getSchoolFilterInput() {
         return {
             Name: $('#schoolNameFilter').val(),
@@ -26,7 +28,8 @@
         rowClass: 'plan-request-card',
         columns: [
             {
-                data: "nameAr",
+
+                data: currentLang == 'ar' ? "nameAr" : "nameEn",
                 title: uiControlsSetup().GetUiControlText("lblSchoolName"),
                 className: "td-left name",
                
@@ -45,33 +48,12 @@
                 title: uiControlsSetup().GetUiControlText("lblSchoolType"),
                 className: "td-left type"
             },
-            //{
-            //    data: "levelName",
-            //    title: uiControlsSetup().GetUiControlText("lblSchoolLevel"),
-            //    className: "td-left level"
-            //},
             {
                 data: null,
                 title: uiControlsSetup().GetUiControlText("lblSchoolLevel"),
                 className: "td-left level",
-                defaultContent: "ابتدائي, اعدادي"
+                defaultContent: currentLang == 'ar' ? "ابتدائي, اعدادي" : "Primary, Preparatory"
             }
-            //{
-            //    data: "region",
-            //    title: uiControlsSetup().GetUiControlText("lblRegion"),
-            //    className: "td-left region"
-            //},
-            //{
-            //    data: "currentPlanStatus",
-            //    title: uiControlsSetup().GetUiControlText("lblCurrentEvaluationStatus"),
-            //    className: "td-right status",
-            //    render: function (data, type, row) {
-            //        const color = row.currentPlanStatusColor || "#cccccc";
-            //        const textColor = getContrastingTextColor(color);
-            //        const safe = data || "";
-            //        return `<span class="request-status m-0" style="background-color:${color};color:${textColor};">${safe}</span>`;
-            //    }
-            //}
         ],
         onRowClick: function (rowData, event) {
             if ($(event.target).closest('.school-details-link').length) return;
@@ -85,17 +67,6 @@
             });
         }
     });
-
-    //function openSchoolDetails(schoolId) {
-    //    const options = {
-    //        success: function (response) {
-    //            $('#schoolModalLabel').text(response.name || '');
-    //            $('#schoolModalBody').html(response.htmlContent || '');
-    //            $('#schoolDetailsModal').modal('show');
-    //        }
-    //    };
-    //    //jqClient(options).Get(`/School/GetSchoolDetails?schoolID=${schoolId}`);
-    //}
 
     schoolsListing.reload();
 });

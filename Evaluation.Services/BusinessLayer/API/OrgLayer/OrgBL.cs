@@ -35,14 +35,37 @@ public class OrgBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider c
             case DepartmentCateogry.Schools:
                 var school = await schoolRepository.GetSchoolDetails(id);
                 var schoolManager = await employeeService.GetEmployee(school.ManagerQID);
-                orgDetails = mapper.Map<OrgDetailsDto>(school);
-                orgDetails.ManagerName = schoolManager?.NameEn;
+                orgDetails = mapper.Map<OrgDetailsDto>(school, opt =>
+                {
+                    opt.Items["lang"] = requestInfo.Lang;
+                });
+                orgDetails.ManagerName = requestInfo.Lang == "ar" ? schoolManager?.NameAr : schoolManager?.NameEn;
+
+                var evaluationRequests = await schoolRepository.GetEvaluationRequestByOrgTreeId(id);
+
+                var currentRequest = evaluationRequests.OrderByDescending(er => er.CreateDate).FirstOrDefault();
+               
+                orgDetails.CurrentEvaluationResult = (requestInfo.Lang == "ar" ? currentRequest?.FormEvalMatrixValue?.NameAr : currentRequest?.FormEvalMatrixValue?.NameEn) ?? "-";
+
+                orgDetails.CurrentEvaluationDate = currentRequest?.EvaluationDate.ToString() ?? "-";
+
+                var lastRequest = evaluationRequests.OrderBy(er => er.CreateDate).FirstOrDefault();
+
+                orgDetails.LastEvaluationResult = (requestInfo.Lang == "ar" ? lastRequest?.FormEvalMatrixValue?.NameAr : lastRequest?.FormEvalMatrixValue?.NameEn) ?? "-";
+                orgDetails.LastEvaluationDate = lastRequest?.EvaluationDate.ToString() ?? "-";
+
                 break;
             case DepartmentCateogry.Employee:
-                orgDetails = mapper.Map<OrgDetailsDto>(await employeeService.GetEmployeeById(id));
+                orgDetails = mapper.Map<OrgDetailsDto>(await employeeService.GetEmployeeById(id), opt =>
+                {
+                    opt.Items["lang"] = requestInfo.Lang;
+                });
                 break;
             case DepartmentCateogry.Orgnization:
-                orgDetails = mapper.Map<OrgDetailsDto>(await organizationService.GetOrganizationById(id));
+                orgDetails = mapper.Map<OrgDetailsDto>(await organizationService.GetOrganizationById(id), opt =>
+                {
+                    opt.Items["lang"] = requestInfo.Lang;
+                });
                 break;
             case DepartmentCateogry.OrgSelf:
                 break;

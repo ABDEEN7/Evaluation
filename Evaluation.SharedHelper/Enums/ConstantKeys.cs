@@ -383,6 +383,18 @@ public static class ConstantKeys
         public static readonly string EducationalEntitiesDescription = "EducationalEntitiesDescription";
         public static readonly string FormEducationalEntitiesTitle = "FormEducationalEntitiesTitle";
     }
+
+    public static class WebAppOrgDetails
+    {
+        public static readonly string lblOrgDetailsCurrentEvaluation = "lblOrgDetailsCurrentEvaluation";
+        public static readonly string lblOrgDetailsCurrentSituation = "lblOrgDetailsCurrentSituation";
+        public static readonly string lblOrgDetailsLastEvaluation = "lblOrgDetailsLastEvaluation";
+        public static readonly string lblOrgDetailsInProgressEvaluation = "lblOrgDetailsInProgressEvaluation";
+        public static readonly string lblOrgDetailsBasicInformation = "lblOrgDetailsBasicInformation";
+        public static readonly string lblOrgDetailsManager = "lblOrgDetailsManager";
+        public static readonly string lblOrgDetailsEstablishmentDate = "lblOrgDetailsEstablishmentDate";
+        public static readonly string lblOrgDetailsLevels= "lblOrgDetailsLevels";
+    }
     public static class WebAppRequest
     {
         public static readonly string lblDownload = "lblDownload";
@@ -431,6 +443,13 @@ public static class ConstantKeys
         public static readonly string lblCloseModal = "lblCloseModal";
         public static readonly string lblEvaluationFileScope = "lblEvaluationFileScope";
         public static readonly string lblEvaluationFileHeader = "lblEvaluationFileHeader";
+        public static readonly string lblRequestNumber = "lblRequestNumber";
+        public static readonly string lblFromDate = "lblFromDate";
+        public static readonly string lblToDate = "lblToDate";
+        public static readonly string lblEvaluationDate = "lblEvaluationDate";
+        public static readonly string lblNextEvaluationDate = "lblNextEvaluationDate";
+        public static readonly string lblEvaluationResult = "lblEvaluationResult";
+        public static readonly string lblStatus = "lblStatus";
     }
 
     public static class AdminPermission

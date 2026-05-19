@@ -166,6 +166,8 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
                     {
                         formItemsValue.ActualValue = item.ActualValue;
                         formItemsValue.Note = item.Note;
+                        formItemsValue.EvaluationRequestId = formEvaluationDto.EvaluationRequestId;
+                        formItemsValue.ServiceRequestId = formEvaluationDto.ServiceRequestId;
                     }
                     await formService.UpdateFormItemValue(formItemsValue);
                 }
@@ -207,6 +209,7 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
                 evaluationRequest.EvalDays = calculationResult.Value.NextEvalDays;
                 evaluationRequest.EvaluationDate = DateOnly.Parse(DateTime.Now.ToString());
                 evaluationRequest.NextEvaluationDate = DateOnly.Parse(DateTime.Now.AddDays(calculationResult.Value.NextEvalDays).ToString());
+                evaluationRequest.FinalEvalValue = calculationResult.Value.Value;
 
                 await _evaluationRequestService.UpdateEvaluationRequest(evaluationRequest);
 
