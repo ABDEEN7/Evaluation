@@ -1,0 +1,182 @@
+﻿@using Evaluation.SharedHelper.Enums
+
+@section Styles {
+    <style>
+        .table thead {
+            --bs-table-bg: var(--bs-primary, #6d1f2e);
+            color: #fff;
+        }
+
+            .table thead th {
+                background-color: var(--bs-primary, #6d1f2e) !important;
+                color: #fff !important;
+            }
+    </style>
+}
+
+<!-- ── Page Header ── -->
+<div class="d-flex align-items-center gap-2 mb-4">
+    <i class="fas fa-exchange-alt fs-4 text-primary"></i>
+    <div>
+        <h5 class="mb-0 fw-bold @ConstantKeys.ReassignAssignment.ReassignAssignmentTitle"></h5>
+        <small class="text-muted @ConstantKeys.ReassignAssignment.ReassignAssignmentSubTitle"></small>
+    </div>
+</div>
+
+<!-- ── Users Card ── -->
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-white border-bottom fw-semibold text-primary @ConstantKeys.ReassignAssignment.SelectUsersSectionTitle">
+        <i class="fas fa-users me-1"></i>
+    </div>
+    <div class="card-body">
+        <div class="row g-2 align-items-end">
+
+            <!-- From User — 5 cols -->
+            <div class="col-md-5">
+                <label class="form-label fw-semibold @ConstantKeys.ReassignAssignment.FromUserLabel">
+                    <span class="text-danger">*</span>
+                </label>
+                <select id="fromUser" class="form-select" onchange="onFromUserChange()">
+                    <option value="" class="@ConstantKeys.ReassignAssignment.SelectUserPlaceholder"></option>
+                </select>
+            </div>
+
+            <!-- Arrow — 1 col -->
+            <div class="col-md-1 text-center">
+                <span class="badge rounded-pill bg-warning text-dark px-3 py-2">
+                    <i class="fas fa-arrow-left"></i>
+                </span>
+            </div>
+
+            <!-- To User — 5 cols -->
+            <div class="col-md-5">
+                <label class="form-label fw-semibold @ConstantKeys.ReassignAssignment.ToUserLabel">
+                    <span class="text-danger">*</span>
+                </label>
+                <select id="toUser" class="form-select" onchange="updateLoadBtn()">
+                    <option value="" class="@ConstantKeys.ReassignAssignment.SelectUserPlaceholder"></option>
+                </select>
+            </div>
+
+            <!-- Load spinner — shown while fetching after user select -->
+            <div class="col-md-1 d-flex align-items-end justify-content-center pb-1">
+                <span id="loadSpinner" class="spinner-border spinner-border-sm text-primary d-none"></span>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- ── Table Card ── -->
+<div class="card shadow-sm d-none" id="tableCard">
+    <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
+        <span class="fw-semibold text-primary @ConstantKeys.ReassignAssignment.AssignmentsTableTitle">
+            <i class="fas fa-list-alt me-1"></i>
+        </span>
+        <span class="badge bg-primary rounded-pill" id="badgeCount">0</span>
+    </div>
+
+    <div class="card-body pb-2">
+
+        <!-- Selection toolbar -->
+        <div class="d-flex justify-content-between align-items-center mb-3 p-2 rounded bg-light border">
+            <span class="small text-muted">
+                <span class="@ConstantKeys.ReassignAssignment.SelectedCountText"></span>
+                <strong id="selectedCount" class="text-primary">0</strong>
+                <span class="@ConstantKeys.ReassignAssignment.TotalCountText"></span>
+                <strong id="totalCount">0</strong>
+            </span>
+            <div class="d-flex gap-2">
+                <button class="btn btn-outline-secondary btn-sm @ConstantKeys.ReassignAssignment.SelectAllButton"
+                        onclick="selectAll()">
+                    <i class="fas fa-check-double me-1"></i>
+                </button>
+                <button class="btn btn-outline-secondary btn-sm @ConstantKeys.ReassignAssignment.ClearAllButton"
+                        onclick="clearAll()">
+                    <i class="fas fa-times me-1"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Table -->
+        <div class="table-responsive rounded border">
+            <table class="table table-hover table-bordered mb-0">
+                <thead>
+                    <tr>
+                        <th class="text-center" style="width:50px">
+                            <input type="checkbox" id="checkAll" class="form-check-input"
+                                   onchange="toggleAll(this)">
+                        </th>
+                        <th style="width:50px" class="@ConstantKeys.ReassignAssignment.RowNumberHeader"></th>
+                        <th class="@ConstantKeys.ReassignAssignment.RequestNumberHeader"></th>
+                        <th class="@ConstantKeys.ReassignAssignment.ServiceNameArHeader"></th>
+                        <th class="@ConstantKeys.ReassignAssignment.ServiceNameEnHeader"></th>
+                    </tr>
+                </thead>
+                <tbody id="assignmentsBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="card-footer bg-white d-flex justify-content-end gap-2">
+        <button class="btn btn-outline-secondary @ConstantKeys.ReassignAssignment.ResetButton"
+                onclick="clearTable()">
+            <i class="fas fa-undo me-1"></i>
+        </button>
+        <button class="btn btn-success" id="btnSave" onclick="saveReassign()" disabled>
+            <span id="btnSaveText" class="@ConstantKeys.ReassignAssignment.SaveReassignButton">
+                <i class="fas fa-save me-1"></i>
+            </span>
+            <span id="saveSpinner" class="spinner-border spinner-border-sm d-none"></span>
+        </button>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script src="~/plan-assets/vendor/jquery/jquery.min.js"></script>
+    <script src="~/plan-assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
+    <script src="~/plan-assets/vendor/select2/js/select2.min.js"></script>
+
+    <script src="~/js/reassign-assignment/reassign-const.js"></script>
+    <script src="~/js/reassign-assignment/reassign-init.js"></script>
+    <script src="~/js/reassign-assignment/reassign-write.js"></script>
+
+    <script>
+        $(document).ready(async function () {
+            await webAppConfigsSetup().Init({
+                pageNames: [
+                    '@nameof(ConstantKeys.WebAppCommon)',
+                    '@nameof(ConstantKeys.WebAppPages.ReassignAssignment)'
+                ],
+                pages: [
+                    '@nameof(ConstantKeys.WebAppCommon)',
+                    '@nameof(ConstantKeys.WebAppPages.ReassignAssignment)'
+                ],
+                permissions: [
+                    '@nameof(ConstantKeys.WebPermissions.VIEW_WEB_ReassignAssignment)',
+                    '@nameof(ConstantKeys.WebPermissions.ADD_WEB_ReassignAssignment)',
+                    '@nameof(ConstantKeys.WebPermissions.EDIT_WEB_ReassignAssignment)',
+                    '@nameof(ConstantKeys.WebPermissions.DELETE_WEB_ReassignAssignment)'
+                ]
+            }).then((result) => {
+                uiControlItems = result.uiControlItems.filter(x =>
+                    x.rowOrder > 0 &&
+                    x.permissionBackendName === '@nameof(ConstantKeys.WebPermissions.ADD_WEB_ReassignAssignment)'
+                );
+
+                textDir = result.currentlanguage === "ar" ? "RTL" : "LTR";
+                permissionsList = result.permissionsList;
+                controlsList = result.controlsList;
+
+                columnList = uiControlItems
+                    .filter(x => x.constraint?.showInGrid === true && x.control)
+                    .map(c => ({
+                        ...c.constraint,
+                        pageName: c.control.pageName
+                    }));
+            });
+        });
+    </script>
+}

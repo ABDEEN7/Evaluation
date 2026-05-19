@@ -164,8 +164,10 @@ var formGenerateFieldUtility = window.formUtility;
                 const allowRenameFormItem = field.attributes?.find(c => c.name === 'allowRenameFormItem');
                 //const allowRename = field.attributes?.find(c => c.name === 'allowRename');
                 const params = new URLSearchParams(window.location.search);
-                var evaluationRequestId = (params.get("Evlid") ).replace("#", "");
-                var serviceRequestId = (params.get("id") ).replace("#", "");
+                var evaluationRequestId = (params.get("Evlid")).replace("#", "");
+                var serviceRequestId = null;
+                if (params.get("id"))
+                 serviceRequestId = (params.get("id") ).replace("#", "");
                 const controlValues = JSON.parse(field.value);
                 const html = await generateFullFormPageHtml({
                     formId,

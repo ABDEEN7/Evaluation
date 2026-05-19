@@ -22,6 +22,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Oracle.ManagedDataAccess.Client;
 using System;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using static Evaluation.SharedHelper.Enums.ConstantKeys;
@@ -423,6 +424,11 @@ public class HRService : ApiBase
                 obj.Code = school.OrgNo;
 
                 schools.Add(obj);
+
+
+                var result = await AddUpdateOrgTree(school.OrgNo);
+                
+
             }
 
             var schoolsResult = await uow.GetRepository<School>().InsertRange(schools);
