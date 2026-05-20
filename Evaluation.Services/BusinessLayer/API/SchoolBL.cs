@@ -54,8 +54,6 @@ public class SchoolBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvide
     [HttpPost]
     public async Task<PaginatedResult<ResponseSchools>> GetSchools([FromBody]SchoolRequest request)
     {
-        //TODO: Get Department Id by Department Routing Path
-
         var result = await schoolRepository.GetSchoolsAsyncOld(request);
         return mapper.Map<PaginatedResult<ResponseSchools>>(result);
     }
@@ -81,7 +79,7 @@ public class SchoolBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvide
             {
                 DepartmentCateogry.Schools =>
                     await schoolRepository.GetSchoolsAsync(request, targetOrgTreeIds, currentOrgTree),
-
+                    
                 DepartmentCateogry.Employee =>
                     await employeeService.GetEmployeeAsync(request, targetOrgTreeIds, currentOrgTree),
 
