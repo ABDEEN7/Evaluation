@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.Calendars;
+using Evaluation.DAL.Models.DepartementEntites;
 using Evaluation.DAL.Models.FormsModules;
 using Evaluation.DAL.Repositories;
 using Evaluation.Services.Special;
@@ -116,6 +117,24 @@ namespace Evaluation.Services.Models.Admin
             return result;
 
 
+        }
+        public async Task<bool> UpdateDepartmentOrder(List<OrderingDTO> message)
+        {
+            bool rtn = false;
+
+            var updatedRows = from updatedItem in message
+                              join rowToUpdate in uow.GetRepository<ScopeAcademicYear>().GetAllNonDeleted() on updatedItem.Id equals rowToUpdate.Id
+                              select new { Row = rowToUpdate, updatedItem.OrderNo };
+
+
+
+            updatedRows.ToList().ForEach(x => x.Row.OrderNo = x.OrderNo);
+
+            await uow.CommitAsync();
+            rtn = true;
+
+
+            return rtn;
         }
 
     }

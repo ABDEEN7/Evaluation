@@ -86,14 +86,22 @@ namespace Evaluation.Admin.Controllers
             return Ok(new ResponseEntity(result));
 
         }
-
-
         [HttpPost]
         [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.AdminPermission.DELETE_ADMIN_SCOPE_ACADEMIC_YEAR_SCOPE })]
         public async Task<IActionResult> DeleteScopeAcademicYear(Guid Id)
         {
 
             var result = await masterBL.GetAdminService<SrvScopeAcademicYearBL>().DeleteScopeAcademicYear(Id);
+            return Ok(result);
+
+        }
+        [HttpPost]
+        [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.AdminPermission.EDIT_ADMIN_SCOPE_ACADEMIC_YEAR_SCOPE })]
+        public async Task<IActionResult> UpdateDepartmentOrder()
+        {
+
+            var model = Request.Form["OrderObj"][0]?.StringToObject<List<OrderingDTO>>();
+            var result = await masterBL.GetAdminService<SrvScopeAcademicYearBL>().UpdateDepartmentOrder(model!);
             return Ok(result);
 
         }
