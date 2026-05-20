@@ -31,8 +31,8 @@ namespace Evaluation.Services.Special
         private readonly UnitOfWork uow;
         private readonly IServiceScopeFactory serviceScopeFactory;
         private readonly ILogger<CacheDataProvider> logger;
-		private readonly IMapper mapper;
-        public CacheDataProvider(CacheManager cacheManager, UnitOfWork uow, 
+        private readonly IMapper mapper;
+        public CacheDataProvider(CacheManager cacheManager, UnitOfWork uow,
             IServiceScopeFactory serviceScopeFactory, ILogger<CacheDataProvider> logger, IMapper mapper)
         {
             this.cacheManager = cacheManager;
@@ -71,29 +71,23 @@ namespace Evaluation.Services.Special
         }
         private async Task<List<SystemSettingDTO>> GetSystemSettings(List<string> keys)
         {
-			using (var uow = serviceScopeFactory.CreateScopedUow())
-			{
-				var result = new List<SystemSettingDTO>();
+            var result = new List<SystemSettingDTO>();
 
-				if (keys != null)
-				{
-					var list = await uow.GetRepository<SystemSetting>()
-						.GetAllActiveNonDeleted()
-						.Where(x => keys.Contains(x.SettingKey))
-						.Select(x=>new SystemSettingDTO
-						{
-							SettingGroup = x.SettingGroup,
-							SettingKey = x.SettingKey,
-							SettingValue = x.SettingValue
-						}).ToListAsync();
+            if (keys != null)
+            {
+                var list = await uow.GetRepository<SystemSetting>()
+                    .GetAllActiveNonDeleted()
+                    .Where(x => keys.Contains(x.SettingKey))
+                    .Select(x => new SystemSettingDTO
+                    {
+                        SettingGroup = x.SettingGroup,
+                        SettingKey = x.SettingKey,
+                        SettingValue = x.SettingValue
+                    }).ToListAsync();
 
-					result = list;
-                }
-
-				return result;
-			}
-
-			
+                result = list;
+            }
+            return result;
         }
 
         private async Task<List<T>> GetOrSetCacheAsync<T>(string key, Func<Task<List<T>>> dataFetcher)
@@ -151,12 +145,12 @@ namespace Evaluation.Services.Special
                         PageName = x.PageName,
                         UserUiname = x.UserUiname,
                         ControlName = x.ControlName,
-						BackEndName=x.BackendName,
+                        BackEndName = x.BackendName,
                         EnValue = x.ValueEn,
                         ArValue = x.ValueAr,
                         Url = x.Url,
                         txtValue = lang == "ar" ? x.ValueAr : x.ValueEn,
-                        
+
                     }).ToList();
                 });
 
@@ -199,190 +193,190 @@ namespace Evaluation.Services.Special
                 return data;
             });
 
-            return list.Where(c => c.IsActive==true && c.IsDeleted==false).ToList();
+            return list.Where(c => c.IsActive == true && c.IsDeleted == false).ToList();
         }
 
 
 
-		// -------------------------------------------------------------------
-		//// 📨 EMAIL PROFILES
-		// -------------------------------------------------------------------
-		public async Task<List<EmailProfileDTO>> GetEmailProfiles()
-		{
-			var key = ConstantKeys.WebAppCacheTableName.EmailProfiles;
-			return await GetOrSetCacheAsync(key, async () =>
-			{
-				using var scopedUow = serviceScopeFactory.CreateScopedUow();
-				var repo = scopedUow.GetRepository<EmailProfile>();
-				var list = await repo.GetAllActiveNonDeleted().ToListAsync();
-				return mapper.Map<List<EmailProfileDTO>>(list);
-			});
-		}
+        // -------------------------------------------------------------------
+        //// 📨 EMAIL PROFILES
+        // -------------------------------------------------------------------
+        public async Task<List<EmailProfileDTO>> GetEmailProfiles()
+        {
+            var key = ConstantKeys.WebAppCacheTableName.EmailProfiles;
+            return await GetOrSetCacheAsync(key, async () =>
+            {
+                using var scopedUow = serviceScopeFactory.CreateScopedUow();
+                var repo = scopedUow.GetRepository<EmailProfile>();
+                var list = await repo.GetAllActiveNonDeleted().ToListAsync();
+                return mapper.Map<List<EmailProfileDTO>>(list);
+            });
+        }
 
 
-		//-------------------------------------------------------------------
-		//📱 SMS PROFILES
-		//-------------------------------------------------------------------
-		public async Task<List<SMSProfileDTO>> GetSMSProfiles()
-		{
-			var key = ConstantKeys.WebAppCacheTableName.SMSProfiles;
-			return await GetOrSetCacheAsync(key, async () =>
-			{
-				using var scopedUow = serviceScopeFactory.CreateScopedUow();
-				var repo = scopedUow.GetRepository<SMSProfile>();
-				var list = await repo.GetAllActiveNonDeleted().ToListAsync();
-				return mapper.Map<List<SMSProfileDTO>>(list);
-			});
-		}
+        //-------------------------------------------------------------------
+        //📱 SMS PROFILES
+        //-------------------------------------------------------------------
+        public async Task<List<SMSProfileDTO>> GetSMSProfiles()
+        {
+            var key = ConstantKeys.WebAppCacheTableName.SMSProfiles;
+            return await GetOrSetCacheAsync(key, async () =>
+            {
+                using var scopedUow = serviceScopeFactory.CreateScopedUow();
+                var repo = scopedUow.GetRepository<SMSProfile>();
+                var list = await repo.GetAllActiveNonDeleted().ToListAsync();
+                return mapper.Map<List<SMSProfileDTO>>(list);
+            });
+        }
 
 
-		//-------------------------------------------------------------------
-		//📧 EMAIL TEMPLATES
-		//-------------------------------------------------------------------
-		public async Task<List<EmailTemplateDTO>> GetEmailTemplates()
-		{
-			var key = ConstantKeys.WebAppCacheTableName.EmailTemplates;
-			return await GetOrSetCacheAsync(key, async () =>
-			{
-				using var scopedUow = serviceScopeFactory.CreateScopedUow();
-				var repo = scopedUow.GetRepository<EmailTemplate>();
-				var list = await repo.GetAllActiveNonDeleted().ToListAsync();
-				return mapper.Map<List<EmailTemplateDTO>>(list);
-			});
-		}
+        //-------------------------------------------------------------------
+        //📧 EMAIL TEMPLATES
+        //-------------------------------------------------------------------
+        public async Task<List<EmailTemplateDTO>> GetEmailTemplates()
+        {
+            var key = ConstantKeys.WebAppCacheTableName.EmailTemplates;
+            return await GetOrSetCacheAsync(key, async () =>
+            {
+                using var scopedUow = serviceScopeFactory.CreateScopedUow();
+                var repo = scopedUow.GetRepository<EmailTemplate>();
+                var list = await repo.GetAllActiveNonDeleted().ToListAsync();
+                return mapper.Map<List<EmailTemplateDTO>>(list);
+            });
+        }
 
 
-		//-------------------------------------------------------------------
-		//💬 SMS TEMPLATES
-		//-------------------------------------------------------------------
-		public async Task<List<SMSTemplateDTO>> GetSMSTemplates()
-		{
-			var key = ConstantKeys.WebAppCacheTableName.SMSTemplates;
-			return await GetOrSetCacheAsync(key, async () =>
-			{
-				using var scopedUow = serviceScopeFactory.CreateScopedUow();
-				var repo = scopedUow.GetRepository<SMSTemplate>();
-				var list = await repo.GetAllActiveNonDeleted().ToListAsync();
-				return mapper.Map<List<SMSTemplateDTO>>(list);
-			});
-		}
+        //-------------------------------------------------------------------
+        //💬 SMS TEMPLATES
+        //-------------------------------------------------------------------
+        public async Task<List<SMSTemplateDTO>> GetSMSTemplates()
+        {
+            var key = ConstantKeys.WebAppCacheTableName.SMSTemplates;
+            return await GetOrSetCacheAsync(key, async () =>
+            {
+                using var scopedUow = serviceScopeFactory.CreateScopedUow();
+                var repo = scopedUow.GetRepository<SMSTemplate>();
+                var list = await repo.GetAllActiveNonDeleted().ToListAsync();
+                return mapper.Map<List<SMSTemplateDTO>>(list);
+            });
+        }
 
 
-		//-------------------------------------------------------------------
-		//⚙️ SERVICE STATUS CONFIGURATION
-		//-------------------------------------------------------------------
-		public async Task<List<ServiceStatusConfigurationDTO>> GetServiceStatusConfiguration()
-		{
-			var key = ConstantKeys.WebAppCacheTableName.SchServiceStatusConfiguration;
+        //-------------------------------------------------------------------
+        //⚙️ SERVICE STATUS CONFIGURATION
+        //-------------------------------------------------------------------
+        public async Task<List<ServiceStatusConfigurationDTO>> GetServiceStatusConfiguration()
+        {
+            var key = ConstantKeys.WebAppCacheTableName.SchServiceStatusConfiguration;
 
-			return await GetOrSetCacheAsync(key, async () =>
-			{
-				using var scopedUow = serviceScopeFactory.CreateScopedUow();
-				var repo = scopedUow.GetRepository<ServiceStatusConfiguration>();
+            return await GetOrSetCacheAsync(key, async () =>
+            {
+                using var scopedUow = serviceScopeFactory.CreateScopedUow();
+                var repo = scopedUow.GetRepository<ServiceStatusConfiguration>();
 
-				var list = await repo.GetAllQueryFiltered()
-									 .Include(c => c.Service)
-									 .ToListAsync();
+                var list = await repo.GetAllQueryFiltered()
+                                     .Include(c => c.Service)
+                                     .ToListAsync();
 
-				return mapper.Map<List<ServiceStatusConfigurationDTO>>(list);
-			});
-		}
-
-
-		//-------------------------------------------------------------------
-		//🚀 SERVICE INITIATOR PARTY TYPES
-		//-------------------------------------------------------------------
-		public async Task<List<ServiceInitiatorPartyType>> GetServiceIntiator()
-		{
-			var key = ConstantKeys.WebAppCacheTableName.ServiceInitiatorPartyType;
-			return await GetOrSetCacheAsync(key, async () =>
-			{
-				using var scopedUow = serviceScopeFactory.CreateScopedUow();
-				var repo = scopedUow.GetRepository<ServiceInitiatorPartyType>();
-				var list = await repo.GetAllActiveNonDeleted().ToListAsync();
-				return list;
-			});
-		}
-		
-		//-------------------------------------------------------------------
-		//🧩 ACTION PARTY TYPES
-		//-------------------------------------------------------------------
-		public async Task<List<ActionPartyTypeDTO>> GetActionPartyTypes()
-		{
-			var key = ConstantKeys.WebAppCacheTableName.ActionPartyTypes;
-			return await GetOrSetCacheAsync(key, async () =>
-			{
-				using var scopedUow = serviceScopeFactory.CreateScopedUow();
-				var repo = scopedUow.GetRepository<ActionPartyType>();
-				var list = await repo.GetAllActiveNonDeleted().ToListAsync();
-				return list.Select(x => new ActionPartyTypeDTO
-				{
-					Id = x.Id,
-					ServiceActionId = x.ServiceActionId,
-					PartyTypeId = x.PartyTypeId
-				}).ToList();
-			});
-		}
+                return mapper.Map<List<ServiceStatusConfigurationDTO>>(list);
+            });
+        }
 
 
-		//-------------------------------------------------------------------
-		//🧮 SERVICE STATUS(with deleted)
-		//-------------------------------------------------------------------
-		public async Task<IList<ServiceStatus>> GetStatusAllWithDeleted()
-		{
-			var key = ConstantKeys.WebAppCacheTableName.ServiceStatus;
-			var data = await GetOrSetCacheAsync(key, async () =>
-			{
-				using var scopedUow = serviceScopeFactory.CreateScopedUow();
-				var repo = scopedUow.GetRepository<ServiceStatus>();
-				var list = await repo.GetAll()
-									 .Include(c => c.StatusPartyTypeDisplayNames)
-									 .ToListAsync();
-				return list;
-			});
+        //-------------------------------------------------------------------
+        //🚀 SERVICE INITIATOR PARTY TYPES
+        //-------------------------------------------------------------------
+        public async Task<List<ServiceInitiatorPartyType>> GetServiceIntiator()
+        {
+            var key = ConstantKeys.WebAppCacheTableName.ServiceInitiatorPartyType;
+            return await GetOrSetCacheAsync(key, async () =>
+            {
+                using var scopedUow = serviceScopeFactory.CreateScopedUow();
+                var repo = scopedUow.GetRepository<ServiceInitiatorPartyType>();
+                var list = await repo.GetAllActiveNonDeleted().ToListAsync();
+                return list;
+            });
+        }
 
-			return data;
-		}
+        //-------------------------------------------------------------------
+        //🧩 ACTION PARTY TYPES
+        //-------------------------------------------------------------------
+        public async Task<List<ActionPartyTypeDTO>> GetActionPartyTypes()
+        {
+            var key = ConstantKeys.WebAppCacheTableName.ActionPartyTypes;
+            return await GetOrSetCacheAsync(key, async () =>
+            {
+                using var scopedUow = serviceScopeFactory.CreateScopedUow();
+                var repo = scopedUow.GetRepository<ActionPartyType>();
+                var list = await repo.GetAllActiveNonDeleted().ToListAsync();
+                return list.Select(x => new ActionPartyTypeDTO
+                {
+                    Id = x.Id,
+                    ServiceActionId = x.ServiceActionId,
+                    PartyTypeId = x.PartyTypeId
+                }).ToList();
+            });
+        }
 
-		public T? GetFromCache<T>(string key) where T : class
-		{
-			var settingItem = GetSystemSettingValue(ConstantKeys.AdminSettings.EnableCaching)
-						 .GetAwaiter().GetResult();
 
-			var EnableCaching = true;
+        //-------------------------------------------------------------------
+        //🧮 SERVICE STATUS(with deleted)
+        //-------------------------------------------------------------------
+        public async Task<IList<ServiceStatus>> GetStatusAllWithDeleted()
+        {
+            var key = ConstantKeys.WebAppCacheTableName.ServiceStatus;
+            var data = await GetOrSetCacheAsync(key, async () =>
+            {
+                using var scopedUow = serviceScopeFactory.CreateScopedUow();
+                var repo = scopedUow.GetRepository<ServiceStatus>();
+                var list = await repo.GetAll()
+                                     .Include(c => c.StatusPartyTypeDisplayNames)
+                                     .ToListAsync();
+                return list;
+            });
 
-			if (!string.IsNullOrEmpty(settingItem))
-			{
-				EnableCaching = bool.Parse(settingItem.ToLower());
-			}
+            return data;
+        }
 
-			if (EnableCaching)
-			{
-				return cacheManager.GetValue<T>(key);
-			}
-			else
-			{
-				return null;
-			}
+        public T? GetFromCache<T>(string key) where T : class
+        {
+            var settingItem = GetSystemSettingValue(ConstantKeys.AdminSettings.EnableCaching)
+                         .GetAwaiter().GetResult();
 
-		}
-		public async Task SetToCache(string key, object value)
-		{
-			if (string.IsNullOrWhiteSpace(key))
-				throw new ArgumentException("Cache key cannot be null or whitespace.", nameof(key));
-			if (value is null)
-				throw new ArgumentNullException(nameof(value));
+            var EnableCaching = true;
 
-			string clearCacheDurationStr = await GetSystemSettingValue(ConstantKeys.WebAppAccountConfigurations.ClearCacheDuration);
+            if (!string.IsNullOrEmpty(settingItem))
+            {
+                EnableCaching = bool.Parse(settingItem.ToLower());
+            }
 
-			int hours = 1; // Default fallback
-			if (!string.IsNullOrEmpty(clearCacheDurationStr) && int.TryParse(clearCacheDurationStr, out int parsedHours))
-				hours = parsedHours;
+            if (EnableCaching)
+            {
+                return cacheManager.GetValue<T>(key);
+            }
+            else
+            {
+                return null;
+            }
 
-			TimeSpan cacheDuration = TimeSpan.FromHours(hours);
-			cacheManager.SetValue(key, value, cacheDuration);
-		}
+        }
+        public async Task SetToCache(string key, object value)
+        {
+            if (string.IsNullOrWhiteSpace(key))
+                throw new ArgumentException("Cache key cannot be null or whitespace.", nameof(key));
+            if (value is null)
+                throw new ArgumentNullException(nameof(value));
 
-	}
+            string clearCacheDurationStr = await GetSystemSettingValue(ConstantKeys.WebAppAccountConfigurations.ClearCacheDuration);
+
+            int hours = 1; // Default fallback
+            if (!string.IsNullOrEmpty(clearCacheDurationStr) && int.TryParse(clearCacheDurationStr, out int parsedHours))
+                hours = parsedHours;
+
+            TimeSpan cacheDuration = TimeSpan.FromHours(hours);
+            cacheManager.SetValue(key, value, cacheDuration);
+        }
+
+    }
 
 }

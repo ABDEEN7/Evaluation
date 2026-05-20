@@ -44,9 +44,9 @@ namespace Evaluation.Admin.Controllers
             model.containsOrderNo = property != null ? true : false;
             return View(model);
         }
-        [HttpGet]
+        [HttpPost]
         [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.AdminPermission.VIEW_ADMIN_SCOPE_ACADEMIC_YEAR_SCOPE })]
-        public async Task<IActionResult> GetAllScopeAcademicYear(int Page = 1)
+        public async Task<IActionResult> GetAllScopeAcademicYear(int Page = 1, Guid? departmentId = null)
         {
             var PageSize =  Convert.ToInt32(masterBL.GetAdminService<SrvSystemSettingBL>().GetSetting(ConstantKeys.AdminSettings.ADMIN_PAGE_SIZE));
             var response = await masterBL.GetAdminService<SrvScopeAcademicYearBL>().GetScopeAcademicYearList(Page, PageSize);

@@ -1,45 +1,52 @@
-﻿
-let showMore = false, table = null, dialogElem = null, tree = null, selectedtree = null;
+﻿let showMore = false, table = null, dialogElem = null, tree = null, selectedtree = null;
 const dailogId = commonUtil.CONTENT_DAILOG_ID;
 let currentPage = 0;
 let isSearch = false;
 let isLoading = true;
-
+let searchParams = {};
+let pageNumber = 0;
 
 const btnAddContentId = 'btn-add-content',
     btnSubmitId = "btn-submit",
-    $formSection = $('#form-section')
-    ;
+    $formSection = $('#form-section'),
+    searchPanelSectionId = "search-panel-section",
+    progressBarAppendId = "scroll-progress-bar";
 
 const gridContainerId = "view-container",
     tblContentContainerId = "tbl-template-container",
     $tblContentContainer = $('#' + tblContentContainerId),
     $btnAddContent = $('#' + btnAddContentId);
 
-const loadData = (isScroll) => {
+
+const loadData = (reqData, isScroll) => {
     isLoading = true;
+
+    if (isScroll) {
+        showMore = false;
+        commonUtil.createLoader(progressBarAppendId, true);
+    } else {
+        Showloader(true);
+    }
+
     const options = {
         success: function (data) {
-
             if (isScroll) {
                 showMore = true;
+                commonUtil.createLoader(progressBarAppendId);
             } else {
-
+                Showloader(false);
                 showMore = true;
             }
-            if (data) {
 
-                const _isInit = isScroll ? false : true;
+            if (data) {
+                const _isInit = !isScroll;
                 if (!data || data.length <= 0) {
                     showMore = false;
-
-                    if (!isScroll) {
-                        table.setData([]);
-                    }
+                    if (!isScroll) table.setData([]);
+                    commonUtil.createLoader(progressBarAppendId, false, true);
                     return;
                 } else {
                     isLoading = false;
-                    currentPage++;
                     showMore = true;
                     if (_isInit) {
                         table.setData(data);
@@ -48,12 +55,66 @@ const loadData = (isScroll) => {
                     }
                 }
             }
+        },
+        error: function (xhr) {
+            if (isScroll) {
+                showMore = true;
+                commonUtil.createLoader(progressBarAppendId);
+            } else {
+                Showloader(false);
+            }
         }
     };
-    jqClientAdvanced(options).Get("ScopeAcademicYear/GetAllScopeAcademicYear".concat('?Page=', currentPage));
 
+    jqClientAdvanced(options).Post("ScopeAcademicYear/GetAllScopeAcademicYear", reqData);
 };
 
+
+const searchColsDef = () => {
+    return [
+        {
+            field: 'departmentId',
+            header: sharedFn().GetUiControlText('DepartmentClass'),
+            type: 'DROPDOWN',
+            constraint: {
+                controlType: 'DROPDOWN',
+                uibackendName: 'departmentId',
+                controlJsonConfig: JSON.stringify({ controlUibackendName: 'departmentId', parentReferenceValue: null })
+            },
+            collections: []
+        }
+    ];
+};
+
+
+const btnSeachEvent = (searchEvent) => {
+    pageNumber = 0;
+    const { data, event, params } = searchEvent;
+    if ($.isEmptyObject(data)) {
+        notificationUtil.error(sharedFn().GetUiControlText('SEARCHVALIDATION'));
+        return;
+    }
+    const reqData = { ...data, ...params, pageNum: pageNumber };
+    searchParams = reqData;
+    loadData(reqData, false);
+};
+
+const btnClearEvent = (event) => {
+    searchParams = {};
+    pageNumber = 0;
+    loadData({ pageNum: pageNumber }, false);
+};
+
+const columnSearch = (ctrlId, colDef, params) => {
+    const searchPanel = columnSearchUtil.createColumnSearch({
+        ctrlId, colDef, params,
+        actions: [
+            { btnId: 'btn-seach-clear', text: sharedFn().GetUiControlText('CLEAR_BUTTON'), eventName: btnClearEvent, type: 'CLEAR' },
+            { btnId: 'btn-seach-start', text: sharedFn().GetUiControlText('SEARCH_BUTTON'), eventName: btnSeachEvent, type: 'SEARCH' }
+        ]
+    });
+    $('#' + searchPanelSectionId).empty().append(searchPanel);
+};
 
 
 const deleteData = (id, event, cell) => {
@@ -67,24 +128,28 @@ const deleteData = (id, event, cell) => {
             success: function (data) {
                 table.deleteRow(id);
                 notificationUtil.success(sharedFn().GetUiControlText('ADMIN_MSG_DELETE'));
+            },
+            error: function (xhr) {
+                notificationUtil.error(xhr.responseJSON.Message);
             }
         };
         jqClientAdvanced(options).Post("ScopeAcademicYear/DeleteScopeAcademicYear".concat('?Id=', id));
-
     });
-
-
 };
+
 
 $(window).scroll(function () {
     if ($(window).scrollTop() >= ($(document).height() - $(window).height()) * .60) {
         if (!isLoading) {
-            loadData(true);
+            loadData(searchParams, true);
         }
     }
 });
 
+
 $(document).ready(function () {
+
+    columnSearch('search-panel-scopeacademicyear', searchColsDef(), {});
 
     table = tableUtil.createTabulator({
         id: gridContainerId,
@@ -103,38 +168,39 @@ $(document).ready(function () {
 
     dialogElem = commonUtil.createDailog({ dailogId: dailogId });
 
-    loadData(false);
-   
+    loadData({ pageNum: pageNumber }, false);
 
+    commonUtil.infiniteScroll(null, () => {
+        if (showMore) {
+            pageNumber = pageNumber + 1;
+            searchParams = { ...searchParams, pageNum: pageNumber };
+            loadData(searchParams, true);
+        }
+    });
 
     $(`#${btnAddContentId}`).click(function (e) {
-
         sharedFn().ClearForm();
         sharedFn().EditMode();
         sharedFn().SetDefaultValueFromConfig();
-      
     });
-   
 
     $("#btn-submit").click(function (e) {
 
-
         if (sharedFn().NewvalidateForm("form-control", sharedFn().GetUiControlText('ADMIN_CNTRL_REQUIRED'), sharedFn().GetUiControlText('ADMIN_MSG_MAX_CHAR_LENGTH'), sharedFn().GetUiControlText('ADMIN_MSG_MIN_CHAR_LENGTH'))) {
-
 
             commonUtil.btnProgress(btnSubmitId);
             var requestdata = sharedFn().GetSaveObject(controlvalidationlist, $('#Id').val());
 
             const options = {
                 success: function (response) {
+                    commonUtil.btnProgress(btnSubmitId, true);
+
                     if (response) {
                         var data = response.data;
                         if (data) {
                             var { responseStatus } = data;
-                            //debugger
                             switch (responseStatus) {
                                 case 1:
-
                                     table.addData([data], true);
                                     table.deselectRow();
                                     table.getRows()[0].select();
@@ -154,12 +220,11 @@ $(document).ready(function () {
                                     break;
                             }
                         }
-
                     }
-
-
-
-
+                },
+                error: function (xhr) {
+                    commonUtil.btnProgress(btnSubmitId, true);
+                    notificationUtil.error(xhr.responseJSON.Message);
                 }
             };
 
@@ -170,16 +235,10 @@ $(document).ready(function () {
                 url = "ScopeAcademicYear/UpdateScopeAcademicYear";
             } else {
                 url = "ScopeAcademicYear/SaveScopeAcademicYear";
-
             }
 
             jqClientAdvanced(options).PostFormData(url, requestdata);
-
-
         }
     });
 
 });
-
-
-

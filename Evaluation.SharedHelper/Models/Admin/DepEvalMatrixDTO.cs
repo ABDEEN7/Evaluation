@@ -8,7 +8,7 @@ namespace Evaluation.SharedHelper.Models.Admin;
 public class DepEvalMatrixDTO : EntityBaseDTO
 {
     public Guid AcademicYearId { get; set; }
-    public string? AcademicYear { get; set; }
+    public Guid? AcademicYear { get; set; }
     public string? BackendName { get; set; }
     public string? NameAr { get; set; }
     public string? NameEn { get; set; }
