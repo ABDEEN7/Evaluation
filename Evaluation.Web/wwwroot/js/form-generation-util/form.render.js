@@ -64,7 +64,7 @@ window.serviceRequestForm = window.serviceRequestForm || {};
                 e.preventDefault();
                 e.stopPropagation();
 
-                const doSubmit = () => {
+                const doSubmit = async () => {
                     ns.submitAction(actionDetails, formGroups,  saveAsDraft= false );
                 };
 
