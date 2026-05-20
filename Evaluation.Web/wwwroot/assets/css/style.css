@@ -2689,3 +2689,25 @@ input.auto-fill {
     border-color: #0D4361 !important;
 }
 
+
+
+/* Global modals overlay fix */
+.modal.show::before,
+.modal[style*="display: block"]::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    z-index: -1;
+}
+
+.modal.show,
+.modal[style*="display: block"] {
+    z-index: 1055 !important;
+}
+
+    .modal.show .modal-dialog,
+    .modal[style*="display: block"] .modal-dialog {
+        position: relative;
+        z-index: 1056 !important;
+    }
