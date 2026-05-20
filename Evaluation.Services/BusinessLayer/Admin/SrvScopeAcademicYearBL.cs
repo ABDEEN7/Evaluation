@@ -8,6 +8,7 @@ using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Admin;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 namespace Evaluation.Services.Models.Admin
@@ -20,17 +21,20 @@ namespace Evaluation.Services.Models.Admin
         }
 
 
-        public async Task<List<ScopeAcademicYearDTO>> GetScopeAcademicYearList(int Page, int PageSize)
+        public async Task<List<ScopeAcademicYearDTO>> GetScopeAcademicYearList(ScopeFormItemRequest request, int PageSize)
         {
 
 
-            var list = await uow.GetRepository<ScopeAcademicYear>()
+            var list = uow.GetRepository<ScopeAcademicYear>()
                 .GetAllNonDeleted()
                 .Include(x => x.CreateBy)
                 .OrderByDescending(x => x.CreateDate)
-                 .Skip((Page - 1) * PageSize)
-                .Take(PageSize)
-                .ToListAsync();
+                 .Skip((request.Page - 1) * PageSize)
+                .Take(PageSize);
+            if (request.DepartmentId.HasValue)
+            {
+                list = list.Where(x => x.DepartmentId == request.DepartmentId);
+            }
 
             var result = mapper.Map<List<ScopeAcademicYearDTO>>(list, opts => opts.Items["Language"] = _requestInfo.Lang);
             return result;

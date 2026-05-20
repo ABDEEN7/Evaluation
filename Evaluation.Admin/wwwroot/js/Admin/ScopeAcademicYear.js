@@ -76,11 +76,6 @@ const searchColsDef = () => {
             field: 'departmentId',
             header: sharedFn().GetUiControlText('DepartmentClass'),
             type: 'DROPDOWN',
-            constraint: {
-                controlType: 'DROPDOWN',
-                uibackendName: 'departmentId',
-                controlJsonConfig: JSON.stringify({ controlUibackendName: 'departmentId', parentReferenceValue: null })
-            },
             collections: []
         }
     ];
@@ -117,6 +112,47 @@ const columnSearch = (ctrlId, colDef, params) => {
 };
 
 
+const getDepartmentClass = () => {
+    const options = {
+        success: function (result) {
+            if (result) {
+                const { data } = result;
+                if (data) {
+                    const { DepartmentClass } = data;
+                    const ddlData = DepartmentClass.map(item => ({
+                        id: item.id,
+                        text: txtDir === "RTL" ? item.nameAr : item.nameEn
+                    }));
+
+                    
+                    const ddlElm = document.querySelector(`[data-key="departmentId"]`);
+                    if (ddlElm) {
+                        const dropdown = '#' + ddlElm.getAttribute('id');
+                        $(dropdown).select2({
+                            width: 'resolve',
+                            allowClear: true,
+                            data: ddlData,
+                            placeholder: sharedFn().GetUiControlText('DepartmentClass'),
+                            dropdownCssClass: "manageselect2zindex"
+                        });
+                        $(dropdown).val('').trigger('change');
+                    }
+                    $('#DepartmentId').select2({
+                        width: 'resolve',
+                        allowClear: true,
+                        data: ddlData,
+                        placeholder: sharedFn().GetUiControlText('DepartmentClass'),
+                        dropdownCssClass: "manageselect2zindex"
+                    });
+                    $('#DepartmentId').val('').trigger('change');
+                }
+            }
+        }
+    };
+    jqClientAdvanced(options).Get("Department/GetDepartmentClass");
+};
+
+
 const deleteData = (id, event, cell) => {
     if (!id) return;
 
@@ -150,6 +186,9 @@ $(window).scroll(function () {
 $(document).ready(function () {
 
     columnSearch('search-panel-scopeacademicyear', searchColsDef(), {});
+
+    
+    getDepartmentClass();
 
     table = tableUtil.createTabulator({
         id: gridContainerId,
