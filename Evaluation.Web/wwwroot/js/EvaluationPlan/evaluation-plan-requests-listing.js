@@ -34,7 +34,7 @@
         
             {
                 data: "service",
-                className: " td-left td-60 mb-2",
+                className: "td-left py-1 td-70",
                  render: function(data, type, row) {
            
                 return `
@@ -56,13 +56,13 @@
             {
         data: "status",
         title: uiControlsSetup().GetUiControlText("lblRequestStatus"),
-        className: "td-right td-40 mb-2",
+        className: "td-right py-1 place-content-end td-30",
         render: function(data, type, row) {
             const statusColor = row.statusColor || "#cccccc";
             const textColor = "#000";
 
             return `
-            <div class="d-flex justify-content-end w-100">
+            <div class="d-flex justify-content-end w-100 mb-3">
                 <span class="request-status py-1 px-2"
                       style="background-color:${statusColor};color:${textColor};">
                     ${data || ""}
@@ -71,13 +71,7 @@
         `;
         }
     },
-   {
-        data: null,
-        className: "td-full small-width card-only-row request-divider",
-        render: function() {
-            return `<div class="request-divider-line"></div>`;
-        }
-    },
+
             {
         data: "requestNumber",
         className: "td-left small-width",
