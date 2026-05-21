@@ -3,6 +3,7 @@ using Evaluation.DAL.Helper;
 using Evaluation.DAL.Repositories;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Dtos.PlanDto;
+using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Api.ServiceRequestEntitiesDTO;
 using FluentResults;
@@ -54,7 +55,7 @@ public class EvaluationRequestBL(IServiceScopeFactory serviceScopeFactory, Cache
 
 
         result.TotalDataCount = evaluationRequestResult.Count;
-        var pageSize = 10;
+        var pageSize = Int32.TryParse(await cacheDataProvider.GetSystemSettingValue(ConstantKeys.WebAppSettings.PAGE_SIZE_FOR_SCHOOL_EVALUATION_REQUESTS), out int recordsPerPage); ;
         result.PageNumber = model.PageNumber.Value;
         result.PageSize = pageSize;
         result.IsRemainingData = result.Data.Count >= result.PageSize;

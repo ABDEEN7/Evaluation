@@ -1091,12 +1091,18 @@ public static class ConstantKeys
         public const string DELETE_WEB_ReassignAssignment = "DELETE_WEB_ReassignAssignment";
         #endregion
 
+        #region EvaluationRequest
+        public const string VIEW_EVALUATION_REQUEST = "VIEW_EVALUATION_REQUEST";
+        public const string UPDATE_EVALUATION_REQUEST = "UPDATE_EVALUATION_REQUEST";
+        #endregion
+
         #region School
         public const string VIEW_WEB_SCHOOL = "VIEW_WEB_SCHOOL";
         #endregion
     }
     public static class WebAppSettings
     {
+        public static readonly string PAGE_SIZE_FOR_SCHOOL_EVALUATION_REQUESTS = "PageSizeForSchoolEvaluationRequests";
         public static readonly string PAGE_SIZE = "PAGE_SIZE";
         public static readonly string DefaultWebsiteBannerImage = "DefaultWebsiteBannerImage";
     }
