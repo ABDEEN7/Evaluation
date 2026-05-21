@@ -11,6 +11,7 @@ using Evaluation.Services.Extensions;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Dtos.AcademicYearDto;
 using Evaluation.SharedHelper.Dtos.SchoolDto;
+using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Extensions;
 using Evaluation.SharedHelper.Helper;
 using Evaluation.SharedHelper.Models;
@@ -54,7 +55,7 @@ public class SchoolRepository(IServiceScopeFactory serviceScopeFactory,
         using var uow = serviceScopeFactory.CreateScopedUow();
 
         var filter = BuildFilterExpression(request, targetOrgTreeIds, currentSelectedSchools);
-        
+
         var query = uow.GetRepository<School>()
             .GetAllNonDeleted(filter)
             .Select(s => new
@@ -67,8 +68,8 @@ public class SchoolRepository(IServiceScopeFactory serviceScopeFactory,
             .Select(x => new ResponseOrgsPlans
             {
                 Id = x.School.Id,
-                Name = x.School.NameEn,
-
+                Name = requestInfo.Lang == "ar" ? x.School.NameAr : x.School.NameEn,
+                IsOpen = x.School.EvaluationRequests.Any(x => x.ServiceStatus.ServiceStatusType.BackendName.ToLower() == ConstantKeys.ServiceStatusTypeBackend.Open.ToLower()),
                 SchoolLevel = x.School.SchoolLevel!
                     .Select(sl => new SchoolLevelDto
                     {

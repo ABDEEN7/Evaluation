@@ -240,7 +240,7 @@
             checkbox.prop('checked', true);
         }
 
-        if (readonly) {
+        if (readonly || school.IsOpen) {
             checkbox.prop('disabled', true);
         }
 
