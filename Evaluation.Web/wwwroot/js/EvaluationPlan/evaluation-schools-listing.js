@@ -50,7 +50,7 @@
             className: "td-left small-width",
             render: function(data) {
                 return `
-                <iclass="las la-barcode card-only-icon me-1"></i>
+                <i class="las la-barcode card-only-icon me-1"></i>
                 <span class="card-only-label me-2">Code: </span>
                 <span>${data || "_"}</span>
             `;

@@ -1928,11 +1928,25 @@ input.auto-fill {
 }
 
 .requeststableBody tr:has(.dataTables_empty) {
+    width: 98% !important;
+    display: table-row !important;
+    place-items: center;
+}
+
+    /*.requeststableBody tr:has(.dataTables_empty) td {
+        padding: 3rem !important;
+        text-align: center;
+    }*/
+
+
+.requeststableBody td.dataTables_empty {
     width: 100% !important;
     display: table-row !important;
     place-items: center;
-    padding: 2rem 0 !important;
+    padding: 3rem !important;
+    text-align: center;
 }
+
 
 .card-only-icon i,
 .card-only-icon {
