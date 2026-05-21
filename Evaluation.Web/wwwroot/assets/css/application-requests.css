@@ -604,7 +604,7 @@ table#requesttable.dataTable thead th.card-img {
 .application-request .requeststableBody .request-status {
     font-size: 0.9rem;
     font-weight: 700;
-    background-color: #D8F4DD;
+    background-color: transparent;
     color: #0E6B32;
     border-radius: 4px;
     display: inline-block;
@@ -627,7 +627,7 @@ table#requesttable.dataTable thead th.card-img {
     width: 100%;
     display: block;
     line-height: 30px;
-    text-align: center;
+    text-align: start;
     font-size: 0.88rem;
 }
 .application-request.card .requeststableBody .service-icon {
