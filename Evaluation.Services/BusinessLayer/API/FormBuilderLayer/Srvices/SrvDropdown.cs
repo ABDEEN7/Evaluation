@@ -762,7 +762,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 		{
 			using var scopedUow = serviceScopeFactory.CreateScopedUow();
 
-			var repository = scopedUow.GetRepository<AcademicYearScope>();
+			var repository = scopedUow.GetRepository<ScopeAcademicYear>();
 
 		
 			var currentAcademicYear = await scopedUow.GetRepository<AcademicYear>()
@@ -774,7 +774,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 			if (currentAcademicYear == Guid.Empty)
 				return new List<Dictionary<string, object>>();
 
-			IQueryable<AcademicYearScope> query = repository.GetAllQueryFiltered()
+			IQueryable<ScopeAcademicYear> query = repository.GetAllQueryFiltered()
 				.Include(x => x.Scope);
 
 
