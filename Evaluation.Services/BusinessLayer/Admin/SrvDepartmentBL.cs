@@ -2,6 +2,8 @@
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.Calendars;
 using Evaluation.DAL.Models.DepartementEntites;
+using Evaluation.DAL.Models.Org;
+using Evaluation.DAL.Models.SystemSetting;
 using Evaluation.DAL.Models.Website;
 using Evaluation.DAL.Repositories;
 using Evaluation.Services.Special;
@@ -11,26 +13,27 @@ using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Admin;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using static Evaluation.SharedHelper.Enums.ConstantKeys;
 namespace Evaluation.Services.Models.Admin
 {
     public class SrvDepartmentBL : AdminBase
     {
-        public SrvDepartmentBL(IServiceProvider serviceProvider, UnitOfWork uow, LoggingServices loggingServices, IMapper mapper, UserInfo userInfo,IServiceScopeFactory serviceScopeFactory,RequestInfo requestInfo) : base(serviceProvider, uow, loggingServices, mapper, userInfo, serviceScopeFactory, requestInfo)
+        public SrvDepartmentBL(IServiceProvider serviceProvider, UnitOfWork uow, LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, IServiceScopeFactory serviceScopeFactory, RequestInfo requestInfo) : base(serviceProvider, uow, loggingServices, mapper, userInfo, serviceScopeFactory, requestInfo)
         {
-            
+
         }
 
 
         public async Task<List<DepartmentDTO>> GetDepartmentList(int Page, int PageSize)
         {
-           
+
 
             var list = await uow.GetRepository<Department>()
                 .GetAllNonDeleted()
                 .Include(x => x.CreateBy)
                 .OrderBy(x => x.OrderNo)
                 .ThenByDescending(x => x.CreateDate)
-                 .Skip(Page*PageSize)
+                 .Skip(Page * PageSize)
                 .Take(PageSize)
                 .ToListAsync();
 
@@ -39,13 +42,13 @@ namespace Evaluation.Services.Models.Admin
 
 
         }
-   
+
         public async Task<DepartmentDTO> SaveDepartment(DepartmentDTO message, List<WebsiteAttachmentDTO>? filemodel)
         {
-           
-           
 
-            var BackendName= await GenerateBackendNameByTitle(message.NameEn);
+
+
+            var BackendName = await GenerateBackendNameByTitle(message.NameEn);
             var existBackendName = await uow
              .GetRepository<Department>()
                   .GetAllNonDeleted(x => x.BackendName == BackendName)
@@ -148,29 +151,29 @@ namespace Evaluation.Services.Models.Admin
             obj.DepImageBlobUrlEn = message.DepImageFileNameEn_BlobURL;
 
             uow.GetRepository<Department>().Insert(obj);
-                await uow.CommitAsync();
+            await uow.CommitAsync();
             var result = mapper.Map<DepartmentDTO>(obj, opts => opts.Items["Language"] = _requestInfo.Lang);
             result.ResponseStatus = DBResult.Inserted;
-                return result;
-            
+            return result;
+
         }
         public async Task<DepartmentDTO> UpdateDepartment(DepartmentDTO message, List<WebsiteAttachmentDTO>? filemodel)
         {
-           
-            
-          
-               
-                var result = new DepartmentDTO();
 
-                if (message.Id is not null)
-                {
-                    
 
-                    Department obj = await uow.GetRepository<Department>()
-                                      .GetAllNonDeleted()
-                                      .Include(x => x.CreateBy)
-                                      .Where(x => x.Id == message.Id)
-                                      .FirstAsync();
+
+
+            var result = new DepartmentDTO();
+
+            if (message.Id is not null)
+            {
+
+
+                Department obj = await uow.GetRepository<Department>()
+                                  .GetAllNonDeleted()
+                                  .Include(x => x.CreateBy)
+                                  .Where(x => x.Id == message.Id)
+                                  .FirstAsync();
                 var attachmentinserted = 0;
                 if (filemodel != null)
                 {
@@ -184,7 +187,7 @@ namespace Evaluation.Services.Models.Admin
                                 case "DepartmentDepImageFileNameAr":
                                     message.DepImageFileNameAr_BlobURL = item.BlobUrl;
                                     message.DepImageFileNameAr = item.FileName;
-                                message.DepImageFileNameAr_UiFileName = item.UiFileName;
+                                    message.DepImageFileNameAr_UiFileName = item.UiFileName;
 
                                     break;
                                 case "DepartmentDepImageFileNameEn":
@@ -270,14 +273,14 @@ namespace Evaluation.Services.Models.Admin
 
 
                 uow.GetRepository<Department>().Update(obj);
-                    await uow.CommitAsync();
+                await uow.CommitAsync();
                 result = mapper.Map<DepartmentDTO>(obj, opts => opts.Items["Language"] = _requestInfo.Lang);
                 result.UpdateBy = userInfo.DBName;
                 result.ResponseStatus = DBResult.Updated;
-                }
+            }
 
-                return result;
-           
+            return result;
+
         }
         public async Task<bool> UpdateDepartmentOrder(List<OrderingDTO> message)
         {
@@ -300,16 +303,16 @@ namespace Evaluation.Services.Models.Admin
         public async Task<DepartmentDTO> DeleteDepartment(Guid? Id)
         {
 
-           
 
-               
-                var result = new DepartmentDTO();
-                if (Id is not null)
-                {
-                    Department obj = await uow.GetRepository<Department>()
-                                      .GetAllNonDeleted()
-                                      .Where(x => x.Id == Id)
-                                      .FirstAsync();
+
+
+            var result = new DepartmentDTO();
+            if (Id is not null)
+            {
+                Department obj = await uow.GetRepository<Department>()
+                                  .GetAllNonDeleted()
+                                  .Where(x => x.Id == Id)
+                                  .FirstAsync();
                 var SystemModule = await uow.GetRepository<SystemModule>()
  .GetAllNonDeleted()
                        .Where(x => x.DepartmentId == obj.Id)
@@ -328,14 +331,27 @@ namespace Evaluation.Services.Models.Admin
                     throw new BusinessException(ConstantKeys.ExceptionMessage.DepartmentExistsAcademicYear);
                 }
                 uow.GetRepository<Department>().Delete(obj);
-                    await uow.CommitAsync();
+                await uow.CommitAsync();
                 result = mapper.Map<DepartmentDTO>(obj, opts => opts.Items["Language"] = _requestInfo.Lang);
                 result.ResponseStatus = DBResult.Deleted;
-                }
-                return result;
-           
+            }
+            return result;
+
 
         }
-       
+
+
+        public async Task<List<Department>> GetDepartmentClass()
+        {
+
+            var result = await uow.GetRepository<Department>()
+               .GetAllNonDeleted()
+               .Include(x => x.CreateBy)
+               .Distinct()
+               .ToListAsync();
+
+            return result;
+
+        }
     }
 }
