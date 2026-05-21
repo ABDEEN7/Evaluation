@@ -2722,17 +2722,31 @@ input.auto-fill {
     width: 35% !important;
 }
 
+
+
+
+/* Hide in table */
 .application-request.table-card-seperate-styling tbody tr:not(.card):not(.card-row) .card-only-icon,
 .application-request.table-card-seperate-styling tbody tr:not(.card):not(.card-row) .card-only-label,
-.application-request.table-card-seperate-styling tbody tr:not(.card):not(.card-row) .title-icon {
+.application-request.table-card-seperate-styling tbody tr:not(.card):not(.card-row) .title-icon,
+tr.plan-request-card:not(.card):not(.card-row) .title-icon,
+tr.plan-request-card:not(.card):not(.card-row) .card-only-icon,
+tr.plan-request-card:not(.card):not(.card-row) .card-only-label {
     display: none !important;
 }
 
+/* Show in cards */
 .application-request.table-card-seperate-styling tbody tr.card-row .card-only-icon,
 .application-request.table-card-seperate-styling tbody tr.card-row .card-only-label,
 .application-request.table-card-seperate-styling tbody tr.card-row .title-icon,
 .application-request.table-card-seperate-styling tbody tr.card .card-only-icon,
 .application-request.table-card-seperate-styling tbody tr.card .card-only-label,
-.application-request.table-card-seperate-styling tbody tr.card .title-icon {
+.application-request.table-card-seperate-styling tbody tr.card .title-icon,
+tr.plan-request-card.card .title-icon,
+tr.plan-request-card.card-row .title-icon,
+tr.plan-request-card.card .card-only-icon,
+tr.plan-request-card.card-row .card-only-icon,
+tr.plan-request-card.card .card-only-label,
+tr.plan-request-card.card-row .card-only-label {
     display: inline-flex !important;
 }
