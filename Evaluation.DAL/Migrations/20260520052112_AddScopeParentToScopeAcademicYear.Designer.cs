@@ -4,6 +4,7 @@ using Evaluation.DAL.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Evaluation.DAL.Migrations
 {
     [DbContext(typeof(EvaluationDbContext))]
-    partial class EvaluationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260520052112_AddScopeParentToScopeAcademicYear")]
+    partial class AddScopeParentToScopeAcademicYear
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -3625,6 +3628,68 @@ namespace Evaluation.DAL.Migrations
                     b.ToTable("RelatedFieldsGroup");
                 });
 
+            modelBuilder.Entity("Evaluation.DAL.Models.FormsModules.AcademicYearScope", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("AcademicYearId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CreateById")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreateDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("getdate()");
+
+                    b.Property<Guid?>("DeleteById")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("DeleteDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<Guid?>("ParentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("ScopeId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("UpdateById")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("UpdateDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AcademicYearId");
+
+                    b.HasIndex("CreateById");
+
+                    b.HasIndex("DeleteById");
+
+                    b.HasIndex("ParentId");
+
+                    b.HasIndex("ScopeId");
+
+                    b.HasIndex("UpdateById");
+
+                    b.ToTable("AcademicYearScope");
+                });
+
             modelBuilder.Entity("Evaluation.DAL.Models.FormsModules.CalcMethod", b =>
                 {
                     b.Property<Guid>("Id")
@@ -4685,9 +4750,6 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
                         .HasDefaultValue(false);
-
-                    b.Property<int>("OrderNo")
-                        .HasColumnType("int");
 
                     b.Property<Guid>("ScopeId")
                         .HasColumnType("uniqueidentifier");
@@ -12905,6 +12967,47 @@ namespace Evaluation.DAL.Migrations
                     b.Navigation("CreateBy");
 
                     b.Navigation("DeleteBy");
+
+                    b.Navigation("UpdateBy");
+                });
+
+            modelBuilder.Entity("Evaluation.DAL.Models.FormsModules.AcademicYearScope", b =>
+                {
+                    b.HasOne("Evaluation.DAL.Models.Calendars.AcademicYear", "AcademicYear")
+                        .WithMany()
+                        .HasForeignKey("AcademicYearId");
+
+                    b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "CreateBy")
+                        .WithMany()
+                        .HasForeignKey("CreateById")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "DeleteBy")
+                        .WithMany()
+                        .HasForeignKey("DeleteById");
+
+                    b.HasOne("Evaluation.DAL.Models.FormsModules.Scope", "Parent")
+                        .WithMany()
+                        .HasForeignKey("ParentId");
+
+                    b.HasOne("Evaluation.DAL.Models.FormsModules.Scope", "Scope")
+                        .WithMany()
+                        .HasForeignKey("ScopeId");
+
+                    b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "UpdateBy")
+                        .WithMany()
+                        .HasForeignKey("UpdateById");
+
+                    b.Navigation("AcademicYear");
+
+                    b.Navigation("CreateBy");
+
+                    b.Navigation("DeleteBy");
+
+                    b.Navigation("Parent");
+
+                    b.Navigation("Scope");
 
                     b.Navigation("UpdateBy");
                 });

@@ -14,4 +14,7 @@ public class ScopeAcademicYear : EntityBase, IAuditLogEntity
     public Scope? Scope { get; set; }
     public Guid AcademicYearId { get; set; }
     public AcademicYear AcademicYear { get; set; } = null!;
+    public Guid? ScopeParentId { get; set; }
+    public Scope? ScopeParent { get; set; }
+    public int OrderNo { get; set; } = 0;
 }

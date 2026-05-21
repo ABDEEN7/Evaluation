@@ -55,7 +55,8 @@ public class EvaluationRequestBL(IServiceScopeFactory serviceScopeFactory, Cache
 
 
         result.TotalDataCount = evaluationRequestResult.Count;
-        var pageSize = Int32.TryParse(await cacheDataProvider.GetSystemSettingValue(ConstantKeys.WebAppSettings.PAGE_SIZE_FOR_SCHOOL_EVALUATION_REQUESTS), out int recordsPerPage); ;
+        Int32.TryParse(await cacheDataProvider.GetSystemSettingValue(ConstantKeys.WebAppSettings.PAGE_SIZE_FOR_SCHOOL_EVALUATION_REQUESTS), out int recordsPerPage);
+        var pageSize = recordsPerPage;
         result.PageNumber = model.PageNumber.Value;
         result.PageSize = pageSize;
         result.IsRemainingData = result.Data.Count >= result.PageSize;
