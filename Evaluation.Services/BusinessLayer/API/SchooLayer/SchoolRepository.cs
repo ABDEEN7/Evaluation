@@ -1,25 +1,19 @@
 ﻿using AutoMapper;
 using Evaluation.DAL.Helper;
-using Evaluation.DAL.Models.Calendars;
 using Evaluation.DAL.Models.DepartementEntites;
 using Evaluation.DAL.Models.Org;
-using Evaluation.DAL.Models.Planing;
+using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
 using Evaluation.DAL.Repositories;
-using Evaluation.Services.BusinessLayer.API.AcademicYearLayer;
-using Evaluation.Services.BusinessLayer.API.DepartmentLayer;
 using Evaluation.Services.Extensions;
 using Evaluation.Services.Special;
-using Evaluation.SharedHelper.Dtos.AcademicYearDto;
 using Evaluation.SharedHelper.Dtos.SchoolDto;
 using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Extensions;
 using Evaluation.SharedHelper.Helper;
 using Evaluation.SharedHelper.Models;
-using FluentResults;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
 
 namespace Evaluation.Services.BusinessLayer.API.SchooLayer;
 
@@ -110,6 +104,22 @@ public class SchoolRepository(IServiceScopeFactory serviceScopeFactory,
            .GetRepository<School>().GetByIDActiveNonDeleted(SchoolID);
 
         return school;
+    }
+
+    public async Task<List<EvaluationRequest>> GetEvaluationRequestByOrgTreeId(Guid OrgTreeId)
+    {
+        IQueryable<EvaluationRequest> query = unitOfWork.GetRepository<EvaluationRequest>()
+            .GetAllActiveNonDeleted()
+            .Include(d => d.ServiceStatus)
+            .Include(d => d.FormEvalMatrixValue)
+            .Where(er =>
+                er.OrgTreeId == OrgTreeId &&
+                er.DepEvaluationType.DepartmentId == requestInfo.DepId &&
+                er.FormEvalMatrixValueId != null)
+            .OrderByDescending(er => er.CreateDate)
+            .Take(2);
+
+        return query.ToList();
     }
 
     public async Task<IQueryable<DepEvaluationType>> GetVisitTypes()

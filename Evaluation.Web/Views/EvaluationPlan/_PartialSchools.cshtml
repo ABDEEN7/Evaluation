@@ -40,7 +40,7 @@
                                class="form-label @ConstantKeys.WebSchools.SchoolName"></label>
                         <input id="schoolNameFilter" class="form-control filter-enter" />
                     </div>
-
+@* 
                     <div class="col-md-4">
                         <label for="schoolCodeFilter"
                                class="form-label @ConstantKeys.WebSchools.SchoolCode"></label>
@@ -89,7 +89,7 @@
                             <option value="2">جارية</option>
                             <option value="3">مكتملة</option>
                         </select>
-                    </div>
+                    </div> *@
 
                 </div>
 
@@ -136,9 +136,6 @@
     </div>
 
 </div>
-@* @await Component.InvokeAsync("SchoolDetailsModal", new { modalId = "SCHOOL", title = "تفاصيل المدرسة", body = "" }) *@
-
-@await Component.InvokeAsync("SchoolDetailsModal", new { modalId = "SCHOOL", title = "تفاصيل المدرسة", body = "" })
 
 @await Component.InvokeAsync("SchoolDetailsModal", new { modalId = "schoolDetailsPopup", title = "تفاصيل المدرسة", body = "", isModal = true, type = "SCHOOL" })
 <script>
