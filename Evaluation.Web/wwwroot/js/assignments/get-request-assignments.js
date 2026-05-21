@@ -159,7 +159,7 @@
 
                 // Map scopes from API format to array of IDs
                 const scopes = (assignment.evalRequestAssignmentScopies || [])
-                    .map(scope => scope.scopeId)
+                    .map(scope => scope.id)
                     .filter(Boolean);
 
                 state.selectedAssignments.push({

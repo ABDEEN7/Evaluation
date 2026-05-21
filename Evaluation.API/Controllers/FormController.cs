@@ -1,4 +1,5 @@
 ﻿using Evaluation.DAL.Dtos.Form;
+using Evaluation.DAL.Helper;
 using Evaluation.Services.BusinessLayer;
 using Evaluation.Services.BusinessLayer.API.FormLayer;
 using Evaluation.SharedHelper.Dtos.Form;
@@ -18,6 +19,13 @@ public class FormController : ControllerBase
     {
         _masterBl = masterBl;
     }
+
+    [HttpGet]
+    public async Task<Result<List<ScopeTreeDto>>> GetScopeStructure()
+    {
+        return await _masterBl.GetApiService<FormBL>().GetScopeStructure();
+    }
+
 
     [HttpGet]
     public async Task<Result<FormDto>> GetItems([FromQuery] Guid formId)
