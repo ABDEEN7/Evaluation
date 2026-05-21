@@ -30,6 +30,7 @@ let P_matrixResponse;
 let evalForm;
 let P_countOfColumnsValue;
 let P_hasMuliEvaluation;
+let P_renamedItems;
 
 const SELECTORS = {
     tbody: 'tbodyRows'
@@ -443,6 +444,7 @@ const generateFullFormPageHtml = async ({ formId,
     allowAdd,
     namingResult = null }) => {
 
+    P_renamedItems = namingResult.renamedItems;
     P_evaluationRequestId = evaluationRequestId;
     P_serviceRequestId = serviceRequestId;
 
@@ -467,12 +469,12 @@ const generateFullFormPageHtml = async ({ formId,
 
     let isRenamedEvaluation = false;
 
-    if (allowRename == false && isRename == true && readOnly == false)
+    if (allowRename == false && isRename == true)
         isRenamedEvaluation = true;
 
     if (isRenamedEvaluation) {
         isRename = false;
-        const map = new Map(namingResult.items.map(item => [item.id, item.name]));
+        const map = new Map(namingResult.renamedItems.map(item => [item.id, item.name]));
 
         items = items
             .filter(item => map.has(item.id))
@@ -574,7 +576,7 @@ async function initializeControls(formId, fieldId, controlValues) {
                 subItemValueMap.set(subItem.id, subItem);
             });
         });
-    }
+    } 
 
     const matrixOptions = matrixValues.map(({ id, name, actualMatrixValue }) => {
         const option = new Option(name, id);
@@ -641,6 +643,13 @@ async function initializeControls(formId, fieldId, controlValues) {
     const container = document.getElementById(`${fieldId}-index-table`);
 
     container.appendChild(table);
+
+    if (controlValues?.results != null)
+    {
+        $(`#${P_fieldId}-result-value`).text(`(${Number(controlValues?.results.value).toFixed(2)})${controlValues?.results.name}`);
+        $(`#${P_fieldId}-result-div`).removeClass("d-none");
+    }
+  
 }
 
 
