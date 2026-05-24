@@ -87,30 +87,83 @@ window.serviceRequestForm = window.serviceRequestForm || {};
             const $el = $("#" + id);
 
             let value = null;
-
             switch ((field.type || "").toLowerCase()) {
 
-                case "evl_form": {
-                    const allowRenameFormItem = field.attributes?.find(c => c.name === 'allowRenameFormItem');
+                case "checkbox":
+            value = $el.is(":checked");
+            break;
+                case "list": {
+                const tableId = getListDomId(field, renderType);
 
-                    const formObj = allowRenameFormItem
-                        ? renameFormItems(field.formId)
-                        : await saveForm(field.formId);
-
-                    value = formObj ? JSON.stringify(formObj) : null;
-                    break;
+                let tableData = [];
+                if (window.Tabulator) {
+                    const tables = Tabulator.findTable("#" + tableId);
+                    tableData = (tables && tables.length) ? (tables[0].getData() || []) : [];
                 }
 
-                default:
-                    value = $el.val();
-                    break;
-            }
+                value = (tableData || []).map(row => {
+                    const r = { ...(row || {}) };
 
-            valuesMap[field.fieldId] = value;
+                    if (r.file != null && r.file !== "") {
+                        r.file = Array.isArray(r.file) ? r.file : [r.file];
+                    }
+
+                    if (r.IsOld === undefined || r.IsOld === null || r.IsOld === "") {
+                        r.IsOld = false;
+                    }
+
+                    return r;
+                });
+
+                value = JSON.stringify(value);
+                break;
+            }
+                case "select2":
+                case "dropdown": {
+                const v = $el.val();
+                if ($el.attr("multiple")) {
+                    value = Array.isArray(v) ? v : (v ? [v] : []);
+                } else {
+                    value = v;
+                }
+                break;
+            }
+                case "evaluationplan": {
+                const fieldId = `field_${field.fieldId}`;
+                const planObj = window.SubmitPlanHandler?.getFormPlanJson(fieldId);
+                value = planObj ? JSON.stringify(planObj) : null;
+                break;
+            }
+                case "evl_form": {
+                const allowRenameFormItem = field.attributes?.find(c => c.name === 'allowRenameFormItem');
+
+                const formObj = allowRenameFormItem
+                    ? renameFormItems(field.formId)
+                    : await saveForm(field.formId);
+
+                value = formObj ? JSON.stringify(formObj) : null;
+                break;
+            }
+                case "time":
+                case "datetime":
+                case "date":
+                case "phone":
+                case "text":
+                case "textarea":
+                case "number":
+                case "tinymce":
+                case "jqte":
+                default:
+            value = $el.val();
+            break;
         }
 
-        return { fields, valuesMap };
-    }
+        valuesMap[field.fieldId] = value;
+    } 
+
+         return { fields, valuesMap };
+}
+        
 
     // ================================
     // #region 🔹 validation
@@ -207,24 +260,54 @@ window.serviceRequestForm = window.serviceRequestForm || {};
         if (planId) qs.set("planId", planId);
 
         const postUrl = `${baseUrl}?${qs.toString()}`;
-
-
-        const successFunction = function (result)
-        {
+        const successFunction = function (result) {
             if (!result) {
-                DisplayAlert("Unexpected empty response.", "danger"); return;
-            } let RequestId = getRequestOrEvalId(); if (RequestId) { window.tempFileStorage = {}; DisplayAlert('Form submitted successfully!', 'success'); setTimeout(() => { sharedUtility().RedirectToModuleOrDefault({ Evlid: getEvlRequestId() }); }, 1000); } else { let message = saveAsDraft ? uiControlsSetup().GetUiControlText('lblRequestSavedAsDraftSuccessfully') : uiControlsSetup().GetUiControlText('lblRequestCreatedSuccessfully'); if (result.requestNumber) { message = message.replace('{requestNumber}', result.requestNumber); } notificationUtil.confirmation({ title: message, body: '', okText: uiControlsSetup().GetUiControlText('lblOk'), showCancelButton: false, }, function () { sharedUtility().RedirectToModuleOrDefault(); }); }
+                DisplayAlert("Unexpected empty response.", "danger");
+                return;
+            }
+            let RequestId = getRequestOrEvalId();
+            if (RequestId) {
+                window.tempFileStorage = {};
+                DisplayAlert('Form submitted successfully!', 'success');
+                setTimeout(() => {
+                    sharedUtility().RedirectToModuleOrDefault({
+                        Evlid: getEvlRequestId()
+                    });
+                }, 1000);
+            } else {
+                let message = saveAsDraft
+                    ? uiControlsSetup().GetUiControlText('lblRequestSavedAsDraftSuccessfully')
+                    : uiControlsSetup().GetUiControlText('lblRequestCreatedSuccessfully');
+
+                if (result.requestNumber) {
+                    message = message.replace('{requestNumber}', result.requestNumber);
+                }
+
+                notificationUtil.confirmation(
+                    {
+                        title: message,
+                        body: '',
+                        okText: uiControlsSetup().GetUiControlText('lblOk'),
+                        showCancelButton: false,
+                    },
+                    function () {
+                        sharedUtility().RedirectToModuleOrDefault();
+                    }
+                );
+            }
         };
-        const errorFunction = function (xhr)
-        {
+
+        const errorFunction = function (xhr) {
             try {
                 const response = xhr?.responseText ? JSON.parse(xhr.responseText) : null;
-                if (Array.isArray(response))
-                { showErrors(response); }
-                else {
+                if (Array.isArray(response)) {
+                    showErrors(response);
+                } else {
                     DisplayAlert(response?.message || "An unexpected error occurred.", 'danger');
                 }
-            } catch { DisplayAlert("An unexpected error occurred.", 'danger'); }
+            } catch {
+                DisplayAlert("An unexpected error occurred.", 'danger');
+            }
         };
         jqClient({})
             .PostFormData(postUrl, formData)
