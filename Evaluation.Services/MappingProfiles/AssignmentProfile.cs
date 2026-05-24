@@ -2,6 +2,7 @@
 using Evaluation.DAL.Models.Planing.TeamsModule;
 using Evaluation.DAL.Models.UserEntiy;
 using Evaluation.SharedHelper.Consts;
+using Evaluation.SharedHelper.Dtos.OrgDto;
 using Evaluation.SharedHelper.Dtos.TeamMemberDto;
 using Evaluation.SharedHelper.Models;
 
@@ -101,3 +102,4 @@ public class JobTitleResolver : IMemberValueResolver<MinistryUser, AssignmentDto
         );
     }
 }
+

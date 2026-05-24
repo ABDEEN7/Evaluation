@@ -2764,3 +2764,11 @@ tr.plan-request-card.card .card-only-label,
 tr.plan-request-card.card-row .card-only-label {
     display: inline-flex !important;
 }
+
+.select2-container--open {
+    z-index: 9999999 !important;
+}
+
+.select2-dropdown {
+    z-index: 9999999 !important;
+}
