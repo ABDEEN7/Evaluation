@@ -525,7 +525,7 @@ const relatedItemPopup = (rowsHtml) => `<div class="modal fade" id="RealatedItem
                     <h4 class="modal-title fw-semibold mb-2" id="modalTitle"></h4>
                 </div>
 
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                         <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal" aria-label="Close"><i class="la la-close me-1 fs-14"></i><span class="close-text">Close</span></button>
             </div>
 
             <div class="modal-body py-0">

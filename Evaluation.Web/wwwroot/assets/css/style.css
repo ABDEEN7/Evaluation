@@ -5617,3 +5617,12 @@ input[type="number"] {
         text-align: start !important;
         direction: inherit !important;
     }
+
+
+.close-text {
+    font-size: 0.9rem;
+}
+
+.btn.btn-outline-secondary.btn-sm {
+    margin-inline-start: auto;
+}

@@ -772,7 +772,7 @@ window.formUtility = window.formUtility || {};
                               <div class="modal-content">
                                 <div class="modal-header">
                                   <h5 class="modal-title" id="${modalId}Label">${modalTitleText}</h5>
-                                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                              <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal" aria-label="Close"><i class="la la-close me-1 fs-14"></i><span class="close-text">Close</span></button>
                                 </div>
                                 <div class="modal-body" id="${modalBodyId}">
                                   <!-- Form fields will be dynamically injected here -->
@@ -802,7 +802,7 @@ window.formUtility = window.formUtility || {};
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="${modalId}Label">${modalTitleText}</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal" aria-label="Close"><i class="la la-close me-1 fs-14"></i><span class="close-text">Close</span></button>
                     </div>
                     <div class="modal-body" id="${modalBodyId}">
                         <!-- Form fields will be dynamically injected here -->
