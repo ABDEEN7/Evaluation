@@ -1,4 +1,6 @@
 ﻿$(document).ready(function () {
+
+    let currentLang = sharedUtility().GetCookie('lang');
     function getSchoolFilterInput() {
         return {
             Name: $('#schoolNameFilter').val(),
@@ -26,14 +28,14 @@
         rowClass: 'plan-request-card',
         columns: [
         {
-            data: "nameAr",
+            data: currentLang == 'ar' ? "nameAr" : "nameEn",
             title: uiControlsSetup().GetUiControlText("lblSchoolName"),
             className: "td-full mb-3",
             render: function(data, type, row) {
                 const safe = data || "";
 
                 return `
-                    <div class="plan-title-row">
+                    <div data-bs-toggle= 'modal' data-bs-target= '#schoolDetailsPopup' class="plan-title-row text-decoration-none text-primary fw-bold school-details-link" data-id="${row.id}">
                         <i class="las la-school card-only-icon title-icon"></i>
 
                         <span class="plan-text-wrap px-1">
@@ -76,7 +78,7 @@
                 return `
                 <i class="las la-school card-only-icon me-1"></i>
                 <span class="card-only-label me-2">Level: </span>
-                <span>ابتدائي, اعدادي</span>
+                <span>${ currentLang == 'ar' ? "ابتدائي, اعدادي" : "Primary, Preparatory"}</span>
             `;
             }
         },
@@ -142,17 +144,6 @@
             });
         }
     });
-
-    //function openSchoolDetails(schoolId) {
-    //    const options = {
-    //        success: function (response) {
-    //            $('#schoolModalLabel').text(response.name || '');
-    //            $('#schoolModalBody').html(response.htmlContent || '');
-    //            $('#schoolDetailsModal').modal('show');
-    //        }
-    //    };
-    //    //jqClient(options).Get(`/School/GetSchoolDetails?schoolID=${schoolId}`);
-    //}
 
     schoolsListing.reload();
 });

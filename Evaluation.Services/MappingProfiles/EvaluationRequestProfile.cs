@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
-using Evaluation.DAL.Models.ServiceEnities;
 using Evaluation.DAL.Models.ServiceRequestEntities;
 using Evaluation.SharedHelper.Dtos.PlanDto;
+using Evaluation.SharedHelper.Models.Api.ServiceRequestEntitiesDTO;
 using Microsoft.IdentityModel.Tokens;
 
 
@@ -33,6 +33,33 @@ public class EvaluationRequestProfile : Profile
             .ForMember(d => d.Source, opt => opt.MapFrom(_ => "ServiceRequest"))
          .ReverseMap();
 
+        CreateMap<EvaluationRequest, EvaluationRequestDTO>()
+            .ForMember(d => d.RequestNumber, opt => opt.MapFrom(src => src.RequestNumber))
+            .ForMember(d => d.FromDate, opt => opt.MapFrom(src => src.FromDate))
+            .ForMember(d => d.ToDate, opt => opt.MapFrom(src => src.ToDate))
+            .ForMember(d => d.EvaluationDate, opt => opt.MapFrom(src => src.EvaluationDate))
+            .ForMember(d => d.NextEvaluationDate, opt => opt.MapFrom(src => src.NextEvaluationDate))
+            .ForMember(d => d.EvaluationResult, opt => opt.MapFrom<LocalizedEvaluationResultNameResolver>())
+            .ForMember(d => d.Status, opt => opt.MapFrom<LocalizedEvaluationRequestStatusNameResolver>())
+            .ForMember(d => d.Id, opt => opt.MapFrom(src => src.Id));
+
     }
 
+}		
+public class LocalizedEvaluationRequestStatusNameResolver : IValueResolver<EvaluationRequest, EvaluationRequestDTO, string>
+{
+    public string Resolve(EvaluationRequest src, EvaluationRequestDTO dest, string destMember, ResolutionContext context)
+    {
+        var lang = context.Items["lang"]?.ToString();
+        return lang == "ar" ? src.ServiceStatus?.NameAr : src.ServiceStatus?.NameEn;
+    }
+}
+
+public class LocalizedEvaluationResultNameResolver : IValueResolver<EvaluationRequest, EvaluationRequestDTO, string>
+{
+    public string Resolve(EvaluationRequest src, EvaluationRequestDTO dest, string destMember, ResolutionContext context)
+    {
+        var lang = context.Items["lang"]?.ToString();
+        return lang == "ar" ? src.FormEvalMatrixValue?.NameAr : src.FormEvalMatrixValue?.NameEn;
+    }
 }

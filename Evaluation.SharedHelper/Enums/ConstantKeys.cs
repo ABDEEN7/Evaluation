@@ -388,6 +388,18 @@ public static class ConstantKeys
         public static readonly string FormEducationalEntitiesTitle = "FormEducationalEntitiesTitle";
         public static readonly string ReassignAssignment = "WebReassignAssignment";
     }
+
+    public static class WebAppOrgDetails
+    {
+        public static readonly string lblOrgDetailsCurrentEvaluation = "lblOrgDetailsCurrentEvaluation";
+        public static readonly string lblOrgDetailsCurrentSituation = "lblOrgDetailsCurrentSituation";
+        public static readonly string lblOrgDetailsLastEvaluation = "lblOrgDetailsLastEvaluation";
+        public static readonly string lblOrgDetailsInProgressEvaluation = "lblOrgDetailsInProgressEvaluation";
+        public static readonly string lblOrgDetailsBasicInformation = "lblOrgDetailsBasicInformation";
+        public static readonly string lblOrgDetailsManager = "lblOrgDetailsManager";
+        public static readonly string lblOrgDetailsEstablishmentDate = "lblOrgDetailsEstablishmentDate";
+        public static readonly string lblOrgDetailsLevels= "lblOrgDetailsLevels";
+    }
     public static class WebAppRequest
     {
         public static readonly string lblDownload = "lblDownload";
@@ -436,6 +448,14 @@ public static class ConstantKeys
         public static readonly string lblCloseModal = "lblCloseModal";
         public static readonly string lblEvaluationFileScope = "lblEvaluationFileScope";
         public static readonly string lblEvaluationFileHeader = "lblEvaluationFileHeader";
+        public static readonly string lblRequestNumber = "lblRequestNumber";
+        public static readonly string lblSchoolEvalRequests = "lblSchoolEvalRequests";
+        public static readonly string lblFromDate = "lblFromDate";
+        public static readonly string lblToDate = "lblToDate";
+        public static readonly string lblEvaluationDate = "lblEvaluationDate";
+        public static readonly string lblNextEvaluationDate = "lblNextEvaluationDate";
+        public static readonly string lblEvaluationResult = "lblEvaluationResult";
+        public static readonly string lblStatus = "lblStatus";
     }
 
     public static class AdminPermission
@@ -1071,12 +1091,18 @@ public static class ConstantKeys
         public const string DELETE_WEB_ReassignAssignment = "DELETE_WEB_ReassignAssignment";
         #endregion
 
+        #region EvaluationRequest
+        public const string VIEW_EVALUATION_REQUEST = "VIEW_EVALUATION_REQUEST";
+        public const string UPDATE_EVALUATION_REQUEST = "UPDATE_EVALUATION_REQUEST";
+        #endregion
+
         #region School
         public const string VIEW_WEB_SCHOOL = "VIEW_WEB_SCHOOL";
         #endregion
     }
     public static class WebAppSettings
     {
+        public static readonly string PAGE_SIZE_FOR_SCHOOL_EVALUATION_REQUESTS = "PageSizeForSchoolEvaluationRequests";
         public static readonly string PAGE_SIZE = "PAGE_SIZE";
         public static readonly string DefaultWebsiteBannerImage = "DefaultWebsiteBannerImage";
     }
@@ -1669,6 +1695,12 @@ public static class ConstantKeys
         public static readonly Guid REJECT = Guid.Parse("550e8400-e29b-41d4-a716-446655440003");
         public static readonly Guid UPDATE = Guid.Parse("550e8400-e29b-41d4-a716-446655440004");
         public static readonly Guid REQUESTMISSING = Guid.Parse("550e8400-e29b-41d4-a716-446655440005");
+    }
+    public static class ServiceStatusTypeBackend
+    {
+        public static string Open = "Open";
+        public static string Completed = "Completed";
+        public static string Closed = "Closed";
     }
 
 }

@@ -11,4 +11,5 @@ public class ResponseOrgsPlans
     public int? YearAcdemicYear { get; set; }
     public List<SchoolLevelDto>? SchoolLevel { get; set; }
     public ParentOrgTreeDto? OrgParent { get; set; }
+    public bool IsOpen { get; set; }
 }

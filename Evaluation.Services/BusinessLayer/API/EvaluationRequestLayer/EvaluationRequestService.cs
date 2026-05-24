@@ -2,7 +2,6 @@
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.Attachments;
 using Evaluation.DAL.Models.DepartementEntites;
-using Evaluation.DAL.Models.FormsModules;
 using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
 using Evaluation.DAL.Models.ServiceRequestEntities;
 using Evaluation.DAL.Models.UserEntiy;
@@ -21,14 +20,11 @@ using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Api.AttachmentsDTOs;
-using Evaluation.SharedHelper.Models.Api.EvaluationRequestEntities;
 using Evaluation.SharedHelper.Models.Api.FormBuilderDTO;
 using Evaluation.SharedHelper.Models.Api.ServiceRequestEntitiesDTO;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
-using System.Globalization;
 using static Evaluation.SharedHelper.Enums.ConstantKeys;
 
 namespace Evaluation.Services.BusinessLayer.API;
@@ -75,9 +71,23 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 
         return query.ToList();
     }
+    public async Task<List<EvaluationRequest>> GetEvaluationRequestsByOrgTreeId(Guid OrgTreeId, FilterRequestsDTO model)
+    {
+		IQueryable<EvaluationRequest> query = unitOfWork.GetRepository<EvaluationRequest>()
+					.GetAllActiveNonDeleted()
+					.Include(d => d.ServiceStatus)
+					.Include(d => d.FormEvalMatrixValue)
+					 .Where(er => er.OrgTreeId == OrgTreeId &&
+						er.DepEvaluationType.DepartmentId == requestInfo.DepId)
+					 .OrderByDescending(er => er.CreateDate);
 
+        query = await requestAccessService.ApplyEvaluationRequestAccess(query);
 
-	public async Task<WebAppEvaluationRequestsDTO> GetEvaluationRequestsAsync(Guid userId, FilterRequestsDTO model)
+        return query.ToList();
+    }
+
+  
+    public async Task<WebAppEvaluationRequestsDTO> GetEvaluationRequestsAsync(Guid userId, FilterRequestsDTO model)
 	{
 		string lang = requestInfo!.Lang;
 

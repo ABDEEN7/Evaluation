@@ -3,19 +3,22 @@ using Evaluation.Admin.Extensions;
 using Evaluation.Admin.Models;
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.DepartementEntites;
+using Evaluation.DAL.Models.Org;
+using Evaluation.DAL.Models.SystemSetting;
 using Evaluation.Services.BusinessLayer;
 using Evaluation.Services.Models.Admin;
 using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Models.Admin;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using static Evaluation.SharedHelper.Enums.ConstantKeys;
 
 namespace Evaluation.Admin.Controllers
 {
     [Authorize]
     public class DepartmentController : Controller
     {
-        
+
         private readonly UserInfo userInfoSession;
         private readonly MasterBL masterBL;
         private readonly IHttpContextAccessor httpContextAccessor;
@@ -26,7 +29,7 @@ namespace Evaluation.Admin.Controllers
             this.userInfoSession = userInfoSession;
             this.masterBL = masterBL;
             this.httpContextAccessor = httpContextAccessor;
-           
+
         }
         [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.AdminPermission.VIEW_ADMIN_DEPARTMENT })]
         public async Task<IActionResult> Index()
@@ -48,7 +51,7 @@ namespace Evaluation.Admin.Controllers
         [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.AdminPermission.VIEW_ADMIN_DEPARTMENT })]
         public async Task<IActionResult> GetAllDepartment(int Page = 1)
         {
-            var PageSize =  Convert.ToInt32(masterBL.GetAdminService<SrvSystemSettingBL>().GetSetting(ConstantKeys.AdminSettings.ADMIN_PAGE_SIZE));
+            var PageSize = Convert.ToInt32(masterBL.GetAdminService<SrvSystemSettingBL>().GetSetting(ConstantKeys.AdminSettings.ADMIN_PAGE_SIZE));
             var response = await masterBL.GetAdminService<SrvDepartmentBL>().GetDepartmentList(Page, PageSize);
             return Ok(response);
         }
@@ -70,13 +73,13 @@ namespace Evaluation.Admin.Controllers
             var files = Request.Form.Files;
             var result = new DepartmentDTO();
             var model = Request.Form["request"][0]?.StringToObject<DepartmentDTO>();
-            List<WebsiteAttachmentDTO> filemodel = new  List<WebsiteAttachmentDTO>();
+            List<WebsiteAttachmentDTO> filemodel = new List<WebsiteAttachmentDTO>();
             if (null != files)
             {
                 var FinalFiles = files.Where(c => c.Length > 0).ToList();
                 if (FinalFiles.Count > 0)
                 {
-                    var constraintList = await masterBL.GetAdminService<SrvSystemSettingBL>().GetAppConstraints(ConstantKeys.AdminPermission.ADD_ADMIN_DEPARTMENT );
+                    var constraintList = await masterBL.GetAdminService<SrvSystemSettingBL>().GetAppConstraints(ConstantKeys.AdminPermission.ADD_ADMIN_DEPARTMENT);
 
                     var response = await masterBL.GetAdminService<SrvBaseBL>().ValidateWebsiteAttachment(constraintList, FinalFiles);
                     if (response != null)
@@ -117,13 +120,13 @@ namespace Evaluation.Admin.Controllers
             var files = Request.Form.Files;
             var result = new DepartmentDTO();
             var model = Request.Form["request"][0]?.StringToObject<DepartmentDTO>();
-            List<WebsiteAttachmentDTO> filemodel = new  List<WebsiteAttachmentDTO>();
+            List<WebsiteAttachmentDTO> filemodel = new List<WebsiteAttachmentDTO>();
             if (null != files)
             {
                 var FinalFiles = files.Where(c => c.Length > 0).ToList();
                 if (FinalFiles.Count > 0)
                 {
-                    var constraintList = await masterBL.GetAdminService<SrvSystemSettingBL>().GetAppConstraints(ConstantKeys.AdminPermission.ADD_ADMIN_DEPARTMENT );
+                    var constraintList = await masterBL.GetAdminService<SrvSystemSettingBL>().GetAppConstraints(ConstantKeys.AdminPermission.ADD_ADMIN_DEPARTMENT);
 
                     var response = await masterBL.GetAdminService<SrvBaseBL>().ValidateWebsiteAttachment(constraintList, FinalFiles);
                     if (response != null)
@@ -171,10 +174,18 @@ namespace Evaluation.Admin.Controllers
         [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.AdminPermission.DELETE_ADMIN_DEPARTMENT })]
         public async Task<IActionResult> DeleteDepartment(Guid Id)
         {
-           
-                var result = await masterBL.GetAdminService<SrvDepartmentBL>().DeleteDepartment(Id);
-                return Ok(result);
-           
+
+            var result = await masterBL.GetAdminService<SrvDepartmentBL>().DeleteDepartment(Id);
+            return Ok(result);
+
+        }
+
+        public async Task<IActionResult> GetDepartmentClass()
+        {
+            Dictionary<string, object> response = new Dictionary<string, object>();
+            var DepClass = await masterBL.GetAdminService<SrvDepartmentBL>().GetDepartmentClass();
+            response.Add("DepartmentClass", DepClass);
+            return Ok(new ResponseEntity(response));
         }
 
     }
