@@ -14,7 +14,6 @@ public class DepEvalMatrixProfile : Profile
     .ForMember(d => d.NameEn, opt => opt.MapFrom(src => src.NameEn))
     .ForMember(d => d.NameAr, opt => opt.MapFrom(src => src.NameAr))
     .ForMember(d => d.AcademicYearId, opt => opt.MapFrom(src => src.AcademicYearId))
-    .ForMember(d => d.AcademicYear, opt => opt.MapFrom<AcademicYearResolver, Guid?>(src => src.AcademicYearId))
     .ForMember(d => d.ItemValue, opt => opt.MapFrom(src => src.ItemValue))
     .ForMember(d => d.MaxValue, opt => opt.MapFrom(src => src.MaxValue))
     .ForMember(d => d.MinValue, opt => opt.MapFrom(src => src.MinValue))

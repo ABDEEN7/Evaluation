@@ -1,4 +1,6 @@
 ﻿$(document).ready(function () {
+
+    let currentLang = sharedUtility().GetCookie('lang');
     function getSchoolFilterInput() {
         return {
             Name: $('#schoolNameFilter').val(),
@@ -25,37 +27,94 @@
         tableViewBtnId: 'tblViewSchool',
         rowClass: 'plan-request-card',
         columns: [
-            {
-                data: "nameAr",
-                title: uiControlsSetup().GetUiControlText("lblSchoolName"),
-                className: "td-left name",
-               
-                render: function (data, type, row) {
-                    const safe = data || "";
-                    return `<a href="javascript:void(0)" data-bs-toggle= 'modal' data-bs-target= '#schoolDetailsPopup' class="text-decoration-none text-primary fw-bold school-details-link" data-id="${row.id}">${safe}</a>`;
-                }
-            },
-            {
-                data: "code",
-                title: uiControlsSetup().GetUiControlText("lblSchoolCode"),
-                className: "td-left code"
-            },
-            {
-                data: "schoolTypeName",
-                title: uiControlsSetup().GetUiControlText("lblSchoolType"),
-                className: "td-left type"
-            },
+        {
+            data: currentLang == 'ar' ? "nameAr" : "nameEn",
+            title: uiControlsSetup().GetUiControlText("lblSchoolName"),
+            className: "td-full mb-3",
+            render: function(data, type, row) {
+                const safe = data || "";
+
+                return `
+                    <div data-bs-toggle= 'modal' data-bs-target= '#schoolDetailsPopup' class="plan-title-row text-decoration-none text-primary fw-bold school-details-link" data-id="${row.id}">
+                        <i class="las la-school card-only-icon title-icon"></i>
+
+                        <span class="plan-text-wrap px-1">
+                            <span class="card-only-label title-label"></span>
+                            <span class="plan-title-text">${data || ""}</span>
+                        </span>
+                    </div>
+                    `;
+            }
+        },
+        {
+            data: "code",
+            title: uiControlsSetup().GetUiControlText("lblSchoolCode"),
+            className: "td-left small-width",
+            render: function(data) {
+                return `
+                <iclass="las la-barcode card-only-icon me-1"></i>
+                <span class="card-only-label me-2">Code: </span>
+                <span>${data || "_"}</span>
+            `;
+            }
+        },
+        {
+            data: "schoolTypeName",
+            title: uiControlsSetup().GetUiControlText("lblSchoolType"),
+            className: "td-right small-width",
+            render: function(data) {
+                return `
+                <i class="las la-graduation-cap card-only-icon me-1"></i>
+                <span class="card-only-label me-2">Sector: </span>
+                <span>${data || ""}</span>
+            `;
+            }
+        },
+        {
+            data: "null",
+            title: uiControlsSetup().GetUiControlText("lblSchoolLevel"),
+            className: "td-right small-width",
+            render: function(data) {
+                return `
+                <i class="las la-school card-only-icon me-1"></i>
+                <span class="card-only-label me-2">Level: </span>
+                <span>${ currentLang == 'ar' ? "ابتدائي, اعدادي" : "Primary, Preparatory"}</span>
+            `;
+            }
+        },
+
+            //{
+             //   data: "nameAr",
+             //   title: uiControlsSetup().GetUiControlText("lblSchoolName"),
+             //   className: "td-left name",   
+             //   render: function (data, type, row) {
+             //       const safe = data || "";
+             //       return `<a href="javascript:void(0)" data-bs-toggle= 'modal' data-bs-target= '#schoolDetailsPopup' class="text-decoration-none text-primary fw-bold school-details-link" data-id="${row.id}">${safe}</a>`;
+              //  }
+            //   },
+
+
+           // {
+           //     data: "code",
+           //     title: uiControlsSetup().GetUiControlText("lblSchoolCode"),
+           //     className: "td-left code"
+           // },
+           // {
+             //   data: "schoolTypeName",
+             //   title: uiControlsSetup().GetUiControlText("lblSchoolType"),
+             //   className: "td-left type"
+            //},
             //{
             //    data: "levelName",
             //    title: uiControlsSetup().GetUiControlText("lblSchoolLevel"),
             //    className: "td-left level"
             //},
-            {
-                data: null,
-                title: uiControlsSetup().GetUiControlText("lblSchoolLevel"),
-                className: "td-left level",
-                defaultContent: "ابتدائي, اعدادي"
-            }
+            //{
+            //    data: null,
+            //    title: uiControlsSetup().GetUiControlText("lblSchoolLevel"),
+            //    className: "td-left level",
+            //    defaultContent: "ابتدائي, اعدادي"
+            //}
             //{
             //    data: "region",
             //    title: uiControlsSetup().GetUiControlText("lblRegion"),
@@ -85,17 +144,6 @@
             });
         }
     });
-
-    //function openSchoolDetails(schoolId) {
-    //    const options = {
-    //        success: function (response) {
-    //            $('#schoolModalLabel').text(response.name || '');
-    //            $('#schoolModalBody').html(response.htmlContent || '');
-    //            $('#schoolDetailsModal').modal('show');
-    //        }
-    //    };
-    //    //jqClient(options).Get(`/School/GetSchoolDetails?schoolID=${schoolId}`);
-    //}
 
     schoolsListing.reload();
 });

@@ -1,9 +1,9 @@
 ﻿@using Evaluation.SharedHelper.Enums
 
-<div class="m-4">
+<div class="p-0">
 
     <!-- Toolbar Row -->
-    <div class="mb-3">
+    <div class="m-4">
         <div class="d-flex justify-content-between align-items-center">
 
             <!-- Left: View Toggle -->
@@ -40,7 +40,7 @@
                                class="form-label @ConstantKeys.WebSchools.SchoolName"></label>
                         <input id="schoolNameFilter" class="form-control filter-enter" />
                     </div>
-
+@* 
                     <div class="col-md-4">
                         <label for="schoolCodeFilter"
                                class="form-label @ConstantKeys.WebSchools.SchoolCode"></label>
@@ -89,7 +89,7 @@
                             <option value="2">جارية</option>
                             <option value="3">مكتملة</option>
                         </select>
-                    </div>
+                    </div> *@
 
                 </div>
 
@@ -117,37 +117,18 @@
 
 
 
+    @* SCHOOL TABLE *@
 
 
-
-        <!-- Schools Table -->
-        <div class="table-responsive" id="schoolsTableWrapper">
-            <table id="schoolTable" class="table table-striped table-bordered w-100 application-request card">
-                <thead>
-                    <tr>
-                        <th class="@ConstantKeys.WebSchools.Name"></th>
-                        <th class="@ConstantKeys.WebSchools.Code"></th>
-                        <th class="@ConstantKeys.WebSchools.TypeCol"></th>
-                        <th class="@ConstantKeys.WebSchools.LevelsCol"></th>
-               @*         <th class="@ConstantKeys.WebSchools.RegionCol"></th>
-                        <th @ConstantKeys.WebSchools.StatusCol></th> *@
-                    </tr>
-                </thead>
-                <tbody class="requeststableBody w-100"></tbody>
-            </table>
-        </div>
-    <!-- Schools Table -->
     <div class="table-responsive" id="schoolsTableWrapper">
         <table id="schoolTable"
-               class="table table-striped table-bordered w-100 application-request card">
-            <thead>
+               class="table table-striped table-bordered w-100 application-request table-card-seperate-styling">
+            <thead class="table-light">
                 <tr>
                     <th class="@ConstantKeys.WebSchools.Name"></th>
                     <th class="@ConstantKeys.WebSchools.Code"></th>
                     <th class="@ConstantKeys.WebSchools.TypeCol"></th>
                     <th class="@ConstantKeys.WebSchools.LevelsCol"></th>
-                    <th class="@ConstantKeys.WebSchools.RegionCol"></th>
-                    <th @ConstantKeys.WebSchools.StatusCol></th>
                 </tr>
             </thead>
             <tbody class="requeststableBody w-100"></tbody>
@@ -155,9 +136,6 @@
     </div>
 
 </div>
-@* @await Component.InvokeAsync("SchoolDetailsModal", new { modalId = "SCHOOL", title = "تفاصيل المدرسة", body = "" }) *@
-
-@await Component.InvokeAsync("SchoolDetailsModal", new { modalId = "SCHOOL", title = "تفاصيل المدرسة", body = "" })
 
 @await Component.InvokeAsync("SchoolDetailsModal", new { modalId = "schoolDetailsPopup", title = "تفاصيل المدرسة", body = "", isModal = true, type = "SCHOOL" })
 <script>

@@ -143,12 +143,12 @@
 
                     if (!data) return "_";
 
-                    const statusColor = row.statusColor || "#cccccc";
+                    const statusColor = row.statusColor || "#89153D";
                     const textColor = getContrastingTextColor(statusColor);
 
                     return `
                     <span class="request-status m-0"
-                          style="background-color:${statusColor};color:${textColor};">
+                          style="color:${statusColor};">
                         <i class="las la-edit card-only-icon me-1"></i>
                         ${data}
                     </span>

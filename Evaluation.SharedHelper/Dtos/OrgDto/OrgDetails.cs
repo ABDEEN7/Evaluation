@@ -27,6 +27,9 @@ public class OrgDetailsDto
     public string? OrgEmail { get; set; }
     public string? Address { get; set; }
     public string? Phone { get; set; }
-    public string? Mobile { get; set; }
+    public string? CurrentEvaluationResult { get; set; }
+    public string? CurrentEvaluationDate { get; set; }
+    public string? LastEvaluationResult { get; set; }
+    public string? LastEvaluationDate { get; set; }
 
 }
