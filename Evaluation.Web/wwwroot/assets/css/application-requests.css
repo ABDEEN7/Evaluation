@@ -612,7 +612,7 @@ table#requesttable.dataTable thead th.card-img {
     overflow: hidden !important;
     text-overflow: ellipsis;
     align-items: center;
-    justify-content: center
+    justify-content: center;
 }
 .table-responsive .application-request .requeststableBody .request-status {
     display: block;
@@ -624,10 +624,10 @@ table#requesttable.dataTable thead th.card-img {
 }
 .application-request.card .requeststableBody .request-status {
     max-width: 100%;
-    width: 100%;
+    width: fit-content !important;
     display: block;
     line-height: 30px;
-    text-align: start;
+    text-align: end;
     font-size: 0.88rem;
 }
 .application-request.card .requeststableBody .service-icon {

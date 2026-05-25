@@ -63,7 +63,7 @@
 
             return `
             <div class="d-flex justify-content-end w-100 mb-3">
-                <span class="request-status py-1 px-2"
+                <span class="request-status py-1 px-3"
                       style="background-color:${statusColor};color:${textColor};">
                     ${data || ""}
                 </span>
@@ -79,7 +79,7 @@
             return `
             <i class="las la-file-alt card-only-icon me-1"></i>
             <span class="card-only-label me-2">Request number:</span>
-            <span>${data || "_"}</span>
+            <span class="data-text">${data || "_"}</span>
         `;
         }
     },
@@ -90,7 +90,7 @@
             return `
             <i class="las la-school card-only-icon me-1"></i>
             <span class="card-only-label me-2">Schools count:</span>
-            <span>${data || 0}</span>
+            <span class="data-text">${data || 0}</span>
         `;
         }
     },
@@ -104,7 +104,7 @@
             return `
             <i class="las la-calendar card-only-icon"></i>
             <span class="card-only-label mx-1">Created on:</span>
-            <span>${moment(data).format("DD-MM-YYYY")}</span>
+            <span class="data-text">${moment(data).format("DD-MM-YYYY")}</span>
         `;
         }
     },
@@ -119,7 +119,7 @@
             <div class="d-flex justify-content-end align-items-center">
                 <i class="las la-clock card-only-icon"></i>
                 <span class="card-only-label mx-1">Created at:</span>
-                <span>${moment(data).format("hh:mm A")}</span>
+                <span class="data-text">${moment(data).format("hh:mm A")}</span>
             </div>
         `;
         }
@@ -131,7 +131,7 @@
             return `
             <i class="las la-calendar-week card-only-icon me-1"></i>
             <span class="card-only-label me-1">Period:</span>
-            <span dir="rtl">
+            <spandir="rtl" class="data-text">
                 من ${moment(row.planDateFrom).format("DD/MM/YYYY")}
                 إلى ${moment(row.planDateTo).format("DD/MM/YYYY")}
             </span>
