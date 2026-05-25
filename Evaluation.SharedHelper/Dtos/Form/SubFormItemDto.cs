@@ -4,7 +4,7 @@ public class SubFormItemDto
 {
     public Guid Id { get; set; }
     public string Name { get; set; } = null!;
-    public List<SubItenList> SubItenLists { get; set; }
+    public List<SubItenList> SubItemLists { get; set; }
 }
 public class SubItenList
 {

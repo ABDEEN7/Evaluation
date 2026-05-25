@@ -609,13 +609,15 @@ async function initializeControls(formId, fieldId, controlValues) {
 
             if (isSubItem) {
                 const subItemLists = subItemListsMap.get(itemId) ?? [];
-                subItemLists.forEach(({ id, nameAr, nameEn }) => {
-                    select.add(new Option(nameAr || nameEn, id));
-                });
-                select.setAttribute('data-sub-item', 'true');
-                select.setAttribute('data-initialized', 'true');
-            } else {
+                if (subItemLists.length > 0) {
+                    subItemLists.forEach(({ id, nameAr, nameEn }) => {
+                        select.add(new Option(nameAr || nameEn, id));
+                    });
+                } else {
 
+                    matrixOptions.forEach(option => select.add(option.cloneNode(true)));
+                }
+            } else {
                 matrixOptions.forEach(option => select.add(option.cloneNode(true)));
             }
 
@@ -639,17 +641,7 @@ async function initializeControls(formId, fieldId, controlValues) {
             populateForm(subItem.id, true)
         );
     });
-    const targetSelect = document.getElementById(`${fieldId}_4b6c08df-c732-4d7b-b1fb-61a05132b5a0_Select_0`);
-    if (targetSelect) {
-        const observer = new MutationObserver((mutations) => {
-            mutations.forEach(m => {
-                console.log('🚨 SELECT CHANGED:', targetSelect.innerHTML);
-                console.trace('🚨 WHO CHANGED IT?');
-            });
-        });
-        observer.observe(targetSelect, { childList: true, subtree: true });
-        console.log('👀 Observer attached to select');
-    }
+
     const table = buildHorizontalTable(matrixValues);
     const container = document.getElementById(`${fieldId}-index-table`);
     container.appendChild(table);
