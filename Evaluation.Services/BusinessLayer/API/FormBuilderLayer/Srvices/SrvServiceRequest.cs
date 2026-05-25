@@ -2,6 +2,7 @@
 using Azure.Core;
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.Attachments;
+using Evaluation.DAL.Models.Calendars;
 using Evaluation.DAL.Models.DepartementEntites;
 using Evaluation.DAL.Models.FormsModules;
 using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
@@ -268,7 +269,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 			};
 			return ServiceRequest;
 		}
-        public async Task<List<JsTreeNodeDto>> GetScopeList(Guid partyId)
+        public async Task<List<JsTreeNodeDto>> GetScopeList_old(Guid partyId)
         {
            using var uow = serviceScopeFactory.CreateScopedUow();
             var departmentid=await uow.GetRepository<EvaluationParty>().GetAllNonDeleted().Where(x=>x.Id==partyId).Select(x=>x.DepartmentId).FirstOrDefaultAsync();
@@ -298,7 +299,42 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             return treeData;
 
         }
-        public async Task<List<SupportedFileDto>> GetSupportedFiles(Guid requestId)
+		public async Task<List<JsTreeNodeDto>> GetScopeList(Guid partyId)
+		{
+			using var uow = serviceScopeFactory.CreateScopedUow();
+
+            var departmentId = requestInfo.DepId; 
+
+			var currentAcademicYearId = await uow.GetRepository<AcademicYear>()
+				.GetAllNonDeleted()
+				.Where(x => x.IsCurrent) 
+				.Select(x => x.Id)
+				.FirstOrDefaultAsync();
+
+			var scopeAcademicYears = await uow.GetRepository<ScopeAcademicYear>()
+				.GetAllNonDeleted()
+				.Include(x => x.Scope)
+				.Where(x =>
+					x.DepartmentId == departmentId &&
+					x.AcademicYearId == currentAcademicYearId)
+				.OrderBy(x => x.OrderNo)
+				.ToListAsync();
+
+			var treeData = scopeAcademicYears.Select(x => new JsTreeNodeDto
+			{
+				id = x.ScopeId.ToString(),
+				text = _requestInfo.Lang == "ar"
+					? x.Scope?.NameAr ?? string.Empty
+					: x.Scope?.NameEn ?? string.Empty,
+
+				parent = x.ScopeParentId.HasValue
+					? x.ScopeParentId.Value.ToString()
+					: "#"
+			}).ToList();
+
+			return treeData;
+		}
+		public async Task<List<SupportedFileDto>> GetSupportedFiles(Guid requestId)
         {
             using var uow = serviceScopeFactory.CreateScopedUow();
 

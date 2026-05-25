@@ -40,7 +40,7 @@
 
                         <span class="plan-text-wrap px-1">
                             <span class="card-only-label title-label"></span>
-                            <span class="plan-title-text">${data || ""}</span>
+                            <span class="plan-title-text-school">${data || ""}</span>
                         </span>
                     </div>
                     `;
@@ -52,7 +52,7 @@
             className: "td-left small-width",
             render: function(data) {
                 return `
-                <iclass="las la-barcode card-only-icon me-1"></i>
+                <i class="las la-barcode card-only-icon me-1"></i>
                 <span class="card-only-label me-2">Code: </span>
                 <span>${data || "_"}</span>
             `;
@@ -73,7 +73,7 @@
         {
             data: "null",
             title: uiControlsSetup().GetUiControlText("lblSchoolLevel"),
-            className: "td-right small-width",
+            className: "td-full small-width",
             render: function(data) {
                 return `
                 <i class="las la-school card-only-icon me-1"></i>

@@ -5,10 +5,11 @@
         GET_ACADEMIC_YEARS: `/AcademicYear/${DepartmentRouting}/GetAcademicYearByDepartment`,
         GET_Service_Status: `/ServiceRequest/${DepartmentRouting}/GetServiceStatus`
     };
-
+   
     function getPlanRequestFilter() {
         return {
             RequestNo: $('#planRequestNoFilter').val(),
+            //PlanId: $('#planIdFilter').val() || null,
             SchoolId: $('#planRequestSchoolFilter').val() || null,
             StatusesList: $('#planRequestStatusFilter').val() || null,
             RequestDateFrom: $('#planRequestDateFrom').val(),
@@ -29,104 +30,106 @@
         cardViewBtnId: 'cardViewPlanRequest',
         tableViewBtnId: 'tblViewPlanRequest',
         rowClass: 'plan-request-card',
-        columns: [
-
+        columns: [     
+        
             {
                 data: "service",
                 className: "td-left py-1 td-70",
-                render: function (data, type, row) {
-                    return `
-                        <div class="plan-title-row mb-3">
-                            <i class="las la-file-signature card-only-icon title-icon"></i>
-                            <span class="plan-text-wrap px-2">
-                                <span class="card-only-label title-label">${uiControlsSetup().GetUiControlText("lblRequest")}: </span>
-                                <span class="plan-title-text">${data || ""}</span>
-                            </span>
-                        </div>
+                 render: function(data, type, row) {
+           
+                return `
+                    <div class="plan-title-row mb-3"> 
+                        <i class="las la-file-signature card-only-icon title-icon"></i>
+                        <span class="plan-text-wrap px-2">
+                    <span class="card-only-label title-label">${uiControlsSetup().GetUiControlText("lblRequest")}: </span>
+                    <span class="plan-title-text">${data || ""}</span>
+                    </span>
+                    </div>
                     `;
                 }
             },
             {
-                data: "status",
-                title: uiControlsSetup().GetUiControlText("lblRequestStatus"),
-                className: "td-right py-1 place-content-end td-30",
-                render: function (data, type, row) {
-                    const statusColor = row.statusColor || "#cccccc";
-                    const textColor = "#000";
-                    return `
-                        <div class="d-flex justify-content-end w-100 mb-3">
-                            <span class="request-status py-1 px-2"
-                                  style="background-color:${statusColor};color:${textColor};">
-                                ${data || ""}
-                            </span>
-                        </div>
-                    `;
-                }
-            },
+        data: "status",
+        title: uiControlsSetup().GetUiControlText("lblRequestStatus"),
+        className: "td-right py-1 place-content-end td-30",
+        render: function(data, type, row) {
+            const statusColor = row.statusColor || "#cccccc";
+            const textColor = "#000";
+            return `
+            <div class="d-flex justify-content-end w-100 mb-3">
+                <span class="request-status py-1 px-3"
+                      style="background-color:${statusColor};color:${textColor};">
+                    ${data || ""}
+                </span>
+            </div>
+        `;
+        }
+    },
             {
-                data: "requestNumber",
-                className: "td-left small-width",
-                render: function (data) {
-                    return `
-                        <i class="las la-file-alt card-only-icon me-1"></i>
-                        <span class="card-only-label me-2">${uiControlsSetup().GetUiControlText("lblRequestNumber")}:</span>
-                        <span>${data || "_"}</span>
-                    `;
-                }
-            },
-            {
-                data: "schoolsCount",
-                className: "td-right small-width",
-                render: function (data) {
-                    return `
-                        <i class="las la-school card-only-icon me-1"></i>
-                        <span class="card-only-label me-2">${uiControlsSetup().GetUiControlText("lblSchoolsCount")}:</span>
-                        <span>${data || 0}</span>
-                    `;
-                }
-            },
-            {
-                data: "createOn",
-                title: uiControlsSetup().GetUiControlText("lblRequestCreatedDate"),
-                className: "td-left small-width",
-                render: function (data) {
-                    if (!data) return "_";
-                    return `
-                        <i class="las la-calendar card-only-icon"></i>
-                        <span class="card-only-label mx-1">${uiControlsSetup().GetUiControlText("evalRequestlblcreatedOn")}:</span>
-                        <span>${moment(data).format("DD-MM-YYYY")}</span>
-                    `;
-                }
-            },
-            {
-                data: "createOnTime",
-                title: uiControlsSetup().GetUiControlText("lblRequestCreatedTime"),
-                className: "td-right small-width",
-                render: function (data) {
-                    if (!data) return "_";
-                    return `
-                        <div class="d-flex justify-content-end align-items-center">
-                            <i class="las la-clock card-only-icon"></i>
-                            <span class="card-only-label mx-1">${uiControlsSetup().GetUiControlText("evalRequestlblCreatedAt")}:</span>
-                            <span>${moment(data).format("hh:mm A")}</span>
-                        </div>
-                    `;
-                }
-            },
-            {
-                data: null,
-                className: "td-full small-width",
-                render: function (data, type, row) {
-                    return `
-                        <i class="las la-calendar-week card-only-icon me-1"></i>
-                        <span class="card-only-label me-1">${uiControlsSetup().GetUiControlText("lblPeriod")}:</span>
-                        <span dir="rtl">
-                            ${uiControlsSetup().GetUiControlText("lblFrom")} ${moment(row.planDateFrom).format("DD/MM/YYYY")}
+        data: "requestNumber",
+        className: "td-left small-width",
+        render: function(data) {
+            return `
+            <i class="las la-file-alt card-only-icon me-1"></i>
+            <span class="card-only-label me-2">${uiControlsSetup().GetUiControlText("lblRequestNumber")}:</span>
+            <span class="data-text">${data || "_"}</span>
+        `;
+        }
+    },
+    {
+        data: "schoolsCount",
+        className: "td-right small-width",
+        render: function(data) {
+            return `
+            <i class="las la-school card-only-icon me-1"></i>
+            <span class="card-only-label me-2">Schools count:</span>
+            <span class="data-text">${data || 0}</span>
+        `;
+        }
+    },
+    {
+        data: "createOn",
+        title: uiControlsSetup().GetUiControlText("lblRequestCreatedDate"),
+        className: "td-left small-width",
+        render: function(data) {
+            if (!data) return "_";
+            return `
+            <i class="las la-calendar card-only-icon"></i>
+            <span class="card-only-label mx-1">${uiControlsSetup().GetUiControlText("evalRequestlblcreatedOn")}:</span>
+            <span class="data-text">${moment(data).format("DD-MM-YYYY")}</span>
+        `;
+        }
+    },
+    {
+        data: "createOnTime",
+        title: uiControlsSetup().GetUiControlText("lblRequestCreatedTime"),
+        className: "td-right small-width",
+        render: function(data) {
+            if (!data) return "_";
+
+            return `
+            <div class="d-flex justify-content-end align-items-center">
+                <i class="las la-clock card-only-icon"></i>
+                <span class="card-only-label mx-1">${uiControlsSetup().GetUiControlText("evalRequestlblCreatedAt")}:</span>
+                <span class="data-text">${moment(data).format("hh:mm A")}</span>
+            </div>
+        `;
+        }
+    },
+     {
+        data: null,
+        className: "td-full small-width",
+        render: function(data, type, row) {
+            return `
+            <i class="las la-calendar-week card-only-icon me-1"></i>
+            <span class="card-only-label me-1">${uiControlsSetup().GetUiControlText("lblPeriod")}:</span>
+            <spandir="rtl" class="data-text">
+                من${uiControlsSetup().GetUiControlText("lblFrom")} ${moment(row.planDateFrom).format("DD/MM/YYYY")}
                             ${uiControlsSetup().GetUiControlText("lblTo")} ${moment(row.planDateTo).format("DD/MM/YYYY")}
-                        </span>
-                    `;
-                }
-            }
+            </span>
+        `;
+        }
+    }
         ],
         onRowClick: function (rowData) {
             openPlanRequestDetails(rowData.id);

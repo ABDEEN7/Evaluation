@@ -21,9 +21,9 @@
             <!-- Advanced Search Button -->
             <button id="advancedSearchEvaluationRequestBtn"
                     type="button"
-                    class="btn btn-outline-secondary d-flex align-items-center gap-2 px-3 py-2">
+                    class="btn btn-outline-secondary d-flex align-items-center gap-2">
                 <i class="la la-filter"></i>
-                <span class="@ConstantKeys.EvaluationOperations.AdvancedSearch"></span>
+                @* <span class="@ConstantKeys.EvaluationOperations.AdvancedSearch"></span> *@
             </button>
 
         </div>
@@ -32,7 +32,7 @@
     <!-- Filter Form (hidden by default, toggled by Advanced Search) -->
     <form id="evaluation-request-filter-form-id" style="display:none;">
 
-        <div class="p-3 mb-3 filter-section">
+        <div class="mb-3 filter-section">
 
             <div class="row g-3">
 
@@ -79,8 +79,8 @@
 
             </div>
 
-            <!-- Filter Action Buttons -->
-            <div class="row mt-4">
+          @*   <!-- Filter Action Buttons -->
+             <div class="row mt-4">
                 <div class="col-lg-4 col-sm-12">
                     <!-- empty spacer -->
                 </div>
@@ -99,8 +99,30 @@
                         </button>
                     </div>
                 </div>
-            </div>
+            </div>  *@
 
+
+
+
+
+
+
+            <!-- Filter Action Buttons -->
+            <div class="row mt-4">
+                <div class="col-lg-8 col-sm-12"></div>
+                <div class="col-lg-4 col-sm-12">
+                    <div class="d-flex gap-2 justify-content-end">
+                        <button id="filterEvaluationRequestBtnId"
+                                type="button"
+                                class="btn btn-primary @ConstantKeys.WebSchools.Search">
+                        </button>
+                        <button id="clearFilterEvaluationRequestBtnId"
+                                type="button"
+                                class="btn btn-outline-secondary @ConstantKeys.WebSchools.ClearFilter">
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
 
     </form>
@@ -174,10 +196,11 @@
                         </div>
 
                         <div class="col-md-3 d-flex justify-content-end align-items-start gap-2">
-                            <button type="button"
-                                    class="btn-close"
-                                    data-bs-dismiss="modal">
-                                <i class="la la-close mt-1"></i>
+                          
+
+
+                            <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal" aria-label="Close">
+                                <i class="la la-close me-1 fs-14"></i><span class="close-text">Close</span>
                             </button>
                         </div>
 

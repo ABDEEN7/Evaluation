@@ -114,7 +114,7 @@ const generateFormAccordionItem = (rowsHtml, hasAnyNote, hasAnyChildren, fieldId
             </table>
             ${allowAdd ? `<div><button type="button" onclick="addNewRow(this)" class="btn btn-sm add-btn"><i class="la la-plus"></i> Add New</button></div>` : ''}
            
-<div id="${fieldId}-result-div" class="d-none bg-primary d-flex justify-content-between align-items-center py-2">
+<div id="${fieldId}-result-div" class="d-none bg-custom d-flex justify-content-between align-items-center py-3 px-4 br-6">
   <div class="text-white">Result:</div>
   <div class="text-white" id="${fieldId}-result-value"></div>
 </div>
@@ -391,7 +391,7 @@ function buildHorizontalTable(data) {
     const table = document.createElement("table");
     table.border = "1";
     table.style.borderCollapse = "collapse";
-    table.className = "table table-bordered table-hover align-middle w-100 dataTable no-footer";
+    table.className = "table table-hover align-middle w-100 dataTable no-footer text-center";
 
     const tHeadnameRow = document.createElement("thead");
     tHeadnameRow.className = 'table-light';
@@ -525,7 +525,7 @@ const relatedItemPopup = (rowsHtml) => `<div class="modal fade" id="RealatedItem
                     <h4 class="modal-title fw-semibold mb-2" id="modalTitle"></h4>
                 </div>
 
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                         <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal" aria-label="Close"><i class="la la-close me-1 fs-14"></i><span class="close-text">Close</span></button>
             </div>
 
             <div class="modal-body py-0">
