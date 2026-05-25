@@ -133,31 +133,30 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
         return result;
     }
 
-    public async Task<Result<FormEvaluationDto>> SaveEvaluationForm(FormEvaluationDto formEvaluationDto)
-    {
-        var formValidation = await Validate(formEvaluationDto);
-        if (!formValidation.IsValid)
-            return Result.Fail<FormEvaluationDto>(ConstantKeys.ExceptionMessage.FormDataIsNotValid);
+	public async Task<Result<FormEvaluationDto>> SaveEvaluationForm(FormEvaluationDto formEvaluationDto)
+	{
+		if (formEvaluationDto == null)
+			return Result.Fail<FormEvaluationDto>(ConstantKeys.ExceptionMessage.FormDataIsNull);
 
-        if (formEvaluationDto == null)
-            return Result.Fail<FormEvaluationDto>(ConstantKeys.ExceptionMessage.FormDataIsNull); 
+		var formValidation = await Validate(formEvaluationDto);
+		if (!formValidation.IsValid)
+			return Result.Fail<FormEvaluationDto>(ConstantKeys.ExceptionMessage.FormDataIsNotValid);
 
-        var userId = userInfo.UserId;
+		var userId = userInfo.UserId;
+		if (userId == null)
+			return Result.Fail<FormEvaluationDto>(ConstantKeys.ExceptionMessage.UserNotFound);
 
-        if (userId == null)
-            return Result.Fail<FormEvaluationDto>(ConstantKeys.ExceptionMessage.UserNotFound);
-
-        var form = mapper.Map<FormEvaluationValue>(formEvaluationDto);
-
-        var evalForm = await formService.GetEvalForm(formEvaluationDto.Id);
-
-        if (evalForm.IsFinalEval)
-            if(formEvaluationDto.EvaluationRequestId == null || formEvaluationDto.EvaluationRequestId == Guid.Empty)
-                throw new BusinessException(ConstantKeys.ExceptionMessage.InvalidJson);
-
-
+		var evalForm = await formService.GetEvalForm(formEvaluationDto.Id);
 		if (evalForm == null)
 			return Result.Fail<FormEvaluationDto>("Eval form not found");
+
+		if (evalForm.IsFinalEval &&
+			(formEvaluationDto.EvaluationRequestId == null || formEvaluationDto.EvaluationRequestId == Guid.Empty))
+		{
+			throw new BusinessException(ConstantKeys.ExceptionMessage.InvalidJson);
+		}
+
+		var form = mapper.Map<FormEvaluationValue>(formEvaluationDto);
 
 		if (evalForm.HasOneValue)
 		{
@@ -173,7 +172,6 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
 					formItemsValue.ServiceRequestId = formEvaluationDto.ServiceRequestId;
 
 					uow.GetRepository<FormItemValue>().Update(formItemsValue);
-
 				}
 				else
 				{
@@ -181,8 +179,7 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
 					item.EvaluationRequestId = formEvaluationDto.EvaluationRequestId;
 					item.ServiceRequestId = formEvaluationDto.ServiceRequestId;
 
-					uow.GetRepository<FormItemValue>().Insert(formItemsValue);
-
+					uow.GetRepository<FormItemValue>().Insert(item);
 				}
 			}
 
@@ -196,15 +193,15 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
 					subFormItemsValue.Note = item.Note;
 
 					uow.GetRepository<SubFormItemValue>().Update(subFormItemsValue);
-
 				}
 				else
 				{
 					item.UserId = userId.Value;
-					uow.GetRepository<SubFormItemValue>().Update(item);
 
+					uow.GetRepository<SubFormItemValue>().Insert(item);
 				}
 			}
+
 		}
 		else
 		{
@@ -233,17 +230,17 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
 			evaluationRequest.FormEvalMatrixValueId = calculationResult.Value.Id;
 			evaluationRequest.EvalDays = calculationResult.Value.NextEvalDays;
 			evaluationRequest.EvaluationDate = DateOnly.FromDateTime(DateTime.Now);
-			evaluationRequest.NextEvaluationDate = DateOnly.FromDateTime(DateTime.Now.AddDays(calculationResult.Value.NextEvalDays));
+			evaluationRequest.NextEvaluationDate =
+				DateOnly.FromDateTime(DateTime.Now.AddDays(calculationResult.Value.NextEvalDays));
 			evaluationRequest.FinalEvalValue = calculationResult.Value.Value;
 
-			await _evaluationRequestService.UpdateEvaluationRequest(evaluationRequest);
+			uow.GetRepository<EvaluationRequest>().Update(evaluationRequest);
 		}
 
 		return Result.Ok(formEvaluationDto);
-    }
-	
+	}
 
-	
+
 	public async Task<Result<FormEvaluationDto>> UpdateEvaluationForm(FormEvaluationDto formEvaluationDto)
     {
         if (formEvaluationDto == null)
