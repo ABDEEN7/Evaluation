@@ -5660,12 +5660,12 @@ input[type="number"] {
     z-index: 999999 !important;
 }
 
-.dropdown,
+/*.dropdown,
 .btn-group,
 .dropdown-toggle {
     position: relative;
     z-index: 99999;
-}
+}*/
 
 
 .dropdown-menu {

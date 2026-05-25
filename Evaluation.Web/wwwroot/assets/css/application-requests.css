@@ -227,7 +227,6 @@
             overflow-y: scroll;
             background: #fff !important;
             z-index: 999999999 !important;
-            z-index: 999999999 !important;
         }
 
     .application-request.card .requeststableBody .plan-request-card td.process .dropdown-menu a {
