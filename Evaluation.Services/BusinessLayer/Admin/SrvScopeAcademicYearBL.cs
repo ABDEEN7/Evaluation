@@ -51,7 +51,7 @@ namespace Evaluation.Services.Models.Admin
             ScopeAcademicYear obj = new ScopeAcademicYear();
 
             obj.ScopeId = message.ScopeId;
-            obj.DepartmentId = message.Department;
+            obj.DepartmentId = message.DepartmentId;
             obj.AcademicYearId = message.AcademicYearId;
             obj.IsActive = message.IsActive;
 
@@ -80,7 +80,7 @@ namespace Evaluation.Services.Models.Admin
 
 
                 obj.ScopeId = message.ScopeId;
-                obj.DepartmentId = message.Department;
+                obj.DepartmentId = message.DepartmentId;
                 obj.AcademicYearId = message.AcademicYearId;
                 obj.IsActive = message.IsActive;
 

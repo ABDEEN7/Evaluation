@@ -87,7 +87,6 @@
                     <i class="las la-certificate card-only-icon title-icon"></i>
 
                     <span class="plan-text-wrap px-1">
-                        <span class="card-only-label title-label">Operation: </span>
                         <span class="plan-title-text">${data || ""}</span>
                     </span>
                 </div>

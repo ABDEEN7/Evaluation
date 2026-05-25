@@ -14,6 +14,7 @@ using Evaluation.SharedHelper.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System.Linq.Expressions;
+using static Evaluation.SharedHelper.Enums.ConstantKeys;
 
 namespace Evaluation.Services.BusinessLayer.API.SchooLayer;
 
@@ -62,7 +63,7 @@ public class SchoolRepository(IServiceScopeFactory serviceScopeFactory,
             .Select(x => new ResponseOrgsPlans
             {
                 Id = x.School.Id,
-                Name = requestInfo.Lang == "ar" ? x.School.NameAr : x.School.NameEn,
+                Name = requestInfo.Lang == LanguageConst.Ar ? x.School.NameAr : x.School.NameEn,
                 IsOpen = x.School.EvaluationRequests.Any(x => x.ServiceStatus.ServiceStatusType.BackendName.ToLower() == ConstantKeys.ServiceStatusTypeBackend.Open.ToLower()),
                 SchoolLevel = x.School.SchoolLevel!
                     .Select(sl => new SchoolLevelDto

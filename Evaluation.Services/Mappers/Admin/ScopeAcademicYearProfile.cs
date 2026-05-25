@@ -14,7 +14,7 @@ namespace Evaluation.Services.Mappers.Admin
         {
             CreateMap<ScopeAcademicYear, ScopeAcademicYearDTO>()
                 .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive))
-                .ForMember(dest => dest.Department, opt => opt.MapFrom(src => src.DepartmentId))
+                .ForMember(dest => dest.DepartmentId, opt => opt.MapFrom(src => src.DepartmentId))
                 .ForMember(dest => dest.scopeAcademicYearScopeParent, opt => opt.MapFrom(src => src.ScopeParentId))
                 .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => src.IsDeleted))
                 .ForMember(dest => dest.UpdateBy, opt => opt.MapFrom<UserProfileResolver, Guid?>(src => src.UpdateById.HasValue ? src.UpdateById : src.CreateById))

@@ -18,5 +18,6 @@ namespace Evaluation.DAL.Models.FormBuilder
         public string? DataSourceTable { get; set; }
         public Guid? ParentId { get; set; }
         public DropDownType? Parent { get; set; }
+        public ICollection<FieldDropDownValue>? FieldDropDownValues { get; set; }
     }
 }

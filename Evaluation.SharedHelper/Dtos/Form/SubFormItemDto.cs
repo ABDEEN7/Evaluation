@@ -4,4 +4,11 @@ public class SubFormItemDto
 {
     public Guid Id { get; set; }
     public string Name { get; set; } = null!;
+    public List<SubItenList> SubItenLists { get; set; }
+}
+public class SubItenList
+{
+    public Guid Id { get; set; }
+    public string? NameAr { get; set; }
+    public string? NameEn { get; set; }
 }
