@@ -155,71 +155,95 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
                 throw new BusinessException(ConstantKeys.ExceptionMessage.InvalidJson);
 
 
-        if (evalForm != null)
-        {
-            if (evalForm.HasOneValue)
-            {
-                foreach (var item in form.Items)
-                {
-                    var formItemsValue = await formService.GetFormItemValue(item.Id);
-                    if (formItemsValue != null)
-                    {
-                        formItemsValue.ActualValue = item.ActualValue;
-                        formItemsValue.Note = item.Note;
-                        formItemsValue.EvaluationRequestId = formEvaluationDto.EvaluationRequestId;
-                        formItemsValue.ServiceRequestId = formEvaluationDto.ServiceRequestId;
-                    }
-                    await formService.UpdateFormItemValue(formItemsValue);
-                }
+		if (evalForm == null)
+			return Result.Fail<FormEvaluationDto>("Eval form not found");
 
-                foreach (var item in form.SubItems)
-                {
-                    var subFormItemsValue = await formService.GetSubFormItemValue(item.Id);
-                    if (subFormItemsValue != null)
-                    {
-                        subFormItemsValue.FieldDropDownValueId = item.FieldDropDownValueId;
-                        subFormItemsValue.Note = item.Note;
-                    }
-                    await formService.UpdateSubFormItemValue(subFormItemsValue);
-                }
-                await formService.SaveFormItemsAndSubs(form);
-            }
-        }
-        else
-        {
-            foreach (var item in form.Items)
-            {
-                item.UserId = userId.Value;
-            }
+		if (evalForm.HasOneValue)
+		{
+			foreach (var item in form.Items)
+			{
+				var formItemsValue = await formService.GetFormItemValue(item.Id);
 
-            foreach (var item in form.SubItems)
-            {
-                item.UserId = userId.Value;
-            }
+				if (formItemsValue != null)
+				{
+					formItemsValue.ActualValue = item.ActualValue;
+					formItemsValue.Note = item.Note;
+					formItemsValue.EvaluationRequestId = formEvaluationDto.EvaluationRequestId;
+					formItemsValue.ServiceRequestId = formEvaluationDto.ServiceRequestId;
 
-            await formService.SaveFormItemsAndSubs(form);
+					uow.GetRepository<FormItemValue>().Update(formItemsValue);
 
-            if (evalForm.IsFinalEval)
-            {
-                var calculationResult = await CalculateFormResult(formEvaluationDto);
+				}
+				else
+				{
+					item.UserId = userId.Value;
+					item.EvaluationRequestId = formEvaluationDto.EvaluationRequestId;
+					item.ServiceRequestId = formEvaluationDto.ServiceRequestId;
 
-                var evaluationRequest = await _evaluationRequestService.GetEvaluationRequestByIdAsync((Guid)formEvaluationDto.EvaluationRequestId);
+					uow.GetRepository<FormItemValue>().Insert(formItemsValue);
 
-                evaluationRequest.FormEvalMatrixValueId = calculationResult.Value.Id;
-                evaluationRequest.EvalDays = calculationResult.Value.NextEvalDays;
-                evaluationRequest.EvaluationDate = DateOnly.Parse(DateTime.Now.ToString());
-                evaluationRequest.NextEvaluationDate = DateOnly.Parse(DateTime.Now.AddDays(calculationResult.Value.NextEvalDays).ToString());
-                evaluationRequest.FinalEvalValue = calculationResult.Value.Value;
+				}
+			}
 
-                await _evaluationRequestService.UpdateEvaluationRequest(evaluationRequest);
+			foreach (var item in form.SubItems)
+			{
+				var subFormItemsValue = await formService.GetSubFormItemValue(item.Id);
 
-            }
-        }
+				if (subFormItemsValue != null)
+				{
+					subFormItemsValue.FieldDropDownValueId = item.FieldDropDownValueId;
+					subFormItemsValue.Note = item.Note;
 
-        return Result.Ok(formEvaluationDto);
+					uow.GetRepository<SubFormItemValue>().Update(subFormItemsValue);
+
+				}
+				else
+				{
+					item.UserId = userId.Value;
+					uow.GetRepository<SubFormItemValue>().Update(item);
+
+				}
+			}
+		}
+		else
+		{
+			foreach (var item in form.Items)
+			{
+				item.UserId = userId.Value;
+				item.EvaluationRequestId = formEvaluationDto.EvaluationRequestId;
+				item.ServiceRequestId = formEvaluationDto.ServiceRequestId;
+			}
+
+			foreach (var item in form.SubItems)
+			{
+				item.UserId = userId.Value;
+			}
+
+			await formService.SaveFormItemsAndSubs(form);
+		}
+
+		if (evalForm.IsFinalEval)
+		{
+			var calculationResult = await CalculateFormResult(formEvaluationDto);
+
+			var evaluationRequest =
+				await _evaluationRequestService.GetEvaluationRequestByIdAsync(formEvaluationDto.EvaluationRequestId.Value);
+
+			evaluationRequest.FormEvalMatrixValueId = calculationResult.Value.Id;
+			evaluationRequest.EvalDays = calculationResult.Value.NextEvalDays;
+			evaluationRequest.EvaluationDate = DateOnly.FromDateTime(DateTime.Now);
+			evaluationRequest.NextEvaluationDate = DateOnly.FromDateTime(DateTime.Now.AddDays(calculationResult.Value.NextEvalDays));
+			evaluationRequest.FinalEvalValue = calculationResult.Value.Value;
+
+			await _evaluationRequestService.UpdateEvaluationRequest(evaluationRequest);
+		}
+
+		return Result.Ok(formEvaluationDto);
     }
+	
 
-    public async Task<Result<FormEvaluationDto>> UpdateEvaluationForm(FormEvaluationDto formEvaluationDto)
+	
+	public async Task<Result<FormEvaluationDto>> UpdateEvaluationForm(FormEvaluationDto formEvaluationDto)
     {
         if (formEvaluationDto == null)
             return Result.Fail<FormEvaluationDto>(ConstantKeys.ExceptionMessage.FormDataIsNull);
@@ -239,8 +263,8 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
                 formItemsValue.ActualValue = item.ActualValue;
                 formItemsValue.Note = item.Note;
             }
-            await formService.UpdateFormItemValue(formItemsValue);
-        }
+			uow.GetRepository<FormItemValue>().Update(formItemsValue);
+		}
 
         foreach (var item in form.SubItems)
         {
@@ -250,7 +274,7 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
                 subFormItemsValue.FieldDropDownValueId = item.FieldDropDownValueId;
                 subFormItemsValue.Note = item.Note;
             }
-            await formService.UpdateSubFormItemValue(subFormItemsValue);
+			 uow.GetRepository<SubFormItemValue>().Update(subFormItemsValue);
         }
 
         return Result.Ok(formEvaluationDto);

@@ -529,17 +529,23 @@
 
         if (ns.currentPage > 1) {
             const prevItem = $('<li>').addClass('page-item');
+
             const prevLink = $('<a>')
                 .addClass('page-link')
                 .attr('href', '#')
                 .attr('data-page', ns.currentPage - 1)
-                .text(`${t('lblPrevious')}`);
+                .html(`
+                <i class="fas fa-angle-right "></i>
+                ${uiControlsSetup().GetUiControlText("lblPrevious")}
+            `);
+
             prevItem.append(prevLink);
             pagination.append(prevItem);
         }
 
         for (let i = 1; i <= totalPages; i++) {
             const pageItem = $('<li>').addClass('page-item');
+
             if (i === ns.currentPage) {
                 pageItem.addClass('active');
             }
@@ -556,11 +562,16 @@
 
         if (ns.currentPage < totalPages) {
             const nextItem = $('<li>').addClass('page-item');
+
             const nextLink = $('<a>')
                 .addClass('page-link')
                 .attr('href', '#')
                 .attr('data-page', ns.currentPage + 1)
-                .text(`${t('lblNext')}`);
+                .html(`
+                ${uiControlsSetup().GetUiControlText("lblNext")}
+                <i class="fas fa-angle-left"></i>
+            `);
+
             nextItem.append(nextLink);
             pagination.append(nextItem);
         }

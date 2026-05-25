@@ -3,6 +3,7 @@ using Evaluation.DAL.Dtos.Form;
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.FormsModules;
 using Evaluation.DAL.Repositories;
+using Evaluation.Services.Extensions;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Models;
 using Microsoft.EntityFrameworkCore;
@@ -21,11 +22,19 @@ public class FormService(IServiceScopeFactory serviceScopeFactory,
     RequestInfo requestInfo
     ) : ApiBase(serviceScopeFactory, cacheDataProvider, unitOfWork, loggingServices, mapper, userInfo, serviceProvider, requestInfo)
 {
-    public async Task<EvalForm> GetEvalForm(Guid id)
+    public async Task<EvalForm?> GetEvalForm(Guid id)
     {
-        return await unitOfWork.GetRepository<EvalForm>()
-            .GetByIdAsync(id);
-    }
+        using var scope = serviceProvider.CreateScopedUow();
+
+		var result= await scope.GetRepository<EvalForm>()
+            .GetAllQueryFiltered(x=>x.Id== id)
+            .Include(x=>x.FormItems)
+            .ThenInclude(x=>x.FormItemValues)
+            .FirstOrDefaultAsync();
+
+        return result;
+
+	}
 
     public async Task<EvalForm> GetEvalForm(Guid id, bool IncludeCalcMethod)
     {
@@ -75,21 +84,6 @@ public class FormService(IServiceScopeFactory serviceScopeFactory,
             .Include(d => d.SubFormItems)
             .Where(f => f.Id == Id!)
             .FirstOrDefaultAsync();
-    }
-
-    public async Task<FormItemValue> UpdateFormItemValue(FormItemValue formItemValue)
-    {
-        unitOfWork.GetRepository<FormItemValue>().Update(formItemValue);
-        await uow.CommitAsync();
-
-        return formItemValue;
-    }
-    public async Task<SubFormItemValue> UpdateSubFormItemValue(SubFormItemValue subFormItemValue)
-    {
-        unitOfWork.GetRepository<SubFormItemValue>().Update(subFormItemValue);
-        await uow.CommitAsync();
-
-        return subFormItemValue;
     }
 
     public async Task<FormEvaluationValue> SaveFormItemsAndSubs(FormEvaluationValue form)

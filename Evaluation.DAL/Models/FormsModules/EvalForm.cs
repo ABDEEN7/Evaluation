@@ -21,4 +21,6 @@ public class EvalForm : EntityBase , IAuditLogEntity
     public bool HasMuliEvaluation { get; set; }
     public int CountOfColumnsValue { get; set; } = 1;
 
+	public virtual ICollection<FormItem> FormItems { get; set; } = [];
+
 }
