@@ -74,12 +74,27 @@ public class OrgBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider c
         return orgDetails;
     }
 
-    public async Task<List<OrgDetailsDto>> GetEmployeesBySchoolId(Guid id)
-    {
-        return mapper.Map<List<OrgDetailsDto>>(await employeeService.GetEmployeesBySchoolId(id));
-    }
+	public async Task<List<OrgDetailsDto>> GetEmployeesBySchoolId(Guid id)
+	{
+		var result = await employeeService.GetEmployeesBySchoolId(id);
 
-    public async Task<List<ParentOrgTreeDto>> GetParentOrgTreeAsync()
+		var employees = result.Select(e => new OrgDetailsDto
+		{
+			Id = e.Id,
+			Name = e.NameEn,
+			EmployeeNo = e.EmployeeNo,
+			Email = e.Email,
+			QID = e.QID,
+			NationalityCode = e.NationalityCode,
+			BirthDate = e.BirthDate,
+			JoinDate = e.JoinDate.ToString("yyyy-MM-dd"),
+			UserGender = e.UserGender != null ? e.UserGender.NameEn : null,
+			JobTitle = e.JobTitle != null ? e.JobTitle.NameEn : null
+		}).ToList();
+
+        return employees;
+	}
+	public async Task<List<ParentOrgTreeDto>> GetParentOrgTreeAsync()
     {
         List<DepTargetOrgTree> depTargetOrgTrees = await orgService.GetDepTargetOrgTree();
         int? academicYear = await academicYearServices.GetCurrentAcademicYear();

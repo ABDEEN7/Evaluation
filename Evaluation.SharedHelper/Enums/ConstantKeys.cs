@@ -1468,8 +1468,8 @@ public static class ConstantKeys
 
     public static class LanguageConst
     {
-        public static readonly string En = "En";
-        public static readonly string Ar = "Ar";
+        public static readonly string En = "en";
+        public static readonly string Ar = "ar";
     }
 
     public static class SystemSettings
