@@ -182,7 +182,15 @@ var formGenerateFieldUtility = window.formUtility;
                 });
 
                 container.html(html);
+                console.log('🔴 container rendered');
 
+                if (allowRenameFormItem) {
+                    await fillRenameControls(fieldId, controlValues);
+                } else {
+                    await initializeControls(formId, fieldId, controlValues);
+                }
+
+                console.log('🟢 after initializeControls — check DOM now');
                 if (allowRenameFormItem) {
                    await fillRenameControls(fieldId, controlValues)
                 }

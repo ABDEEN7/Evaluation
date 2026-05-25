@@ -81,6 +81,7 @@ namespace Evaluation.Services.Models.Admin
             obj.CanViewAllRequests = message.CanViewAllRequests;
             obj.CanViewAllEvaluations = message.CanViewAllEvaluations;
             obj.DepartmentId = message.DepartmentId;
+            obj.CanViewAllPlan = message.CanViewAllPlan;
             obj.IsActive = message.IsActive;
 
             uow.GetRepository<PartyType>().Insert(obj);

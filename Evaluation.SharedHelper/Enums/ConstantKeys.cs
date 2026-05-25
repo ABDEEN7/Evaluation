@@ -1702,5 +1702,10 @@ public static class ConstantKeys
         public static string Completed = "Completed";
         public static string Closed = "Closed";
     }
+     public static class SystemModuleBackend
+	{
+        public static string EvaluationRequest = "EvaluationRequest";
+    }
+
 
 }
