@@ -5672,3 +5672,10 @@ input[type="number"] {
     z-index: 999999 !important;
     background-color: #fff !important;
 }
+
+
+
+.table thead th {
+    background-color: var(--color-primary) !important;
+    color: #fff !important;
+}
