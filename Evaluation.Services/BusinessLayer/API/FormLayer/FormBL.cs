@@ -33,9 +33,10 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
         var mappedEvalForm = mapper.Map<TemplateFormDto>(evalForm);
 
         var formItems = await formService.GetFormItems(FormId);
-        var mappedData = mapper.Map<List<FormItemDto>>(formItems);
+		var mappedData = mapper.Map<List<FormItemDto>>(formItems,
+	opt => opt.Items["lang"] = "en");
 
-        foreach (var item in formItems)
+		foreach (var item in formItems)
         {
             var relatedItemDtos = new List<RelatedItemDto>();
 

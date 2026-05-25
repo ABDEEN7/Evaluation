@@ -54,12 +54,12 @@ public class EvaluationPartyController : Controller
     }
     [HttpGet]
     [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.AdminPermission.VIEW_ADMIN_EVALUATIONPARTIES })]
-    public async Task<IActionResult> GetPartyTypeEvalPartyStatus()
+    public async Task<IActionResult> GetPartyTypeEvalPartyStatus(Guid? departmentId)
     {
 
         Dictionary<string, object> response = new Dictionary<string, object>();
         var PartyTypeList = await masterBL.GetAdminService<SrvEvaluationPartyBL>().GetPartyTypeList();
-        var ServiceStatusList = await masterBL.GetAdminService<SrvEvaluationPartyBL>().GetServiceStatusList();
+        var ServiceStatusList = await masterBL.GetAdminService<SrvEvaluationPartyBL>().GetServiceStatusList(departmentId);
         response.Add("PartyTypeList", PartyTypeList);
         response.Add("ServiceStatusList", ServiceStatusList);
         return Ok(new ResponseEntity(response));

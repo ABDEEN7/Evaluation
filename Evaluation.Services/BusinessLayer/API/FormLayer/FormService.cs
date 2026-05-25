@@ -68,8 +68,10 @@ public class FormService(IServiceScopeFactory serviceScopeFactory,
                   .GetAllActiveNonDeleted()
                   .Where(s => s.EvalFormId == formId)
                   .Include(f => f.FormItemConfigs)
-                  .Include(d => d.SubFormItems)
-                  .Include(f => f.RelatedFrom)
+				  .Include(x => x.SubFormItems)
+	               .ThenInclude(x => x.DropDownType)
+		           .ThenInclude(x => x.FieldDropDownValues)
+				  .Include(f => f.RelatedFrom)
                   .ThenInclude(y => y.RelatedItem)
                   .OrderBy(x => x.OrderNo)
                   .ToListAsync();

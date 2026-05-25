@@ -560,10 +560,12 @@ async function initializeControls(formId, fieldId, controlValues) {
 
     P_matrixResponse = matrixResponse;
 
-    const items = itemsResult?.value ?? [];
+    
+    const itemsData = itemsResult?.value?.items ?? [];
+
     const matrixValues = matrixResponse?.value ?? matrixResponse ?? [];
 
-    // Build lookup maps for faster access
+    // Build lookup maps for saved values
     const itemValueMap = new Map();
     const subItemValueMap = new Map();
 
@@ -576,41 +578,49 @@ async function initializeControls(formId, fieldId, controlValues) {
         });
     }
 
+    
     const matrixOptions = matrixValues.map(({ id, name, actualMatrixValue }) => {
         const option = new Option(name, id);
-
         option.setAttribute('data-actual-value', actualMatrixValue);
-
         return option;
+    });
+
+    
+    const subItemListsMap = new Map();
+    itemsData.forEach(item => {
+        (item.subFormItems || []).forEach(subItem => {
+            subItemListsMap.set(subItem.id, subItem.subItemLists ?? []);
+        });
     });
 
     function populateForm(itemId, isSubItem = false) {
         let length = 1;
 
-        if (P_hasMuliEvaluation)
-        {
+        if (P_hasMuliEvaluation && !isSubItem) {
             length = P_countOfColumnsValue;
-        }
-
-        if (isSubItem) {
-            length = 1;
         }
 
         for (var i = 0; i < length; i++) {
             const select = document.getElementById(`${fieldId}_${itemId}_Select_${i}`);
-
             if (!select) return;
 
-            // Reset select
             select.length = 0;
             select.add(createPlaceholderOption());
 
-            // Add matrix options
-            matrixOptions.forEach(option =>
-                select.add(option.cloneNode(true))
-            );
+            if (isSubItem) {
+                const subItemLists = subItemListsMap.get(itemId) ?? [];
+                if (subItemLists.length > 0) {
+                    subItemLists.forEach(({ id, nameAr, nameEn }) => {
+                        select.add(new Option(nameAr || nameEn, id));
+                    });
+                } else {
 
-            // Apply saved values
+                    matrixOptions.forEach(option => select.add(option.cloneNode(true)));
+                }
+            } else {
+                matrixOptions.forEach(option => select.add(option.cloneNode(true)));
+            }
+
             const valueSource = isSubItem
                 ? subItemValueMap.get(itemId)
                 : itemValueMap.get(itemId);
@@ -623,13 +633,9 @@ async function initializeControls(formId, fieldId, controlValues) {
                 calculateFE(select, formId);
             });
         }
-     
-        const note = document.getElementById(`${fieldId}_${itemId}_Note`);
-
     }
 
-    // Populate main items and sub-items
-    items.items.forEach(item => {
+    itemsData.forEach(item => {
         populateForm(item.id, false);
         (item.subFormItems || []).forEach(subItem =>
             populateForm(subItem.id, true)
@@ -637,13 +643,9 @@ async function initializeControls(formId, fieldId, controlValues) {
     });
 
     const table = buildHorizontalTable(matrixValues);
-
     const container = document.getElementById(`${fieldId}-index-table`);
-
     container.appendChild(table);
 }
-
-
 async function openRelatedItemModal(id) {
 
 
