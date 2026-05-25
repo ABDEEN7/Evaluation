@@ -5626,3 +5626,72 @@ input[type="number"] {
 .btn.btn-outline-secondary.btn-sm {
     margin-inline-start: auto;
 }
+
+.select2-container--open {
+    z-index: 9999999 !important;
+}
+
+.select2-dropdown {
+    z-index: 9999999 !important;
+}
+
+
+
+.tabulator .tabulator-header {
+    background-color: var(--color-primary) !important;
+    border-bottom: none !important;
+}
+
+    .tabulator .tabulator-header .tabulator-col {
+        background-color: var(--color-primary) !important;
+        color: #fff !important;
+        border-inline-end: 1px solid rgba(255, 255, 255, 0.25) !important;
+    }
+
+    .tabulator .tabulator-header .tabulator-col-title {
+        color: #fff !important;
+        font-weight: 500;
+        text-align: center;
+    }
+
+
+/* Global dropdown fix */
+.dropdown-menu {
+    z-index: 999999 !important;
+}
+
+/*.dropdown,
+.btn-group,
+.dropdown-toggle {
+    position: relative;
+    z-index: 99999;
+}*/
+
+
+.dropdown-menu {
+    z-index: 999999 !important;
+    background-color: #fff !important;
+}
+
+
+
+.table thead th {
+    background-color: var(--color-primary) !important;
+    color: #fff !important;
+}
+
+
+.bg-custom {
+    background-color: var(--color-primary) !important;
+    color: #fff !important;
+}
+
+
+.table-light th {
+    text-align: center !important;
+}
+
+
+table.dataTable tbody tr.child-row > td {
+    background-color: #8a153815 !important;
+}
