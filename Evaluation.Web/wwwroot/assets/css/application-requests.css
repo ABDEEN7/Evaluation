@@ -218,23 +218,34 @@
         box-shadow: rgba(0, 0, 0, 0.05) 0px 5px 15px;
         max-height: 220px;
         overflow-y: scroll;
-        background: transparent !important;
+        background: #fff !important;
+        z-index: 999999999 !important;
     }
-        .application-request.card .requeststableBody .plan-request-card td.process .dropdown-menu a{
-            padding:10px 5px;
+
+        .application-request.card .requeststableBody .plan-request-card td.process .dropdown-menu:hover {
+            max-height: 220px;
+            overflow-y: scroll;
+            background: #fff !important;
+            z-index: 999999999 !important;
+            z-index: 999999999 !important;
         }
-            .application-request.card .requeststableBody .plan-request-card td.process .dropdown-menu a i{
-                color:var(--accent-color)
-            }
+
+    .application-request.card .requeststableBody .plan-request-card td.process .dropdown-menu a {
+        padding: 10px 5px;
+    }
+
+        .application-request.card .requeststableBody .plan-request-card td.process .dropdown-menu a i {
+            color: var(--accent-color)
+        }
 
     .application-request.card .requeststableBody .plan-request-card td.process .dropdown-item:hover i,
     .application-request.card .requeststableBody .plan-request-card td.process .dropdown-item.active:hover i,
     .application-request.card .requeststableBody .plan-request-card td.process .dropdown-item.active i {
-        color: transparent;
+        color: #fff !important;
+        z-index: 9999999999999999;
     }
-    .application-request.card .requeststableBody .plan-request-card td.process .dropdown-menu:hover a#AddNote i,
-    .application-request.card .requeststableBody .plan-request-card td.process .dropdown-menu a#AddNote i
-    .application-request.card .requeststableBody .plan-request-card td.process .dropdown-menuactive a#AddNote i {
+
+    .application-request.card .requeststableBody .plan-request-card td.process .dropdown-menu:hover a#AddNote i, .application-request.card .requeststableBody .plan-request-card td.process .dropdown-menu a#AddNote i .application-request.card .requeststableBody .plan-request-card td.process .dropdown-menuactive a#AddNote i {
         color: #085f5c !important;
     }
     .application-request.card .requeststableBody .plan-request-card td.process .dropdown-menu:hover a#ChangeEmployee i,
