@@ -5689,3 +5689,9 @@ input[type="number"] {
 
 .table-light th {
     text-align: center !important;
+}
+
+
+table.dataTable tbody tr.child-row > td {
+    background-color: #8a153815 !important;
+}
