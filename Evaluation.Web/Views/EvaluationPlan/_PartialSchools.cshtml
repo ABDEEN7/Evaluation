@@ -1,9 +1,9 @@
 ﻿@using Evaluation.SharedHelper.Enums
 
-<div class="p-0">
+<div class="m-4">
 
     <!-- Toolbar Row -->
-    <div class="m-4">
+    <div class="mb-3">
         <div class="d-flex justify-content-between align-items-center">
 
             <!-- Left: View Toggle -->
@@ -21,9 +21,9 @@
             <!-- Right: Filter Toggle Button -->
             <button id="advancedSearchSchoolBtn"
                     type="button"
-                    class="btn btn-outline-secondary d-flex align-items-center gap-2 px-3 py-2">
+                    class="btn btn-outline-secondary d-flex align-items-center gap-2">
                 <i class="la la-filter"></i>
-                <span class="@ConstantKeys.WebSchools.Search"></span>
+                @* <span class="@ConstantKeys.WebSchools.Search"></span> *@
             </button>
 
         </div>
@@ -31,15 +31,35 @@
 
     <!-- Filter Form: hidden by default -->
     <div id="school-filter-wrapper" style="display:none;">
-        <div class="filter-section p-3 mb-3">
+        <div class="filter-section mb-3">
             <form id="school-filter-form-id">
-                <div class="row g-3">
+                <div class="row">
 
                     <div class="col-md-4">
                         <label for="schoolNameFilter"
                                class="form-label @ConstantKeys.WebSchools.SchoolName"></label>
                         <input id="schoolNameFilter" class="form-control filter-enter" />
                     </div>
+                    <div class="col-md-4"></div>
+                    <div class="col-md-4 col-sm-12 align-self-end">
+                        <div class="d-flex gap-2 justify-content-end align-self-end">
+                            <button id="filterSchoolBtnId"
+                                    type="button"
+                                    class="btn btn-primary @ConstantKeys.WebSchools.Search">
+                            </button>
+                            <button id="clearFilterSchoolBtnId"
+                                    type="button"
+                                    class="btn btn-outline-secondary @ConstantKeys.WebSchools.ClearFilter">
+                            </button>
+                        </div>
+                    </div>
+
+
+
+
+
+
+
 @* 
                     <div class="col-md-4">
                         <label for="schoolCodeFilter"
@@ -94,9 +114,9 @@
                 </div>
 
                 <!-- Filter Action Buttons -->
-                <div class="row mt-4">
-                    <div class="col-lg-8 col-sm-12"></div>
-                    <div class="col-lg-4 col-sm-12">
+                @* <div class="row mt-4"> *@
+                    @* <div class="col-lg-8 col-sm-12"></div> *@
+                    @* <div class="col-md-4 col-sm-12">
                         <div class="d-flex gap-2 justify-content-end">
                             <button id="filterSchoolBtnId"
                                     type="button"
@@ -107,15 +127,15 @@
                                     class="btn btn-outline-secondary @ConstantKeys.WebSchools.ClearFilter">
                             </button>
                         </div>
-                    </div>
-                </div>
+                    </div> *@
+                @* </div> *@
 
             </form>
         </div>
     </div>
 
 
-
+    </div>
 
     @* SCHOOL TABLE *@
 
@@ -136,6 +156,9 @@
     </div>
 
 </div>
+@* @await Component.InvokeAsync("SchoolDetailsModal", new { modalId = "SCHOOL", title = "تفاصيل المدرسة", body = "" }) *@
+
+@await Component.InvokeAsync("SchoolDetailsModal", new { modalId = "SCHOOL", title = "تفاصيل المدرسة", body = "" })
 
 @await Component.InvokeAsync("SchoolDetailsModal", new { modalId = "schoolDetailsPopup", title = "تفاصيل المدرسة", body = "", isModal = true, type = "SCHOOL" })
 <script>

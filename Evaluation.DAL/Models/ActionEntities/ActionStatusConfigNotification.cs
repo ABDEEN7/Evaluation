@@ -20,11 +20,15 @@ namespace Evaluation.DAL.Models.ActionEntities
         public bool IsEmailSend { get; set; }
         public Guid? EmailTemplateId { get; set; }
         public EmailTemplate? EmailTemplate { get; set; }
+        public int EmailMinsFromAction { get; set; } = 0;
         public bool IsMessageSend { get; set; }
         public Guid? SMSTemplateId { get; set; }
         public SMSTemplate? SMSTemplate { get; set; }
+        public int SMSMinsFromAction { get; set; } = 0;
         public bool IsNotificationSend { get; set; }
         public Guid? NotificationTemplateId { get; set; }
         public NotificationTemplate? NotificationTemplate { get; set; }
+        public int NotificationMinsFromAction { get; set; } = 0;
+
     }
 }

@@ -20,14 +20,22 @@ public class OrgProfile : Profile
         .ForMember(d => d.Name, opt => opt.MapFrom<LocalizedSchoolNameResolver>())
             .ReverseMap();
 
-        CreateMap<Employee, OrgDetailsDto>()
-        .ForMember(d => d.Id, opt => opt.MapFrom(src => src.Id))
-        .ForMember(d => d.Name, opt => opt.MapFrom<LocalizedEmployeeNameResolver>())
-            //.ForMember(d => d.JobTitle, opt => opt.MapFrom<JobTitleResolver, Guid?>(src => src.JobTitleId))
-            .ForMember(d => d.UserGender, opt => opt.MapFrom<UserGenderResolver, Guid?>(src => src.UserGenderId))
-            .ReverseMap();
+		CreateMap<Employee, OrgDetailsDto>()
+	  .ForMember(d => d.Id, opt => opt.MapFrom(src => src.Id))
+	  .ForMember(d => d.Name, opt => opt.MapFrom<LocalizedEmployeeNameResolver>())
+	  //.ForMember(d => d.JobTitle,
+		 // opt => opt.MapFrom<JobTitleResolver, Guid?>(src => src.JobTitleId))
+	  //.ForMember(d => d.UserGender,
+		 // opt => opt.MapFrom<UserGenderResolver, Guid?>(src => src.UserGenderId))
+	  .ForMember(d => d.EmployeeNo, opt => opt.MapFrom(src => src.EmployeeNo))
+	  .ForMember(d => d.Email, opt => opt.MapFrom(src => src.Email))
+	  .ForMember(d => d.QID, opt => opt.MapFrom(src => src.QID))
+	  .ForMember(d => d.NationalityCode, opt => opt.MapFrom(src => src.NationalityCode))
+	  .ForMember(d => d.BirthDate, opt => opt.MapFrom(src => src.BirthDate))
+	  .ForMember(d => d.JoinDate, opt => opt.MapFrom(src => src.JoinDate.ToString("yyyy-MM-dd")))
+	  .ReverseMap();
 
-        CreateMap<Organization, OrgDetailsDto>()
+		CreateMap<Organization, OrgDetailsDto>()
         .ForMember(d => d.Id, opt => opt.MapFrom(src => src.Id))
         .ForMember(d => d.Name, opt => opt.MapFrom<LocalizedOrganizationNameResolver>())
             .ReverseMap();

@@ -78,7 +78,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             }
         }
 
-        public async Task<List<DropDownValueDTO>> GetDropDownValues(string lang, Guid? EvalId, Guid? SchId, List<Guid?>? dropDownTypeIds = null)
+        public async Task<List<DropDownValueDTO>> GetDropDownValues(string lang, Guid? EvalId, Guid? SchoolId, List<Guid?>? dropDownTypeIds = null)
         {
             using var scopedUow = serviceScopeFactory.CreateScopedUow();
             // 1. Try to get the full list from cache
@@ -128,7 +128,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                         var tableName = dropdownType.DataSourceTable;
 
 
-                        var rawData = await GetDataFromTable(tableName, EvalId, SchId, lang);
+                        var rawData = await GetDataFromTable(tableName, EvalId, SchoolId, lang);
                         if (rawData != null)
                         {
                             values = rawData.Select(c => new DropDownValueDTO
@@ -182,7 +182,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
 
 
-        public async Task<List<DropDownValueDTO>> GetDropDownValuesByDropDownTypeId(Guid dropDownTypeId, Guid? EvalId, Guid? schId, Guid? parentDropDownId = null, Guid? fieldValueId = null)
+        public async Task<List<DropDownValueDTO>> GetDropDownValuesByDropDownTypeId(Guid dropDownTypeId, Guid? EvalId, Guid? SchoolId, Guid? parentDropDownId = null, Guid? fieldValueId = null)
         {
             string lang = _requestInfo.Lang;
             using var scopedUow = serviceScopeFactory.CreateScopedUow();
@@ -229,7 +229,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             if (!string.IsNullOrEmpty(dropdownType.DataSourceTable))
             {
                 var tableName = dropdownType.DataSourceTable;
-                var rawData = await GetDataFromTable(tableName, EvalId, schId, lang, fieldValueId);
+                var rawData = await GetDataFromTable(tableName, EvalId, SchoolId, lang, fieldValueId);
 
                 if (rawData != null)
                 {
@@ -484,7 +484,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
             return null;
         }
-        private async Task<List<Dictionary<string, object>>> GetDataFromTable(string tableName, Guid? EvalId, Guid? SchId, string lang, Guid? fieldValueId = null)
+        private async Task<List<Dictionary<string, object>>> GetDataFromTable(string tableName, Guid? EvalId, Guid? SchoolId, string lang, Guid? fieldValueId = null)
         {
             
             var allowedTablesSettingValue = await cacheDataProvider.GetSystemSettingValue(SystemSettings.DropDownDataSourceAllowedTables);
@@ -513,39 +513,49 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 					break;
 				case "SchoolClasses":
 					{
-						//if (SchId == null || SchId == Guid.Empty)
-						//	return new List<Dictionary<string, object>>();
-						SchId =Guid.Parse("aface110-2a67-e311-93f9-00155d283a04");
-						var school = await NSISService.GetSchoolbyIdAsync(SchId.Value);
+                        //SchoolId = SchoolId;// Guid.Parse("aface110-2a67-e311-93f9-00155d283a04");
+
+						var school = await NSISService.GetSchoolbyIdAsync(SchoolId.Value);
+
+						if (school?.Classes == null || !school.Classes.Any())
+						{
+							result = new List<Dictionary<string, object>>();
+							break;
+						}
 
 						result = school.Classes
-	                       .Where(x => fieldValueId == null || x.Id == fieldValueId)
-	                       .Select((x, index) => new Dictionary<string, object>
-	                       {
-		                       ["Id"] = x.Id ,
-		                       ["NameEn"] = x.NameEn ?? string.Empty,
-		                       ["NameAr"] = x.NameAr ?? string.Empty,
-		                       ["OrderNo"] = index + 1,
-		                      
-	                       })
-	                       .ToList();
+							.Where(x => fieldValueId == null || x.Id == fieldValueId)
+							.Select((x, index) => new Dictionary<string, object>
+							{
+								["Id"] = x.Id,
+								["NameEn"] = x.NameEn ?? string.Empty,
+								["NameAr"] = x.NameAr ?? string.Empty,
+								["OrderNo"] = index + 1,
+							})
+							.ToList();
 
 						break;
 					}
 
 				case "schoolEmployee":
 					{
-						SchId = Guid.Parse("a297a912-2e70-453c-befc-5dd502cd4894");
+						//SchoolId = Guid.Parse("a297a912-2e70-453c-befc-5dd502cd4894");
 
-						var schoolEmployee = await OrgBL.GetEmployeesBySchoolId(SchId.Value);
+						var schoolEmployee = await OrgBL.GetEmployeesBySchoolId(SchoolId.Value);
 
 						result = schoolEmployee?
-							.Where(x => fieldValueId == null || x.Id== fieldValueId)
+							.Where(x => fieldValueId == null || x.Id == fieldValueId)
 							.Select(x => new Dictionary<string, object>
 							{
-								["Id"] = x.Id ,
-								["NameEn"] = x.Name ?? string.Empty,
-								["NameAr"] = x.Name ?? string.Empty,
+								["Id"] = x.Id,
+								["NameEn"] = string.IsNullOrWhiteSpace(x.JobTitle)
+									? x.Name ?? string.Empty
+									: $"{x.Name} - {x.JobTitle}",
+
+								["NameAr"] = string.IsNullOrWhiteSpace(x.JobTitle)
+									? x.Name ?? string.Empty
+									: $"{x.Name} - {x.JobTitle}",
+
 								["OrderNo"] = 0
 							})
 							.ToList()

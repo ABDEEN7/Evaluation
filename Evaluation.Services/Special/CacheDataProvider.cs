@@ -69,28 +69,34 @@ namespace Evaluation.Services.Special
             }
             return result;
         }
-        private async Task<List<SystemSettingDTO>> GetSystemSettings(List<string> keys)
-        {
-            var result = new List<SystemSettingDTO>();
+		private async Task<List<SystemSettingDTO>> GetSystemSettings(List<string> keys)
+		{
+			using (var uow = serviceScopeFactory.CreateScopedUow())
+			{
+				var result = new List<SystemSettingDTO>();
 
-            if (keys != null)
-            {
-                var list = await uow.GetRepository<SystemSetting>()
-                    .GetAllActiveNonDeleted()
-                    .Where(x => keys.Contains(x.SettingKey))
-                    .Select(x => new SystemSettingDTO
-                    {
-                        SettingGroup = x.SettingGroup,
-                        SettingKey = x.SettingKey,
-                        SettingValue = x.SettingValue
-                    }).ToListAsync();
+				if (keys != null)
+				{
+					var list = await uow.GetRepository<SystemSetting>()
+						.GetAllActiveNonDeleted()
+						.Where(x => keys.Contains(x.SettingKey))
+						.Select(x => new SystemSettingDTO
+						{
+							SettingGroup = x.SettingGroup,
+							SettingKey = x.SettingKey,
+							SettingValue = x.SettingValue
+						}).ToListAsync();
 
-                result = list;
-            }
-            return result;
-        }
+					result = list;
+				}
 
-        private async Task<List<T>> GetOrSetCacheAsync<T>(string key, Func<Task<List<T>>> dataFetcher)
+				return result;
+			}
+
+
+		}
+
+		private async Task<List<T>> GetOrSetCacheAsync<T>(string key, Func<Task<List<T>>> dataFetcher)
         {
             if (!await IsCachingEnabledAsync())
                 return await dataFetcher();

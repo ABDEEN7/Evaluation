@@ -38,17 +38,12 @@
                  render: function(data, type, row) {
            
                 return `
-                    <div class="plan-title-row mb-3">
- 
+                    <div class="plan-title-row mb-3"> 
                         <i class="las la-file-signature card-only-icon title-icon"></i>
- 
                         <span class="plan-text-wrap px-2">
-                    <span class="card-only-label title-label">Request: </span>
+                    <span class="card-only-label title-label">${uiControlsSetup().GetUiControlText("lblRequest")}: </span>
                     <span class="plan-title-text">${data || ""}</span>
                     </span>
- 
-                     
- 
                     </div>
                     `;
                 }
@@ -60,10 +55,9 @@
         render: function(data, type, row) {
             const statusColor = row.statusColor || "#cccccc";
             const textColor = "#000";
-
             return `
             <div class="d-flex justify-content-end w-100 mb-3">
-                <span class="request-status py-1 px-2"
+                <span class="request-status py-1 px-3"
                       style="background-color:${statusColor};color:${textColor};">
                     ${data || ""}
                 </span>
@@ -71,15 +65,14 @@
         `;
         }
     },
-
             {
         data: "requestNumber",
         className: "td-left small-width",
         render: function(data) {
             return `
             <i class="las la-file-alt card-only-icon me-1"></i>
-            <span class="card-only-label me-2">Request number:</span>
-            <span>${data || "_"}</span>
+            <span class="card-only-label me-2">${uiControlsSetup().GetUiControlText("lblRequestNumber")}:</span>
+            <span class="data-text">${data || "_"}</span>
         `;
         }
     },
@@ -90,7 +83,7 @@
             return `
             <i class="las la-school card-only-icon me-1"></i>
             <span class="card-only-label me-2">Schools count:</span>
-            <span>${data || 0}</span>
+            <span class="data-text">${data || 0}</span>
         `;
         }
     },
@@ -100,11 +93,10 @@
         className: "td-left small-width",
         render: function(data) {
             if (!data) return "_";
-
             return `
             <i class="las la-calendar card-only-icon"></i>
-            <span class="card-only-label mx-1">Created on:</span>
-            <span>${moment(data).format("DD-MM-YYYY")}</span>
+            <span class="card-only-label mx-1">${uiControlsSetup().GetUiControlText("evalRequestlblcreatedOn")}:</span>
+            <span class="data-text">${moment(data).format("DD-MM-YYYY")}</span>
         `;
         }
     },
@@ -118,8 +110,8 @@
             return `
             <div class="d-flex justify-content-end align-items-center">
                 <i class="las la-clock card-only-icon"></i>
-                <span class="card-only-label mx-1">Created at:</span>
-                <span>${moment(data).format("hh:mm A")}</span>
+                <span class="card-only-label mx-1">${uiControlsSetup().GetUiControlText("evalRequestlblCreatedAt")}:</span>
+                <span class="data-text">${moment(data).format("hh:mm A")}</span>
             </div>
         `;
         }
@@ -130,10 +122,10 @@
         render: function(data, type, row) {
             return `
             <i class="las la-calendar-week card-only-icon me-1"></i>
-            <span class="card-only-label me-1">Period:</span>
-            <span dir="rtl">
-                من ${moment(row.planDateFrom).format("DD/MM/YYYY")}
-                إلى ${moment(row.planDateTo).format("DD/MM/YYYY")}
+            <span class="card-only-label me-1">${uiControlsSetup().GetUiControlText("lblPeriod")}:</span>
+            <spandir="rtl" class="data-text">
+                من${uiControlsSetup().GetUiControlText("lblFrom")} ${moment(row.planDateFrom).format("DD/MM/YYYY")}
+                            ${uiControlsSetup().GetUiControlText("lblTo")} ${moment(row.planDateTo).format("DD/MM/YYYY")}
             </span>
         `;
         }

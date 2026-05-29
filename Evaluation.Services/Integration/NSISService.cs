@@ -21,101 +21,149 @@ public class NSISService
     }
 
 
-    public async Task<AuthenticationResponse> GetTokenAsync()
-    {
-        try
-        {
-            var authToken = Encoding.ASCII.GetBytes($"{ClsAppSetting.NsisUsername}:{ClsAppSetting.NsisPassword}");
-            var auth = "Basic " + Convert.ToBase64String(authToken);
+	public async Task<AuthenticationResponse?> GetTokenAsync()
+	{
+		try
+		{
+			var authToken = Encoding.ASCII.GetBytes(
+				$"{ClsAppSetting.NsisUsername}:{ClsAppSetting.NsisPassword}"
+			);
 
-            var request = new HttpRequestMessage(HttpMethod.Post, ClsAppSetting.NsisAuthenticationURL);
+			var request = new HttpRequestMessage(
+				HttpMethod.Post,
+				ClsAppSetting.NsisAuthenticationURL
+			);
 
-            request.Headers.Add("Accept", "application/json");
-            request.Headers.Add("Authorization", auth);
+			request.Headers.Add("Accept", "application/json");
+			request.Headers.Authorization =
+				new System.Net.Http.Headers.AuthenticationHeaderValue(
+					"Basic",
+					Convert.ToBase64String(authToken)
+				);
 
-            var collection = new List<KeyValuePair<string, string>>();
-            collection.Add(new("grant_type", ClsAppSetting.NsisGrantType));
-            var bodycontent = new FormUrlEncodedContent(collection);
-            request.Content = bodycontent;
+			request.Content = new FormUrlEncodedContent(new[]
+			{
+			new KeyValuePair<string, string>("grant_type", ClsAppSetting.NsisGrantType)
+		});
 
-            var response = await _httpClient.SendAsync(request);
+			var response = await _httpClient.SendAsync(request);
+			var content = await response.Content.ReadAsStringAsync();
 
-            response.EnsureSuccessStatusCode();
+			if (!response.IsSuccessStatusCode)
+			{
+				_loggingServices.SaveExceptionLog(
+					new Exception($"NSIS Token Error: {response.StatusCode} - {content}")
+				);
+				return null;
+			}
 
-            var content = await response.Content.ReadAsStringAsync();
+			return JsonSerializer.Deserialize<AuthenticationResponse>(
+				content,
+				new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+			);
+		}
+		catch (Exception ex)
+		{
+			_loggingServices.SaveExceptionLog(ex);
+			return null;
+		}
+	}
+	private async Task<T?> SendRequestAsync<T>(string endpoint)
+	{
+		try
+		{
+			var tokenResponse = await GetTokenAsync();
 
-            var options = new JsonSerializerOptions
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                PropertyNameCaseInsensitive = true
-            };
+			if (tokenResponse == null || string.IsNullOrEmpty(tokenResponse.Access_token))
+			{
+				_loggingServices.SaveExceptionLog(
+					new Exception("NSIS token response is null or access token is empty.")
+				);
+				return default;
+			}
 
-            return JsonSerializer.Deserialize<AuthenticationResponse>(content, options);
-        }
-        catch (Exception)
-        {
-            _loggingServices.SaveExceptionLog(new Exception("Error occurred while calling NSIS API."));
-            return default;
-        }
-    }
+			var request = new HttpRequestMessage(
+				HttpMethod.Get,
+				$"{ClsAppSetting.NsisBaseURL}/{endpoint}"
+			);
 
-    private async Task<T?> SendRequestAsync<T>(string endpoint)
-    {
-        try
-        {
-            var request = new HttpRequestMessage(HttpMethod.Get, $"{ClsAppSetting.NsisBaseURL}/{endpoint}");
+			request.Headers.Authorization =
+				new System.Net.Http.Headers.AuthenticationHeaderValue(
+					"Bearer",
+					tokenResponse.Access_token
+				);
 
-            var JWTToken = GetTokenAsync().Result.Access_token;
-            var auth = "Bearer " + JWTToken;
+			var response = await _httpClient.SendAsync(request);
 
-            request.Headers.Add("Authorization", auth);
+			var content = await response.Content.ReadAsStringAsync();
 
-            var response = await _httpClient.SendAsync(request);
+			if (!response.IsSuccessStatusCode)
+			{
+				_loggingServices.SaveExceptionLog(
+					new Exception($"NSIS API Error: {response.StatusCode} - {content}")
+				);
+				return default;
+			}
 
-            response.EnsureSuccessStatusCode();
-            var content = await response.Content.ReadAsStringAsync();
+			var options = new JsonSerializerOptions
+			{
+				PropertyNameCaseInsensitive = true
+			};
 
-            var options = new JsonSerializerOptions
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                PropertyNameCaseInsensitive = true
-            };
-
-            return JsonSerializer.Deserialize<T>(content, options);
-        }
-        catch (Exception)
-        {
-            _loggingServices.SaveExceptionLog(new Exception("Error occurred while calling NSIS API."));
-            return default;
-        }
-    }
-
-    public async Task<List<SchoolDto>?> GetSchoolsAsync()
+			return JsonSerializer.Deserialize<T>(content, options);
+		}
+		catch (Exception ex)
+		{
+			_loggingServices.SaveExceptionLog(ex);
+			return default;
+		}
+	}
+	public async Task<List<SchoolDto>?> GetSchoolsAsync()
     {
         var endpoint = $"{ClsAppSetting.NsisSchoolsApi}?limit={ClsAppSetting.NsisLimit}&filter=status='{ClsAppSetting.NsisStatus}'";
         var result = await SendRequestAsync<NSISSchoolsResponse>(endpoint);
         return result.Orgs;
     }
-    public async Task<NSISSchool> GetSchoolbyIdAsync(Guid Id)
-    {
-        var endpoint = $"{ClsAppSetting.NsisSchoolsApi}/{Id}";
-        var classesEndpoint = string.Format(ClsAppSetting.NsisClassesApi, Id);
-        var teachersEndpoint = string.Format(ClsAppSetting.NsisTeachersApi, Id);
-        var staffEndpoint = string.Format(ClsAppSetting.NsisStaffApi, Id);
-        var enrollmentEndpoint = string.Format(ClsAppSetting.NsisEnrollmentApi, Id);
-        var result = await SendRequestAsync<NSISSchoolResponse>(endpoint);
-        var classesResult = await SendRequestAsync<NSISClassResponse>(classesEndpoint);
-        var teachersResult = await SendRequestAsync<NSISTeacherResponse>(teachersEndpoint);
-        var staffResult = await SendRequestAsync<NSISStaffResponse>(staffEndpoint);
-        var enrollmentResult = await SendRequestAsync<NSISEnrollmentResponse>(enrollmentEndpoint);
-        result.Org.Classes = classesResult.Classes;
-        result.Org.Teachers = teachersResult.Users;
-        result.Org.Staff = staffResult.Users;
-        result.Org.Enrollments = enrollmentResult.Enrollments;
+	public async Task<NSISSchool?> GetSchoolbyIdAsync(Guid id)
+	{
+		try
+		{
+			var endpoint = $"{ClsAppSetting.NsisSchoolsApi}/{id}";
+			var classesEndpoint = string.Format(ClsAppSetting.NsisClassesApi, id);
+			var teachersEndpoint = string.Format(ClsAppSetting.NsisTeachersApi, id);
+			var staffEndpoint = string.Format(ClsAppSetting.NsisStaffApi, id);
+			var enrollmentEndpoint = string.Format(ClsAppSetting.NsisEnrollmentApi, id);
 
-        var mappedData = _mapper.Map<NSISSchool>(result.Org);
+			var result = await SendRequestAsync<NSISSchoolResponse>(endpoint);
 
-        return mappedData;
-    }
+			if (result?.Org == null)
+			{
+				_loggingServices.SaveExceptionLog(
+					new Exception($"School not found for id: {id}")
+				);
+
+				return null;
+			}
+
+			var classesResult = await SendRequestAsync<NSISClassResponse>(classesEndpoint);
+			var teachersResult = await SendRequestAsync<NSISTeacherResponse>(teachersEndpoint);
+			var staffResult = await SendRequestAsync<NSISStaffResponse>(staffEndpoint);
+			var enrollmentResult = await SendRequestAsync<NSISEnrollmentResponse>(enrollmentEndpoint);
+
+			result.Org.Classes = classesResult?.Classes ?? new List<Class>();
+			result.Org.Teachers = teachersResult?.Users ?? new List<Teacher>();
+			result.Org.Staff = staffResult?.Users ?? new List<StaffDto>();
+			result.Org.Enrollments = enrollmentResult?.Enrollments ?? new List<EnrollmentDto>();
+
+			var mappedData = _mapper.Map<NSISSchool>(result.Org);
+
+			return mappedData;
+		}
+		catch (Exception ex)
+		{
+			_loggingServices.SaveExceptionLog(ex);
+			return null;
+		}
+	}
 
 }

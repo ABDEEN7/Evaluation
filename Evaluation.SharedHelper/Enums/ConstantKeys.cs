@@ -1468,8 +1468,8 @@ public static class ConstantKeys
 
     public static class LanguageConst
     {
-        public static readonly string En = "En";
-        public static readonly string Ar = "Ar";
+        public static readonly string En = "en";
+        public static readonly string Ar = "ar";
     }
 
     public static class SystemSettings
@@ -1702,5 +1702,10 @@ public static class ConstantKeys
         public static string Completed = "Completed";
         public static string Closed = "Closed";
     }
+     public static class SystemModuleBackend
+	{
+        public static string EvaluationRequest = "EvaluationRequest";
+    }
+
 
 }
