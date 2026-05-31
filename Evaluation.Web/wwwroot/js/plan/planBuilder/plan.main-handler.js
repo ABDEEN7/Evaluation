@@ -382,11 +382,14 @@
         const state = instances.get(fieldId);
 
         // Build query parameters with school IDs
-        const params = new URLSearchParams({
-            schoolIds: schoolIds.join(','), // Send comma-separated IDs
-            page: 1,
-            pageSize: schoolIds.length // Set page size to number of schools to get all in one request
+        const params = new URLSearchParams();
+
+        schoolIds.forEach(id => {
+            params.append('schoolIds', id);
         });
+
+        params.append('page', 1);
+        params.append('pageSize', schoolIds.length);
 
         showLoadingState(fieldId);
 

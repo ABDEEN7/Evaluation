@@ -28,6 +28,7 @@ public class FormItem : EntityBase, IAuditLogEntity
     public ICollection<FormItemRelated>? RelatedFrom { get; set; }
     public ICollection<FormItemRelated>? RelatedTo { get; set; }
     public ICollection<FormItemConfig>? FormItemConfigs { get; set; }
+	public virtual ICollection<FormItemValue> FormItemValues { get; set; } = [];
 
 
 }

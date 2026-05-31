@@ -307,7 +307,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
 			var currentAcademicYearId = await uow.GetRepository<AcademicYear>()
 				.GetAllNonDeleted()
-				.Where(x => x.IsCurrent) 
+				.Where(x => x.IsCurrent && x.DepartmentId== departmentId) 
 				.Select(x => x.Id)
 				.FirstOrDefaultAsync();
 

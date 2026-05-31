@@ -198,13 +198,7 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 			.FirstOrDefaultAsync(x => x.IsActive && !x.IsDeleted);
 	}
 
-    public async Task<EvaluationRequest> UpdateEvaluationRequest(EvaluationRequest request)
-    {
-        uow.GetRepository<EvaluationRequest>().Update(request);
-        await uow.CommitAsync();
-
-        return request;
-    }
+    
 
     public  ServiceRequest MapEvaluationToServiceRequest(EvaluationRequest er)
 	{

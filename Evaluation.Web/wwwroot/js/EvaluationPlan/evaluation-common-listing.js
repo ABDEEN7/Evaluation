@@ -100,8 +100,8 @@ let departmentRoutePath = sharedUtility().extractDepartmentName();
                 language: {
                     info: uiControlsSetup().GetUiControlText("lblShowingEntries"),
                     paginate: {
-                        previous: `${uiControlsSetup().GetUiControlText("lblprevious")} <i class="fas fa-angle-left"></i>`,
-                        next: `${uiControlsSetup().GetUiControlText("lblnext")} <i class="fas fa-angle-right"></i>`
+                        previous: `السابق <i class="fas fa-angle-left"></i>`,
+                        next: `التالي <i class="fas fa-angle-right"></i>`
                     }
                 },
                 ajax: function (dt, callback) {

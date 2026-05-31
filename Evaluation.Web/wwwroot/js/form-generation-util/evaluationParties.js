@@ -31,29 +31,44 @@
     window.AddFileClick = function (partyId, requestId) {
         $("#EvaluationfileModal").modal('show');
         $("#EvaluationfileSectionRequestId").val(requestId);
-      
+
+        const $tree = $('#EvaluationFileScopetree');
+
+        if ($tree.jstree(true)) {
+            $tree.jstree("destroy");
+            $tree.empty();
+        }
 
         const options = {
             success: function (response) {
-                if (response) {
-                    $('#EvaluationFileScopetree').jstree({
-                        core: {
-                            data: response
-                        },
-                        themes: {
-                            dots: true,
-                            icons: true
-                        },
-                        plugins: ["wholerow"]
-                    });
-
+                if (!response || response.length === 0) {
+                    notificationUtil.error("No scopes found");
+                    return;
                 }
+
+                console.log("Scopes:", response);
+
+                $tree.jstree({
+                    core: {
+                        data: response,
+                        check_callback: true
+                    },
+                    themes: {
+                        dots: true,
+                        icons: true
+                    },
+                    plugins: ["wholerow"]
+                });
+
+                $tree.on("ready.jstree", function () {
+                    $tree.jstree("open_all");
+                });
             }
         };
 
-
-
         jqClient(options).Get(`/ServiceRequest/${departmentRoutePath}/GetScopes?partyId=${partyId}`);
+
+
         const element = document.querySelector("#EvaluationfileSection");
 
         if (element.dropzone) {
@@ -67,7 +82,7 @@
             maxFiles: 1,
             maxFilesize: 5,
             addRemoveLinks: true,
-
+            headers: sharedUtility().SharedHeader(true),
             init: function () {
                 var self = this;
 
