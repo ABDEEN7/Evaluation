@@ -45,7 +45,7 @@ public class EvaluationFormBL(IServiceScopeFactory serviceScopeFactory, CacheDat
     public async Task<TemplateFormDto> SaveEvaluationForm(TemplateFormDto model)
     {
         var result = new TemplateFormDto();
-        bool validateObject = true;//await ValidateObject(model!, ConstantKeys.WebPermissions.ADD_WEB_EVALFORMS);
+        bool validateObject = await ValidateObject(model!, ConstantKeys.WebPermissions.ADD_WEB_EVALFORMS);
         if (validateObject)
         {
             result = await evaluationFormService.SaveEvaluationForm(model!);
