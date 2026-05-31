@@ -157,7 +157,7 @@
         const container = $('<div>')
             .attr('id', `${fieldId}_semesterContainer`)
             .addClass('col-md-4')
-            .css('display', field?.visible !== false ? 'block' : 'none');
+            .css('display', field?.visible === true ? 'block' : 'none');
 
         const selectElement = $('<select>')
             .attr('id', `${fieldId}_ddlSemester`)
