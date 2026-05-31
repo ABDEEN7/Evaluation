@@ -11,4 +11,5 @@ public class SubItenList
     public Guid Id { get; set; }
     public string? NameAr { get; set; }
     public string? NameEn { get; set; }
+    public int? OrderNo { get; set; }
 }
