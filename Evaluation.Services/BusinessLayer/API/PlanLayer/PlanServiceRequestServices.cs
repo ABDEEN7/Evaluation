@@ -345,31 +345,31 @@ public class PlanServiceRequestServices(
     public async Task<List<DDLFomrEvalMatrixValueDto>> GetFomrEvalMatrixValueList()
     {
         var latestIds = await unitOfWork
-    .GetRepository<EvaluationRequest>()
-    .GetAllActiveNonDeleted(x =>
-        x.FormEvalMatrixValueId != null &&
-        x.FormEvalMatrixValue.FormEvalMatrix.DepartmentId == requestInfo.DepId)
-    .GroupBy(x => x.OrgTreeId)
-    .Select(g => g
-        .OrderByDescending(x => x.EvaluationDate ?? DateOnly.MinValue)
-        .Select(x => x.FormEvalMatrixValueId)
-        .FirstOrDefault())
-    .Where(x => x != null)
-    .Distinct()
-    .ToListAsync();
-        var data = await unitOfWork
-            .GetRepository<FormEvalMatrixValue>()
-            .GetAllActiveNonDeleted(x => latestIds.Contains(x.Id))
-            .OrderByDescending(x => x.OrderNo)
-            .ToListAsync();
-        var result = data.Select(x => new DDLFomrEvalMatrixValueDto
-        {
-            Id = x.Id,
-            Name = LanguageStatic.SelectLang(
-        requestInfo.Lang,
-        x.NameAr,
-        x.NameEn)
-        }).ToList();
+                        .GetRepository<EvaluationRequest>()
+                        .GetAllActiveNonDeleted(x =>
+                            x.FormEvalMatrixValueId != null &&
+                            x.FormEvalMatrixValue.FormEvalMatrix.DepartmentId == requestInfo.DepId)
+                        .GroupBy(x => x.OrgTreeId)
+                        .Select(g => g
+                            .OrderByDescending(x => x.EvaluationDate ?? DateOnly.MinValue)
+                            .Select(x => x.FormEvalMatrixValueId)
+                            .FirstOrDefault())
+                        .Where(x => x != null)
+                        .Distinct()
+                        .ToListAsync();
+                            var data = await unitOfWork
+                                .GetRepository<FormEvalMatrixValue>()
+                                .GetAllActiveNonDeleted(x => latestIds.Contains(x.Id))
+                                .OrderByDescending(x => x.OrderNo)
+                                .ToListAsync();
+                            var result = data.Select(x => new DDLFomrEvalMatrixValueDto
+                            {
+                                Id = x.Id,
+                                Name = LanguageStatic.SelectLang(
+                            requestInfo.Lang,
+                            x.NameAr,
+                            x.NameEn)
+                            }).ToList();
         return result;
     }
     private async Task SyncEvaluationRequests(

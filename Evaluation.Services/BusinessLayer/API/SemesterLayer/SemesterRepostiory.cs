@@ -2,6 +2,7 @@
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.Calendars;
 using Evaluation.DAL.Repositories;
+using Evaluation.Services.Extensions;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Consts;
 using Evaluation.SharedHelper.Models;
@@ -27,9 +28,11 @@ public class SemesterRepostiory(IServiceScopeFactory serviceScopeFactory,
     //}
     public async Task<List<SemesterDto>> GetSemesters()
     {
-        return await unitOfWork.GetRepository<Semester>()
+        using var scope = serviceScopeFactory.CreateScopedUow();
+		var result= await scope.GetRepository<Semester>()
                 .GetAllActiveNonDeleted()
-                .Where(x => x.AcademicYear.Department.UserDepartments.Any(x => x.UserId == userinfo.UserId))
+                .Include(x=>x.AcademicYear)
+                .Where(x => x.AcademicYear!.DepartmentId==requestInfo.DepId)
                 .Select(x => new SemesterDto
                 {
                     Id = x.Id,
@@ -37,5 +40,6 @@ public class SemesterRepostiory(IServiceScopeFactory serviceScopeFactory,
                     EndDate = x.EndDate,
                     StartDate = x.StartDate
                 }).ToListAsync();
+        return result;
     }
 }
