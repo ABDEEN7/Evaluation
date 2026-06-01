@@ -133,13 +133,34 @@ window.serviceRequestForm = window.serviceRequestForm || {};
                         formUtility.attachments.push(...attachments);
                     }
 
-                    if (Array.isArray(dropdownsData)) {
+                    if (Array.isArray(dropdownsData) && dropdownsData.length > 0) {
+
                         window.dropdowns = window.dropdowns || [];
                         window.dropDownTypeIds = window.dropDownTypeIds || [];
 
                         dropdownsData.forEach(item => {
-                            const exists = dropdowns.some(x => x.id === item.id && x.dropDownTypeId === item.dropDownTypeId);
-                            if (!exists) dropdowns.push(item);
+
+                            const itemId = item.id ?? item.Id;
+                            const typeId = item.dropDownTypeId ?? item.DropDownTypeId;
+
+                            const exists = window.dropdowns.some(x => {
+                                const xId = x.id ?? x.Id;
+                                const xTypeId = x.dropDownTypeId ?? x.DropDownTypeId;
+
+                                return xId === itemId && xTypeId === typeId;
+                            });
+
+                            if (!exists) {
+                                window.dropdowns.push({
+                                    ...item,
+                                    id: itemId,
+                                    dropDownTypeId: typeId
+                                });
+                            }
+
+                            if (typeId && !window.dropDownTypeIds.includes(typeId)) {
+                                window.dropDownTypeIds.push(typeId);
+                            }
                         });
                     }
 
@@ -192,8 +213,7 @@ window.serviceRequestForm = window.serviceRequestForm || {};
         const renderDropdownUI = () => {
             const dropdownWrapper = $('<div>').addClass('dropdown');
 
-            const buttonText =
-                (window.uiControlsSetup && uiControlsSetup().GetUiControlText('lblProcedures')) || 'Procedures';
+            const buttonText = uiControlsSetup().GetUiControlText('lblProcedures') || 'Procedures';
 
             const button = $('<button>', {
                 class: 'btn btn-primary btn-sm dropdown-toggle',

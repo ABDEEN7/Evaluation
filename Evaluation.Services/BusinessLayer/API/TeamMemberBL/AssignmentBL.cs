@@ -105,23 +105,43 @@ public class AssignmentBL(IServiceScopeFactory serviceScopeFactory,
         {
             await UpdateOrDeleteAssignments(evaluationRequestId, model);
         }
-        await unitOfWork.CommitAsync();
         return true;
     }
     public async Task<Result<List<EvaluationRequestAssignmentDto>>> GetTeamByEvaluationRequestId(Guid evaluationRequestId)
     {
 		using var scopeUow = serviceScopeFactory.CreateScopedUow();
-
+        var lang = requestInfo.Lang;
 		var team = await scopeUow.GetRepository<EvaluationRequestAssignment>()
-		            .GetAllQueryFiltered(x => x.EvaluationRequestId == evaluationRequestId)
-		            .Include(x => x.NdaStatus)
-		            .Include(x => x.MinistryUser)
-		            .Include(x => x.PartyType)
-		            .Include(x => x.EvalRequestAssignmentScopies)
-			            .ThenInclude(x => x.Scope)
-		            .ToListAsync();
-		var evaluationRequestAssignmentDto = mapper.Map<List<EvaluationRequestAssignmentDto>>(team);
-        return evaluationRequestAssignmentDto;
+	                       .GetAllQueryFiltered(x => x.EvaluationRequestId == evaluationRequestId)
+	                       .Select(x => new EvaluationRequestAssignmentDto
+	                       {
+		                       MinistryUserId = x.MinistryUserId,
+		                       MinistryUser = lang == "ar"  ? x.MinistryUser!.NameAr : x.MinistryUser!.NameEn,
+
+							   EvaluationRequestId = x.EvaluationRequestId,
+
+		                       PartyTypeId = x.PartyTypeId,
+		                       PartyType =  lang == "ar" ? x.PartyType!.NameAr : x.PartyType!.NameEn,
+
+		                       IsLeader = x.IsLeader,
+		                       IsNDA = x.IsNDA,
+
+		                       NdaStatusId = x.NdaStatusId,
+		                       NdaStatus = lang =="ar" ? x.NdaStatus!.NameAr : x.NdaStatus!.NameEn,
+		                       NdaDate = x.NdaDate,
+		                       Note = x.Note,
+
+		                       EvalRequestAssignmentScopies = x.EvalRequestAssignmentScopies == null
+			                       ? new List<EvalRequestAssignmentScopeDto>()
+			                       : x.EvalRequestAssignmentScopies.Select(s => new EvalRequestAssignmentScopeDto
+			                       {
+				                       ScopeId = s.ScopeId,
+				                       Note = s.Note,
+			                       }).ToList()
+	                       })
+	                       .ToListAsync();
+
+        return team;
     }
     private async Task AddAssignments(Guid evaluationRequestId, List<EvalTeamRequestDto> model)
     {
@@ -222,8 +242,9 @@ public class AssignmentBL(IServiceScopeFactory serviceScopeFactory,
                 EvalRequestAssignmentScopies = dto.Scopes.Select(s =>
                     new EvalRequestAssignmentScope
                     {
-                        ScopeId = s.Id
-                    }).ToList()
+                        ScopeId = s.Id,
+						CreateById = userInfo.UserId.Value,
+					}).ToList()
             })
             .ToList();
 

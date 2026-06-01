@@ -129,7 +129,8 @@ var formUtility = window.formUtility;
     }
 
     function getValuesFromGlobalList(dropDownTypeId, parentValue) {
-        const list = dropdowns || [];
+
+        const list = window.dropdowns || [];
 
         if (parentValue) {
             return list.filter(c =>
@@ -137,7 +138,10 @@ var formUtility = window.formUtility;
                 c.parentDropDownId === parentValue
             );
         }
-        return list.filter(c => c.dropDownTypeId === dropDownTypeId);
+
+        return list.filter(c =>
+            c.dropDownTypeId === dropDownTypeId
+        );
     }
 
     function populateDropdown($field, values, selectedValue) {

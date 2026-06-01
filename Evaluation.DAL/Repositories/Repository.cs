@@ -250,5 +250,6 @@ public class Repository<T>(DbContext context, UserInfo userInfo) : RepositoryBas
         }
         return logs;
     }
-    #endregion
+
+	#endregion
 }

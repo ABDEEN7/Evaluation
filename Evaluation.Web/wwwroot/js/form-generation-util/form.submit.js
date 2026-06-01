@@ -205,12 +205,12 @@ window.serviceRequestForm = window.serviceRequestForm || {};
         formData.append("fieldValues", JSON.stringify(payloadFields));
 
         if (actionTypeName === ACTION_TYPE.ASSIGNT_TEAM) {
-            const validation = validateTeamByFieldId('assign');
+            //const validation = validateTeamByFieldId('assign');
 
-            if (!validation.isValid) {
-                DisplayAlert('يرجى تصحيح الأخطاء التالية:\n' + validation.errors.join('\n'), "danger");
-                return { formData: null, ok: false };
-            }
+            //if (!validation.isValid) {
+            //    DisplayAlert('يرجى تصحيح الأخطاء التالية:\n' + validation.errors.join('\n'), "danger");
+            //    return { formData: null, ok: false };
+            //}
 
             formData.append("teamUsers", JSON.stringify(getAssignmentsDataByFieldId('assign')));
         }

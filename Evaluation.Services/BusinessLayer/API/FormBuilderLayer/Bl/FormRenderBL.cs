@@ -792,7 +792,7 @@ namespace Evaluation.Services.BusinessLayer.API
 			var requestDto = new ServiceRequestDTO
 			{
 				ActionCustom = actionCustom,
-				//DropDownValues = await dropDownTask,
+				DropDownValues = await dropDownTask,
 				//SchAttachments = schAttachmentsTask != null ? await schAttachmentsTask : null
 			};
 
