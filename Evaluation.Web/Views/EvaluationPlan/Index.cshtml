@@ -678,24 +678,26 @@
                 uiControlsSetup().UpdatPageTitle('WebAppScholarship');
                  InitNavbarSection();
                 $('body').show();
-            });
+         
 
             if (!sharedUtility().ExistingToken()) {
                 sharedUtility().RedirectUnauthorized();
                 return;
             }
 
-            window.formUtility = window.formUtility || {};
+               });
 
-            const searchParams = new URLSearchParams(window.location.search);
-           
-            const reqId = searchParams.get('id');
+                 window.formUtility = window.formUtility || {};
+
+                 const searchParams = new URLSearchParams(window.location.search);
+
+               const reqId = searchParams.get('id');
             const serviceId = searchParams.get('serviceId');
             const EvlId = searchParams.get('Evlid');
             const planId = searchParams.get('planId');
             const SerReqid = searchParams.get('SerReqid');
 
-            if (reqId) {
+                if (reqId) {
                 openPlanRequestDetails(reqId);
             }
 

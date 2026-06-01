@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Evaluation.DAL.Dtos.Form;
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.ActionEntities;
 using Evaluation.DAL.Models.FormBuilder;
@@ -9,6 +10,7 @@ using Evaluation.DAL.Repositories;
 using Evaluation.Services.BusinessLayer.API;
 using Evaluation.Services.BusinessLayer.API.EvaluationForm;
 using Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices;
+using Evaluation.Services.BusinessLayer.API.FormLayer;
 using Evaluation.Services.BusinessLayer.API.PlanLayer;
 using Evaluation.Services.BusinessLayer.API.TeamMemberBL;
 using Evaluation.Services.Extensions;
@@ -25,6 +27,7 @@ using Evaluation.SharedHelper.Models.Api.ServiceRequestEntitiesDTO;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System.Globalization;
 using static Evaluation.SharedHelper.Enums.ConstantKeys;
 
@@ -35,7 +38,7 @@ namespace Evaluation.Services.Models.API
         IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow, SrvNotification SrvNotification, SrvUser SrvUser,
         LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, SrvField SrvField, SrvAction SrvAction,
         SrvStatus SrvStatus, SrvAssignment SrvAssignment, SrvDropdown SrvDropdown, SrvActionTransactionsLog SrvActionTransactionsLog,
-        SrvService SrvService, AssignmentBL _assignmentBL, EvaluationFormBL _EvaluationFormBL, SrvServiceRequest SrvServiceRequest, PlanServiceRequestServices planServiceRequestServices, SrvAttachments SrvAttachments, IServiceProvider serviceProvider, RequestInfo _requestInfo)
+        SrvService SrvService, AssignmentBL _assignmentBL, FormBL _FormBL, SrvServiceRequest SrvServiceRequest, PlanServiceRequestServices planServiceRequestServices, SrvAttachments SrvAttachments, IServiceProvider serviceProvider, RequestInfo _requestInfo)
             : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, _requestInfo)
     {
 
@@ -221,7 +224,7 @@ namespace Evaluation.Services.Models.API
 						}
 
 						var FormField = existingFields
-							.Where(x => x.IsApproved)
+							//.Where(x => x.IsApproved)
 							.FirstOrDefault(x =>
 								x.Field?.FieldType?.BackendName == FieldTypeConstant.Evl_Form &&
 								!string.IsNullOrWhiteSpace(x.Value)
@@ -230,12 +233,11 @@ namespace Evaluation.Services.Models.API
 						if (FormField == null)
 							break;
 
-
-						var dto = JsonConvert.DeserializeObject<TemplateFormDto>(FormField.Value!);
+						var dto = JsonConvert.DeserializeObject<FormEvaluationDto>(FormField.Value!);
 
 						if (dto == null) throw new BusinessException(ExceptionMessage.msgInvalidEvaluationForm);
 
-						await _EvaluationFormBL.SaveEvaluationForm(dto);
+						await _FormBL.SaveEvaluationForm(dto);
 						 UpdateVisitInfoFromFields(application, existingFields);
 						break;
 					}
