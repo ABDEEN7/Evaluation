@@ -162,10 +162,7 @@ const planUtility = window.planUtility;
     <div class="col-xl-5">
                             <div class="row">
                                 <div class="col-md-8 mb-3">
-                                    <input type="text"
-                                           id="${pid(fieldId, 'customSearch')}"
-                                           class="form-control"
-                                           placeholder="${t('plhSearchHere')}">
+                                  
                                 </div>
                                 <div class="col-md-4 mb-3">
                                     <button type="button" class="btn filterbtn"
