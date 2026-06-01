@@ -360,14 +360,17 @@
             const isLeaderChecked = member.id === state.teamLeaderId || member.isLeader ? 'checked' : '';
 
             const sendMailBtnHTML = state.evaluationRequestId ? `
-    <td>
-        <button class="btn btn-sm btn-outline-primary send-mail-btn"
-                data-member-id="${member.id}"
-                data-member-name="${memberName}">
-            <i class="las la-envelope"></i>
-        </button>
-    </td>
-` : ``;
+                                  <td>
+                                            <button class="btn btn-sm btn-outline-primary"
+                                                    onclick="sendAssignmentEmail(
+                                                        '${member.id}',
+                                                        '${state.evaluationRequestId}',
+                                                        '${memberName}'
+                                                    )">
+                                                <i class="las la-envelope"></i>
+                                            </button>
+                                        </td>
+                            ` : ``;
 
             return `
     <tr data-selected-id="${member.id}">
@@ -830,7 +833,49 @@
                     });
             });
     }
+    window.sendAssignmentEmail = async function ( ministryUserId,evaluationRequestId, ministryUser ) {
 
+        const confirmMessage =
+            uiControlsSetup().GetUiControlText("WEB_CONFIRM_SEND_EMAIL")
+                .replace("{0}", ` <span style="font-weight:bold;color:maroon;">${ministryUser}</span> `);
+
+        notificationUtil.confirmation({
+            title: confirmMessage,
+            okText: uiControlsSetup().GetUiControlText("WEB_CONFIRM_BUTTON"),
+            cancelText: uiControlsSetup().GetUiControlText("WEB_CANCEL")
+        }, async function (confirmed) {
+
+            if (!confirmed) return;
+
+            try {
+
+                const response = await jqClient().Post(
+                    API_ENDPOINTS.SEND_MAIL_NOTIFICATION,
+                    {
+                        userId: ministryUserId,
+                        evaluationRequestId: evaluationRequestId
+                    });
+
+                if (response?.isSuccess || response?.success) {
+                    notificationUtil.success(
+                        uiControlsSetup().GetUiControlText("msgMailSentSuccess")
+                    );
+                } else {
+                    notificationUtil.error(
+                        response?.message ||
+                        uiControlsSetup().GetUiControlText("msgMailSentFailed")
+                    );
+                }
+
+            } catch (e) {
+                console.error(e);
+
+                notificationUtil.error(
+                    sharedFn().GetUiControlText("msgMailSentFailed")
+                );
+            }
+        });
+    };
     // ================== HELPERS ==================
 
     function showMembersLoading() {
