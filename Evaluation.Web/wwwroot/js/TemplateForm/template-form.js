@@ -73,9 +73,13 @@ function CommonLogicAfterInitial() {
             if (!this.checked) {
                 $("label[for='EvalFormsHasOneValue']").show();
                 $("#EvalFormsHasOneValue").parent().show();
+                $("label[for='FinalEvalMatrixEval']").show();
+                $("#FinalEvalMatrixEval").parent().show();
             } else {
                 $("label[for='EvalFormsHasOneValue']").hide();
                 $("#EvalFormsHasOneValue").parent().hide();
+                $("label[for='FinalEvalMatrixEval']").hide();
+                $("#FinalEvalMatrixEval").parent().hide();
             }
         });
     $(document).off("change", "#EvalFormHasMuliEvaluation")
@@ -593,7 +597,7 @@ function BuildFormItemConfigTable(formItemId, formItemCalcMethodId) {
     };
 
     var tableColumns = sharedFn().PopulateColumn(filteredColList, '', true);
-    tableColumns.splice(1, 0, checkboxColumn); 
+    tableColumns.splice(1, 0, checkboxColumn);
     $('#ModalPopup .modal-body #PopupForm').append(`
         <div class="row mt-3">
             <div class="card-header justify-content-end d-flex align-items-center bg-light">
@@ -1188,7 +1192,7 @@ initTables = () => {
             placeholder: sharedFn().GetUiControlText('NO_DATA_FOUND'),
             headerFilterPlaceholder: sharedFn().GetUiControlText('FILTER_COLUMN'),
             movableRows: true,
-            selectable:true
+            selectable: true
         },
         isResponsiveLayout: false,
         uniqueRowId: 'id',
@@ -1442,7 +1446,7 @@ async function InitFormItemConfigPopup(
     });
 
     LoadFormItemConfigData();
-   
+
 
     // apply initial state after tabulator renders
 }
@@ -1463,7 +1467,7 @@ function LoadFormItemConfigData() {
                 $("#IsMultipleEvaluationWrapper").hide();
                 $("#IsMultipleEvaluation").prop("checked", false);
 
-            } 
+            }
         }
     };
 

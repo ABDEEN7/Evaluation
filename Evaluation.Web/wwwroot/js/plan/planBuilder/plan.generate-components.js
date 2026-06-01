@@ -266,16 +266,10 @@
         if (school.lastEvaluationDate) {
             infoDiv.append(
                 $('<small>')
-                    .addClass('text-muted d-block')
-                    .text(`${t('lblLastEvaluation')}: ${school.lastEvaluationDate}`)
-            );
-        }
-
-        if (school.formEvalMatrixNameValue) {
-            infoDiv.append(
-                $('<small>')
-                    .addClass('text-muted d-block')
-                    .text(school.formEvalMatrixNameValue)
+                    .addClass('text-muted')
+                    .text(
+                        `${t('lblLastEvaluation')}: ${school.lastEvaluationDate}    ${school.formEvalMatrixNameValue}`
+                    )
             );
         }
 

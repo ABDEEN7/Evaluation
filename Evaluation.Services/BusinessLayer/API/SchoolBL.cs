@@ -126,7 +126,7 @@ public class SchoolBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvide
         {
             Id = x.Id,
             Name = LanguageStatic.SelectLang(requestInfo.Lang, x.NameAr, x.NameEn),
-			BackendName = x.BackendName
+			BackendName = x.EvaluationType.BackendName
 		}).ToListAsync();
     }
 }
