@@ -141,7 +141,7 @@ public class SchoolRepository(IServiceScopeFactory serviceScopeFactory,
 		//filter = filter.And(c=> c.) we will added here filter by ServiceStatus.IsOPEN
 		if (request.Id != null && request.Id.Count > 0)
 			filter = filter.And(c => request.Id.Contains(c.Id));
-		if (request.SchoolIds.Count > 0)
+		if (request.SchoolIds!= null && request.SchoolIds.Count > 0)
 			filter = filter.And(c => request.SchoolIds.Contains(c.Id));
 		if (!string.IsNullOrWhiteSpace(request.Name))
 				filter = filter.And(s => s.NameEn.Contains(request.Name) || s.NameAr.Contains(request.Name));

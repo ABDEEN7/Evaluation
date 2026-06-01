@@ -39,4 +39,7 @@
         ReadOnly_ACTION_TYPES
     };
 
+    window.dropdowns = window.dropdowns || [];
+    global.dropDownTypeIds = global.dropDownTypeIds || [];
+
 })(window);
