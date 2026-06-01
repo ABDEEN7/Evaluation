@@ -203,7 +203,7 @@ const planUtility = window.planUtility;
                             </th>
                             <th>${t('lblSchoolName')}</th>
                             <th>${t('lblVisitDate')}</th>
-                            <th>${t('lblLastEvaluation')}</th>
+                            <th>${t('lblEstablishmentDate')}</th>
                             <th>${t('lblVisitType')}</th>
                             <th>${t('lblAcademicYear')}</th>
                             <th>${t('lblActions')}</th>

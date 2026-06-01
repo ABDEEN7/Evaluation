@@ -256,31 +256,24 @@ function $p(selector) {
      * @returns {Array} Array of selected school objects
      */
     function getSchools(fieldScore) {
+        const fieldId = fieldScore.endsWith('_') ? fieldScore.slice(0, -1) : fieldScore;
+        const instance = window.PlanHandler?.getInstance(fieldId);
+        const selectedSchoolsMap = instance?.selectedSchoolsMap;
+
+        if (!selectedSchoolsMap || selectedSchoolsMap.size === 0) return [];
+
         const schools = [];
 
-        // Get only selected schools
-        $('#' + fieldScore + 'planTable tbody .selectRow:checked').each(function () {
-            const checkbox = $(this);
-            const schoolId = checkbox.data('school-id');
-            const schoolName = checkbox.data('name');
-            const row = checkbox.closest('tr');
+        selectedSchoolsMap.forEach((schoolData, schoolId) => {
+            const parsedDates = parseDateRange(schoolData.visitDate || '');
 
-            const dateRangeInput = row.find('.childDate');
-            const dateRangeValue = dateRangeInput.val() || '';
-            const parsedDates = parseDateRange(dateRangeValue);
-
-            const visitTypeSelect = row.find('.visitTypeSelect');
-            const visitTypeId = visitTypeSelect.val() || null;
-
-            const schoolData = {
+            schools.push({
                 id: schoolId,
+                name: schoolData.name,
                 startEvaluationDate: parsedDates.startDate || null,
                 endEvaluationDate: parsedDates.endDate || null,
-                visitTypeId: visitTypeId,
-                name: schoolName
-            };
-
-            schools.push(schoolData);
+                visitTypeId: schoolData.visitTypeId || null
+            });
         });
 
         return schools;

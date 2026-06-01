@@ -249,6 +249,7 @@
         return label;
     };
 
+    
     const generateSchoolNameCell = (fieldId, school) => {
         const ratingClass = RATING_CLASSES[school.rating] || 'bg-light';
         const container = $('<div>').addClass('d-flex align-items-center justify-content-between');
@@ -260,6 +261,23 @@
         infoDiv
             .append($('<h6>').addClass('mb-1').text(school.name || '-'))
             .attr('data-name', nameId);
+
+        
+        if (school.lastEvaluationDate) {
+            infoDiv.append(
+                $('<small>')
+                    .addClass('text-muted d-block')
+                    .text(`${t('lblLastEvaluation')}: ${school.lastEvaluationDate}`)
+            );
+        }
+
+        if (school.formEvalMatrixNameValue) {
+            infoDiv.append(
+                $('<small>')
+                    .addClass('text-muted d-block')
+                    .text(school.formEvalMatrixNameValue)
+            );
+        }
 
         // Org parent (small label)
         if (school.orgParent?.nameEn) {
@@ -383,11 +401,10 @@
         visitDateCell.append(generateVisitDateField(fieldId, school, readonly));
         row.append(visitDateCell);
 
-        // Last evaluation date cell
+        // establishmentDate date cell
         const lastEvalCell = $('<td>');
-        lastEvalCell.text(school.lastEvaluationDate || '-');
+        lastEvalCell.text(school.establishmentDate || '-');
         row.append(lastEvalCell);
-
         // Visit type cell
         const visitTypeCell = $('<td>');
         visitTypeCell.append(generateVisitTypeField(fieldId, school, readonly));
