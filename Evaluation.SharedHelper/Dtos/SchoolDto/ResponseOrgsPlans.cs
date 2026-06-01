@@ -12,4 +12,6 @@ public class ResponseOrgsPlans
     public List<SchoolLevelDto>? SchoolLevel { get; set; }
     public ParentOrgTreeDto? OrgParent { get; set; }
     public bool IsOpen { get; set; }
+    public string? FormEvalMatrixNameValue { get; set; }
+    public DateOnly EstablishmentDate { get; set; }
 }

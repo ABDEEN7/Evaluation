@@ -143,18 +143,26 @@ const planUtility = window.planUtility;
             <div class="card card-table">
                 <div class="card-body">
 
-                    <div class="row align-items-center mb-3">
-                        <div class="col-xl-7">
-                            <h4>${t('lblSelectSchools')}</h4>
-                        </div>
+               <div class="row align-items-center mb-3">
+    <div class="col-xl-7 d-flex align-items-center gap-3">
+        <h4 class="mb-0">${t('lblSelectSchools')}</h4>
 
-                        <div class="col-xl-5">
+        <div class="selection-counter-badge d-flex align-items-center gap-2 
+                     px-3 py-1 rounded-pill border"
+             style="background: #f0f7ff; border-color: #3b82f6 !important; 
+                    transition: all 0.3s ease; font-size: 0.875rem; color: #1d4ed8;">
+            <i class="la la-check-square" style="font-size: 1rem;"></i>
+            <span>${t('lblSelectedSchools') || 'المدارس المحددة'}:</span>
+            <span id="${pid(fieldId, 'selectedSchoolsCounter')}"
+                  style="font-weight: 700; font-size: 1rem; min-width: 1.5rem; 
+                         text-align: center;">0</span>
+        </div>
+    </div>
+
+    <div class="col-xl-5">
                             <div class="row">
                                 <div class="col-md-8 mb-3">
-                                    <input type="text"
-                                           id="${pid(fieldId, 'customSearch')}"
-                                           class="form-control"
-                                           placeholder="${t('plhSearchHere')}">
+                                  
                                 </div>
                                 <div class="col-md-4 mb-3">
                                     <button type="button" class="btn filterbtn"
@@ -192,7 +200,7 @@ const planUtility = window.planUtility;
                             </th>
                             <th>${t('lblSchoolName')}</th>
                             <th>${t('lblVisitDate')}</th>
-                            <th>${t('lblLastEvaluation')}</th>
+                            <th>${t('lblEstablishmentDate')}</th>
                             <th>${t('lblVisitType')}</th>
                             <th>${t('lblAcademicYear')}</th>
                             <th>${t('lblActions')}</th>

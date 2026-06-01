@@ -13,6 +13,7 @@ using Evaluation.SharedHelper.Helper;
 using Evaluation.SharedHelper.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using System.Linq;
 using System.Linq.Expressions;
 using static Evaluation.SharedHelper.Enums.ConstantKeys;
 
@@ -65,6 +66,7 @@ public class SchoolRepository(IServiceScopeFactory serviceScopeFactory,
 				Id = x.School.Id,
 				Name = requestInfo.Lang == LanguageConst.Ar ? x.School.NameAr : x.School.NameEn,
 				IsOpen = x.School.EvaluationRequests.Any(x => x.ServiceStatus.ServiceStatusType.BackendName.ToLower() == ConstantKeys.ServiceStatusTypeBackend.Open.ToLower()),
+
 				SchoolLevel = x.School.SchoolLevel!
 					.Select(sl => new SchoolLevelDto
 					{
@@ -74,7 +76,15 @@ public class SchoolRepository(IServiceScopeFactory serviceScopeFactory,
 					}).ToList(),
 
 				LastEvaluationDate = x.LastEval.EvaluationDate,
-				AcademicYear = x.LastEval.NextEvaluationDate
+				AcademicYear = x.LastEval.NextEvaluationDate,
+				EstablishmentDate = x.School.EstablishmentDate,
+
+				FormEvalMatrixNameValue = x.School.EvaluationRequests
+	.OrderByDescending(er => er.CreateDate)
+	.Select(er => requestInfo.Lang == LanguageConst.Ar
+		? er.FormEvalMatrixValue!.NameAr
+		: er.FormEvalMatrixValue!.NameEn)
+	.FirstOrDefault()
 			});
 
 		return await query.GetPaginatedResult(request.PageNumber, request.PageSize);
@@ -141,10 +151,10 @@ public class SchoolRepository(IServiceScopeFactory serviceScopeFactory,
 		//filter = filter.And(c=> c.) we will added here filter by ServiceStatus.IsOPEN
 		if (request.Id != null && request.Id.Count > 0)
 			filter = filter.And(c => request.Id.Contains(c.Id));
-		if (request.SchoolIds!= null && request.SchoolIds.Count > 0)
+		if (request.SchoolIds != null && request.SchoolIds.Count > 0)
 			filter = filter.And(c => request.SchoolIds.Contains(c.Id));
 		if (!string.IsNullOrWhiteSpace(request.Name))
-				filter = filter.And(s => s.NameEn.Contains(request.Name) || s.NameAr.Contains(request.Name));
+			filter = filter.And(s => s.NameEn.Contains(request.Name) || s.NameAr.Contains(request.Name));
 		if (request.EstablishmentDate != null)
 		{
 			int year = request.EstablishmentDate.Value.Year;
