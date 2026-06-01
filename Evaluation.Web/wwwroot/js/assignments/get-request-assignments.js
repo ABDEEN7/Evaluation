@@ -358,19 +358,6 @@
             // Check if this member is team leader
             const isLeaderChecked = member.id === state.teamLeaderId || member.isLeader ? 'checked' : '';
 
-            const sendMailBtnHTML = state.evaluationRequestId ? `
-                                  <td>
-                                            <button class="btn btn-sm btn-outline-primary"
-                                                    onclick="sendAssignmentEmail(
-                                                        '${member.id}',
-                                                        '${state.evaluationRequestId}',
-                                                        '${memberName}'
-                                                    )">
-                                                <i class="las la-envelope"></i>
-                                            </button>
-                                        </td>
-                            ` : ``;
-
             return `
     <tr data-selected-id="${member.id}">
         <td>
@@ -411,7 +398,6 @@
                 <span class="checkmark"></span>
             </label>
         </td>
-        ${sendMailBtnHTML}
     </tr>
 `;
         }).join('');
@@ -669,7 +655,7 @@
                 });
             });
 
-        // إضافة عضو للفريق المحدد
+        
         $(document).off('change', `${id('userTable')} .row-select`)
             .on('change', `${id('userTable')} .row-select`, function () {
                 if (!this.checked) {
@@ -698,9 +684,12 @@
                     ? userPartyTypes[0].partyType.id
                     : null;
 
+                
+                const defaultScopes = (member.scopeIds || []).map(String);
+
                 state.selectedAssignments.push({
                     ...member,
-                    scopes: [],
+                    scopes: defaultScopes, 
                     nda: null,
                     partyTypeId: autoSelectedPartyTypeId,
                     isLeader: false
