@@ -77,12 +77,23 @@
         }
     },
     {
+        data: "planName",
+        className: "td-right small-width",
+        render: function(data) {
+            return `
+            <i class="las la-school card-only-icon me-1"></i>
+            <span class="card-only-label me-2">${uiControlsSetup().GetUiControlText("lblPlanName")}:</span>
+            <span class="data-text">${data || 0}</span>
+        `;
+        }
+    },
+    {
         data: "schoolsCount",
         className: "td-right small-width",
         render: function(data) {
             return `
             <i class="las la-school card-only-icon me-1"></i>
-            <span class="card-only-label me-2">Schools count:</span>
+            <span class="card-only-label me-2">${uiControlsSetup().GetUiControlText("lblSchoolsCount")}:</span>
             <span class="data-text">${data || 0}</span>
         `;
         }
