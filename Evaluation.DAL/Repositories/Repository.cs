@@ -251,9 +251,5 @@ public class Repository<T>(DbContext context, UserInfo userInfo) : RepositoryBas
         return logs;
     }
 
-	public async Task FirstOrDefaultAsync(Func<object, bool> value)
-	{
-		throw new NotImplementedException();
-	}
 	#endregion
 }
