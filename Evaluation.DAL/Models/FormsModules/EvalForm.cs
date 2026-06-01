@@ -20,7 +20,9 @@ public class EvalForm : EntityBase , IAuditLogEntity
     public bool AllowRename { get; set; }
     public bool HasMuliEvaluation { get; set; }
     public int CountOfColumnsValue { get; set; } = 1;
+    public Guid? FinalEvalMatrixId { get; set; }
+    public FormEvalMatrix? FinalEvalMatrix { get; set; }
 
-	public virtual ICollection<FormItem> FormItems { get; set; } = [];
+    public virtual ICollection<FormItem> FormItems { get; set; } = [];
 
 }
