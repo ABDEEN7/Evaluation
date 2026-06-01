@@ -84,6 +84,10 @@ public class SchoolRepository(IServiceScopeFactory serviceScopeFactory,
 	.Select(er => requestInfo.Lang == LanguageConst.Ar
 		? er.FormEvalMatrixValue!.NameAr
 		: er.FormEvalMatrixValue!.NameEn)
+	.FirstOrDefault(),
+				NextEvaluationDate = x.School.EvaluationRequests
+	.OrderByDescending(er => er.CreateDate)
+	.Select(s => s.NextEvaluationDate)
 	.FirstOrDefault()
 			});
 

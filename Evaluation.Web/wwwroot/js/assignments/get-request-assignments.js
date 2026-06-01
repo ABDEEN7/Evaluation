@@ -245,7 +245,6 @@
             <th>${t('lblDomain')}</th>
             <th>${t('lblPartyType')}</th>
             <th>${t('lblTeamLeader')}</th>
-            ${state.evaluationRequestId ? `<th>${t('lblSendMail')}</th>` : ''}
         `;
 
         $thead.html(headerHTML);
@@ -821,7 +820,7 @@
                     cancelText: sharedFn().GetUiControlText('WEB_CANCEL')
                 },
                     result => {
-                        
+
                         const response = jqClient().Post(API_ENDPOINTS.SEND_MAIL_NOTIFICATION,
                             { userId: memberId, evaluationRequestId: state.evaluationRequestId });
 
@@ -833,7 +832,7 @@
                     });
             });
     }
-    window.sendAssignmentEmail = async function ( ministryUserId,evaluationRequestId, ministryUser ) {
+    window.sendAssignmentEmail = async function (ministryUserId, evaluationRequestId, ministryUser) {
 
         const confirmMessage =
             uiControlsSetup().GetUiControlText("WEB_CONFIRM_SEND_EMAIL")

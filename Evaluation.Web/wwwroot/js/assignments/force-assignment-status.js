@@ -74,12 +74,6 @@ window.renderForceAssignments = function (assignments, divId) {
                 <td>${ndaDate}</td>
 
                 <td>${x.note || '-'}</td>
-
-                 <td>
-                        ${sendEmailButton}
-                        ${forceButton}
-                </td>
-
             </tr>
         `;
     });

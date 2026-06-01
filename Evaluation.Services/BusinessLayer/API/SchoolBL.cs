@@ -125,7 +125,8 @@ public class SchoolBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvide
         return await responses.Select(x => new SchoolVisits
         {
             Id = x.Id,
-            Name = LanguageStatic.SelectLang(requestInfo.Lang, x.NameAr, x.NameEn)
-        }).ToListAsync();
+            Name = LanguageStatic.SelectLang(requestInfo.Lang, x.NameAr, x.NameEn),
+			BackendName = x.BackendName
+		}).ToListAsync();
     }
 }
