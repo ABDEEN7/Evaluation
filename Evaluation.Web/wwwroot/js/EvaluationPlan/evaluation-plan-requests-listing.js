@@ -31,8 +31,8 @@
         tableViewBtnId: 'tblViewPlanRequest',
         rowClass: 'plan-request-card',
         columns: [     
-           {
-    data: "service",
+       {
+    data: "planName",
         className: "td-full mb-4",
         render: function(data, type, row) {
 
@@ -45,7 +45,7 @@
             <div class="request-icon"
                  style="background-color:${statusColor}; color:${textColor};">
 
-                <i class="las la-file-signature"></i>
+                <i class="las la-school"></i>
 
             </div>
 
@@ -77,17 +77,7 @@
         `;
         }
     },
-    {
-        data: "planName",
-        className: "td-right small-width",
-        render: function(data) {
-            return `
-            <i class="las la-school card-only-icon me-1"></i>
-            <span class="card-only-label me-2">${uiControlsSetup().GetUiControlText("lblPlanName")}:</span>
-            <span class="data-text">${data || 0}</span>
-        `;
-        }
-    },
+  
     {
         data: "schoolsCount",
         className: "td-full",
@@ -142,20 +132,7 @@
         `;
         }
     },
-     {
-        data: null,
-        className: "td-full small-width",
-        render: function(data, type, row) {
-            return `
-            <i class="las la-calendar-week card-only-icon me-1"></i>
-            <span class="card-only-label me-1">${uiControlsSetup().GetUiControlText("lblPeriod")}:</span>
-            <spandir="rtl" class="data-text">
-                من${uiControlsSetup().GetUiControlText("lblFrom")} ${moment(row.planDateFrom).format("DD/MM/YYYY")}
-                            ${uiControlsSetup().GetUiControlText("lblTo")} ${moment(row.planDateTo).format("DD/MM/YYYY")}
-            </span>
-        `;
-        }
-    }
+     
         ],
         onRowClick: function (rowData) {
             openPlanRequestDetails(rowData.id);
