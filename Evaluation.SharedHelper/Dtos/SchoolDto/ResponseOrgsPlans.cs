@@ -14,4 +14,5 @@ public class ResponseOrgsPlans
     public bool IsOpen { get; set; }
     public string? FormEvalMatrixNameValue { get; set; }
     public DateOnly EstablishmentDate { get; set; }
+    public DateOnly? NextEvaluationDate { get; set; }
 }

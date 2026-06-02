@@ -80,10 +80,15 @@ public class SchoolRepository(IServiceScopeFactory serviceScopeFactory,
 				EstablishmentDate = x.School.EstablishmentDate,
 
 				FormEvalMatrixNameValue = x.School.EvaluationRequests
-	.OrderByDescending(er => er.CreateDate)
+	.OrderBy(s => s.NextEvaluationDate)
+	.ThenByDescending(er => er.CreateDate)
 	.Select(er => requestInfo.Lang == LanguageConst.Ar
 		? er.FormEvalMatrixValue!.NameAr
 		: er.FormEvalMatrixValue!.NameEn)
+	.FirstOrDefault(),
+				NextEvaluationDate = x.School.EvaluationRequests
+	.OrderByDescending(er => er.CreateDate)
+	.Select(s => s.NextEvaluationDate)
 	.FirstOrDefault()
 			});
 

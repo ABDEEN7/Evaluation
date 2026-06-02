@@ -47,18 +47,7 @@ window.renderForceAssignments = function (assignments, divId) {
               `
             : "";
 
-        const sendEmailButton =x.ndaStatusId?.toLowerCase() === NDA_STATUS.PENDING?.toLowerCase()
-                                    ? `
-                                <button class="btn btn-sm btn-outline-primary"
-                                        onclick="sendAssignmentEmail(
-                                            '${x.ministryUserId}',
-                                            '${x.evaluationRequestId}',
-                                            '${(x.ministryUser || '').replace(/'/g, "\\'")}'
-                                        )">
-                                    <i class="las la-envelope"></i>
-                                </button>
-                              `
-                                    : "";
+       
 
         html += `
             <tr id="assignment_row_${x.ministryUserId}">
@@ -74,12 +63,6 @@ window.renderForceAssignments = function (assignments, divId) {
                 <td>${ndaDate}</td>
 
                 <td>${x.note || '-'}</td>
-
-                 <td>
-                        ${sendEmailButton}
-                        ${forceButton}
-                </td>
-
             </tr>
         `;
     });

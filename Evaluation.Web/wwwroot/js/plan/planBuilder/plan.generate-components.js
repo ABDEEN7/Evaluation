@@ -249,7 +249,7 @@
         return label;
     };
 
-    
+
     const generateSchoolNameCell = (fieldId, school) => {
         const ratingClass = RATING_CLASSES[school.rating] || 'bg-light';
         const container = $('<div>').addClass('d-flex align-items-center justify-content-between');
@@ -262,20 +262,14 @@
             .append($('<h6>').addClass('mb-1').text(school.name || '-'))
             .attr('data-name', nameId);
 
-        
+
         if (school.lastEvaluationDate) {
             infoDiv.append(
                 $('<small>')
-                    .addClass('text-muted d-block')
-                    .text(`${t('lblLastEvaluation')}: ${school.lastEvaluationDate}`)
-            );
-        }
-
-        if (school.formEvalMatrixNameValue) {
-            infoDiv.append(
-                $('<small>')
-                    .addClass('text-muted d-block')
-                    .text(school.formEvalMatrixNameValue)
+                    .addClass('text-muted')
+                    .text(
+                        `${t('lblLastEvaluation')}: ${school.lastEvaluationDate}    ${school.formEvalMatrixNameValue}`
+                    )
             );
         }
 
@@ -336,8 +330,14 @@
         return inputElement;
     };
 
-    const generateVisitTypeField = (fieldId, school, readonly) => {
+    const generateVisitTypeField = (fieldId, school, readonly, isSelected = false) => {
         const selectId = `${fieldId}_${school.id}_visitType`;
+
+        const currentYear = new Date().getFullYear();
+        const lastEvalYear = school.nextEvaluationDate
+            ? new Date(school.nextEvaluationDate).getFullYear()
+            : null;
+        const shouldAutoSelect = !isSelected && lastEvalYear === currentYear;
 
         const selectElement = $('<select>')
             .addClass('form-select visitTypeSelect')
@@ -348,9 +348,14 @@
         ns.visitTypes.forEach(type => {
             const option = $('<option>')
                 .val(type.id)
-                .text(type.name);
+                .text(type.name)
+                .attr('data-backendname', type.backendName);
 
-            if (school.visitType === type.name || school.visitTypeId === type.id) {
+            if (shouldAutoSelect && type.backendName === 'Corporate') {
+                
+                option.prop('selected', true);
+            } else if (school.visitType === type.name || school.visitTypeId === type.id) {
+ 
                 option.prop('selected', true);
             }
 
@@ -386,11 +391,21 @@
         const readonly = isReadOnly;
         const row = $('<tr>');
 
+
+        const currentYear = new Date().getFullYear();
+        const lastEvalYear = school.nextEvaluationDate
+            ? new Date(school.nextEvaluationDate).getFullYear()
+            : null;
+        const shouldAutoSelect = !isSelected && lastEvalYear === currentYear;
+
         // Checkbox cell
         const checkboxCell = $('<td>');
-        checkboxCell.append(generateSelectCheckbox(fieldId, school, readonly, isSelected));
+        checkboxCell.append(generateSelectCheckbox(fieldId, school, readonly, isSelected || shouldAutoSelect));
         row.append(checkboxCell);
 
+        if (shouldAutoSelect) {
+            row.attr('data-auto-selected', 'true');
+        }
         // School name cell
         const nameCell = $('<td>');
         nameCell.append(generateSchoolNameCell(fieldId, school));
@@ -407,12 +422,12 @@
         row.append(lastEvalCell);
         // Visit type cell
         const visitTypeCell = $('<td>');
-        visitTypeCell.append(generateVisitTypeField(fieldId, school, readonly));
+        visitTypeCell.append(generateVisitTypeField(fieldId, school, readonly, isSelected));
         row.append(visitTypeCell);
 
         // Academic year cell
         const academicYearCell = $('<td>');
-        const academicYearText = school.academicYear || '-';
+        const academicYearText = school.NEX || '-';
         const yearAcdemicYearText = school.yearAcdemicYear;
 
         academicYearCell.text(
@@ -609,7 +624,7 @@
 
         // Destroy previous instance for this specific fieldId
         if ($input.data('flatpickr')) {
-                $input.data('flatpickr').destroy();
+            $input.data('flatpickr').destroy();
         }
 
         const config = {
