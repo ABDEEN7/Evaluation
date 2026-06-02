@@ -605,46 +605,35 @@
         const $table = $p(fieldId, 'planTable');
         const state = instances.get(fieldId);
 
+        $table.find('tr[data-auto-selected="true"]').each(function () {
+            const $row = $(this);
+            const schoolId = $row.find('.selectRow').data('school-id');
+            const schoolName = $row.find('.selectRow').data('name');
+            const visitDate = $row.find(`.childDate[data-school-id="${schoolId}"]`).val();
+            const visitTypeId = $row.find(`.visitTypeSelect[data-school-id="${schoolId}"]`).val();
+            console.log('auto-selected row:', schoolId, 'visitTypeId:', visitTypeId);
+            console.log('select element:', $row.find(`.visitTypeSelect[data-school-id="${schoolId}"]`).length);
+            console.log('select HTML:', $row.find(`.visitTypeSelect[data-school-id="${schoolId}"]`)[0]?.outerHTML);
+            if (schoolId) {
+                state.selectedSchoolsMap.set(schoolId, {
+                    id: schoolId,
+                    name: schoolName,
+                    visitDate: visitDate,
+                    visitTypeId: visitTypeId
+                });
+            }
+        });
+
+        state.selectedSchools = Array.from(state.selectedSchoolsMap.values());
+        updateSelectionCounter(fieldId);
         $table.find('.selectRow').off('change').on('change', function () {
             updateSelectedSchools(fieldId);
         });
-
         $table.find('.childDate').off('change').on('change', function () {
-            const schoolId = $(this).data('school-id');
-            const newDate = $(this).val();
-            if (state.selectedSchoolsMap && state.selectedSchoolsMap.has(schoolId)) {
-                state.selectedSchoolsMap.get(schoolId).visitDate = newDate;
-                state.selectedSchools = Array.from(state.selectedSchoolsMap.values());
-            }
+            updateSelectedSchools(fieldId);
         });
-
         $table.find('.visitTypeSelect').off('change').on('change', function () {
-            const schoolId = $(this).data('school-id');
-            const newType = $(this).val();
-
-            if (newType) {
-                const $checkbox = $table.find(`.selectRow[data-school-id="${schoolId}"]`);
-                if (!$checkbox.is(':checked')) {
-                    $checkbox.prop('checked', true);
-                }
-
-                if (!state.selectedSchoolsMap.has(schoolId)) {
-                    const schoolName = $checkbox.data('name');
-                    state.selectedSchoolsMap.set(schoolId, {
-                        id: schoolId,
-                        name: schoolName,
-                        visitDate: $table.find(`.childDate[data-school-id="${schoolId}"]`).val() || '',
-                        visitTypeId: newType
-                    });
-                } else {
-                    state.selectedSchoolsMap.get(schoolId).visitTypeId = newType;
-                }
-                state.selectedSchools = Array.from(state.selectedSchoolsMap.values());
-                updateSelectionCounter(fieldId);
-            } else if (state.selectedSchoolsMap.has(schoolId)) {
-                state.selectedSchoolsMap.get(schoolId).visitTypeId = newType;
-                state.selectedSchools = Array.from(state.selectedSchoolsMap.values());
-            }
+            updateSelectedSchools(fieldId);
         });
     };
 

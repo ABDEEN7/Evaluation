@@ -422,7 +422,7 @@
         row.append(lastEvalCell);
         // Visit type cell
         const visitTypeCell = $('<td>');
-        visitTypeCell.append(generateVisitTypeField(fieldId, school, readonly, isSelected));
+        visitTypeCell.append(generateVisitTypeField(fieldId, school, readonly, isSelected, shouldAutoSelect));
         row.append(visitTypeCell);
 
         // Academic year cell
