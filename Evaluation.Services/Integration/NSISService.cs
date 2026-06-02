@@ -1,7 +1,11 @@
 ﻿using AutoMapper;
+using Evaluation.DAL.Models.Org;
+using Evaluation.DAL.Repositories;
 using Evaluation.Services.Special;
+using Evaluation.SharedHelper;
 using Evaluation.SharedHelper.Dtos.NsisIntegrationDto;
 using Evaluation.SharedHelper.Helper;
+using Microsoft.Extensions.DependencyInjection;
 using System.Text;
 using System.Text.Json;
 
@@ -12,13 +16,15 @@ public class NSISService
     private readonly HttpClient _httpClient;
     private readonly LoggingServices _loggingServices;
     private readonly IMapper _mapper;
+    private readonly IServiceScopeFactory serviceScopeFactory;
 
-    public NSISService(HttpClient httpClient, LoggingServices loggingServices, IMapper mapper)
+    public NSISService(HttpClient httpClient, LoggingServices loggingServices, IMapper mapper, IServiceScopeFactory serviceScopeFactory )
     {
         _httpClient = httpClient;
         _loggingServices = loggingServices;
         _mapper = mapper;
-    }
+		this.serviceScopeFactory = serviceScopeFactory;
+	}
 
 
 	public async Task<AuthenticationResponse?> GetTokenAsync()
@@ -165,5 +171,70 @@ public class NSISService
 			return null;
 		}
 	}
+
+	//public async Task SyncAllSchoolClassesAsync()
+	//{
+	//	using var uow = serviceScopeFactory.CreateScopedUow();
+
+	//	var nsisSchools = await GetSchoolsAsync();
+
+	//	if (nsisSchools == null || !nsisSchools.Any())
+	//		return;
+
+	//	foreach (var nsisSchool in nsisSchools)
+	//	{
+	//		if (!Guid.TryParse(nsisSchool.Id, out Guid nsisSchoolId))
+	//			continue;
+
+	//		var school = await uow.GetRepository<OrgTree>()
+	//			.FirstOrDefaultAsync(x => x.NSISCode == nsisSchoolId);
+
+	//		if (school == null)
+	//			continue;
+
+	//		var schoolDetails = await GetSchoolbyIdAsync(nsisSchoolId);
+
+	//		if (schoolDetails?.Classes == null || !schoolDetails.Classes.Any())
+	//			continue;
+
+	//		foreach (var nsisClass in schoolDetails.Classes)
+	//		{
+				
+
+	//			var classCode = nsisClass.ClassCode ;
+
+	//			if (string.IsNullOrWhiteSpace(classCode))
+	//				continue;
+
+	//			var exists = await uow.GetRepository<SchoolClass>()
+	//				.AnyAsync(x =>
+	//					x.SchoolId == school.Id &&
+	//					x.Code == classCode);
+
+	//			if (exists)
+	//				continue;
+
+	//			var schoolClass = new SchoolClass
+	//			{
+	//				Id = Guid.NewGuid(),
+
+	//				SchoolId = school.Id,
+
+	//				NameAr = nsisClass.NameAr ?? string.Empty,
+	//				NameEn = nsisClass.NameEn ?? string.Empty,
+
+	//				Grade = nsisClass.Grade ?? string.Empty,
+	//				Duration = 45,
+
+	//				Code = classCode,
+
+	//			};
+
+	//			await uow.GetRepository<SchoolClass>().AddAsync(schoolClass);
+	//		}
+
+	//		await uow.SaveChangesAsync();
+	//	}
+	//}
 
 }

@@ -78,12 +78,23 @@
         }
     },
     {
+        data: "planName",
+        className: "td-right small-width",
+        render: function(data) {
+            return `
+            <i class="las la-school card-only-icon me-1"></i>
+            <span class="card-only-label me-2">${uiControlsSetup().GetUiControlText("lblPlanName")}:</span>
+            <span class="data-text">${data || 0}</span>
+        `;
+        }
+    },
+    {
         data: "schoolsCount",
         className: "td-full",
         render: function(data) {
             return `
             <i class="las la-school card-only-icon me-1"></i>
-            <span class="card-only-label me-2">Schools count:</span>
+            <span class="card-only-label me-2">${uiControlsSetup().GetUiControlText("lblSchoolsCount")}:</span>
             <span class="data-text">${data || 0}</span>
         `;
         }
@@ -131,7 +142,20 @@
         `;
         }
     },
-     
+     {
+        data: null,
+        className: "td-full small-width",
+        render: function(data, type, row) {
+            return `
+            <i class="las la-calendar-week card-only-icon me-1"></i>
+            <span class="card-only-label me-1">${uiControlsSetup().GetUiControlText("lblPeriod")}:</span>
+            <spandir="rtl" class="data-text">
+                من${uiControlsSetup().GetUiControlText("lblFrom")} ${moment(row.planDateFrom).format("DD/MM/YYYY")}
+                            ${uiControlsSetup().GetUiControlText("lblTo")} ${moment(row.planDateTo).format("DD/MM/YYYY")}
+            </span>
+        `;
+        }
+    }
         ],
         onRowClick: function (rowData) {
             openPlanRequestDetails(rowData.id);

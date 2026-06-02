@@ -5,6 +5,7 @@ namespace Evaluation.SharedHelper.Models.Admin;
 public class DepEvaluationTypeDto : EntityBaseDTO
 {
     public Guid DepartmentId { get; set; }
+    public Guid EvaluationTypeId { get; set; }
     public Department? Department { get; set; }
     public string BackendName { get; set; } = null!;
     public string NameAr { get; set; } = null!;

@@ -136,19 +136,20 @@
                 render: function(data) {
                     return `
                     <i class="las la-school card-only-icon"></i>
-                    <span class="card-only-label me-1"> Schools count: </span>
+                    <span class="card-only-label me-1">${uiControlsSetup().GetUiControlText("lblSchoolsCount")} : </span>
                     ${data || ""}
                     `;
                 }
             },
             {
-            data: null,
-            className: "td-left status-break-row",
-                render: function(data, type, row) {
+                data: null,
+                className: "td-left status-break-row",
+                render: function (data, type, row) {
                     return `
                     <i class="las la-calendar-week card-only-icon"></i>
-                    <span class="card-only-label me-1"> Period: </span>
-                    من ${row.startDate} إلى ${row.endDate}
+                    <span class="card-only-label me-1"> ${uiControlsSetup().GetUiControlText("lblTimePeriod")} : </span>
+                    ${uiControlsSetup().GetUiControlText("lblFrom")} ${moment(row.startDate).format("DD/MM/YYYY")}
+                            ${uiControlsSetup().GetUiControlText("lblTo")} ${moment(row.endDate).format("DD/MM/YYYY")}
                     `;
                 }
             },
@@ -218,14 +219,14 @@
 
         ],
 
-        onRowClick: function(rowData, e) {
+        onRowClick: function (rowData, e) {
 
-          // prevent dropdown clicks from opening details
-          if ($(e.target).closest('.dropdown, .dropdown-menu, .dropdown-item').length) {
-                return;
-          }
-          InitializePlanDetails(rowData.id);
-    }
+            // prevent dropdown clicks from opening details
+            if ($(e.target).closest('.dropdown, .dropdown-menu, .dropdown-item').length) {
+                return;
+            }
+            InitializePlanDetails(rowData.id);
+        }
 
     });
 
@@ -373,7 +374,7 @@
     $('#filterPlanBtnsId').on('click', function () {
         plansListing.reload();
     });
-  
+
     $('#addPlanBtn').on('click', function () {
         window.location.href = '/Plan/Create';
     });

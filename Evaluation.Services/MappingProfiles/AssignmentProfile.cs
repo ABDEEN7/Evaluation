@@ -16,16 +16,22 @@ public class AssignmentProfile : Profile
             ForMember(x => x.Name, opt => opt.MapFrom(src => src.NameEn)).
             ReverseMap();
 
-        CreateMap<MinistryUser, AssignmentDto>()
-           .ForMember(x => x.Name, opt =>
-               opt.MapFrom<TeamResolver, Guid>(src => src.Id))
-           .ForMember(x => x.JobTitle, opt =>
-               opt.MapFrom<JobTitleResolver, Guid>(src => src.Id))
-           .ForMember(x => x.UserPartyTypes, opt =>
-               opt.MapFrom(src => src.UserPartTypes))
-           .ReverseMap();
-
-        CreateMap<UserPartyType, UserPartyTypeDto>()
+		CreateMap<MinistryUser, AssignmentDto>()
+		.ForMember(x => x.Name,
+			opt => opt.MapFrom<TeamResolver, Guid>(src => src.Id))
+		.ForMember(x => x.JobTitle,
+			opt => opt.MapFrom<JobTitleResolver, Guid>(src => src.Id))
+		.ForMember(x => x.UserPartyTypes,
+			opt => opt.MapFrom(src => src.UserPartTypes))
+		.ForMember(x => x.ScopeIds,
+			opt => opt.MapFrom(src =>
+				src.UserTeams!
+					.SelectMany(ut => ut.UserTeamScope)
+					.Select(uts => uts.ScopeId)
+					.Distinct()
+			))
+		.ReverseMap();
+		CreateMap<UserPartyType, UserPartyTypeDto>()
             .ReverseMap();
 
         CreateMap<PartyType, PartyTypeDto>()

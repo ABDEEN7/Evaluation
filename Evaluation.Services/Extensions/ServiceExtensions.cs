@@ -116,9 +116,9 @@ public static class ServiceExtensions
 
         services.AddScoped<ISmsServices, SmsServices>();
         services.AddScoped<MasterBL>();
-        services.AddScoped<NSISService>();
+		services.AddHttpClient<NSISService>();
 
-    }
+	}
     public static UnitOfWork CreateScopedUow(this IServiceProvider serviceProvider)
     {
         var scope = serviceProvider.CreateScope();

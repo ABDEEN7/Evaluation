@@ -174,6 +174,7 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
             if (!await CheckEvaluationForm(message.Id))
             {
                 obj.IsFinalEval = message.IsFinalEval;
+                obj.FinalEvalMatrixId = message.FinalEvalMatrixId;
             }
             else
             {
@@ -225,6 +226,7 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
             if (!await CheckEvaluationForm(message.Id))
             {
                 obj.IsFinalEval = message.IsFinalEval;
+                obj.FinalEvalMatrixId = message.FinalEvalMatrixId;
             }
             else
             {

@@ -157,7 +157,7 @@
         const container = $('<div>')
             .attr('id', `${fieldId}_semesterContainer`)
             .addClass('col-md-4')
-            .css('display', field?.visible !== false ? 'block' : 'none');
+            .css('display', field?.visible === true ? 'block' : 'none');
 
         const selectElement = $('<select>')
             .attr('id', `${fieldId}_ddlSemester`)
@@ -249,6 +249,7 @@
         return label;
     };
 
+
     const generateSchoolNameCell = (fieldId, school) => {
         const ratingClass = RATING_CLASSES[school.rating] || 'bg-light';
         const container = $('<div>').addClass('d-flex align-items-center justify-content-between');
@@ -260,6 +261,17 @@
         infoDiv
             .append($('<h6>').addClass('mb-1').text(school.name || '-'))
             .attr('data-name', nameId);
+
+
+        if (school.lastEvaluationDate) {
+            infoDiv.append(
+                $('<small>')
+                    .addClass('text-muted')
+                    .text(
+                        `${t('lblLastEvaluation')}: ${school.lastEvaluationDate}    ${school.formEvalMatrixNameValue}`
+                    )
+            );
+        }
 
         // Org parent (small label)
         if (school.orgParent?.nameEn) {
@@ -318,8 +330,14 @@
         return inputElement;
     };
 
-    const generateVisitTypeField = (fieldId, school, readonly) => {
+    const generateVisitTypeField = (fieldId, school, readonly, isSelected = false) => {
         const selectId = `${fieldId}_${school.id}_visitType`;
+
+        const currentYear = new Date().getFullYear();
+        const lastEvalYear = school.nextEvaluationDate
+            ? new Date(school.nextEvaluationDate).getFullYear()
+            : null;
+        const shouldAutoSelect = !isSelected && lastEvalYear === currentYear;
 
         const selectElement = $('<select>')
             .addClass('form-select visitTypeSelect')
@@ -330,9 +348,14 @@
         ns.visitTypes.forEach(type => {
             const option = $('<option>')
                 .val(type.id)
-                .text(type.name);
+                .text(type.name)
+                .attr('data-backendname', type.backendName);
 
-            if (school.visitType === type.name || school.visitTypeId === type.id) {
+            if (shouldAutoSelect && type.backendName === 'Corporate') {
+                
+                option.prop('selected', true);
+            } else if (school.visitType === type.name || school.visitTypeId === type.id) {
+ 
                 option.prop('selected', true);
             }
 
@@ -368,11 +391,21 @@
         const readonly = isReadOnly;
         const row = $('<tr>');
 
+
+        const currentYear = new Date().getFullYear();
+        const lastEvalYear = school.nextEvaluationDate
+            ? new Date(school.nextEvaluationDate).getFullYear()
+            : null;
+        const shouldAutoSelect = !isSelected && lastEvalYear === currentYear;
+
         // Checkbox cell
         const checkboxCell = $('<td>');
-        checkboxCell.append(generateSelectCheckbox(fieldId, school, readonly, isSelected));
+        checkboxCell.append(generateSelectCheckbox(fieldId, school, readonly, isSelected || shouldAutoSelect));
         row.append(checkboxCell);
 
+        if (shouldAutoSelect) {
+            row.attr('data-auto-selected', 'true');
+        }
         // School name cell
         const nameCell = $('<td>');
         nameCell.append(generateSchoolNameCell(fieldId, school));
@@ -383,19 +416,18 @@
         visitDateCell.append(generateVisitDateField(fieldId, school, readonly));
         row.append(visitDateCell);
 
-        // Last evaluation date cell
+        // establishmentDate date cell
         const lastEvalCell = $('<td>');
-        lastEvalCell.text(school.lastEvaluationDate || '-');
+        lastEvalCell.text(school.establishmentDate || '-');
         row.append(lastEvalCell);
-
         // Visit type cell
         const visitTypeCell = $('<td>');
-        visitTypeCell.append(generateVisitTypeField(fieldId, school, readonly));
+        visitTypeCell.append(generateVisitTypeField(fieldId, school, readonly, isSelected));
         row.append(visitTypeCell);
 
         // Academic year cell
         const academicYearCell = $('<td>');
-        const academicYearText = school.academicYear || '-';
+        const academicYearText = school.NEX || '-';
         const yearAcdemicYearText = school.yearAcdemicYear;
 
         academicYearCell.text(
@@ -592,7 +624,7 @@
 
         // Destroy previous instance for this specific fieldId
         if ($input.data('flatpickr')) {
-                $input.data('flatpickr').destroy();
+            $input.data('flatpickr').destroy();
         }
 
         const config = {
