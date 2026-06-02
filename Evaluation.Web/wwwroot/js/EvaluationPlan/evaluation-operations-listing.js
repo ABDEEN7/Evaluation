@@ -155,6 +155,22 @@
                 }
             },
             {
+                data: "planName",
+                title: uiControlsSetup().GetUiControlText("lblPlanName"),
+                className: "td-left py-0 status-break-row  align-content-end",
+                render: function (data) {
+
+                    if (!data) return "_";
+
+                    return `  
+                    
+                        <i class="las la-school card-only-icon me-1"></i>
+                        <strong class ="text-truncate-2">${data}</strong>
+                    
+                `;
+                }
+            },
+            {
                 data: "createOn",
                 title: uiControlsSetup().GetUiControlText("lblRequestCreatedDate"),
                 className: "td-left py-0",

@@ -42,7 +42,7 @@ window.renderForceAssignments = function (assignments, divId) {
             ? `
                 <button class="btn btn-danger btn-sm"
                         onclick="forceAssignmentStatus('${x.ministryUserId}','${x.evaluationRequestId}')">
-                    Force
+                    ${uiControlsSetup().GetUiControlText('lblForce')}
                 </button>
               `
             : "";
@@ -73,7 +73,17 @@ window.renderForceAssignments = function (assignments, divId) {
 
                 <td>${ndaDate}</td>
 
-                <td>${x.note || '-'}</td>
+               <td>
+                    ${x.note
+                                ? `<span data-bs-toggle="tooltip"
+                                 data-bs-placement="top"
+                                 title="${x.note.replace(/"/g, '&quot;')}">
+                                ${x.note.length > 50
+                                    ? x.note.substring(0, 50) + '...'
+                                    : x.note}
+                           </span>`
+                                : '-'}
+               </td>
 
                  <td>
                         ${sendEmailButton}
@@ -90,6 +100,10 @@ window.renderForceAssignments = function (assignments, divId) {
     `;
 
     container.html(html);
+
+    container.find('[data-bs-toggle="tooltip"]').each(function () {
+        new bootstrap.Tooltip(this);
+    });
 };
 
 window.forceAssignmentStatus = async function (ministryUserId, evaluationRequestId) {

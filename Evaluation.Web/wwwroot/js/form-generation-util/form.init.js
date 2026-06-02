@@ -681,19 +681,17 @@ window.formUtility = window.formUtility || {};
 
 
     const GetDropdownOptionsForTabulator = () => {
-
-        let lang = currentLang;
-        if (!dropdowns || !Array.isArray(dropdowns)) {
+        if (!Array.isArray(window.dropdowns)) {
             return [];
         }
-        const result = dropdowns.map(x => {
-            var item = { id: x.id, value: lang == 'ar' ? x.titleAr : x.titleEn, };
 
-            return item;
-        });
+        const isArabic = currentLang === "ar";
 
-        return result;
-    }
+        return window.dropdowns.map(x => ({
+            id: x.id,
+            value: isArabic ? x.titleAr : x.titleEn
+        }));
+    };
     function toggleAddButtonVisibility(tableId, addButtonId, maxCount, maxCountNew, minCountNew) {
         const addButton = $('#' + addButtonId);
         if (!addButton.length) return;

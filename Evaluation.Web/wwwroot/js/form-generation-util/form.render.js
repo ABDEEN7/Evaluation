@@ -28,7 +28,7 @@ window.serviceRequestForm = window.serviceRequestForm || {};
         history.pushState(null, "", url.pathname + url.search);
     }
     const getText = (key) =>
-        (window.uiControlsSetup && uiControlsSetup().GetUiControlText(key)) || "";
+        ( uiControlsSetup().GetUiControlText(key)) || "";
 
   
     const getRequestId = () => {
