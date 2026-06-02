@@ -135,7 +135,7 @@
             <i class="las la-calendar-week card-only-icon me-1"></i>
             <span class="card-only-label me-1">${uiControlsSetup().GetUiControlText("lblPeriod")}:</span>
             <spandir="rtl" class="data-text">
-                من${uiControlsSetup().GetUiControlText("lblFrom")} ${moment(row.planDateFrom).format("DD/MM/YYYY")}
+                ${uiControlsSetup().GetUiControlText("lblFrom")} ${moment(row.planDateFrom).format("DD/MM/YYYY")}
                             ${uiControlsSetup().GetUiControlText("lblTo")} ${moment(row.planDateTo).format("DD/MM/YYYY")}
             </span>
         `;
