@@ -132,24 +132,42 @@
     },
             {
                 data: "countSchools",
-                className: "td-left status-break-row align-content-center",
+                className: "td-full",
                 render: function(data) {
                     return `
-                    <i class="las la-school card-only-icon"></i>
-                    <span class="card-only-label me-1">${uiControlsSetup().GetUiControlText("lblSchoolsCount")} : </span>
+                    <i class="las la-school card-only-icon me-1"></i>
+                    <span class="card-only-label me-2">${uiControlsSetup().GetUiControlText("lblSchoolsCount")} : </span>
                     ${data || ""}
                     `;
                 }
             },
-            {
+             {
                 data: null,
-                className: "td-left status-break-row",
+                className: "td-full",
                 render: function (data, type, row) {
+
                     return `
-                    <i class="las la-calendar-week card-only-icon"></i>
-                    <span class="card-only-label me-1"> ${uiControlsSetup().GetUiControlText("lblTimePeriod")} : </span>
-                    ${uiControlsSetup().GetUiControlText("lblFrom")} ${moment(row.startDate).format("DD/MM/YYYY")}
-                            ${uiControlsSetup().GetUiControlText("lblTo")} ${moment(row.endDate).format("DD/MM/YYYY")}
+                    <i class="las la-calendar-week card-only-icon me-1"></i>
+                    <span class="card-only-label me-1">
+                        ${uiControlsSetup().GetUiControlText("lblTimePeriod")}:
+                    </span>
+                    <span>
+                        <span class="card-only-label me-1">
+                            ${uiControlsSetup().GetUiControlText("lblFrom")}
+                        </span>
+
+                        <span class="data-text me-2">
+                            ${moment(row.startDate).format("DD/MM/YYYY")}
+                        </span>
+
+                        <span class="card-only-label me-1">
+                            ${uiControlsSetup().GetUiControlText("lblTo")}
+                        </span>
+
+                        <span class="data-text">
+                            ${moment(row.endDate).format("DD/MM/YYYY")}
+                        </span>
+                    </span>
                     `;
                 }
             },
