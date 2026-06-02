@@ -89,42 +89,43 @@
         },
 
         columns: [
-           {
-            data: "name",
-           className: "td-left td-70 mt-1",
-            render: function(data, type, row) {
-                const isApproved = row.statusCode === "Approved";
-                return `
-                    <div class="plan-title-row mb-3">
- 
-                        <i class="las la-file-signature card-only-icon title-icon"></i>
- 
-                        <span class="plan-text-wrap px-2">
-                    <span class="card-only-label title-label">Plan: </span>
-                    <span class="plan-title-text">${data || ""}</span>
-                    </span>
- 
-                     
- 
-                    </div>
-                    `;
-                              }
-            },
-            {
-        data: "statusCode",
-        className: "td-right td-30 justify-content-end",
+         {
+    data: "name",
+        className: "td-full mb-4",
         render: function(data, type, row) {
 
-            const isApproved = row.statusCode === "Approved";
+            const statusColor =
+                row.statusCode === "Approved"
+                    ? "#198754"
+                    : "#cccccc";
 
-            if (!isApproved) return "";
+            const textColor = "#000";
 
             return `
-        <div class="d-flex justify-content-end">
-            <span class="request-status approved-status bg-success-light py-1 px-2">
-                <i class="las la-check"></i>
-                ${row.statusCode}
-            </span>
+        <div class="request-info">
+
+            <div class="request-icon"
+                 style="background-color:${statusColor}; color:${textColor};">
+
+                <i class="las la-file-signature"></i>
+
+            </div>
+
+            <div class="request-text">
+
+                <div class="request-header">
+                    ${data || ""}
+                </div>
+
+                <div class="request-status-text"
+                     style="color:${statusColor};">
+
+                    ${row.statusCode || ""}
+
+                </div>
+
+            </div>
+
         </div>
         `;
         }
@@ -153,7 +154,7 @@
             },
             {
                 data: 'services',
-                className: "td-full p-0 process",
+                className: "td-full p-0 process mt-4",
                 title: uiControlsSetup().GetUiControlText('lblActions'),
                 orderable: false,
                 render: function (data, type, row, meta) {

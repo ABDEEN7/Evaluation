@@ -266,11 +266,15 @@ section, .section {
 }
 
 .color-primary {
-    color: var(--color-primary);
+    color: var(--color-primary) !important;
 }
 
 .justify-items-end {
     justify-items: end !important;
+}
+
+.place-content-end {
+    place-content: end !important;
 }
 /*--------------------------------------------------------------
 # Enhance Layout
@@ -1746,10 +1750,8 @@ input.auto-fill {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-
-
     font-weight: 600;
-    color: #666;
+   
 }
 
 
@@ -1783,6 +1785,8 @@ input.auto-fill {
 
 .data-text {
     font-size: clamp(0.85rem, 1vw, 1rem) !important;
+    color: #000 !important;
+    font-weight: 600;
 }
 
 
@@ -5694,4 +5698,71 @@ input[type="number"] {
 
 table.dataTable tbody tr.child-row > td {
     background-color: #8a153815 !important;
+}
+
+
+
+
+
+/*NEW CARDS DESIGN*/
+.application-request.card .requeststableBody .plan-request-card td {
+    height: 30px !important;
+}
+
+
+
+.request-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.request-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 8px;
+    color: #fff !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.request-icon i {
+    font-size: 18px;
+}
+
+.request-text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.request-header {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #000;
+    line-height: 1.2;
+}
+
+.request-status-text {
+    font-size: 0.95rem;
+    margin-top: 2px;
+    font-weight: 700;
+}
+
+
+.school-name-row {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    min-width: 0;
+}
+
+.ellipsis-text {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+    font-size: 14px !important;
 }

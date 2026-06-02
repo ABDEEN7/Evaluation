@@ -76,68 +76,68 @@
         rowClass: 'plan-request-card',
 
         columns: [
+         {
+    data: "evaluationType",
+        title: uiControlsSetup().GetUiControlText("lblEvaluationPlan"),
+        className: "td-full mb-4",
+        render: function(data, type, row) {
+
+            const isCompleted = row.StatusISOPen === false;
+            const statusColor = isCompleted ? "#0E6B32" : "#A63D40";
+            const statusText = isCompleted ? "مكتمل" : "غير مكتمل";
+
+            return `
+        <div class="request-info">
+
+            <div class="request-icon"
+                 style="background-color:${statusColor}; color:#000;">
+
+                <i class="las la-certificate"></i>
+
+            </div>
+
+            <div class="request-text">
+
+                <div class="request-header">
+                    ${data || ""}
+                </div>
+
+                <div class="request-status-text"
+                     style="color:${statusColor};">
+
+                    ${statusText}
+
+                </div>
+
+            </div>
+
+        </div>
+        `;
+        }
+    },
           {
-            data: "evaluationType",
-                title: uiControlsSetup().GetUiControlText("lblEvaluationPlan"),
-                className: "td-left py-1 td-70",
-                render: function(data) {
+        data: "orgTreeName",
+        title: uiControlsSetup().GetUiControlText("lblSchoolName"),
+        className: "td-full",
+        render: function(data) {
 
-                    return `
-                <div class="plan-title-row">
-                    <i class="las la-certificate card-only-icon title-icon"></i>
+            if (!data) return "_";
 
-                    <span class="plan-text-wrap px-1">
-                        <span class="plan-title-text">${data || ""}</span>
-                    </span>
-                </div>
-                `;
-                }
-            },
-            {
-            data: "Status",
-            title: uiControlsSetup().GetUiControlText("lblRequestStatus"),
-            className: "td-right py-1 place-content-end td-30",
-            render: function(data, type, row) {
+            return `  
+        <div class="ellipsis school-name-row">
+            <i class="las la-school card-only-icon me-1"></i>
 
-                const isCompleted = row.StatusISOPen === false;
-
-               return `
-                <div class="d-flex justify-content-end">
-                    ${isCompleted ? `
-                    <span class="request-status approved-status bg-success-light py-1 px-2">
-                        <i class="las la-check"></i>
-                        مكتمل
-                    </span>
-                    ` : `
-                    <span class="request-status approved-status bg-danger-light text-danger py-1 px-2">
-                        <i class="las la-times"></i>
-                        غير مكتمل
-                    </span>
-                    `}
-                </div>
-                `;
-                }
-            },
-            {
-                data: "orgTreeName",
-                title: uiControlsSetup().GetUiControlText("lblSchoolName"),
-                className: "td-left py-0 status-break-row  align-content-end",
-                render: function(data) {
-
-                    if (!data) return "_";
-
-                    return `  
-                    
-                        <i class="las la-school card-only-icon me-1"></i>
-                        <strong class ="text-truncate-2">${data}</strong>
-                    
-                `;
-                }
-             },
+            <strong class="ellipsis-text">
+                ${data}
+            </strong>
+        </div>
+        `;
+        }
+    },
             {
                 data: "status",
                 title: uiControlsSetup().GetUiControlText("lblRequestNo"),
-                className: "td-left status-break-row py-0 align-content-end",
+                className: "td-full mb-3",
                 render: function (data, type, row) {
 
                     if (!data) return "_";
@@ -155,37 +155,43 @@
                 }
             },
             {
-                data: "createOn",
-                title: uiControlsSetup().GetUiControlText("lblRequestCreatedDate"),
-                className: "td-left py-0",
-                render: function(data) {
+        data: "createOn",
+        title: uiControlsSetup().GetUiControlText("lblRequestCreatedDate"),
+        className: "td-right",
+        render: function(data) {
 
-                    if (!data) return "_";
+            if (!data) return "_";
 
-                    return `
-                <i class="las la-calendar card-only-icon"></i>
-                <span class="card-only-label mx-1"> Created on:  </span>
-                ${moment(data).format("DD-MM-YYYY")}
-                `;
-                }
-            },
-            {
-                data: "createOn",
-                title: uiControlsSetup().GetUiControlText("lblRequestCreatedTime"),
-                className: "td-right bg-grey justify-content-end py-0",
-                render: function(data) {
+            return `
+        <i class="las la-calendar card-only-icon color-primary me-1"></i>
 
-                    if (!data) return "_";
+        <span class="data-text me-1">
+            ${moment(data).format("DD-MM-YYYY")}
+        </span>
+        `;
+        }
+    },
+    {
+        data: "createOn",
+        title: uiControlsSetup().GetUiControlText("lblRequestCreatedTime"),
+        className: "td-left place-content-end",
+        render: function(data) {
 
-                    return `
-                <div class="d-flex justify-content-end align-items-center">
-                    <i class="las la-clock card-only-icon"></i>
-                    <span class="card-only-label mx-1">Created at: </span>
-                    ${moment(data).format("hh:mm A")}
-                </div>
-                `;
-                }
-            },
+            if (!data) return "_";
+
+            return `
+        <div class="d-flex justify-content-end place-content-end">
+
+            <i class="las la-clock card-only-icon color-primary me-1"></i>
+
+            <span class="data-text me-1">
+                ${moment(data).format("hh:mm A")}
+            </span>
+
+        </div>
+        `;
+        }
+    },
             
         ],
 
