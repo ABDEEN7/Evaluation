@@ -31,43 +31,44 @@
         tableViewBtnId: 'tblViewPlanRequest',
         rowClass: 'plan-request-card',
         columns: [     
-        
-            {
-                data: "service",
-                className: "td-left py-1 td-70",
-                 render: function(data, type, row) {
-           
-                return `
-                    <div class="plan-title-row mb-3"> 
-                        <i class="las la-file-signature card-only-icon title-icon"></i>
-                        <span class="plan-text-wrap px-2">
-                    <span class="card-only-label title-label">${uiControlsSetup().GetUiControlText("lblRequest")}: </span>
-                    <span class="plan-title-text">${data || ""}</span>
-                    </span>
-                    </div>
-                    `;
-                }
-            },
-            {
-        data: "status",
-        title: uiControlsSetup().GetUiControlText("lblRequestStatus"),
-        className: "td-right py-1 place-content-end td-30",
+       {
+    data: "planName",
+        className: "td-full mb-4",
         render: function(data, type, row) {
+
             const statusColor = row.statusColor || "#cccccc";
             const textColor = "#000";
+
             return `
-            <div class="d-flex justify-content-end w-100 mb-3">
-                <span class="request-status py-1 px-3"
-                      style="background-color:${statusColor};color:${textColor};">
-                    ${data || ""}
-                </span>
+        <div class="request-info">
+
+            <div class="request-icon"
+                 style="background-color:${statusColor}; color:${textColor};">
+
+                <i class="las la-school"></i>
+
             </div>
+
+            <div class="request-text">
+
+                <div class="request-header">
+                    ${data || ""}
+                </div>
+
+                <div class="request-status-text" style="color:${statusColor};">
+                    ${row.status || ""}
+                </div>
+
+            </div>
+
+        </div>
         `;
         }
     },
+        
             {
         data: "requestNumber",
-        className: "td-left small-width",
+        className: "td-full",
         render: function(data) {
             return `
             <i class="las la-file-alt card-only-icon me-1"></i>
@@ -76,20 +77,10 @@
         `;
         }
     },
-    {
-        data: "planName",
-        className: "td-right small-width",
-        render: function(data) {
-            return `
-            <i class="las la-school card-only-icon me-1"></i>
-            <span class="card-only-label me-2">${uiControlsSetup().GetUiControlText("lblPlanName")}:</span>
-            <span class="data-text">${data || 0}</span>
-        `;
-        }
-    },
+  
     {
         data: "schoolsCount",
-        className: "td-right small-width",
+        className: "td-full",
         render: function(data) {
             return `
             <i class="las la-school card-only-icon me-1"></i>
@@ -99,48 +90,49 @@
         }
     },
     {
+        data: null,
+        className: "td-full mb-3",
+        render: function(data, type, row) {
+            return `
+            <i class="las la-calendar-week card-only-icon me-1"></i>
+            <span class="card-only-label me-1">${uiControlsSetup().GetUiControlText("lblPeriod")}:</span>
+            <span>
+              <span class="card-only-label me-1">${uiControlsSetup().GetUiControlText("lblFrom")}</span><span class="data-text me-1">${moment(row.planDateFrom).format("DD/MM/YYYY")}</span>
+                        <span class="card-only-label me-1">${uiControlsSetup().GetUiControlText("lblTo")}</span><span class="data-text me-1">${moment(row.planDateTo).format("DD/MM/YYYY")}</span>
+            </span>
+        `;
+        }
+    },
+    {
         data: "createOn",
         title: uiControlsSetup().GetUiControlText("lblRequestCreatedDate"),
-        className: "td-left small-width",
+        className: "td-right",
         render: function(data) {
             if (!data) return "_";
             return `
-            <i class="las la-calendar card-only-icon"></i>
-            <span class="card-only-label mx-1">${uiControlsSetup().GetUiControlText("evalRequestlblcreatedOn")}:</span>
-            <span class="data-text">${moment(data).format("DD-MM-YYYY")}</span>
+            <i class="las la-calendar card-only-icon color-primary me-1"></i>
+         
+            <span class="data-text me-1">${moment(data).format("DD-MM-YYYY")}</span>
         `;
         }
     },
     {
         data: "createOnTime",
         title: uiControlsSetup().GetUiControlText("lblRequestCreatedTime"),
-        className: "td-right small-width",
+        className: "td-left place-content-end",
         render: function(data) {
             if (!data) return "_";
 
             return `
-            <div class="d-flex justify-content-end align-items-center">
-                <i class="las la-clock card-only-icon"></i>
-                <span class="card-only-label mx-1">${uiControlsSetup().GetUiControlText("evalRequestlblCreatedAt")}:</span>
-                <span class="data-text">${moment(data).format("hh:mm A")}</span>
+            <div class="d-flex justify-content-end place-content-end">
+                <i class="las la-clock card-only-icon color-primary me-1"></i>
+            
+                <span class="data-text me-1">${moment(data).format("hh:mm A")}</span>
             </div>
         `;
         }
     },
-     {
-        data: null,
-        className: "td-full small-width",
-        render: function(data, type, row) {
-            return `
-            <i class="las la-calendar-week card-only-icon me-1"></i>
-            <span class="card-only-label me-1">${uiControlsSetup().GetUiControlText("lblPeriod")}:</span>
-            <spandir="rtl" class="data-text">
-                ${uiControlsSetup().GetUiControlText("lblFrom")} ${moment(row.planDateFrom).format("DD/MM/YYYY")}
-                            ${uiControlsSetup().GetUiControlText("lblTo")} ${moment(row.planDateTo).format("DD/MM/YYYY")}
-            </span>
-        `;
-        }
-    }
+     
         ],
         onRowClick: function (rowData) {
             openPlanRequestDetails(rowData.id);

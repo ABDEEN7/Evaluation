@@ -89,72 +89,91 @@
         },
 
         columns: [
-            {
-                data: "name",
-                className: "td-left td-70 mt-1",
-                render: function (data, type, row) {
-                    const isApproved = row.statusCode === "Approved";
-                    return `
-                    <div class="plan-title-row mb-3">
- 
-                        <i class="las la-file-signature card-only-icon title-icon"></i>
- 
-                        <span class="plan-text-wrap px-2">
-                    <span class="card-only-label title-label">${uiControlsSetup().GetUiControlText("lblEvaluationOperationsTable.Plan")} : </span>
-                    <span class="plan-title-text">${data || ""}</span>
-                    </span>
- 
-                     
- 
-                    </div>
-                    `;
-                }
-            },
-            {
-                data: "statusCode",
-                className: "td-right td-30 justify-content-end",
-                render: function (data, type, row) {
+         {
+    data: "name",
+        className: "td-full mb-4",
+        render: function(data, type, row) {
 
-                    const isApproved = row.statusCode === "Approved";
+            const statusColor =
+                row.statusCode === "Approved"
+                    ? "#198754"
+                    : "#cccccc";
 
-                    if (!isApproved) return "";
+            const textColor = "#000";
 
-                    return `
-        <div class="d-flex justify-content-end">
-            <span class="request-status approved-status bg-success-light py-1 px-2">
-                <i class="las la-check"></i>
-                ${row.statusCode}
-            </span>
+            return `
+        <div class="request-info">
+
+            <div class="request-icon"
+                 style="background-color:${statusColor}; color:${textColor};">
+
+                <i class="las la-file-signature"></i>
+
+            </div>
+
+            <div class="request-text">
+
+                <div class="request-header">
+                    ${data || ""}
+                </div>
+
+                <div class="request-status-text"
+                     style="color:${statusColor};">
+
+                    ${row.statusCode || ""}
+
+                </div>
+
+            </div>
+
         </div>
         `;
-                }
-            },
+        }
+    },
             {
                 data: "countSchools",
-                className: "td-left status-break-row align-content-center",
-                render: function (data) {
+                className: "td-full",
+                render: function(data) {
                     return `
-                    <i class="las la-school card-only-icon"></i>
-                    <span class="card-only-label me-1">${uiControlsSetup().GetUiControlText("lblSchoolsCount")} : </span>
+                    <i class="las la-school card-only-icon me-1"></i>
+                    <span class="card-only-label me-2">${uiControlsSetup().GetUiControlText("lblSchoolsCount")} : </span>
                     ${data || ""}
                     `;
                 }
             },
-            {
+             {
                 data: null,
-                className: "td-left status-break-row",
+                className: "td-full",
                 render: function (data, type, row) {
+
                     return `
-                    <i class="las la-calendar-week card-only-icon"></i>
-                    <span class="card-only-label me-1"> ${uiControlsSetup().GetUiControlText("lblTimePeriod")} : </span>
-                    ${uiControlsSetup().GetUiControlText("lblFrom")} ${moment(row.startDate).format("DD/MM/YYYY")}
-                            ${uiControlsSetup().GetUiControlText("lblTo")} ${moment(row.endDate).format("DD/MM/YYYY")}
+                    <i class="las la-calendar-week card-only-icon me-1"></i>
+                    <span class="card-only-label me-1">
+                        ${uiControlsSetup().GetUiControlText("lblTimePeriod")}:
+                    </span>
+                    <span>
+                        <span class="card-only-label me-1">
+                            ${uiControlsSetup().GetUiControlText("lblFrom")}
+                        </span>
+
+                        <span class="data-text me-2">
+                            ${moment(row.startDate).format("DD/MM/YYYY")}
+                        </span>
+
+                        <span class="card-only-label me-1">
+                            ${uiControlsSetup().GetUiControlText("lblTo")}
+                        </span>
+
+                        <span class="data-text">
+                            ${moment(row.endDate).format("DD/MM/YYYY")}
+                        </span>
+                    </span>
                     `;
                 }
             },
             {
                 data: 'services',
-                className: "td-full p-0 process",
+                className: "td-full p-0 process mt-4",
                 title: uiControlsSetup().GetUiControlText('lblActions'),
                 orderable: false,
                 render: function (data, type, row, meta) {
