@@ -73,13 +73,13 @@ function CommonLogicAfterInitial() {
             if (!this.checked) {
                 $("label[for='EvalFormsHasOneValue']").show();
                 $("#EvalFormsHasOneValue").parent().show();
-                $("label[for='FinalEvalMatrixEval']").show();
-                $("#FinalEvalMatrixEval").parent().show();
+                $("label[for='FinalEvalMatrixEval']").hide();
+                $("#FinalEvalMatrixEval").parent().hide();
             } else {
                 $("label[for='EvalFormsHasOneValue']").hide();
                 $("#EvalFormsHasOneValue").parent().hide();
-                $("label[for='FinalEvalMatrixEval']").hide();
-                $("#FinalEvalMatrixEval").parent().hide();
+                $("label[for='FinalEvalMatrixEval']").show();
+                $("#FinalEvalMatrixEval").parent().show();
             }
         });
     $(document).off("change", "#EvalFormHasMuliEvaluation")
