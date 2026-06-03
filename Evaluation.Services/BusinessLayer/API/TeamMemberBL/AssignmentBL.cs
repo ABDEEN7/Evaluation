@@ -73,10 +73,22 @@ public class AssignmentBL(IServiceScopeFactory serviceScopeFactory,
         if (teamId != null)
             member = member.Where(x => x.UserTeams!.Any(t => t.TeamId == teamId));
 
-        var memberWithParty = await member
-            .Include(x => x.UserPartTypes!)
-            .ThenInclude(w => w.PartyType).ToListAsync();
-        var memberTeamDto = mapper.Map<List<AssignmentDto>>(memberWithParty);
+		var memberWithParty = await member
+	   .Where(x => x.UserPartTypes!.Any(up =>
+		   up.PartyType != null &&
+		   up.PartyType.DepartmentId == requestInfo.DepId))
+
+	   .Include(x => x.UserTeams)
+		   .ThenInclude(ut => ut.UserTeamScope)
+			   .ThenInclude(uts => uts.Scope)
+
+	   .Include(x => x.UserPartTypes!
+		   .Where(up => up.PartyType != null &&
+						up.PartyType.DepartmentId == requestInfo.DepId))
+		   .ThenInclude(up => up.PartyType)
+
+	   .ToListAsync();
+		var memberTeamDto = mapper.Map<List<AssignmentDto>>(memberWithParty);
         return memberTeamDto;
     }
     public async Task<List<ScopeDto>> GetScopesAsync()

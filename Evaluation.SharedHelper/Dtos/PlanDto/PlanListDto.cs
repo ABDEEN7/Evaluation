@@ -11,6 +11,6 @@ public class PlanListDto
     public string? StatusCode { get; set; }
     public int? CountSchools { get; set; }
     public Guid PlanStatusId { get; set; }
-
-	public IList<ServiceDTO>? Services { get; set; }
+    public DateTime CreateDate { get; set; }
+    public IList<ServiceDTO>? Services { get; set; }
 }

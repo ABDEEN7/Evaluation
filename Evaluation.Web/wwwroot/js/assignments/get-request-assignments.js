@@ -245,7 +245,6 @@
             <th>${t('lblDomain')}</th>
             <th>${t('lblPartyType')}</th>
             <th>${t('lblTeamLeader')}</th>
-            ${state.evaluationRequestId ? `<th>${t('lblSendMail')}</th>` : ''}
         `;
 
         $thead.html(headerHTML);
@@ -359,19 +358,6 @@
             // Check if this member is team leader
             const isLeaderChecked = member.id === state.teamLeaderId || member.isLeader ? 'checked' : '';
 
-            const sendMailBtnHTML = state.evaluationRequestId ? `
-                                  <td>
-                                            <button class="btn btn-sm btn-outline-primary"
-                                                    onclick="sendAssignmentEmail(
-                                                        '${member.id}',
-                                                        '${state.evaluationRequestId}',
-                                                        '${memberName}'
-                                                    )">
-                                                <i class="las la-envelope"></i>
-                                            </button>
-                                        </td>
-                            ` : ``;
-
             return `
     <tr data-selected-id="${member.id}">
         <td>
@@ -412,7 +398,6 @@
                 <span class="checkmark"></span>
             </label>
         </td>
-        ${sendMailBtnHTML}
     </tr>
 `;
         }).join('');
@@ -670,7 +655,7 @@
                 });
             });
 
-        // إضافة عضو للفريق المحدد
+        
         $(document).off('change', `${id('userTable')} .row-select`)
             .on('change', `${id('userTable')} .row-select`, function () {
                 if (!this.checked) {
@@ -699,9 +684,12 @@
                     ? userPartyTypes[0].partyType.id
                     : null;
 
+                
+                const defaultScopes = (member.scopeIds || []).map(String);
+
                 state.selectedAssignments.push({
                     ...member,
-                    scopes: [],
+                    scopes: defaultScopes, 
                     nda: null,
                     partyTypeId: autoSelectedPartyTypeId,
                     isLeader: false
@@ -821,7 +809,7 @@
                     cancelText: sharedFn().GetUiControlText('WEB_CANCEL')
                 },
                     result => {
-                        
+
                         const response = jqClient().Post(API_ENDPOINTS.SEND_MAIL_NOTIFICATION,
                             { userId: memberId, evaluationRequestId: state.evaluationRequestId });
 
@@ -833,7 +821,7 @@
                     });
             });
     }
-    window.sendAssignmentEmail = async function ( ministryUserId,evaluationRequestId, ministryUser ) {
+    window.sendAssignmentEmail = async function (ministryUserId, evaluationRequestId, ministryUser) {
 
         const confirmMessage =
             uiControlsSetup().GetUiControlText("WEB_CONFIRM_SEND_EMAIL")

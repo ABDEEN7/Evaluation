@@ -621,7 +621,27 @@
         $table.find('.visitTypeSelect').off('change').on('change', function () {
             const schoolId = $(this).data('school-id');
             const newType = $(this).val();
-            if (state.selectedSchoolsMap && state.selectedSchoolsMap.has(schoolId)) {
+
+            if (newType) {
+                const $checkbox = $table.find(`.selectRow[data-school-id="${schoolId}"]`);
+                if (!$checkbox.is(':checked')) {
+                    $checkbox.prop('checked', true);
+                }
+
+                if (!state.selectedSchoolsMap.has(schoolId)) {
+                    const schoolName = $checkbox.data('name');
+                    state.selectedSchoolsMap.set(schoolId, {
+                        id: schoolId,
+                        name: schoolName,
+                        visitDate: $table.find(`.childDate[data-school-id="${schoolId}"]`).val() || '',
+                        visitTypeId: newType
+                    });
+                } else {
+                    state.selectedSchoolsMap.get(schoolId).visitTypeId = newType;
+                }
+                state.selectedSchools = Array.from(state.selectedSchoolsMap.values());
+                updateSelectionCounter(fieldId);
+            } else if (state.selectedSchoolsMap.has(schoolId)) {
                 state.selectedSchoolsMap.get(schoolId).visitTypeId = newType;
                 state.selectedSchools = Array.from(state.selectedSchoolsMap.values());
             }
