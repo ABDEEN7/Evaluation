@@ -51,10 +51,20 @@ public class EvaluationRequestBL(IServiceScopeFactory serviceScopeFactory, Cache
 
         var evaluationRequestResult = await evaluationRequestService.GetEvaluationRequestsByOrgTreeId(orgTreeId, model);
 
-        result.Data = mapper.Map<List<EvaluationRequestDTO>>(evaluationRequestResult, opts => opts.Items["lang"] = requestInfo.Lang);
-
-
-        result.TotalDataCount = evaluationRequestResult.Count;
+		result.Data = evaluationRequestResult
+	                .Select(x => new EvaluationRequestDTO
+	                {
+		                Id = x.Id,
+		                RequestNumber = x.RequestNumber,
+		                Status = requestInfo.Lang == "ar"? x.ServiceStatus!.NameAr: x.ServiceStatus!.NameEn,
+						FromDate = DateOnly.FromDateTime(x.FromDate),
+						ToDate = DateOnly.FromDateTime(x.ToDate),
+						EvaluationDate = x.EvaluationDate,
+		                NextEvaluationDate = x.NextEvaluationDate,
+		                EvaluationResult = requestInfo.Lang == "ar" ? x.FormEvalMatrixValue?.NameAr : x.FormEvalMatrixValue?.NameEn
+					})
+	                .ToList();
+		result.TotalDataCount = evaluationRequestResult.Count;
         Int32.TryParse(await cacheDataProvider.GetSystemSettingValue(ConstantKeys.WebAppSettings.PAGE_SIZE_FOR_SCHOOL_EVALUATION_REQUESTS), out int recordsPerPage);
         var pageSize = recordsPerPage;
         result.PageNumber = model.PageNumber.Value;

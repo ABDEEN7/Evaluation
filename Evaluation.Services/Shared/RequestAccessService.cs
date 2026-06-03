@@ -105,8 +105,13 @@ namespace Evaluation.Services.Shared
 				query = query.Where(x =>
 					(x.Assignments != null && x.Assignments.Any(a =>
 						a.MinistryUserId == userId)) ||
-					x.CreateById == userId);
-				
+					x.CreateById == userId ||
+					(x.EvaluationRequestId != null &&
+					 x.EvaluationRequest != null &&
+					 x.EvaluationRequest.EvaluationRequestAssignments != null &&
+					 x.EvaluationRequest.EvaluationRequestAssignments.Any(a =>
+						 a.MinistryUserId == userId))
+				);
 			}
 
 			query = query.Where(x =>

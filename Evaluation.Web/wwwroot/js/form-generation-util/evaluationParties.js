@@ -28,7 +28,14 @@
         return { open, closed };
     };
     Dropzone.autoDiscover = false;
-    window.AddFileClick = function (partyId, requestId) {
+    window.AddFileClick = function (partyId, requestId, isEvaluationRequestOpen) {
+
+        if (!window.isEvaluationRequestOpen) {
+            notificationUtil.error(
+                uiControlsSetup().GetUiControlText("msgCannotAddSupportingFiles")
+            );
+            return;
+        }
         $("#EvaluationfileModal").modal('show');
         $("#EvaluationfileSectionRequestId").val(requestId);
 
@@ -343,11 +350,20 @@
             var filedivid = "Filediv_" + partyId;
             const filesHTML = `
            <div class="mb-3">
-            <button type="button"
-                                        class="btn btn-sm btn-primary btn-add-eval-request"
-                                        data-party-id="${escapeHtml(partyId)}" onclick="AddFileClick('${partyId}','${requestId}')">
-                                  <i class="la la-plus"></i> Add Files
-                                </button>
+           ${options.isEvaluationRequestOpen === true ? `
+                    <button type="button"
+                            class="btn btn-sm btn-primary btn-add-support-file"
+                            data-party-id="${escapeHtml(partyId)}"
+                            onclick="AddFileClick('${partyId}','${requestId}', true)">
+                        <i class="la la-plus"></i> Add Files
+                    </button>
+                ` : `
+                    <button type="button"
+                            class="btn btn-sm btn-secondary"
+                            disabled>
+                        <i class="la la-lock"></i> Add Files
+                    </button>
+                `}
                            </div>    
                   <div class="table-card rounded overflow-hidden">
                     <div class="table-responsive">

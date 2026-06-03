@@ -74,7 +74,8 @@
         cardViewBtnId: 'cardViewEvaluationRequest',
         tableViewBtnId: 'tblViewEvaluationRequest',
         rowClass: 'plan-request-card',
-
+        tabLabelSelector: '#tabEvaluationOperations .my-1',
+        tabLabelKey: 'TabEvaluationOperations',
         columns: [
           {
             data: "evaluationType",
@@ -154,6 +155,75 @@
                 `;
                 }
             },
+
+            {
+                data: "evlDateFrom",
+                title: uiControlsSetup().GetUiControlText("lblEvaluationDateFrom"),
+                className: "td-left py-0",
+                render: function (data, type, row) {
+                    if (!data) return "_";
+
+                    const daysLeft = getDaysUntil(data);
+                    const isOverdue = daysLeft !== null && daysLeft < 0;
+                    const isUrgent = daysLeft !== null && daysLeft >= 0 && daysLeft <= 3;
+                    const isWarning = daysLeft !== null && daysLeft > 3 && daysLeft <= 10;
+
+                    let countdownBadge = '';
+                    let nearNote = '';
+
+                    if (isOverdue) {
+                        countdownBadge = `
+            <span class="badge ms-2" style="background:#FCEBEB;color:#A32D2D;border-radius:20px;padding:2px 8px;font-size:11px;">
+                <i class="las la-exclamation-circle me-1"></i>متأخر ${Math.abs(daysLeft)} يوم
+            </span>`;
+                        nearNote = `
+            <div class="mt-1" style="background:#FCEBEB;color:#A32D2D;border-radius:6px;padding:3px 8px;font-size:11px;display:inline-flex;align-items:center;gap:4px;">
+                <i class="las la-exclamation-triangle"></i>
+                تجاوز موعد التقييم
+            </div>`;
+                    } else if (isUrgent) {
+                        countdownBadge = `
+            <span class="badge ms-2" style="background:#FCEBEB;color:#A32D2D;border-radius:20px;padding:2px 8px;font-size:11px;">
+                <i class="las la-clock me-1"></i>${daysLeft} يوم متبقي
+            </span>`;
+                        nearNote = `
+            <div class="mt-1" style="background:#FCEBEB;color:#A32D2D;border-radius:6px;padding:3px 8px;font-size:11px;display:inline-flex;align-items:center;gap:4px;">
+                <i class="las la-exclamation-triangle"></i>
+                هذه المدرسة على وشك التقييم
+            </div>`;
+                    } else if (isWarning) {
+                        countdownBadge = `
+            <span class="badge ms-2" style="background:#FAEEDA;color:#854F0B;border-radius:20px;padding:2px 8px;font-size:11px;">
+                <i class="las la-clock me-1"></i>${daysLeft} يوم متبقي
+            </span>`;
+                        nearNote = `
+            <div class="mt-1" style="background:#FAEEDA;color:#854F0B;border-radius:6px;padding:3px 8px;font-size:11px;display:inline-flex;align-items:center;gap:4px;">
+                <i class="las la-exclamation-triangle"></i>
+                هذه المدرسة على وشك التقييم
+            </div>`;
+                    }
+
+                    const fmt = ["M/D/YYYY", "MM/DD/YYYY", "YYYY-MM-DD", "DD-MM-YYYY"];
+                    const displayFrom = moment(data.split(' ')[0], fmt, false).format("DD-MM-YYYY");
+                    const displayTo = row.evlDateTo
+                        ? moment(row.evlDateTo.split(' ')[0], fmt, false).format("DD-MM-YYYY")
+                        : null;
+
+                    const dateRange = displayTo
+                        ? `<span style="white-space:nowrap;">${displayFrom} <i class="las la-arrow-right mx-1 opacity-50"></i> ${displayTo}</span>`
+                        : `<span>${displayFrom}</span>`;
+
+                    return `
+    <div>
+        <div class="d-flex align-items-center gap-1">
+            <i class="las la-calendar card-only-icon"></i>
+            ${dateRange}
+            ${countdownBadge}
+        </div>
+        ${nearNote}
+    </div>`;
+                }
+            },
             {
                 data: "planName",
                 title: uiControlsSetup().GetUiControlText("lblPlanName"),
@@ -204,7 +274,16 @@
             },
             
         ],
-
+        rowCallback: function (row, data) {
+            const days = getDaysUntil(data.evlDateFrom);
+            if (days !== null && days < 0) {
+                $(row).css('border-left', '3px solid #E24B4A');    
+            } else if (days !== null && days <= 3) {
+                $(row).css('border-left', '3px solid #E24B4A');    
+            } else if (days !== null && days <= 10) {
+                $(row).css('border-left', '3px solid #BA7517');    
+            }
+        },
         onRowClick: function (rowData) {
             openEvaluationRequestDetails(rowData.id);
         }
@@ -221,7 +300,7 @@
                 $('#breadcrumbSchoolName').text((window.currentLang === "ar" ? response.school.nameAr : response.school.nameEn) || '');
                 $('#evaluationRequestDetailsModal').modal('show');
 
-
+                window.isEvaluationRequestOpen = response.statusISOPen;
                 const formAccordionItem = document.getElementById("formAccordionItem");
 
                 if (!response.formGroups || response.formGroups.length === 0) {
@@ -260,7 +339,7 @@
                 }
 
                 bindSchoolDetails(response);
-
+                bindEvaluationDates(response);
                 if (response.assignment && response.assignment.length > 0) {
 
                     $("#forceAssignmentAccordion").removeClass("d-none");
@@ -289,6 +368,64 @@
         $root.find("#phone").text(s.phone || '');
         $root.find("#email").text(s.orgEmail || '');
         $root.find("#address").text(s.address || '');
+    }
+
+    function bindEvaluationDates(response) {
+        const fmt = ["M/D/YYYY", "MM/DD/YYYY", "YYYY-MM-DD", "DD-MM-YYYY"];
+        const fromRaw = response.evlDateFrom || '';
+        const toRaw = response.evlDateTo || '';
+
+        const $container = $('#evaluationDateRangeContainer').empty();
+        if (!fromRaw) return;
+
+        const displayFrom = moment(fromRaw.split(' ')[0], fmt, false).format("DD-MM-YYYY");
+        const displayTo = toRaw
+            ? moment(toRaw.split(' ')[0], fmt, false).format("DD-MM-YYYY")
+            : null;
+
+        const daysLeft = getDaysUntil(fromRaw);
+        const isOverdue = daysLeft !== null && daysLeft < 0;
+        const isUrgent = daysLeft !== null && daysLeft >= 0 && daysLeft <= 3;
+        const isWarning = daysLeft !== null && daysLeft > 3 && daysLeft <= 10;
+
+        let badge = '';
+        let note = '';
+
+        if (isOverdue) {
+            badge = `<span style="background:#FCEBEB;color:#A32D2D;border-radius:20px;padding:2px 10px;font-size:12px;display:inline-flex;align-items:center;gap:4px;">
+                    <i class="las la-exclamation-circle"></i> متأخر ${Math.abs(daysLeft)} يوم
+                 </span>`;
+            note = `<div style="background:#FCEBEB;color:#A32D2D;border-radius:6px;padding:4px 10px;font-size:12px;display:inline-flex;align-items:center;gap:6px;margin-top:4px;">
+                    <i class="las la-exclamation-triangle"></i> تجاوز موعد التقييم
+                 </div>`;
+        } else if (isUrgent) {
+            badge = `<span style="background:#FCEBEB;color:#A32D2D;border-radius:20px;padding:2px 10px;font-size:12px;display:inline-flex;align-items:center;gap:4px;">
+                    <i class="las la-clock"></i> ${daysLeft} يوم متبقي
+                 </span>`;
+            note = `<div style="background:#FCEBEB;color:#A32D2D;border-radius:6px;padding:4px 10px;font-size:12px;display:inline-flex;align-items:center;gap:6px;margin-top:4px;">
+                    <i class="las la-exclamation-triangle"></i> هذه المدرسة على وشك التقييم
+                 </div>`;
+        } else if (isWarning) {
+            badge = `<span style="background:#FAEEDA;color:#854F0B;border-radius:20px;padding:2px 10px;font-size:12px;display:inline-flex;align-items:center;gap:4px;">
+                    <i class="las la-clock"></i> ${daysLeft} يوم متبقي
+                 </span>`;
+            note = `<div style="background:#FAEEDA;color:#854F0B;border-radius:6px;padding:4px 10px;font-size:12px;display:inline-flex;align-items:center;gap:6px;margin-top:4px;">
+                    <i class="las la-exclamation-triangle"></i> هذه المدرسة على وشك التقييم
+                 </div>`;
+        }
+
+        const dateRange = displayTo
+            ? `${displayFrom} <i class="las la-arrow-right mx-1 opacity-50"></i> ${displayTo}`
+            : displayFrom;
+
+        $container.html(`
+        <div class="d-flex align-items-center gap-2 flex-wrap mt-1">
+            <i class="las la-calendar text-muted fs-14"></i>
+            <span style="white-space:nowrap;font-size:13px;">${dateRange}</span>
+            ${badge}
+        </div>
+        ${note}
+    `);
     }
     function renderEvaluationPartiesSection(response, requestId) {
         const parties = response?.evaluationParties || [];
@@ -373,6 +510,15 @@
 
       </div>
     </div>`;
+    }
+
+    function getDaysUntil(dateStr) {
+        if (!dateStr) return null;
+        // strip time portion: "10/8/2025 12:00:00 AM" → "10/8/2025"
+        const datePart = dateStr.split(' ')[0];
+        const target = moment(datePart, ["M/D/YYYY", "MM/DD/YYYY", "YYYY-MM-DD", "DD-MM-YYYY"], false).startOf('day');
+        if (!target.isValid()) return null;
+        return target.diff(moment().startOf('day'), 'days');
     }
     function NdaSubmit(response, requestId) {
         const btn = document.getElementById('ndaSubmitBtn');

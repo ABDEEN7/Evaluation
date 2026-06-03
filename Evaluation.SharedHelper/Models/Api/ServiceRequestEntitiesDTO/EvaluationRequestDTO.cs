@@ -78,6 +78,8 @@ namespace Evaluation.SharedHelper.Models.Api.ServiceRequestEntitiesDTO
 
         public DateOnly FromDate { get; set; }
         public DateOnly ToDate { get; set; }
+        public string? EvlDateFrom { get; set; }
+        public string? EvlDateTo { get; set; }
         public DateOnly? EvaluationDate { get; set; }
         public DateOnly? NextEvaluationDate { get; set; }
         public string? EvaluationResult { get; set; }
