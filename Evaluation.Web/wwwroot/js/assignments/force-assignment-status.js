@@ -33,6 +33,7 @@ window.renderForceAssignments = function (assignments, divId) {
             <tbody>
     `;
 
+
     assignments.forEach(x => {
 
         const ndaDate = x.ndaDate
@@ -42,12 +43,23 @@ window.renderForceAssignments = function (assignments, divId) {
             ? `
                 <button class="btn btn-danger btn-sm"
                         onclick="forceAssignmentStatus('${x.ministryUserId}','${x.evaluationRequestId}')">
-                    ${uiControlsSetup().GetUiControlText('lblForce')}
+                    Force
                 </button>
               `
             : "";
 
-       
+        const sendEmailButton = x.ndaStatusId?.toLowerCase() === NDA_STATUS.PENDING?.toLowerCase()
+            ? `
+                                <button class="btn btn-sm btn-outline-primary"
+                                        onclick="sendAssignmentEmail(
+                                            '${x.ministryUserId}',
+                                            '${x.evaluationRequestId}',
+                                            '${(x.ministryUser || '').replace(/'/g, "\\'")}'
+                                        )">
+                                    <i class="las la-envelope"></i>
+                                </button>
+                              `
+            : "";
 
         html += `
             <tr id="assignment_row_${x.ministryUserId}">
@@ -62,17 +74,7 @@ window.renderForceAssignments = function (assignments, divId) {
 
                 <td>${ndaDate}</td>
 
-               <td>
-                    ${x.note
-                                ? `<span data-bs-toggle="tooltip"
-                                 data-bs-placement="top"
-                                 title="${x.note.replace(/"/g, '&quot;')}">
-                                ${x.note.length > 50
-                                    ? x.note.substring(0, 50) + '...'
-                                    : x.note}
-                           </span>`
-                                : '-'}
-               </td>
+                <td>${x.note || '-'}</td>
 
                  <td>
                         ${sendEmailButton}
