@@ -280,7 +280,9 @@ window.formUtility = window.formUtility || {};
               
 
                 case 'select2': {
-                    const isMultiSelect = field.attributes?.some(attr => attr.name === 'Multi_Value_Select');
+                    const isMultiSelect = field.Attributes?.some(attr =>
+                        (attr.name || attr.Name)?.toLowerCase().trim() === 'multi_value_select'
+                    );
 
                     select2Fields.push({
                         id: `${prefield}${field.fieldId}`,
@@ -620,12 +622,14 @@ window.formUtility = window.formUtility || {};
                         column.formatter = (cell) => {
                             let value = cell.getValue();
                             if (!value) return "";
-
+                            const isMultiSelect = field.Attributes?.some(attr =>
+                                (attr.name || attr.Name)?.toLowerCase().trim() === 'multi_value_select'
+                            );
                             if (typeof value === "string") {
                                 try {
                                     if (value.startsWith("[") && value.endsWith("]")) {
                                         value = JSON.parse(value);
-                                    } else if (value.includes(",")) {
+                                    } else if (isMultiSelect && value.includes(",")) {
                                         value = value.split(",").map(v => v.trim());
                                     }
                                 } catch { }
@@ -635,8 +639,13 @@ window.formUtility = window.formUtility || {};
 
                             const options = GetDropdownOptionsForTabulator(field) || [];
                             const map = new Map(options.map(o => [String(o.id), o.value]));
-
                             const labels = value.map(v => map.get(String(v)) || v);
+
+                            if (isMultiSelect && labels.length > 1) {
+                                return labels.map(l =>
+                                    `<span style="background:var(--bs-primary-bg-subtle);color:var(--bs-primary);border-radius:20px;padding:1px 8px;font-size:11px;margin:1px;display:inline-block;">${l}</span>`
+                                ).join(' ');
+                            }
 
                             return labels.join(", ");
                         };
