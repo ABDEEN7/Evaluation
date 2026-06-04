@@ -31,6 +31,8 @@ let evalForm;
 let P_countOfColumnsValue;
 let P_hasMuliEvaluation;
 
+const initializedForms = new Set();
+
 const SELECTORS = {
     tbody: 'tbodyRows'
 };
@@ -53,8 +55,7 @@ const escapeHtml = (text = '', isRename = false, itemId = null, fieldId = null, 
         div.textContent = text;
         return div.innerHTML;
     }
-    else
-    {
+    else {
         const input = document.createElement("input");
         input.type = "text";
         input.className = "form-control form-control-sm item-name";
@@ -68,7 +69,7 @@ const escapeHtml = (text = '', isRename = false, itemId = null, fieldId = null, 
         }
 
         return input.outerHTML;
- 
+
     }
 
 };
@@ -95,16 +96,16 @@ const generateFormAccordionItem = (rowsHtml, hasAnyNote, hasAnyChildren, fieldId
                         ${hasAnyChildren ? '<th></th>' : ''}
                         <th>#</th>
                          ${!isRename ?
-                        `
+        `
                         <th>المعايير</th>
                        
                         ${hasMuliEvaluation
-                                ? Array.from({ length: countOfColumnsValue }, (_, i) =>
-                                    `<th>${formItemConfigs[i].formItemConfig_NameAr}</th>`
-                                ).join('')
-                                : '<th>اختر التقييم</th>'}
+            ? Array.from({ length: countOfColumnsValue }, (_, i) =>
+                `<th>${formItemConfigs[i].formItemConfig_NameAr}</th>`
+            ).join('')
+            : '<th>اختر التقييم</th>'}
                                 ${hasAnyNote ? '<th>الشواهد وأثرها</th>' : ''}
-                        ` : ` <th>الاولويات</th> ${allowDelete ?'<th></th>':''}`}
+                        ` : ` <th>الاولويات</th> ${allowDelete ? '<th></th>' : ''}`}
                    
                     </tr>
                 </thead>
@@ -128,11 +129,11 @@ const generateFormAccordionItem = (rowsHtml, hasAnyNote, hasAnyChildren, fieldId
 // ==============================
 // Field Builders
 // ==============================
-const buildSelection = (item, fieldId, readOnly, index=0) => `
+const buildSelection = (item, fieldId, readOnly, index = 0) => `
 <select class="form-select eval-select"
         id="${fieldId}_${item.id}_Select_${index}"
         data-id="${item.id}"
-        ${P_hasMuliEvaluation ? `data-config-weight-percentage= "${item.formItemConfigs[index].formItemConfig_Percentage}"`:``}
+        ${P_hasMuliEvaluation ? `data-config-weight-percentage= "${item.formItemConfigs[index].formItemConfig_Percentage}"` : ``}
         ${readOnly ? 'disabled' : ''}>
 </select>
 `;
@@ -189,7 +190,7 @@ const createRow = ({
     ${!isRename ?
         `
 
-         ${hasMuliEvaluation?`
+         ${hasMuliEvaluation ? `
     ${Array.from({ length: countOfColumnsValue }, (_, index) => `
     <td>
         ${buildSelection(item, fieldId, readOnly, index)}
@@ -207,7 +208,7 @@ const createRow = ({
         <span class="validation-message text-danger small mt-1" id="validation-${item.id}-${ItemPropertyType.NOTE}"style="display:none;"></span>
     </td>` : ''}
 
-    ` : `${allowDelete ?`<td><button type="button" class="btn btn-sm delete-btn" onclick="deleteRow(this)"><i class="la la-trash"></i></button></td>`:''}`
+    ` : `${allowDelete ? `<td><button type="button" class="btn btn-sm delete-btn" onclick="deleteRow(this)"><i class="la la-trash"></i></button></td>` : ''}`
     }
     
 </tr>
@@ -247,44 +248,42 @@ const generateTableBodyHtml = async (
     let firstitem = items[0];
     const firstitemCollapseId = `collapse-${firstitem.id}`;
     lastOrder = 1;
-    if (isRename)
-    {
+    if (isRename) {
         let firstRow = createRow({
             item: firstitem,
             order: lastOrder,
-            collapseId:firstitemCollapseId,
+            collapseId: firstitemCollapseId,
             hasChildrenColumn: hasAnyChildren,
-            hasAnyNote:hasAnyNote,
-            fieldId:fieldId,
-            readOnly:readOnly,
-            isRename:isRename,
-            allowRename:allowRename,
-            allowDelete:allowDelete,
-            hasMuliEvaluation:hasMuliEvaluation,
-            countOfColumnsValue:countOfColumnsValue
+            hasAnyNote: hasAnyNote,
+            fieldId: fieldId,
+            readOnly: readOnly,
+            isRename: isRename,
+            allowRename: allowRename,
+            allowDelete: allowDelete,
+            hasMuliEvaluation: hasMuliEvaluation,
+            countOfColumnsValue: countOfColumnsValue
         });
 
         renameItems.shift()
 
         return firstRow;
     }
-    else
-    {
+    else {
         let rows = items.map((item, i) => {
 
             const collapseId = `collapse-${item.id}`;
             const mainRow = createRow({
-                item:item,
+                item: item,
                 order: i + 1,
-                collapseId:collapseId,
+                collapseId: collapseId,
                 hasChildrenColumn: hasAnyChildren,
-                hasAnyNote:hasAnyNote,
-                fieldId:fieldId,
-                readOnly:readOnly,
-                isRename:isRename,
-                allowRename:allowRename,
-                allowDelete:allowDelete,
-                hasMuliEvaluation:hasMuliEvaluation,
+                hasAnyNote: hasAnyNote,
+                fieldId: fieldId,
+                readOnly: readOnly,
+                isRename: isRename,
+                allowRename: allowRename,
+                allowDelete: allowDelete,
+                hasMuliEvaluation: hasMuliEvaluation,
                 countOfColumnsValue: countOfColumnsValue
             });
 
@@ -292,15 +291,15 @@ const generateTableBodyHtml = async (
                 createRow({
                     item: { ...child, parentId: item.id },
                     order: `${i + 1}.${idx + 1}`,
-                    collapseId:collapseId,
+                    collapseId: collapseId,
                     isChild: true,
                     hasChildrenColumn: hasAnyChildren,
-                    hasAnyNote:hasAnyNote,
-                    fieldId:fieldId,
-                    readOnly:readOnly,
-                    isRename:isRename,
-                    hasMuliEvaluation:hasMuliEvaluation,
-                    countOfColumnsValue:countOfColumnsValue
+                    hasAnyNote: hasAnyNote,
+                    fieldId: fieldId,
+                    readOnly: readOnly,
+                    isRename: isRename,
+                    hasMuliEvaluation: hasMuliEvaluation,
+                    countOfColumnsValue: countOfColumnsValue
                 })
             ).join('');
 
@@ -315,8 +314,7 @@ const generateTableBodyHtml = async (
 };
 
 
-function addNewRow(button)
-{
+function addNewRow(button) {
     if (renameItems.length > 0) {
 
         let firstitem = renameItems[0];
@@ -347,8 +345,7 @@ function addNewRow(button)
             button.style.display = "none";
         }
     }
-    else
-    {
+    else {
         //return error message
     }
 
@@ -399,13 +396,12 @@ function buildHorizontalTable(data) {
     const nameRow = document.createElement("tr");
     const rangeRow = document.createElement("tr");
 
-    // Row 1: Names
+    // Row 1: Header label
     const nameCell = document.createElement("th");
     nameCell.textContent = "Name";
-    //nameCell.className = 'table-grey';
     nameRow.appendChild(nameCell);
-    tHeadnameRow.appendChild(nameRow);
-    // Row 2: Range
+
+    // Row 2: Range label
     const rangeCell = document.createElement("td");
     rangeCell.textContent = `Range`;
     rangeRow.appendChild(rangeCell);
@@ -414,9 +410,7 @@ function buildHorizontalTable(data) {
         // Row 1: Names
         const nameCell = document.createElement("th");
         nameCell.textContent = item.name;
-        //nameCell.className = 'table-grey';
         nameRow.appendChild(nameCell);
-        tHeadnameRow.appendChild(nameRow);
 
         // Row 2: Min - Max
         const rangeCell = document.createElement("td");
@@ -424,6 +418,8 @@ function buildHorizontalTable(data) {
         rangeRow.appendChild(rangeCell);
     });
 
+    // Append once after loop
+    tHeadnameRow.appendChild(nameRow);
     table.appendChild(tHeadnameRow);
     table.appendChild(rangeRow);
 
@@ -481,7 +477,7 @@ const generateFullFormPageHtml = async ({ formId,
                 name: map.get(item.id) // replace name
             }));
     }
-    
+
 
     const hasAnyNote = items.some(i => i.hasNote);
     const hasAnyChildren = items.some(i => i.subFormItems?.length);
@@ -494,8 +490,7 @@ const generateFullFormPageHtml = async ({ formId,
     P_allowAdd = allowAdd;
     P_isRename = isRename;
 
-    if (isRename)
-    {
+    if (isRename) {
         renameItems = itemsResult?.value.items;
     }
 
@@ -554,13 +549,17 @@ const relatedItemPopup = (rowsHtml) => `<div class="modal fade" id="RealatedItem
 // ==============================
 async function initializeControls(formId, fieldId, controlValues) {
 
+    // Prevent duplicate initialization for the same fieldId
+    if (initializedForms.has(fieldId)) return;
+    initializedForms.add(fieldId);
+
     const matrixResponse = await jqClient().Get(
         GET_FORMS_API.getMatrixValues(depRoutePath, formId)
     );
 
     P_matrixResponse = matrixResponse;
 
-    
+
     const itemsData = itemsResult?.value?.items ?? [];
 
     const matrixValues = matrixResponse?.value ?? matrixResponse ?? [];
@@ -578,14 +577,14 @@ async function initializeControls(formId, fieldId, controlValues) {
         });
     }
 
-    
+
     const matrixOptions = matrixValues.map(({ id, name, actualMatrixValue }) => {
         const option = new Option(name, id);
         option.setAttribute('data-actual-value', actualMatrixValue);
         return option;
     });
 
-    
+
     const subItemListsMap = new Map();
     itemsData.forEach(item => {
         (item.subFormItems || []).forEach(subItem => {
@@ -614,7 +613,6 @@ async function initializeControls(formId, fieldId, controlValues) {
                         select.add(new Option(nameAr || nameEn, id));
                     });
                 } else {
-
                     matrixOptions.forEach(option => select.add(option.cloneNode(true)));
                 }
             } else {
@@ -642,12 +640,13 @@ async function initializeControls(formId, fieldId, controlValues) {
         );
     });
 
-    const table = buildHorizontalTable(matrixValues);
     const container = document.getElementById(`${fieldId}-index-table`);
-    container.appendChild(table);
+    if (container) {
+        const table = buildHorizontalTable(matrixValues);
+        container.appendChild(table);
+    }
 }
 async function openRelatedItemModal(id) {
-
 
     let relatedItems = itemsResult?.value.items.find(r => r.id == id)?.relatedItems ?? [];
 
@@ -671,8 +670,7 @@ async function openRelatedItemModal(id) {
     modal.show();
 }
 
-function deleteRow(button)
-{
+function deleteRow(button) {
     const row = button.closest("tr");
 
     const input = row.querySelector('.item-name');

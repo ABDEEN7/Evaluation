@@ -12,44 +12,44 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Evaluation.Services.BusinessLayer.API;
 
 public class EvaluationRequestBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider,
-        UnitOfWork uow, LoggingServices loggingServices, IMapper mapper, UserInfo userInfo,
-        IServiceProvider serviceProvider, RequestInfo requestInfo, EvaluationRequestService evaluationRequestService, ServiceRequestService serviceRequestService)
-        : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, requestInfo)
+		UnitOfWork uow, LoggingServices loggingServices, IMapper mapper, UserInfo userInfo,
+		IServiceProvider serviceProvider, RequestInfo requestInfo, EvaluationRequestService evaluationRequestService, ServiceRequestService serviceRequestService)
+		: ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, requestInfo)
 {
 
-    public async Task<List<EvaluationRequestCalenderDto>> GetEvaluationRequestsForCalender(string[] monthes)
-    {
-        var evaluationRequestResult = await evaluationRequestService.GetEvaluationRequests(monthes);
-        var serviceRequestResult = await serviceRequestService.GetServiceRequestsByEvaluationRequestIds(evaluationRequestResult.Select(er => er.Id).ToList());
+	public async Task<List<EvaluationRequestCalenderDto>> GetEvaluationRequestsForCalender(string[] monthes)
+	{
+		var evaluationRequestResult = await evaluationRequestService.GetEvaluationRequests(monthes);
+		var serviceRequestResult = await serviceRequestService.GetServiceRequestsByEvaluationRequestIds(evaluationRequestResult.Select(er => er.Id).ToList());
 
-        List<EvaluationRequestCalenderDto> evaluationRequestCalenderDtos = new List<EvaluationRequestCalenderDto>();
+		List<EvaluationRequestCalenderDto> evaluationRequestCalenderDtos = new List<EvaluationRequestCalenderDto>();
 
-        var mappedEvaluationRequest = mapper.Map<List<EvaluationRequestCalenderDto>>(evaluationRequestResult);
-        var mappedServiceRequest = mapper.Map<List<EvaluationRequestCalenderDto>>(serviceRequestResult);
+		var mappedEvaluationRequest = mapper.Map<List<EvaluationRequestCalenderDto>>(evaluationRequestResult);
+		var mappedServiceRequest = mapper.Map<List<EvaluationRequestCalenderDto>>(serviceRequestResult);
 
-        foreach (var item in mappedEvaluationRequest)
-        {
-            item.Url = $"/{requestInfo.Lang}/evaluationplan{requestInfo.DepRouting}?Evlid={item.Id}";
-        }
+		foreach (var item in mappedEvaluationRequest)
+		{
+			item.Url = $"/{requestInfo.Lang}/evaluationplan{requestInfo.DepRouting}?Evlid={item.Id}";
+		}
 
-        
-        //TODO: waiting until complete the routing url
-        //foreach (var item in mappedServiceRequest)
-        //{
-        //    item.Url = $"https://localhost:7221/en/evaluationplan/{requestInfo.DepRouting}?Evlid={item.Id}";
-        //}
 
-        evaluationRequestCalenderDtos.AddRange(mappedEvaluationRequest);
-        evaluationRequestCalenderDtos.AddRange(mappedServiceRequest);
+		//TODO: waiting until complete the routing url
+		//foreach (var item in mappedServiceRequest)
+		//{
+		//    item.Url = $"https://localhost:7221/en/evaluationplan/{requestInfo.DepRouting}?Evlid={item.Id}";
+		//}
 
-        return evaluationRequestCalenderDtos;
-    }
+		evaluationRequestCalenderDtos.AddRange(mappedEvaluationRequest);
+		evaluationRequestCalenderDtos.AddRange(mappedServiceRequest);
 
-    public async Task<WebAppEvaluationRequestsDTO> GetEvaluationRequestsByOrgTreeId(Guid orgTreeId, FilterRequestsDTO model)
-    {
-        var result = new WebAppEvaluationRequestsDTO();
+		return evaluationRequestCalenderDtos;
+	}
 
-        var evaluationRequestResult = await evaluationRequestService.GetEvaluationRequestsByOrgTreeId(orgTreeId, model);
+	public async Task<WebAppEvaluationRequestsDTO> GetEvaluationRequestsByOrgTreeId(Guid orgTreeId, FilterRequestsDTO model)
+	{
+		var result = new WebAppEvaluationRequestsDTO();
+
+		var evaluationRequestResult = await evaluationRequestService.GetEvaluationRequestsByOrgTreeId(orgTreeId, model);
 
 		result.Data = evaluationRequestResult
 	                .Select(x => new EvaluationRequestDTO
@@ -71,22 +71,22 @@ public class EvaluationRequestBL(IServiceScopeFactory serviceScopeFactory, Cache
         result.PageSize = pageSize;
         result.IsRemainingData = result.Data.Count >= result.PageSize;
 
-        return result;
-    }
+		return result;
+	}
 
-    public async Task<Result<EvaluationRequestCalenderDto>> UpdateEvaluationRequest(EvaluationRequestCalenderDto evaluationRequestCalenderDto)
-    {
-        if (evaluationRequestCalenderDto == null)
-            return Result.Fail<EvaluationRequestCalenderDto>("evaluation request is null.");
+	public async Task<Result<EvaluationRequestCalenderDto>> UpdateEvaluationRequest(EvaluationRequestCalenderDto evaluationRequestCalenderDto)
+	{
+		if (evaluationRequestCalenderDto == null)
+			return Result.Fail<EvaluationRequestCalenderDto>("evaluation request is null.");
 
-        //var evaluationRequest = await evaluationRequestService.GetEvaluationRequestById(evaluationRequestCalenderDto.Id);
+		//var evaluationRequest = await evaluationRequestService.GetEvaluationRequestById(evaluationRequestCalenderDto.Id);
 
-        //evaluationRequest.FromDate = DateTime.Parse(evaluationRequestCalenderDto.Start);
-        //evaluationRequest.ToDate = DateTime.Parse(evaluationRequestCalenderDto.End).AddDays(-1);//remove extra day that added on show
+		//evaluationRequest.FromDate = DateTime.Parse(evaluationRequestCalenderDto.Start);
+		//evaluationRequest.ToDate = DateTime.Parse(evaluationRequestCalenderDto.End).AddDays(-1);//remove extra day that added on show
 
-        //await evaluationRequestService.UpdateEvaluationRequest(evaluationRequest);
+		//await evaluationRequestService.UpdateEvaluationRequest(evaluationRequest);
 
-        return evaluationRequestCalenderDto;
-    }
+		return evaluationRequestCalenderDto;
+	}
 
 }

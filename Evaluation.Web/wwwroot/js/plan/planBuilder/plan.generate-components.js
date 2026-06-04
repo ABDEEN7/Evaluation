@@ -408,7 +408,7 @@
                 .text(type.name)
                 .attr('data-backendname', type.backendName);
 
-            if (shouldAutoSelect && type.backendName === 'Corporate') {
+            if (shouldAutoSelect && type.backendName === 'Periodicevaluation') {
                 
                 option.prop('selected', true);
             } else if (school.visitType === type.name || school.visitTypeId === type.id) {
@@ -479,7 +479,7 @@
         row.append(lastEvalCell);
         // Visit type cell
         const visitTypeCell = $('<td>');
-        visitTypeCell.append(generateVisitTypeField(fieldId, school, readonly, isSelected));
+        visitTypeCell.append(generateVisitTypeField(fieldId, school, readonly, isSelected, shouldAutoSelect));
         row.append(visitTypeCell);
 
         // Academic year cell
