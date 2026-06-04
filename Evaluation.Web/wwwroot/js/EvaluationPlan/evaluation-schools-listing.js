@@ -133,17 +133,20 @@
             //}
         ],
         onRowClick: function (rowData, event) {
-            if ($(event.target).closest('.school-details-link').length) return;
-            //openSchoolDetails(rowData.id);
+            $('#schoolDetailsPopup').data('schoolId', rowData.id);
+            const modal = new bootstrap.Modal(document.getElementById('schoolDetailsPopup'));
+            modal.show();
         },
         onDraw: function () {
-            $('#schoolTable').off('click', '.school-details-link').on('click', '.school-details-link', function (e) {
-                e.preventDefault();
-                //const id = $(this).data('id');
-                //openSchoolDetails(id);
+            $('#schoolTable').off('click', '.plan-request-card').on('click', '.plan-request-card', function (e) {
+                const id = $(this).data('id');
+                if (!id) return;
+                $('#schoolDetailsPopup').data('schoolId', id);
+                const modal = new bootstrap.Modal(document.getElementById('schoolDetailsPopup'));
+                modal.show();
             });
         }
     });
 
-    schoolsListing.reload();
+   // schoolsListing.reload();
 });

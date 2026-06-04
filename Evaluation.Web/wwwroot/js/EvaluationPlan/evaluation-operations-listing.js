@@ -295,7 +295,7 @@
 
                 formUtility.attachments = response.attachments || [];
                 $('#evaluationRequeststatus').text(response.status || '');
-                $('#evaluationRequestNoText').text(response.requestNumber || '');
+                $('#evaluationRequestNo').text(response.requestNumber || '444');
 
                 $('#breadcrumbSchoolName').text((window.currentLang === "ar" ? response.school.nameAr : response.school.nameEn) || '');
                 $('#evaluationRequestDetailsModal').modal('show');
@@ -601,7 +601,7 @@
     });
     Evaluation.Loaders.loadPlans('evaluationPlanIdFilter');
     //Evaluation.Loaders.loadServiceStatus('evaluationRequestStatusFilter');
-    evaluationRequestsListing.reload();
+    //evaluationRequestsListing.reload();
 });
 
 

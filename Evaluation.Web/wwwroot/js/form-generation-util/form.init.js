@@ -183,11 +183,16 @@ window.formUtility = window.formUtility || {};
                     : "table_";
 
         fields.forEach(field => {
+            const attributes = (field.attributes || field.Attributes || []).map(a => ({
+                name: (a.name || a.Name || "").trim().toLowerCase(),
+                value: a.value ?? a.Value ?? ""
+            }));
 
-            if (!field.value && field.attributes) {
-                const defaultAttr = field.attributes?.find(attr => attr.name.trim().toLowerCase() === 'default');
-                if (defaultAttr && defaultAttr.value) {
-                    field.value = defaultAttr.value;
+            if (!field.value) {
+                const defaultAttr = attributes.find( x => x.name?.trim().toLowerCase() === "default" );
+
+                if (defaultAttr?.value || defaultAttr?.Value) {
+                    field.value = defaultAttr.value || defaultAttr.Value;
                 }
             }
 
@@ -198,14 +203,14 @@ window.formUtility = window.formUtility || {};
                         : (typeof field.isEditable == "undefined" ? false : !field.isEditable);
 
                     if (!field.value &&
-                        field.attributes &&
-                        field.attributes?.find(attr =>
+                        attributes &&
+                        attributes?.find(attr =>
                             attr.name.trim().toLowerCase() === 'default' &&
                             attr.value.trim().toLowerCase() === 'todaydate')) {
                         field.value = new Date().toLocaleDateString('en-GB');
                     }
 
-                    const calcMin7DaysFrom = field.attributes?.find(attr => attr.name.toLowerCase() === 'min7days')?.value;
+                    const calcMin7DaysFrom = attributes?.find(attr => attr.name.toLowerCase() === 'min7days')?.value;
 
                     datePcikerElements.push({
                         id: `${prefield}${field.fieldId}`,
@@ -222,14 +227,14 @@ window.formUtility = window.formUtility || {};
                         : (typeof field.isEditable == "undefined" ? false : !field.isEditable);
 
                     if (!field.value &&
-                        field.attributes &&
-                        field.attributes?.find(attr =>
+                        attributes &&
+                        attributes?.find(attr =>
                             attr.name.trim().toLowerCase() === 'default' &&
                             attr.value.trim().toLowerCase() === 'date')) {
                         field.value = new Date().toLocaleDateString('en-GB');
                     }
 
-                    const calcMin7Days = field.attributes?.find(attr => attr.name.toLowerCase() === 'min7days')?.value;
+                    const calcMin7Days = attributes?.find(attr => attr.name.toLowerCase() === 'min7days')?.value;
 
                     datetimePcikerElements.push({
                         id: `${prefield}${field.fieldId}`,
@@ -251,7 +256,7 @@ window.formUtility = window.formUtility || {};
                         inputElement.val(field.value);
                     }
 
-                    const defaultAttr = field.attributes?.find(attr =>
+                    const defaultAttr = attributes?.find(attr =>
                         attr.name.trim().toLowerCase() === 'default');
 
                     if (!field.value && defaultAttr?.value) {
@@ -267,7 +272,7 @@ window.formUtility = window.formUtility || {};
                 case 'jqte': {
                     const jqteValue =
                         field.value ||
-                        field.attributes?.find(attr => attr.name.trim().toLowerCase() === 'default')?.value ||
+                        attributes?.find(attr => attr.name.trim().toLowerCase() === 'default')?.value ||
                         '';
                     jqteElements.push({
                         id: `${prefield}${field.fieldId}`,
@@ -304,9 +309,9 @@ window.formUtility = window.formUtility || {};
                 }
 
                 case 'dropzone': {
-                    const acceptAttr = field.attributes?.find(attr => attr.name === 'accept');
-                    const sizeAttr = field.attributes?.find(attr => attr.name === 'data-max-size');
-                    const msgAttr = field.attributes?.find(attr => attr.name.toLowerCase() === 'message');
+                    const acceptAttr = attributes?.find(attr => attr.name === 'accept');
+                    const sizeAttr = attributes?.find(attr => attr.name === 'data-max-size');
+                    const msgAttr = attributes?.find(attr => attr.name.toLowerCase() === 'message');
 
                     dropzoneElements.push({
                         id: `${prefield}${field.fieldId}`,
@@ -346,19 +351,19 @@ window.formUtility = window.formUtility || {};
                     const addObjectBtnId = "addListBtn";
                     const modalTitleTextForEdit = getUiText('lblEditTabelDetails');
 
-                    const preventDelete = field.attributes?.some(attr => attr.name === 'preventDelete');
-                    const preventDeleteOld = field.attributes?.some(attr => attr.name === 'preventDeleteOld');
-                    const preventEdit = field.attributes?.some(attr => attr.name === 'preventEdit');
-                    const preventEditOld = field.attributes?.some(attr => attr.name === 'preventEditOld');
-                    const preventAdd = field.attributes?.some(attr => attr.name === 'preventAdd');
+                    const preventDelete = attributes?.some(attr => attr.name === 'preventDelete');
+                    const preventDeleteOld = attributes?.some(attr => attr.name === 'preventDeleteOld');
+                    const preventEdit = attributes?.some(attr => attr.name === 'preventEdit');
+                    const preventEditOld = attributes?.some(attr => attr.name === 'preventEditOld');
+                    const preventAdd = attributes?.some(attr => attr.name === 'preventAdd');
 
                     let maxCount = null;
                     let minCount = null;
-                    const maxCountAttr = field.attributes?.find(attr => attr.name === "maxcount");
-                    const minCountAttr = field.attributes?.find(attr => attr.name === "mincount");
+                    const maxCountAttr = attributes?.find(attr => attr.name === "maxcount");
+                    const minCountAttr = attributes?.find(attr => attr.name === "mincount");
 
-                    const maxCountNewAttr = field.attributes?.find(attr => attr.name.toLowerCase() === "maxcountnew");
-                    const minCountNewAttr = field.attributes?.find(attr => attr.name.toLowerCase() === "mincountnew");
+                    const maxCountNewAttr = attributes?.find(attr => attr.name.toLowerCase() === "maxcountnew");
+                    const minCountNewAttr = attributes?.find(attr => attr.name.toLowerCase() === "mincountnew");
 
                     let maxCountNew = maxCountNewAttr ? parseInt(maxCountNewAttr.value) : null;
                     let minCountNew = minCountNewAttr ? parseInt(minCountNewAttr.value) : null;
@@ -472,15 +477,27 @@ window.formUtility = window.formUtility || {};
                     break;
                 }
                 default: {
-                    const calcAgeAttr = field.attributes?.find(attr => attr.name.trim().toLowerCase() === 'calcage');
+                    const fieldElement = $(`#${prefield}${field.fieldId}`);
+
+                    if (!field.value) {
+                        const defaultAttr = attributes?.find( attr => attr.name.trim().toLowerCase() === 'default');
+                        if (defaultAttr?.value) {
+                            field.value = defaultAttr.value;
+                        }
+                    }
+
+                    const calcAgeAttr = attributes?.find(attr => attr.name.trim().toLowerCase() === 'calcage');
+
                     if (calcAgeAttr) {
-                        const birthDateField = fields.find(x => x.attributes?.some(attr => attr.name === "birthDateValue"));
+                        const birthDateField = fields.find(x =>x.attributes?.some(attr => attr.name === "birthDateValue"));
+
                         if (birthDateField) {
                             field.value = calculate(birthDateField.value);
                         }
                     }
-                    const fieldElement = $(`#${prefield}${field.fieldId}`);
-                    fieldElement.val(field.value);
+
+                    fieldElement.val(field.value ?? '');
+
                     break;
                 }
             }
