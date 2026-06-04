@@ -28,13 +28,12 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
 {
     public async Task<Result<FormDto>> GetFormItems(Guid FormId)
     {
-
+        var lang = requestInfo.Lang;
         var evalForm = await formService.GetEvalForm(FormId, IncludeCalcMethod: true);
         var mappedEvalForm = mapper.Map<TemplateFormDto>(evalForm);
 
         var formItems = await formService.GetFormItems(FormId);
-		var mappedData = mapper.Map<List<FormItemDto>>(formItems,
-	opt => opt.Items["lang"] = "en");
+		var mappedData = mapper.Map<List<FormItemDto>>(formItems,opt => opt.Items["lang"] = lang);
 
 		foreach (var item in formItems)
         {
@@ -51,8 +50,8 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
                             Id = relatedFromItem.RelatedItemId,
                             Note = formItemValue?.Note,
                             Value = formItemValue?.ActualValue?.ToString(),
-                            Name = relatedFromItem.RelatedItem.NameAr
-                        });
+                            Name = lang=="ar"? relatedFromItem.RelatedItem!.NameAr: relatedFromItem.RelatedItem!.NameEn
+						});
                 }
             }
             mappedData.Where(md => md.Id == item.Id).FirstOrDefault().RelatedItems = relatedItemDtos;

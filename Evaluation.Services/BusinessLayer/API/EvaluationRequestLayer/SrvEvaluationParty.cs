@@ -177,10 +177,16 @@ namespace Evaluation.Services.BusinessLayer.API.EvaluationRequestLayer
 
 			IQueryable<ServiceRequest> requestsQuery = uow
 				.GetRepository<ServiceRequest>()
+
 				.GetAllActiveNonDeleted(r => r.EvaluationRequestId == evaluationRequestId)
 				.Include(x => x.Status)
 					.ThenInclude(x => x!.ServiceStatusType)
+				.Include(x => x.Status)
+					.ThenInclude(x => x!.StatusPreventPartyTypes)
 				.Include(x => x.Service)
+					.ThenInclude(x => x!.RequestShowPartyType)
+	            .Include(x => x.EvaluationRequest)
+					.ThenInclude(x => x!.EvaluationRequestAssignments)
 				.Include(x => x.CreateBy);
 
 			requestsQuery = await requestAccessService.ApplyServiceRequestAccess(requestsQuery);

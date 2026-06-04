@@ -183,11 +183,16 @@ window.formUtility = window.formUtility || {};
                     : "table_";
 
         fields.forEach(field => {
+            const attributes = (field.attributes || field.Attributes || []).map(a => ({
+                name: (a.name || a.Name || "").trim().toLowerCase(),
+                value: a.value ?? a.Value ?? ""
+            }));
 
-            if (!field.value && field.attributes) {
-                const defaultAttr = field.attributes?.find(attr => attr.name.trim().toLowerCase() === 'default');
-                if (defaultAttr && defaultAttr.value) {
-                    field.value = defaultAttr.value;
+            if (!field.value) {
+                const defaultAttr = attributes.find( x => x.name?.trim().toLowerCase() === "default" );
+
+                if (defaultAttr?.value || defaultAttr?.Value) {
+                    field.value = defaultAttr.value || defaultAttr.Value;
                 }
             }
 
@@ -198,14 +203,14 @@ window.formUtility = window.formUtility || {};
                         : (typeof field.isEditable == "undefined" ? false : !field.isEditable);
 
                     if (!field.value &&
-                        field.attributes &&
-                        field.attributes?.find(attr =>
+                        attributes &&
+                        attributes?.find(attr =>
                             attr.name.trim().toLowerCase() === 'default' &&
                             attr.value.trim().toLowerCase() === 'todaydate')) {
                         field.value = new Date().toLocaleDateString('en-GB');
                     }
 
-                    const calcMin7DaysFrom = field.attributes?.find(attr => attr.name.toLowerCase() === 'min7days')?.value;
+                    const calcMin7DaysFrom = attributes?.find(attr => attr.name.toLowerCase() === 'min7days')?.value;
 
                     datePcikerElements.push({
                         id: `${prefield}${field.fieldId}`,
@@ -222,14 +227,14 @@ window.formUtility = window.formUtility || {};
                         : (typeof field.isEditable == "undefined" ? false : !field.isEditable);
 
                     if (!field.value &&
-                        field.attributes &&
-                        field.attributes?.find(attr =>
+                        attributes &&
+                        attributes?.find(attr =>
                             attr.name.trim().toLowerCase() === 'default' &&
                             attr.value.trim().toLowerCase() === 'date')) {
                         field.value = new Date().toLocaleDateString('en-GB');
                     }
 
-                    const calcMin7Days = field.attributes?.find(attr => attr.name.toLowerCase() === 'min7days')?.value;
+                    const calcMin7Days = attributes?.find(attr => attr.name.toLowerCase() === 'min7days')?.value;
 
                     datetimePcikerElements.push({
                         id: `${prefield}${field.fieldId}`,
@@ -251,7 +256,7 @@ window.formUtility = window.formUtility || {};
                         inputElement.val(field.value);
                     }
 
-                    const defaultAttr = field.attributes?.find(attr =>
+                    const defaultAttr = attributes?.find(attr =>
                         attr.name.trim().toLowerCase() === 'default');
 
                     if (!field.value && defaultAttr?.value) {
@@ -267,7 +272,7 @@ window.formUtility = window.formUtility || {};
                 case 'jqte': {
                     const jqteValue =
                         field.value ||
-                        field.attributes?.find(attr => attr.name.trim().toLowerCase() === 'default')?.value ||
+                        attributes?.find(attr => attr.name.trim().toLowerCase() === 'default')?.value ||
                         '';
                     jqteElements.push({
                         id: `${prefield}${field.fieldId}`,
@@ -280,7 +285,9 @@ window.formUtility = window.formUtility || {};
               
 
                 case 'select2': {
-                    const isMultiSelect = field.attributes?.some(attr => attr.name === 'Multi_Value_Select');
+                    const isMultiSelect = field.Attributes?.some(attr =>
+                        (attr.name || attr.Name)?.toLowerCase().trim() === 'multi_value_select'
+                    );
 
                     select2Fields.push({
                         id: `${prefield}${field.fieldId}`,
@@ -302,9 +309,9 @@ window.formUtility = window.formUtility || {};
                 }
 
                 case 'dropzone': {
-                    const acceptAttr = field.attributes?.find(attr => attr.name === 'accept');
-                    const sizeAttr = field.attributes?.find(attr => attr.name === 'data-max-size');
-                    const msgAttr = field.attributes?.find(attr => attr.name.toLowerCase() === 'message');
+                    const acceptAttr = attributes?.find(attr => attr.name === 'accept');
+                    const sizeAttr = attributes?.find(attr => attr.name === 'data-max-size');
+                    const msgAttr = attributes?.find(attr => attr.name.toLowerCase() === 'message');
 
                     dropzoneElements.push({
                         id: `${prefield}${field.fieldId}`,
@@ -344,19 +351,19 @@ window.formUtility = window.formUtility || {};
                     const addObjectBtnId = "addListBtn";
                     const modalTitleTextForEdit = getUiText('lblEditTabelDetails');
 
-                    const preventDelete = field.attributes?.some(attr => attr.name === 'preventDelete');
-                    const preventDeleteOld = field.attributes?.some(attr => attr.name === 'preventDeleteOld');
-                    const preventEdit = field.attributes?.some(attr => attr.name === 'preventEdit');
-                    const preventEditOld = field.attributes?.some(attr => attr.name === 'preventEditOld');
-                    const preventAdd = field.attributes?.some(attr => attr.name === 'preventAdd');
+                    const preventDelete = attributes?.some(attr => attr.name === 'preventDelete');
+                    const preventDeleteOld = attributes?.some(attr => attr.name === 'preventDeleteOld');
+                    const preventEdit = attributes?.some(attr => attr.name === 'preventEdit');
+                    const preventEditOld = attributes?.some(attr => attr.name === 'preventEditOld');
+                    const preventAdd = attributes?.some(attr => attr.name === 'preventAdd');
 
                     let maxCount = null;
                     let minCount = null;
-                    const maxCountAttr = field.attributes?.find(attr => attr.name === "maxcount");
-                    const minCountAttr = field.attributes?.find(attr => attr.name === "mincount");
+                    const maxCountAttr = attributes?.find(attr => attr.name === "maxcount");
+                    const minCountAttr = attributes?.find(attr => attr.name === "mincount");
 
-                    const maxCountNewAttr = field.attributes?.find(attr => attr.name.toLowerCase() === "maxcountnew");
-                    const minCountNewAttr = field.attributes?.find(attr => attr.name.toLowerCase() === "mincountnew");
+                    const maxCountNewAttr = attributes?.find(attr => attr.name.toLowerCase() === "maxcountnew");
+                    const minCountNewAttr = attributes?.find(attr => attr.name.toLowerCase() === "mincountnew");
 
                     let maxCountNew = maxCountNewAttr ? parseInt(maxCountNewAttr.value) : null;
                     let minCountNew = minCountNewAttr ? parseInt(minCountNewAttr.value) : null;
@@ -470,15 +477,27 @@ window.formUtility = window.formUtility || {};
                     break;
                 }
                 default: {
-                    const calcAgeAttr = field.attributes?.find(attr => attr.name.trim().toLowerCase() === 'calcage');
+                    const fieldElement = $(`#${prefield}${field.fieldId}`);
+
+                    if (!field.value) {
+                        const defaultAttr = attributes?.find( attr => attr.name.trim().toLowerCase() === 'default');
+                        if (defaultAttr?.value) {
+                            field.value = defaultAttr.value;
+                        }
+                    }
+
+                    const calcAgeAttr = attributes?.find(attr => attr.name.trim().toLowerCase() === 'calcage');
+
                     if (calcAgeAttr) {
-                        const birthDateField = fields.find(x => x.attributes?.some(attr => attr.name === "birthDateValue"));
+                        const birthDateField = fields.find(x =>x.attributes?.some(attr => attr.name === "birthDateValue"));
+
                         if (birthDateField) {
                             field.value = calculate(birthDateField.value);
                         }
                     }
-                    const fieldElement = $(`#${prefield}${field.fieldId}`);
-                    fieldElement.val(field.value);
+
+                    fieldElement.val(field.value ?? '');
+
                     break;
                 }
             }
@@ -620,12 +639,14 @@ window.formUtility = window.formUtility || {};
                         column.formatter = (cell) => {
                             let value = cell.getValue();
                             if (!value) return "";
-
+                            const isMultiSelect = field.Attributes?.some(attr =>
+                                (attr.name || attr.Name)?.toLowerCase().trim() === 'multi_value_select'
+                            );
                             if (typeof value === "string") {
                                 try {
                                     if (value.startsWith("[") && value.endsWith("]")) {
                                         value = JSON.parse(value);
-                                    } else if (value.includes(",")) {
+                                    } else if (isMultiSelect && value.includes(",")) {
                                         value = value.split(",").map(v => v.trim());
                                     }
                                 } catch { }
@@ -635,8 +656,13 @@ window.formUtility = window.formUtility || {};
 
                             const options = GetDropdownOptionsForTabulator(field) || [];
                             const map = new Map(options.map(o => [String(o.id), o.value]));
-
                             const labels = value.map(v => map.get(String(v)) || v);
+
+                            if (isMultiSelect && labels.length > 1) {
+                                return labels.map(l =>
+                                    `<span style="background:var(--bs-primary-bg-subtle);color:var(--bs-primary);border-radius:20px;padding:1px 8px;font-size:11px;margin:1px;display:inline-block;">${l}</span>`
+                                ).join(' ');
+                            }
 
                             return labels.join(", ");
                         };
@@ -681,19 +707,17 @@ window.formUtility = window.formUtility || {};
 
 
     const GetDropdownOptionsForTabulator = () => {
-
-        let lang = currentLang;
-        if (!dropdowns || !Array.isArray(dropdowns)) {
+        if (!Array.isArray(window.dropdowns)) {
             return [];
         }
-        const result = dropdowns.map(x => {
-            var item = { id: x.id, value: lang == 'ar' ? x.titleAr : x.titleEn, };
 
-            return item;
-        });
+        const isArabic = currentLang === "ar";
 
-        return result;
-    }
+        return window.dropdowns.map(x => ({
+            id: x.id,
+            value: isArabic ? x.titleAr : x.titleEn
+        }));
+    };
     function toggleAddButtonVisibility(tableId, addButtonId, maxCount, maxCountNew, minCountNew) {
         const addButton = $('#' + addButtonId);
         if (!addButton.length) return;
