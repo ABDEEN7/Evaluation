@@ -50,6 +50,7 @@
         SCHOOL_NAME: 'schoolName',
         LAST_EVAL_DATE: 'lastEvalDate',
         CREATED_DATE: 'createdDate',
+        CREATEDTO_DATE: 'createdToDate',
         NEXT_EVAL_DATE: 'nextEvalDate',
         PREVIOUS_RESULT: 'previousResult',
         VISIT_TYPE: 'visitType'

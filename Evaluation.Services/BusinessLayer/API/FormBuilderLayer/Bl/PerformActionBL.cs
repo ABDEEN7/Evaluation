@@ -208,7 +208,7 @@ namespace Evaluation.Services.Models.API
 
 						if (dto == null) throw new BusinessException(ExceptionMessage.msgInvalidEvaluationForm);
 
-                        await planServiceRequestServices.DeletePlanDraft(dto.Id);
+                        await planServiceRequestServices.DeletePlanById(dto.Id);
 
                         break;
                     }

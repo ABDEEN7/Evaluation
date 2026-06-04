@@ -97,6 +97,7 @@ document.addEventListener("DOMContentLoaded", () => {
             center: "title",
             right: "multiMonthYear,dayGridMonth,timeGridWeek,timeGridDay"
         },
+        initialView: "dayGridMonth",   
         initialDate: today,
         navLinks: true,
         businessHours: {

@@ -213,6 +213,7 @@ public static class ConstantKeys
         public static readonly string NoneOfTheSelectedEvaluationRequestsWereFoundForThisUser = "NoneOfTheSelectedEvaluationRequestsWereFoundForThisUser";
         public static readonly string UnExpectedException = "UnExpectedException";
         public static readonly string NoEvaluationRequestsWereSelected = "NoEvaluationRequestsWereSelected";
+        public static readonly string CannotDeletePlanInProcess = "CannotDeletePlanInProcess";
     }
 
     public static class AdminSettings

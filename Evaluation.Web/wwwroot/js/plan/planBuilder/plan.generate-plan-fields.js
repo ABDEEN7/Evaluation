@@ -265,18 +265,29 @@ const planUtility = window.planUtility;
                         </div>
                         <hr>
 
-                        <!-- تاريخ الإنشاء -->
+                        
                         <div class="mb-3">
-                            <label class="form-label">${t('lblCreatedDate')}</label>
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="la la-calendar"></i></span>
-                                <input type="text"
-                                       id="${pid(fieldId, 'filterCreatedDate')}"
-                                       name="createdDate"
-                                       class="form-control filter-date-picker"
-                                       placeholder="${t('plhChooseDate')}">
-                            </div>
-                        </div>
+    <label class="form-label">${t('lblCreatedDateFrom') || 'تاريخ الإنشاء من'}</label>
+    <div id="${pid(fieldId, 'filterCreatedDate_wrap')}" style="position:relative;">
+        <input type="text"
+               id="${pid(fieldId, 'filterCreatedDate')}"
+               name="createdDate"
+               class="form-control filter-date-picker"
+               placeholder="${t('plhChooseDate')}"
+               readonly>
+    </div>
+</div>
+<div class="mb-3">
+    <label class="form-label">${t('lblCreatedDateTo') || 'تاريخ الإنشاء إلى'}</label>
+    <div id="${pid(fieldId, 'filterToCreatedDate_wrap')}" style="position:relative;">
+        <input type="text"
+               id="${pid(fieldId, 'filterToCreatedDate')}"
+               name="toCreatedDate"
+               class="form-control filter-date-picker"
+               placeholder="${t('plhChooseDate')}"
+               readonly>
+    </div>
+</div>
                         <hr>
 
                         <!-- تاريخ التقييم القادم -->
