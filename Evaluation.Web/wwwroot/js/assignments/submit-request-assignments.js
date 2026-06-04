@@ -30,7 +30,6 @@
             return { isValid: false, errors };
         }
 
-        // التحقق من وجود قائد واحد فقط
         const leaders = teamData.filter(m => m.IsLeader);
         if (leaders.length === 0) {
             errors.push('يجب تحديد قائد للفريق');
@@ -38,15 +37,16 @@
             errors.push('يجب تحديد قائد واحد فقط للفريق');
         }
 
-        // التحقق من البيانات المطلوبة لكل عضو
         teamData.forEach((member, index) => {
-            if (!member.MinistryUserId) {
+            // ✅ UserId بدل MinistryUserId
+            if (!member.UserId) {
                 errors.push(`العضو رقم ${index + 1}: معرف المستخدم مطلوب`);
             }
             if (!member.PartyTypeId) {
                 errors.push(`العضو رقم ${index + 1}: نوع الطرف مطلوب`);
             }
-            if (!member.EvalRequestAssignmentScopies || member.EvalRequestAssignmentScopies.length === 0) {
+            // ✅ Scopes بدل EvalRequestAssignmentScopies
+            if (!member.Scopes || member.Scopes.length === 0) {
                 errors.push(`العضو رقم ${index + 1}: يجب تحديد مجال واحد على الأقل`);
             }
         });

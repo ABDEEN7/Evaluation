@@ -237,8 +237,8 @@ public class PlanRequestRepository(IServiceScopeFactory serviceScopeFactory, Srv
                 Name = x.PlanName,
                 StartDate = x.StartDate,
                 EndDate = x.EndDate,
-
-                PlanStatusId = x.PlanStatusId.Value,
+				CreateDate = x.CreateDate,
+				PlanStatusId = x.PlanStatusId.Value,
                 StatusCode = x.PlanStatus.BackendName,
 
                 CountSchools = x.EvaluationRequests
@@ -246,7 +246,7 @@ public class PlanRequestRepository(IServiceScopeFactory serviceScopeFactory, Srv
                     .Distinct()
                     .Count()
             })
-            .OrderByDescending(x => x.StartDate);
+            .OrderByDescending(x => x.CreateDate);
 
         var finalResult = await query.GetPaginatedResult(request.PageNumber, request.PageSize = 10);
 

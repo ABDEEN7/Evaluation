@@ -307,7 +307,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
 			var currentAcademicYearId = await uow.GetRepository<AcademicYear>()
 				.GetAllNonDeleted()
-				.Where(x => x.IsCurrent) 
+				.Where(x => x.IsCurrent && x.DepartmentId== departmentId) 
 				.Select(x => x.Id)
 				.FirstOrDefaultAsync();
 
@@ -337,14 +337,16 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 		public async Task<List<SupportedFileDto>> GetSupportedFiles(Guid requestId)
         {
             using var uow = serviceScopeFactory.CreateScopedUow();
-
+            var lang = requestInfo.Lang;
             var attachments = await uow.GetRepository<EvalAttachment>()
                 .GetAllNonDeleted()
+                .Include(x=>x.Scope)
                 .Where(x => x.EvaluationRequestId == requestId)
                 .Select(x => new SupportedFileDto
                 {
                     UiFileName = x.UiFileName,
-                    FileUrl = StorageService.GenerateSasToken(
+					ScopeName = lang =="ar"? x.Scope!.NameAr: x.Scope!.NameEn,
+					FileUrl = StorageService.GenerateSasToken(
                         x.FileName,
                         2,
                         x.UiFileName,

@@ -46,6 +46,7 @@ public class SrvDepEvaluationTypeBL : AdminBase
         DepEvaluationType.NameEn = message.NameEn;
         DepEvaluationType.NameAr = message.NameAr;
         DepEvaluationType.DepartmentId = message.DepartmentId;
+        DepEvaluationType.EvaluationTypeId = message.EvaluationTypeId;
         DepEvaluationType.IsActive = message.IsActive;
         DepEvaluationType.BackendName = bacendName;
         uow.GetRepository<DepEvaluationType>().Insert(DepEvaluationType);
@@ -99,6 +100,7 @@ public class SrvDepEvaluationTypeBL : AdminBase
         job.NameEn = DepEvaluationType.NameEn;
         job.IsActive = DepEvaluationType.IsActive;
         job.DepartmentId = DepEvaluationType.DepartmentId;
+        job.EvaluationTypeId = DepEvaluationType.DepartmentId;
         job.UpdateById = userInfo.UserId;
         job.UpdateDate = DateTime.UtcNow;
 

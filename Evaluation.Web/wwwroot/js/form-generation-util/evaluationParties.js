@@ -31,29 +31,44 @@
     window.AddFileClick = function (partyId, requestId) {
         $("#EvaluationfileModal").modal('show');
         $("#EvaluationfileSectionRequestId").val(requestId);
-      
+
+        const $tree = $('#EvaluationFileScopetree');
+
+        if ($tree.jstree(true)) {
+            $tree.jstree("destroy");
+            $tree.empty();
+        }
 
         const options = {
             success: function (response) {
-                if (response) {
-                    $('#EvaluationFileScopetree').jstree({
-                        core: {
-                            data: response
-                        },
-                        themes: {
-                            dots: true,
-                            icons: true
-                        },
-                        plugins: ["wholerow"]
-                    });
-
+                if (!response || response.length === 0) {
+                    notificationUtil.error("No scopes found");
+                    return;
                 }
+
+                console.log("Scopes:", response);
+
+                $tree.jstree({
+                    core: {
+                        data: response,
+                        check_callback: true
+                    },
+                    themes: {
+                        dots: true,
+                        icons: true
+                    },
+                    plugins: ["wholerow"]
+                });
+
+                $tree.on("ready.jstree", function () {
+                    $tree.jstree("open_all");
+                });
             }
         };
 
-
-
         jqClient(options).Get(`/ServiceRequest/${departmentRoutePath}/GetScopes?partyId=${partyId}`);
+
+
         const element = document.querySelector("#EvaluationfileSection");
 
         if (element.dropzone) {
@@ -67,7 +82,7 @@
             maxFiles: 1,
             maxFilesize: 5,
             addRemoveLinks: true,
-
+            headers: sharedUtility().SharedHeader(true),
             init: function () {
                 var self = this;
 
@@ -144,24 +159,43 @@
     function GetSupportedFiles(requestId) {
         const options = {
             success: function (response) {
-                if (!response || response.length === 0) return;
-
                 const container = $('#filedivid');
                 container.empty();
 
-                response.forEach(file => {
-                    const iconClass = getFileIcon(file.uiFileName);
+                if (!response || response.length === 0) return;
 
-                    const fileBox = `
-                    <div class="file-box text-center p-2 border rounded">
-                        <a href="${file.fileUrl}" target="_blank">
-                            <i class="${iconClass} fa-3x mb-2"></i>
-                            <div class="file-name">${file.uiFileName}</div>
-                        </a>
+                const groupedByScope = response.reduce((acc, file) => {
+                    const scopeName = file.scopeName || file.scope || "بدون مجال";
+                    if (!acc[scopeName]) acc[scopeName] = [];
+                    acc[scopeName].push(file);
+                    return acc;
+                }, {});
+
+                Object.entries(groupedByScope).forEach(([scopeName, files]) => {
+                    const scopeHtml = `
+                    <div class="w-100 mb-3">
+                        <div class="fw-bold mb-2 text-primary">
+                            ${escapeHtml(scopeName)}
+                        </div>
+
+                        <div class="d-flex flex-wrap gap-3">
+                            ${files.map(file => {
+                        const iconClass = getFileIcon(file.uiFileName);
+
+                        return `
+                                    <div class="file-box text-center p-2 border rounded">
+                                        <a href="${file.fileUrl}" target="_blank">
+                                            <i class="${iconClass} fa-3x mb-2"></i>
+                                            <div class="file-name">${escapeHtml(file.uiFileName)}</div>
+                                        </a>
+                                    </div>
+                                `;
+                    }).join("")}
+                        </div>
                     </div>
                 `;
 
-                    container.append(fileBox);
+                    container.append(scopeHtml);
                 });
             }
         };
@@ -218,14 +252,14 @@
                     return acc;
                 }, {});
 
-            const badgesHtml = `
-                <span class="badge bg-danger-light ms-auto me-2 fw-semibold br-0">
-                    <i class="las la-times fs-14"></i> ${escapeHtml(openText)}: ${open}
-                </span>
-                <span class="badge bg-success-light me-2 fw-semibold br-0">
-                    <i class="la la-check fs-14"></i> ${escapeHtml(closedText)}: ${closed}
-                </span>
-            `;
+            const badgesHtml = party.isSupportFiles ? '' : `
+                            <span class="badge bg-danger-light ms-auto me-2 fw-semibold br-0">
+                                <i class="las la-times fs-14"></i> ${escapeHtml(openText)}: ${open}
+                            </span>
+                            <span class="badge bg-success-light me-2 fw-semibold br-0">
+                                <i class="la la-check fs-14"></i> ${escapeHtml(closedText)}: ${closed}
+                            </span>
+                          `;
 
             const servicesHtml = services.length
                 ? `

@@ -513,7 +513,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 					break;
 				case "SchoolClasses":
 					{
-                        //SchoolId = SchoolId;// Guid.Parse("aface110-2a67-e311-93f9-00155d283a04");
+                        SchoolId =  Guid.Parse("aface110-2a67-e311-93f9-00155d283a04");
 
 						var school = await NSISService.GetSchoolbyIdAsync(SchoolId.Value);
 
@@ -539,7 +539,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
 				case "schoolEmployee":
 					{
-						//SchoolId = Guid.Parse("a297a912-2e70-453c-befc-5dd502cd4894");
+						SchoolId = Guid.Parse("a297a912-2e70-453c-befc-5dd502cd4894");
 
 						var schoolEmployee = await OrgBL.GetEmployeesBySchoolId(SchoolId.Value);
 

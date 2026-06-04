@@ -72,13 +72,19 @@ public class SrvEvaluationPartyBL : AdminBase
 	}
 	public async Task<List<DropdownItem>> GetServiceStatusList(Guid? departmentId)
 	{
-
 		var result = await uow.GetRepository<ServiceStatus>()
-					.GetAllActiveNonDeleted(x => x.Service.SystemModule.DepartmentId == departmentId && x.Service.SystemModule.SystemModuleType.BackendName == SystemModuleBackend.EvaluationRequest)
+					.GetAllActiveNonDeleted()
+					.Include(x=>x.Service)
+						.ThenInclude(x=>x.SystemModule)
+						   .ThenInclude(x=>x.Department)
+					.Include(x => x.Service)
+						.ThenInclude(x => x.SystemModule)
+							.ThenInclude(x=>x.SystemModuleType)//x.Service.SystemModule!.DepartmentId == departmentId &&
+					.Where(x =>  x.Service.SystemModule!.SystemModuleType!.BackendName == SystemModuleBackend.EvaluationRequest)
 					.Select(x => new DropdownItem
 					{
 						Id = x.Id,
-						Name = _requestInfo.Lang == "ar" ? x.NameAr : x.NameEn
+						Name = _requestInfo.Lang == "ar" ? x.NameAr + " - "+ x.Service.SystemModule!.Department!.NameAr : x.NameEn + " - " + x.Service.SystemModule!.Department!.NameEn
 					})
 					.ToListAsync();
 		return result;

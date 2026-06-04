@@ -326,11 +326,10 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             }
 
             assignment.Note = dto.ConflictReason;
-            assignment.IsNDA =! dto.HasConflict;
             assignment.NdaDate = DateTime.UtcNow;
-            assignment.NdaStatusId = NDAStatusIds.Approve;
+			assignment.NdaStatusId = dto.HasConflict? NDAStatusIds.Objection : NDAStatusIds.Approve;
 
-            await scope.CommitAsync();
+			await scope.CommitAsync();
 
             return new NdaApproveResponse
             {

@@ -21,6 +21,7 @@ public class TemplateFormDto : EntityBaseDTO
     public string? CalcMethod { get; set; }
     public string? FormStatus { get; set; }
     public Guid FormStatusId { get; set; }
+    public Guid? FinalEvalMatrixId { get; set; }
     public bool AllowRename { get; set; }
     public bool HasMuliEvaluation { get; set; }
     public int? EvalCountOfColumnsValue { get; set; } = 1;

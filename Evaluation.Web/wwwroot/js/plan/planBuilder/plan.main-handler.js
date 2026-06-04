@@ -333,7 +333,7 @@
 
         // Build query parameters
         const params = new URLSearchParams({
-            page,
+            pageNumber: page,
             pageSize: state.pageSize
         });
 
@@ -382,11 +382,14 @@
         const state = instances.get(fieldId);
 
         // Build query parameters with school IDs
-        const params = new URLSearchParams({
-            schoolIds: schoolIds.join(','), // Send comma-separated IDs
-            page: 1,
-            pageSize: schoolIds.length // Set page size to number of schools to get all in one request
+        const params = new URLSearchParams();
+
+        schoolIds.forEach(id => {
+            params.append('schoolIds', id);
         });
+
+        params.append('page', 1);
+        params.append('pageSize', schoolIds.length);
 
         showLoadingState(fieldId);
 
@@ -426,7 +429,7 @@
 
         // ✅ بناء الـ query parameters
         const params = new URLSearchParams({
-            page,
+            pageNumber: page,
             pageSize: state.pageSize
         });
 
@@ -600,19 +603,40 @@
 
     const attachRowEvents = (fieldId) => {
         const $table = $p(fieldId, 'planTable');
+        const state = instances.get(fieldId);
 
+        $table.find('tr[data-auto-selected="true"]').each(function () {
+            const $row = $(this);
+            const schoolId = $row.find('.selectRow').data('school-id');
+            const schoolName = $row.find('.selectRow').data('name');
+            const visitDate = $row.find(`.childDate[data-school-id="${schoolId}"]`).val();
+            const visitTypeId = $row.find(`.visitTypeSelect[data-school-id="${schoolId}"]`).val();
+            console.log('auto-selected row:', schoolId, 'visitTypeId:', visitTypeId);
+            console.log('select element:', $row.find(`.visitTypeSelect[data-school-id="${schoolId}"]`).length);
+            console.log('select HTML:', $row.find(`.visitTypeSelect[data-school-id="${schoolId}"]`)[0]?.outerHTML);
+            if (schoolId) {
+                state.selectedSchoolsMap.set(schoolId, {
+                    id: schoolId,
+                    name: schoolName,
+                    visitDate: visitDate,
+                    visitTypeId: visitTypeId
+                });
+            }
+        });
+
+        state.selectedSchools = Array.from(state.selectedSchoolsMap.values());
+        updateSelectionCounter(fieldId);
         $table.find('.selectRow').off('change').on('change', function () {
             updateSelectedSchools(fieldId);
         });
-
         $table.find('.childDate').off('change').on('change', function () {
             updateSelectedSchools(fieldId);
         });
-
         $table.find('.visitTypeSelect').off('change').on('change', function () {
             updateSelectedSchools(fieldId);
         });
     };
+
 
     /* ===================== HANDLERS ===================== */
 
@@ -685,6 +709,16 @@
                 const endDate = new Date(parts[1].trim());
                 ns.initChildPicker(startDate, endDate);
             }
+        }
+    };
+    const updateSelectionCounter = (fieldId) => {
+        const state = instances.get(fieldId);
+        const count = state.selectedSchoolsMap ? state.selectedSchoolsMap.size : 0;
+        const $counter = $p(fieldId, 'selectedSchoolsCounter');
+        if ($counter.length) {
+            $counter.text(count);
+            $counter.closest('.selection-counter-badge')
+                .toggleClass('badge-active', count > 0);
         }
     };
 
@@ -780,23 +814,37 @@
 
     const updateSelectedSchools = (fieldId) => {
         const state = instances.get(fieldId);
-        state.selectedSchools = [];
 
+        if (!state.selectedSchoolsMap) {
+            state.selectedSchoolsMap = new Map();
+        }
+
+        $p(fieldId, 'planTable').find('.selectRow').each(function () {
+            const schoolId = $(this).data('school-id');
+            if (!$(this).is(':checked')) {
+                state.selectedSchoolsMap.delete(schoolId);
+            }
+        });
         $p(fieldId, 'planTable').find('.selectRow:checked').each(function () {
             const $checkbox = $(this);
             const schoolId = $checkbox.data('school-id');
             const schoolName = $checkbox.data('name');
+            const visitDate = $p(fieldId, 'planTable')
+                .find(`.childDate[data-school-id="${schoolId}"]`).val();
+            const visitTypeId = $p(fieldId, 'planTable')
+                .find(`.visitTypeSelect[data-school-id="${schoolId}"]`).val();
 
-            const visitDate = $p(fieldId, 'planTable').find(`.childDate[data-school-id="${schoolId}"]`).val();
-            const visitTypeId = $p(fieldId, 'planTable').find(`.visitTypeSelect[data-school-id="${schoolId}"]`).val();
-
-            state.selectedSchools.push({
+            state.selectedSchoolsMap.set(schoolId, {
                 id: schoolId,
                 name: schoolName,
                 visitDate: visitDate,
                 visitTypeId: visitTypeId
             });
         });
+
+        state.selectedSchools = Array.from(state.selectedSchoolsMap.values());
+
+        updateSelectionCounter(fieldId);
     };
 
     const showLoadingState = (fieldId) => {
