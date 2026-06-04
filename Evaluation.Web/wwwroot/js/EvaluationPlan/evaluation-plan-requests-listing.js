@@ -30,29 +30,26 @@
         cardViewBtnId: 'cardViewPlanRequest',
         tableViewBtnId: 'tblViewPlanRequest',
         rowClass: 'plan-request-card',
-        columns: [     
-       {
-    data: "planName",
+        columns: [  
+            {
+    data: "service",
         className: "td-full mb-4",
         render: function(data, type, row) {
 
             const statusColor = row.statusColor || "#cccccc";
-            const textColor = "#000";
 
             return `
         <div class="request-info">
 
             <div class="request-icon"
-                 style="background-color:${statusColor}; color:${textColor};">
-
-                <i class="las la-school"></i>
-
+                 style="background-color:${statusColor}; color:#000;">
+                <i class="las la-file-signature"></i>
             </div>
 
             <div class="request-text">
 
                 <div class="request-header">
-                    ${data || ""}
+                    ${uiControlsSetup().GetUiControlText("lblRequest")}: ${data || ""}
                 </div>
 
                 <div class="request-status-text" style="color:${statusColor};">
@@ -65,7 +62,7 @@
         `;
         }
     },
-        
+       
             {
         data: "requestNumber",
         className: "td-full",
@@ -86,6 +83,19 @@
             <i class="las la-school card-only-icon me-1"></i>
             <span class="card-only-label me-2">${uiControlsSetup().GetUiControlText("lblSchoolsCount")}:</span>
             <span class="data-text">${data || 0}</span>
+        `;
+        }
+    },
+    {
+        data: "planName",
+        className: "td-full",
+        render: function(data) {
+            return `
+        <i class="las la-school card-only-icon me-1"></i>
+        <span class="card-only-label me-2">
+            ${uiControlsSetup().GetUiControlText("lblPlanName")}:
+        </span>
+        <span class="data-text">${data || "_"}</span>
         `;
         }
     },
