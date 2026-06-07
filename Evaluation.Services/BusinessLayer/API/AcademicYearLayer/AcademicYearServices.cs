@@ -3,6 +3,7 @@ using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.Calendars;
 using Evaluation.DAL.Models.DepartementEntites;
 using Evaluation.DAL.Repositories;
+using Evaluation.Services.Extensions;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Exceptions;
@@ -27,32 +28,34 @@ public class AcademicYearServices(IServiceScopeFactory serviceScopeFactory,
     public async Task<Guid> GetAcademicYearId()
     {
         var userId = userInfo.UserId;
+        using var ScopeUow = serviceScopeFactory.CreateScopedUow();
 
-        var departmentId = await unitOfWork
-            .GetRepository<Department>()
-            .GetAllActiveNonDeleted(d => d.UserDepartments.Any(ud => ud.UserId == userId))
-            .Select(d => new
-            {
-                d.Id,
-                LastAssignedDate = d.UserDepartments
-                    .Where(ud => ud.UserId == userId)
-                    .Max(ud => ud.CreateDate)
-            })
-            .OrderByDescending(x => x.LastAssignedDate)
-            .Select(x => x.Id)
-            .FirstOrDefaultAsync();
+		var departmentId = await ScopeUow
+			                .GetRepository<Department>()
+                            .GetAllActiveNonDeleted(d => d.UserDepartments.Any(ud => ud.UserId == userId))
+                            .Include(d => d.UserDepartments)    
+                            .Select(d => new
+                            {
+                                d.Id,
+                                LastAssignedDate = d.UserDepartments
+                                    .Where(ud => ud.UserId == userId)
+                                    .Max(ud => ud.CreateDate)
+                            })
+                            .OrderByDescending(x => x.LastAssignedDate)
+                            .Select(x => x.Id)
+                            .FirstOrDefaultAsync();
 
         if (departmentId == Guid.Empty)
             throw new BusinessException(ConstantKeys.ExceptionMessage.CurrentAcademiUser);
 
-        var academicYearId = await unitOfWork
-            .GetRepository<AcademicYear>()
-            .GetAllActiveNonDeleted(x =>
-                x.DepartmentId == departmentId &&
-                x.IsCurrent)
-            .OrderByDescending(x => x.CreateDate)
-            .Select(x => x.Id)
-            .FirstOrDefaultAsync();
+        var academicYearId = await ScopeUow
+			                .GetRepository<AcademicYear>()
+                            .GetAllActiveNonDeleted(x =>
+                                x.DepartmentId == departmentId &&
+                                x.IsCurrent)
+                            .OrderByDescending(x => x.CreateDate)
+                            .Select(x => x.Id)
+                            .FirstOrDefaultAsync();
 
         if (academicYearId == Guid.Empty)
             throw new BusinessException(ConstantKeys.ExceptionMessage.CurrentAcademiUser);
@@ -61,7 +64,9 @@ public class AcademicYearServices(IServiceScopeFactory serviceScopeFactory,
     }
     public async Task<int?> GetCurrentAcademicYear()
     {
-        int? acc = await uow.GetRepository<AcademicYear>()
+		using var ScopeUow = serviceScopeFactory.CreateScopedUow();
+
+		int? acc = await ScopeUow.GetRepository<AcademicYear>()
                                     .GetAllActiveNonDeleted()
                                     .OrderByDescending(x => x.CreateDate)
                                     .Where(x => x.DepartmentId == requestInfo.DepId && x.IsCurrent)

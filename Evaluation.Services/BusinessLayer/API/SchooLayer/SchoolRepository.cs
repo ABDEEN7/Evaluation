@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.DepartementEntites;
+using Evaluation.DAL.Models.FormsModules;
 using Evaluation.DAL.Models.Org;
 using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
 using Evaluation.DAL.Repositories;
@@ -97,43 +98,44 @@ public class SchoolRepository(IServiceScopeFactory serviceScopeFactory,
 
 	public async Task<List<School>> GetSchoolsByDepartmentId(Guid depId)
 	{
-		var department = await serviceProvider.CreateScopedUow().GetRepository<Department>()
-			 .GetAllQueryFiltered()
-			 .AsNoTracking().Include(c => c.DepTargetOrgTrees)
-			 .Where(c => c.Id == depId)
-			 .FirstOrDefaultAsync();
+		using var scopeUow = serviceProvider.CreateScopedUow();
+
+		var department = await scopeUow.GetRepository<Department>()
+								 .GetAllQueryFiltered()
+								 .AsNoTracking()
+								 .Include(c => c.DepTargetOrgTrees)
+								 .Where(c => c.Id == depId)
+								 .FirstOrDefaultAsync();
 
 
-		var schools = serviceProvider
-		   .CreateScopedUow()
-		   .GetRepository<School>()
-		   .GetAllNonDeleted()
-		   .Where(c => c.OrgParentId == department.DepTargetOrgTrees.Select(x => x.TargetOrgTreeId).FirstOrDefault())
-		   .ToList();
+		var schools =await scopeUow.GetRepository<School>()
+					   .GetAllNonDeleted()
+					   .Where(c => c.OrgParentId == department.DepTargetOrgTrees.Select(x => x.TargetOrgTreeId).FirstOrDefault())
+					   .ToListAsync();
 
 		return schools;
 	}
-	public async Task<School> GetSchoolDetails(Guid SchoolID)
+	public async Task<School?> GetSchoolDetails(Guid SchoolID)
 	{
-		var school = await serviceProvider
-		   .CreateScopedUow()
-		   .GetRepository<School>().GetByIDActiveNonDeleted(SchoolID);
-
+		using var scopeUow= serviceProvider.CreateScopedUow();
+		var school = await scopeUow.GetRepository<School>().GetByIDActiveNonDeleted(SchoolID);
 		return school;
 	}
 
 	public async Task<List<EvaluationRequest>> GetEvaluationRequestByOrgTreeId(Guid OrgTreeId)
 	{
-		IQueryable<EvaluationRequest> query = unitOfWork.GetRepository<EvaluationRequest>()
-			.GetAllActiveNonDeleted()
-			.Include(d => d.ServiceStatus)
-			.Include(d => d.FormEvalMatrixValue)
-			.Where(er =>
-				er.OrgTreeId == OrgTreeId &&
-				er.DepEvaluationType.DepartmentId == requestInfo.DepId &&
-				er.FormEvalMatrixValueId != null)
-			.OrderByDescending(er => er.CreateDate)
-			.Take(2);
+		using var scopeUow = serviceProvider.CreateScopedUow();
+
+		IQueryable<EvaluationRequest> query = scopeUow.GetRepository<EvaluationRequest>()
+										.GetAllActiveNonDeleted()
+										.Include(d => d.ServiceStatus)
+										.Include(d => d.FormEvalMatrixValue)
+										.Where(er =>
+											er.OrgTreeId == OrgTreeId &&
+											er.DepEvaluationType.DepartmentId == requestInfo.DepId &&
+											er.FormEvalMatrixValueId != null)
+										.OrderByDescending(er => er.CreateDate)
+										.Take(2);
 
 		return query.ToList();
 	}
