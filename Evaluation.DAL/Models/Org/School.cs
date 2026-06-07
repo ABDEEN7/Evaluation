@@ -37,5 +37,7 @@ public class School : OrgTree , IAuditLogEntity
     public SchoolGender? SchoolEmpGender { get; set; }
 
     public virtual ICollection<SchoolLevel>? SchoolLevel { get; set; }
+    public virtual ICollection<SchoolGradeSction>? SchoolGradeSction { get; set; }
+    public virtual ICollection<SchoolGradeSectionCourse>? SchoolGradeSectionCourse { get; set; }
     
 }
