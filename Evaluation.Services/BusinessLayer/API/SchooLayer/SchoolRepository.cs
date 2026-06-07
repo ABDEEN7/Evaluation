@@ -160,11 +160,14 @@ public class SchoolRepository(IServiceScopeFactory serviceScopeFactory,
             filter = filter.And(c => request.SchoolIds.Contains(c.Id));
         if (!string.IsNullOrWhiteSpace(request.Name))
             filter = filter.And(s => s.NameEn.Contains(request.Name) || s.NameAr.Contains(request.Name));
-        if (request.EstablishmentDate.HasValue && request.establishmentDateTo.HasValue)
+        if (request.EstablishmentDate.HasValue)
         {
             filter = filter.And(s =>
-                s.EstablishmentDate.Year >= request.EstablishmentDate.Value &&
-                s.EstablishmentDate.Year <= request.establishmentDateTo.Value);
+                s.EstablishmentDate.Year >= request.EstablishmentDate.Value);
+        }
+        if (request.establishmentDateTo.HasValue)
+        {
+            filter = filter.And(s => s.EstablishmentDate.Year <= request.establishmentDateTo.Value);
         }
         if (request.ParentId != Guid.Empty && request.ParentId != null)
         {

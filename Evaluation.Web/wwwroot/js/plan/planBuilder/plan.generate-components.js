@@ -31,13 +31,14 @@
     } = window.PlanConstants || {};
 
     // ================== STATE MANAGEMENT (Per Instance) ==================
-    // ⚠️ تم نقل الـ state إلى main-handler ليكون منفصل لكل instance
+    //instance
     ns.visitTypes = [];
     ns.planTypes = [];
     ns.semesters = [];
     ns.holidays = [];
     ns.parentSchool = [];
     ns.fomrEvalMatrixValue = [];
+    ns.currentAcademicYear = null;
     ns.currentPage = 1;
     ns.pageSize = 10;
 

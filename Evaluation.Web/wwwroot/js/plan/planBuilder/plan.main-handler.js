@@ -81,7 +81,8 @@
                     loadVisitTypes(),
                     loadVacationDays(),
                     loadParentOrgTree(),
-                    loadFomrEvalMatrixValue()
+                    loadFomrEvalMatrixValue(),
+                    loadCurrentAcademicYear()
                 ]);
             }
 
@@ -137,7 +138,17 @@
     const loadFomrEvalMatrixValue = () =>
         jqClient().Get(API_ENDPOINTS.GetFomrEvalMatrixValue)
             .then(r => ns.fomrEvalMatrixValue = r?.result || []);
-
+    const loadCurrentAcademicYear = () =>
+        jqClient()
+            .Get(API_ENDPOINTS.GET_CurrentAcademicYear)
+            .then(r => {
+                ns.currentAcademicYear = r
+                    ? {
+                        start: new Date(r.startDate),
+                        end: new Date(r.endDate)
+                    }
+                    : null;
+            });
     /* ===================== POPULATE ===================== */
 
     //const populatePlanTypes = (fieldId) => {
@@ -508,18 +519,18 @@
             pageSize: state.pageSize
         });
 
-        
+
         if (state.searchTerm) {
             params.append('search', state.searchTerm);
         }
 
-        
+
         Object.keys(filters).forEach(k => {
             if (filters[k]) params.append(k, filters[k]);
         });
 
         showLoadingState(fieldId);
-        
+
         jqClient().Get(`${API_ENDPOINTS.GET_SCHOOLS}?${params}`)
             .done(r => {
                 const schools = r.items || [];
@@ -741,12 +752,23 @@
     };
 
     const initYearMode = (fieldId) => {
-        const y = new Date().getFullYear();
-        const start = `${y}-01-01`;
-        const end = `${y}-12-31`;
+        const academicYear = ns.currentAcademicYear;
+
+        if (!academicYear || !academicYear.start || !academicYear.end) {
+            console.warn('[PlanHandler] currentAcademicYear not loaded yet — falling back to calendar year');
+            const y = new Date().getFullYear();
+            const start = `${y}-01-01`;
+            const end = `${y}-12-31`;
+            $p(fieldId, 'parentDate').val(`${start} to ${end}`).prop('disabled', true);
+            ns.initChildPicker(new Date(start), new Date(end));
+            return;
+        }
+
+        const start = ns.formatDateISO(academicYear.start);
+        const end = ns.formatDateISO(academicYear.end);
 
         $p(fieldId, 'parentDate').val(`${start} to ${end}`).prop('disabled', true);
-        ns.initChildPicker(new Date(start), new Date(end));
+        ns.initChildPicker(academicYear.start, academicYear.end);
     };
 
     const initMonthMode = (fieldId) => {

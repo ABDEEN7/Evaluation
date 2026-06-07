@@ -86,7 +86,8 @@
         UPDATE_PLAN: `/Plan/${deprouting}/UpdatePlan`,
         GET_PLAN_DETAILS: `/Plan/${deprouting}/GetPlansWithunSelectedSchoolsDetails`,
         GET_PARNT_ORGTREE: `/Org/${deprouting}/GetParentOrgTree`,
-        GetFomrEvalMatrixValue: `/Plan/${deprouting}/GetFomrEvalMatrixValueList`
+        GetFomrEvalMatrixValue: `/Plan/${deprouting}/GetFomrEvalMatrixValueList`,
+        GET_CurrentAcademicYear: `/AcademicYear/${deprouting}/GetCurrentAcademicYearByDepartment`
     };
 
     // Export all constants
