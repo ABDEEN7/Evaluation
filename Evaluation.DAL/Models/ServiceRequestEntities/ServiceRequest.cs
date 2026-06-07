@@ -49,7 +49,6 @@ namespace Evaluation.DAL.Models.ServiceRequestEntities
         public Guid? SchoolCourseId { get; set; }
         public SchoolCourse? SchoolCourse { get; set; }
         public Guid? SchoolClassId { get; set; }
-        public SchoolClass? SchoolClass { get; set; }
 
 
         public virtual ICollection<ServiceRequestFieldsValue>? ServiceRequestFieldsValues { get; set; }

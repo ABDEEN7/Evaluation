@@ -129,6 +129,12 @@ public partial class EvaluationDbContext : DbContext
     public virtual DbSet<FieldInfoType> FieldInfoType { get; set; }
     public virtual DbSet<IntegrationPointLog> IntegrationPointLog { get; set; }
     public virtual DbSet<IntegrationPointDataLog> IntegrationPointDataLog { get; set; }
+    public virtual DbSet<SchoolStatus> SchoolStatus { get; set; }
+    public virtual DbSet<SchoolModel> SchoolModel { get; set; }
+    public virtual DbSet<SchoolGender> SchoolGender { get; set; }
+    public virtual DbSet<SchoolGradeSction> SchoolGradeSction { get; set; }
+    public virtual DbSet<SchoolGradeSectionCourse> SchoolGradeSectionCourse { get; set; }
+    public virtual DbSet<SchoolProgram> SchoolProgram { get; set; }
 
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
