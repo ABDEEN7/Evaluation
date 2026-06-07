@@ -1,4 +1,5 @@
-﻿using Evaluation.DAL.Models.Audit;
+﻿using Evaluation.DAL.Models.Attachments;
+using Evaluation.DAL.Models.Audit;
 using Evaluation.DAL.Models.BaseModule;
 using Evaluation.DAL.Models.Calendars;
 using Evaluation.DAL.Models.DepartementEntites;
@@ -24,5 +25,8 @@ public class Plan : EntityBase, IAuditLogEntity
     public string? PlanJsonValue { get; set; }
 
     public virtual ICollection<EvaluationRequest>? EvaluationRequests { get; set; }
+
+	//public virtual Guid? EvalAttachmentsId { get; set; }
+	//public virtual EvalAttachment? EvalAttachments { get; set; }
 
 }

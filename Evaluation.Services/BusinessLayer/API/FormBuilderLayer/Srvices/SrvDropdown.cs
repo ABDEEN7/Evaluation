@@ -568,6 +568,11 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 						result = await GetScopesData(requestInfo.DepId!.Value,fieldValueId);
 						break;
 					}
+				case "teamMemberScops":
+					{
+						result = await GetTeamMemberScopesData(fieldValueId);
+						break;
+					}
 				case "teamMember":
 					{
 						result = await GetTeamMembersData(EvalId.Value, fieldValueId);
@@ -814,6 +819,41 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 					["ColorCode"] = x.Scope.ColorCode ?? ""
 				})
 				.ToList();
+		}
+
+		private async Task<List<Dictionary<string, object>>> GetTeamMemberScopesData(Guid? fieldValueId = null)
+		{
+			using var scopedUow = serviceScopeFactory.CreateScopedUow();
+
+			var query = scopedUow.GetRepository<EvaluationRequestAssignment>()
+				.GetAllQueryFiltered()
+				.Where(x => x.MinistryUserId == userInfo.UserId)
+				.SelectMany(x => x.EvalRequestAssignmentScopies!)
+				.Where(x => x.Scope != null);
+
+			if (fieldValueId.HasValue && fieldValueId.Value != Guid.Empty)
+			{
+				query = query.Where(x => x.ScopeId == fieldValueId.Value);
+			}
+
+			var scopes = await query
+	                        .Select(x => x.Scope!)
+	                        .Distinct()
+	                        .OrderBy(x => x.OrderNo)
+	                        .ToListAsync();
+
+			var data = scopes
+				.Select(x => new Dictionary<string, object>
+				{
+					["Id"] = x.Id,
+					["NameAr"] = x.NameAr ?? string.Empty,
+					["NameEn"] = x.NameEn ?? string.Empty,
+					["OrderNo"] = x.OrderNo,
+					["ColorCode"] = x.ColorCode ?? string.Empty
+				})
+				.ToList();
+
+			return data;
 		}
 		private async Task<List<Dictionary<string, object>>> GetTeamMembersData(Guid? evaluationRequestId,Guid? fieldValueId = null)
 		{

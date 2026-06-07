@@ -22,8 +22,6 @@ public class FormItem : EntityBase, IAuditLogEntity
     public int OrderNo { get; set; } = 0;
     public string? ColorCode { get; set; }
     public bool HasMuliEvaluation { get; set; }
-
-
     public virtual ICollection<SubFormItem>? SubFormItems { get; set; }
     public ICollection<FormItemRelated>? RelatedFrom { get; set; }
     public ICollection<FormItemRelated>? RelatedTo { get; set; }

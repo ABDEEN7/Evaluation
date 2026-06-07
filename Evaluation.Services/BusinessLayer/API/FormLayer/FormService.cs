@@ -36,9 +36,10 @@ public class FormService(IServiceScopeFactory serviceScopeFactory,
 
 	}
 
-    public async Task<EvalForm> GetEvalForm(Guid id, bool IncludeCalcMethod)
+    public async Task<EvalForm?> GetEvalForm(Guid id, bool IncludeCalcMethod)
     {
-        var query = unitOfWork.GetRepository<EvalForm>()
+		using var scope = serviceProvider.CreateScopedUow();
+		var query = scope.GetRepository<EvalForm>()
             .GetAllQueryFiltered();
 
         if (IncludeCalcMethod)
@@ -47,41 +48,52 @@ public class FormService(IServiceScopeFactory serviceScopeFactory,
         return await query.Where(f => f.Id == id).FirstOrDefaultAsync();
     }
 
-    public async Task<FormEvalMatrix> GetFormEvalMatrix(Guid id)
+    public async Task<FormEvalMatrix?> GetFormEvalMatrix(Guid id)
     {
-        return await unitOfWork.GetRepository<FormEvalMatrix>()
+		using var scope = serviceProvider.CreateScopedUow();
+
+		var matrix= await scope.GetRepository<FormEvalMatrix>()
             .GetByIdAsync(id);
-    }
+        return matrix;
+
+	}
 
     public async Task<List<FormEvalMatrixValue>> GetFormEvalMatrixValues(Guid id)
     {
-        return await unitOfWork.GetRepository<FormEvalMatrixValue>()
+		using var scope = serviceProvider.CreateScopedUow();
+
+		var result= await scope.GetRepository<FormEvalMatrixValue>()
             .GetAllActiveNonDeleted()
             .Where(x => x.FormEvalMatrixId == id)
             .OrderBy(x => x.OrderNo)
             .ToListAsync();
+        return result;
     }
 
     public async Task<List<FormItem>> GetFormItems(Guid formId)
     {
-        var formItems = await unitOfWork.GetRepository<FormItem>()
-                  .GetAllActiveNonDeleted()
-                  .Where(s => s.EvalFormId == formId)
-                  .Include(f => f.FormItemConfigs)
-				  .Include(x => x.SubFormItems)
-	               .ThenInclude(x => x.DropDownType)
-		           .ThenInclude(x => x.FieldDropDownValues)
-				  .Include(f => f.RelatedFrom)
-                  .ThenInclude(y => y.RelatedItem)
-                  .OrderBy(x => x.OrderNo)
-                  .ToListAsync();
+		using var scope = serviceProvider.CreateScopedUow();
 
-        return formItems;
+		var formItems= await scope.GetRepository<FormItem>()
+			.GetAllActiveNonDeleted()
+			.Where(s => s.EvalFormId == formId)
+			.Include(f => f.FormItemConfigs)
+			.Include(x => x.SubFormItems)
+				.ThenInclude(x => x.DropDownType)
+					.ThenInclude(x => x.FieldDropDownValues)
+			.Include(f => f.RelatedFrom)
+				.ThenInclude(y => y.RelatedItem)
+			.OrderBy(x => x.OrderNo)
+			.ToListAsync();
+
+		return formItems;
     }
 
-    public async Task<FormItem> GetFormItem(Guid Id)
+    public async Task<FormItem?> GetFormItem(Guid Id)
     {
-        return await unitOfWork.GetRepository<FormItem>()
+		using var scope = serviceProvider.CreateScopedUow();
+
+		return await scope.GetRepository<FormItem>()
             .GetAllQueryFiltered()
             .Include(d => d.SubFormItems)
             .Where(f => f.Id == Id!)
@@ -90,28 +102,34 @@ public class FormService(IServiceScopeFactory serviceScopeFactory,
 
     public async Task<FormEvaluationValue> SaveFormItemsAndSubs(FormEvaluationValue form)
     {
-        if (form.Items.Count > 0)
+        if (form.Items?.Any() == true)
             await unitOfWork.GetRepository<FormItemValue>().InsertRange(form.Items);
-        if (form.SubItems.Count > 0)
+        if (form.SubItems?.Any() == true)
             await unitOfWork.GetRepository<SubFormItemValue>().InsertRange(form.SubItems);
-        await uow.CommitAsync();
+        //await uow.CommitAsync();
 
         return form;
     }
 
-    public async Task<FormItemValue> GetFormItemValue(Guid ValueId)
+    public async Task<FormItemValue?> GetFormItemValue(Guid ValueId)
     {
-        return await unitOfWork.GetRepository<FormItemValue>().GetByIDActiveNonDeleted(ValueId!);
+		using var scope = serviceProvider.CreateScopedUow();
+
+		return await scope.GetRepository<FormItemValue>().GetByIDActiveNonDeleted(ValueId!);
     }
 
-    public async Task<FormItemValue> GetFormItemValueByItemId(Guid ItemId)
+    public async Task<FormItemValue?> GetFormItemValueByItemId(Guid ItemId)
     {
-        return await unitOfWork.GetRepository<FormItemValue>().GetAllActiveNonDeleted().Where(x => x.FormItemId == ItemId).FirstOrDefaultAsync();
+		using var scope = serviceProvider.CreateScopedUow();
+
+		return await scope.GetRepository<FormItemValue>().GetAllActiveNonDeleted().Where(x => x.FormItemId == ItemId).FirstOrDefaultAsync();
     }
 
-    public async Task<SubFormItemValue> GetSubFormItemValue(Guid ValueId)
+    public async Task<SubFormItemValue?> GetSubFormItemValue(Guid ValueId)
     {
-        return await unitOfWork.GetRepository<SubFormItemValue>().GetByIDActiveNonDeleted(ValueId!);
+		using var scope = serviceProvider.CreateScopedUow();
+
+		return await scope.GetRepository<SubFormItemValue>().GetByIDActiveNonDeleted(ValueId!);
     }
 
 }
