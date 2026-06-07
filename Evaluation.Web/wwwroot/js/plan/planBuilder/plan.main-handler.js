@@ -138,17 +138,15 @@
     const loadFomrEvalMatrixValue = () =>
         jqClient().Get(API_ENDPOINTS.GetFomrEvalMatrixValue)
             .then(r => ns.fomrEvalMatrixValue = r?.result || []);
+
     const loadCurrentAcademicYear = () =>
-        jqClient()
-            .Get(API_ENDPOINTS.GET_CurrentAcademicYear)
+        jqClient().Get(API_ENDPOINTS.GET_CurrentAcademicYear)
             .then(r => {
                 ns.currentAcademicYear = r
-                    ? {
-                        start: new Date(r.startDate),
-                        end: new Date(r.endDate)
-                    }
+                    ? { start: new Date(r.startDate), end: new Date(r.endDate) }
                     : null;
             });
+
     /* ===================== POPULATE ===================== */
 
     //const populatePlanTypes = (fieldId) => {
@@ -246,9 +244,11 @@
         });
     };
     const initializeFilterDatePickers = (fieldId) => {
-        const regularDateFields = ['filterLastEvalDate', 'filterNextEvalDate'];
-        regularDateFields.forEach(field => {
+        const dateFields = ['filterLastEvalDate', 'filterCreatedDate', 'filterNextEvalDate'];
+
+        dateFields.forEach(field => {
             const $input = $p(fieldId, field);
+
             if ($input.length && typeof flatpickr !== 'undefined') {
                 flatpickr($input[0], {
                     locale: "en",
@@ -256,83 +256,6 @@
                     allowInput: true
                 });
             }
-        });
-
-
-        ['filterCreatedDate', 'filterToCreatedDate'].forEach(fieldName => {
-            const $yearInput = $p(fieldId, fieldName);
-            if (!$yearInput.length) return;
-
-            $yearInput.attr('readonly', true);
-
-            const wrapperId = `${fieldId}_${fieldName}_YearPicker`;
-            $yearInput.wrap(`<div id="${wrapperId}" style="position:relative;display:inline-block;width:100%;"></div>`);
-
-            const dropdown = $(`
-            <div class="yp-dropdown" style="
-                display:none; position:absolute; top:38px; left:0; z-index:9999;
-                background:#fff; border:1px solid #ccc; border-radius:6px;
-                padding:10px; width:240px; box-sizing:border-box;">
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-                    <button type="button" class="yp-prev" style="background:none;border:none;cursor:pointer;font-size:16px;">‹</button>
-                    <span class="yp-range" style="font-size:13px;font-weight:500;"></span>
-                    <button type="button" class="yp-next" style="background:none;border:none;cursor:pointer;font-size:16px;">›</button>
-                </div>
-                <div class="yp-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;"></div>
-            </div>
-        `);
-
-            $(`#${wrapperId}`).append(dropdown);
-
-            const today = new Date().getFullYear();
-            let pageStart = Math.floor(today / 12) * 12;
-            let selectedYear = null;
-
-            const renderGrid = () => {
-                dropdown.find('.yp-range').text(`${pageStart} – ${pageStart + 11}`);
-                const grid = dropdown.find('.yp-grid').empty();
-                for (let y = pageStart; y < pageStart + 12; y++) {
-                    const cell = $(`<div style="
-                    text-align:center;padding:6px 2px;border-radius:4px;
-                    font-size:12px;cursor:pointer;
-                    background:${y === selectedYear ? '#185FA5' : 'transparent'};
-                    color:${y === selectedYear ? '#fff' : 'inherit'};
-                    border:1px solid ${y === today ? '#ccc' : 'transparent'};
-                ">${y}</div>`);
-                    cell.on('click', function (e) {
-                        e.stopPropagation();
-                        selectedYear = y;
-                        $yearInput.val(y);
-                        dropdown.hide();
-                        renderGrid();
-                    });
-                    grid.append(cell);
-                }
-            };
-
-            $yearInput.on('click', function (e) {
-                e.stopPropagation();
-                dropdown.toggle();
-                renderGrid();
-            });
-
-            dropdown.find('.yp-prev').on('click', function (e) {
-                e.stopPropagation();
-                pageStart -= 12;
-                renderGrid();
-            });
-
-            dropdown.find('.yp-next').on('click', function (e) {
-                e.stopPropagation();
-                pageStart += 12;
-                renderGrid();
-            });
-
-            $(document).on('click', function () {
-                dropdown.hide();
-            });
-
-            renderGrid();
         });
     };
 
@@ -513,24 +436,24 @@
         state.currentPage = page;
         state.filters = filters;
 
-        // query parameters
+        // ✅ بناء الـ query parameters
         const params = new URLSearchParams({
             pageNumber: page,
             pageSize: state.pageSize
         });
 
-
+        // ✅ إضافة البحث
         if (state.searchTerm) {
             params.append('search', state.searchTerm);
         }
 
-
+        // ✅ إضافة الفلاتر
         Object.keys(filters).forEach(k => {
             if (filters[k]) params.append(k, filters[k]);
         });
 
         showLoadingState(fieldId);
-
+        // ✅ استدعاء API
         jqClient().Get(`${API_ENDPOINTS.GET_SCHOOLS}?${params}`)
             .done(r => {
                 const schools = r.items || [];
@@ -691,35 +614,46 @@
         const $table = $p(fieldId, 'planTable');
         const state = instances.get(fieldId);
 
-        $table.find('tr[data-auto-selected="true"]').each(function () {
-            const $row = $(this);
-            const schoolId = $row.find('.selectRow').data('school-id');
-            const schoolName = $row.find('.selectRow').data('name');
-            const visitDate = $row.find(`.childDate[data-school-id="${schoolId}"]`).val();
-            const visitTypeId = $row.find(`.visitTypeSelect[data-school-id="${schoolId}"]`).val();
-            console.log('auto-selected row:', schoolId, 'visitTypeId:', visitTypeId);
-            console.log('select element:', $row.find(`.visitTypeSelect[data-school-id="${schoolId}"]`).length);
-            console.log('select HTML:', $row.find(`.visitTypeSelect[data-school-id="${schoolId}"]`)[0]?.outerHTML);
-            if (schoolId) {
-                state.selectedSchoolsMap.set(schoolId, {
-                    id: schoolId,
-                    name: schoolName,
-                    visitDate: visitDate,
-                    visitTypeId: visitTypeId
-                });
-            }
-        });
-
-        state.selectedSchools = Array.from(state.selectedSchoolsMap.values());
-        updateSelectionCounter(fieldId);
         $table.find('.selectRow').off('change').on('change', function () {
             updateSelectedSchools(fieldId);
         });
+
         $table.find('.childDate').off('change').on('change', function () {
-            updateSelectedSchools(fieldId);
+            const schoolId = $(this).data('school-id');
+            const newDate = $(this).val();
+            if (state.selectedSchoolsMap && state.selectedSchoolsMap.has(schoolId)) {
+                state.selectedSchoolsMap.get(schoolId).visitDate = newDate;
+                state.selectedSchools = Array.from(state.selectedSchoolsMap.values());
+            }
         });
+
         $table.find('.visitTypeSelect').off('change').on('change', function () {
-            updateSelectedSchools(fieldId);
+            const schoolId = $(this).data('school-id');
+            const newType = $(this).val();
+
+            if (newType) {
+                const $checkbox = $table.find(`.selectRow[data-school-id="${schoolId}"]`);
+                if (!$checkbox.is(':checked')) {
+                    $checkbox.prop('checked', true);
+                }
+
+                if (!state.selectedSchoolsMap.has(schoolId)) {
+                    const schoolName = $checkbox.data('name');
+                    state.selectedSchoolsMap.set(schoolId, {
+                        id: schoolId,
+                        name: schoolName,
+                        visitDate: $table.find(`.childDate[data-school-id="${schoolId}"]`).val() || '',
+                        visitTypeId: newType
+                    });
+                } else {
+                    state.selectedSchoolsMap.get(schoolId).visitTypeId = newType;
+                }
+                state.selectedSchools = Array.from(state.selectedSchoolsMap.values());
+                updateSelectionCounter(fieldId);
+            } else if (state.selectedSchoolsMap.has(schoolId)) {
+                state.selectedSchoolsMap.get(schoolId).visitTypeId = newType;
+                state.selectedSchools = Array.from(state.selectedSchoolsMap.values());
+            }
         });
     };
 
@@ -752,23 +686,20 @@
     };
 
     const initYearMode = (fieldId) => {
-        const academicYear = ns.currentAcademicYear;
-
-        if (!academicYear || !academicYear.start || !academicYear.end) {
-            console.warn('[PlanHandler] currentAcademicYear not loaded yet — falling back to calendar year');
+        const ay = ns.currentAcademicYear;
+        if (ay?.start && ay?.end) {
+            const start = ns.formatDateISO(ay.start);
+            const end = ns.formatDateISO(ay.end);
+            $p(fieldId, 'parentDate').val(`${start} to ${end}`).prop('disabled', true);
+            ns.initChildPicker(ay.start, ay.end);
+        } else {
+            // fallback to calendar year
             const y = new Date().getFullYear();
             const start = `${y}-01-01`;
             const end = `${y}-12-31`;
             $p(fieldId, 'parentDate').val(`${start} to ${end}`).prop('disabled', true);
             ns.initChildPicker(new Date(start), new Date(end));
-            return;
         }
-
-        const start = ns.formatDateISO(academicYear.start);
-        const end = ns.formatDateISO(academicYear.end);
-
-        $p(fieldId, 'parentDate').val(`${start} to ${end}`).prop('disabled', true);
-        ns.initChildPicker(academicYear.start, academicYear.end);
     };
 
     const initMonthMode = (fieldId) => {
@@ -836,12 +767,11 @@
         e.preventDefault();
         const state = instances.get(fieldId);
 
-
+        // ✅ جمع قيم الفلاتر
         state.filters = {
             name: $p(fieldId, 'filterSchoolName').val(),
             lastEvalDate: $p(fieldId, 'filterLastEvalDate').val(),
             establishmentDate: $p(fieldId, 'filterCreatedDate').val(),
-            establishmentDateTo: $p(fieldId, 'filterToCreatedDate').val(),
             nextEvalDate: $p(fieldId, 'filterNextEvalDate').val(),
             fomrEvalMatrixValueId: $p(fieldId, 'filterPreviousResult').val(),
             visitType: $p(fieldId, 'filterVisitType').val()
@@ -870,7 +800,6 @@
         $p(fieldId, 'filterSchoolName').val('');
         $p(fieldId, 'filterLastEvalDate').val('');
         $p(fieldId, 'filterCreatedDate').val('');
-        $p(fieldId, 'filterToCreatedDate').val('');
         $p(fieldId, 'filterNextEvalDate').val('');
         $p(fieldId, 'filterPreviousResult').val('');
         $p(fieldId, 'filterVisitType').val('');

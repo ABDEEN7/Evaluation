@@ -78,6 +78,7 @@ public class SchoolRepository(IServiceScopeFactory serviceScopeFactory,
                 LastEvaluationDate = x.LastEval.EvaluationDate,
                 AcademicYear = x.LastEval.NextEvaluationDate,
                 EstablishmentDate = x.School.EstablishmentDate,
+                NextEvaluationDate = x.LastEval.NextEvaluationDate,
 
                 FormEvalMatrixNameValue = x.School.EvaluationRequests
     .OrderBy(s => s.NextEvaluationDate)
@@ -85,10 +86,6 @@ public class SchoolRepository(IServiceScopeFactory serviceScopeFactory,
     .Select(er => requestInfo.Lang == LanguageConst.Ar
         ? er.FormEvalMatrixValue!.NameAr
         : er.FormEvalMatrixValue!.NameEn)
-    .FirstOrDefault(),
-                NextEvaluationDate = x.School.EvaluationRequests
-    .OrderByDescending(er => er.CreateDate)
-    .Select(s => s.NextEvaluationDate)
     .FirstOrDefault()
             });
 
