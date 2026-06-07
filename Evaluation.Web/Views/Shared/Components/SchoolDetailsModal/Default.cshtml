@@ -198,6 +198,7 @@
                                         <th class=" @ConstantKeys.WebAppRequest.lblEvaluationDate"></th>
                                         <th class=" @ConstantKeys.WebAppRequest.lblNextEvaluationDate"></th>
                                         <th class=" @ConstantKeys.WebAppRequest.lblEvaluationResult"></th>
+                                        <th class=""></th>
                                     </tr>
                                 </thead>
                                 <tbody class="requeststableBody w-100"></tbody>
@@ -314,6 +315,19 @@ else
                         data: "evaluationResult",
                     title: uiControlsSetup().GetUiControlText("lblEvaluationResult"),
                         className: "td-left code"
+                    },
+                    {
+                        data: null,
+                        orderable: false,
+                        searchable: false,
+                        render: function (data, type, row) {
+
+                            return `
+                                <button class="btn btn-sm btn-primary"
+                                        onclick="openEvaluationRequestDetails('${row.id}')">
+                                    ${uiControlsSetup().GetUiControlText("lblEvaluationRequestDetails")}
+                                </button>`;
+                        }
                     }
                 ],
                 // onRowClick: function (rowData, event) {

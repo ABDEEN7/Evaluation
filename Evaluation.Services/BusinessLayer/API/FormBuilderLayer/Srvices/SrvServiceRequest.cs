@@ -1112,35 +1112,35 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
 			using var scopedUow = serviceScopeFactory.CreateScopedUow();
 
-            //var initiators = (await cacheDataProvider.GetServiceIntiator())
-            //    .Where(c => userInfo.PartyTypes.Contains(c.PartyTypeId) && c.service?.SystemModule?.DepartmentId == requestInfo.DepId)
-            //    .Select(c => c.serviceId)
-            //    .ToHashSet();
+            var initiators = (await cacheDataProvider.GetServiceIntiator())
+                .Where(c => userInfo.PartyTypes.Contains(c.PartyTypeId) && c.service?.SystemModule?.DepartmentId == requestInfo.DepId)
+                .Select(c => c.serviceId)
+                .ToHashSet();
 
-            //var statusConfig = (await cacheDataProvider.GetServiceStatusConfiguration())
-            //	.Where(c => distinctStatusIds.Contains(c.CurrentStatusId)
-            //			 && c.Service!.SystemModuleId == moduleId)
-            //	.Select(c => new { c.CurrentStatusId, c.ServiceId })
-            //	.ToList();
+            var statusConfig = (await cacheDataProvider.GetServiceStatusConfiguration())
+                .Where(c => distinctStatusIds.Contains(c.CurrentStatusId)
+                         && c.Service!.SystemModuleId == moduleId)
+                .Select(c => new { c.CurrentStatusId, c.ServiceId })
+                .ToList();
 
-            //var allowedServiceIds = statusConfig
-            //	.Where(c => initiators.Contains(c.ServiceId))
-            //	.Select(c => c.ServiceId)
-            //	.Distinct()
-            //	.ToList();
+            var allowedServiceIds = statusConfig
+                .Where(c => initiators.Contains(c.ServiceId))
+                .Select(c => c.ServiceId)
+                .Distinct()
+                .ToList();
 
             var services = await scopedUow
                 .GetRepository<Service>()
                 .GetAllQueryFiltered()
                 .Include(x => x.SystemModule)
                 .Where(s =>
-                    //allowedServiceIds.Contains(s.Id) &&
+                    allowedServiceIds.Contains(s.Id) &&
                     s.Initialservice != true &&
-                    s.SystemModule!.SystemModuleTypeId == moduleId && s.SystemModule.DepartmentId == requestInfo.DepId)
-                //&&
-                //s.StartDate.HasValue &&
-                //today >= s.StartDate.Value &&
-                //(!s.EndDate.HasValue || s.EndDate.Value.AddDays(1) >= today))
+                    s.SystemModule!.SystemModuleTypeId == moduleId && s.SystemModule.DepartmentId == requestInfo.DepId
+                &&
+                s.StartDate.HasValue &&
+                today >= s.StartDate.Value &&
+                (!s.EndDate.HasValue || s.EndDate.Value.AddDays(1) >= today))
                 .Select(s => new ServiceDTO
                 {
                     Id = s.Id,
@@ -1152,13 +1152,13 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
             foreach (var statusId in distinctStatusIds)
             {
-                //var serviceIdsForStatus = statusConfig
-                //	.Where(c => c.CurrentStatusId == statusId)
-                //	.Select(c => c.ServiceId)
-                //	.ToHashSet();
+                var serviceIdsForStatus = statusConfig
+                    .Where(c => c.CurrentStatusId == statusId)
+                    .Select(c => c.ServiceId)
+                    .ToList();
 
                 result[statusId] = services
-                    //.Where(s => serviceIdsForStatus.Contains(s.Id.Value))
+                    .Where(s => serviceIdsForStatus.Contains(s.Id.Value))
                     .ToList();
             }
 

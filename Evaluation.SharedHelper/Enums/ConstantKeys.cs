@@ -1396,7 +1396,7 @@ public static class ConstantKeys
         public const string PageDescription = Prefix + "PageDescription";
 
         public const string TabEvaluationPlans = Prefix + "TabEvaluationPlans";
-        public const string TabEvaluationOperations = Prefix + "TabEvaluationOperations";
+        public const string TabEvaluationOperations = "TabEvaluationOperations";
         public const string TabSchools = Prefix + "TabSchools";
 
         public const string SubTabPlanRequests = Prefix + "SubTabPlanRequests";
