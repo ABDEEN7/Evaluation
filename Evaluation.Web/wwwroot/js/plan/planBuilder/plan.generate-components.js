@@ -2,38 +2,54 @@
 
 (function (ns) {
 
+    // =================== LOCALIZATION Helper===================
     function t(key, fallback = '') {
         const text = uiControlsSetup()?.GetUiControlText(key);
         return text || key;
     }
 
+    // ================== PREFIX CONFIGURATION ==================
     ns.fieldIdPrefixes = new Map();
+
     ns.initializePrefix = function (fieldId) {
-        if (fieldId) { ns.fieldIdPrefixes.set(fieldId, fieldId); ns.fieldIdPrefix = fieldId; }
-    };
+        if (fieldId) {
+            ns.fieldIdPrefixes.set(fieldId, fieldId);
+            ns.fieldIdPrefix = fieldId;
+        }
+    }
+
     ns.getPrefixedId = function (id, fieldId) {
         const prefix = fieldId || ns.fieldIdPrefix;
-        return (!prefix || !id) ? id : `${prefix}_${id}`;
+        if (!prefix || !id) return id;
+        return `${prefix}_${id}`;
     };
+    // ================== CONSTANTS ==================
+    const {
+        VALIDATION_RULES,
+        RATING_CLASSES,
+        PLAN_TYPE_BACKEND
+    } = window.PlanConstants || {};
 
-    const { VALIDATION_RULES, RATING_CLASSES, PLAN_TYPE_BACKEND } = window.PlanConstants || {};
-
+    // ================== STATE MANAGEMENT (Per Instance) ==================
     ns.visitTypes = [];
     ns.planTypes = [];
     ns.semesters = [];
     ns.holidays = [];
     ns.parentSchool = [];
-    ns.schoolLevels = [];
-    ns.genders = [];
-    ns.departments = [];
+    ns.fomrEvalMatrixValue = [];
+    ns.currentAcademicYear = null;
     ns.currentPage = 1;
     ns.pageSize = 10;
 
-    /* ==================== DATE HELPERS ==================== */
+    // ================== HELPER FUNCTIONS ==================
+
     const formatDateRange = (startDate, endDate) => {
         if (!startDate || !endDate) return '';
-        const start = new Date(startDate), end = new Date(endDate);
-        if (isNaN(start.getTime()) || isNaN(end.getTime())) return '';
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+            return '';
+        }
         return `${formatDateISO(start)} to ${formatDateISO(end)}`;
     };
 
@@ -46,331 +62,787 @@
 
     const isHoliday = (dateObj) => {
         const dateStr = formatDateISO(dateObj);
+
         return ns.holidays?.some(holiday => {
-            if (dateStr < formatDateISO(holiday.start) || dateStr > formatDateISO(holiday.end)) return false;
-            return holiday.isCron && holiday.cron
-                ? matchesCronExpression(dateObj, holiday.cron)
-                : true;
+            // First check if date is within the holiday's valid period
+            const holidayStartStr = formatDateISO(holiday.start);
+            const holidayEndStr = formatDateISO(holiday.end);
+
+            if (dateStr < holidayStartStr || dateStr > holidayEndStr) {
+                return false; // Date is outside the holiday period
+            }
+
+            if (holiday.isCron && holiday.cron) {
+                // For cron holidays, check if the date matches the cron pattern
+                return matchesCronExpression(dateObj, holiday.cron, holiday.start, holiday.end);
+            } else {
+                // For regular range holidays, if date is within start-end, it's a holiday
+                return true; // Already confirmed above that date is within range
+            }
         }) || false;
     };
-
-    // ✅ FIX: was referencing undefined `currentDayOfWeek`
-    const matchesCronExpression = (date, cronExpression) => {
-        const parts = cronExpression.trim().split(/\s+/);
-        if (parts.length < 5) return false;
-        const dow = parts[4];
-        const current = date.getDay();
-        if (dow.includes(',')) return dow.split(',').map(Number).includes(current);
-        if (dow.includes('-')) { const [s, e] = dow.split('-').map(Number); return current >= s && current <= e; }
-        return parseInt(dow) === current;
-    };
-
-    /* ==================== FORM FIELD GENERATORS ==================== */
+    const matchesCronExpression = (date, cronExpression, startDate, endDate) => {
+        const cronParts = cronExpression.trim().split(/\s+/);
+        if (cronParts.length >= 5) {
+            const dayOfWeekCron = cronParts[4];
+            if (dayOfWeekCron.includes(",")) {
+                const days = dayOfWeekCron.split(",").map(d => parseInt(d));
+                return days.includes(currentDayOfWeek);
+            } else if (dayOfWeekCron.includes("-")) {
+                // Range like "1-5" (Monday to Friday)
+                const [start, end] = dayOfWeekCron.split("-").map(d => parseInt(d));
+                return currentDayOfWeek >= start && currentDayOfWeek <= end;
+            }
+            else {
+                //single day
+                return parseInt(dayOfWeekCron) === currentDayOfWeek;
+            }
+            return false;
+        }
+    }
+    // ================== PLAN FORM FIELD GENERATORS ==================
+    // 1. In generateTitleField - FIX THE PLACEHOLDER
     const generateTitleField = (fieldId, field, readonly) => {
-        const el = $('<input>').attr('type', 'text').attr('id', `${fieldId}_planTitle`)
-            .attr('name', 'PlanTitle').addClass('form-control')
-            .attr('placeholder', t('lblInsertPlan')).val(field?.value || '');
-        if (readonly) el.prop('readonly', true).prop('disabled', true);
-        if (VALIDATION_RULES.TITLE.required) el.attr('required', true);
-        return el;
+        const inputElement = $('<input>')
+            .attr('type', 'text')
+            .attr('id', `${fieldId}_planTitle`)
+            .attr('name', 'PlanTitle')
+            .addClass('form-control')
+            .attr('placeholder', `${t('lblInsertPlan')}`)
+            .val(field?.value || '');
+
+        if (readonly) {
+            inputElement.prop('readonly', true).prop('disabled', true);
+        }
+
+        if (VALIDATION_RULES.TITLE.required) {
+            inputElement.attr('required', true);
+        }
+
+        return inputElement;
     };
 
     const generatePlanTypeField = (fieldId, field, readonly) => {
-        const selectElement = $('<select>').attr('id', `${fieldId}_ddlPlanType`).attr('name', 'PlanTypeId')
-            .addClass('form-control').append($('<option>').val('').text(t('lblChoosePlanType')));
-        if (readonly) selectElement.prop('disabled', true);
-        if (VALIDATION_RULES.PLAN_TYPE.required) selectElement.attr('required', true);
+        const selectElement = $('<select>')
+            .attr('id', `${fieldId}_ddlPlanType`)
+            .attr('name', 'PlanTypeId')
+            .addClass('form-control')
+            .append($('<option>').val('').text(`${t('lblChoosePlanType')}`));
+
+        if (readonly) {
+            selectElement.prop('disabled', true);
+        }
+
+        if (VALIDATION_RULES.PLAN_TYPE.required) {
+            selectElement.attr('required', true);
+        }
+
         ns.planTypes.forEach(type => {
-            const option = $('<option>').val(type.id).text(type.name).attr('data-backendname', type.backendName);
-            if (field?.value === type.id) option.prop('selected', true);
+            const option = $('<option>')
+                .val(type.id)
+                .text(type.name)
+                .attr('data-backendname', type.backendName);
+
+            if (field?.value === type.id) {
+                option.prop('selected', true);
+            }
+
             selectElement.append(option);
         });
+
         return selectElement;
     };
 
     const generateSemesterField = (fieldId, field, readonly) => {
-        const container = $('<div>').attr('id', `${fieldId}_semesterContainer`).addClass('col-md-4')
-            // ✅ FIX: was `!== false` (showed by default). Now `=== true` (hidden by default)
+        const container = $('<div>')
+            .attr('id', `${fieldId}_semesterContainer`)
+            .addClass('col-md-4')
             .css('display', field?.visible === true ? 'block' : 'none');
-        const selectElement = $('<select>').attr('id', `${fieldId}_ddlSemester`).attr('name', 'SemesterId')
-            .addClass('form-control').append($('<option>').val('').text(t('lblChooseSemester')));
-        if (readonly) selectElement.prop('disabled', true);
-        ns.semesters.forEach(s => {
-            const opt = $('<option>').val(s.id).text(s.name).data('startDate', s.startDate).data('endDate', s.endDate);
-            if (field?.value === s.id) opt.prop('selected', true);
-            selectElement.append(opt);
+
+        const selectElement = $('<select>')
+            .attr('id', `${fieldId}_ddlSemester`)
+            .attr('name', 'SemesterId')
+            .addClass('form-control')
+            .append($('<option>').val('').text(`${t('lblChooseSemester')}`));
+
+        if (readonly) {
+            selectElement.prop('disabled', true);
+        }
+
+        ns.semesters.forEach(semester => {
+            const option = $('<option>')
+                .val(semester.id)
+                .text(semester.name)
+                .data('startDate', semester.startDate)
+                .data('endDate', semester.endDate);
+
+            if (field?.value === semester.id) {
+                option.prop('selected', true);
+            }
+
+            selectElement.append(option);
         });
-        const label = $('<label>').addClass('form-label').attr('for', `${fieldId}_ddlSemester`)
+
+        const label = $('<label>')
+            .addClass('form-label')
+            .attr('for', `${fieldId}_ddlSemester`)
             .html(`${t('lblSemester')} <span class="text-danger">*</span>`);
-        const group = $('<div>').addClass('mb-4').append(label, selectElement);
-        if (!readonly) group.append($('<div>').addClass('invalid-feedback').text(t('lblPleaseChooseSemester')));
-        container.append(group);
+
+        const formGroup = $('<div>').addClass('mb-4');
+        formGroup.append(label, selectElement);
+
+
+        if (!readonly) {
+            formGroup.append($('<div>').addClass('invalid-feedback').text(`${t('lblPleaseChooseSemester')}`));
+        }
+        container.append(formGroup);
         return container;
     };
 
     const generateDateRangeField = (fieldId, field, readonly) => {
-        const el = $('<input>').attr('type', 'text').attr('id', `${fieldId}_parentDate`)
-            .attr('name', 'dateRange').addClass('form-control')
-            .attr('placeholder', t('lblChooseDateRange')).val(field?.value || '');
-        if (readonly) el.prop('readonly', true).prop('disabled', true);
-        else el.attr('required', true);
-        return $('<div>').addClass('input-group datetime').append(
-            el,
+        const inputElement = $('<input>')
+            .attr('type', 'text')
+            .attr('id', `${fieldId}_parentDate`)
+            .attr('name', 'dateRange')
+            .addClass('form-control')
+            .attr('placeholder', `${t('lblChooseDateRange')}`)
+            .val(field?.value || '');
+
+        if (readonly) {
+            inputElement.prop('readonly', true).prop('disabled', true);
+        } else {
+            inputElement.attr('required', true);
+        }
+
+        const inputGroup = $('<div>').addClass('input-group datetime');
+        inputGroup.append(
+            inputElement,
             $('<span>').addClass('input-group-text').html('<i class="la la-calendar"></i>')
         );
+
+        return inputGroup;
     };
 
-    /* ==================== TABLE CELL GENERATORS ==================== */
+    // ================== SCHOOL TABLE FIELD GENERATORS ==================
+
     const generateSelectCheckbox = (fieldId, school, readonly, isSelected = false) => {
         const label = $('<label>').addClass('custom-checkbox');
-        const checkbox = $('<input>').attr('type', 'checkbox').addClass('selectRow')
+
+        const checkbox = $('<input>')
+            .attr('type', 'checkbox')
+            .addClass('selectRow')
             .attr('data-id', `${fieldId}_${school.id}_chk`)
             .attr('data-school-id', school.id)
             .attr('data-name', school.name);
-        if (isSelected) checkbox.prop('checked', true);
-        if (readonly) checkbox.prop('disabled', true);
-        label.append(checkbox, $('<span>').addClass('checkmark'));
+
+        // Check the checkbox if the school is selected
+        if (isSelected) {
+            checkbox.prop('checked', true);
+        }
+
+        if (readonly || school.IsOpen) {
+            checkbox.prop('disabled', true);
+        }
+
+        const checkmark = $('<span>').addClass('checkmark');
+        label.append(checkbox, checkmark);
         return label;
     };
 
-    const generateSchoolNameCell = (fieldId, school) => {
+
+    const generateSchoolNameCell_old = (fieldId, school) => {
         const ratingClass = RATING_CLASSES[school.rating] || 'bg-light';
         const container = $('<div>').addClass('d-flex align-items-center justify-content-between');
+
         const infoDiv = $('<div>');
+        const nameId = `${fieldId}_${school.id}_name`;
 
-        infoDiv.append($('<h6>').addClass('mb-1').text(school.name || '-')).attr('data-name', `${fieldId}_${school.id}_name`);
+        // School name
+        infoDiv
+            .append($('<h6>').addClass('mb-1').text(school.name || '-'))
+            .attr('data-name', nameId);
 
-        if (school.orgParent?.nameEn) {
-            infoDiv.append($('<small>').addClass('text-muted d-block').text(school.orgParent.nameEn));
+
+        if (school.lastEvaluationDate) {
+            infoDiv.append(
+                $('<small>')
+                    .addClass('text-muted')
+                    .text(
+                        `${t('lblLastEvaluation')}: ${school.lastEvaluationDate}    ${school.formEvalMatrixNameValue}`
+                    )
+            );
         }
 
-        const levelText = (school.schoolLevel?.length > 0)
-            ? school.schoolLevel.map(l => l.name).join(', ')
-            : '-';
-        infoDiv.append($('<div>').addClass('square-bullet mt-1').append($('<div>').text(levelText)));
+        // Org parent (small label)
+        if (school.orgParent?.nameEn) {
+            infoDiv.append(
+                $('<small>')
+                    .addClass('text-muted d-block')
+                    .text(school.orgParent.nameEn)
+            );
+        }
 
-        container.append(infoDiv, $('<span>').addClass(`badge ${ratingClass}`).text(school.rating || ''));
+        // School levels
+        const levelBadge = $('<div>').addClass('square-bullet mt-1');
+        const levelText = (school.schoolLevel && school.schoolLevel.length > 0)
+            ? school.schoolLevel.map(l => l.name).join(', ')
+            : t('lblPrimary') || 'ابتدائي';
+
+        levelBadge.append($('<div>').text(levelText));
+        infoDiv.append(levelBadge);
+
+        // Rating badge
+        const ratingBadge = $('<span>')
+            .addClass(`badge ${ratingClass}`)
+            .text(school.rating || '');
+
+        container.append(infoDiv, ratingBadge);
         return container;
     };
 
-    const generateVisitDateField = (fieldId, school, readonly) => {
-        let val = '';
-        if (school.fromDate || school.toDate) val = formatDateRange(school.fromDate, school.toDate);
-        else if (school.visitDate) val = school.visitDate;
-        else if (school.startEvaluationDate && school.endEvaluationDate) val = formatDateRange(school.startEvaluationDate, school.endEvaluationDate);
+    const generateSchoolNameCell = (fieldId, school) => {
+        const container = $('<div>').addClass('school-cell d-flex align-items-start justify-content-between gap-2');
+        const infoDiv = $('<div>').addClass('school-info d-flex flex-column gap-1');
 
-        const el = $('<input>').attr('type', 'text')
-            .addClass('form-control form-control-sm childDate')
-            .attr('placeholder', t('lblChooseVisitDateRange'))
-            .attr('data-school-id', school.id)
-            .attr('data-field-id', `${fieldId}_${school.id}_ddlVisitDate`)
-            .val(val || '').prop('readonly', true);
-        if (readonly) el.prop('disabled', true);
-        return el;
-    };
-
-    const generateVisitTypeField = (fieldId, school, readonly) => {
-        const sel = $('<select>').addClass('form-select visitTypeSelect')
-            .attr('data-school-id', school.id)
-            .attr('data-field-id', `${fieldId}_${school.id}_visitType`)
-            .append($('<option>').val('').text(t('lblChooseVisitType')));
-        ns.visitTypes.forEach(type => {
-            const opt = $('<option>').val(type.id).text(type.name);
-            if (school.visitType === type.name || school.visitTypeId === type.id) opt.prop('selected', true);
-            sel.append(opt);
-        });
-        if (readonly) sel.prop('disabled', true);
-        return sel;
-    };
-
-    const generateActionsCell = (school) => {
-        return $('<p>').addClass('m-0').append(
-            $('<a>').attr('href', '#').addClass('text-dark').attr('type', 'button')
-                .attr('data-bs-toggle', 'modal').attr('data-bs-target', '#schoolDetailsModal')
-                .attr('data-id', school.id).html('<i class="la la-eye"></i>')
+        // School name
+        infoDiv.append(
+            $('<span>').addClass('school-name fw-500').text(school.name || '-')
         );
+
+        // Eval badge + date row
+        if (school.lastEvaluationDate) {
+            const score = parseFloat(school.formEvalMatrixNameValue) || null;
+            let tier = 'poor', label = 'ضعيف';
+            if (score >= 90) { tier = 'excellent'; label = t('lblExcellent') || 'ممتاز'; }
+            else if (score >= 70) { tier = 'good'; label = t('lblGood') || 'جيد'; }
+            else if (score >= 50) { tier = 'average'; label = t('lblAverage') || 'مقبول'; }
+
+            const evalRow = $('<div>').addClass('eval-row d-flex align-items-center flex-wrap gap-1');
+            evalRow.append(
+                $('<span>').addClass(`eval-badge score-${tier}`)
+                    .html(`<span class="eval-dot dot-${tier}"></span>${label} &mdash; ${score ?? school.formEvalMatrixNameValue}`)
+            );
+            evalRow.append(
+                $('<span>').addClass('eval-date-pill')
+                    .html(`<i class="la la-calendar"></i> ${school.lastEvaluationDate}`)
+            );
+            infoDiv.append(evalRow);
+        }
+
+        // Org parent
+        if (school.orgParent?.nameEn) {
+            infoDiv.append(
+                $('<div>').addClass('org-parent')
+                    .html(`<i class="la la-building"></i> ${school.orgParent.nameEn}`)
+            );
+        }
+
+        // School levels
+        if (school.schoolLevel?.length > 0) {
+            const levelsRow = $('<div>').addClass('levels-row d-flex flex-wrap gap-1');
+            school.schoolLevel.forEach(l => {
+                levelsRow.append($('<span>').addClass('level-chip').text(l.name));
+            });
+            infoDiv.append(levelsRow);
+        }
+
+        container.append(infoDiv);
+
+        // Rating badge (right side)
+        if (school.rating) {
+            const ratingClass = RATING_CLASSES[school.rating] || '';
+            container.append(
+                $('<span>').addClass(`rating-badge ${ratingClass}`).text(school.rating)
+            );
+        }
+
+        return container;
+    };
+    const generateVisitDateField = (fieldId, school, readonly) => {
+        let visitDateValue = '';
+
+        if (school.fromDate || school.toDate) {
+            visitDateValue = formatDateRange(school.fromDate, school.toDate);
+        } else if (school.visitDate) {
+            visitDateValue = school.visitDate;
+        } else if (school.startEvaluationDate && school.endEvaluationDate) {
+            visitDateValue = formatDateRange(school.startEvaluationDate, school.endEvaluationDate);
+        }
+
+        const dateId = `${fieldId}_${school.id}_ddlVisitDate`;
+
+        const inputElement = $('<input>')
+            .attr('type', 'text')
+            .addClass('form-control form-control-sm childDate')
+            .attr('placeholder', `${t('lblChooseVisitDateRange')}`)
+            .attr('data-school-id', school.id)
+            .attr('data-field-id', dateId)
+            .val(visitDateValue || '')
+            .prop('readonly', true);
+
+        if (readonly) {
+            inputElement.prop('disabled', true);
+        }
+
+        return inputElement;
     };
 
-    /* ==================== ROW GENERATOR ==================== */
+    const generateVisitTypeField = (fieldId, school, readonly, isSelected = false) => {
+        const selectId = `${fieldId}_${school.id}_visitType`;
+
+        const currentYear = new Date().getFullYear();
+        const lastEvalYear = school.nextEvaluationDate
+            ? new Date(school.nextEvaluationDate).getFullYear()
+            : null;
+        const shouldAutoSelect = !isSelected && lastEvalYear === currentYear;
+
+        const selectElement = $('<select>')
+            .addClass('form-select visitTypeSelect')
+            .attr('data-school-id', school.id)
+            .attr('data-field-id', selectId)
+            .append($('<option>').val('').text(`${t('lblChooseVisitType')}`));
+
+        ns.visitTypes.forEach(type => {
+            const option = $('<option>')
+                .val(type.id)
+                .text(type.name)
+                .attr('data-backendname', type.backendName);
+
+            if (shouldAutoSelect && type.backendName === 'Periodicevaluation') {
+
+                option.prop('selected', true);
+            } else if (school.visitType === type.name || school.visitTypeId === type.id) {
+
+                option.prop('selected', true);
+            }
+
+            selectElement.append(option);
+        });
+
+        if (readonly) {
+            selectElement.prop('disabled', true);
+        }
+
+        return selectElement;
+    };
+
+    const generateActionsCell = (school, readonly) => {
+        const container = $('<p>').addClass('m-0');
+
+        const link = $('<a>')
+            .attr('href', '#')
+            .addClass('text-dark')
+            .attr('type', 'button')
+            .attr('data-bs-toggle', 'modal')
+            .attr('data-bs-target', '#SCHOOL')
+            .attr('data-id', school.id)
+            .html('<i class="la la-eye"></i>');
+
+        container.append(link);
+        return container;
+    };
+
+    // ================== TABLE ROW GENERATOR ==================
+
     const generateSchoolRow = (fieldId, school, isReadOnly, isSelected = false) => {
+        const readonly = isReadOnly;
         const row = $('<tr>');
-        row.append($('<td>').append(generateSelectCheckbox(fieldId, school, isReadOnly, isSelected)));
-        row.append($('<td>').append(generateSchoolNameCell(fieldId, school)));
-        row.append($('<td>').append(generateVisitDateField(fieldId, school, isReadOnly)));
-        row.append($('<td>').text(school.lastEvaluationDate || '-'));
-        row.append($('<td>').append(generateVisitTypeField(fieldId, school, isReadOnly)));
-        row.append($('<td>').text(school.academicYear || '-'));
-        row.append($('<td>').append(generateActionsCell(school)));
+
+
+        const currentYear = new Date().getFullYear();
+        const lastEvalYear = school.nextEvaluationDate
+            ? new Date(school.nextEvaluationDate).getFullYear()
+            : null;
+        const shouldAutoSelect = !isSelected && lastEvalYear === currentYear;
+
+        // Checkbox cell
+        const checkboxCell = $('<td>');
+        checkboxCell.append(generateSelectCheckbox(fieldId, school, readonly, isSelected || shouldAutoSelect));
+        row.append(checkboxCell);
+
+        if (shouldAutoSelect) {
+            row.attr('data-auto-selected', 'true');
+        }
+        // School name cell
+        const nameCell = $('<td>');
+        nameCell.append(generateSchoolNameCell(fieldId, school));
+        row.append(nameCell);
+
+        // Visit date cell
+        const visitDateCell = $('<td>');
+        visitDateCell.append(generateVisitDateField(fieldId, school, readonly));
+        row.append(visitDateCell);
+
+        // establishmentDate date cell
+        const lastEvalCell = $('<td>');
+        lastEvalCell.text(school.establishmentDate || '-');
+        row.append(lastEvalCell);
+        // Visit type cell
+        const visitTypeCell = $('<td>');
+        visitTypeCell.append(generateVisitTypeField(fieldId, school, readonly, isSelected));
+        row.append(visitTypeCell);
+
+        // Academic year cell
+        const academicYearCell = $('<td>');
+        const academicYearText = school.NEX || '-';
+        const yearAcdemicYearText = school.yearAcdemicYear;
+
+        academicYearCell.text(
+            yearAcdemicYearText
+                ? `${academicYearText} (${yearAcdemicYearText})`
+                : academicYearText
+        );
+
+        row.append(academicYearCell);
+
+        // Actions cell
+        const actionsCell = $('<td>');
+        actionsCell.append(generateActionsCell(school, readonly));
+        row.append(actionsCell);
+
         return row;
     };
 
-    /* ==================== RENDER FUNCTIONS ==================== */
+    // ================== RENDER FUNCTIONS ==================
+
     const renderPlanForm = (fieldId, planData, isReadOnly) => {
+        const readonly = isReadOnly;
         const form = $('<form>').addClass('row').attr('id', `${fieldId}_planForm`);
 
-        // Title
+        // Title Field
+        const titleCol = $('<div>').addClass('col-md-12');
         const titleGroup = $('<div>').addClass('mb-4');
+        const titleLabel = $('<label>')
+            .addClass('form-label')
+            .attr('for', `${fieldId}_planTitle`)
+            .html(`${t('lblTitle')} <span class="text-danger">*</span>`);
+
+        const titleField = generateTitleField(fieldId, { value: planData?.title }, readonly);
+        titleGroup.append(titleLabel, titleField);
+
+        if (!readonly) {
+            titleGroup.append($('<div>').addClass('invalid-feedback').text(`${t('lblPleaseEnterPlanTitle')}`));
+        }
         titleGroup.append(
-            $('<label>').addClass('form-label').attr('for', `${fieldId}_planTitle`)
-                .html(`${t('lblTitle')} <span class="text-danger">*</span>`),
-            generateTitleField(fieldId, { value: planData?.title }, isReadOnly)
-        );
-        if (!isReadOnly) titleGroup.append($('<div>').addClass('invalid-feedback').text(t('lblPleaseEnterPlanTitle')));
-        form.append($('<div>').addClass('col-md-12').append(titleGroup));
+            $('<div>').attr('id', `error_${fieldId}_planTitle`).addClass('error-message text-danger'));
 
-        // Plan Type
-        const ptGroup = $('<div>').addClass('mb-4');
-        ptGroup.append(
-            $('<label>').addClass('form-label').attr('for', `${fieldId}_ddlPlanType`)
-                .html(`${t('lblPlanType')} <span class="text-danger">*</span>`),
-            generatePlanTypeField(fieldId, { value: planData?.planTypeId }, isReadOnly)
-        );
-        if (!isReadOnly) ptGroup.append($('<div>').addClass('invalid-feedback').text(t('lblPleaseChoosePlanType')));
-        form.append($('<div>').addClass('col-md-4').append(ptGroup));
+        titleCol.append(titleGroup);
+        form.append(titleCol);
 
-        // Semester
-        form.append(generateSemesterField(fieldId, { value: planData?.semesterId, visible: planData?.showSemester }, isReadOnly));
+        // Plan Type Field
+        const planTypeCol = $('<div>').addClass('col-md-4');
+        const planTypeGroup = $('<div>').addClass('mb-4');
+        const planTypeLabel = $('<label>')
+            .addClass('form-label')
+            .attr('for', `${fieldId}_ddlPlanType`)
+            .html(`${t('lblPlanType')} <span class="text-danger">*</span>`);
 
-        // Date Range
-        const drGroup = $('<div>').addClass('mb-4');
-        drGroup.append(
-            $('<label>').addClass('form-label').attr('for', `${fieldId}_parentDate`)
-                .html(`${t('lblTimePeriod')} <span class="text-danger">*</span>`),
-            generateDateRangeField(fieldId, { value: planData?.dateRange }, isReadOnly)
+        const planTypeField = generatePlanTypeField(fieldId, { value: planData?.planTypeId }, readonly);
+        planTypeGroup.append(planTypeLabel, planTypeField);
+
+        if (!readonly) {
+            planTypeGroup.append($('<div>').addClass('invalid-feedback').text(`${t('lblPleaseChoosePlanType')}`));
+        }
+        planTypeGroup.append(
+            $('<div>').attr('id', `error_${fieldId}_ddlPlanType`).addClass('error-message text-danger'));
+        planTypeCol.append(planTypeGroup);
+        form.append(planTypeCol);
+
+        // Semester Field
+        const semesterField = generateSemesterField(fieldId, {
+            value: planData?.semesterId,
+            visible: planData?.showSemester
+        }, readonly);
+        form.append(semesterField);
+
+        // Date Range Field
+        const dateRangeCol = $('<div>').addClass('col-md-4');
+        const dateRangeGroup = $('<div>').addClass('mb-4');
+        const dateRangeLabel = $('<label>')
+            .addClass('form-label')
+            .attr('for', `${fieldId}_parentDate`)
+            .html(`${t('lblTimePeriod')} <span class="text-danger">*</span>`);
+
+        const dateRangeField = generateDateRangeField(fieldId, { value: planData?.dateRange }, readonly);
+        dateRangeGroup.append(dateRangeLabel, dateRangeField);
+
+        if (!readonly) {
+            dateRangeGroup.append($('<div>').addClass('invalid-feedback').text(`${t('lblPleaseChooseTimePeriod')}`));
+        }
+        dateRangeGroup.append(
+            $('<div>').attr('id', `error_${fieldId}_parentDate`).addClass('error-message text-danger')
         );
-        if (!isReadOnly) drGroup.append($('<div>').addClass('invalid-feedback').text(t('lblPleaseChooseTimePeriod')));
-        form.append($('<div>').addClass('col-md-4').append(drGroup));
+
+        dateRangeCol.append(dateRangeGroup);
+        form.append(dateRangeCol);
 
         return form;
     };
 
     const renderSchoolTable = (fieldId, schools, isReadOnly, selectedSchoolsMap = null) => {
         const tbody = $('<tbody>');
+
         if (!schools || schools.length === 0) {
-            tbody.append($('<tr>').append($('<td>').attr('colspan', '7').addClass('text-center text-muted').text(t('lblNoData'))));
-            return tbody;
+            const emptyRow = $('<tr>');
+            emptyRow.append(
+                $('<td>')
+                    .attr('colspan', '7')
+                    .addClass('text-center text-muted')
+                    .text(`${t('lblNoData')}`)
+            );
+            tbody.append(emptyRow);
+        } else {
+            schools.forEach(school => {
+                // Check if this school is in the selected schools map
+                const isSelected = selectedSchoolsMap && selectedSchoolsMap.has(school.id);
+
+                // If selected, merge the selection data into the school object
+                if (isSelected) {
+                    const selectedData = selectedSchoolsMap.get(school.id);
+                    school = { ...school, ...selectedData };
+                }
+
+                const row = generateSchoolRow(fieldId, school, isReadOnly, isSelected);
+                tbody.append(row);
+            });
         }
-        schools.forEach(originalSchool => {
-            const isSelected = selectedSchoolsMap && selectedSchoolsMap.has(originalSchool.id);
-            let school = originalSchool;
-            if (isSelected) {
-                const mapData = selectedSchoolsMap.get(originalSchool.id);
-                school = {
-                    ...originalSchool,
-                    visitDate: mapData.visitDate || originalSchool.visitDate || '',
-                    visitTypeId: mapData.visitTypeId || originalSchool.visitTypeId || ''
-                };
-            }
-            tbody.append(generateSchoolRow(fieldId, school, isReadOnly, isSelected));
-        });
+
         return tbody;
     };
 
     const renderPagination = (totalRecords) => {
         const totalPages = Math.ceil(totalRecords / ns.pageSize);
         const pagination = $('<ul>').addClass('pagination pagination-sm mb-0');
+
         if (totalPages <= 1) return pagination;
 
         if (ns.currentPage > 1) {
-            pagination.append($('<li>').addClass('page-item').append(
-                $('<a>').addClass('page-link').attr('href', '#').attr('data-page', ns.currentPage - 1).text(t('lblPrevious'))
-            ));
+            const prevItem = $('<li>').addClass('page-item');
+
+            const prevLink = $('<a>')
+                .addClass('page-link')
+                .attr('href', '#')
+                .attr('data-page', ns.currentPage - 1)
+                .html(`
+                <i class="fas fa-angle-right "></i>
+                ${uiControlsSetup().GetUiControlText("lblPrevious")}
+            `);
+
+            prevItem.append(prevLink);
+            pagination.append(prevItem);
         }
+
         for (let i = 1; i <= totalPages; i++) {
-            const li = $('<li>').addClass('page-item' + (i === ns.currentPage ? ' active' : ''));
-            li.append($('<a>').addClass('page-link').attr('href', '#').attr('data-page', i).text(i));
-            pagination.append(li);
+            const pageItem = $('<li>').addClass('page-item');
+
+            if (i === ns.currentPage) {
+                pageItem.addClass('active');
+            }
+
+            const pageLink = $('<a>')
+                .addClass('page-link')
+                .attr('href', '#')
+                .attr('data-page', i)
+                .text(i);
+
+            pageItem.append(pageLink);
+            pagination.append(pageItem);
         }
+
         if (ns.currentPage < totalPages) {
-            pagination.append($('<li>').addClass('page-item').append(
-                $('<a>').addClass('page-link').attr('href', '#').attr('data-page', ns.currentPage + 1).text(t('lblNext'))
-            ));
+            const nextItem = $('<li>').addClass('page-item');
+
+            const nextLink = $('<a>')
+                .addClass('page-link')
+                .attr('href', '#')
+                .attr('data-page', ns.currentPage + 1)
+                .html(`
+                ${uiControlsSetup().GetUiControlText("lblNext")}
+                <i class="fas fa-angle-left"></i>
+            `);
+
+            nextItem.append(nextLink);
+            pagination.append(nextItem);
         }
+
         return pagination;
     };
 
-    /* ==================== FLATPICKR ==================== */
+    // ================== FLATPICKR INITIALIZATION ==================
+
     const initParentPicker = (fieldId, mode, minDate, maxDate, existingValue = null) => {
-        const selector = `#${fieldId}_parentDate`;
-        const $input = $(selector);
-        if (!$input.length) { console.error('[initParentPicker] not found:', selector); return; }
-        if ($input.data('flatpickr')) $input.data('flatpickr').destroy();
+        const targetSelector = `#${fieldId}_parentDate`;
+        const $input = $(targetSelector);
 
-        if (mode === 'disabled') { $input.prop('disabled', true); return; }
-        $input.prop('disabled', false);
+        if (!$input.length) {
+            console.error('[initParentPicker] Element not found:', targetSelector);
+            return;
+        }
 
-        const base = {
-            locale: 'en', allowInput: true,
-            onDayCreate: (dObj, dStr, fp, dayElem) => {
+        // Destroy previous instance for this specific fieldId
+        if ($input.data('flatpickr')) {
+            $input.data('flatpickr').destroy();
+        }
+
+        const config = {
+            locale: "en",
+            allowInput: true,
+            onDayCreate: function (dObj, dStr, fp, dayElem) {
                 if (isHoliday(dayElem.dateObj)) {
-                    dayElem.classList.add('blocked', 'flatpickr-disabled');
+                    dayElem.classList.add('blocked');
+                    // Make the day non-clickable
+                    dayElem.classList.add('flatpickr-disabled');
+                    // Remove the click event
                     dayElem.style.pointerEvents = 'none';
                 }
             },
-            onChange: (selectedDates, dateStr, instance) => {
-                if (!selectedDates.length) return;
-                const s = selectedDates[0], e = selectedDates[selectedDates.length - 1];
-                if (isHoliday(s) || (selectedDates.length > 1 && isHoliday(e))) {
-                    instance.clear(); alert('لا يمكن البدء أو الانتهاء في يوم عطلة');
+            onChange: function (selectedDates, dateStr, instance) {
+                // Double-check on change (for manual input via allowInput)
+                if (selectedDates.length > 0) {
+                    const startDate = selectedDates[0];
+                    const endDate = selectedDates[selectedDates.length - 1];
+
+                    if (isHoliday(startDate) || (selectedDates.length > 1 && isHoliday(endDate))) {
+                        instance.clear();
+                        alert('لا يمكن البدء أو الانتهاء في يوم عطلة');
+                    }
                 }
             }
         };
 
+        if (mode === 'disabled') {
+            $input.prop('disabled', true);
+            return;
+        }
+
+        $input.prop('disabled', false);
+
         if (mode === 'month') {
-            base.plugins = [new monthSelectPlugin({ shorthand: false, dateFormat: 'm-y', altFormat: 'F Y', altInput: true, theme: 'light' })];
-            if (existingValue?.includes(' to ')) base.defaultDate = new Date(existingValue.split(' to ')[0].trim());
-            base.onChange = (selectedDates, dateStr, instance) => {
-                if (!selectedDates.length) { destroyChildPicker(); return; }
-                const d = selectedDates[0];
-                const first = new Date(d.getFullYear(), d.getMonth(), 1);
-                const last = new Date(d.getFullYear(), d.getMonth() + 1, 0);
-                $input.val(`${formatDateISO(first)} to ${formatDateISO(last)}`)
-                    .data('startDate', formatDateISO(first)).data('endDate', formatDateISO(last));
-                initChildPicker(first, last);
-            };
-            $input.data('flatpickr', flatpickr(selector, base));
-        } else if (mode === 'custom') {
-            base.mode = 'range'; base.dateFormat = 'Y-m-d';
-            if (minDate) base.minDate = minDate;
-            if (maxDate) base.maxDate = maxDate;
-            if (existingValue?.includes(' to ')) {
-                const [s, e] = existingValue.split(' to ');
-                base.defaultDate = [s.trim(), e.trim()];
+            config.plugins = [
+                new monthSelectPlugin({
+                    shorthand: false,
+                    dateFormat: "m-y",
+                    altFormat: "F Y",
+                    altInput: true,
+                    theme: "light"
+                })
+            ];
+
+            if (existingValue && existingValue.includes(' to ')) {
+                const parts = existingValue.split(' to ');
+                if (parts.length === 2) {
+                    const startDate = new Date(parts[0].trim());
+                    config.defaultDate = startDate;
+                }
             }
-            base.onClose = (selectedDates) => {
-                if (selectedDates.length === 2) initChildPicker(selectedDates[0], selectedDates[1]);
-                else if (!selectedDates.length) destroyChildPicker();
+
+            config.onChange = function (selectedDates, dateStr, instance) {
+                if (selectedDates.length > 0) {
+                    const selectedDate = selectedDates[0];
+                    const year = selectedDate.getFullYear();
+                    const month = selectedDate.getMonth();
+
+                    const firstDay = new Date(year, month, 1);
+                    const lastDay = new Date(year, month + 1, 0);
+
+                    const rangeStr = `${formatDateISO(firstDay)} to ${formatDateISO(lastDay)}`;
+                    $input.val(rangeStr);
+
+                    $input.data('startDate', formatDateISO(firstDay));
+                    $input.data('endDate', formatDateISO(lastDay));
+
+                    initChildPicker(firstDay, lastDay);
+                } else {
+                    destroyChildPicker();
+                }
+            }
+
+            const fp = flatpickr(targetSelector, config);
+            $input.data('flatpickr', fp);
+        }
+        else if (mode === 'custom') {
+            config.mode = "range";
+            config.dateFormat = "Y-m-d";
+
+            if (minDate) config.minDate = minDate;
+            if (maxDate) config.maxDate = maxDate;
+
+            if (existingValue && existingValue.includes(' to ')) {
+                const parts = existingValue.split(' to ');
+                if (parts.length === 2) {
+                    config.defaultDate = [parts[0].trim(), parts[1].trim()];
+                }
+            }
+
+            config.onClose = function (selectedDates, dateStr, instance) {
+                if (selectedDates.length === 2) {
+                    const [min, max] = selectedDates;
+                    initChildPicker(min, max);
+                } else if (selectedDates.length === 0) {
+                    destroyChildPicker();
+                }
             };
-            $input.data('flatpickr', flatpickr(selector, base));
+
+            const fp = flatpickr(targetSelector, config);
+            $input.data('flatpickr', fp);
         }
     };
 
     const initChildPicker = (minDate, maxDate) => {
-        $('.childDate').each(function () { if ($(this).data('flatpickr')) $(this).data('flatpickr').destroy(); });
+        // Destroy all existing child pickers
+        $('.childDate').each(function () {
+            if ($(this).data('flatpickr')) {
+                $(this).data('flatpickr').destroy();
+            }
+        });
 
-        flatpickr('.childDate', {
-            mode: 'range', locale: 'en', dateFormat: 'Y-m-d', allowInput: true,
-            minDate, maxDate,
+        flatpickr(".childDate", {
+            mode: "range",
+            locale: "en",
+            dateFormat: "Y-m-d",
+            allowInput: true,
+            minDate: minDate,
+            maxDate: maxDate,
             onReady: function (selectedDates, dateStr, instance) {
-                const mc = instance.calendarContainer.querySelector('.flatpickr-months');
+                const monthsContainer = instance.calendarContainer.querySelector('.flatpickr-months');
                 const prev = instance.calendarContainer.querySelector('.flatpickr-prev-month');
                 const next = instance.calendarContainer.querySelector('.flatpickr-next-month');
-                const stack = document.createElement('div');
-                stack.className = 'fp-arrow-stack';
-                stack.appendChild(prev); stack.appendChild(next);
-                mc.insertBefore(stack, mc.firstChild);
-                mc.appendChild(mc.querySelector('.flatpickr-current-month'));
+
+                const arrowStack = document.createElement('div');
+                arrowStack.className = 'fp-arrow-stack';
+                arrowStack.appendChild(prev);
+                arrowStack.appendChild(next);
+
+                monthsContainer.insertBefore(arrowStack, monthsContainer.firstChild);
+
+                const monthYear = monthsContainer.querySelector('.flatpickr-current-month');
+                monthsContainer.appendChild(monthYear);
 
                 if (!instance.calendarContainer.querySelector('.fp-btns')) {
                     const btns = document.createElement('div');
                     btns.className = 'fp-btns';
+
                     const cancel = document.createElement('button');
-                    cancel.type = 'button'; cancel.className = 'fp-cancel'; cancel.textContent = t('lblCancel');
-                    cancel.onclick = e => { e.preventDefault(); instance.clear(); instance.close(); };
+                    cancel.type = 'button';
+                    cancel.className = 'fp-cancel';
+                    cancel.textContent = `${t('lblCancel')}`;
+                    cancel.onclick = (e) => {
+                        e.preventDefault();
+                        instance.clear();
+                        instance.close();
+                    };
+
                     const apply = document.createElement('button');
-                    apply.type = 'button'; apply.className = 'fp-apply'; apply.textContent = t('lblConfirm');
-                    apply.onclick = e => { e.preventDefault(); instance.close(); };
-                    btns.appendChild(cancel); btns.appendChild(apply);
+                    apply.type = 'button';
+                    apply.className = 'fp-apply';
+                    apply.textContent = `${t('lblConfirm')}`;
+                    apply.onclick = (e) => {
+                        e.preventDefault();
+                        instance.close();
+                    };
+
+                    btns.appendChild(cancel);
+                    btns.appendChild(apply);
                     instance.calendarContainer.appendChild(btns);
                 }
             }
@@ -378,15 +850,24 @@
     };
 
     const destroyChildPicker = () => {
-        $('.childDate').each(function () { if ($(this).data('flatpickr')) $(this).data('flatpickr').destroy(); });
+        $('.childDate').each(function () {
+            if ($(this).data('flatpickr')) {
+                $(this).data('flatpickr').destroy();
+            }
+        });
     };
 
-    const getMonthRange = (date) => ({
-        start: new Date(date.getFullYear(), date.getMonth(), 1),
-        end: new Date(date.getFullYear(), date.getMonth() + 1, 0)
-    });
+    const getMonthRange = (date) => {
+        const year = date.getFullYear();
+        const month = date.getMonth();
+        return {
+            start: new Date(year, month, 1),
+            end: new Date(year, month + 1, 0)
+        };
+    };
 
-    /* ==================== EXPORTS ==================== */
+    // ================== EXPORTS ==================
+
     ns.generateTitleField = generateTitleField;
     ns.generatePlanTypeField = generatePlanTypeField;
     ns.generateSemesterField = generateSemesterField;
