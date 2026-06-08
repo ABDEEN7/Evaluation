@@ -220,7 +220,7 @@ function renameFormItems(formId) {
 
     const payload = {
         id: formId,
-        items: mainItems
+        renamedItems: mainItems
     };
 
     console.log("FINAL NESTED JSON:", payload);
@@ -252,7 +252,8 @@ async function saveForm(formId) {
         formSettings: result.formSettings,
         results: calculation.value,
         evaluationRequestId: P_evaluationRequestId,
-        serviceRequestId: P_serviceRequestId
+        serviceRequestId: P_serviceRequestId,
+        renamedItems: P_renamedItems
     };
     return finalResult;
 }
