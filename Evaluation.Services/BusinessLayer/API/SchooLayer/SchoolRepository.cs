@@ -143,8 +143,14 @@ public class SchoolRepository(IServiceScopeFactory serviceScopeFactory,
         .GetAllActiveNonDeleted(x => x.DepartmentId == requestInfo.DepId);
         return visitTypes;
     }
-
-
+    //public async Task<IQueryable<DepEvaluationType>> GetEducationLevel()
+    //{
+    //    var visitTypes =
+    //    unitOfWork
+    //    .GetRepository<EducationLevel>()
+    //    .GetAllActiveNonDeleted(x => x.DepartmentId == requestInfo.DepId);
+    //    return visitTypes;
+    //}
     private Expression<Func<School, bool>> BuildFilterExpression(SchoolRequest request, List<Guid?> targetOrgTreeIds, List<Guid> currentSchools)
     {
 

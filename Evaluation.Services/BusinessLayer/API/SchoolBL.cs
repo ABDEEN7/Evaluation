@@ -129,4 +129,14 @@ public class SchoolBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvide
 			BackendName = x.EvaluationType.BackendName
 		}).ToListAsync();
     }
+    public async Task<List<SchoolVisits>> GetEducationLevelAsync()
+    {
+        var responses = await schoolRepository.GetVisitTypes();
+        return await responses.Select(x => new SchoolVisits
+        {
+            Id = x.Id,
+            Name = LanguageStatic.SelectLang(requestInfo.Lang, x.NameAr, x.NameEn),
+			BackendName = x.EvaluationType.BackendName
+		}).ToListAsync();
+    }
 }

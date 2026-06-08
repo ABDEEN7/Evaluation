@@ -94,16 +94,16 @@ namespace Evaluation.Admin.Controllers
             
         }
 
-        
-        //[HttpPost]
-        //[CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.AdminPermission.DELETE_ADMIN_ACADEMIC_YEAR })]
-        //public async Task<IActionResult> DeleteAcademicYear(Guid Id)
-        //{
-           
-        //        var result = await masterBL.GetAdminService<SrvAcademicYearBL>().DeleteAcademicYear(Id);
-        //        return Ok(result);
-           
-        //}
+
+        [HttpPost]
+        [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.AdminPermission.DELETE_ADMIN_ACADEMIC_YEAR })]
+        public async Task<IActionResult> DeleteAcademicYear(Guid Id)
+        {
+
+            var result = await masterBL.GetAdminService<SrvAcademicYearBL>().DeleteAcademicYear(Id);
+            return Ok(result);
+
+        }
 
     }
 }

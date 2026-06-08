@@ -160,36 +160,36 @@ namespace Evaluation.Services.Models.Admin
 
         }
 
-        //       public async Task<AcademicYearDTO> DeleteAcademicYear(Guid? Id)
-        //       {
+        public async Task<AcademicYearDTO> DeleteAcademicYear(Guid? Id)
+        {
 
 
 
 
-        //           var result = new AcademicYearDTO();
-        //           if (Id is not null)
-        //           {
-        //               AcademicYear obj = await uow.GetRepository<AcademicYear>()
-        //                                 .GetAllNonDeleted()
-        //                                 .Where(x => x.Id == Id)
-        //                                 .FirstAsync();
-        //               var SystemModule = await uow.GetRepository<AcademicYearScope>()
-        //.GetAllNonDeleted()
-        //                      .Where(x => x.AcademicYearId == obj.Id)
-        //                      .ToListAsync();
-        //               if (SystemModule.Count > 0)
-        //               {
-        //                   throw new BusinessException(ConstantKeys.ExceptionMessage.AcademicYearExistsScope);
-        //               }
-        //               uow.GetRepository<AcademicYear>().Delete(obj);
-        //               await uow.CommitAsync();
-        //               result = mapper.Map<AcademicYearDTO>(obj, opts => opts.Items["Language"] = _requestInfo.Lang);
-        //               result.ResponseStatus = DBResult.Deleted;
-        //           }
-        //           return result;
+            var result = new AcademicYearDTO();
+            if (Id is not null)
+            {
+                AcademicYear obj = await uow.GetRepository<AcademicYear>()
+                                  .GetAllNonDeleted()
+                                  .Where(x => x.Id == Id)
+                                  .FirstAsync();
+                var scopeAcademicYear = await uow.GetRepository<ScopeAcademicYear>()
+ .GetAllNonDeleted()
+                       .Where(x => x.AcademicYearId == obj.Id)
+                       .ToListAsync();
+                if (scopeAcademicYear.Count > 0)
+                {
+                    throw new BusinessException(ConstantKeys.ExceptionMessage.AcademicYearExistsScope);
+                }
+                uow.GetRepository<AcademicYear>().Delete(obj);
+                await uow.CommitAsync();
+                result = mapper.Map<AcademicYearDTO>(obj, opts => opts.Items["Language"] = _requestInfo.Lang);
+                result.ResponseStatus = DBResult.Deleted;
+            }
+            return result;
 
 
-        //       }
+        }
 
     }
 }

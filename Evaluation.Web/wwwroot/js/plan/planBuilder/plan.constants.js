@@ -53,7 +53,10 @@
         CREATEDTO_DATE: 'createdToDate',
         NEXT_EVAL_DATE: 'nextEvalDate',
         PREVIOUS_RESULT: 'previousResult',
-        VISIT_TYPE: 'visitType'
+        VISIT_TYPE: 'visitType',
+        SCHOOL_LEVEL: 'schoolLevel',
+        GENDER: 'gender',
+        GRADE: 'grade'          
     };
 
     // Rating classes mapping

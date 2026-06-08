@@ -98,6 +98,7 @@
             populateFilterVisitTypes(fieldId);
             populateFilterParentOrgTree(fieldId);
             populateFilterPreviousResult(fieldId);
+            populateFilterSchoolLevels(fieldId);
         } catch (e) {
             console.error(`[PlanHandler] Init failed for ${fieldId}`, e);
             alert('حدث خطأ أثناء التحميل');
@@ -256,6 +257,23 @@
                     allowInput: true
                 });
             }
+        });
+    };
+    const populateFilterSchoolLevels = (fieldId) => {
+        const $select = $p(fieldId, 'filterSchoolLevel');
+        ns.schoolLevels?.forEach(level => {
+            $select.append($('<option>').val(level.id).text(level.name));
+        });
+    };
+
+    const populateFilterGrades = (fieldId, levelId) => {
+        const $select = $p(fieldId, 'filterGrade').empty()
+            .append($('<option>').val('').text(t('lblAll')));
+        if (!levelId) return;
+
+        const grades = ns.schoolLevels?.find(l => l.id === levelId)?.grades || [];
+        grades.forEach(g => {
+            $select.append($('<option>').val(g.id).text(g.name));
         });
     };
 
@@ -592,13 +610,11 @@
                 onSemesterChange(fieldId, this);
             });
 
-        // ✅ البحث: استدعاء API بعد 300ms من التوقف عن الكتابة
         $wrapper.off('input', pid(fieldId, 'customSearch'))
             .on('input', pid(fieldId, 'customSearch'), function () {
                 onSearch(fieldId, this);
             });
 
-        // ✅ الفلتر: استدعاء API مع الفلاتر
         $wrapper.off('submit', pid(fieldId, 'filterForm'))
             .on('submit', pid(fieldId, 'filterForm'), function (e) {
                 onFilter(fieldId, e);
@@ -607,6 +623,10 @@
         $wrapper.off('click', pid(fieldId, 'clearFiltersBtn'))
             .on('click', pid(fieldId, 'clearFiltersBtn'), function () {
                 clearFilters(fieldId);
+            });
+        $wrapper.off('change', `#${pid(fieldId, 'filterSchoolLevel')}`)
+            .on('change', `#${pid(fieldId, 'filterSchoolLevel')}`, function () {
+                populateFilterGrades(fieldId, $(this).val());
             });
     };
 
@@ -774,7 +794,10 @@
             establishmentDate: $p(fieldId, 'filterCreatedDate').val(),
             nextEvalDate: $p(fieldId, 'filterNextEvalDate').val(),
             fomrEvalMatrixValueId: $p(fieldId, 'filterPreviousResult').val(),
-            visitType: $p(fieldId, 'filterVisitType').val()
+            visitType: $p(fieldId, 'filterVisitType').val(),
+            schoolLevel: $p(fieldId, 'filterSchoolLevel').val(),
+            gender: $p(fieldId, 'filterGender').val(),
+            grade: $p(fieldId, 'filterGrade').val()
         };
 
         // حذف القيم الفارغة
@@ -796,7 +819,7 @@
         state.filters = {};
         state.searchTerm = '';
 
-        // مسح الحقول من UI
+        
         $p(fieldId, 'filterSchoolName').val('');
         $p(fieldId, 'filterLastEvalDate').val('');
         $p(fieldId, 'filterCreatedDate').val('');
@@ -804,7 +827,11 @@
         $p(fieldId, 'filterPreviousResult').val('');
         $p(fieldId, 'filterVisitType').val('');
         $p(fieldId, 'customSearch').val('');
-        // ✅ إعادة تحميل كل المدارس
+        $p(fieldId, 'filterSchoolLevel').val('');
+        $p(fieldId, 'filterGender').val('');
+        $p(fieldId, 'filterGrade').val('');
+        populateFilterGrades(fieldId, '');
+        
         loadSchools(fieldId, 1);
     };
 
