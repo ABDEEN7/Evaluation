@@ -16,7 +16,7 @@ namespace Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
 
 public class EvaluationRequest : EntityBase, IAuditLogEntity
 {
-	//public string? Name { get; set; } = null!;
+	public string? Name { get; set; } = null!;
 	public Guid PlanId { get; set; }
     public Plan? Plan { get; set; }
     public Guid OrgTreeId { get; set; }
@@ -39,11 +39,12 @@ public class EvaluationRequest : EntityBase, IAuditLogEntity
     public DateOnly? EvaluationDate { get; set; }
     public DateOnly? NextEvaluationDate { get; set; }
     public decimal? FinalEvalValue { get; set; }
+    //public Guid? FinalReportId { get; set; }
+    //public EvalAttachment? FinalReport { get; set; }
     public virtual ICollection<ServiceRequestFieldsValue>? ServiceRequestFieldsValues { get; set; }
     public virtual ICollection<EvaluationRequestAssignment>? EvaluationRequestAssignments { get; set; }
 
-	//public virtual Guid? FinalReportId { get; set; }
-	//public virtual EvalAttachment? FinalReport { get; set; }
+   
 
 
 
