@@ -4,13 +4,11 @@ const planUtility = window.planUtility;
 (function (ns) {
     'use strict';
 
-    // ================== LOCALIZATION Helper ==================
     function t(key, fallback = '') {
         const text = uiControlsSetup()?.GetUiControlText(key);
         return text || key;
     }
 
-    // ================== CONSTANTS ==================
     const {
         VALIDATION_RULES,
         TABLE_CONFIG,
@@ -20,7 +18,6 @@ const planUtility = window.planUtility;
         API_ENDPOINTS,
     } = window.PlanConstants || {};
 
-    // ================== ID HELPER ==================
     function pid(fieldId, name) {
         return `${fieldId}_${name}`;
     }
@@ -36,16 +33,13 @@ const planUtility = window.planUtility;
 
     ns.generatePlanFields = function (fieldId) {
         const html = ns.generatePlanFieldsHTML(fieldId);
-
         const mainContent =
             document.querySelector('.main-content') ||
             document.querySelector('main') ||
             document.body;
-
         const wrapper = document.createElement('div');
         wrapper.id = pid(fieldId, 'wrapper');
         wrapper.innerHTML = html;
-
         mainContent.appendChild(wrapper);
     };
 
@@ -68,18 +62,17 @@ const planUtility = window.planUtility;
                 <div class="row">
 
                     <!-- Title -->
-                        <div class="mb-4">
-                            <label for="${pid(fieldId, 'planTitle')}" class="form-label">
-                                ${t('lblPlanTitle')} <span class="text-danger">*</span>
-                            </label>
-                            <input type="text"
-                                   id="${pid(fieldId, 'planTitle')}"
-                                   name="PlanTitle"
-                                   class="form-control"
-                                   placeholder="${t('plhEnterPlanTitle')}"
-                                   ${VALIDATION_RULES?.TITLE?.required ? 'required' : ''}>
-                        </div>
-                            <div id="${pid(fieldId, 'planTitle_error')}" class="error-message text-danger"></div>
+                    <div class="mb-4">
+                        <label for="${pid(fieldId, 'planTitle')}" class="form-label">
+                            ${t('lblPlanTitle')} <span class="text-danger">*</span>
+                        </label>
+                        <input type="text"
+                               id="${pid(fieldId, 'planTitle')}"
+                               name="PlanTitle"
+                               class="form-control"
+                               placeholder="${t('plhEnterPlanTitle')}"
+                               ${VALIDATION_RULES?.TITLE?.required ? 'required' : ''}>
+                    </div>
 
                     <!-- Plan Type -->
                     <div class="col-md-4">
@@ -94,7 +87,6 @@ const planUtility = window.planUtility;
                                 <option value="">${t('lblChoosePlanType')}</option>
                             </select>
                         </div>
-                            <div id="${pid(fieldId, 'ddlPlanType_error')}" class="error-message text-danger"></div>
                     </div>
 
                     <!-- Semester -->
@@ -108,7 +100,6 @@ const planUtility = window.planUtility;
                                     class="form-control">
                                 <option value="">${t('lblChooseSemester')}</option>
                             </select>
-                            <div id="${pid(fieldId, 'ddlSemester_error')}" class="error-message text-danger"></div>
                         </div>
                     </div>
 
@@ -128,7 +119,6 @@ const planUtility = window.planUtility;
                                     <i class="la la-calendar"></i>
                                 </span>
                             </div>
-                            <div id="${pid(fieldId, 'parentDate_error')}" class="error-message text-danger"></div>
                         </div>
                     </div>
 
@@ -143,26 +133,17 @@ const planUtility = window.planUtility;
             <div class="card card-table">
                 <div class="card-body">
 
-               <div class="row align-items-center mb-3">
-    <div class="col-xl-7 d-flex align-items-center gap-3">
-        <h4 class="mb-0">${t('lblSelectSchools')}</h4>
-
-        <div class="selection-counter-badge d-flex align-items-center gap-2 
-                     px-3 py-1 rounded-pill border"
-             style="background: #f0f7ff; border-color: #3b82f6 !important; 
-                    transition: all 0.3s ease; font-size: 0.875rem; color: #1d4ed8;">
-            <i class="la la-check-square" style="font-size: 1rem;"></i>
-            <span>${t('lblSelectedSchools') || 'المدارس المحددة'}:</span>
-            <span id="${pid(fieldId, 'selectedSchoolsCounter')}"
-                  style="font-weight: 700; font-size: 1rem; min-width: 1.5rem; 
-                         text-align: center;">0</span>
-        </div>
-    </div>
-
-    <div class="col-xl-5">
+                    <div class="row align-items-center mb-3">
+                        <div class="col-xl-7">
+                            <h4>${t('lblSelectSchools')}</h4>
+                        </div>
+                        <div class="col-xl-5">
                             <div class="row">
                                 <div class="col-md-8 mb-3">
-                                  
+                                    <input type="text"
+                                           id="${pid(fieldId, 'customSearch')}"
+                                           class="form-control"
+                                           placeholder="${t('plhSearchHere')}">
                                 </div>
                                 <div class="col-md-4 mb-3">
                                     <button type="button" class="btn filterbtn"
@@ -200,7 +181,7 @@ const planUtility = window.planUtility;
                             </th>
                             <th>${t('lblSchoolName')}</th>
                             <th>${t('lblVisitDate')}</th>
-                            <th>${t('lblEstablishmentDate')}</th>
+                            <th>${t('lblLastEvaluation')}</th>
                             <th>${t('lblVisitType')}</th>
                             <th>${t('lblAcademicYear')}</th>
                             <th>${t('lblActions')}</th>
@@ -215,12 +196,10 @@ const planUtility = window.planUtility;
                     </tbody>
                 </table>
             </div>
-                <div id="${pid(fieldId, 'selectAll_error')}" class="error-message text-danger"></div>
-
         `;
     }
 
-    // ================== FILTER ==================
+    // ================== FILTER OFFCANVAS ==================
     function generateFilterOffcanvas(fieldId) {
         return `
             <div class="offcanvas offcanvas-end"
@@ -241,6 +220,7 @@ const planUtility = window.planUtility;
                 <div class="offcanvas-body p-4">
                     <form id="${pid(fieldId, 'filterForm')}">
 
+                        <!-- اسم المدرسة -->
                         <div class="mb-3">
                             <label class="form-label">${t('lblSchoolName')}</label>
                             <input type="text"
@@ -248,6 +228,42 @@ const planUtility = window.planUtility;
                                    name="schoolName"
                                    class="form-control"
                                    placeholder="${t('plhWriteHere')}">
+                        </div>
+                        <hr>
+
+                        <!-- المرحلة الدراسية -->
+                        <div class="mb-3">
+                            <label class="form-label">${t('lblSchoolLevel')}</label>
+                            <select id="${pid(fieldId, 'filterSchoolLevel')}"
+                                    name="schoolLevel"
+                                    class="form-control">
+                                <option value="">${t('lblAll')}</option>
+                                <!-- يتم تعبئته ديناميكياً -->
+                            </select>
+                        </div>
+                        <hr>
+
+                        <!-- الجنس -->
+                        <div class="mb-3">
+                            <label class="form-label">${t('lblGender')}</label>
+                            <select id="${pid(fieldId, 'filterGender')}"
+                                    name="gender"
+                                    class="form-control">
+                                <option value="">${t('lblAll')}</option>
+                                <!-- يتم تعبئته ديناميكياً -->
+                            </select>
+                        </div>
+                        <hr>
+
+                        <!-- الشعبة / القسم -->
+                        <div class="mb-3">
+                            <label class="form-label">${t('lblDepartment')}</label>
+                            <select id="${pid(fieldId, 'filterDepartment')}"
+                                    name="department"
+                                    class="form-control">
+                                <option value="">${t('lblAll')}</option>
+                                <!-- يتم تعبئته ديناميكياً -->
+                            </select>
                         </div>
                         <hr>
 
@@ -265,29 +281,18 @@ const planUtility = window.planUtility;
                         </div>
                         <hr>
 
-                        
+                        <!-- تاريخ الإنشاء -->
                         <div class="mb-3">
-    <label class="form-label">${t('lblCreatedDateFrom') || 'تاريخ الإنشاء من'}</label>
-    <div id="${pid(fieldId, 'filterCreatedDate_wrap')}" style="position:relative;">
-        <input type="text"
-               id="${pid(fieldId, 'filterCreatedDate')}"
-               name="createdDate"
-               class="form-control filter-date-picker"
-               placeholder="${t('plhChooseDate')}"
-               readonly>
-    </div>
-</div>
-<div class="mb-3">
-    <label class="form-label">${t('lblCreatedDateTo') || 'تاريخ الإنشاء إلى'}</label>
-    <div id="${pid(fieldId, 'filterToCreatedDate_wrap')}" style="position:relative;">
-        <input type="text"
-               id="${pid(fieldId, 'filterToCreatedDate')}"
-               name="toCreatedDate"
-               class="form-control filter-date-picker"
-               placeholder="${t('plhChooseDate')}"
-               readonly>
-    </div>
-</div>
+                            <label class="form-label">${t('lblCreatedDate')}</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="la la-calendar"></i></span>
+                                <input type="text"
+                                       id="${pid(fieldId, 'filterCreatedDate')}"
+                                       name="createdDate"
+                                       class="form-control filter-date-picker"
+                                       placeholder="${t('plhChooseDate')}">
+                            </div>
+                        </div>
                         <hr>
 
                         <!-- تاريخ التقييم القادم -->
@@ -310,7 +315,12 @@ const planUtility = window.planUtility;
                             <select id="${pid(fieldId, 'filterPreviousResult')}"
                                     name="previousResult"
                                     class="form-control">
-                                    <option value="">${t('lblAll')}</option>
+                                <option value="">${t('lblAll')}</option>
+                                <option value="Perfect">${t('lblPerfect')}</option>
+                                <option value="VeryGood">${t('lblVeryGood')}</option>
+                                <option value="Good">${t('lblGood')}</option>
+                                <option value="Acceptable">${t('lblAcceptable')}</option>
+                                <option value="Week">${t('lblWeak')}</option>
                             </select>
                         </div>
                         <hr>
@@ -322,19 +332,17 @@ const planUtility = window.planUtility;
                                     name="visitType"
                                     class="form-control">
                                 <option value="">${t('lblAll')}</option>
-                                <!-- Will be populated dynamically -->
                             </select>
                         </div>
                         <hr>
 
-                        <!-- المدرسة الأم - FIXED ID -->
+                        <!-- المدرسة الأم -->
                         <div class="mb-3">
                             <label class="form-label">${t('lblParentsSchool')}</label>
                             <select id="${pid(fieldId, 'filterParentOrgTree')}"
                                     name="parentOrgTree"
                                     class="form-control">
                                 <option value="">${t('lblAll')}</option>
-                                <!-- Will be populated dynamically -->
                             </select>
                         </div>
 
@@ -354,7 +362,5 @@ const planUtility = window.planUtility;
             </div>
         `;
     }
-
-
 
 })(planUtility);
