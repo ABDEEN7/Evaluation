@@ -82,7 +82,9 @@
                     loadVacationDays(),
                     loadParentOrgTree(),
                     loadFomrEvalMatrixValue(),
-                    loadCurrentAcademicYear()
+                    loadCurrentAcademicYear(),
+                    loadSchoolLevels(),
+                    loadSchoolGenders()
                 ]);
             }
 
@@ -99,6 +101,7 @@
             populateFilterParentOrgTree(fieldId);
             populateFilterPreviousResult(fieldId);
             populateFilterSchoolLevels(fieldId);
+            populateFilterGenders(fieldId);   
         } catch (e) {
             console.error(`[PlanHandler] Init failed for ${fieldId}`, e);
             alert('حدث خطأ أثناء التحميل');
@@ -266,16 +269,13 @@
         });
     };
 
-    const populateFilterGrades = (fieldId, levelId) => {
-        const $select = $p(fieldId, 'filterGrade').empty()
-            .append($('<option>').val('').text(t('lblAll')));
-        if (!levelId) return;
-
-        const grades = ns.schoolLevels?.find(l => l.id === levelId)?.grades || [];
-        grades.forEach(g => {
-            $select.append($('<option>').val(g.id).text(g.name));
+    const populateFilterGenders = (fieldId) => {
+        const $select = $p(fieldId, 'filterGender');
+        ns.schoolGenders?.forEach(g => {
+            $select.append($('<option>').val(g.backendName).text(g.name));
         });
     };
+
 
     /* ===================== RENDER ===================== */
 
@@ -285,7 +285,7 @@
         const form = ns.renderPlanForm(fieldId, null, state.isReadOnly);
         $p(fieldId, 'planFormContainer').find('.form-container').html(form);
 
-        // ✅ تحميل المدارس من Backend
+        
         loadSchools(fieldId, 1);
         initCustomMode(fieldId);
     };
@@ -454,13 +454,13 @@
         state.currentPage = page;
         state.filters = filters;
 
-        // ✅ بناء الـ query parameters
+        // query parameters
         const params = new URLSearchParams({
             pageNumber: page,
             pageSize: state.pageSize
         });
 
-        // ✅ إضافة البحث
+        // 
         if (state.searchTerm) {
             params.append('search', state.searchTerm);
         }
@@ -497,6 +497,13 @@
             });
     };
 
+    const loadSchoolLevels = () =>
+        jqClient().Get(API_ENDPOINTS.GETEDUCATION_LEVEL)
+            .then(r => ns.schoolLevels = r?.result || []);
+
+    const loadSchoolGenders = () =>
+        jqClient().Get(API_ENDPOINTS.GET_SCHOOL_GENDER)
+            .then(r => ns.schoolGenders = r?.result || []);
     /* ===================== PAGINATION ===================== */
 
     const renderPagination = (fieldId) => {
@@ -624,8 +631,8 @@
             .on('click', pid(fieldId, 'clearFiltersBtn'), function () {
                 clearFilters(fieldId);
             });
-        $wrapper.off('change', `#${pid(fieldId, 'filterSchoolLevel')}`)
-            .on('change', `#${pid(fieldId, 'filterSchoolLevel')}`, function () {
+        $wrapper.off('change', `#${pidRaw(fieldId, 'filterSchoolLevel')}`)
+            .on('change', `#${pidRaw(fieldId, 'filterSchoolLevel')}`, function () {
                 populateFilterGrades(fieldId, $(this).val());
             });
     };
@@ -778,7 +785,7 @@
 
         clearTimeout(state.searchTimeout);
         state.searchTimeout = setTimeout(() => {
-            // ✅ استدعاء API مع البحث
+
             loadSchools(fieldId, 1, state.filters);
         }, 300);
     };
@@ -819,7 +826,7 @@
         state.filters = {};
         state.searchTerm = '';
 
-        
+
         $p(fieldId, 'filterSchoolName').val('');
         $p(fieldId, 'filterLastEvalDate').val('');
         $p(fieldId, 'filterCreatedDate').val('');
@@ -831,7 +838,7 @@
         $p(fieldId, 'filterGender').val('');
         $p(fieldId, 'filterGrade').val('');
         populateFilterGrades(fieldId, '');
-        
+
         loadSchools(fieldId, 1);
     };
 

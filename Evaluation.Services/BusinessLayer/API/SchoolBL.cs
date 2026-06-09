@@ -121,34 +121,19 @@ public class SchoolBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvide
 
     public async Task<List<SchoolVisits>> GetVisitsAsync()
     {
-        var responses = schoolRepository.GetVisitTypes();
-        return await responses.Select(x => new SchoolVisits
-        {
-            Id = x.Id,
-            Name = LanguageStatic.SelectLang(requestInfo.Lang, x.NameAr, x.NameEn),
-            BackendName = x.EvaluationType.BackendName
-        }).ToListAsync();
+        var respons = await schoolRepository.GetVisitTypes();
+        return respons;
     }
     public async Task<List<GetEducationLevelDto>> GetEducationLevelAsync()
     {
         int? currentAcademicYear = await academicYearServices.GetCurrentAcademicYear();
-        var responses = schoolRepository.GetEducationLevel(currentAcademicYear);
-        return await responses.Select(x => new GetEducationLevelDto
-        {
-            Id = x.Id,
-            Name = LanguageStatic.SelectLang(requestInfo.Lang, x.NameAr, x.NameEn),
-            BackendName = x.BackendName
-        }).ToListAsync();
+        var responses =await schoolRepository.GetEducationLevel(currentAcademicYear);
+        return responses;
     }
     public async Task<List<SchoolGenderDto>> GetSchoolGenderAsync()
     {
-        
-        var responses = schoolRepository.GetSchoolGender();
-        return await responses.Select(x => new SchoolGenderDto
-        {
-            Id = x.Id,
-            Name = LanguageStatic.SelectLang(requestInfo.Lang, x.NameAr, x.NameEn),
-            BackendName = x.BackendName
-        }).ToListAsync();
+
+        var respons =await schoolRepository.GetSchoolGender();
+        return respons;
     }
 }

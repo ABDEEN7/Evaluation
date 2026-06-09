@@ -1,4 +1,6 @@
-﻿using AutoMapper;
+﻿using Aspose.Words.Lists;
+using AutoMapper;
+using Azure;
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.DepartementEntites;
 using Evaluation.DAL.Models.FormsModules;
@@ -7,6 +9,7 @@ using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
 using Evaluation.DAL.Repositories;
 using Evaluation.Services.Extensions;
 using Evaluation.Services.Special;
+using Evaluation.SharedHelper.Consts;
 using Evaluation.SharedHelper.Dtos.SchoolDto;
 using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Extensions;
@@ -137,31 +140,51 @@ public class SchoolRepository(IServiceScopeFactory serviceScopeFactory,
         return query.ToList();
     }
 
-    public IQueryable<DepEvaluationType> GetVisitTypes()
+    public async Task<List<SchoolVisits>> GetVisitTypes()
     {
         using var scopeUow = serviceProvider.CreateScopedUow();
         var visitTypes =
+            await
         scopeUow
         .GetRepository<DepEvaluationType>()
-        .GetAllActiveNonDeleted(x => x.DepartmentId == requestInfo.DepId);
+        .GetAllActiveNonDeleted(x => x.DepartmentId == requestInfo.DepId)
+        .Select(x => new SchoolVisits
+        {
+            Id = x.Id,
+            Name = LanguageStatic.SelectLang(requestInfo.Lang, x.NameAr, x.NameEn),
+            BackendName = x.EvaluationType.BackendName
+        }).ToListAsync();
         return visitTypes;
     }
-    public IQueryable<SchoolGender> GetSchoolGender()
+    public async Task<List<SchoolGenderDto>> GetSchoolGender()
     {
         using var scopeUow = serviceProvider.CreateScopedUow();
-        var gender =
+        var gender =await
         scopeUow
         .GetRepository<SchoolGender>()
-        .GetAllActiveNonDeleted();
+        .GetAllActiveNonDeleted()
+        .Select(x => new SchoolGenderDto
+        {
+            Id = x.Id,
+            Name = LanguageStatic.SelectLang(requestInfo.Lang, x.NameAr, x.NameEn),
+            BackendName = x.BackendName
+        }).ToListAsync();
         return gender;
     }
-    public IQueryable<EducationLevel> GetEducationLevel(int? currentAcademicYear)
+    public async Task<List<GetEducationLevelDto>> GetEducationLevel(int? currentAcademicYear)
     {
         using var scopeUow = serviceProvider.CreateScopedUow();
-        var visitTypes =
+        var visitTypes = await
         scopeUow
         .GetRepository<EducationLevel>()
-        .GetAllActiveNonDeleted(x => x.SchoolLevels.Any(x => x.AcademicYear == currentAcademicYear));
+        .GetAllActiveNonDeleted(x => x.SchoolLevels.Any(x => x.AcademicYear == currentAcademicYear))
+        .Select(x => new GetEducationLevelDto
+        {
+            Id = x.Id,
+            Name = LanguageStatic.SelectLang(requestInfo.Lang, x.NameAr, x.NameEn),
+            BackendName = x.BackendName
+        }).ToListAsync();
+
         return visitTypes;
     }
     private Expression<Func<School, bool>> BuildFilterExpression(SchoolRequest request, List<Guid?> targetOrgTreeIds, List<Guid> currentSchools)

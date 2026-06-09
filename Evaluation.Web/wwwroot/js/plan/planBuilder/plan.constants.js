@@ -91,7 +91,9 @@
         GET_PARNT_ORGTREE: `/Org/${deprouting}/GetParentOrgTree`,
         GetFomrEvalMatrixValue: `/Plan/${deprouting}/GetFomrEvalMatrixValueList`,
         GET_CurrentAcademicYear: `/AcademicYear/${deprouting}/GetCurrentAcademicYearByDepartment`,
-        GETEDUCATION_LEVEL: `/School/${deprouting}/GetEducationLevel`
+        GETEDUCATION_LEVEL: `/School/${deprouting}/GetEducationLevel`,
+        GET_SCHOOL_GENDER: `/School/${deprouting}/GetSchoolGender`
+
     };
 
     // Export all constants
