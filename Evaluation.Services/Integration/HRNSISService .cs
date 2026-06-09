@@ -198,8 +198,8 @@ namespace Evaluation.Services.Integration
 						modelMap,
 						programMap);
 
-					//schoolRepo.Update(existingSchool);
-					//syncedSchools.Add(existingSchool);
+					schoolRepo.Update(existingSchool);
+					syncedSchools.Add(existingSchool);
 				}
 				else
 				{
@@ -238,7 +238,7 @@ namespace Evaluation.Services.Integration
 				}
 			}
 
-			//await uow.CommitAsync();
+			await uow.CommitAsync();
 
 			var allHomerooms = await allHomeroomsTask;
 
@@ -266,8 +266,8 @@ namespace Evaluation.Services.Integration
 				throw new BusinessException("Academic year not found from NSIS_HOMEROOM.");
 			if (academicYear.HasValue)
 			{
-				//await SyncOrgAcademicYearsAsync(academicYear.Value, syncedSchools);
-				//await SyncSchoolLevelsAsync(nsisSchools,existingSchools,academicYear.Value,homeroomsByInstitution, allAcadPlans);
+				await SyncOrgAcademicYearsAsync(academicYear.Value, syncedSchools);
+				await SyncSchoolLevelsAsync(nsisSchools,existingSchools,academicYear.Value,homeroomsByInstitution, allAcadPlans);
 
 				await SyncSchoolGradesAndSectionsAsync(nsisSchools,existingSchools,academicYear.Value,homeroomsByInstitution, allAcadPlans);
 
@@ -348,108 +348,6 @@ namespace Evaluation.Services.Integration
 				Console.WriteLine($"NSIS_SCHOOL error: {ex.Message}");
 			}
 
-			return result;
-		}
-
-		private async Task<int?> GetCurrentAcademicYearFromNSISAsync()
-		{
-			using var con = new OracleConnection(ClsAppSetting.OracleDBConnection);
-
-			try
-			{
-				await con.OpenAsync();
-
-				using var cmd = con.CreateCommand();
-
-				cmd.CommandText = @"
-									SELECT STRM
-									FROM NSIS.NSIS_HOMEROOM
-									WHERE STRM IS NOT NULL
-									FETCH FIRST 1 ROWS ONLY";
-
-				var result = await cmd.ExecuteScalarAsync();
-
-				if (result == null)
-					return null;
-
-				return int.TryParse(result.ToString(), out var year)
-					? year
-					: null;
-			}
-			catch (Exception ex)
-			{
-				Console.WriteLine($"NSIS_HOMEROOM STRM error: {ex.Message}");
-				return null;
-			}
-		}
-		public async Task<List<NSISHomeroomDto>> GetHomeroomsBySchoolAsync(string institution)
-		{
-			var result = new List<NSISHomeroomDto>();
-			using var con = new OracleConnection(ClsAppSetting.OracleDBConnection);
-			try
-			{
-				await con.OpenAsync();
-				using var cmd = con.CreateCommand();
-				cmd.BindByName = true;
-				cmd.CommandText = @"
-                SELECT STRM, INSTITUTION, LOCATION, ACAD_LEVEL, ACAD_PLAN, PLAN_SECTION
-                FROM NSIS.NSIS_HOMEROOM
-                WHERE INSTITUTION = :Institution";
-				cmd.Parameters.Add(new OracleParameter("Institution", institution));
-				using var reader = await cmd.ExecuteReaderAsync();
-				while (await reader.ReadAsync())
-					result.Add(reader.ToNSISHomeroomDto());
-			}
-			catch (Exception ex) { Console.WriteLine($"NSIS_HOMEROOM error: {ex.Message}"); }
-			finally { await con.CloseAsync(); }
-			return result;
-		}
-
-		public async Task<List<NSISScheduleDto>> GetSchedulesBySchoolAsync(string institution)
-		{
-			var result = new List<NSISScheduleDto>();
-			using var con = new OracleConnection(ClsAppSetting.OracleDBConnection);
-			try
-			{
-				await con.OpenAsync();
-				using var cmd = con.CreateCommand();
-				cmd.BindByName = true;
-				cmd.CommandText = @"
-                SELECT INSTITUTION, EMPL_ID, SUBJECT, ACAD_PLAN, PLAN_SECTION,
-                       GROUP_ID, PERIODS, DAYCD, SC_PRD_BGN_TM, SC_PRD_END_TM, LOCATION
-                FROM NSIS.NSIS_SCHEDULE
-                WHERE INSTITUTION = :Institution";
-				cmd.Parameters.Add(new OracleParameter("Institution", institution));
-				using var reader = await cmd.ExecuteReaderAsync();
-				while (await reader.ReadAsync())
-					result.Add(reader.ToNSISScheduleDto());
-			}
-			catch (Exception ex) { Console.WriteLine($"NSIS_SCHEDULE error: {ex.Message}"); }
-			finally { await con.CloseAsync(); }
-			return result;
-		}
-
-		public async Task<List<NSISAcadPlanDto>> GetAcadPlansByLevelAsync(string acadLevel)
-		{
-			var result = new List<NSISAcadPlanDto>();
-			using var con = new OracleConnection(ClsAppSetting.OracleDBConnection);
-			try
-			{
-				await con.OpenAsync();
-				using var cmd = con.CreateCommand();
-				cmd.BindByName = true;
-				cmd.CommandText = @"
-                SELECT ACAD_PLAN, ACAD_PLAN_ARA, ACAD_PLAN_ENG,
-                       ACAD_LEVEL, ACAD_PROG, ACAD_PROG_ARA, ACAD_PROG_ENG
-                FROM NSIS.ACAD_PLAN
-                WHERE ACAD_LEVEL = :AcadLevel";
-				cmd.Parameters.Add(new OracleParameter("AcadLevel", acadLevel));
-				using var reader = await cmd.ExecuteReaderAsync();
-				while (await reader.ReadAsync())
-					result.Add(reader.ToNSISAcadPlanDto());
-			}
-			catch (Exception ex) { Console.WriteLine($"ACAD_PLAN error: {ex.Message}"); }
-			finally { await con.CloseAsync(); }
 			return result;
 		}
 		private async Task SyncSchoolLevelsAsync(List<NSISSchoolDto> nsisSchools,Dictionary<string, School> schoolMap,int academicYear, Dictionary<string, List<NSISHomeroomDto>> homeroomsByInstitution, List<NSISAcadPlanDto> acadPlans)
@@ -574,7 +472,6 @@ namespace Evaluation.Services.Integration
 
 			await uow.CommitAsync();
 		}
-
 		private async Task SyncSchoolCoursesAsync(List<NSISSchoolDto> nsisSchools,Dictionary<string, List<NSISCourseDto>> coursesByInstitution)
 		{
 			using var uow = serviceScopeFactory.CreateScopedUow();
@@ -600,7 +497,6 @@ namespace Evaluation.Services.Integration
 				if (string.IsNullOrWhiteSpace(nsisCode))
 					continue;
 
-				//var nsisCourses = await GetCoursesBySchoolAsync(nsisCode);
 				if (!coursesByInstitution.TryGetValue(nsisCode, out var nsisCourses))
 					continue;
 				foreach (var item in nsisCourses)
@@ -629,7 +525,6 @@ namespace Evaluation.Services.Integration
 
 			await uow.CommitAsync();
 		}
-
 		private async Task SyncSchoolGradesAndSectionsAsync(
 		List<NSISSchoolDto> nsisSchools,
 		Dictionary<string, School> schoolMap,
@@ -642,8 +537,6 @@ namespace Evaluation.Services.Integration
 			var gradeLevelRepo = uow.GetRepository<GradeLevel>();
 			var schoolGradeRepo = uow.GetRepository<SchoolGrade>();
 			var sectionRepo = uow.GetRepository<SchoolGradeSection>();
-
-			//var acadPlans = await GetAllAcadPlansAsync();
 
 			var acadPlanMap = acadPlans
 				.Where(x => !string.IsNullOrWhiteSpace(x.AcadPlan))
@@ -688,7 +581,6 @@ namespace Evaluation.Services.Integration
 				if (!schoolMap.TryGetValue(nsisCode, out var school))
 					continue;
 
-				//var homerooms = await GetHomeroomsBySchoolAsync(nsisCode);
 				if (!homeroomsByInstitution.TryGetValue(nsisCode, out var homerooms))
 					continue;
 				foreach (var homeroom in homerooms)
@@ -772,7 +664,6 @@ namespace Evaluation.Services.Integration
 
 			await uow.CommitAsync();
 		}
-
 		public async Task<List<NSISAcadPlanDto>> GetAllAcadPlansAsync()
 		{
 			var result = new List<NSISAcadPlanDto>();
@@ -810,48 +701,6 @@ namespace Evaluation.Services.Integration
 
 			return result;
 		}
-		public async Task<List<NSISCourseDto>> GetCoursesBySchoolAsync(string institution)
-		{
-			var result = new List<NSISCourseDto>();
-
-			using var con = new OracleConnection(ClsAppSetting.OracleDBConnection);
-
-			try
-			{
-				await con.OpenAsync();
-
-				using var cmd = con.CreateCommand();
-				cmd.BindByName = true;
-
-				cmd.CommandText = @"
-									SELECT DISTINCT
-										STRM,
-										INSTITUTION,
-										ACAD_PLAN,
-										SUBJECT,
-										SHORT_SBJ_NAM_ENG,
-										SUBJECT_NAME_ENG,
-										SUBJECT_NAME_ARA
-									FROM NSIS.NSIS_COURSE
-									WHERE INSTITUTION = :Institution";
-
-				cmd.Parameters.Add(new OracleParameter("Institution", institution));
-
-				using var reader = await cmd.ExecuteReaderAsync();
-
-				while (await reader.ReadAsync())
-				{
-					result.Add(reader.ToNSISCourseDto());
-				}
-			}
-			catch (Exception ex)
-			{
-				Console.WriteLine($"NSIS_COURSE error: {ex.Message}");
-			}
-
-			return result;
-		}
-
 		public async Task<List<NSISHomeroomDto>> GetAllHomeroomsAsync()
 		{
 			var result = new List<NSISHomeroomDto>();
@@ -880,7 +729,6 @@ namespace Evaluation.Services.Integration
 
 			return result;
 		}
-
 		public async Task<List<NSISCourseDto>> GetAllCoursesAsync()
 		{
 			var result = new List<NSISCourseDto>();
@@ -981,7 +829,6 @@ namespace Evaluation.Services.Integration
 				school.SchoolProgramId = programId;
 			}
 		}
-
 
 		private async Task<Dictionary<string, Guid>> GetOrCreateLookupMapAsync<T>(UnitOfWork uow,IEnumerable<LookupDto> items,Func<T, string?> integrationCodeSelector,Func<LookupDto, T> factory) where T : EntityBase
 		{
