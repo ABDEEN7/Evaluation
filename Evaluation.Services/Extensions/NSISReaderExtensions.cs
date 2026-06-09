@@ -10,20 +10,30 @@ namespace Evaluation.Services.Extensions
 {
 	public static class NSISReaderExtensions
 	{
-		private static string SafeString(this DbDataReader r, string col)
+		private static string? SafeString(this DbDataReader r, string col)
 		{
 			int ord = r.GetOrdinal(col);
-			return r.IsDBNull(ord) ? null : r.GetString(ord);
+			return r.IsDBNull(ord) ? null : r.GetValue(ord)?.ToString();
 		}
 
 		private static int SafeInt(this DbDataReader r, string col)
 		{
 			int ord = r.GetOrdinal(col);
-			return r.IsDBNull(ord) ? 0 : Convert.ToInt32(r.GetValue(ord));
+
+			if (r.IsDBNull(ord))
+				return 0;
+
+			return Convert.ToInt32(r.GetValue(ord));
 		}
 
 		private static bool YesNo(this DbDataReader r, string col)
-			=> string.Equals(r.SafeString(col), "Y", StringComparison.OrdinalIgnoreCase);
+		{
+			var value = r.SafeString(col);
+
+			return string.Equals(value, "Y", StringComparison.OrdinalIgnoreCase)
+				|| string.Equals(value, "1", StringComparison.OrdinalIgnoreCase)
+				|| string.Equals(value, "true", StringComparison.OrdinalIgnoreCase);
+		}
 
 		public static NSISSchoolDto ToNSISSchoolDto(this DbDataReader r) => new()
 		{

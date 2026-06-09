@@ -39,29 +39,237 @@ namespace Evaluation.Services.Integration
 			_integrationLogger = integrationLogger;
 		}
 
-		// ───────────────────────────────────────────────
-		// ORACLE FETCH METHODS
-		// ───────────────────────────────────────────────
 
+		public async Task<bool> SyncAllSchoolsAsync()
+		{
+			var nsisSchools = await _integrationLogger.ExecuteAsync(
+				async () => await GetAllNSISSchoolsAsync());
+
+			if (nsisSchools == null || nsisSchools.Count == 0)
+				return false;
+
+			using var uow = serviceScopeFactory.CreateScopedUow();
+
+			var schoolRepo = uow.GetRepository<School>();
+
+			var existingSchools = await schoolRepo.GetAllNonDeleted()
+									.Where(s => s.NSISCode != null)
+									.ToDictionaryAsync(s => s.NSISCode!, s => s);
+
+			var schoolTypeMap = await GetOrCreateLookupMapAsync<SchoolType>(
+								uow,
+								nsisSchools.Select(s => new LookupDto
+								{
+									Code = s.SchoolCategoryCode,
+									NameAr = s.SchoolCategoryAr,
+									NameEn = s.SchoolCategoryEn
+								}),
+								x => x.IntegrationCode,
+								item => new SchoolType
+								{
+									IntegrationCode = item.Code,
+									NameAr = item.NameAr,
+									NameEn = item.NameEn,
+									BackendName = item.Code
+								});
+
+			var genderMap = await GetOrCreateLookupMapAsync<SchoolGender>(
+									uow,
+									nsisSchools.Select(s => new LookupDto
+									{
+										Code = s.GenderCode,
+										NameAr = s.GenderName,
+										NameEn = s.GenderName
+									}),
+									x => x.IntegrationCode,
+									item => new SchoolGender
+									{
+										IntegrationCode = item.Code,
+										NameAr = item.NameAr,
+										NameEn = item.NameEn,
+										BackendName = item.Code
+									});
+
+			var empGenderMap = await GetOrCreateLookupMapAsync<SchoolGender>(
+								uow,
+								nsisSchools.Select(s => new LookupDto
+								{
+									Code = s.EmpGenderCode,
+									NameAr = s.EmpGenderName,
+									NameEn = s.EmpGenderName
+								}),
+								x => x.IntegrationCode,
+								item => new SchoolGender
+								{
+									IntegrationCode = item.Code,
+									NameAr = item.NameAr,
+									NameEn = item.NameEn,
+									BackendName = item.Code
+								});
+
+			var modelMap = await GetOrCreateLookupMapAsync<SchoolModel>(
+								uow,
+								nsisSchools.Select(s => new LookupDto
+								{
+									Code = s.ModelCode,
+									NameAr = s.ModelName,
+									NameEn = s.ModelName
+								}),
+								x => x.IntegrationCode,
+								item => new SchoolModel
+								{
+									IntegrationCode = item.Code,
+									NameAr = item.NameAr,
+									NameEn = item.NameEn,
+									BackendName = item.Code
+								});
+
+			var programMap = await GetOrCreateLookupMapAsync<SchoolProgram>(
+							uow,
+							nsisSchools.Select(s => new LookupDto
+							{
+								Code = s.ProgramCode,
+								NameAr = s.ProgramName,
+								NameEn = s.ProgramName
+							}),
+							x => x.IntegrationCode,
+							item => new SchoolProgram
+							{
+								IntegrationCode = item.Code,
+								NameAr = item.NameAr,
+								NameEn = item.NameEn,
+								BackendName = item.Code
+							});
+
+			await uow.CommitAsync();
+
+			var today = DateOnly.FromDateTime(DateTime.Now);
+
+			foreach (var dto in nsisSchools)
+			{
+				var NSISCode = dto.Institution?.Trim();
+
+				if (string.IsNullOrWhiteSpace(NSISCode))
+					continue;
+
+				if (existingSchools.TryGetValue(NSISCode, out var existingSchool))
+				{
+					MapNSISToSchool(
+						dto,
+						existingSchool,
+						today,
+						schoolTypeMap,
+						genderMap,
+						empGenderMap,
+						modelMap,
+						programMap);
+
+					schoolRepo.Update(existingSchool);
+				}
+				else
+				{
+					var newSchool = new School
+					{
+						NSISCode = NSISCode,
+						HrCode = "2"+NSISCode,
+						Code = NSISCode
+					};
+
+					MapNSISToSchool(
+						dto,
+						newSchool,
+						today,
+						schoolTypeMap,
+						genderMap,
+						empGenderMap,
+						modelMap,
+						programMap);
+
+					await schoolRepo.InsertAsync(newSchool);
+
+					existingSchools[NSISCode] = newSchool;
+				}
+			}
+
+			await uow.CommitAsync();
+
+			await SyncSchoolLevelsAsync(nsisSchools, existingSchools);
+
+			return true;
+		}
 		public async Task<List<NSISSchoolDto>> GetAllNSISSchoolsAsync()
 		{
 			var result = new List<NSISSchoolDto>();
+
 			using var con = new OracleConnection(ClsAppSetting.OracleDBConnection);
+
 			try
 			{
 				await con.OpenAsync();
+
 				using var cmd = con.CreateCommand();
-				cmd.CommandText = "SELECT * FROM NSIS.NSIS_SCHOOL";
+
+				cmd.CommandText = @"
+									SELECT 
+										INSTITUTION,
+										LOCATION,
+										SCHOOL_NAME_ARA,
+										SCHOOL_NAME_ENG,
+										CAMPUS,
+										AREA,
+										AREA_NAME_ARA,
+										AREA_NAME_ENG,
+										SUB_AREA,
+										SUB_AREA_NAME_ARA,
+										SUB_AREA_NAME_ENG,
+										ADDRESS_LINE1,
+										PHONE,
+										FAX,
+										EMAIL_ADDR,
+										SCHOOL_CATEGORY,
+										SCHOOL_CATEGORY_ARA,
+										SCHOOL_CATEGORY_ENG,
+										SCHL_GENDER_CD,
+										SCHL_GENDER_DN,
+										KG,
+										PRIMARY,
+										PREPARATORY,
+										SECONDARY,
+										SCHL_MODEL_CD,
+										SCHL_MODEL_DN,
+										SCHL_COHORT_CD,
+										SCHL_COHORT_DN,
+										SCHL_EMP_GEN_CD,
+										SCHL_EMP_GEN_DN,
+										SCHL_TYPE_CD,
+										SCHL_TYPE_DN,
+										LATITUDE,
+										LONGITUDE,
+										URL,
+										SCHL_OUTS_CD,
+										SCHL_OUTS_DN,
+										SCHL_PROGRAM_CD,
+										SCHL_PROGRAM_DN,
+										SCHOOL_CAPACITY,
+										SCHL_PIN_NUMBER
+									FROM NSIS.NSIS_SCHOOL";
+
 				using var reader = await cmd.ExecuteReaderAsync();
+
 				while (await reader.ReadAsync())
+				{
 					result.Add(reader.ToNSISSchoolDto());
+				}
 			}
-			catch (Exception ex) { Console.WriteLine($"NSIS_SCHOOL error: {ex.Message}"); }
-			finally { await con.CloseAsync(); }
+			catch (Exception ex)
+			{
+				Console.WriteLine($"NSIS_SCHOOL error: {ex.Message}");
+			}
+
 			return result;
 		}
 
-		public async Task<List<NSISHomeroomDto>> GetHomeroomsBySchoolAsync(string institution, string location)
+		public async Task<List<NSISHomeroomDto>> GetHomeroomsBySchoolAsync(string institution)
 		{
 			var result = new List<NSISHomeroomDto>();
 			using var con = new OracleConnection(ClsAppSetting.OracleDBConnection);
@@ -73,9 +281,8 @@ namespace Evaluation.Services.Integration
 				cmd.CommandText = @"
                 SELECT STRM, INSTITUTION, LOCATION, ACAD_LEVEL, ACAD_PLAN, PLAN_SECTION
                 FROM NSIS.NSIS_HOMEROOM
-                WHERE INSTITUTION = :Institution AND LOCATION = :Location";
+                WHERE INSTITUTION = :Institution";
 				cmd.Parameters.Add(new OracleParameter("Institution", institution));
-				cmd.Parameters.Add(new OracleParameter("Location", location));
 				using var reader = await cmd.ExecuteReaderAsync();
 				while (await reader.ReadAsync())
 					result.Add(reader.ToNSISHomeroomDto());
@@ -132,160 +339,122 @@ namespace Evaluation.Services.Integration
 			finally { await con.CloseAsync(); }
 			return result;
 		}
-
-		// ───────────────────────────────────────────────
-		// MAIN SYNC: SCHOOLS (UPSERT BY HrCode/LOCATION)
-		// ───────────────────────────────────────────────
-
-		public async Task<bool> SyncAllSchoolsAsync()
-		{
-			var nsisSchools = await _integrationLogger.ExecuteAsync(
-				async () => await GetAllNSISSchoolsAsync());
-
-			if (nsisSchools.Count == 0)
-				return false;
-
-			using var uow = serviceScopeFactory.CreateScopedUow();
-			var schoolRepo = uow.GetRepository<School>();
-
-			// Load all lookup tables into memory to avoid N+1 queries
-			var existingSchools = await schoolRepo.GetAllNonDeleted()
-				.ToDictionaryAsync(s => s.HrCode, s => s);
-
-			var schoolTypeMap = await GetOrCreateLookupMapAsync<SchoolType>(
-				uow, nsisSchools.Select(s => s.TypeCode).Distinct(),
-				(repo, code) => repo.GetAllNonDeleted().Where(x => x.IntegrationCode == code).FirstOrDefaultAsync(),
-				code => new SchoolType { IntegrationCode = code, NameAr = code, NameEn = code, BackendName = code });
-
-			var genderMap = await GetOrCreateLookupMapAsync<SchoolGender>(
-				uow, nsisSchools.Select(s => s.GenderCode).Distinct(),
-				(repo, code) => repo.GetAllNonDeleted().Where(x => x.IntegrationCode == code).FirstOrDefaultAsync(),
-				code => new SchoolGender { IntegrationCode = code, NameAr = code, NameEn = code, BackendName = code });
-
-			var empGenderMap = await GetOrCreateLookupMapAsync<SchoolGender>(
-				uow, nsisSchools.Select(s => s.EmpGenderCode).Distinct(),
-				(repo, code) => repo.GetAllNonDeleted().Where(x => x.IntegrationCode == code).FirstOrDefaultAsync(),
-				code => new SchoolGender { IntegrationCode = code, NameAr = code, NameEn = code, BackendName = code });
-
-			var modelMap = await GetOrCreateLookupMapAsync<SchoolModel>(
-				uow, nsisSchools.Select(s => s.ModelCode).Distinct(),
-				(repo, code) => repo.GetAllNonDeleted().Where(x => x.IntegrationCode == code).FirstOrDefaultAsync(),
-				code => new SchoolModel { IntegrationCode = code, NameAr = code, NameEn = code, BackendName = code });
-
-			var programMap = await GetOrCreateLookupMapAsync<SchoolProgram>(
-				uow, nsisSchools.Select(s => s.ProgramCode).Distinct(),
-				(repo, code) => repo.GetAllNonDeleted().Where(x => x.IntegrationCode == code).FirstOrDefaultAsync(),
-				code => new SchoolProgram { IntegrationCode = code, NameAr = code, NameEn = code, BackendName = code });
-
-			await uow.CommitAsync(); // commit any new lookup inserts
-
-			DateOnly today = DateOnly.FromDateTime(DateTime.Now);
-
-			foreach (var dto in nsisSchools)
-			{
-				var hrCode = dto.Location; // LOCATION is the unique school key
-
-				if (existingSchools.TryGetValue(hrCode, out School existing))
-				{
-					// UPDATE
-					MapNSISToSchool(dto, existing, today, schoolTypeMap, genderMap, empGenderMap, modelMap, programMap);
-					schoolRepo.Update(existing);
-				}
-				else
-				{
-					// INSERT
-					var newSchool = new School { HrCode = hrCode, Code = hrCode };
-					MapNSISToSchool(dto, newSchool, today, schoolTypeMap, genderMap, empGenderMap, modelMap, programMap);
-					await schoolRepo.InsertAsync(newSchool);
-					existingSchools[hrCode] = newSchool; // track for SchoolLevel sync below
-				}
-			}
-
-			await uow.CommitAsync();
-
-			// Sync school levels (homeroom → SchoolLevel rows)
-			await SyncSchoolLevelsAsync(nsisSchools, existingSchools);
-
-			return true;
-		}
-
-		// ───────────────────────────────────────────────
-		// SYNC: SCHOOL LEVELS (HOMEROOM → SchoolLevel)
-		// ───────────────────────────────────────────────
-
-		private async Task SyncSchoolLevelsAsync(
-			List<NSISSchoolDto> nsisSchools,
-			Dictionary<string, School> schoolMap)
+		private async Task SyncSchoolLevelsAsync(List<NSISSchoolDto> nsisSchools,Dictionary<string, School> schoolMap)
 		{
 			using var uow = serviceScopeFactory.CreateScopedUow();
+
 			var levelRepo = uow.GetRepository<SchoolLevel>();
 			var eduLevelRepo = uow.GetRepository<EducationLevel>();
 
-			// Load all EducationLevels keyed by IntegrationCode (ACAD_LEVEL value)
-			var eduLevels = await eduLevelRepo.GetAllNonDeleted()
-				.Where(e => e.IntegrationCode != null)
-				.ToDictionaryAsync(e => e.IntegrationCode, e => e);
+			var acadPlans = await GetAllAcadPlansAsync();
 
-			// Load existing SchoolLevel rows to avoid duplicates
+			var eduLevels = await eduLevelRepo.GetAllNonDeleted()
+				.Where(x => x.IntegrationCode != null)
+				.ToDictionaryAsync(x => x.IntegrationCode!, x => x);
+
 			var existingLevels = await levelRepo.GetAllNonDeleted()
 				.ToListAsync();
+
+			var existingKeys = existingLevels
+				.Select(x => $"{x.SchoolId}_{x.EducationLevelId}_{x.AcademicYear}")
+				.ToHashSet();
 
 			int currentYear = DateTime.Now.Year;
 
 			foreach (var dto in nsisSchools)
 			{
-				if (!schoolMap.TryGetValue(dto.Location, out var school))
+				var nsisCode = dto.Institution?.Trim();
+
+				if (string.IsNullOrWhiteSpace(nsisCode))
 					continue;
 
-				var homerooms = await GetHomeroomsBySchoolAsync(dto.Institution, dto.Location);
+				if (!schoolMap.TryGetValue(nsisCode, out var school))
+					continue;
+
+				var homerooms = await GetHomeroomsBySchoolAsync(nsisCode);
 
 				foreach (var homeroom in homerooms)
 				{
-					// Resolve or create EducationLevel
-					if (!eduLevels.TryGetValue(homeroom.AcadLevel, out var eduLevel))
+					var plan = acadPlans.FirstOrDefault(x => x.AcadPlan == homeroom.AcadPlan);
+
+					if (plan == null || string.IsNullOrWhiteSpace(plan.AcadProg))
+						continue;
+
+					if (!eduLevels.TryGetValue(plan.AcadProg, out var eduLevel))
 					{
 						eduLevel = new EducationLevel
 						{
-							IntegrationCode = homeroom.AcadLevel,
-							NameAr = homeroom.AcadLevel,
-							NameEn = homeroom.AcadLevel,
-							BackendName = homeroom.AcadLevel,
-							OrderNo = 0
+							IntegrationCode = plan.AcadProg,
+							NameAr = plan.AcadProgAr ?? plan.AcadProg,
+							NameEn = plan.AcadProgEn ?? plan.AcadProg,
+							BackendName = plan.AcadProg,
+							OrderNo = int.TryParse(plan.AcadProg, out var orderNo) ? orderNo : 0
 						};
+
 						await eduLevelRepo.InsertAsync(eduLevel);
-						await uow.CommitAsync();
-						eduLevels[homeroom.AcadLevel] = eduLevel;
+						eduLevels[plan.AcadProg] = eduLevel;
 					}
 
-					// Upsert SchoolLevel
-					bool alreadyExists = existingLevels.Any(l =>
-						l.SchoolId == school.Id &&
-						l.EducationLevelId == eduLevel.Id &&
-						l.AcademicYear == currentYear);
+					var key = $"{school.Id}_{eduLevel.Id}_{currentYear}";
 
-					if (!alreadyExists)
+					if (existingKeys.Contains(key))
+						continue;
+
+					await levelRepo.InsertAsync(new SchoolLevel
 					{
-						await levelRepo.InsertAsync(new SchoolLevel
-						{
-							SchoolId = school.Id,
-							EducationLevelId = eduLevel.Id,
-							AcademicYear = currentYear
-						});
-					}
+						SchoolId = school.Id,
+						EducationLevelId = eduLevel.Id,
+						AcademicYear = currentYear
+					});
+
+					existingKeys.Add(key);
 				}
 			}
 
 			await uow.CommitAsync();
 		}
 
-		// ───────────────────────────────────────────────
-		// SYNC: GRADE SECTIONS (HOMEROOM → SchoolGradeSection)
-		// ───────────────────────────────────────────────
+		public async Task<List<NSISAcadPlanDto>> GetAllAcadPlansAsync()
+		{
+			var result = new List<NSISAcadPlanDto>();
 
+			using var con = new OracleConnection(ClsAppSetting.OracleDBConnection);
+
+			try
+			{
+				await con.OpenAsync();
+
+				using var cmd = con.CreateCommand();
+
+				cmd.CommandText = @"
+								SELECT 
+									ACAD_PLAN,
+									ACAD_PLAN_ARA,
+									ACAD_PLAN_ENG,
+									ACAD_LEVEL,
+									ACAD_PROG,
+									ACAD_PROG_ARA,
+									ACAD_PROG_ENG
+								FROM NSIS.ACAD_PLAN";
+
+				using var reader = await cmd.ExecuteReaderAsync();
+
+				while (await reader.ReadAsync())
+				{
+					result.Add(reader.ToNSISAcadPlanDto());
+				}
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine($"ACAD_PLAN error: {ex.Message}");
+			}
+
+			return result;
+		}
 		public async Task SyncGradeSectionsAsync(Guid schoolLevelId, string institution,
 			string location, string acadLevel)
 		{
-			var homerooms = await GetHomeroomsBySchoolAsync(institution, location);
+			var homerooms = await GetHomeroomsBySchoolAsync(institution);
 			var filtered = homerooms.Where(h => h.AcadLevel == acadLevel).ToList();
 
 			if (!filtered.Any()) return;
@@ -320,67 +489,106 @@ namespace Evaluation.Services.Integration
 			await uow.CommitAsync();
 		}
 
-		// ───────────────────────────────────────────────
-		// HELPERS
-		// ───────────────────────────────────────────────
 
 		private static void MapNSISToSchool(
-			NSISSchoolDto dto, School school, DateOnly today,
-			Dictionary<string, Guid> schoolTypeMap,
-			Dictionary<string, Guid> genderMap,
-			Dictionary<string, Guid> empGenderMap,
-			Dictionary<string, Guid> modelMap,
-			Dictionary<string, Guid> programMap)
+	NSISSchoolDto dto,
+	School school,
+	DateOnly today,
+	Dictionary<string, Guid> schoolTypeMap,
+	Dictionary<string, Guid> genderMap,
+	Dictionary<string, Guid> empGenderMap,
+	Dictionary<string, Guid> modelMap,
+	Dictionary<string, Guid> programMap)
 		{
 			school.NameAr = dto.NameAr;
 			school.NameEn = dto.NameEn;
+
 			school.Address = dto.Address;
 			school.Phone = dto.Phone;
 			school.OrgEmail = dto.Email;
+
 			school.LATITUDE = dto.Latitude;
 			school.LONGITUDE = dto.Longitude;
 			school.URL = dto.Url;
+
 			school.SchoolCapacity = dto.SchoolCapacity;
-			school.EstablishmentDate = today;
+
+			if (school.EstablishmentDate == default)
+				school.EstablishmentDate = today;
+
 			school.IsActive = true;
 			school.IsAccredited = false;
 			school.SupportIdentity = false;
-			school.AcceditedDate = today;
-			school.SupportIdentityDate = today;
 
-			if (!string.IsNullOrEmpty(dto.TypeCode) && schoolTypeMap.TryGetValue(dto.TypeCode, out var typeId))
+			if (!school.AcceditedDate.HasValue)
+				school.AcceditedDate = today;
+
+			if (!school.SupportIdentityDate.HasValue)
+				school.SupportIdentityDate = today;
+
+			if (!string.IsNullOrWhiteSpace(dto.SchoolCategoryCode) && schoolTypeMap.TryGetValue(dto.SchoolCategoryCode.Trim(), out var typeId))
+			{
 				school.TypeId = typeId;
-			if (!string.IsNullOrEmpty(dto.GenderCode) && genderMap.TryGetValue(dto.GenderCode, out var gId))
-				school.SchoolGenderId = gId;
-			if (!string.IsNullOrEmpty(dto.EmpGenderCode) && empGenderMap.TryGetValue(dto.EmpGenderCode, out var egId))
-				school.SchoolEmpGenderId = egId;
-			if (!string.IsNullOrEmpty(dto.ModelCode) && modelMap.TryGetValue(dto.ModelCode, out var mId))
-				school.SchoolModelId = mId;
-			if (!string.IsNullOrEmpty(dto.ProgramCode) && programMap.TryGetValue(dto.ProgramCode, out var pId))
-				school.SchoolProgramId = pId;
+			}
+
+			if (!string.IsNullOrWhiteSpace(dto.GenderCode) &&
+				genderMap.TryGetValue(dto.GenderCode.Trim(), out var genderId))
+			{
+				school.SchoolGenderId = genderId;
+			}
+
+			if (!string.IsNullOrWhiteSpace(dto.EmpGenderCode) &&
+				empGenderMap.TryGetValue(dto.EmpGenderCode.Trim(), out var empGenderId))
+			{
+				school.SchoolEmpGenderId = empGenderId;
+			}
+
+			if (!string.IsNullOrWhiteSpace(dto.ModelCode) &&
+				modelMap.TryGetValue(dto.ModelCode.Trim(), out var modelId))
+			{
+				school.SchoolModelId = modelId;
+			}
+
+			if (!string.IsNullOrWhiteSpace(dto.ProgramCode) &&
+				programMap.TryGetValue(dto.ProgramCode.Trim(), out var programId))
+			{
+				school.SchoolProgramId = programId;
+			}
 		}
 
-	
+
 		private async Task<Dictionary<string, Guid>> GetOrCreateLookupMapAsync<T>(
-		UnitOfWork uow,
-		IEnumerable<string> codes,
-		Func<Repository<T>, string, Task<T>> finder,  
-		Func<string, T> factory) where T : EntityBase
+	UnitOfWork uow,
+	IEnumerable<LookupDto> items,
+	Func<T, string?> integrationCodeSelector,
+	Func<LookupDto, T> factory) where T : EntityBase
 		{
-			var map = new Dictionary<string, Guid>(StringComparer.OrdinalIgnoreCase);
 			var repo = uow.GetRepository<T>();
 
-			foreach (var code in codes.Where(c => !string.IsNullOrEmpty(c)))
-			{
-				if (map.ContainsKey(code)) continue;
+			var requiredItems = items
+				.Where(x => !string.IsNullOrWhiteSpace(x.Code))
+				.GroupBy(x => x.Code!.Trim(), StringComparer.OrdinalIgnoreCase)
+				.Select(g => g.First())
+				.ToList();
 
-				var entity = await finder(repo, code);
-				if (entity == null)
-				{
-					entity = factory(code);
-					await repo.InsertAsync(entity);
-				}
-				map[code] = entity.Id;
+			var existingItems = await repo.GetAllNonDeleted().ToListAsync();
+
+			var map = existingItems
+				.Where(x => !string.IsNullOrWhiteSpace(integrationCodeSelector(x)))
+				.GroupBy(x => integrationCodeSelector(x)!.Trim(), StringComparer.OrdinalIgnoreCase)
+				.ToDictionary(g => g.Key, g => g.First().Id, StringComparer.OrdinalIgnoreCase);
+
+			foreach (var item in requiredItems)
+			{
+				var code = item.Code!.Trim();
+
+				if (map.ContainsKey(code))
+					continue;
+
+				var newItem = factory(item);
+				await repo.InsertAsync(newItem);
+
+				map[code] = newItem.Id;
 			}
 
 			return map;

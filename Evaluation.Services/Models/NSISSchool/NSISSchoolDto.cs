@@ -89,4 +89,11 @@ namespace Evaluation.Services.Models.NSISSchool
 		public string AcadProgAr { get; set; }
 		public string AcadProgEn { get; set; }
 	}
+
+	public class LookupDto
+	{
+		public string? Code { get; set; }
+		public string? NameAr { get; set; }
+		public string? NameEn { get; set; }
+	}
 }
