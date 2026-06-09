@@ -2,14 +2,18 @@
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.ServiceEnities;
 using Evaluation.DAL.Models.ServiceRequestEntities;
+using Evaluation.DAL.Models.StatusEntities;
+using Evaluation.DAL.Models.UserEntiy;
 using Evaluation.DAL.Repositories;
 using Evaluation.Services.Special;
+using Evaluation.SharedHelper.Consts;
 using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Admin;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using static Evaluation.SharedHelper.Enums.ConstantKeys;
 
 namespace Evaluation.Services.Models.Admin
 {
@@ -140,9 +144,25 @@ namespace Evaluation.Services.Models.Admin
                 return result;
            
         }
+        public async Task<List<ServiceStatuisDDLDto>> GetServiceStatuis(Guid serviceId)
+        {
 
-       
-       
+            var result = await uow.GetRepository<ServiceStatus>()
+                .GetAllNonDeleted(x=>x.ServiceId == serviceId)
+                .Include(x => x.CreateBy)
+                .Select(x => new ServiceStatuisDDLDto()
+                {
+                    Name = _requestInfo.Lang == LanguageConst.Ar ? x.NameAr : x.NameEn,
+                    Id = x.Id
+                })
+                .ToListAsync();
+
+            return result;
+
+        }
+
+
+
 
     }
 }

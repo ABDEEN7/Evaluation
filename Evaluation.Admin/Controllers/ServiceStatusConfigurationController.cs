@@ -98,8 +98,19 @@ namespace Evaluation.Admin.Controllers
                 return Ok(result);
             
         }
-
         
-       
+        [HttpGet]
+        [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.AdminPermission.DELETE_ADMIN_ServiceStatusConfiguration })]
+        public async Task<IActionResult> GetAllServiceStatus(Guid serviceId)
+        {
+
+            Dictionary<string, object> response = new Dictionary<string, object>();
+            var User = await masterBL.GetAdminService<SrvServiceStatusConfigurationBL>().GetServiceStatuis(serviceId);
+            response.Add("ServiceStatuis", User);
+            return Ok(new ResponseEntity(response));
+        }
+
+
+
     }
 }

@@ -35,6 +35,39 @@ function ClearControlByPage() {
     
 }
 
+const loadStatusByService = (serviceId) => {
+    const options = {
+        success: function (result) {
+            if (result) {
+                const { data } = result;
+                if (data) {
+                    const { ServiceStatuis } = data;
+                    AllStatusList = ServiceStatuis || [];
+                    repopulateStatusDropdown('ServiceStatusConfigurationCurrentStatusId', AllStatusList);
+                    repopulateStatusDropdown('ServiceStatusConfigurationNextStatusId', AllStatusList);
+                }
+            }
+        }
+    };
+
+    jqClientAdvanced(options).Get(`ServiceStatusConfiguration/GetAllServiceStatus?serviceId=${serviceId}`);
+};
+const repopulateStatusDropdown = (dropdownId, statusList) => {
+    const ddlData = statusList.map(item => ({
+        id: item.id,
+        text: item.name
+    }));
+
+    const $dropdown = $('#' + dropdownId);
+    $dropdown.empty();
+    $dropdown.select2({
+        width: 'resolve',
+        allowClear: true,
+        data: ddlData,
+        placeholder: sharedFn().GetUiControlText(dropdownId),
+    });
+    $dropdown.val('').trigger('change');
+}
 
 const loadData = (isSearch) => {
     const serviceId = services_div_select2.val();
@@ -130,9 +163,9 @@ $(document).ready(function () {
         sharedFn().EditMode();
         sharedFn().SetDefaultValueFromConfig();
         sharedFn().SetValueToDropdown();
-       
+        const serviceId = $('#ServiceId').val();
+        loadStatusByService(serviceId);
     });
-   
 
     $("#btn-submit").click(function (e) {
 
@@ -187,7 +220,12 @@ $(document).ready(function () {
         }
     });
 
-   
+    $('#ServiceId').on('change', function () {
+        const serviceId = $(this).val();
+        repopulateStatusDropdown('ServiceStatusConfigurationCurrentStatusId', []);
+        repopulateStatusDropdown('ServiceStatusConfigurationNextStatusId', []);
+        loadStatusByService(serviceId);
+    });   
 
 });
 

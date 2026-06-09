@@ -60,5 +60,8 @@ public class SchoolController : ControllerBase
     [HttpGet]
     //[CheckRolePermisionFilter(true, ConstantKeys.WebPermissions.VIEW_WEB_SCHOOL)]
     public async Task<IActionResult> GetEducationLevel()
-        => Ok(new { result = await _masterBl.GetApiService<SchoolBL>().GetVisitsAsync() });
+        => Ok(new { result = await _masterBl.GetApiService<SchoolBL>().GetEducationLevelAsync() });
+    [HttpGet]
+    public async Task<IActionResult> GetSchoolGender()
+        => Ok(new { result = await _masterBl.GetApiService<SchoolBL>().GetSchoolGenderAsync() });
 }

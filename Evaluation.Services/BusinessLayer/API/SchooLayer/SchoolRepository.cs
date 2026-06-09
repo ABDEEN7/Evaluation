@@ -93,66 +93,77 @@ public class SchoolRepository(IServiceScopeFactory serviceScopeFactory,
         return await query.GetPaginatedResult(request.PageNumber, request.PageSize);
     }
 
-	public async Task<List<School>> GetSchoolsByDepartmentId(Guid depId)
-	{
-		using var scopeUow = serviceProvider.CreateScopedUow();
+    public async Task<List<School>> GetSchoolsByDepartmentId(Guid depId)
+    {
+        using var scopeUow = serviceProvider.CreateScopedUow();
 
-		var department = await scopeUow.GetRepository<Department>()
-								 .GetAllQueryFiltered()
-								 .AsNoTracking()
-								 .Include(c => c.DepTargetOrgTrees)
-								 .Where(c => c.Id == depId)
-								 .FirstOrDefaultAsync();
+        var department = await scopeUow.GetRepository<Department>()
+                                 .GetAllQueryFiltered()
+                                 .AsNoTracking()
+                                 .Include(c => c.DepTargetOrgTrees)
+                                 .Where(c => c.Id == depId)
+                                 .FirstOrDefaultAsync();
 
 
-		var schools =await scopeUow.GetRepository<School>()
-					   .GetAllNonDeleted()
-					   .Where(c => c.OrgParentId == department.DepTargetOrgTrees.Select(x => x.TargetOrgTreeId).FirstOrDefault())
-					   .ToListAsync();
+        var schools = await scopeUow.GetRepository<School>()
+                       .GetAllNonDeleted()
+                       .Where(c => c.OrgParentId == department.DepTargetOrgTrees.Select(x => x.TargetOrgTreeId).FirstOrDefault())
+                       .ToListAsync();
 
-		return schools;
-	}
-	public async Task<School?> GetSchoolDetails(Guid SchoolID)
-	{
-		using var scopeUow= serviceProvider.CreateScopedUow();
-		var school = await scopeUow.GetRepository<School>().GetByIDActiveNonDeleted(SchoolID);
-		return school;
-	}
+        return schools;
+    }
+    public async Task<School?> GetSchoolDetails(Guid SchoolID)
+    {
+        using var scopeUow = serviceProvider.CreateScopedUow();
+        var school = await scopeUow.GetRepository<School>().GetByIDActiveNonDeleted(SchoolID);
+        return school;
+    }
 
-	public async Task<List<EvaluationRequest>> GetEvaluationRequestByOrgTreeId(Guid OrgTreeId)
-	{
-		using var scopeUow = serviceProvider.CreateScopedUow();
+    public async Task<List<EvaluationRequest>> GetEvaluationRequestByOrgTreeId(Guid OrgTreeId)
+    {
+        using var scopeUow = serviceProvider.CreateScopedUow();
 
-		IQueryable<EvaluationRequest> query = scopeUow.GetRepository<EvaluationRequest>()
-										.GetAllActiveNonDeleted()
-										.Include(d => d.ServiceStatus)
-										.Include(d => d.FormEvalMatrixValue)
-										.Where(er =>
-											er.OrgTreeId == OrgTreeId &&
-											er.DepEvaluationType.DepartmentId == requestInfo.DepId &&
-											er.FormEvalMatrixValueId != null)
-										.OrderByDescending(er => er.CreateDate)
-										.Take(2);
+        IQueryable<EvaluationRequest> query = scopeUow.GetRepository<EvaluationRequest>()
+                                        .GetAllActiveNonDeleted()
+                                        .Include(d => d.ServiceStatus)
+                                        .Include(d => d.FormEvalMatrixValue)
+                                        .Where(er =>
+                                            er.OrgTreeId == OrgTreeId &&
+                                            er.DepEvaluationType.DepartmentId == requestInfo.DepId &&
+                                            er.FormEvalMatrixValueId != null)
+                                        .OrderByDescending(er => er.CreateDate)
+                                        .Take(2);
 
         return query.ToList();
     }
 
-    public async Task<IQueryable<DepEvaluationType>> GetVisitTypes()
+    public IQueryable<DepEvaluationType> GetVisitTypes()
     {
+        using var scopeUow = serviceProvider.CreateScopedUow();
         var visitTypes =
-        unitOfWork
+        scopeUow
         .GetRepository<DepEvaluationType>()
         .GetAllActiveNonDeleted(x => x.DepartmentId == requestInfo.DepId);
         return visitTypes;
     }
-    //public async Task<IQueryable<DepEvaluationType>> GetEducationLevel()
-    //{
-    //    var visitTypes =
-    //    unitOfWork
-    //    .GetRepository<EducationLevel>()
-    //    .GetAllActiveNonDeleted(x => x.DepartmentId == requestInfo.DepId);
-    //    return visitTypes;
-    //}
+    public IQueryable<SchoolGender> GetSchoolGender()
+    {
+        using var scopeUow = serviceProvider.CreateScopedUow();
+        var gender =
+        scopeUow
+        .GetRepository<SchoolGender>()
+        .GetAllActiveNonDeleted();
+        return gender;
+    }
+    public IQueryable<EducationLevel> GetEducationLevel(int? currentAcademicYear)
+    {
+        using var scopeUow = serviceProvider.CreateScopedUow();
+        var visitTypes =
+        scopeUow
+        .GetRepository<EducationLevel>()
+        .GetAllActiveNonDeleted(x => x.SchoolLevels.Any(x => x.AcademicYear == currentAcademicYear));
+        return visitTypes;
+    }
     private Expression<Func<School, bool>> BuildFilterExpression(SchoolRequest request, List<Guid?> targetOrgTreeIds, List<Guid> currentSchools)
     {
 
