@@ -96,4 +96,15 @@ namespace Evaluation.Services.Models.NSISSchool
 		public string? NameAr { get; set; }
 		public string? NameEn { get; set; }
 	}
+
+	public class NSISCourseDto
+	{
+		public string? Year { get; set; }
+		public string? Institution { get; set; }
+		public string? AcadPlan { get; set; }
+		public string? SubjectCode { get; set; }
+		public string? ShortSubjectNameEn { get; set; }
+		public string? SubjectNameEn { get; set; }
+		public string? SubjectNameAr { get; set; }
+	}
 }

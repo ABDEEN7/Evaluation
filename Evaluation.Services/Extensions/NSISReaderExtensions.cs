@@ -115,5 +115,22 @@ namespace Evaluation.Services.Extensions
 			AcadProgAr = r.SafeString("ACAD_PROG_ARA"),
 			AcadProgEn = r.SafeString("ACAD_PROG_ENG"),
 		};
+
+		public static NSISCourseDto ToNSISCourseDto(this DbDataReader r) => new()
+		{
+			Year = r.SafeString("STRM"),
+
+			Institution = r.SafeString("INSTITUTION"),
+
+			AcadPlan = r.SafeString("ACAD_PLAN"),
+
+			SubjectCode = r.SafeString("SUBJECT"),
+
+			ShortSubjectNameEn = r.SafeString("SHORT_SBJ_NAM_ENG"),
+
+			SubjectNameEn = r.SafeString("SUBJECT_NAME_ENG"),
+
+			SubjectNameAr = r.SafeString("SUBJECT_NAME_ARA")
+		};
 	}
 }
