@@ -607,7 +607,7 @@
     });
     Evaluation.Loaders.loadPlans('evaluationPlanIdFilter');
     //Evaluation.Loaders.loadServiceStatus('evaluationRequestStatusFilter');
-    //evaluationRequestsListing.reload();
+    evaluationRequestsListing.reload();
 });
 
 
