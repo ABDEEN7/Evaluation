@@ -23,10 +23,11 @@ public class Plan : EntityBase, IAuditLogEntity
     public Guid? SemesterId { get; set; }
     public Semester? Semester { get; set; }
     public string? PlanJsonValue { get; set; }
+    public Guid? PlanAttachmentId { get; set; }
+    public EvalAttachment? PlanAttachment { get; set; }
 
     public virtual ICollection<EvaluationRequest>? EvaluationRequests { get; set; }
 
-	//public virtual Guid? EvalAttachmentsId { get; set; }
-	//public virtual EvalAttachment? EvalAttachments { get; set; }
+    
 
 }
