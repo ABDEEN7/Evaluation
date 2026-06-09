@@ -45,12 +45,17 @@ namespace Evaluation.DAL.Models.ServiceRequestEntities
         public Guid? VisitorUserId { get; set; }
         public MinistryUser? VisitorUser { get; set; }
         public Guid? EducationLevelId { get; set; }
-        public EducationLevel? EducationLevel { get; set; }
-        public Guid? SchoolCourseId { get; set; }
-        public SchoolCourse? SchoolCourse { get; set; }
-        public Guid? SchoolClassId { get; set; }
-        public SchoolClass? SchoolClass { get; set; }
+		public EducationLevel? EducationLevel { get; set; }
 
+        public Guid? GradeLevelId { get; set; }
+		public GradeLevel? GradeLevel { get; set; }
+        public Guid? SchoolGradeSectionId { get; set; }
+		public SchoolGradeSection? SchoolGradeSection { get; set; }
+
+		public Guid? SchoolCourseId { get; set; }
+        public SchoolCourse? SchoolCourse { get; set; }
+        public Guid? TeacherId { get; set; }
+        public Employee? Teacher { get; set; }
 
         public virtual ICollection<ServiceRequestFieldsValue>? ServiceRequestFieldsValues { get; set; }
 		public virtual ICollection<RequestAssignment>? Assignments { get; set; }

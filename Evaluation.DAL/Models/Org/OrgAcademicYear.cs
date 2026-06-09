@@ -12,4 +12,10 @@ public class OrgAcademicYear : EntityBase, IAuditLogEntity
     public string? JobTitleAr { get; set; } // to keep the jobtitle history for the empoloyees
     public string? JobTitleEn { get; set; }
     public int Year { get; set; }
+    public Guid? SchoolGenderId { get; set; }
+    public SchoolGender? SchoolGender { get; set; }
+    public Guid? SchoolModelId { get; set; }
+    public SchoolModel? SchoolModel { get; set; }
+    public Guid? SchoolProgramId { get; set; }
+    public SchoolProgram? SchoolProgram { get; set; }
 }

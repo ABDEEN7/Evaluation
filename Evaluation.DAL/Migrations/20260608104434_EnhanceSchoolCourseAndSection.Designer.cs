@@ -4,6 +4,7 @@ using Evaluation.DAL.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Evaluation.DAL.Migrations
 {
     [DbContext(typeof(EvaluationDbContext))]
-    partial class EvaluationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260608104434_EnhanceSchoolCourseAndSection")]
+    partial class EnhanceSchoolCourseAndSection
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -4739,79 +4742,6 @@ namespace Evaluation.DAL.Migrations
                     b.ToTable("ScopeAcademicYears");
                 });
 
-            modelBuilder.Entity("Evaluation.DAL.Models.FormsModules.ScopeReportNote", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("CreateById")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreateDate")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("getdate()");
-
-                    b.Property<Guid?>("DeleteById")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("DeleteDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("DepartmentId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("EvaluationRequestId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("IsActive")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(true);
-
-                    b.Property<bool>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false);
-
-                    b.Property<string>("NegativePoint")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Note")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PositivePoint")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("ScopeId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("UpdateById")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("UpdateDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreateById");
-
-                    b.HasIndex("DeleteById");
-
-                    b.HasIndex("DepartmentId");
-
-                    b.HasIndex("EvaluationRequestId");
-
-                    b.HasIndex("ScopeId");
-
-                    b.HasIndex("UpdateById");
-
-                    b.ToTable("ScopeReportNote");
-                });
-
             modelBuilder.Entity("Evaluation.DAL.Models.FormsModules.ScopeType", b =>
                 {
                     b.Property<Guid>("Id")
@@ -7182,9 +7112,6 @@ namespace Evaluation.DAL.Migrations
                     b.Property<decimal?>("FinalEvalValue")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<Guid?>("FinalReportId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<Guid?>("FormEvalMatrixValueId")
                         .HasColumnType("uniqueidentifier");
 
@@ -7200,9 +7127,6 @@ namespace Evaluation.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
                         .HasDefaultValue(false);
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateOnly?>("NextEvaluationDate")
                         .HasColumnType("date");
@@ -7722,9 +7646,6 @@ namespace Evaluation.DAL.Migrations
                         .HasColumnType("bit")
                         .HasDefaultValue(false);
 
-                    b.Property<Guid?>("PlanAttachmentId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("PlanJsonValue")
                         .HasColumnType("nvarchar(max)");
 
@@ -7757,8 +7678,6 @@ namespace Evaluation.DAL.Migrations
                     b.HasIndex("CreateById");
 
                     b.HasIndex("DeleteById");
-
-                    b.HasIndex("PlanAttachmentId");
 
                     b.HasIndex("PlanStatusId");
 
@@ -8677,9 +8596,6 @@ namespace Evaluation.DAL.Migrations
                     b.Property<Guid?>("EvaluationRequestId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("GradeLevelId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
@@ -8706,10 +8622,10 @@ namespace Evaluation.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid?>("SchoolCourseId")
+                    b.Property<Guid?>("SchoolClassId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("SchoolGradeSectionId")
+                    b.Property<Guid?>("SchoolCourseId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<long>("Sequence")
@@ -8722,9 +8638,6 @@ namespace Evaluation.DAL.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("StatusId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("TeacherId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid?>("UpdateById")
@@ -8756,8 +8669,6 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("EvaluationRequestId");
 
-                    b.HasIndex("GradeLevelId");
-
                     b.HasIndex("OrgTreeId");
 
                     b.HasIndex("PlanHistoryId");
@@ -8766,13 +8677,9 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("SchoolCourseId");
 
-                    b.HasIndex("SchoolGradeSectionId");
-
                     b.HasIndex("ServiceId");
 
                     b.HasIndex("StatusId");
-
-                    b.HasIndex("TeacherId");
 
                     b.HasIndex("UpdateById");
 
@@ -14211,53 +14118,6 @@ namespace Evaluation.DAL.Migrations
                     b.Navigation("UpdateBy");
                 });
 
-            modelBuilder.Entity("Evaluation.DAL.Models.FormsModules.ScopeReportNote", b =>
-                {
-                    b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "CreateBy")
-                        .WithMany()
-                        .HasForeignKey("CreateById")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "DeleteBy")
-                        .WithMany()
-                        .HasForeignKey("DeleteById");
-
-                    b.HasOne("Evaluation.DAL.Models.DepartementEntites.Department", "Department")
-                        .WithMany()
-                        .HasForeignKey("DepartmentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Evaluation.DAL.Models.Planing.EvaluationRequestEntity.EvaluationRequest", "EvaluationRequest")
-                        .WithMany()
-                        .HasForeignKey("EvaluationRequestId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Evaluation.DAL.Models.FormsModules.Scope", "Scope")
-                        .WithMany()
-                        .HasForeignKey("ScopeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "UpdateBy")
-                        .WithMany()
-                        .HasForeignKey("UpdateById");
-
-                    b.Navigation("CreateBy");
-
-                    b.Navigation("DeleteBy");
-
-                    b.Navigation("Department");
-
-                    b.Navigation("EvaluationRequest");
-
-                    b.Navigation("Scope");
-
-                    b.Navigation("UpdateBy");
-                });
-
             modelBuilder.Entity("Evaluation.DAL.Models.FormsModules.ScopeType", b =>
                 {
                     b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "CreateBy")
@@ -15788,11 +15648,6 @@ namespace Evaluation.DAL.Migrations
                         .HasForeignKey("DeleteById")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Evaluation.DAL.Models.Attachments.EvalAttachment", "PlanAttachment")
-                        .WithMany()
-                        .HasForeignKey("PlanAttachmentId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("Evaluation.DAL.Models.Planing.PlanStatus", "PlanStatus")
                         .WithMany()
                         .HasForeignKey("PlanStatusId")
@@ -15818,8 +15673,6 @@ namespace Evaluation.DAL.Migrations
                     b.Navigation("CreateBy");
 
                     b.Navigation("DeleteBy");
-
-                    b.Navigation("PlanAttachment");
 
                     b.Navigation("PlanStatus");
 
@@ -16373,11 +16226,6 @@ namespace Evaluation.DAL.Migrations
                         .HasForeignKey("EvaluationRequestId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Evaluation.DAL.Models.Org.GradeLevel", "GradeLevel")
-                        .WithMany()
-                        .HasForeignKey("GradeLevelId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("Evaluation.DAL.Models.Org.OrgTree", "OrgTree")
                         .WithMany()
                         .HasForeignKey("OrgTreeId")
@@ -16398,11 +16246,6 @@ namespace Evaluation.DAL.Migrations
                         .HasForeignKey("SchoolCourseId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Evaluation.DAL.Models.Org.SchoolGradeSection", "SchoolGradeSection")
-                        .WithMany()
-                        .HasForeignKey("SchoolGradeSectionId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("Evaluation.DAL.Models.ServiceEnities.Service", "Service")
                         .WithMany()
                         .HasForeignKey("ServiceId")
@@ -16414,11 +16257,6 @@ namespace Evaluation.DAL.Migrations
                         .HasForeignKey("StatusId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.HasOne("Evaluation.DAL.Models.Org.Employee", "Teacher")
-                        .WithMany()
-                        .HasForeignKey("TeacherId")
-                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "UpdateBy")
                         .WithMany()
@@ -16442,8 +16280,6 @@ namespace Evaluation.DAL.Migrations
 
                     b.Navigation("EvaluationRequestHistory");
 
-                    b.Navigation("GradeLevel");
-
                     b.Navigation("OrgTree");
 
                     b.Navigation("Plan");
@@ -16452,13 +16288,9 @@ namespace Evaluation.DAL.Migrations
 
                     b.Navigation("SchoolCourse");
 
-                    b.Navigation("SchoolGradeSection");
-
                     b.Navigation("Service");
 
                     b.Navigation("Status");
-
-                    b.Navigation("Teacher");
 
                     b.Navigation("UpdateBy");
 

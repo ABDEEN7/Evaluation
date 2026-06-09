@@ -24,6 +24,7 @@ using Evaluation.SharedHelper.Models.Api.FormBuilderDTO;
 using Evaluation.SharedHelper.Models.Api.ServiceRequestEntitiesDTO;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.VisualBasic;
 using Newtonsoft.Json;
 using static Evaluation.SharedHelper.Enums.ConstantKeys;
 
@@ -73,10 +74,12 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
     }
     public async Task<List<EvaluationRequest>> GetEvaluationRequestsByOrgTreeId(Guid OrgTreeId, FilterRequestsDTO model)
     {
-		IQueryable<EvaluationRequest> query = unitOfWork.GetRepository<EvaluationRequest>()
+		using var uow = serviceScopeFactory.CreateScopedUow();
+		IQueryable<EvaluationRequest> query = uow.GetRepository<EvaluationRequest>()
 					.GetAllActiveNonDeleted()
 					.Include(d => d.ServiceStatus)
 					.Include(d => d.FormEvalMatrixValue)
+					.Include(d => d.DepEvaluationType)
 					 .Where(er => er.OrgTreeId == OrgTreeId &&
 						er.DepEvaluationType.DepartmentId == requestInfo.DepId)
 					 .OrderByDescending(er => er.CreateDate);
@@ -154,7 +157,8 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 			CreateDate = x.CreateDate,
 			CreateOn = x.CreateDate.ToString(dateFormat),
 			CreateOnTime = x.CreateDate.ToString(timeFormat),
-
+			EvlDateFrom=x.FromDate.ToString(dateFormat),
+			EvlDateTo = x.ToDate.ToString(dateFormat),
 			PlanId = x.PlanId,
 			PlanName = x.Plan != null ? x.Plan.PlanName : "",
 
@@ -228,6 +232,7 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 
 		if (request.Service == null || request.ServiceStatus == null)
 			throw new BusinessException(ExceptionMessage.lblRequestNotValid);
+		var dateFormatTask = cacheDataProvider.GetSystemSettingValue(SystemSettings.DateFormat);
 
 		var userTask = srvUser.GetByIDActiveNonDeleted(userId);
 		var moduleTask = SrvSystemModule.GetSystemModuleByIdAsync(request.Service.SystemModuleId);
@@ -286,6 +291,7 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 		var actionTransactions = await actionTransactionsTask;
 		var actions = await actionsTask;
 		var evaluationParties = await evaluationPartiesTask;
+		var dateFormat = await dateFormatTask;
 		var requestDetails= new EvaluationRequestDTO
 		{
 			RequestNumber=request.RequestNumber,
@@ -306,6 +312,9 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 			//CanViewAllFieldHistory = hasAllFieldHistoryPermission
 			IsNdaApprovalPending= userAssignmentRequiresNda,
 			Assignment= showAllRequestsPermission ? assignment: null,
+
+			EvlDateFrom = request.FromDate.ToString(dateFormat),
+			EvlDateTo = request.ToDate.ToString(dateFormat),
 		};
 		
 		return requestDetails;

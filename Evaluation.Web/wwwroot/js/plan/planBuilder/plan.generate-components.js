@@ -250,7 +250,7 @@
     };
 
 
-    const generateSchoolNameCell = (fieldId, school) => {
+    const generateSchoolNameCell_old = (fieldId, school) => {
         const ratingClass = RATING_CLASSES[school.rating] || 'bg-light';
         const container = $('<div>').addClass('d-flex align-items-center justify-content-between');
 
@@ -286,7 +286,7 @@
         const levelBadge = $('<div>').addClass('square-bullet mt-1');
         const levelText = (school.schoolLevel && school.schoolLevel.length > 0)
             ? school.schoolLevel.map(l => l.name).join(', ')
-            : '-';
+            : t('lblPrimary') || 'ابتدائي'; 
 
         levelBadge.append($('<div>').text(levelText));
         infoDiv.append(levelBadge);
@@ -300,7 +300,64 @@
         return container;
     };
 
+    const generateSchoolNameCell = (fieldId, school) => {
+        const container = $('<div>').addClass('school-cell d-flex align-items-start justify-content-between gap-2');
+        const infoDiv = $('<div>').addClass('school-info d-flex flex-column gap-1');
 
+        // School name
+        infoDiv.append(
+            $('<span>').addClass('school-name fw-500').text(school.name || '-')
+        );
+
+        // Eval badge + date row
+        if (school.lastEvaluationDate) {
+            const score = parseFloat(school.formEvalMatrixNameValue) || null;
+            let tier = 'poor', label = 'ضعيف';
+            if (score >= 90) { tier = 'excellent'; label = t('lblExcellent') || 'ممتاز'; }
+            else if (score >= 70) { tier = 'good'; label = t('lblGood') || 'جيد'; }
+            else if (score >= 50) { tier = 'average'; label = t('lblAverage') || 'مقبول'; }
+
+            const evalRow = $('<div>').addClass('eval-row d-flex align-items-center flex-wrap gap-1');
+            evalRow.append(
+                $('<span>').addClass(`eval-badge score-${tier}`)
+                    .html(`<span class="eval-dot dot-${tier}"></span>${label} &mdash; ${score ?? school.formEvalMatrixNameValue}`)
+            );
+            evalRow.append(
+                $('<span>').addClass('eval-date-pill')
+                    .html(`<i class="la la-calendar"></i> ${school.lastEvaluationDate}`)
+            );
+            infoDiv.append(evalRow);
+        }
+
+        // Org parent
+        if (school.orgParent?.nameEn) {
+            infoDiv.append(
+                $('<div>').addClass('org-parent')
+                    .html(`<i class="la la-building"></i> ${school.orgParent.nameEn}`)
+            );
+        }
+
+        // School levels
+        if (school.schoolLevel?.length > 0) {
+            const levelsRow = $('<div>').addClass('levels-row d-flex flex-wrap gap-1');
+            school.schoolLevel.forEach(l => {
+                levelsRow.append($('<span>').addClass('level-chip').text(l.name));
+            });
+            infoDiv.append(levelsRow);
+        }
+
+        container.append(infoDiv);
+
+        // Rating badge (right side)
+        if (school.rating) {
+            const ratingClass = RATING_CLASSES[school.rating] || '';
+            container.append(
+                $('<span>').addClass(`rating-badge ${ratingClass}`).text(school.rating)
+            );
+        }
+
+        return container;
+    };
     const generateVisitDateField = (fieldId, school, readonly) => {
         let visitDateValue = '';
 
@@ -351,7 +408,7 @@
                 .text(type.name)
                 .attr('data-backendname', type.backendName);
 
-            if (shouldAutoSelect && type.backendName === 'Corporate') {
+            if (shouldAutoSelect && type.backendName === 'Periodicevaluation') {
                 
                 option.prop('selected', true);
             } else if (school.visitType === type.name || school.visitTypeId === type.id) {
@@ -422,7 +479,7 @@
         row.append(lastEvalCell);
         // Visit type cell
         const visitTypeCell = $('<td>');
-        visitTypeCell.append(generateVisitTypeField(fieldId, school, readonly, isSelected));
+        visitTypeCell.append(generateVisitTypeField(fieldId, school, readonly, isSelected, shouldAutoSelect));
         row.append(visitTypeCell);
 
         // Academic year cell

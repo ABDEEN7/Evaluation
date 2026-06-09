@@ -29,7 +29,10 @@ public class OrgDetailsDto
     public string? Phone { get; set; }
     public string? CurrentEvaluationResult { get; set; }
     public string? CurrentEvaluationDate { get; set; }
-    public string? LastEvaluationResult { get; set; }
-    public string? LastEvaluationDate { get; set; }
+	public string? LastEvaluationResult { get; set; }
+	public string? LastEvaluationDate { get; set; }
+
+	public string? LastEvaluationResult2 { get; set; }
+	public string? LastEvaluationDate2 { get; set; }
 
 }

@@ -5,6 +5,7 @@ namespace Evaluation.DAL.Dtos.Form;
 public class FormItemDto
 {
     public Guid Id { get; set; }
+    public Guid ScopeId { get; set; }
     public string Name { get; set; } = null!;
     public List<SubFormItemDto>? SubFormItems { get; set; }
     public int OrderNo { get; set; } = 0;
@@ -24,6 +25,6 @@ public class RelatedItemDto
 {
     public Guid Id { get; set; }
     public string Name { get; set; } = null!;
-    public string Value { get; set; } = null!;
-    public string Note { get; set; } = null!;
+    public string? Value { get; set; } = null!;
+    public string? Note { get; set; } = null!;
 }

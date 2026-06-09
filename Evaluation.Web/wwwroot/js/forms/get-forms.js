@@ -15,7 +15,6 @@ const GET_FORMS_API = {
 const params = new URLSearchParams(window.location.search);
 let depRoutePath = sharedUtility().extractDepartmentName();
 
-//let matrixValues = [];
 let itemsResult = [];
 let renameItems = [];
 let lastOrder;
@@ -30,6 +29,10 @@ let P_matrixResponse;
 let evalForm;
 let P_countOfColumnsValue;
 let P_hasMuliEvaluation;
+let P_renamedItems;
+let P_fieldId;
+
+const initializedForms = new Set();
 
 const SELECTORS = {
     tbody: 'tbodyRows'
@@ -45,32 +48,22 @@ const ItemPropertyType = Object.freeze({
 // Utilities
 // ==============================
 
-
 const escapeHtml = (text = '', isRename = false, itemId = null, fieldId = null, allowRename = false) => {
-
     if (!isRename) {
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
-    }
-    else
-    {
+    } else {
         const input = document.createElement("input");
         input.type = "text";
         input.className = "form-control form-control-sm item-name";
         input.id = `${fieldId}_${itemId}_ItemName`;
         input.setAttribute("data-id", itemId);
-
         if (!allowRename) {
-
             input.disabled = true;
-
         }
-
         return input.outerHTML;
- 
     }
-
 };
 
 const createPlaceholderOption = (text = 'Please select') => {
@@ -80,9 +73,80 @@ const createPlaceholderOption = (text = 'Please select') => {
     return option;
 };
 
+
 // ==============================
-// Accordion Builders
+// Card View (ViewForm template)
 // ==============================
+
+const generateCardView = (items, fieldId, readOnly, hasAnyNote) => {
+
+    const cardsHtml = items.map((item, i) => {
+
+        const subItemsHtml = (item.subFormItems || []).map((sub, j) => `
+            <div class="aspect-card">
+                <div class="aspect-header">
+                    <span class="aspect-label">جانب ${j + 1}</span>
+                    <input class="aspect-title-input" type="text"
+                           value="${escapeHtml(sub.name)}" readonly />
+                </div>
+                <div class="domain-row">
+                    <div class="domain-title">${escapeHtml(item.name)}</div>
+                    <div class="rows-area">
+                        <div class="row-item">
+                            <span class="row-index">${j + 1}</span>
+                            <input class="row-name" type="text"
+                                   value="${escapeHtml(sub.name)}" readonly />
+                            <select class="row-select sub-eval-select"
+                                    id="${fieldId}_${sub.id}_Select_0"
+                                    data-id="${sub.id}"
+                                    ${readOnly ? 'disabled' : ''}>
+                            </select>
+                            ${hasAnyNote && item.hasNote ? `
+                            <textarea class="row-note note-input"
+                                      id="${fieldId}_${item.id}_Note"
+                                      data-id="${item.id}"
+                                      rows="2"
+                                      placeholder="أضف ملاحظات..."
+                                      ${readOnly ? 'disabled' : ''}></textarea>
+                            ` : '<span></span>'}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+
+        return `
+            <div class="criterion-card">
+                <div class="criterion-header">
+                    <span class="criterion-number">معيار ${i + 1}</span>
+                    <input class="criterion-title-input" type="text"
+                           value="${escapeHtml(item.name)}" readonly />
+                    ${Array.isArray(item.relatedItems) && item.relatedItems.length > 0
+                ? `<span class="info-icon" onclick="openRelatedItemModal('${item.id}')">ⓘ</span>`
+                : ''}
+                </div>
+                <div class="criterion-body">
+                    ${subItemsHtml}
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    return `
+        <div id="${fieldId}-index-table"></div>
+        <div id="card-form-root" style="display:flex;flex-direction:column;gap:24px;">
+            ${cardsHtml}
+        </div>
+        <div id="${fieldId}-result-div"
+             class="d-none bg-custom d-flex justify-content-between align-items-center py-3 px-4 br-6">
+            <div class="text-white">Result:</div>
+            <div class="text-white" id="${fieldId}-result-value"></div>
+        </div>
+    `;
+};
+
+
+
 
 const generateFormAccordionItem = (rowsHtml, hasAnyNote, hasAnyChildren, fieldId, isRename, allowDelete, allowAdd, hasMuliEvaluation, countOfColumnsValue, formItemConfigs) => `
 <div class="accordion-item mb-3 rounded">
@@ -94,18 +158,16 @@ const generateFormAccordionItem = (rowsHtml, hasAnyNote, hasAnyChildren, fieldId
                     <tr>
                         ${hasAnyChildren ? '<th></th>' : ''}
                         <th>#</th>
-                         ${!isRename ?
-                        `
-                        <th>المعايير</th>
-                       
-                        ${hasMuliEvaluation
-                                ? Array.from({ length: countOfColumnsValue }, (_, i) =>
-                                    `<th>${formItemConfigs[i].formItemConfig_NameAr}</th>`
-                                ).join('')
-                                : '<th>اختر التقييم</th>'}
-                                ${hasAnyNote ? '<th>الشواهد وأثرها</th>' : ''}
-                        ` : ` <th>الاولويات</th> ${allowDelete ?'<th></th>':''}`}
-                   
+                        ${!isRename ?
+        `<th>المعايير</th>
+                            ${hasMuliEvaluation
+            ? Array.from({ length: countOfColumnsValue }, (_, i) =>
+                `<th>${formItemConfigs[i].formItemConfig_NameAr}</th>`
+            ).join('')
+            : '<th>اختر التقييم</th>'}
+                            ${hasAnyNote ? '<th>الشواهد وأثرها</th>' : ''}`
+        : `<th>الاولويات</th> ${allowDelete ? '<th></th>' : ''}`
+    }
                     </tr>
                 </thead>
                 <tbody id="${fieldId}-${SELECTORS.tbody}">
@@ -113,13 +175,11 @@ const generateFormAccordionItem = (rowsHtml, hasAnyNote, hasAnyChildren, fieldId
                 </tbody>
             </table>
             ${allowAdd ? `<div><button type="button" onclick="addNewRow(this)" class="btn btn-sm add-btn"><i class="la la-plus"></i> Add New</button></div>` : ''}
-           
-<div id="${fieldId}-result-div" class="d-none bg-custom d-flex justify-content-between align-items-center py-3 px-4 br-6">
-  <div class="text-white">Result:</div>
-  <div class="text-white" id="${fieldId}-result-value"></div>
-</div>
-           
-           </div>
+
+            <div id="${fieldId}-result-div" class="d-none bg-custom d-flex justify-content-between align-items-center py-3 px-4 br-6">
+                <div class="text-white">Result:</div>
+                <div class="text-white" id="${fieldId}-result-value"></div>
+            </div>
         </div>
     </div>
 </div>
@@ -128,11 +188,11 @@ const generateFormAccordionItem = (rowsHtml, hasAnyNote, hasAnyChildren, fieldId
 // ==============================
 // Field Builders
 // ==============================
-const buildSelection = (item, fieldId, readOnly, index=0) => `
+const buildSelection = (item, fieldId, readOnly, index = 0) => `
 <select class="form-select eval-select"
         id="${fieldId}_${item.id}_Select_${index}"
         data-id="${item.id}"
-        ${P_hasMuliEvaluation ? `data-config-weight-percentage= "${item.formItemConfigs[index].formItemConfig_Percentage}"`:``}
+        ${P_hasMuliEvaluation ? `data-config-weight-percentage="${item.formItemConfigs[index].formItemConfig_Percentage}"` : ``}
         ${readOnly ? 'disabled' : ''}>
 </select>
 `;
@@ -147,7 +207,7 @@ const buildNote = ({ id }, fieldId, readOnly) => `
 `;
 
 // ==============================
-// Row Builders
+// Row Builders (Table View)
 // ==============================
 const createToggleButton = (collapseId) => `
 <button type="button" class="btn btn-sm"
@@ -174,46 +234,42 @@ const createRow = ({
 }) => `
 <tr class="${isChild ? 'child-row collapse' : 'main-row'} align-middle"
     ${isChild ? `id="${collapseId}" data-parent-id="${item.parentId}"` : ''}>
-    
+
     ${hasChildrenColumn ? `
         <td>${!isChild && item.subFormItems?.length ? createToggleButton(collapseId) : ''}</td>
     ` : ''}
     <td>${order}</td>
-    <td class="text-start">${escapeHtml(item.name, isRename, item.id, fieldId, allowRename)} 
+    <td class="text-start">${escapeHtml(item.name, isRename, item.id, fieldId, allowRename)}
     ${Array.isArray(item.relatedItems) && item.relatedItems.length > 0
         ? `<span class="info-icon" onclick="openRelatedItemModal('${item.id}')">ⓘ</span>`
-        : ''
-    }
-    
+        : ''}
     </td>
     ${!isRename ?
-        `
-
-         ${hasMuliEvaluation?`
-    ${Array.from({ length: countOfColumnsValue }, (_, index) => `
-    <td>
-        ${buildSelection(item, fieldId, readOnly, index)}
-        <span 
-            class="validation-message text-danger small mt-1"
-            id="validation-${item.id}-${ItemPropertyType.SELECT}_${index}"
-            style="display:none;">
-        </span>
-    </td>
-`).join('')}` : `<td>${buildSelection(item, fieldId, readOnly, 0)}
-    <span class="validation-message text-danger small mt-1" id="validation-${item.id}-${ItemPropertyType.SELECT}"style="display:none;"></span>
-</td>
-`}
-    ${hasAnyNote ? `<td>${buildNote(item, fieldId, readOnly)}
-        <span class="validation-message text-danger small mt-1" id="validation-${item.id}-${ItemPropertyType.NOTE}"style="display:none;"></span>
-    </td>` : ''}
-
-    ` : `${allowDelete ?`<td><button type="button" class="btn btn-sm delete-btn" onclick="deleteRow(this)"><i class="la la-trash"></i></button></td>`:''}`
+        `${hasMuliEvaluation ? `
+            ${Array.from({ length: countOfColumnsValue }, (_, index) => `
+            <td>
+                ${buildSelection(item, fieldId, readOnly, index)}
+                <span class="validation-message text-danger small mt-1"
+                      id="validation-${item.id}-${ItemPropertyType.SELECT}_${index}"
+                      style="display:none;"></span>
+            </td>
+            `).join('')}`
+            : `<td>${buildSelection(item, fieldId, readOnly, 0)}
+                <span class="validation-message text-danger small mt-1"
+                      id="validation-${item.id}-${ItemPropertyType.SELECT}"
+                      style="display:none;"></span>
+               </td>`
+        }
+        ${hasAnyNote ? `
+        <td>${buildNote(item, fieldId, readOnly)}
+            <span class="validation-message text-danger small mt-1"
+                  id="validation-${item.id}-${ItemPropertyType.NOTE}"
+                  style="display:none;"></span>
+        </td>` : ''}`
+        : `${allowDelete ? `<td><button type="button" class="btn btn-sm delete-btn" onclick="deleteRow(this)"><i class="la la-trash"></i></button></td>` : ''}`
     }
-    
 </tr>
 `;
-
-
 
 const createRowRelatedItem = ({
     item,
@@ -229,7 +285,7 @@ const createRowRelatedItem = ({
 `;
 
 // ==============================
-// Table Generator
+// Table Body Generator
 // ==============================
 const generateTableBodyHtml = async (
     items,
@@ -247,44 +303,39 @@ const generateTableBodyHtml = async (
     let firstitem = items[0];
     const firstitemCollapseId = `collapse-${firstitem.id}`;
     lastOrder = 1;
-    if (isRename)
-    {
+
+    if (isRename) {
         let firstRow = createRow({
             item: firstitem,
             order: lastOrder,
-            collapseId:firstitemCollapseId,
+            collapseId: firstitemCollapseId,
             hasChildrenColumn: hasAnyChildren,
-            hasAnyNote:hasAnyNote,
-            fieldId:fieldId,
-            readOnly:readOnly,
-            isRename:isRename,
-            allowRename:allowRename,
-            allowDelete:allowDelete,
-            hasMuliEvaluation:hasMuliEvaluation,
-            countOfColumnsValue:countOfColumnsValue
+            hasAnyNote: hasAnyNote,
+            fieldId: fieldId,
+            readOnly: readOnly,
+            isRename: isRename,
+            allowRename: allowRename,
+            allowDelete: allowDelete,
+            hasMuliEvaluation: hasMuliEvaluation,
+            countOfColumnsValue: countOfColumnsValue
         });
-
-        renameItems.shift()
-
+        renameItems.shift();
         return firstRow;
-    }
-    else
-    {
+    } else {
         let rows = items.map((item, i) => {
-
             const collapseId = `collapse-${item.id}`;
             const mainRow = createRow({
-                item:item,
+                item: item,
                 order: i + 1,
-                collapseId:collapseId,
+                collapseId: collapseId,
                 hasChildrenColumn: hasAnyChildren,
-                hasAnyNote:hasAnyNote,
-                fieldId:fieldId,
-                readOnly:readOnly,
-                isRename:isRename,
-                allowRename:allowRename,
-                allowDelete:allowDelete,
-                hasMuliEvaluation:hasMuliEvaluation,
+                hasAnyNote: hasAnyNote,
+                fieldId: fieldId,
+                readOnly: readOnly,
+                isRename: isRename,
+                allowRename: allowRename,
+                allowDelete: allowDelete,
+                hasMuliEvaluation: hasMuliEvaluation,
                 countOfColumnsValue: countOfColumnsValue
             });
 
@@ -292,33 +343,28 @@ const generateTableBodyHtml = async (
                 createRow({
                     item: { ...child, parentId: item.id },
                     order: `${i + 1}.${idx + 1}`,
-                    collapseId:collapseId,
+                    collapseId: collapseId,
                     isChild: true,
                     hasChildrenColumn: hasAnyChildren,
-                    hasAnyNote:hasAnyNote,
-                    fieldId:fieldId,
-                    readOnly:readOnly,
-                    isRename:isRename,
-                    hasMuliEvaluation:hasMuliEvaluation,
-                    countOfColumnsValue:countOfColumnsValue
+                    hasAnyNote: hasAnyNote,
+                    fieldId: fieldId,
+                    readOnly: readOnly,
+                    isRename: isRename,
+                    hasMuliEvaluation: hasMuliEvaluation,
+                    countOfColumnsValue: countOfColumnsValue
                 })
             ).join('');
 
             return mainRow + childrenRows;
-
-
         }).join('');
 
         return rows;
     }
-
 };
 
 
-function addNewRow(button)
-{
+function addNewRow(button) {
     if (renameItems.length > 0) {
-
         let firstitem = renameItems[0];
         lastOrder = lastOrder + 1;
         const firstitemCollapseId = `collapse-${firstitem.id}`;
@@ -337,26 +383,17 @@ function addNewRow(button)
         });
 
         const tbody = document.getElementById(`${P_fieldId}-${SELECTORS.tbody}`);
-        tbody.insertAdjacentHTML(
-            "beforeend",
-            row
-        );
+        tbody.insertAdjacentHTML("beforeend", row);
 
-        renameItems.shift()
+        renameItems.shift();
         if (renameItems.length == 0) {
             button.style.display = "none";
         }
     }
-    else
-    {
-        //return error message
-    }
-
 }
 
 const generateTableBodyHtmlForRelatedItems = async (items, hasAnyNote) => {
     return items.map((item, i) => {
-
         const mainRow = createRowRelatedItem({
             item,
             order: i + 1,
@@ -386,7 +423,6 @@ async function fillRenameControls(fieldId, controlValues) {
     });
 }
 
-
 function buildHorizontalTable(data) {
     const table = document.createElement("table");
     table.border = "1";
@@ -399,41 +435,37 @@ function buildHorizontalTable(data) {
     const nameRow = document.createElement("tr");
     const rangeRow = document.createElement("tr");
 
-    // Row 1: Names
     const nameCell = document.createElement("th");
     nameCell.textContent = "Name";
-    //nameCell.className = 'table-grey';
     nameRow.appendChild(nameCell);
-    tHeadnameRow.appendChild(nameRow);
-    // Row 2: Range
+
     const rangeCell = document.createElement("td");
     rangeCell.textContent = `Range`;
     rangeRow.appendChild(rangeCell);
 
     data.forEach(item => {
-        // Row 1: Names
         const nameCell = document.createElement("th");
         nameCell.textContent = item.name;
-        //nameCell.className = 'table-grey';
         nameRow.appendChild(nameCell);
-        tHeadnameRow.appendChild(nameRow);
 
-        // Row 2: Min - Max
         const rangeCell = document.createElement("td");
         rangeCell.textContent = `(${item.minValue} - ${item.maxValue})`;
         rangeRow.appendChild(rangeCell);
     });
 
+    tHeadnameRow.appendChild(nameRow);
     table.appendChild(tHeadnameRow);
     table.appendChild(rangeRow);
 
     return table;
 }
 
+
 // ==============================
-// Page Generator 
+// Page Generator — Router
 // ==============================
-const generateFullFormPageHtml = async ({ formId,
+const generateFullFormPageHtml = async ({
+    formId,
     fieldId,
     evaluationRequestId,
     serviceRequestId,
@@ -441,10 +473,19 @@ const generateFullFormPageHtml = async ({ formId,
     allowRename,
     allowDelete,
     allowAdd,
-    namingResult = null }) => {
+    namingResult = null
+}) => {
 
+    // يقبل أي شكل للبيانات: renamedItems أو items أو مصفوفة مباشرة
+    const renamedList = namingResult?.renamedItems
+        ?? namingResult?.items
+        ?? (Array.isArray(namingResult) ? namingResult : []);
+
+    P_renamedItems = renamedList;
     P_evaluationRequestId = evaluationRequestId;
     P_serviceRequestId = serviceRequestId;
+
+    console.log('namingResult =>', JSON.stringify(namingResult));
 
     itemsResult = await jqClient().Get(
         GET_FORMS_API.getItems(depRoutePath, formId)
@@ -459,11 +500,11 @@ const generateFullFormPageHtml = async ({ formId,
         allowAdd = false;
     }
 
-    let isRename = itemsResult?.value.evalForm.allowRename
+    let isRename = itemsResult?.value.evalForm.allowRename;
     let hasMuliEvaluation = evalForm.hasMuliEvaluation;
     let countOfColumnsValue = evalForm.evalCountOfColumnsValue;
     P_countOfColumnsValue = evalForm.evalCountOfColumnsValue;
-    P_hasMuliEvaluation = evalForm.hasMuliEvaluation
+    P_hasMuliEvaluation = evalForm.hasMuliEvaluation;
 
     let isRenamedEvaluation = false;
 
@@ -472,21 +513,20 @@ const generateFullFormPageHtml = async ({ formId,
 
     if (isRenamedEvaluation) {
         isRename = false;
-        const map = new Map(namingResult.items.map(item => [item.id, item.name]));
 
-        items = items
-            .filter(item => map.has(item.id))
-            .map(item => ({
-                ...item,
-                name: map.get(item.id) // replace name
-            }));
+        if (renamedList.length > 0) {
+            const map = new Map(renamedList.map(item => [item.id, item.name]));
+            items = items
+                .filter(item => map.has(item.id))
+                .map(item => ({
+                    ...item,
+                    name: map.get(item.id)
+                }));
+        }
     }
-    
 
     const hasAnyNote = items.some(i => i.hasNote);
     const hasAnyChildren = items.some(i => i.subFormItems?.length);
-
-
 
     P_fieldId = fieldId;
     P_allowRename = allowRename;
@@ -494,10 +534,20 @@ const generateFullFormPageHtml = async ({ formId,
     P_allowAdd = allowAdd;
     P_isRename = isRename;
 
-    if (isRename)
-    {
-        renameItems = itemsResult?.value.items;
+    if (isRename) {
+        renameItems = [...(itemsResult?.value.items ?? [])];
     }
+
+    // ── الـ Router ──
+    const useCardView = items.some(i => i.subFormItems?.length > 0);
+
+    if (useCardView) {
+        return generateCardView(items, fieldId, readOnly, hasAnyNote);
+    }
+
+    // ── Table View ──
+    const activeConfigs = (items.find(i => i.formItemConfigs?.some(c => !c.isDeleted))
+        ?.formItemConfigs ?? []).filter(c => !c.isDeleted);
 
     const rowsHtml = await generateTableBodyHtml(
         items,
@@ -513,21 +563,38 @@ const generateFullFormPageHtml = async ({ formId,
         countOfColumnsValue
     );
 
-    return `${generateFormAccordionItem(rowsHtml, hasAnyNote, hasAnyChildren, fieldId, isRename, allowDelete, allowAdd, evalForm.hasMuliEvaluation, countOfColumnsValue, items[0].formItemConfigs)}`;
+    return generateFormAccordionItem(
+        rowsHtml,
+        hasAnyNote,
+        hasAnyChildren,
+        fieldId,
+        isRename,
+        allowDelete,
+        allowAdd,
+        evalForm.hasMuliEvaluation,
+        countOfColumnsValue,
+        activeConfigs
+    );
 };
 
 
-const relatedItemPopup = (rowsHtml) => `<div class="modal fade" id="RealatedItemModal" tabindex="-1" aria-hidden="true">
+// ==============================
+// Related Items Popup
+// ==============================
+const relatedItemPopup = (rowsHtml) => `
+<div class="modal fade" id="RealatedItemModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header align-items-start border-0">
                 <div>
                     <h4 class="modal-title fw-semibold mb-2" id="modalTitle"></h4>
                 </div>
-
-                         <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal" aria-label="Close"><i class="la la-close me-1 fs-14"></i><span class="close-text">Close</span></button>
+                <button type="button" class="btn btn-outline-secondary btn-sm"
+                        data-bs-dismiss="modal" aria-label="Close">
+                    <i class="la la-close me-1 fs-14"></i>
+                    <span class="close-text">Close</span>
+                </button>
             </div>
-
             <div class="modal-body py-0">
                 <div class="row">
                     <table class="table table-bordered text-center align-middle">
@@ -549,10 +616,14 @@ const relatedItemPopup = (rowsHtml) => `<div class="modal fade" id="RealatedItem
     </div>
 </div>`;
 
+
 // ==============================
 // Initialize Controls
 // ==============================
 async function initializeControls(formId, fieldId, controlValues) {
+
+    if (initializedForms.has(fieldId)) return;
+    initializedForms.add(fieldId);
 
     const matrixResponse = await jqClient().Get(
         GET_FORMS_API.getMatrixValues(depRoutePath, formId)
@@ -560,12 +631,10 @@ async function initializeControls(formId, fieldId, controlValues) {
 
     P_matrixResponse = matrixResponse;
 
-    
     const itemsData = itemsResult?.value?.items ?? [];
-
     const matrixValues = matrixResponse?.value ?? matrixResponse ?? [];
 
-    // Build lookup maps for saved values
+    // Build lookup maps
     const itemValueMap = new Map();
     const subItemValueMap = new Map();
 
@@ -578,14 +647,12 @@ async function initializeControls(formId, fieldId, controlValues) {
         });
     }
 
-    
     const matrixOptions = matrixValues.map(({ id, name, actualMatrixValue }) => {
         const option = new Option(name, id);
         option.setAttribute('data-actual-value', actualMatrixValue);
         return option;
     });
 
-    
     const subItemListsMap = new Map();
     itemsData.forEach(item => {
         (item.subFormItems || []).forEach(subItem => {
@@ -614,7 +681,6 @@ async function initializeControls(formId, fieldId, controlValues) {
                         select.add(new Option(nameAr || nameEn, id));
                     });
                 } else {
-
                     matrixOptions.forEach(option => select.add(option.cloneNode(true)));
                 }
             } else {
@@ -642,28 +708,35 @@ async function initializeControls(formId, fieldId, controlValues) {
         );
     });
 
-    const table = buildHorizontalTable(matrixValues);
     const container = document.getElementById(`${fieldId}-index-table`);
-    container.appendChild(table);
+    if (container) {
+        const table = buildHorizontalTable(matrixValues);
+        container.appendChild(table);
+    }
+
+    if (controlValues?.results != null) {
+        $(`#${P_fieldId}-result-value`).text(
+            `(${Number(controlValues.results.value).toFixed(2)}) ${controlValues.results.name}`
+        );
+        $(`#${P_fieldId}-result-div`).removeClass("d-none");
+    }
 }
+
+
+// ==============================
+// Related Items Modal
+// ==============================
 async function openRelatedItemModal(id) {
-
-
     let relatedItems = itemsResult?.value.items.find(r => r.id == id)?.relatedItems ?? [];
 
-    const relatedItemsRowsHtml = await generateTableBodyHtmlForRelatedItems(
-        relatedItems
-    );
-
+    const relatedItemsRowsHtml = await generateTableBodyHtmlForRelatedItems(relatedItems);
     const popupHtml = await relatedItemPopup(relatedItemsRowsHtml);
 
     document.body.insertAdjacentHTML('beforeend', popupHtml);
 
     let modalElement = document.getElementById('RealatedItemModal');
-
     let modal = new bootstrap.Modal(modalElement);
 
-    // Remove modal from DOM after it is closed
     modalElement.addEventListener('hidden.bs.modal', () => {
         modalElement.remove();
     });
@@ -671,14 +744,14 @@ async function openRelatedItemModal(id) {
     modal.show();
 }
 
-function deleteRow(button)
-{
+
+// ==============================
+// Delete Row (Table View)
+// ==============================
+function deleteRow(button) {
     const row = button.closest("tr");
-
     const input = row.querySelector('.item-name');
-
     const dataId = input.getAttribute('data-id');
-
     const item = itemsResult?.valueOrDefault.items.find(x => x.id === dataId);
 
     renameItems.push(item);
