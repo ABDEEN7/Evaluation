@@ -128,17 +128,33 @@
         <div class="ellipsis school-name-row">
             <i class="las la-school card-only-icon me-1"></i>
 
-            <strong class="ellipsis-text">
+            <span class="ellipsis-text">
                 ${data}
-            </strong>
+            </span>
         </div>
         `;
+        }
+    },
+      {
+        data: "planName",
+        title: uiControlsSetup().GetUiControlText("lblPlanName"),
+        className: "td-full",
+        render: function(data) {
+
+            if (!data) return "_";
+
+            return `  
+                    
+                        <i class="las la-school card-only-icon me-1"></i>
+                        <span class ="text-truncate-2">${data}</span>
+                    
+                `;
         }
     },
             {
                 data: "status",
                 title: uiControlsSetup().GetUiControlText("lblRequestNo"),
-                className: "td-full mb-3",
+                className: "td-full",
                 render: function (data, type, row) {
 
                     if (!data) return "_";
@@ -149,97 +165,128 @@
                     return `
                     <span class="request-status m-0"
                           style="color:${statusColor};">
-                        <i class="las la-edit card-only-icon me-1"></i>
+                        <i class="las la-edit card-only-icon me-1" style="color:${statusColor};"></i>
                         ${data}
                     </span>
                 `;
                 }
             },
+               
+  {
+        data: "evlDateFrom",
+        title: uiControlsSetup().GetUiControlText("lblEvaluationDateFrom"),
+        className: "td-full td-date-range-block",
+        render: function(data, type, row) {
+            if (!data) return "_";
 
-            {
-                data: "evlDateFrom",
-                title: uiControlsSetup().GetUiControlText("lblEvaluationDateFrom"),
-                className: "td-left py-0",
-                render: function (data, type, row) {
-                    if (!data) return "_";
+            const daysLeft = getDaysUntil(data);
+            const isOverdue = daysLeft !== null && daysLeft < 0;
+            const isUrgent = daysLeft !== null && daysLeft >= 0 && daysLeft <= 3;
+            const isWarning = daysLeft !== null && daysLeft > 3 && daysLeft <= 10;
 
-                    const daysLeft = getDaysUntil(data);
-                    const isOverdue = daysLeft !== null && daysLeft < 0;
-                    const isUrgent = daysLeft !== null && daysLeft >= 0 && daysLeft <= 3;
-                    const isWarning = daysLeft !== null && daysLeft > 3 && daysLeft <= 10;
+            let countdownBadge = '';
+            let nearNote = '';
 
-                    let countdownBadge = '';
-                    let nearNote = '';
+           if (isOverdue) {
 
-                    if (isOverdue) {
-                        countdownBadge = `
-            <span class="badge ms-2" style="background:#FCEBEB;color:#A32D2D;border-radius:20px;padding:2px 8px;font-size:11px;">
-                <i class="las la-exclamation-circle me-1"></i>متأخر ${Math.abs(daysLeft)} يوم
-            </span>`;
-                        nearNote = `
-            <div class="mt-1" style="background:#FCEBEB;color:#A32D2D;border-radius:6px;padding:3px 8px;font-size:11px;display:inline-flex;align-items:center;gap:4px;">
-                <i class="las la-exclamation-triangle"></i>
-                تجاوز موعد التقييم
+        countdownBadge = `
+        <span class="status-countdown-badge info">
+            <i class="las la-exclamation-circle"></i>
+            متأخر ${Math.abs(daysLeft)} يوم
+        </span>`;
+
+        nearNote = `
+        <span class="evaluation-near-note success">
+            <i class="las la-exclamation-triangle"></i>
+            تجاوز موعد التقييم
+        </span>`;
+
+    }
+    else if (isUrgent) {
+
+        countdownBadge = `
+        <span class="status-countdown-badge info">
+            <i class="las la-clock"></i>
+            ${daysLeft} يوم متبقي
+        </span>`;
+
+        nearNote = `
+        <span class="evaluation-near-note success">
+            <i class="las la-exclamation-triangle"></i>
+            هذه المدرسة على وشك التقييم
+        </span>`;
+
+    }
+    else if (isWarning) {
+
+        countdownBadge = `
+        <span class="status-countdown-badge info">
+            <i class="las la-clock"></i>
+            ${daysLeft} يوم متبقي
+        </span>`;
+
+        nearNote = `
+        <span class="evaluation-near-note success">
+            <i class="las la-exclamation-triangle"></i>
+            هذه المدرسة على وشك التقييم
+        </span>`;
+    }
+
+            const fmt = ["M/D/YYYY", "MM/DD/YYYY", "YYYY-MM-DD", "DD-MM-YYYY"];
+            const displayFrom = moment(data.split(' ')[0], fmt, false).format("DD-MM-YYYY");
+            const displayTo = row.evlDateTo
+                ? moment(row.evlDateTo.split(' ')[0], fmt, false).format("DD-MM-YYYY")
+                : null;
+
+            const dateRange = displayTo
+                ? `
+                <span>
+                    <span class="card-only-label me-1">
+                        ${getUiText("lblFrom", "من")}
+                    </span>
+
+                    <span class="data-text me-2">
+                        ${displayFrom}
+                    </span>
+
+                    <span class="card-only-label me-1">
+                        ${getUiText("lblTo", "إلى")}
+                    </span>
+
+                    <span class="data-text">
+                        ${displayTo}
+                    </span>
+                </span>
+            `
+                : `
+                <span>
+                    <span class="card-only-label me-1">
+                        ${getUiText("lblFrom", "من")}
+                    </span>
+
+                    <span class="data-text">
+                        ${displayFrom}
+                    </span>
+                </span>
+            `;
+
+            return `
+            <div class="date-range-wrapper">
+
+                <div class="d-flex align-items-center gap-1 flex-wrap">
+                    <i class="las la-calendar card-only-icon"></i>
+                    ${dateRange}
+                </div>
+
+                <div class="d-flex flex-wrap gap-2 align-items-center">
+                    ${countdownBadge}
+                    ${nearNote}
+                </div>
+
             </div>`;
-                    } else if (isUrgent) {
-                        countdownBadge = `
-            <span class="badge ms-2" style="background:#FCEBEB;color:#A32D2D;border-radius:20px;padding:2px 8px;font-size:11px;">
-                <i class="las la-clock me-1"></i>${daysLeft} يوم متبقي
-            </span>`;
-                        nearNote = `
-            <div class="mt-1" style="background:#FCEBEB;color:#A32D2D;border-radius:6px;padding:3px 8px;font-size:11px;display:inline-flex;align-items:center;gap:4px;">
-                <i class="las la-exclamation-triangle"></i>
-                هذه المدرسة على وشك التقييم
-            </div>`;
-                    } else if (isWarning) {
-                        countdownBadge = `
-            <span class="badge ms-2" style="background:#FAEEDA;color:#854F0B;border-radius:20px;padding:2px 8px;font-size:11px;">
-                <i class="las la-clock me-1"></i>${daysLeft} يوم متبقي
-            </span>`;
-                        nearNote = `
-            <div class="mt-1" style="background:#FAEEDA;color:#854F0B;border-radius:6px;padding:3px 8px;font-size:11px;display:inline-flex;align-items:center;gap:4px;">
-                <i class="las la-exclamation-triangle"></i>
-                هذه المدرسة على وشك التقييم
-            </div>`;
-                    }
-
-                    const fmt = ["M/D/YYYY", "MM/DD/YYYY", "YYYY-MM-DD", "DD-MM-YYYY"];
-                    const displayFrom = moment(data.split(' ')[0], fmt, false).format("DD-MM-YYYY");
-                    const displayTo = row.evlDateTo
-                        ? moment(row.evlDateTo.split(' ')[0], fmt, false).format("DD-MM-YYYY")
-                        : null;
-
-                    const dateRange = displayTo
-                        ? `<span style="white-space:nowrap;">${displayFrom} <i class="las la-arrow-right mx-1 opacity-50"></i> ${displayTo}</span>`
-                        : `<span>${displayFrom}</span>`;
-
-                    return `
-    <div>
-        <div class="d-flex align-items-center gap-1">
-            <i class="las la-calendar card-only-icon"></i>
-            ${dateRange}
-            ${countdownBadge}
-        </div>
-        ${nearNote}
-    </div>`;
-                }
-            },
-            {
-                data: "planName",
-                title: uiControlsSetup().GetUiControlText("lblPlanName"),
-                className: "td-left py-0 status-break-row  align-content-end",
-                render: function (data) {
-
-                    if (!data) return "_";
-
-                    return `  
-                    
-                        <i class="las la-school card-only-icon me-1"></i>
-                        <strong class ="text-truncate-2">${data}</strong>
-                    
-                `;
-                }
-            },
+        }
+    },
+      
             {
         data: "createOn",
         title: uiControlsSetup().GetUiControlText("lblRequestCreatedDate"),
@@ -376,7 +423,7 @@
         $root.find("#address").text(s.address || '');
     }
 
-    function bindEvaluationDates(response) {
+  function bindEvaluationDates(response) {
         const fmt = ["M/D/YYYY", "MM/DD/YYYY", "YYYY-MM-DD", "DD-MM-YYYY"];
         const fromRaw = response.evlDateFrom || '';
         const toRaw = response.evlDateTo || '';
@@ -398,26 +445,43 @@
         let note = '';
 
         if (isOverdue) {
-            badge = `<span style="background:#FCEBEB;color:#A32D2D;border-radius:20px;padding:2px 10px;font-size:12px;display:inline-flex;align-items:center;gap:4px;">
-                    <i class="las la-exclamation-circle"></i> متأخر ${Math.abs(daysLeft)} يوم
-                 </span>`;
-            note = `<div style="background:#FCEBEB;color:#A32D2D;border-radius:6px;padding:4px 10px;font-size:12px;display:inline-flex;align-items:center;gap:6px;margin-top:4px;">
-                    <i class="las la-exclamation-triangle"></i> تجاوز موعد التقييم
-                 </div>`;
+            badge = `
+            <span class="status-countdown-badge danger">
+                <i class="las la-exclamation-circle"></i>
+                متأخر ${Math.abs(daysLeft)} يوم
+            </span>`;
+
+            note = `
+            <span class="evaluation-near-note danger">
+                <i class="las la-exclamation-triangle"></i>
+                تجاوز موعد التقييم
+            </span>`;
+
         } else if (isUrgent) {
-            badge = `<span style="background:#FCEBEB;color:#A32D2D;border-radius:20px;padding:2px 10px;font-size:12px;display:inline-flex;align-items:center;gap:4px;">
-                    <i class="las la-clock"></i> ${daysLeft} يوم متبقي
-                 </span>`;
-            note = `<div style="background:#FCEBEB;color:#A32D2D;border-radius:6px;padding:4px 10px;font-size:12px;display:inline-flex;align-items:center;gap:6px;margin-top:4px;">
-                    <i class="las la-exclamation-triangle"></i> هذه المدرسة على وشك التقييم
-                 </div>`;
+            badge = `
+            <span class="status-countdown-badge danger">
+                <i class="las la-clock"></i>
+                ${daysLeft} يوم متبقي
+            </span>`;
+
+            note = `
+            <span class="evaluation-near-note danger">
+                <i class="las la-exclamation-triangle"></i>
+                هذه المدرسة على وشك التقييم
+            </span>`;
+
         } else if (isWarning) {
-            badge = `<span style="background:#FAEEDA;color:#854F0B;border-radius:20px;padding:2px 10px;font-size:12px;display:inline-flex;align-items:center;gap:4px;">
-                    <i class="las la-clock"></i> ${daysLeft} يوم متبقي
-                 </span>`;
-            note = `<div style="background:#FAEEDA;color:#854F0B;border-radius:6px;padding:4px 10px;font-size:12px;display:inline-flex;align-items:center;gap:6px;margin-top:4px;">
-                    <i class="las la-exclamation-triangle"></i> هذه المدرسة على وشك التقييم
-                 </div>`;
+            badge = `
+            <span class="status-countdown-badge warning">
+                <i class="las la-clock"></i>
+                ${daysLeft} يوم متبقي
+            </span>`;
+
+            note = `
+            <span class="evaluation-near-note warning">
+                <i class="las la-exclamation-triangle"></i>
+                هذه المدرسة على وشك التقييم
+            </span>`;
         }
 
         const dateRange = displayTo
@@ -425,14 +489,20 @@
             : displayFrom;
 
         $container.html(`
-        <div class="d-flex align-items-center gap-2 flex-wrap mt-1">
-            <i class="las la-calendar text-muted fs-14"></i>
-            <span style="white-space:nowrap;font-size:13px;">${dateRange}</span>
-            ${badge}
+        <div class="date-range-wrapper">
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+                <i class="las la-calendar text-muted fs-14"></i>
+                <span class="modal-date-range-text">${dateRange}</span>
+            </div>
+
+            <div class="d-flex flex-wrap gap-2 align-items-center">
+                ${badge}
+                ${note}
+            </div>
         </div>
-        ${note}
     `);
     }
+
     function renderEvaluationPartiesSection(response, requestId) {
         const parties = response?.evaluationParties || [];
 
