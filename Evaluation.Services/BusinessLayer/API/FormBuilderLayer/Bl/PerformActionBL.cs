@@ -238,7 +238,7 @@ namespace Evaluation.Services.Models.API
 						if (dto == null) throw new BusinessException(ExceptionMessage.msgInvalidEvaluationForm);
 
 						await _FormBL.SaveEvaluationForm(dto);
-						 UpdateVisitInfoFromFields(application, existingFields);
+						UpdateServiceRequestDetailsFromFields(application, existingFields);
 						break;
 					}
 				case ActionTypeKeys.Close:
@@ -291,25 +291,47 @@ namespace Evaluation.Services.Models.API
             return result;
         }
 
-		private void UpdateVisitInfoFromFields(ServiceRequest application,List<ServiceRequestFieldsValue> existingFields)
+		private Guid? ParseNullableGuid(string? value)
 		{
-			var visitName = existingFields
-				.FirstOrDefault(x => x.Field?.FieldInfoType?.BackendName == ConstantKeys.FieldInfoTypeKeys.VisitName)
-				?.Value;
+			return Guid.TryParse(value, out var guid)
+				? guid
+				: null;
+		}
+		private void UpdateServiceRequestDetailsFromFields(ServiceRequest application,List<ServiceRequestFieldsValue> existingFields)
+		{
+			string? GetValue(string backendName)
+			{
+				return existingFields
+					.FirstOrDefault(x =>
+						x.Field?.FieldInfoType?.BackendName == backendName)
+					?.Value;
+			}
 
-			var visitDateFromValue = existingFields
-				.FirstOrDefault(x => x.Field?.FieldInfoType?.BackendName == ConstantKeys.FieldInfoTypeKeys.VisitDateFrom)
-				?.Value;
-
-			var visitDateToValue = existingFields
-				.FirstOrDefault(x => x.Field?.FieldInfoType?.BackendName == ConstantKeys.FieldInfoTypeKeys.VisitDateTo)
-				?.Value;
+			var visitName = GetValue(ConstantKeys.FieldInfoTypeKeys.VisitName);
 
 			if (!string.IsNullOrWhiteSpace(visitName))
 				application.Name = visitName;
 
-			application.VisitDateFrom = ParseNullableDateTime(visitDateFromValue);
-			application.VisitDateTo = ParseNullableDateTime(visitDateToValue);
+			application.VisitDateFrom = ParseNullableDateTime(
+				GetValue(ConstantKeys.FieldInfoTypeKeys.VisitDateFrom));
+
+			application.VisitDateTo = ParseNullableDateTime(
+				GetValue(ConstantKeys.FieldInfoTypeKeys.VisitDateTo));
+
+			application.EducationLevelId = ParseNullableGuid(
+				GetValue(ConstantKeys.FieldInfoTypeKeys.EducationLevel));
+
+			application.GradeLevelId = ParseNullableGuid(
+				GetValue(ConstantKeys.FieldInfoTypeKeys.GradeLevel));
+
+			application.SchoolGradeSectionId = ParseNullableGuid(
+				GetValue(ConstantKeys.FieldInfoTypeKeys.SchoolGradeSection));
+
+			application.SchoolCourseId = ParseNullableGuid(
+				GetValue(ConstantKeys.FieldInfoTypeKeys.SchoolCourse));
+
+			application.TeacherId = ParseNullableGuid(
+				GetValue(ConstantKeys.FieldInfoTypeKeys.Teacher));
 		}
 		private DateTime? ParseNullableDateTime(string? value)
 		{
