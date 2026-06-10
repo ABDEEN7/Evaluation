@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
 using Evaluation.DAL.Models.ActionEntities;
+using Evaluation.DAL.Models.Planing;
 using Evaluation.DAL.Models.StatusEntities;
 using Evaluation.DAL.Repositories;
+using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Admin;
 
@@ -67,11 +69,23 @@ namespace Evaluation.Services.Mappers.Admin
         public string Resolve(object source, object destination, Guid? sourceMember, string destMember, ResolutionContext context)
         {
             if (!sourceMember.HasValue) return "";
+            var backendName = context.Items["SystemModuleBackendName"]?.ToString();
+            if(backendName == ConstantKeys.ModuleType.EvaluationParty) { 
+
             var status = _uow.GetRepository<ServiceStatus>()
                          .GetAllNonDeleted()
                          .FirstOrDefault(x => x.Id == sourceMember);
 
             return _requestInfo.Lang == "ar" ? status?.NameAr ?? string.Empty : status?.NameEn ?? string.Empty;
+            }
+            else
+            {
+                var status = _uow.GetRepository<PlanStatus>()
+                      .GetAllNonDeleted()
+                      .FirstOrDefault(x => x.Id == sourceMember);
+
+                return _requestInfo.Lang == "ar" ? status?.NameAr ?? string.Empty : status?.NameEN ?? string.Empty;
+            }
         }
     }
     public class NotificationCountResolver
