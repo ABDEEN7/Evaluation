@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
+using Evaluation.DAL.Dtos;
 using Evaluation.DAL.DTOs;
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.BaseModule;
+using Evaluation.DAL.Models.Master;
 using Evaluation.DAL.Models.Org;
 using Evaluation.DAL.Models.Planing;
 using Evaluation.DAL.Repositories;
@@ -60,6 +62,7 @@ namespace Evaluation.Services.Integration
 			var allCoursesTask =  GetAllCoursesAsync();
 			var allAcadPlansTask =  GetAllAcadPlansAsync();
 			var allSchedulesTask =  GetAllSchedulesAsync();
+			var allHrEmployeesTask = GetAllHREmployeesAsync();
 
 			using var uow = serviceScopeFactory.CreateScopedUow();
 
@@ -278,7 +281,7 @@ namespace Evaluation.Services.Integration
 
 
 			var allAcadPlans = await allAcadPlansTask;
-
+			var allHrEmployees = await allHrEmployeesTask;
 			if (!academicYear.HasValue)
 				throw new BusinessException("Academic year not found from NSIS_HOMEROOM.");
 			if (academicYear.HasValue)
@@ -298,6 +301,13 @@ namespace Evaluation.Services.Integration
 											.ToDictionary(g => g.Key, g => g.ToList(), StringComparer.OrdinalIgnoreCase);
 
 				await SyncSchoolGradeSectionCoursesAsync(nsisSchools,existingSchools,schedulesByInstitution);
+
+				var employeesByOrgNo = allHrEmployees
+										.Where(x => !string.IsNullOrWhiteSpace(x.OrgNo))
+										.GroupBy(x => x.OrgNo!.Trim())
+										.ToDictionary(g => g.Key, g => g.ToList());
+
+				await SyncSchoolEmployeesAsync(syncedSchools, employeesByOrgNo);
 			}
 			return true;
 		}
@@ -376,7 +386,7 @@ namespace Evaluation.Services.Integration
 
 			return result;
 		}
-		public async Task<List<HROrganizationInfoDto>> GetAllHRSchoolsAsync()//(int page)
+		public async Task<List<HROrganizationInfoDto>> GetAllHRSchoolsAsync()
 		{
 			var orgs = new List<HROrganizationInfoDto>();
 
@@ -417,6 +427,86 @@ namespace Evaluation.Services.Integration
 			}
 
 			return orgs;
+		}
+		public async Task<List<HREmployeeDto>> GetAllHREmployeesAsync()
+		{
+			var result = new List<HREmployeeDto>();
+
+			using var con = new OracleConnection(ClsAppSetting.OracleDBConnection);
+
+			try
+			{
+				await con.OpenAsync();
+
+				using var cmd = con.CreateCommand();
+
+				cmd.CommandText = @"
+            SELECT
+                ORGNO,
+                SUBORGNO,
+                EMPLOYEE_A,
+                EMPLOYEE_E,
+                EMPLOYEE_NUMBER,
+                EMAIL,
+                JOBNO,
+                JOB_TITLE_A,
+                JOB_TITLE_E,
+                PHONE_NUMBER,
+                QID,
+                MANAGER_ID,
+                MANAGER_NAME_A,
+                MANAGER_NAME_E,
+                MANAGER_MAIL,
+                MANAGER_EMPNO,
+				NAT_CODE,
+                NATIONALITY,
+                NATIONALITY_E,
+				PERSON_SEX_A,
+				SEX_CODE
+
+            FROM TEMP_HR.MOE_EMPLOYEES_EVALAPP_V
+            WHERE EMAIL IS NOT NULL";
+
+				using var reader = await cmd.ExecuteReaderAsync();
+
+				while (await reader.ReadAsync())
+				{
+					result.Add(new HREmployeeDto
+					{
+						OrgNo = reader["ORGNO"]?.ToString(),
+						SubOrgNo = reader["SUBORGNO"]?.ToString(),
+
+						NameAr = reader["EMPLOYEE_A"]?.ToString(),
+						NameEn = reader["EMPLOYEE_E"]?.ToString(),
+
+						EmployeeNumber = reader["EMPLOYEE_NUMBER"]?.ToString(),
+						Email = reader["EMAIL"]?.ToString(),
+						JobNo = reader["JOBNO"]?.ToString(),
+						JobTitleAr = reader["JOB_TITLE_A"]?.ToString(),
+						JobTitleEn = reader["JOB_TITLE_E"]?.ToString(),
+						PhoneNumber = reader["PHONE_NUMBER"]?.ToString(),
+						QID = reader["QID"]?.ToString(),
+
+						ManagerQID = reader["MANAGER_ID"]?.ToString(),
+						ManagerNameAr = reader["MANAGER_NAME_A"]?.ToString(),
+						ManagerNameEn = reader["MANAGER_NAME_E"]?.ToString(),
+						ManagerEmail = reader["MANAGER_MAIL"]?.ToString(),
+						ManagerEmployeeNo = reader["MANAGER_EMPNO"]?.ToString(),
+
+						NationalityCode = reader["NAT_CODE"]?.ToString(),
+						NationalityAr = reader["NATIONALITY"]?.ToString(),
+						NationalityEn = reader["NATIONALITY_E"]?.ToString(),
+						SexCode = reader["SEX_CODE"]?.ToString(),
+						SexNameAr = reader["PERSON_SEX_A"]?.ToString(),
+					});
+				}
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine($"HR Employees error: {ex.Message}");
+			}
+
+			return result;
 		}
 		private async Task SyncSchoolLevelsAsync(List<NSISSchoolDto> nsisSchools,Dictionary<string, School> schoolMap,int academicYear, Dictionary<string, List<NSISHomeroomDto>> homeroomsByInstitution, List<NSISAcadPlanDto> acadPlans)
 		{
@@ -827,6 +917,153 @@ namespace Evaluation.Services.Integration
 					});
 
 					existingKeys.Add(key);
+				}
+			}
+
+			await uow.CommitAsync();
+		}
+
+		private async Task SyncSchoolEmployeesAsync(List<School> schools,Dictionary<string, List<HREmployeeDto>> employeesByOrgNo)
+		{
+			if (schools == null || schools.Count == 0)
+				return;
+
+			using var uow = serviceScopeFactory.CreateScopedUow();
+
+			var employeeRepo = uow.GetRepository<Employee>();
+			var jobTitleRepo = uow.GetRepository<JobTitle>();
+			var userGenderRepo = uow.GetRepository<UserGender>();
+			var orgTypeRepo = uow.GetRepository<OrgType>();
+			var orgClassRepo = uow.GetRepository<OrgClass>();
+
+			var employeeOrgType = await orgTypeRepo.GetAllNonDeleted()
+				.FirstOrDefaultAsync(x => x.BackendName == "3");
+
+			var employeeOrgClass = await orgClassRepo.GetAllNonDeleted()
+				.FirstOrDefaultAsync(x => x.BackendName == "3");
+
+			if (employeeOrgType == null)
+				throw new BusinessException("Employee OrgType not found.");
+
+			if (employeeOrgClass == null)
+				throw new BusinessException("Employee OrgClass not found.");
+
+			var genderMap = await userGenderRepo.GetAllNonDeleted()
+				.Where(x => x.BackendName != null)
+				.ToDictionaryAsync(x => x.BackendName!, x => x);
+
+			var defaultGender = genderMap.Values.FirstOrDefault();
+
+			if (defaultGender == null)
+				throw new BusinessException("No UserGender found.");
+
+			var jobTitles = await jobTitleRepo.GetAllNonDeleted()
+				.ToListAsync();
+
+			var jobTitleMap = jobTitles
+				.Where(x => !string.IsNullOrWhiteSpace(x.NameAr))
+				.GroupBy(x => x.NameAr.Trim(), StringComparer.OrdinalIgnoreCase)
+				.ToDictionary(g => g.Key, g => g.First(), StringComparer.OrdinalIgnoreCase);
+
+			var existingEmployees = await employeeRepo.GetAllNonDeleted()
+				.Where(x => x.QID != null)
+				.AsNoTracking()
+				.ToListAsync();
+
+			var employeeMap = existingEmployees
+				.Where(x => !string.IsNullOrWhiteSpace(x.QID))
+				.GroupBy(x => x.QID.Trim())
+				.ToDictionary(g => g.Key, g => g.First());
+
+			foreach (var school in schools)
+			{
+				var orgNo = school.HrCode?.Trim();
+
+				if (string.IsNullOrWhiteSpace(orgNo))
+					continue;
+
+				if (!employeesByOrgNo.TryGetValue(orgNo, out var hrEmployees))
+					continue;
+
+				foreach (var hr in hrEmployees)
+				{
+					var qid = hr.QID?.Trim();
+
+					if (string.IsNullOrWhiteSpace(qid))
+						continue;
+
+					var jobTitleNameAr = hr.JobTitleAr?.Trim();
+
+					if (string.IsNullOrWhiteSpace(jobTitleNameAr))
+						continue;
+
+					if (!jobTitleMap.TryGetValue(jobTitleNameAr, out var jobTitle))
+					{
+						jobTitle = new JobTitle
+						{
+							NameAr = jobTitleNameAr,
+							NameEn = hr.JobTitleEn ?? jobTitleNameAr,
+							BackendName = hr.JobNo ?? jobTitleNameAr
+						};
+
+						await jobTitleRepo.InsertAsync(jobTitle);
+						jobTitleMap[jobTitleNameAr] = jobTitle;
+					}
+
+					var genderId =
+						!string.IsNullOrWhiteSpace(hr.SexCode) &&
+						genderMap.TryGetValue(hr.SexCode.Trim(), out var gender)
+							? gender.Id
+							: defaultGender.Id;
+
+					if (employeeMap.TryGetValue(qid, out var existingEmployee))
+					{
+						existingEmployee.NameAr = hr.NameAr ?? existingEmployee.NameAr;
+						existingEmployee.NameEn = hr.NameEn ?? existingEmployee.NameEn ?? existingEmployee.NameAr;
+						existingEmployee.EmployeeNo = hr.EmployeeNumber ?? existingEmployee.EmployeeNo;
+						existingEmployee.Email = hr.Email ?? existingEmployee.Email;
+						existingEmployee.QID = qid;
+
+						existingEmployee.HrCode = hr.EmployeeNumber;
+						existingEmployee.OrgParentId = school.Id;
+						existingEmployee.OrgTypeId = employeeOrgType.Id;
+						existingEmployee.OrgClassId = employeeOrgClass.Id;
+						existingEmployee.JobTitleId = jobTitle.Id;
+						existingEmployee.UserGenderId = genderId;
+						existingEmployee.NationalityCode = hr.NationalityCode ?? existingEmployee.NationalityCode;
+						existingEmployee.IsOrgManager = school.ManagerQID == qid;
+
+						employeeRepo.Update(existingEmployee);
+					}
+					else
+					{
+						var employee = new Employee
+						{
+							NameAr = hr.NameAr ?? qid,
+							NameEn = hr.NameEn ?? hr.NameAr ?? qid,
+
+							EmployeeNo = hr.EmployeeNumber ?? qid,
+							QID = qid,
+							Email = hr.Email,
+
+							HrCode = hr.EmployeeNumber,
+							OrgParentId = school.Id,
+							OrgTypeId = employeeOrgType.Id,
+							OrgClassId = employeeOrgClass.Id,
+
+							JobTitleId = jobTitle.Id,
+							UserGenderId = genderId,
+
+							BirthDate = DateOnly.FromDateTime(DateTime.Now),
+							JoinDate = DateOnly.FromDateTime(DateTime.Now),
+							NationalityCode = hr.NationalityCode ?? "QA",
+
+							IsOrgManager = school.ManagerQID == qid
+						};
+
+						await employeeRepo.InsertAsync(employee);
+						employeeMap[qid] = employee;
+					}
 				}
 			}
 

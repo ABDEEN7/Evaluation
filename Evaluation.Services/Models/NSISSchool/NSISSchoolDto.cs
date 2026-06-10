@@ -107,4 +107,33 @@ namespace Evaluation.Services.Models.NSISSchool
 		public string? SubjectNameEn { get; set; }
 		public string? SubjectNameAr { get; set; }
 	}
+
+	public class HREmployeeDto
+	{
+		public string? OrgNo { get; set; }
+		public string? SubOrgNo { get; set; }
+
+		public string? NameAr { get; set; }
+		public string? NameEn { get; set; }
+
+		public string? EmployeeNumber { get; set; }
+		public string? Email { get; set; }
+		public string? JobNo { get; set; }
+		public string? JobTitleAr { get; set; }
+		public string? JobTitleEn { get; set; }
+		public string? PhoneNumber { get; set; }
+		public string? QID { get; set; }
+
+		public string? ManagerQID { get; set; }
+		public string? ManagerNameAr { get; set; }
+		public string? ManagerNameEn { get; set; }
+		public string? ManagerEmail { get; set; }
+		public string? ManagerEmployeeNo { get; set; }
+
+		public string? NationalityCode { get; set; }
+		public string? NationalityAr { get; set; }
+		public string? NationalityEn { get; set; }
+		public string? SexCode { get; set; }
+		public string? SexNameAr { get; set; }
+	}
 }
