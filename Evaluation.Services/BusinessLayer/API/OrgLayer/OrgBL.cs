@@ -137,7 +137,8 @@ public class OrgBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider c
 		var employees = result.Select(e => new OrgDetailsDto
 		{
 			Id = e.Id,
-			Name = e.NameEn,
+			NameAr = e.NameAr,
+			NameEn = e.NameEn,
 			EmployeeNo = e.EmployeeNo,
 			Email = e.Email,
 			QID = e.QID,
