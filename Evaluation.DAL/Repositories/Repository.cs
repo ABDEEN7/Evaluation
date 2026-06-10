@@ -147,7 +147,10 @@ public class Repository<T>(DbContext context, UserInfo userInfo) : RepositoryBas
         entity.IsDeleted = false;
         if (userInfo.UserId.HasValue)
             entity.CreateById = userInfo.UserId.Value;
-        await _dbSet.AddAsync(entity);
+        else
+			entity.CreateById =Guid.Parse( "C2536611-576B-4EB8-84F4-747F4ECE9A23");
+
+		await _dbSet.AddAsync(entity);
         return entity;
     }
 	
