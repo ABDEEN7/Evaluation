@@ -147,7 +147,8 @@ public class Repository<T>(DbContext context, UserInfo userInfo) : RepositoryBas
         entity.IsDeleted = false;
         if (userInfo.UserId.HasValue)
             entity.CreateById = userInfo.UserId.Value;
-        
+		
+
 		await _dbSet.AddAsync(entity);
         return entity;
     }
