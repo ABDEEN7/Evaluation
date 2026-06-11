@@ -906,8 +906,11 @@ var formGenerateFieldUtility = window.formUtility;
 
         if (field.type === 'label' || field.type === 'checkbox') {
             fieldLabel.append(field.fieldName);
-        } else {
-            fieldLabel.append(document.createTextNode(field.fieldName || ''));
+        } 
+      else {
+            if ((field.fieldName || '').toLowerCase() !== 'plan details') {
+                fieldLabel.append(document.createTextNode(field.fieldName || ''));
+            }
         }
 
         if (field.type === 'checkbox') {
@@ -1345,7 +1348,7 @@ var formGenerateFieldUtility = window.formUtility;
             const legend = $('<legend>')
                 .addClass('cursor-pointer')
                 .attr('role', canCollapse ? 'button' : 'heading')
-                .text(group.formGroupName || 'Unnamed Group');
+                .text('');
             fieldset.append(legend);
 
             if (actionType === ACTION_TYPE.RETURNBACK || actionType === ACTION_TYPE.RequestDataChange) {
@@ -1396,11 +1399,11 @@ var formGenerateFieldUtility = window.formUtility;
 
                         }
                         if (field.type === 'label') {
-                            const block = $('<div>').addClass('mb-4');
+                            const block = $('<div>').addClass('mb-1');
                             block.append(fieldLabel);
                             colContainer.append(block);
                         } else {
-                            const block = $('<div>').addClass('mb-4');
+                            const block = $('<div>').addClass('mb-1');
 
                             if (actionType === ACTION_TYPE.RETURNBACK || actionType === ACTION_TYPE.RequestDataChange) {
                                 const DisableReturn = hasAttribute(field, 'disabled');

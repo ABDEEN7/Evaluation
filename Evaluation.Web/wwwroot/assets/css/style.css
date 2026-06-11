@@ -2255,27 +2255,29 @@ input.auto-fill {
 
 
 @media (max-width: 1400px) {
-
-    .table-card-seperate-styling .card-row .plan-title-td,
-    .table-card-seperate-styling .card .plan-title-td {
-        width: 70% !important;
-        display: inline-block !important;
-        vertical-align: top !important;
+    .table-card-seperate-styling .card-row .td-left,
+    .table-card-seperate-styling .card .td-left,
+    .table-card-seperate-styling .card-row .td-right,
+    .table-card-seperate-styling .card .td-right {
+        width: 50% !important;
+        flex: 0 0 50% !important;
+        max-width: 50% !important;
+        display: block !important;
     }
 
-    .table-card-seperate-styling .card-row .plan-status-td,
-    .table-card-seperate-styling .card .plan-status-td {
-        width: 30% !important;
-        display: inline-block !important;
-        vertical-align: top !important;
+    .table-card-seperate-styling .card-row .td-left,
+    .table-card-seperate-styling .card .td-left {
         text-align: end !important;
-        margin-top: 0 !important;
     }
 
-        .table-card-seperate-styling .card-row .plan-status-td > div,
-        .table-card-seperate-styling .card .plan-status-td > div {
-            justify-content: flex-end !important;
-        }
+    .table-card-seperate-styling .card-row .td-right,
+    .table-card-seperate-styling .card .td-right {
+        text-align: start !important;
+    }
+    .requeststableBody {
+        padding-inline: 1rem !important;
+    }
+
 }
 
 
@@ -2549,9 +2551,9 @@ input.auto-fill {
         }
 
 
-.table-responsive {
+/*.table-responsive {
     margin: 0rem 1.4rem !important;
-}
+}*/
 
 
 .plan-request-card .td-60 {
@@ -5359,9 +5361,9 @@ input.auto-fill {
         }
 
 
-.table-responsive {
+/*.table-responsive {
     margin: 0rem 1.4rem !important;
-}
+}*/
 
 
 .plan-request-card .td-60 {
@@ -5785,7 +5787,15 @@ table.dataTable tbody tr.child-row > td {
 
 
 
-
+.custom-badge-count {
+    background: #009C80;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+    color: #fff;
+    border: 1px solid #009C80;
+    border-radius: 8px !important;
+    font-weight: 600;
+}
 
 
 
@@ -5857,4 +5867,17 @@ table.dataTable tbody tr.child-row > td {
 .modal-date-range-text {
     white-space: nowrap;
     font-size: 13px;
+}
+
+
+/*/Temporary to test*/
+#planRequestCollapseDetails .accordion-body {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+
+
+.form-container {
+    border-radius: 8px !important;
 }
