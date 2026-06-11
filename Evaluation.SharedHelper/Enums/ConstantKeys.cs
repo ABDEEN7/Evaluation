@@ -304,6 +304,7 @@ public static class ConstantKeys
         public static readonly string EXPANDALL = "EXPANDALL";
         public static readonly string COLLAPSEALL = "COLLAPSEALL";
         public static readonly string lblDepartment = "lblDepartment";
+        public static readonly string SELECTALLACTIVE = "SELECTALLACTIVE";
     }
 
     public static class AdminPages

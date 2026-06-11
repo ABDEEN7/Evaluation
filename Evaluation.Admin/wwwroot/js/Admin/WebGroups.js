@@ -76,6 +76,26 @@ const deleteData = (id) => {
             headerFilterPlaceholder: sharedFn().GetUiControlText('FILTER_COLUMN'),            movableRows: true,        },
         isResponsiveLayout: false,        uniqueRowId: 'id',
         sortColumn: "updateDate",        sortDir: "desc",        columns: TableColumns,
+        rowMoved: function (row) {
+            var request = [];
+            table.getData().map(function (d, index) {
+
+                request.push({
+                    "Id": d.id,
+                    "OrderNo": index
+                });
+            });
+            var formData = new FormData();
+            //debugger
+            formData.append('OrderObj', JSON.stringify(request));
+            const options = {
+                success: function (data) {
+                    notificationUtil.success(sharedFn().GetUiControlText('ADMIN_MSG_UPDATE'));
+                }
+            };
+            jqClientAdvanced(options).PostFormData("WebGroups/UpdateWebGroupsOrder", formData);
+
+        },
         columnResized: function (column) {
 
             // Get the resized column width
