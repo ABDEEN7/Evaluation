@@ -1712,6 +1712,18 @@ public static class ConstantKeys
 	{
         public static string EvaluationRequest = "EvaluationRequest";
     }
+    public static class SystemModuleTypeBackend
+	{
+        public static string EvaluationParty = "EvaluationParty";
+        public static string EvaluationPlan = "EvaluationPlan";
+        public static string EvaluationRequest = "EvaluationRequest";
+    }
+    public static class SystemModuleRouting
+	{
+        public static string EvaluationParty = "/evaluation-party";
+        public static string EvaluationPlan = "/evaluation-plan";
+        public static string EvaluationRequest = "/evaluation-plan-request";
+    }
 
-
+  
 }
