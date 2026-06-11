@@ -1579,7 +1579,11 @@ public static class ConstantKeys
 		public const string VisitDateTo = "VisitDateTo";
 		public const string VisitName = "VisitName";
 
-
+		public const string EducationLevel = "EducationLevel";
+		public const string GradeLevel = "GradeLevel";
+		public const string SchoolGradeSection = "SchoolGradeSection";
+		public const string SchoolCourse = "SchoolCourse";
+		public const string Teacher = "Teacher";
 	}
 	public static class ServiceSettings
     {

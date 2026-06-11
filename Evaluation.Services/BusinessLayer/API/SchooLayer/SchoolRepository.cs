@@ -78,7 +78,7 @@ public class SchoolRepository(IServiceScopeFactory serviceScopeFactory,
 
 				LastEvaluationDate = x.LastEval.EvaluationDate,
 				AcademicYear = x.LastEval.NextEvaluationDate,
-				EstablishmentDate = x.School.EstablishmentDate,
+				EstablishmentDate = null, // x.School.EstablishmentDate,
 
 				FormEvalMatrixNameValue = x.School.EvaluationRequests
 	.OrderBy(s => s.NextEvaluationDate)
@@ -165,7 +165,7 @@ public class SchoolRepository(IServiceScopeFactory serviceScopeFactory,
 		if (request.EstablishmentDate != null)
 		{
 			int year = request.EstablishmentDate.Value.Year;
-			filter = filter.And(s => s.EstablishmentDate.Year == year);
+			filter = filter.And(s => s.EstablishmentDate!.Value.Year == year);
 		}
 		if (request.ParentId != Guid.Empty && request.ParentId != null)
 		{
@@ -191,10 +191,8 @@ public class SchoolRepository(IServiceScopeFactory serviceScopeFactory,
 		if (request.EstablishmentDate != null)
 		{
 			int year = request.EstablishmentDate.Value.Year;
-			filter = filter.And(s => s.EstablishmentDate.Year == year);
-		}
-		//if(request.VisitType != null)
-		//    filter = filter.And(x=>x.)
+			filter = filter.And(s => s.EstablishmentDate!.Value.Year == year);
+		}	
 		return filter;
 
 	}

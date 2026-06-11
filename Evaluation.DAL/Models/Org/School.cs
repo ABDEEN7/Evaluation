@@ -6,7 +6,7 @@ public class School : OrgTree , IAuditLogEntity
 {
     public Guid TypeId { get; set; }//ثابت حكومي من  hr // 
     public SchoolType? SchoolType { get; set; } 
-    public DateOnly EstablishmentDate { get; set; } // date now 
+    public DateOnly? EstablishmentDate { get; set; } // School establish date not available in all systems
     public string? ManagerQID { get; set; }
     public string? ManageEmail { get; set; }
     public string? OrgEmail { get; set; }
