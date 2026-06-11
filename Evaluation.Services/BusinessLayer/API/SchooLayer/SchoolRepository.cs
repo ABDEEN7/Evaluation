@@ -202,11 +202,11 @@ public class SchoolRepository(IServiceScopeFactory serviceScopeFactory,
         if (request.EstablishmentDate.HasValue)
         {
             filter = filter.And(s =>
-                s.EstablishmentDate.Year >= request.EstablishmentDate.Value);
+                s.EstablishmentDate.Value.Year >= request.EstablishmentDate);
         }
         if (request.EstablishmentDate != null)
         {
-            int year = request.EstablishmentDate.Value.Year;
+            int year = request.EstablishmentDate.Value;
             filter = filter.And(s => s.EstablishmentDate!.Value.Year == year);
         }
         if (request.ParentId != Guid.Empty && request.ParentId != null)
