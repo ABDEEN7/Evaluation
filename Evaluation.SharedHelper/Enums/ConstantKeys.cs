@@ -213,6 +213,7 @@ public static class ConstantKeys
         public static readonly string NoneOfTheSelectedEvaluationRequestsWereFoundForThisUser = "NoneOfTheSelectedEvaluationRequestsWereFoundForThisUser";
         public static readonly string UnExpectedException = "UnExpectedException";
         public static readonly string NoEvaluationRequestsWereSelected = "NoEvaluationRequestsWereSelected";
+        public static readonly string CannotDeletePlanInProcess = "CannotDeletePlanInProcess";
     }
 
     public static class AdminSettings
@@ -303,6 +304,7 @@ public static class ConstantKeys
         public static readonly string EXPANDALL = "EXPANDALL";
         public static readonly string COLLAPSEALL = "COLLAPSEALL";
         public static readonly string lblDepartment = "lblDepartment";
+        public static readonly string SELECTALLACTIVE = "SELECTALLACTIVE";
     }
 
     public static class AdminPages
@@ -1710,6 +1712,18 @@ public static class ConstantKeys
 	{
         public static string EvaluationRequest = "EvaluationRequest";
     }
+    public static class SystemModuleTypeBackend
+	{
+        public static string EvaluationParty = "EvaluationParty";
+        public static string EvaluationPlan = "EvaluationPlan";
+        public static string EvaluationRequest = "EvaluationRequest";
+    }
+    public static class SystemModuleRouting
+	{
+        public static string EvaluationParty = "/evaluation-party";
+        public static string EvaluationPlan = "/evaluation-plan";
+        public static string EvaluationRequest = "/evaluation-plan-request";
+    }
 
-
+  
 }

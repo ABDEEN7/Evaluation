@@ -1,5 +1,4 @@
-﻿
-let showMore = false, table = null, dialogElem = null;
+﻿let showMore = false, table = null, dialogElem = null;
 const dailogId = commonUtil.CONTENT_DAILOG_ID;
 let currentPage = 0;
 let isSearch = false;
@@ -26,54 +25,57 @@ $('#submitBtn').click(function () {
     $tblContentContainer.show();
     $formSection.hide();
     $btnAddContent.removeAttr("disabled");
-    
+
+    setTimeout(() => {
+        loadStatusBySystemModule();
+    }, 500);
 });
 
 
 function ClearControlByPage() {
     sharedFn().SetValueToDropdown();
-    
 }
 
 
 const loadData = (isSearch) => {
     const serviceId = services_div_select2.val();
     isLoading = true;
-const options = {
-    success: function (data) {
-        if (data) {
-
-
-            if (data && data.length > 0) {
-                if (isSearch) {
-                    table.setData([]).then(function () {
+    const options = {
+        success: function (data) {
+            if (data) {
+                if (data && data.length > 0) {
+                    if (isSearch) {
+                        table.setData([]).then(function () {
+                            setAllColumnWidths(table, columnWidths);
+                        });
+                        currentPage = 1;
+                    }
+                    table.addData(data).then(function () {
                         setAllColumnWidths(table, columnWidths);
                     });
-                    currentPage = 1;
+                    currentPage = currentPage + 1;
+                    isLoading = false;
                 }
-
-                table.addData(data).then(function () {
-                    setAllColumnWidths(table, columnWidths);
-                });
-                currentPage = currentPage + 1;
-                isLoading = false;
-              
             }
-           
         }
-    }
-};
+    };
 
-    jqClientAdvanced(options).Get("ServiceStatusConfiguration/GetAllServiceStatusConfiguration".concat('?ServiceId=', serviceId).concat('&page=', currentPage));
+    jqClientAdvanced(options).Get(
+        "ServiceStatusConfiguration/GetAllServiceStatusConfiguration"
+            .concat('?ServiceId=', serviceId)
+            .concat('&systemModuleId=', $('#SystemModuleId').val() || '')
+            .concat('&page=', currentPage)
+    );
 };
 
 
 const deleteData = (id) => {
-    
-    notificationUtil.confirmation({ title: sharedFn().GetUiControlText('ADMIN_WARNING_DELETE'), okText: sharedFn().GetUiControlText('DELETE_BUTTON'), cancelText: sharedFn().GetUiControlText('ADMIN_CANCEL') }, result => {
+    notificationUtil.confirmation({
+        title: sharedFn().GetUiControlText('ADMIN_WARNING_DELETE'),
+        okText: sharedFn().GetUiControlText('DELETE_BUTTON'),
+        cancelText: sharedFn().GetUiControlText('ADMIN_CANCEL')
+    }, result => {
         if (!id) return;
-
-
 
         const options = {
             success: function (data) {
@@ -89,9 +91,51 @@ const deleteData = (id) => {
             }
         };
         jqClientAdvanced(options).Post("ServiceStatusConfiguration/DeleteServiceStatusConfiguration".concat('?Id=', id));
-
     });
 };
+
+
+const loadStatusBySystemModule = () => {
+    const systemModuleId = $('#SystemModuleId').val();
+    const departmentId = $('#DepartmentId').val();
+
+    if (!systemModuleId) {
+        repopulateStatusDropdown('ServiceStatusConfigurationCurrentStatusId', []);
+        repopulateStatusDropdown('ServiceStatusConfigurationNextStatusId', []);
+        return;
+    }
+
+    const options = {
+        success: function (result) {
+            if (result) {
+                const { data } = result;
+                if (data) {
+                    const { ServiceStatuis } = data;
+                    AllStatusList = ServiceStatuis || [];
+                    repopulateStatusDropdown('ServiceStatusConfigurationCurrentStatusId', AllStatusList);
+                    repopulateStatusDropdown('ServiceStatusConfigurationNextStatusId', AllStatusList);
+                }
+            }
+        }
+    };
+
+    let url = `ServiceStatusConfiguration/GetAllServiceStatus?systemModuleId=${systemModuleId}&departmentId=${departmentId}`;
+    jqClientAdvanced(options).Get(url);
+};
+
+
+const repopulateStatusDropdown = (dropdownId, statusList) => {
+    const $dropdown = $('#' + dropdownId);
+
+    $dropdown.empty().append('<option value=""></option>');
+
+    statusList.forEach(item => {
+        $dropdown.append(new Option(item.name, item.id, false, false));
+    });
+
+    $dropdown.trigger('change');
+};
+
 
 $(window).scroll(function () {
     if ($(window).scrollTop() >= ($(document).height() - $(window).height()) * .60) {
@@ -100,8 +144,9 @@ $(window).scroll(function () {
         }
     }
 });
+
+
 $(document).ready(function () {
-    
 
     table = tableUtil.createTabulator({
         id: gridContainerId,
@@ -116,29 +161,34 @@ $(document).ready(function () {
         sortColumn: "updateDate",
         sortDir: "desc",
         columns: TableColumns,
-       
     });
 
     dialogElem = commonUtil.createDailog({ dailogId: dailogId });
 
     loadData(false);
-   
-    
+
     $(`#${btnAddContentId}`).click(function (e) {
         table = Tabulator.prototype.findTable("#" + gridContainerId)[0];
         sharedFn().ClearForm();
         sharedFn().EditMode();
         sharedFn().SetDefaultValueFromConfig();
         sharedFn().SetValueToDropdown();
-       
+
+        // نستنى GetDropDownValues ينتهي أولاً ثم نعبئ
+        setTimeout(() => {
+            loadStatusBySystemModule();
+        }, 500);
     });
-   
+
 
     $("#btn-submit").click(function (e) {
 
-
-        if (sharedFn().NewvalidateForm("form-control", sharedFn().GetUiControlText('ADMIN_CNTRL_REQUIRED'), sharedFn().GetUiControlText('ADMIN_MSG_MAX_CHAR_LENGTH'), sharedFn().GetUiControlText('ADMIN_MSG_MIN_CHAR_LENGTH'))) {
-
+        if (sharedFn().NewvalidateForm(
+            "form-control",
+            sharedFn().GetUiControlText('ADMIN_CNTRL_REQUIRED'),
+            sharedFn().GetUiControlText('ADMIN_MSG_MAX_CHAR_LENGTH'),
+            sharedFn().GetUiControlText('ADMIN_MSG_MIN_CHAR_LENGTH')
+        )) {
 
             commonUtil.btnProgress(btnSubmitId);
             var requestdata = sharedFn().GetSaveObject(controlvalidationlist, $('#Id').val());
@@ -151,21 +201,16 @@ $(document).ready(function () {
                         table.addData([data], true);
                         if (response) {
                             notificationUtil.success(sharedFn().GetUiControlText('ADMIN_MSG_SAVE'));
-
-
                         }
                     }
                     else if (data.responseStatus == '2') {
                         table.updateData([data]);
                         if (response) {
                             notificationUtil.success(sharedFn().GetUiControlText('ADMIN_MSG_UPDATE'));
-
                         }
-
                     }
                     else {
                         notificationUtil.error(data.message);
-
                     }
                     sharedFn().ViewMode();
                 }
@@ -178,18 +223,9 @@ $(document).ready(function () {
                 url = "ServiceStatusConfiguration/UpdateServiceStatusConfiguration";
             } else {
                 url = "ServiceStatusConfiguration/SaveServiceStatusConfiguration";
-
             }
             jqClientAdvanced(options).PostFormData(url, requestdata);
-         
-
-
         }
     });
 
-   
-
 });
-
-
-

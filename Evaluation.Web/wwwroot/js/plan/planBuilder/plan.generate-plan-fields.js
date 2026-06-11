@@ -244,7 +244,6 @@ const planUtility = window.planUtility;
                         </div>
                         <hr>
 
-                        <!-- تاريخ آخر تقييم -->
                         <div class="mb-3">
                             <label class="form-label">${t('lblLastEvalDate')}</label>
                             <div class="input-group">
@@ -258,21 +257,31 @@ const planUtility = window.planUtility;
                         </div>
                         <hr>
 
-                        <!-- تاريخ الإنشاء -->
+                        
                         <div class="mb-3">
-                            <label class="form-label">${t('lblCreatedDate')}</label>
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="la la-calendar"></i></span>
-                                <input type="text"
-                                       id="${pid(fieldId, 'filterCreatedDate')}"
-                                       name="createdDate"
-                                       class="form-control filter-date-picker"
-                                       placeholder="${t('plhChooseDate')}">
-                            </div>
-                        </div>
+    <label class="form-label">${t('lblCreatedDateFrom') || 'تاريخ الإنشاء من'}</label>
+    <div id="${pid(fieldId, 'filterCreatedDate_wrap')}" style="position:relative;">
+        <input type="text"
+               id="${pid(fieldId, 'filterCreatedDate')}"
+               name="createdDate"
+               class="form-control filter-date-picker"
+               placeholder="${t('plhChooseDate')}"
+               readonly>
+    </div>
+</div>
+<div class="mb-3">
+    <label class="form-label">${t('lblCreatedDateTo') || 'تاريخ الإنشاء إلى'}</label>
+    <div id="${pid(fieldId, 'filterToCreatedDate_wrap')}" style="position:relative;">
+        <input type="text"
+               id="${pid(fieldId, 'filterToCreatedDate')}"
+               name="toCreatedDate"
+               class="form-control filter-date-picker"
+               placeholder="${t('plhChooseDate')}"
+               readonly>
+    </div>
+</div>
                         <hr>
 
-                        <!-- تاريخ التقييم القادم -->
                         <div class="mb-3">
                             <label class="form-label">${t('lblNextEvalDate')}</label>
                             <div class="input-group">
@@ -286,7 +295,6 @@ const planUtility = window.planUtility;
                         </div>
                         <hr>
 
-                        <!-- النتيجة السابقة -->
                         <div class="mb-3">
                             <label class="form-label">${t('lblPreviousResult')}</label>
                             <select id="${pid(fieldId, 'filterPreviousResult')}"
@@ -297,7 +305,6 @@ const planUtility = window.planUtility;
                         </div>
                         <hr>
 
-                        <!-- نوع الزيارة -->
                         <div class="mb-3">
                             <label class="form-label">${t('lblVisitType')}</label>
                             <select id="${pid(fieldId, 'filterVisitType')}"
@@ -308,8 +315,6 @@ const planUtility = window.planUtility;
                             </select>
                         </div>
                         <hr>
-
-                        <!-- المدرسة الأم - FIXED ID -->
                         <div class="mb-3">
                             <label class="form-label">${t('lblParentsSchool')}</label>
                             <select id="${pid(fieldId, 'filterParentOrgTree')}"
@@ -319,7 +324,38 @@ const planUtility = window.planUtility;
                                 <!-- Will be populated dynamically -->
                             </select>
                         </div>
+                        <div class="mb-3">
+    <label class="form-label">${t('lblSchoolLevel')}</label>
+    <select id="${pid(fieldId, 'filterSchoolLevel')}"
+            name="schoolLevel"
+            class="form-control">
+        <option value="">${t('lblAll')}</option>
+    </select>
+</div>
+<hr>
 
+<div class="mb-3">
+    <label class="form-label">${t('lblGender')}</label>
+    <select id="${pid(fieldId, 'filterGender')}"
+            name="gender"
+            class="form-control">
+        <option value="">${t('lblAll')}</option>
+        <option value="Male">${t('lblMale')}</option>
+        <option value="Female">${t('lblFemale')}</option>
+    </select>
+</div>
+<hr>
+
+<div class="mb-3">
+    <label class="form-label">${t('lblGrade')}</label>
+    <select id="${pid(fieldId, 'filterGrade')}"
+            name="grade"
+            class="form-control">
+        <option value="">${t('lblAll')}</option>
+        <!-- Will be populated dynamically -->
+    </select>
+</div>
+<hr>
                         <div class="d-flex gap-2 mt-4">
                             <button type="submit" class="btn btn-primary w-100">
                                 ${t('btnApply')}

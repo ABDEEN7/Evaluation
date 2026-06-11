@@ -43,4 +43,10 @@ public class AcademicYearController(MasterBL masterBl) : ControllerBase
         var result = await masterBl.GetAdminService<SrvAcademicYearBL>().GetAcademicYearListByCureentDepartment();
         return Ok(result);
     }
+    [HttpGet]
+    public async Task<IActionResult> GetCurrentAcademicYearByDepartment()
+    {
+        var result = await masterBl.GetAdminService<SrvAcademicYearBL>().GetCurrentAcademicYearListByCureentDepartment();
+        return Ok(result);
+    }
 }

@@ -173,6 +173,15 @@ namespace Evaluation.Admin.Controllers
         }
         [HttpGet]
         [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.AdminPermission.VIEW_ADMIN_FIELD })]
+        public async Task<IActionResult> GetAllFieldInfoType()
+        {
+            Dictionary<string, object> response = new Dictionary<string, object>();
+            var fieldInfoType = await masterBL.GetAdminService<SrvFormGroupBL>().GetAllFieldInfoTypes();
+            response.Add("FieldInfoType", fieldInfoType);
+            return Ok(new ResponseEntity(response));
+        }
+        [HttpGet]
+        [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.AdminPermission.VIEW_ADMIN_FIELD })]
         public async Task<IActionResult> GetAllSystemField(Guid systemmoduleid)
         {
             Dictionary<string, object> response = new Dictionary<string, object>();

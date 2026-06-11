@@ -26,17 +26,12 @@ public class AssignmentService(IServiceScopeFactory serviceScopeFactory,
             .GetAllActiveNonDeleted().ToListAsync();
     public async Task<List<Scope>> GetScopes()
     {
-        Guid departmentId = await unitOfWork
-    .GetRepository<Department>()
-    .GetAllActiveNonDeleted(d =>
-        d.UserDepartments.Any(ud => ud.UserId == userInfo.UserId))
-    .OrderByDescending(x=>x.CreateDate)
-    .Select(d => d.Id)
-    .FirstOrDefaultAsync();
-
-        return await unitOfWork.GetRepository<Scope>()
-              //.GetAllActiveNonDeleted(x => x.DepartmentId == departmentId)
-              .GetAllActiveNonDeleted()
+        return await unitOfWork
+    .GetRepository<ScopeAcademicYear>()
+    .GetAllActiveNonDeleted(x =>
+        x.DepartmentId == requestInfo.DepId &&
+        x.ScopeParentId != null)
+              .Select(s => new Scope { NameEn = s.Scope.NameEn, NameAr = s.Scope.NameAr, Id = s.ScopeId })
               .ToListAsync();
     }
 }

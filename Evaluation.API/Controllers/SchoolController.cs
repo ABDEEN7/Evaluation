@@ -34,7 +34,7 @@ public class SchoolController : ControllerBase
     public async Task<IActionResult> GetVisits()
         => Ok(new { result = await _masterBl.GetApiService<SchoolBL>().GetVisitsAsync() });
 
-   [HttpGet]
+    [HttpGet]
     //[CheckRolePermisionFilter(true, ConstantKeys.WebPermissions.VIEW_WEB_SCHOOL)]
     public async Task<IActionResult> GetSchools([FromQuery] SchoolRequest request)
     {
@@ -50,11 +50,18 @@ public class SchoolController : ControllerBase
         return Ok(result);
     }
 
-	[HttpGet]
+    [HttpGet]
     //[CheckRolePermisionFilter(true, ConstantKeys.WebPermissions.VIEW_WEB_SCHOOL)]
     public async Task<IActionResult> GetSchoolsPlan([FromQuery] SchoolRequest request)
     {
         var result = await _masterBl.GetApiService<SchoolBL>().GetSchoolsPlan(request);
         return Ok(result);
     }
+    [HttpGet]
+    //[CheckRolePermisionFilter(true, ConstantKeys.WebPermissions.VIEW_WEB_SCHOOL)]
+    public async Task<IActionResult> GetEducationLevel()
+        => Ok(new { result = await _masterBl.GetApiService<SchoolBL>().GetEducationLevelAsync() });
+    [HttpGet]
+    public async Task<IActionResult> GetSchoolGender()
+        => Ok(new { result = await _masterBl.GetApiService<SchoolBL>().GetSchoolGenderAsync() });
 }

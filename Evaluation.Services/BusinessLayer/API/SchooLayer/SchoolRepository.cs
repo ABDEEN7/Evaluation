@@ -1,4 +1,6 @@
-﻿using AutoMapper;
+﻿using Aspose.Words.Lists;
+using AutoMapper;
+using Azure;
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.DepartementEntites;
 using Evaluation.DAL.Models.FormsModules;
@@ -7,6 +9,7 @@ using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
 using Evaluation.DAL.Repositories;
 using Evaluation.Services.Extensions;
 using Evaluation.Services.Special;
+using Evaluation.SharedHelper.Consts;
 using Evaluation.SharedHelper.Dtos.SchoolDto;
 using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Extensions;
@@ -21,179 +24,220 @@ using static Evaluation.SharedHelper.Enums.ConstantKeys;
 namespace Evaluation.Services.BusinessLayer.API.SchooLayer;
 
 public class SchoolRepository(IServiceScopeFactory serviceScopeFactory,
-	CacheDataProvider cacheDataProvider,
-	UnitOfWork unitOfWork,
-	LoggingServices loggingServices,
-	IMapper mapper,
-	UserInfo userInfo,
-	IServiceProvider serviceProvider,
-	RequestInfo requestInfo
-	) : ApiBase(serviceScopeFactory, cacheDataProvider, unitOfWork, loggingServices, mapper, userInfo,
-		serviceProvider, requestInfo)
+    CacheDataProvider cacheDataProvider,
+    UnitOfWork unitOfWork,
+    LoggingServices loggingServices,
+    IMapper mapper,
+    UserInfo userInfo,
+    IServiceProvider serviceProvider,
+    RequestInfo requestInfo
+    ) : ApiBase(serviceScopeFactory, cacheDataProvider, unitOfWork, loggingServices, mapper, userInfo,
+        serviceProvider, requestInfo)
 {
-	public async Task<PaginatedResult<School>> GetSchoolsAsyncOld(SchoolRequest request)
-	{
-		var filter = BuildFilterExpressionOld(request);
+    public async Task<PaginatedResult<School>> GetSchoolsAsyncOld(SchoolRequest request)
+    {
+        var filter = BuildFilterExpressionOld(request);
 
-		var query = serviceScopeFactory
-			 .CreateScopedUow()
-			 .GetRepository<School>()
-			 .GetAllNonDeleted(filter)
-			 .Include(x => x.SchoolType)
-			 .Include(x => x.SchoolLevel)
-			 .ThenInclude(x => x.EducationLevel);
-		return await query.GetPaginatedResult(request.PageNumber, request.PageSize = 10);
-	}
-	public async Task<PaginatedResult<ResponseOrgsPlans>> GetSchoolsAsync(
-	SchoolRequest request,
-	List<Guid?> targetOrgTreeIds,
-	List<Guid> currentSelectedSchools)
-	{
-		using var uow = serviceScopeFactory.CreateScopedUow();
+        var query = serviceScopeFactory
+             .CreateScopedUow()
+             .GetRepository<School>()
+             .GetAllNonDeleted(filter)
+             .Include(x => x.SchoolType)
+             .Include(x => x.SchoolLevel)
+             .ThenInclude(x => x.EducationLevel);
+        return await query.GetPaginatedResult(request.PageNumber, request.PageSize = 10);
+    }
+    public async Task<PaginatedResult<ResponseOrgsPlans>> GetSchoolsAsync(
+    SchoolRequest request,
+    List<Guid?> targetOrgTreeIds,
+    List<Guid> currentSelectedSchools)
+    {
+        using var uow = serviceScopeFactory.CreateScopedUow();
 
-		var filter = BuildFilterExpression(request, targetOrgTreeIds, currentSelectedSchools);
+        var filter = BuildFilterExpression(request, targetOrgTreeIds, currentSelectedSchools);
 
-		var query = uow.GetRepository<School>()
-			.GetAllNonDeleted(filter)
-			.Select(s => new
-			{
-				School = s,
-				LastEval = s.EvaluationRequests
-					.OrderByDescending(e => e.EvaluationDate)
-					.FirstOrDefault()
-			})
-			.Select(x => new ResponseOrgsPlans
-			{
-				Id = x.School.Id,
-				Name = requestInfo.Lang == LanguageConst.Ar ? x.School.NameAr : x.School.NameEn,
-				IsOpen = x.School.EvaluationRequests.Any(x => x.ServiceStatus.ServiceStatusType.BackendName.ToLower() == ConstantKeys.ServiceStatusTypeBackend.Open.ToLower()),
+        var query = uow.GetRepository<School>()
+            .GetAllNonDeleted(filter)
+            .Select(s => new
+            {
+                School = s,
+                LastEval = s.EvaluationRequests
+                    .OrderByDescending(e => e.EvaluationDate)
+                    .FirstOrDefault()
+            })
+            .Select(x => new ResponseOrgsPlans
+            {
+                Id = x.School.Id,
+                Name = requestInfo.Lang == LanguageConst.Ar ? x.School.NameAr : x.School.NameEn,
+                IsOpen = x.School.EvaluationRequests.Any(x => x.ServiceStatus.ServiceStatusType.BackendName.ToLower() == ConstantKeys.ServiceStatusTypeBackend.Open.ToLower()),
 
-				SchoolLevel = x.School.SchoolLevel!
-					.Select(sl => new SchoolLevelDto
-					{
-						Name = sl.EducationLevel.NameEn,
-						BackendName = sl.EducationLevel.BackendName,
-						SchoolId = sl.SchoolId
-					}).ToList(),
+                SchoolLevel = x.School.SchoolLevel!
+                    .Select(sl => new SchoolLevelDto
+                    {
+                        Name = sl.EducationLevel.NameEn,
+                        BackendName = sl.EducationLevel.BackendName,
+                        SchoolId = sl.SchoolId
+                    }).ToList(),
 
-				LastEvaluationDate = x.LastEval.EvaluationDate,
-				AcademicYear = x.LastEval.NextEvaluationDate,
-				EstablishmentDate = null, // x.School.EstablishmentDate,
+                LastEvaluationDate = x.LastEval.EvaluationDate,
+                AcademicYear = x.LastEval.NextEvaluationDate,
+                EstablishmentDate = null, // x.School.EstablishmentDate,
+                NextEvaluationDate = x.LastEval.NextEvaluationDate,
 
-				FormEvalMatrixNameValue = x.School.EvaluationRequests
-	.OrderBy(s => s.NextEvaluationDate)
-	.ThenByDescending(er => er.CreateDate)
-	.Select(er => requestInfo.Lang == LanguageConst.Ar
-		? er.FormEvalMatrixValue!.NameAr
-		: er.FormEvalMatrixValue!.NameEn)
-	.FirstOrDefault(),
-				NextEvaluationDate = x.School.EvaluationRequests
-	.OrderByDescending(er => er.CreateDate)
-	.Select(s => s.NextEvaluationDate)
-	.FirstOrDefault()
-			});
+                FormEvalMatrixNameValue = x.School.EvaluationRequests
+    .OrderBy(s => s.NextEvaluationDate)
+    .ThenByDescending(er => er.CreateDate)
+    .Select(er => requestInfo.Lang == LanguageConst.Ar
+        ? er.FormEvalMatrixValue!.NameAr
+        : er.FormEvalMatrixValue!.NameEn)
+    .FirstOrDefault()
+            });
 
-		return await query.GetPaginatedResult(request.PageNumber, request.PageSize);
-	}
+        return await query.GetPaginatedResult(request.PageNumber, request.PageSize);
+    }
 
-	public async Task<List<School>> GetSchoolsByDepartmentId(Guid depId)
-	{
-		using var scopeUow = serviceProvider.CreateScopedUow();
+    public async Task<List<School>> GetSchoolsByDepartmentId(Guid depId)
+    {
+        using var scopeUow = serviceProvider.CreateScopedUow();
 
-		var department = await scopeUow.GetRepository<Department>()
-								 .GetAllQueryFiltered()
-								 .AsNoTracking()
-								 .Include(c => c.DepTargetOrgTrees)
-								 .Where(c => c.Id == depId)
-								 .FirstOrDefaultAsync();
+        var department = await scopeUow.GetRepository<Department>()
+                                 .GetAllQueryFiltered()
+                                 .AsNoTracking()
+                                 .Include(c => c.DepTargetOrgTrees)
+                                 .Where(c => c.Id == depId)
+                                 .FirstOrDefaultAsync();
 
 
-		var schools =await scopeUow.GetRepository<School>()
-					   .GetAllNonDeleted()
-					   .Where(c => c.OrgParentId == department.DepTargetOrgTrees.Select(x => x.TargetOrgTreeId).FirstOrDefault())
-					   .ToListAsync();
+        var schools = await scopeUow.GetRepository<School>()
+                       .GetAllNonDeleted()
+                       .Where(c => c.OrgParentId == department.DepTargetOrgTrees.Select(x => x.TargetOrgTreeId).FirstOrDefault())
+                       .ToListAsync();
 
-		return schools;
-	}
-	public async Task<School?> GetSchoolDetails(Guid SchoolID)
-	{
-		using var scopeUow= serviceProvider.CreateScopedUow();
-		var school = await scopeUow.GetRepository<School>().GetByIDActiveNonDeleted(SchoolID);
-		return school;
-	}
+        return schools;
+    }
+    public async Task<School?> GetSchoolDetails(Guid SchoolID)
+    {
+        using var scopeUow = serviceProvider.CreateScopedUow();
+        var school = await scopeUow.GetRepository<School>().GetByIDActiveNonDeleted(SchoolID);
+        return school;
+    }
 
-	public async Task<List<EvaluationRequest>> GetEvaluationRequestByOrgTreeId(Guid OrgTreeId)
-	{
-		using var scopeUow = serviceProvider.CreateScopedUow();
+    public async Task<List<EvaluationRequest>> GetEvaluationRequestByOrgTreeId(Guid OrgTreeId)
+    {
+        using var scopeUow = serviceProvider.CreateScopedUow();
 
-		IQueryable<EvaluationRequest> query = scopeUow.GetRepository<EvaluationRequest>()
-										.GetAllActiveNonDeleted()
-										.Include(d => d.ServiceStatus)
-										.Include(d => d.FormEvalMatrixValue)
-										.Where(er =>
-											er.OrgTreeId == OrgTreeId &&
-											er.DepEvaluationType.DepartmentId == requestInfo.DepId &&
-											er.FormEvalMatrixValueId != null)
-										.OrderByDescending(er => er.CreateDate)
-										.Take(2);
+        IQueryable<EvaluationRequest> query = scopeUow.GetRepository<EvaluationRequest>()
+                                        .GetAllActiveNonDeleted()
+                                        .Include(d => d.ServiceStatus)
+                                        .Include(d => d.FormEvalMatrixValue)
+                                        .Where(er =>
+                                            er.OrgTreeId == OrgTreeId &&
+                                            er.DepEvaluationType.DepartmentId == requestInfo.DepId &&
+                                            er.FormEvalMatrixValueId != null)
+                                        .OrderByDescending(er => er.CreateDate)
+                                        .Take(2);
 
-		return query.ToList();
-	}
+        return query.ToList();
+    }
 
-	public async Task<IQueryable<DepEvaluationType>> GetVisitTypes()
-	{
-		var visitTypes =
-		unitOfWork
-		.GetRepository<DepEvaluationType>()
-		.GetAllActiveNonDeleted(x => x.DepartmentId == requestInfo.DepId);
-		return visitTypes;
-	}
+    public async Task<List<SchoolVisits>> GetVisitTypes()
+    {
+        using var scopeUow = serviceProvider.CreateScopedUow();
+        var visitTypes =
+            await
+        scopeUow
+        .GetRepository<DepEvaluationType>()
+        .GetAllActiveNonDeleted(x => x.DepartmentId == requestInfo.DepId)
+        .Select(x => new SchoolVisits
+        {
+            Id = x.Id,
+            Name = LanguageStatic.SelectLang(requestInfo.Lang, x.NameAr, x.NameEn),
+            BackendName = x.EvaluationType.BackendName
+        }).ToListAsync();
+        return visitTypes;
+    }
+    public async Task<List<SchoolGenderDto>> GetSchoolGender()
+    {
+        using var scopeUow = serviceProvider.CreateScopedUow();
+        var gender =await
+        scopeUow
+        .GetRepository<SchoolGender>()
+        .GetAllActiveNonDeleted()
+        .Select(x => new SchoolGenderDto
+        {
+            Id = x.Id,
+            Name = LanguageStatic.SelectLang(requestInfo.Lang, x.NameAr, x.NameEn),
+            BackendName = x.BackendName
+        }).ToListAsync();
+        return gender;
+    }
+    public async Task<List<GetEducationLevelDto>> GetEducationLevel(int? currentAcademicYear)
+    {
+        using var scopeUow = serviceProvider.CreateScopedUow();
+        var visitTypes = await
+        scopeUow
+        .GetRepository<EducationLevel>()
+        .GetAllActiveNonDeleted(x => x.SchoolLevels.Any(x => x.AcademicYear == currentAcademicYear))
+        .Select(x => new GetEducationLevelDto
+        {
+            Id = x.Id,
+            Name = LanguageStatic.SelectLang(requestInfo.Lang, x.NameAr, x.NameEn),
+            BackendName = x.BackendName
+        }).ToListAsync();
+
+        return visitTypes;
+    }
+    private Expression<Func<School, bool>> BuildFilterExpression(SchoolRequest request, List<Guid?> targetOrgTreeIds, List<Guid> currentSchools)
+    {
+
+        Expression<Func<School, bool>> filter = s => true;
+        filter = filter.And(c => targetOrgTreeIds.Contains(c.OrgParentId) && currentSchools.Contains(c.Id));
+        //filter = filter.And(c=> c.) we will added here filter by ServiceStatus.IsOPEN
+        if (request.Id != null && request.Id.Count > 0)
+            filter = filter.And(c => request.Id.Contains(c.Id));
+        if (request.SchoolIds != null && request.SchoolIds.Count > 0)
+            filter = filter.And(c => request.SchoolIds.Contains(c.Id));
+        if (!string.IsNullOrWhiteSpace(request.Name))
+            filter = filter.And(s => s.NameEn.Contains(request.Name) || s.NameAr.Contains(request.Name));
+        if (request.EstablishmentDate.HasValue)
+        {
+            filter = filter.And(s =>
+                s.EstablishmentDate.Value.Year >= request.EstablishmentDate);
+        }
+        if (request.EstablishmentDate != null)
+        {
+            int year = request.EstablishmentDate.Value;
+            filter = filter.And(s => s.EstablishmentDate!.Value.Year == year);
+        }
+        if (request.ParentId != Guid.Empty && request.ParentId != null)
+        {
+            filter = filter.And(x => x.OrgParentId == request.ParentId);
+        }
+        if (request.FomrEvalMatrixValueId != Guid.Empty && request.FomrEvalMatrixValueId != null)
+        {
+            filter = filter.And(s => s.EvaluationRequests != null &&
+                                     s.EvaluationRequests.Any(er => er.FormEvalMatrixValueId == request.FomrEvalMatrixValueId));
+        }
+        //if(request.VisitType != null)
+        //    filter = filter.And(x=>x.)
+        return filter;
+
+    }
 
 
-	private Expression<Func<School, bool>> BuildFilterExpression(SchoolRequest request, List<Guid?> targetOrgTreeIds, List<Guid> currentSchools)
-	{
+    private Expression<Func<School, bool>> BuildFilterExpressionOld(SchoolRequest request)
+    {
+        Expression<Func<School, bool>> filter = s => true;
+        if (!string.IsNullOrWhiteSpace(request.Name))
+            filter = filter.And(s => s.NameEn.Contains(request.Name) || s.NameAr.Contains(request.Name));
+        if (request.EstablishmentDate != null)
+        {
+            int year = request.EstablishmentDate.Value;
+            filter = filter.And(s => s.EstablishmentDate!.Value.Year == year);
+        }
+        //if(request.VisitType != null)
+        //    filter = filter.And(x=>x.)
+        return filter;
 
-		Expression<Func<School, bool>> filter = s => true;
-		filter = filter.And(c => targetOrgTreeIds.Contains(c.OrgParentId) && currentSchools.Contains(c.Id));
-		//filter = filter.And(c=> c.) we will added here filter by ServiceStatus.IsOPEN
-		if (request.Id != null && request.Id.Count > 0)
-			filter = filter.And(c => request.Id.Contains(c.Id));
-		if (request.SchoolIds != null && request.SchoolIds.Count > 0)
-			filter = filter.And(c => request.SchoolIds.Contains(c.Id));
-		if (!string.IsNullOrWhiteSpace(request.Name))
-			filter = filter.And(s => s.NameEn.Contains(request.Name) || s.NameAr.Contains(request.Name));
-		if (request.EstablishmentDate != null)
-		{
-			int year = request.EstablishmentDate.Value.Year;
-			filter = filter.And(s => s.EstablishmentDate!.Value.Year == year);
-		}
-		if (request.ParentId != Guid.Empty && request.ParentId != null)
-		{
-			filter = filter.And(x => x.OrgParentId == request.ParentId);
-		}
-		if (request.FomrEvalMatrixValueId != Guid.Empty && request.FomrEvalMatrixValueId != null)
-		{
-			filter = filter.And(s => s.EvaluationRequests != null &&
-									 s.EvaluationRequests.Any(er => er.FormEvalMatrixValueId == request.FomrEvalMatrixValueId));
-		}
-		//if(request.VisitType != null)
-		//    filter = filter.And(x=>x.)
-		return filter;
-
-	}
-
-
-	private Expression<Func<School, bool>> BuildFilterExpressionOld(SchoolRequest request)
-	{
-		Expression<Func<School, bool>> filter = s => true;
-		if (!string.IsNullOrWhiteSpace(request.Name))
-			filter = filter.And(s => s.NameEn.Contains(request.Name) || s.NameAr.Contains(request.Name));
-		if (request.EstablishmentDate != null)
-		{
-			int year = request.EstablishmentDate.Value.Year;
-			filter = filter.And(s => s.EstablishmentDate!.Value.Year == year);
-		}	
-		return filter;
-
-	}
+    }
 }
