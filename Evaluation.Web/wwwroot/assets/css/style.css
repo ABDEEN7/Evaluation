@@ -5764,7 +5764,7 @@ table.dataTable tbody tr.child-row > td {
     overflow: hidden;
     text-overflow: ellipsis;
     min-width: 0;
-    font-size: 14px !important;
+   font-size: clamp(0.85rem, 1vw, 1rem) !important;
 }
 
 .filter-section {
@@ -5772,4 +5772,89 @@ table.dataTable tbody tr.child-row > td {
     padding: 2rem;
     margin: 0;
     border-radius: 8px;
+}
+
+
+.application-request.card .requeststableBody tr td.td-date-range-block {
+    min-height: 90px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.date-range-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.status-countdown-badge,
+.evaluation-near-note {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    min-height: 32px;
+    padding: 0 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1;
+    white-space: nowrap;
+    width: fit-content;
+    box-sizing: border-box;
+    border-radius: 8px;
+}
+
+    .status-countdown-badge i,
+    .evaluation-near-note i {
+        font-size: 14px;
+        line-height: 1;
+    }
+
+
+    .status-countdown-badge.info,
+    .evaluation-near-note.info {
+        background: #8A1538 !important;
+        color: #fff !important;
+    }
+
+
+    .status-countdown-badge.success,
+    .evaluation-near-note.success {
+        background: #FDF39E !important;
+        color: #0D4261 !important;
+       
+    }
+
+.td-date-range-block {
+    min-height: 72px;
+}
+
+    .td-date-range-block .d-flex.flex-wrap {
+        row-gap: 6px;
+    }
+
+.modal-date-range-text {
+    white-space: nowrap;
+    font-size: 13px;
 }

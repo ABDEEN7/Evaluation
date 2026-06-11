@@ -511,29 +511,33 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 				case "AcademicYear":
 					result = await GetAllAcademicYearsData(fieldValueId);
 					break;
-				case "SchoolClasses":
+				case "schoolLevels":
 					{
-                        SchoolId =  Guid.Parse("aface110-2a67-e311-93f9-00155d283a04");
+						result = await GetSchoolLevelsData(SchoolId, fieldValueId);
+						break;
+					}
 
-						var school = await NSISService.GetSchoolbyIdAsync(SchoolId.Value);
+				case "schoolGrades":
+					{
+						result = await GetSchoolGradesData(SchoolId, fieldValueId);
+						break;
+					}
 
-						if (school?.Classes == null || !school.Classes.Any())
-						{
-							result = new List<Dictionary<string, object>>();
-							break;
-						}
+				case "schoolSections":
+					{
+						result = await GetSchoolSectionsData(SchoolId, fieldValueId);
+						break;
+					}
 
-						result = school.Classes
-							.Where(x => fieldValueId == null || x.Id == fieldValueId)
-							.Select((x, index) => new Dictionary<string, object>
-							{
-								["Id"] = x.Id,
-								["NameEn"] = x.NameEn ?? string.Empty,
-								["NameAr"] = x.NameAr ?? string.Empty,
-								["OrderNo"] = index + 1,
-							})
-							.ToList();
+				case "schoolGradeSectionSubjects":
+					{
+						result = await GetSchoolGradeSectionSubjectsData(SchoolId, fieldValueId);
+						break;
+					}
 
+				case "schoolGradeSectionSubjectTeachers":
+					{
+						result = await GetSchoolGradeSectionSubjectTeachersData(SchoolId, fieldValueId);
 						break;
 					}
 
@@ -942,6 +946,174 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 				if (Guid.TryParse(p, out var g)) result.Add(g);
 
 			return result;
+		}
+		private async Task<List<Dictionary<string, object>>> GetSchoolLevelsData(Guid? schoolId,Guid? fieldValueId = null)
+		{
+			if (!schoolId.HasValue || schoolId == Guid.Empty)
+				return new();
+
+			using var uow = serviceScopeFactory.CreateScopedUow();
+
+			var query = uow.GetRepository<SchoolLevel>()
+				.GetAllQueryFiltered()
+				.Include(x => x.EducationLevel)
+				.Where(x => x.SchoolId == schoolId.Value);
+
+			if (fieldValueId.HasValue && fieldValueId != Guid.Empty)
+				query = query.Where(x => x.Id == fieldValueId.Value);
+
+			var data = await query.ToListAsync();
+
+			return data
+				.Where(x => x.EducationLevel != null)
+				.Select(x => new Dictionary<string, object>
+				{
+					["Id"] = x.Id,
+					["NameAr"] = x.EducationLevel!.NameAr,
+					["NameEn"] = x.EducationLevel!.NameEn,
+					["OrderNo"] = x.EducationLevel.OrderNo
+				})
+				.ToList();
+		}
+		private async Task<List<Dictionary<string, object>>> GetSchoolGradesData(Guid? schoolId,Guid? fieldValueId = null)
+		{
+			if (!schoolId.HasValue || schoolId == Guid.Empty)
+				return new();
+
+			using var uow = serviceScopeFactory.CreateScopedUow();
+
+			var query = uow.GetRepository<SchoolGrade>()
+				.GetAllQueryFiltered()
+				.Include(x => x.GradeLevel)
+				.Include(x => x.SchoolLevel)
+				.Where(x => x.SchoolLevel!.SchoolId == schoolId.Value);
+
+			if (fieldValueId.HasValue && fieldValueId != Guid.Empty)
+				query = query.Where(x => x.Id == fieldValueId.Value);
+
+			var data = await query.ToListAsync();
+
+			return data
+				.Where(x => x.GradeLevel != null)
+				.Select(x => new Dictionary<string, object>
+				{
+					["Id"] = x.Id,
+					["NameAr"] = x.GradeLevel!.NameAr,
+					["NameEn"] = x.GradeLevel!.NameEn,
+					["OrderNo"] = x.GradeLevel.orderNo,
+					["ParentDropDownId"] = x.SchoolLevelId
+				})
+				.ToList();
+		}
+		private async Task<List<Dictionary<string, object>>> GetSchoolSectionsData(Guid? schoolId,Guid? fieldValueId = null)
+		{
+			if (!schoolId.HasValue || schoolId == Guid.Empty)
+				return new();
+
+			using var uow = serviceScopeFactory.CreateScopedUow();
+
+			var query = uow.GetRepository<SchoolGradeSection>()
+				.GetAllQueryFiltered()
+				.Include(x => x.SchoolGrade)
+					.ThenInclude(x => x.SchoolLevel)
+				.Where(x => x.SchoolGrade!.SchoolLevel!.SchoolId == schoolId.Value);
+
+			if (fieldValueId.HasValue && fieldValueId != Guid.Empty)
+				query = query.Where(x => x.Id == fieldValueId.Value);
+
+			var data = await query.ToListAsync();
+
+			return data.Select(x => new Dictionary<string, object>
+			{
+				["Id"] = x.Id,
+				["NameAr"] = x.SectionAr,
+				["NameEn"] = x.SectionEn,
+				["OrderNo"] = 0,
+				["ParentDropDownId"] = x.SchoolGradeId
+			}).ToList();
+		}
+		private async Task<List<Dictionary<string, object>>> GetSchoolGradeSectionSubjectsData(Guid? schoolId,Guid? fieldValueId = null)
+		{
+			if (!schoolId.HasValue || schoolId == Guid.Empty)
+				return new();
+
+			using var uow = serviceScopeFactory.CreateScopedUow();
+
+			var query = uow.GetRepository<SchoolGradeSectionCourse>()
+				.GetAllQueryFiltered()
+				.Include(x => x.SchoolCourse)
+				.Include(x => x.SchoolGradeSction)
+					.ThenInclude(x => x.SchoolGrade)
+						.ThenInclude(x => x.SchoolLevel)
+				.Where(x => x.SchoolGradeSction!.SchoolGrade!.SchoolLevel!.SchoolId == schoolId.Value);
+
+			var data = await query.ToListAsync();
+
+			return data
+				.Where(x => x.SchoolCourse != null)
+				.GroupBy(x => x.SchoolCourseId)
+				.Select(g =>
+				{
+					var item = g.First();
+
+					return new Dictionary<string, object>
+					{
+						["Id"] = item.SchoolCourseId,
+						["NameAr"] = item.SchoolCourse!.NameAr,
+						["NameEn"] = item.SchoolCourse!.NameEn,
+						["OrderNo"] = item.SchoolCourse.OrderNo,
+						["ParentDropDownId"] = item.SchoolGradeSctionId,
+
+					};
+				})
+				.ToList();
+		}
+
+		private async Task<List<Dictionary<string, object>>> GetSchoolGradeSectionSubjectTeachersData(Guid? schoolId,Guid? schoolCourseId,Guid? fieldValueId = null)
+		{
+			if (!schoolId.HasValue || schoolId == Guid.Empty)
+				return new();
+
+			if (!schoolCourseId.HasValue || schoolCourseId == Guid.Empty)
+				return new();
+
+			using var uow = serviceScopeFactory.CreateScopedUow();
+
+			var query = uow.GetRepository<SchoolGradeSectionCourse>()
+				.GetAllQueryFiltered()
+				.Where(x => x.SchoolCourseId == schoolCourseId.Value);
+
+			if (fieldValueId.HasValue && fieldValueId != Guid.Empty)
+				query = query.Where(x => x.Id == fieldValueId.Value);
+
+			var sectionCourses = await query.ToListAsync();
+
+			var schoolEmployees = await OrgBL.GetEmployeesBySchoolId(schoolId.Value);
+
+			var employeeMap = schoolEmployees
+				.Where(x => !string.IsNullOrWhiteSpace(x.QID))
+				.GroupBy(x => x.QID!.Trim())
+				.ToDictionary(g => g.Key, g => g.First());
+
+			return sectionCourses
+				.Where(x => !string.IsNullOrWhiteSpace(x.QID))
+				.Where(x => employeeMap.ContainsKey(x.QID.Trim()))
+				.GroupBy(x => x.QID.Trim())
+				.Select(g =>
+				{
+					var item = g.First();
+					var emp = employeeMap[item.QID.Trim()];
+
+					return new Dictionary<string, object>
+					{
+						["Id"] = item.Id,
+						["NameAr"] = emp.NameAr ?? item.QID,
+						["NameEn"] = emp.NameEn ?? item.QID,
+						["OrderNo"] = 0,
+						["ParentDropDownId"] = item.SchoolCourseId
+					};
+				})
+				.ToList();
 		}
 	}
 }

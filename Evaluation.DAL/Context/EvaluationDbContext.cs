@@ -132,7 +132,8 @@ public partial class EvaluationDbContext : DbContext
     public virtual DbSet<SchoolStatus> SchoolStatus { get; set; }
     public virtual DbSet<SchoolModel> SchoolModel { get; set; }
     public virtual DbSet<SchoolGender> SchoolGender { get; set; }
-    public virtual DbSet<SchoolGrade> SchoolGradeSction { get; set; }
+    public virtual DbSet<SchoolGrade> SchoolGrade { get; set; }
+    public virtual DbSet<SchoolGradeSection> SchoolGradeSction { get; set; }
     public virtual DbSet<SchoolGradeSectionCourse> SchoolGradeSectionCourse { get; set; }
     public virtual DbSet<SchoolProgram> SchoolProgram { get; set; }
 

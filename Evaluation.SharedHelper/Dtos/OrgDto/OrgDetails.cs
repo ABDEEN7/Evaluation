@@ -4,6 +4,8 @@ public class OrgDetailsDto
 {
     public Guid Id { get; set; }
     public string Name { get; set; }
+    public string NameAr { get; set; }
+    public string NameEn { get; set; }
 
     ///School Info
     public string? TeachersCount { get; set; }
