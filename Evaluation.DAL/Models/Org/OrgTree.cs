@@ -17,5 +17,6 @@ public class OrgTree : EntityBase , IAuditLogEntity
     public OrgType? OrgType { get; set; }
     public Guid OrgClassId { get; set; }
     public OrgClass? OrgClass { get; set; }
+    public string? OrgTreeConfig { get; set; }
     public virtual ICollection<EvaluationRequest>? EvaluationRequests { get; set; }
 }
