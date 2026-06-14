@@ -132,5 +132,12 @@ namespace Evaluation.API.Controllers
 			var result = await _serviceRequestBL.CanCreateEvaluationPlanRequestAsync();
 			return Ok(new { canCreate = result });
 		}
+
+		[HttpGet]
+		public async Task<IActionResult> FormAnalysis(Guid requestId)
+		{
+			var result = await _serviceRequestBL.GetFormAnalysisAsync(requestId);
+			return Ok(result);
+		}
 	}
 }

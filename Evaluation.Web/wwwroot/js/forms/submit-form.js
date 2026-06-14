@@ -253,7 +253,7 @@ async function saveForm(formId) {
         results: calculation.value,
         evaluationRequestId: P_evaluationRequestId,
         serviceRequestId: P_serviceRequestId,
-        renamedItems: P_renamedItems
+       // renamedItems: P_renamedItems
     };
     return finalResult;
 }

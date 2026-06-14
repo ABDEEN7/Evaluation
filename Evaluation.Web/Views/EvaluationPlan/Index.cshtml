@@ -614,7 +614,48 @@
     </div>
 </div>
 <partial name="_PartialFileModal" />
+<div class="modal fade" id="FormAnalysisModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen">
+        <div class="modal-content">
 
+            <div class="modal-header" style="background:#97133f;color:#fff">
+                <h5 class="modal-title">
+                    <i class="las la-chart-bar"></i>
+                    تحليل الاستمارة الصفية
+                </h5>
+
+                <button type="button"
+                        class="btn-close btn-close-white"
+                        data-bs-dismiss="modal">
+                </button>
+            </div>
+
+            <div class="modal-body p-0" style="background:#f5f5f5">
+                <div id="FormAnalysisContainer"></div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="CriteriaDetailsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header" style="background:#97133f;color:#fff">
+                <h5 class="modal-title" id="CriteriaDetailsTitle"></h5>
+
+                <button type="button"
+                        class="btn-close btn-close-white"
+                        data-bs-dismiss="modal">
+                </button>
+            </div>
+
+            <div class="modal-body" id="CriteriaDetailsBody"></div>
+
+        </div>
+    </div>
+</div>
 
 @section Scripts {
     <!-- Tables -->
@@ -643,6 +684,7 @@
     <script src="~/js/evaluationplan/evaluation-operations-listing.js"></script>
     <script src="~/js/evaluationplan/evaluation-plan-requests-listing.js"></script>
 
+    <script src="~/js/form-generation-util/form-analysis-modal.js"></script>
 
     <!-- Form Generation -->
     <script src="/js/form-generation-util/form.constants.js"></script>

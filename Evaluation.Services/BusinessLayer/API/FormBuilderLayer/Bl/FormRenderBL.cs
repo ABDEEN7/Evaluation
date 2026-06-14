@@ -739,14 +739,28 @@ namespace Evaluation.Services.BusinessLayer.API
 			var statusId = requestId is not null
 				? requestObj?.StatusId ?? throw new BusinessException(ExceptionMessage.InvalidRequest)
 				: await statusIdTask ?? throw new BusinessException(ExceptionMessage.lblNoServiceStatusFound);
+			EvlReqId ??= requestObj?.EvaluationRequestId; 
+			Guid? OrgTreeId;
 
-			Guid? OrgTreeId = requestId != null? requestObj?.OrgTreeId: EvlReqId.HasValue
-														? (await uow.GetRepository<EvaluationRequest>()
-															.GetByIDActiveNonDeleted(EvlReqId.Value))?.OrgTreeId
-														: null;
 
-			if (OrgTreeId == Guid.Empty)
-				throw new BusinessException(ExceptionMessage.UserNotFound);
+			if (requestId.HasValue)
+			{
+				OrgTreeId = requestObj?.OrgTreeId
+					?? requestObj?.EvaluationRequest?.OrgTreeId;
+			}
+			else if (EvlReqId.HasValue)
+			{
+				OrgTreeId = (await uow.GetRepository<EvaluationRequest>()
+					.GetByIDActiveNonDeleted(EvlReqId.Value))?.OrgTreeId;
+			}
+			else
+			{
+				OrgTreeId = requestObj?.EvaluationRequest?.OrgTreeId
+					?? requestObj?.OrgTreeId;
+			}
+
+			//if (OrgTreeId == Guid.Empty)
+			//	throw new BusinessException(ExceptionMessage.UserNotFound);
 
 			var dropDownTask = _srvDropdown.GetDropDownValuesForAction(
 				 OrgTreeId,

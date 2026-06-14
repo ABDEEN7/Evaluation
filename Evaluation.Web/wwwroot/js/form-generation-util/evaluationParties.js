@@ -345,7 +345,19 @@
                   </div>
                 `
                 : ``;
-
+            const showFormAnalysis = true;// party?.type?.backendName === "ClassroomObservation";
+            const formAnalysisHtml = showFormAnalysis
+                ? `
+                    <div class="mb-3 text-end">
+                        <a href="javascript:void(0)"
+                           class="btn btn-sm btn-outline-primary"
+                           onclick="openFormAnalysis('${requestId}')">
+                            <i class="las la-chart-bar"></i>
+                            تحليل الاستمارة
+                        </a>
+                    </div>
+                  `
+                : '';
             const expanded = expandFirst && idx === 0;
             var filedivid = "Filediv_" + partyId;
             const filesHTML = `
@@ -442,6 +454,8 @@
                      aria-labelledby="${headerId}"
                      data-bs-parent="#${escapeHtml(parentAccordionId)}">
                   <div class="accordion-body">
+
+                      ${formAnalysisHtml}
 
                     ${servicesHtml}
 
