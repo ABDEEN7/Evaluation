@@ -6,13 +6,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Evaluation.DAL.Models.ServiceEnities
+namespace Evaluation.DAL.Models.FormsModules
 {
-    public class ServiceType : EntityBase, IAuditLogEntity
+    public class EvalPartyCategory : EntityBase, IAuditLogEntity
     {
-        public string BackendName { get; set; } = null!;
         public string NameAr { get; set; } = null!;
-        public string NameEn { get; set; } = null!;
-        public int OrderNo { get; set; } = 0;
+        public string NameEN { get; set; } = null!;
+        public string BackendName { get; set; } = null!;
+        public int OrderNo { get; set; }
+
     }
 }
