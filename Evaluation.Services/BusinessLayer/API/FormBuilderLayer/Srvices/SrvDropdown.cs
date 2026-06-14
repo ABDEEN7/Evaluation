@@ -294,7 +294,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             return dropdownValue;
         }
 
-        public async Task<List<DropDownValueDTO?>> GetDropDownValuesForAction(Guid? PlanId, Guid? EvalId, Guid actionId, string? dropDownTypeIds, string lang, Guid? requestId)
+        public async Task<List<DropDownValueDTO?>> GetDropDownValuesForAction(Guid? SchoolId, Guid? EvalId, Guid actionId, string? dropDownTypeIds, string lang, Guid? requestId)
         {
             var dropDownTypeIdsList = ParseDropDownTypeIds(dropDownTypeIds);
 
@@ -302,7 +302,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
             var tasks = new List<Task<List<DropDownValueDTO>>>
                                 {
-                                    LoadRegularDropDowns(allFields, dropDownTypeIdsList, EvalId,PlanId, lang),
+                                    LoadRegularDropDowns(allFields, dropDownTypeIdsList, EvalId,SchoolId, lang),
                                 };
 
             if (requestId.HasValue)
@@ -351,7 +351,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
         }
 
 
-        private async Task<List<DropDownValueDTO>> LoadRegularDropDowns(List<ActionFieldInfo> fields, List<Guid> excludeDropDownTypeIds, Guid? EvalId, Guid? PlanId, string lang)
+        private async Task<List<DropDownValueDTO>> LoadRegularDropDowns(List<ActionFieldInfo> fields, List<Guid> excludeDropDownTypeIds, Guid? EvalId, Guid? SchoolId, string lang)
         {
             var ids = fields
                 .Where(f => !f.IsLazy)
@@ -361,7 +361,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                 .ToList();
 
             return ids.Any()
-                ? await GetDropDownValues(lang, EvalId,  PlanId, ids.Cast<Guid?>().ToList()) ?? new List<DropDownValueDTO>()
+                ? await GetDropDownValues(lang, EvalId, SchoolId, ids.Cast<Guid?>().ToList()) ?? new List<DropDownValueDTO>()
                 : new List<DropDownValueDTO>();
         }
         private async Task<List<DropDownValueDTO>> LoadLazyDropDownsWithValues(List<ActionFieldInfo> fields, Guid requestId, Guid? EvalId)
