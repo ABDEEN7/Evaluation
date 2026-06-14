@@ -1,4 +1,7 @@
-<script src="~/lib/flatpickr/l10n/ar.js"></script>
+<script>
+    <script src="~/lib/flatpickr/l10n/ar.js"></script>
+    <script src="~/lib/flatpickr/l10n/default.js"></script>
+</script>
 /**
  * Template Name: Evalution Dashboard
  * Bootstrap Version: v5.3.1
@@ -133,7 +136,7 @@ const isAr = document.documentElement.lang.toLowerCase().startsWith("ar");
 
     const fp = flatpickr(".dateRange", {
         mode: "range",
-        locale: isAr ? "ar" : "default",
+        locale: isAr ? "ar" : "en",
         dateFormat: "Y-m-d",
         allowInput: true,
 

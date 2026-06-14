@@ -670,7 +670,7 @@
 const isAr = document.documentElement.lang.toLowerCase().startsWith("ar");
 
     flatpickr(".datePicker", {
-        locale: isAr ? "ar" : "default",
+        locale: isAr ? "ar" : "en",
         dateFormat: "Y-m-d",
         allowInput: true
     });
