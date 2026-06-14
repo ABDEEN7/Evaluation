@@ -136,6 +136,7 @@ public partial class EvaluationDbContext : DbContext
     public virtual DbSet<SchoolGradeSection> SchoolGradeSction { get; set; }
     public virtual DbSet<SchoolGradeSectionCourse> SchoolGradeSectionCourse { get; set; }
     public virtual DbSet<SchoolProgram> SchoolProgram { get; set; }
+    public virtual DbSet<EvalPartyCategory> EvalPartyCategory { get; set; }
 
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
