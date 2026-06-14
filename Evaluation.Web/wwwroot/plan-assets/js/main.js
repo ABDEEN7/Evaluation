@@ -1,3 +1,4 @@
+<script src="~/lib/flatpickr/l10n/ar.js"></script>
 /**
  * Template Name: Evalution Dashboard
  * Bootstrap Version: v5.3.1
@@ -128,54 +129,56 @@ $('#userRole').select2({
    
 
   /******DateRange flatpickr********/
+const isAr = document.documentElement.lang.toLowerCase().startsWith("ar");
 
-  const fp = flatpickr(".dateRange", {
-    mode: "range",
-    locale: "ar",
-    dateFormat: "Y-m-d",
-    allowInput: true,
-    onReady: function(selectedDates, dateStr, instance) {
-      const monthsContainer = instance.calendarContainer.querySelector('.flatpickr-months');
+    const fp = flatpickr(".dateRange", {
+        mode: "range",
+        locale: isAr ? "ar" : "default",
+        dateFormat: "Y-m-d",
+        allowInput: true,
 
-      // Create arrow stack container
-      const prev = instance.calendarContainer.querySelector('.flatpickr-prev-month');
-      const next = instance.calendarContainer.querySelector('.flatpickr-next-month');
+        onReady: function(selectedDates, dateStr, instance) {
+            const monthsContainer = instance.calendarContainer.querySelector('.flatpickr-months');
 
-      const arrowStack = document.createElement('div');
-      arrowStack.className = 'fp-arrow-stack';
-      arrowStack.appendChild(prev);
-      arrowStack.appendChild(next);
+            const prev = instance.calendarContainer.querySelector('.flatpickr-prev-month');
+            const next = instance.calendarContainer.querySelector('.flatpickr-next-month');
 
-      // Insert arrow stack at start (left side in RTL)
-      monthsContainer.insertBefore(arrowStack, monthsContainer.firstChild);
+            const arrowStack = document.createElement('div');
+            arrowStack.className = 'fp-arrow-stack';
+            arrowStack.appendChild(prev);
+            arrowStack.appendChild(next);
 
-      // Month/year container remains for dropdowns (right side in RTL)
-      const monthYear = monthsContainer.querySelector('.flatpickr-current-month');
-      monthsContainer.appendChild(monthYear);
+            monthsContainer.insertBefore(arrowStack, monthsContainer.firstChild);
 
-      // Add Apply/Cancel buttons if not already
-      if (!instance.calendarContainer.querySelector('.fp-btns')) {
-        const btns = document.createElement('div');
-        btns.className = 'fp-btns';
-        const cancel = document.createElement('button');
-        cancel.className = 'fp-cancel';
-        cancel.textContent = 'إلغاء';
-        cancel.addEventListener('click', e => {
-          e.preventDefault();
-          instance.clear();
-          instance.close();
-        });
-        const apply = document.createElement('button');
-        apply.className = 'fp-apply';
-        apply.textContent = 'تأكيد';
-        apply.addEventListener('click', e => {
-          e.preventDefault();
-          instance.close();
-        });
-        btns.appendChild(cancel);
-        btns.appendChild(apply);
-        instance.calendarContainer.appendChild(btns);
-      }
-    }
-  });
+            const monthYear = monthsContainer.querySelector('.flatpickr-current-month');
+            monthsContainer.appendChild(monthYear);
+
+            if (!instance.calendarContainer.querySelector('.fp-btns')) {
+                const btns = document.createElement('div');
+                btns.className = 'fp-btns';
+
+                const cancel = document.createElement('button');
+                cancel.className = 'fp-cancel';
+                cancel.textContent = isAr ? 'إلغاء' : 'Cancel';
+                cancel.addEventListener('click', e => {
+                    e.preventDefault();
+                    instance.clear();
+                    instance.close();
+                });
+
+                const apply = document.createElement('button');
+                apply.className = 'fp-apply';
+                apply.textContent = isAr ? 'تأكيد' : 'Apply';
+                apply.addEventListener('click', e => {
+                    e.preventDefault();
+                    instance.close();
+                });
+
+                btns.appendChild(cancel);
+                btns.appendChild(apply);
+                instance.calendarContainer.appendChild(btns);
+            }
+        }
+    });
+
 })();

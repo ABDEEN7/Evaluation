@@ -667,11 +667,10 @@
         width: '100%',
         multiple: true
     });
-    flatpickr('#evaluationRequestDateFrom', {
-        dateFormat: "Y-m-d",
-        allowInput: true
-    });
-    flatpickr("#evaluationRequestDateTo", {
+const isAr = document.documentElement.lang.toLowerCase().startsWith("ar");
+
+    flatpickr(".datePicker", {
+        locale: isAr ? "ar" : "default",
         dateFormat: "Y-m-d",
         allowInput: true
     });
