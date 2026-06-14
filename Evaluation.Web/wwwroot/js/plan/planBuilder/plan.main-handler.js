@@ -247,17 +247,20 @@
             $select.append(`<option value="${fromEval.id}">${fromEval.name}</option>`);
         });
     };
-    const initializeFilterDatePickers = (fieldId) => {
+ const initializeFilterDatePickers = (fieldId) => {
         const dateFields = ['filterLastEvalDate', 'filterCreatedDate', 'filterNextEvalDate'];
+
+        const isAr = document.documentElement.lang.toLowerCase().startsWith('ar');
 
         dateFields.forEach(field => {
             const $input = $p(fieldId, field);
 
             if ($input.length && typeof flatpickr !== 'undefined') {
                 flatpickr($input[0], {
-                    locale: "en",
+                    locale: isAr ? "ar" : "default",
                     dateFormat: "Y-m-d",
-                    allowInput: true
+                    allowInput: true,
+                    disableMobile: true
                 });
             }
         });

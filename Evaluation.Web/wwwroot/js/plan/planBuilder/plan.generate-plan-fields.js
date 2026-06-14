@@ -122,7 +122,7 @@ const planUtility = window.planUtility;
                                 <input type="text"
                                        id="${pid(fieldId, 'parentDate')}"
                                        name="dateRange"
-                                       class="form-control"
+                                       class="form-control datePicker"
                                        placeholder="${t('plhChooseStartEndDate')}">
                                 <span class="input-group-text">
                                     <i class="la la-calendar"></i>
@@ -251,7 +251,7 @@ const planUtility = window.planUtility;
                                 <input type="text"
                                        id="${pid(fieldId, 'filterLastEvalDate')}"
                                        name="lastEvalDate"
-                                       class="form-control filter-date-picker"
+                                     class="form-control datePicker"
                                        placeholder="${t('plhChooseDate')}">
                             </div>
                         </div>
@@ -264,7 +264,7 @@ const planUtility = window.planUtility;
         <input type="text"
                id="${pid(fieldId, 'filterCreatedDate')}"
                name="createdDate"
-               class="form-control filter-date-picker"
+             class="form-control datePicker"
                placeholder="${t('plhChooseDate')}"
                readonly>
     </div>
@@ -275,7 +275,7 @@ const planUtility = window.planUtility;
         <input type="text"
                id="${pid(fieldId, 'filterToCreatedDate')}"
                name="toCreatedDate"
-               class="form-control filter-date-picker"
+             class="form-control datePicker"
                placeholder="${t('plhChooseDate')}"
                readonly>
     </div>
@@ -289,7 +289,7 @@ const planUtility = window.planUtility;
                                 <input type="text"
                                        id="${pid(fieldId, 'filterNextEvalDate')}"
                                        name="nextEvalDate"
-                                       class="form-control filter-date-picker"
+                                     class="form-control datePicker"
                                        placeholder="${t('plhChooseDate')}">
                             </div>
                         </div>
