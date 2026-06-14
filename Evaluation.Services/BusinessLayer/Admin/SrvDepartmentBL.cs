@@ -6,6 +6,7 @@ using Evaluation.DAL.Models.Org;
 using Evaluation.DAL.Models.SystemSetting;
 using Evaluation.DAL.Models.Website;
 using Evaluation.DAL.Repositories;
+using Evaluation.Services.BusinessLayer.API.DepartmentLayer;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Exceptions;
@@ -13,6 +14,9 @@ using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Admin;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using System.Diagnostics;
+using System.Drawing;
+using Xceed.Document.NET;
 using static Evaluation.SharedHelper.Enums.ConstantKeys;
 namespace Evaluation.Services.Models.Admin
 {
@@ -43,120 +47,157 @@ namespace Evaluation.Services.Models.Admin
 
         }
 
-        public async Task<DepartmentDTO> SaveDepartment(DepartmentDTO message, List<WebsiteAttachmentDTO>? filemodel)
+        public async Task<DepartmentDTO> SaveDepartment(
+        DepartmentDTO message,
+        List<WebsiteAttachmentDTO>? filemodel)
         {
+            var backendName = await GenerateBackendNameByTitle(message.NameEn);
 
-
-
-            var BackendName = await GenerateBackendNameByTitle(message.NameEn);
             var existBackendName = await uow
-             .GetRepository<Department>()
-                  .GetAllNonDeleted(x => x.BackendName == BackendName)
-                  .FirstOrDefaultAsync();
+                .GetRepository<Department>()
+                .GetAllNonDeleted(x => x.BackendName == backendName)
+                .FirstOrDefaultAsync();
 
             if (existBackendName != null)
             {
-
                 message.ResponseStatus = DBResult.BackendExist;
                 return message;
             }
-            if (filemodel != null)
+
+            #region Attachments
+
+            if (filemodel != null && filemodel.Count > 0)
             {
-                if (filemodel.Count > 0)
+                foreach (var item in filemodel)
                 {
-
-                    foreach (var item in filemodel)
+                    var attachment = new WebsiteAttachment
                     {
-                        WebsiteAttachment attachment = new WebsiteAttachment();
-                        attachment.FileName = item.FileName;
-                        attachment.UiFileName = item.UiFileName;
-                        attachment.BlobUrl = item.BlobUrl;
-                        attachment.FileExtension = item.FileExtension;
-                        attachment.FileSize = item.FileSize;
-                        attachment.IsActive = true;
-                        await uow.GetRepository<WebsiteAttachment>().InsertAsync(attachment);
+                        FileName = item.FileName,
+                        UiFileName = item.UiFileName,
+                        BlobUrl = item.BlobUrl,
+                        FileExtension = item.FileExtension,
+                        FileSize = item.FileSize,
+                        IsActive = true
+                    };
 
-                        switch (item.ControlFileName)
-                        {
-                            case "DepartmentDepImageFileNameAr":
-                                message.DepImageFileNameAr_BlobURL = item.BlobUrl;
-                                message.DepImageFileNameAr = item.FileName;
-                                message.DepImageFileNameAr_UiFileName = item.UiFileName;
+                    await uow.GetRepository<WebsiteAttachment>()
+                        .InsertAsync(attachment);
 
-                                break;
-                            case "DepartmentDepImageFileNameEn":
-                                message.DepImageFileNameEn_BlobURL = item.BlobUrl;
-                                message.DepImageFileNameEn = item.FileName;
-                                message.DepImageFileNameEn_UiFileName = item.UiFileName;
+                    switch (item.ControlFileName)
+                    {
+                        case "DepartmentDepImageFileNameAr":
+                            message.DepImageFileNameAr_BlobURL = item.BlobUrl;
+                            message.DepImageFileNameAr = item.FileName;
+                            message.DepImageFileNameAr_UiFileName = item.UiFileName;
+                            break;
 
-                                break;
-                            case "WebsiteAttachmentId":
-                                message.WebsiteAttachmentId = attachment.Id;
-                                break;
-                        }
+                        case "DepartmentDepImageFileNameEn":
+                            message.DepImageFileNameEn_BlobURL = item.BlobUrl;
+                            message.DepImageFileNameEn = item.FileName;
+                            message.DepImageFileNameEn_UiFileName = item.UiFileName;
+                            break;
+
+                        case "WebsiteAttachmentId":
+                            message.WebsiteAttachmentId = attachment.Id;
+                            break;
                     }
-
-
                 }
-
             }
-            Department obj = new Department();
 
-            obj.NameAr = message.NameAr;
-            obj.NameEn = message.NameEn;
-            obj.BackendName = BackendName;
-            obj.RoutingPath = message.RoutingPath;
-            obj.DepIcon = message.DepIcon;
-            obj.IsEvaluated = message.IsEvaluated;
-            //obj.TargetOrgTreeId = message.TargetOrgTreeId;
-            //obj.CategoryId = message.CategoryId;
-            obj.IsNDA = message.IsNDA;
-            obj.DescAr = message.DescAr;
-            obj.DescEn = message.DescEn;
-            obj.WebsiteAttachmentId = message.WebsiteAttachmentId;
-            obj.IsActive = message.IsActive;
+            #endregion
 
-
-            obj.DepImageFileNameAr = message.DepImageFileNameAr;
-            if (message.DepImageFileNameAr_UiFileName != null && message.DepImageFileNameAr_UiFileName.Length > 45)
+            var department = new Department
             {
-                obj.DepImageUiFileNameAr = message.DepImageFileNameAr_UiFileName != null
-                    ? message.DepImageFileNameAr_UiFileName.Substring(0, 40) +
-                      message.DepImageFileNameAr_UiFileName.Substring(message.DepImageFileNameAr_UiFileName.Length - 5)
-                    : null;
-                ;
-            }
-            else
+                NameAr = message.NameAr,
+                NameEn = message.NameEn,
+                BackendName = backendName,
+                RoutingPath = message.RoutingPath,
+                DepIcon = message.DepIcon,
+                IsEvaluated = message.IsEvaluated,
+                IsNDA = message.IsNDA,
+                DescAr = message.DescAr,
+                DescEn = message.DescEn,
+                WebsiteAttachmentId = message.WebsiteAttachmentId,
+                IsActive = message.IsActive,
+
+                DepImageFileNameAr = message.DepImageFileNameAr,
+                DepImageUiFileNameAr =
+                    !string.IsNullOrEmpty(message.DepImageFileNameAr_UiFileName) &&
+                    message.DepImageFileNameAr_UiFileName.Length > 45
+                        ? message.DepImageFileNameAr_UiFileName.Substring(0, 40) +
+                          message.DepImageFileNameAr_UiFileName.Substring(
+                              message.DepImageFileNameAr_UiFileName.Length - 5)
+                        : message.DepImageFileNameAr_UiFileName,
+
+                DepImageBlobUrlAr = message.DepImageFileNameAr_BlobURL,
+
+                DepImageFileNameEn = message.DepImageFileNameEn,
+                DepImageUiFileNameEn =
+                    !string.IsNullOrEmpty(message.DepImageFileNameEn_UiFileName) &&
+                    message.DepImageFileNameEn_UiFileName.Length > 45
+                        ? message.DepImageFileNameEn_UiFileName.Substring(0, 40) +
+                          message.DepImageFileNameEn_UiFileName.Substring(
+                              message.DepImageFileNameEn_UiFileName.Length - 5)
+                        : message.DepImageFileNameEn_UiFileName,
+
+                DepImageBlobUrlEn = message.DepImageFileNameEn_BlobURL,
+                SystemModules = new List<SystemModule>()
+            };
+
+            var systemModuleTypes = uow
+                .GetRepository<SystemModuleType>()
+                .GetAllActiveNonDeleted(x =>
+                    EvaluationModuleDefaultTypes.Contains(x.BackendName))
+                .ToList();
+
+            int orderNo = 1;
+
+            foreach (var item in systemModuleTypes)
             {
-                obj.DepImageUiFileNameAr = message.DepImageFileNameAr_UiFileName;
-
+                department.SystemModules.Add(new SystemModule
+                {
+                    NameEn = item.NameEn,
+                    NameAr = item.NameAr,
+                    OrderNo = orderNo++,
+                    DescriptionAr = item.NameAr,
+                    DescriptionEn = item.NameEn,
+                    SystemModuleTypeId = item.Id,
+                    Routing = EvaluationModuleRoutingMap
+                    .TryGetValue(item.BackendName, out var routing) ? routing : null,
+                    NoDefinition = "EPP_yy",
+                    Icon = "fa fa-clipboard",
+                    BackendName = department.BackendName + item.BackendName,
+                    CreateById = userInfo.UserId ?? Guid.Empty
+                });
             }
-            obj.DepImageBlobUrlAr = message.DepImageFileNameAr_BlobURL;
-
-
-            obj.DepImageFileNameEn = message.DepImageFileNameEn;
-            if (message.DepImageFileNameEn != null && message.DepImageFileNameEn.Length > 45)
+            uow.GetRepository<Department>().Insert(department);
+            foreach (var sm in department.SystemModules)
             {
-                obj.DepImageFileNameEn = message.DepImageFileNameEn != null
-                    ? message.DepImageFileNameEn.Substring(0, 40) +
-                      message.DepImageFileNameEn.Substring(message.DepImageFileNameEn.Length - 5)
-                    : null;
-                ;
+                Debug.WriteLine($"CreateById = {sm.CreateById}");
             }
-            else
-            {
-                obj.DepImageFileNameEn = message.DepImageFileNameEn;
-
-            }
-            obj.DepImageBlobUrlEn = message.DepImageFileNameEn_BlobURL;
-
-            uow.GetRepository<Department>().Insert(obj);
             await uow.CommitAsync();
-            var result = mapper.Map<DepartmentDTO>(obj, opts => opts.Items["Language"] = _requestInfo.Lang);
-            result.ResponseStatus = DBResult.Inserted;
-            return result;
 
+            var result = mapper.Map<DepartmentDTO>(
+                department,
+                opts => opts.Items["Language"] = _requestInfo.Lang);
+
+            result.ResponseStatus = DBResult.Inserted;
+
+            return result;
         }
+        private static readonly Dictionary<string, string> EvaluationModuleRoutingMap =
+    new(StringComparer.OrdinalIgnoreCase)
+    {
+        { SystemModuleTypeBackend.EvaluationParty, SystemModuleRouting.EvaluationParty },
+        { SystemModuleTypeBackend.EvaluationPlan, SystemModuleRouting.EvaluationPlan },
+        { SystemModuleTypeBackend.EvaluationRequest, SystemModuleRouting.EvaluationRequest }
+    };
+        private static readonly string[] EvaluationModuleDefaultTypes =
+       {
+            SystemModuleTypeBackend.EvaluationParty,
+            SystemModuleTypeBackend.EvaluationPlan,
+            SystemModuleTypeBackend.EvaluationRequest
+        };
         public async Task<DepartmentDTO> UpdateDepartment(DepartmentDTO message, List<WebsiteAttachmentDTO>? filemodel)
         {
 

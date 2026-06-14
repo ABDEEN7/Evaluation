@@ -32,5 +32,6 @@ public class Department : EntityBase, IAuditLogEntity
     public virtual ICollection<AcademicYear>? AcademicYears { get; set; }
     public virtual ICollection<WebGroup>? WebGroup { get; set; }
     public virtual ICollection<DepTargetOrgTree>? DepTargetOrgTrees { get; set; }
+    public virtual ICollection<SystemModule>? SystemModules { get; set; }
 
 }

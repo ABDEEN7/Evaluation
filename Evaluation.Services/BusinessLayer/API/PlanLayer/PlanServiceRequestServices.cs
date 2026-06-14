@@ -1,8 +1,6 @@
-﻿using Aspose.Words.Lists;
-using AutoMapper;
+﻿using AutoMapper;
 using Evaluation.DAL.Dtos;
 using Evaluation.DAL.Helper;
-using Evaluation.DAL.Models.DepartementEntites;
 using Evaluation.DAL.Models.FormsModules;
 using Evaluation.DAL.Models.Planing;
 using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
@@ -21,8 +19,8 @@ using Evaluation.SharedHelper.Dtos.SchoolDto;
 using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Models;
-using Evaluation.SharedHelper.Models.Api;
 using FluentResults;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System.Globalization;
@@ -143,6 +141,18 @@ public class PlanServiceRequestServices(
     }
     public async Task DeletePlanById(Guid id)
     {
+        var hasResquestsCannotDelete = unitOfWork
+       .GetRepository<EvaluationRequest>()
+       .GetAllNonDeleted(x => x.PlanId == id).ToList();
+        var hasRequestsCannotDelete = unitOfWork
+       .GetRepository<EvaluationRequest>()
+       .GetAllNonDeleted(x => x.PlanId == id)
+       .Any(x => !x.ServiceStatus.IsInitial);
+
+        if (hasRequestsCannotDelete)
+        {
+            throw new BusinessException(ConstantKeys.ExceptionMessage.CannotDeletePlanInProcess);
+        }
         var request = await planRepository.DeletePlan(id);
     }
     private static void ValidateSchool(SelectedSchool school,

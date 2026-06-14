@@ -2,6 +2,7 @@ using Evaluation.Admin.ActionFilter;
 using Evaluation.Admin.Extensions;
 using Evaluation.Admin.Models;
 using Evaluation.DAL.Helper;
+using Evaluation.DAL.Models.DepartementEntites;
 using Evaluation.DAL.Models.ServiceRequestEntities;
 using Evaluation.Services.BusinessLayer;
 using Evaluation.Services.Models.Admin;
@@ -48,10 +49,10 @@ namespace Evaluation.Admin.Controllers
         }
         [HttpGet]
         [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.AdminPermission.VIEW_ADMIN_ServiceStatusConfiguration })]
-        public async Task<IActionResult> GetAllServiceStatusConfiguration(Guid ServiceId,int Page = 1)
+        public async Task<IActionResult> GetAllServiceStatusConfiguration(Guid ServiceId, Guid systemModuleId, int Page = 1)
         {
             var PageSize =  Convert.ToInt32(masterBL.GetAdminService<SrvSystemSettingBL>().GetSetting(ConstantKeys.AdminSettings.ADMIN_PAGE_SIZE));
-            var response = await masterBL.GetAdminService<SrvServiceStatusConfigurationBL>().GetServiceStatusConfigurationList(Page, PageSize,ServiceId);
+            var response = await masterBL.GetAdminService<SrvServiceStatusConfigurationBL>().GetServiceStatusConfigurationList(Page, PageSize,ServiceId, systemModuleId);
             return Ok(response);
         }
 
@@ -98,8 +99,19 @@ namespace Evaluation.Admin.Controllers
                 return Ok(result);
             
         }
-
         
-       
+        [HttpGet]
+        [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.AdminPermission.DELETE_ADMIN_ServiceStatusConfiguration })]
+        public async Task<IActionResult> GetAllServiceStatus(Guid systemModuleId, Guid departmentId)
+        {
+
+            Dictionary<string, object> response = new Dictionary<string, object>();
+            var User = await masterBL.GetAdminService<SrvServiceStatusConfigurationBL>().GetServiceStatuis(systemModuleId, departmentId);
+            response.Add("ServiceStatuis", User);
+            return Ok(new ResponseEntity(response));
+        }
+
+
+
     }
 }

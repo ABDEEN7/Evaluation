@@ -187,8 +187,13 @@ $(document).ready(function () {
 
 
                         ],
-
                     });
+                    $('#selectAllIsActive').off('change').on('change', function () {
+                        const checked = this.checked;
+                        tabulatorTable.getRows().forEach(row => {
+                            row.update({ isActive: checked });
+                        });
+                        });
 
                     DisableAllElementsForTabulator(tabulatorTable, disableTable);
 

@@ -31,13 +31,13 @@
     } = window.PlanConstants || {};
 
     // ================== STATE MANAGEMENT (Per Instance) ==================
-    // ⚠️ تم نقل الـ state إلى main-handler ليكون منفصل لكل instance
     ns.visitTypes = [];
     ns.planTypes = [];
     ns.semesters = [];
     ns.holidays = [];
     ns.parentSchool = [];
     ns.fomrEvalMatrixValue = [];
+    ns.currentAcademicYear = null;
     ns.currentPage = 1;
     ns.pageSize = 10;
 
@@ -286,7 +286,7 @@
         const levelBadge = $('<div>').addClass('square-bullet mt-1');
         const levelText = (school.schoolLevel && school.schoolLevel.length > 0)
             ? school.schoolLevel.map(l => l.name).join(', ')
-            : t('lblPrimary') || 'ابتدائي'; 
+            : t('lblPrimary') || 'ابتدائي';
 
         levelBadge.append($('<div>').text(levelText));
         infoDiv.append(levelBadge);
@@ -409,10 +409,10 @@
                 .attr('data-backendname', type.backendName);
 
             if (shouldAutoSelect && type.backendName === 'Periodicevaluation') {
-                
+
                 option.prop('selected', true);
             } else if (school.visitType === type.name || school.visitTypeId === type.id) {
- 
+
                 option.prop('selected', true);
             }
 
@@ -479,7 +479,7 @@
         row.append(lastEvalCell);
         // Visit type cell
         const visitTypeCell = $('<td>');
-        visitTypeCell.append(generateVisitTypeField(fieldId, school, readonly, isSelected, shouldAutoSelect));
+        visitTypeCell.append(generateVisitTypeField(fieldId, school, readonly, isSelected));
         row.append(visitTypeCell);
 
         // Academic year cell

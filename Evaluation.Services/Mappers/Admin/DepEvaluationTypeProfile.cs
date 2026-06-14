@@ -10,5 +10,9 @@ public class DepEvaluationTypeProfile : Profile
     public DepEvaluationTypeProfile()
     {
         CreateMap<DepEvaluationType, DepEvaluationTypeDto>();
+        CreateMap<DepEvaluationType, ResponseDepEvaluationTypeDto>()
+            .ForMember(x => x.Department, opt => opt.MapFrom(src => src.Department.BackendName))
+            .ForMember(s => s.EvaluationType, opt => opt.MapFrom(src => src.EvaluationType.BackendName))
+            .ForMember(dest => dest.UpdateBy, opt => opt.MapFrom<UserProfileResolver, Guid?>(src => src.UpdateById.HasValue ? src.UpdateById : src.CreateById));
     }
 }

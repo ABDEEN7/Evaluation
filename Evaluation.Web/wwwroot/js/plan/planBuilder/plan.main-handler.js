@@ -81,7 +81,10 @@
                     loadVisitTypes(),
                     loadVacationDays(),
                     loadParentOrgTree(),
-                    loadFomrEvalMatrixValue()
+                    loadFomrEvalMatrixValue(),
+                    loadCurrentAcademicYear(),
+                    loadSchoolLevels(),
+                    loadSchoolGenders()
                 ]);
             }
 
@@ -97,6 +100,8 @@
             populateFilterVisitTypes(fieldId);
             populateFilterParentOrgTree(fieldId);
             populateFilterPreviousResult(fieldId);
+            populateFilterSchoolLevels(fieldId);
+            populateFilterGenders(fieldId);   
         } catch (e) {
             console.error(`[PlanHandler] Init failed for ${fieldId}`, e);
             alert('حدث خطأ أثناء التحميل');
@@ -137,6 +142,14 @@
     const loadFomrEvalMatrixValue = () =>
         jqClient().Get(API_ENDPOINTS.GetFomrEvalMatrixValue)
             .then(r => ns.fomrEvalMatrixValue = r?.result || []);
+
+    const loadCurrentAcademicYear = () =>
+        jqClient().Get(API_ENDPOINTS.GET_CurrentAcademicYear)
+            .then(r => {
+                ns.currentAcademicYear = r
+                    ? { start: new Date(r.startDate), end: new Date(r.endDate) }
+                    : null;
+            });
 
     /* ===================== POPULATE ===================== */
 
@@ -249,6 +262,20 @@
             }
         });
     };
+    const populateFilterSchoolLevels = (fieldId) => {
+        const $select = $p(fieldId, 'filterSchoolLevel');
+        ns.schoolLevels?.forEach(level => {
+            $select.append($('<option>').val(level.id).text(level.name));
+        });
+    };
+
+    const populateFilterGenders = (fieldId) => {
+        const $select = $p(fieldId, 'filterGender');
+        ns.schoolGenders?.forEach(g => {
+            $select.append($('<option>').val(g.backendName).text(g.name));
+        });
+    };
+
 
     /* ===================== RENDER ===================== */
 
@@ -258,7 +285,7 @@
         const form = ns.renderPlanForm(fieldId, null, state.isReadOnly);
         $p(fieldId, 'planFormContainer').find('.form-container').html(form);
 
-        // ✅ تحميل المدارس من Backend
+        
         loadSchools(fieldId, 1);
         initCustomMode(fieldId);
     };
@@ -427,13 +454,13 @@
         state.currentPage = page;
         state.filters = filters;
 
-        // ✅ بناء الـ query parameters
+        // query parameters
         const params = new URLSearchParams({
             pageNumber: page,
             pageSize: state.pageSize
         });
 
-        // ✅ إضافة البحث
+        // 
         if (state.searchTerm) {
             params.append('search', state.searchTerm);
         }
@@ -470,6 +497,13 @@
             });
     };
 
+    const loadSchoolLevels = () =>
+        jqClient().Get(API_ENDPOINTS.GETEDUCATION_LEVEL)
+            .then(r => ns.schoolLevels = r?.result || []);
+
+    const loadSchoolGenders = () =>
+        jqClient().Get(API_ENDPOINTS.GET_SCHOOL_GENDER)
+            .then(r => ns.schoolGenders = r?.result || []);
     /* ===================== PAGINATION ===================== */
 
     const renderPagination = (fieldId) => {
@@ -583,13 +617,11 @@
                 onSemesterChange(fieldId, this);
             });
 
-        // ✅ البحث: استدعاء API بعد 300ms من التوقف عن الكتابة
         $wrapper.off('input', pid(fieldId, 'customSearch'))
             .on('input', pid(fieldId, 'customSearch'), function () {
                 onSearch(fieldId, this);
             });
 
-        // ✅ الفلتر: استدعاء API مع الفلاتر
         $wrapper.off('submit', pid(fieldId, 'filterForm'))
             .on('submit', pid(fieldId, 'filterForm'), function (e) {
                 onFilter(fieldId, e);
@@ -599,41 +631,56 @@
             .on('click', pid(fieldId, 'clearFiltersBtn'), function () {
                 clearFilters(fieldId);
             });
+        $wrapper.off('change', `#${pidRaw(fieldId, 'filterSchoolLevel')}`)
+            .on('change', `#${pidRaw(fieldId, 'filterSchoolLevel')}`, function () {
+                populateFilterGrades(fieldId, $(this).val());
+            });
     };
 
     const attachRowEvents = (fieldId) => {
         const $table = $p(fieldId, 'planTable');
         const state = instances.get(fieldId);
 
-        $table.find('tr[data-auto-selected="true"]').each(function () {
-            const $row = $(this);
-            const schoolId = $row.find('.selectRow').data('school-id');
-            const schoolName = $row.find('.selectRow').data('name');
-            const visitDate = $row.find(`.childDate[data-school-id="${schoolId}"]`).val();
-            const visitTypeId = $row.find(`.visitTypeSelect[data-school-id="${schoolId}"]`).val();
-            console.log('auto-selected row:', schoolId, 'visitTypeId:', visitTypeId);
-            console.log('select element:', $row.find(`.visitTypeSelect[data-school-id="${schoolId}"]`).length);
-            console.log('select HTML:', $row.find(`.visitTypeSelect[data-school-id="${schoolId}"]`)[0]?.outerHTML);
-            if (schoolId) {
-                state.selectedSchoolsMap.set(schoolId, {
-                    id: schoolId,
-                    name: schoolName,
-                    visitDate: visitDate,
-                    visitTypeId: visitTypeId
-                });
-            }
-        });
-
-        state.selectedSchools = Array.from(state.selectedSchoolsMap.values());
-        updateSelectionCounter(fieldId);
         $table.find('.selectRow').off('change').on('change', function () {
             updateSelectedSchools(fieldId);
         });
+
         $table.find('.childDate').off('change').on('change', function () {
-            updateSelectedSchools(fieldId);
+            const schoolId = $(this).data('school-id');
+            const newDate = $(this).val();
+            if (state.selectedSchoolsMap && state.selectedSchoolsMap.has(schoolId)) {
+                state.selectedSchoolsMap.get(schoolId).visitDate = newDate;
+                state.selectedSchools = Array.from(state.selectedSchoolsMap.values());
+            }
         });
+
         $table.find('.visitTypeSelect').off('change').on('change', function () {
-            updateSelectedSchools(fieldId);
+            const schoolId = $(this).data('school-id');
+            const newType = $(this).val();
+
+            if (newType) {
+                const $checkbox = $table.find(`.selectRow[data-school-id="${schoolId}"]`);
+                if (!$checkbox.is(':checked')) {
+                    $checkbox.prop('checked', true);
+                }
+
+                if (!state.selectedSchoolsMap.has(schoolId)) {
+                    const schoolName = $checkbox.data('name');
+                    state.selectedSchoolsMap.set(schoolId, {
+                        id: schoolId,
+                        name: schoolName,
+                        visitDate: $table.find(`.childDate[data-school-id="${schoolId}"]`).val() || '',
+                        visitTypeId: newType
+                    });
+                } else {
+                    state.selectedSchoolsMap.get(schoolId).visitTypeId = newType;
+                }
+                state.selectedSchools = Array.from(state.selectedSchoolsMap.values());
+                updateSelectionCounter(fieldId);
+            } else if (state.selectedSchoolsMap.has(schoolId)) {
+                state.selectedSchoolsMap.get(schoolId).visitTypeId = newType;
+                state.selectedSchools = Array.from(state.selectedSchoolsMap.values());
+            }
         });
     };
 
@@ -666,12 +713,20 @@
     };
 
     const initYearMode = (fieldId) => {
-        const y = new Date().getFullYear();
-        const start = `${y}-01-01`;
-        const end = `${y}-12-31`;
-
-        $p(fieldId, 'parentDate').val(`${start} to ${end}`).prop('disabled', true);
-        ns.initChildPicker(new Date(start), new Date(end));
+        const ay = ns.currentAcademicYear;
+        if (ay?.start && ay?.end) {
+            const start = ns.formatDateISO(ay.start);
+            const end = ns.formatDateISO(ay.end);
+            $p(fieldId, 'parentDate').val(`${start} to ${end}`).prop('disabled', true);
+            ns.initChildPicker(ay.start, ay.end);
+        } else {
+            // fallback to calendar year
+            const y = new Date().getFullYear();
+            const start = `${y}-01-01`;
+            const end = `${y}-12-31`;
+            $p(fieldId, 'parentDate').val(`${start} to ${end}`).prop('disabled', true);
+            ns.initChildPicker(new Date(start), new Date(end));
+        }
     };
 
     const initMonthMode = (fieldId) => {
@@ -730,7 +785,7 @@
 
         clearTimeout(state.searchTimeout);
         state.searchTimeout = setTimeout(() => {
-            // ✅ استدعاء API مع البحث
+
             loadSchools(fieldId, 1, state.filters);
         }, 300);
     };
@@ -746,7 +801,10 @@
             establishmentDate: $p(fieldId, 'filterCreatedDate').val(),
             nextEvalDate: $p(fieldId, 'filterNextEvalDate').val(),
             fomrEvalMatrixValueId: $p(fieldId, 'filterPreviousResult').val(),
-            visitType: $p(fieldId, 'filterVisitType').val()
+            visitType: $p(fieldId, 'filterVisitType').val(),
+            schoolLevel: $p(fieldId, 'filterSchoolLevel').val(),
+            gender: $p(fieldId, 'filterGender').val(),
+            grade: $p(fieldId, 'filterGrade').val()
         };
 
         // حذف القيم الفارغة
@@ -768,7 +826,7 @@
         state.filters = {};
         state.searchTerm = '';
 
-        // مسح الحقول من UI
+
         $p(fieldId, 'filterSchoolName').val('');
         $p(fieldId, 'filterLastEvalDate').val('');
         $p(fieldId, 'filterCreatedDate').val('');
@@ -776,7 +834,11 @@
         $p(fieldId, 'filterPreviousResult').val('');
         $p(fieldId, 'filterVisitType').val('');
         $p(fieldId, 'customSearch').val('');
-        // ✅ إعادة تحميل كل المدارس
+        $p(fieldId, 'filterSchoolLevel').val('');
+        $p(fieldId, 'filterGender').val('');
+        $p(fieldId, 'filterGrade').val('');
+        populateFilterGrades(fieldId, '');
+
         loadSchools(fieldId, 1);
     };
 

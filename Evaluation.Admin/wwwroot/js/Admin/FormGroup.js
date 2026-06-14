@@ -1,9 +1,9 @@
-﻿
-var isScroll = false;
+﻿var isScroll = false;
 var popupname = "";
 var dynamicaction = "";
 let FormGroupTypeList = [];
 let FieldTypeList = [];
+let FieldInfoTypeList = [];
 let SystemFieldList = [];
 let PartyTypeList = [];
 let DropDownTypeList = [];
@@ -66,9 +66,9 @@ function clickHandle(evt, animalName) {
         jqClientAdvanced(options6).Get("FormGroup/GetAllFieldFormGroupList".concat('?serviceid=', serviceId));
     }
     evt.currentTarget.className += " active";
-    
-    
-    
+
+
+
 }
 const LoadAllFormGroup = (FormGrouptype) => {
 
@@ -80,12 +80,12 @@ const LoadAllFormGroup = (FormGrouptype) => {
                     $('#divaccordian').empty();
                     if (result && result.length > 0) {
                         FormGroupList = result;
-                        
+
                         $('#divaccordian').append('<div id="accordion-container" class="ui-sortable"></div>');
                         createAccordion(result);
-                       
-                       
-                        
+
+
+
                     }
                     $('#divFormGroup').show();
                 }
@@ -115,8 +115,8 @@ const createAccordion = (formGroupList) => {
         const className = `card-body-${item.id}`;
         const tableId = `fieldTable-${item.id}`;
         const title = Lang === "ar" ? item.titleAr : item.titleEn;
-       
- 
+
+
         const $accordionItem = $(`
   <div class="card form-group-item mb-3" id="${item.id}">
     <a class="collapsed" data-bs-toggle="collapse" href="#${contentId}" role="button" aria-expanded="false" aria-controls="${contentId}">
@@ -170,8 +170,8 @@ const createAccordion = (formGroupList) => {
 `);
 
         $accordionContainer.append($accordionItem);
-      
-        
+
+
         table=tableUtil.createTabulator({
             id: tableId,
             config: {
@@ -186,12 +186,12 @@ const createAccordion = (formGroupList) => {
             sortDir: "desc",
             columns: fieldtabulatorcolumns,
         });
-       
-        
+
+
         // Add new items to the div
         $(".action-items").append(viewItem).append(duplicateItem);
         loadFieldData(table, item.id);
-        
+
     });
     var serviceid = $("#ServiceId").val();
     $("#accordion-container").sortable({
@@ -219,7 +219,7 @@ const createAccordion = (formGroupList) => {
 
 
     });
-    
+
 };
 
 
@@ -234,13 +234,13 @@ const loadFieldData = (table, formgroupid) => {
 
                 if (data && data.length > 0) {
                     table.addData(data);
-                    
-                    
+
+
                 }
                 else {
                     table.setData([]);
                 }
-               
+
             }
         }
     };
@@ -295,22 +295,22 @@ function Loadtabledata() {
 
 $('#btn-add-content-formgroup').click(function () {
     popupname = "FormGroup";
-    
+
     var modaltitle = sharedFn().GetUiControlText('FormGroupHeader');
     sharedFn().OpenFormPopup(modaltitle, FormGroupcontrolvalidationlist);
-    
+
 });
 function AddFieldRow(tableid, formgroupid,formgroupname) {
-    
-    
+
+
     table = Tabulator.prototype.findTable("#" + tableid)[0];
     controlvalidationlist = Fieldcontrolvalidationlist;
     popupname = "Field";
     var modaltitle = sharedFn().GetUiControlText('FieldHeader') + "  "+formgroupname;
     sharedFn().OpenFormPopup(modaltitle, Fieldcontrolvalidationlist);
     $("#formgroupid").val(formgroupid);
-    
-   
+
+
 }
 function CreateEditForFormGroup(pkId) {
     const obj = table.getData().find(f => f.id == pkId);
@@ -353,7 +353,7 @@ function CreateEditForFormGroup(pkId) {
                 }
 
             });
-            
+
         }
     }
     if (popupname == "FieldAttribute") {
@@ -362,12 +362,12 @@ function CreateEditForFormGroup(pkId) {
         if (exist > 0) {
             $('#FieldAttributeAttributeKeyDropdown').val(attribute).trigger('change');
             $('#FieldAttributeAttributeKey').attr("disabled", "disabled");
-            
+
         }
         else {
             $('#FieldAttributeAttributeKeyDropdown').val('Others').trigger('change');
             $('#FieldAttributeAttributeKey').removeAttr("disabled");
-            
+
         }
         $('#FieldAttributeAttributeKey').val(attribute);
     }
@@ -380,7 +380,7 @@ function FormGroupEdit(item) {
     popupname = "FormGroup";
     var modaltitle = sharedFn().GetUiControlText('FormGroupHeader');
     sharedFn().OpenFormPopup(modaltitle, FormGroupcontrolvalidationlist, objlist);
-    
+
 }
 function FormGroupDelete(item) {
     popupname = "FormGroup";
@@ -423,7 +423,7 @@ const deleteData = (id, urlname=null) => {
                             notificationUtil.error(sharedFn().GetUiControlText('FORMGROUP_CANNOT_BE_DELETED'));
 
                         }
-                       
+
                     }
                     else if (popupname == "Field") {
 
@@ -444,7 +444,7 @@ const deleteData = (id, urlname=null) => {
                             table.deleteRow(id);
                             notificationUtil.success(sharedFn().GetUiControlText('ADMIN_MSG_DELETE'));
                         }
-                       
+
                     }
                     else if (popupname == "FieldCondition") {
 
@@ -466,7 +466,7 @@ const deleteData = (id, urlname=null) => {
     });
 };
 function SetPopupMode() {
-    
+
     if (popupname == "FormGroup") {
         if (ClickedFormGroupType == "List") {
             $('#FormGroupFormGroupCustomList').parent().show();
@@ -483,14 +483,14 @@ function SetPopupMode() {
             else {
                 $('#FormGroupFormGroupCustomList').removeAttr("disabled");
             }
-            
+
         }
         else {
             $('#FormGroupFormGroupCustomList').parent().hide();
         }
         var formgrouptypeid = FormGroupTypeList.find(x => x.backendName == ClickedFormGroupType).id;
         $("#FormGroupFormGroupType").val(formgrouptypeid);
-        
+
     }
     if (popupname == "Field") {
         var FormGroupCustomListId = $("#FieldFormGroupCustomListId").val();
@@ -498,25 +498,25 @@ function SetPopupMode() {
             $('#FieldIsActive').prop('disabled', true);
 
         }
-        
+
 
     }
 }
 
 
 function SetDropDown() {
-   
+
     var controllist = popupname == "FormGroup" ? FormGroupcontrolvalidationlist : popupname == "Field" ? Fieldcontrolvalidationlist : popupname == "FieldCondition" ? FieldConditioncontrolvalidationlist : popupname == "FieldAttribute" ? FieldAttributecontrolvalidationlist : null;
-   
+
     if (controllist) {
         var dropdownlist = controllist.filter(c => c.constraint.controlType == 'DROPDOWN' || c.constraint.controlType == 'MULTIDROPDOWN');
         if (dropdownlist.length > 0) {
             dropdownlist.forEach(item => {
                 var constrain = item.constraint;
-                
+
                 if (constrain.controlName == "FormGroupId") {
-                   
-                  var  FormGroup= FormGroupList.map(dpitem => (
+
+                    var FormGroup= FormGroupList.map(dpitem => (
                         {
                             id: dpitem.id,
                             text: txtDir === "RTL" ? dpitem.titleAr : dpitem.titleEn
@@ -529,10 +529,28 @@ function SetDropDown() {
                         data: FormGroup,
                         placeholder: sharedFn().GetUiControlText(constrain.uibackendName),
                         dropdownCssClass: "manageselect2zindex",
-                        dropdownParent: $("#ModalPopup"),   
+                        dropdownParent: $("#ModalPopup"),
                     })
                     $dropdown.val('').trigger('change');
 
+                };
+                if (constrain.controlName == "FieldInfoTypeId") {
+                    var ddldata = FieldInfoTypeList.map(item => (
+                        {
+                            id: item.id,
+                            text: txtDir === "RTL" ? item.nameAr : item.nameEn
+                        }
+                    ));
+                    var $dropdown = $('#' + constrain.uibackendName);
+                    $dropdown.select2({
+                        width: 'resolve',
+                        allowClear: true,
+                        data: ddldata,
+                        placeholder: sharedFn().GetUiControlText(constrain.uibackendName),
+                        dropdownCssClass: "manageselect2zindex",
+                        dropdownParent: $("#ModalPopup"),
+                    });
+                    $dropdown.val('').trigger('change');
                 };
                 if (constrain.controlName == "FieldTypeId") {
                     var ddldata = FieldTypeList.map(item => (
@@ -548,20 +566,19 @@ function SetDropDown() {
                         data: ddldata,
                         placeholder: sharedFn().GetUiControlText(constrain.uibackendName),
                         dropdownCssClass: "manageselect2zindex",
-                        dropdownParent: $("#ModalPopup"),   
+                        dropdownParent: $("#ModalPopup"),
                     }).on("change", event => {
                         var data = event.target.value;
                         if (data) {
                             var selectedvalue = FieldTypeList.find(x => x.id == data).backendName;
-                            if (selectedvalue == "dropdown" || selectedvalue == "select2" ) {
+                            if (selectedvalue == "dropdown" || selectedvalue == "select2") {
                                 showdropdown(true);
                                 $("#FieldFormGroupList").parent().hide();
                                 $("#FieldFormGroupList").val('').trigger('change');
                                 $("#FieldEvalFormId").parent().hide();
                                 $("#FieldEvalFormId").val('').trigger('change');
                             }
-                            else if (selectedvalue == "list")
-                            {
+                            else if (selectedvalue == "list") {
                                 $("#FieldFormGroupList").parent().show();
                                 showdropdown(false);
                             }
@@ -575,9 +592,9 @@ function SetDropDown() {
                                 $("#FieldEvalFormId").parent().hide();
                                 $("#FieldEvalFormId").val('').trigger('change');
                                 showdropdown(false);
-                               
+
                             }
-                            
+
                         }
                         else {
                             showdropdown(false);
@@ -586,7 +603,7 @@ function SetDropDown() {
                             $("#FieldEvalFormId").parent().hide();
                             $("#FieldEvalFormId").val('').trigger('change');
                         }
-                        
+
                     }).on("select2:unselecting", function (e) {
                         showdropdown(false);
                         $("#FieldFormGroupList").parent().hide();
@@ -634,7 +651,7 @@ function SetDropDown() {
                             dropdownParent: $("#ModalPopup"),
                         })
                     }
-                    
+
                     $dropdown.val('').trigger('change');
 
                 };
@@ -647,7 +664,7 @@ function SetDropDown() {
                         data: PartyTypeList,
                         placeholder: sharedFn().GetUiControlText(constrain.uibackendName),
                         dropdownCssClass: "manageselect2zindex",
-                        dropdownParent: $("#ModalPopup"),   
+                        dropdownParent: $("#ModalPopup"),
                     })
                     $dropdown.val('').trigger('change');
 
@@ -661,7 +678,7 @@ function SetDropDown() {
                         data: DropDownTypeList,
                         placeholder: sharedFn().GetUiControlText(constrain.uibackendName),
                         dropdownCssClass: "manageselect2zindex",
-                        dropdownParent: $("#ModalPopup"),   
+                        dropdownParent: $("#ModalPopup"),
                     })
                     $dropdown.val('').trigger('change');
 
@@ -675,7 +692,7 @@ function SetDropDown() {
                         data: ParentDropDownFieldList,
                         placeholder: sharedFn().GetUiControlText(constrain.uibackendName),
                         dropdownCssClass: "manageselect2zindex",
-                        dropdownParent: $("#ModalPopup")   
+                        dropdownParent: $("#ModalPopup")
                     })
                     $dropdown.val('').trigger('change');
 
@@ -695,25 +712,25 @@ function SetDropDown() {
                         data: Field,
                         placeholder: sharedFn().GetUiControlText(constrain.uibackendName),
                         dropdownCssClass: "manageselect2zindex",
-                        dropdownParent: $("#ModalPopup"),  
+                        dropdownParent: $("#ModalPopup"),
                     }).on("change", event => {
                         var data = event.target.value;
                         if (data) {
-                          
+
                             var selectdata = FieldList.find(x => x.id == data);
                             var selectedvalue = selectdata.type;
                             var DropDownTypeId = selectdata.dropDownTypeId;
                             if (selectedvalue == "dropdown" || selectedvalue == "select2") {
                                 $("#FieldConditionFieldValue").parent().hide();
                                 $("#FieldConditionFieldDropDownValueIds").parent().show();
-                                
+
                                 const options = {
                                     success: function (result) {
                                         if (result) {
                                             const { data } = result;
                                             if (data) {
                                                 const { FieldDropDownValueList } = data;
-                                                 DropDownValueList = FieldDropDownValueList.map(dpitem => (
+                                                DropDownValueList = FieldDropDownValueList.map(dpitem => (
                                                     {
                                                         id: dpitem.id,
                                                         text: txtDir === "RTL" ? dpitem.titleAr : dpitem.titleEn
@@ -733,7 +750,7 @@ function SetDropDown() {
                                                     data: DropDownValueList,
                                                     placeholder: sharedFn().GetUiControlText('FieldConditionFieldDropDownValueIds'),
                                                     dropdownCssClass: "manageselect2zindex",
-                                                    dropdownParent: $("#ModalPopup")   
+                                                    dropdownParent: $("#ModalPopup")
                                                 })
                                                 if (fieldvalueselectedlist) {
                                                     $dropdown.val(fieldvalueselectedlist).trigger('change');
@@ -754,7 +771,7 @@ function SetDropDown() {
                             $("#FieldConditionFieldValue").parent().show();
                             $("#FieldConditionFieldDropDownValueIds").parent().hide();
                         }
-                        
+
                     });
                     $dropdown.val('').trigger('change');
 
@@ -820,41 +837,41 @@ function SetDropDown() {
                                 else {
                                     $dropdown.val('').trigger('change');
                                 }
-                                
+
                             }
                         }
                     };
                     jqClientAdvanced(options8).Get("FormGroup/GetFormGroupListByTypeList".concat('?serviceid=', serviceid));
-                    
+
 
                 };
                 if (constrain.controlName == "EvalFormId") {
-                  
-                       var ddldata = EvalFormList.map(item => (
-                            {
-                                id: item.id,
-                               text: txtDir === "RTL" ? item.nameAr : item.nameEn
-                            }
-                        ));
-                        var $dropdown = $('#' + constrain.uibackendName);
-                        $dropdown.empty();
-                        $dropdown.select2({
-                            width: 'resolve',
-                            allowClear: true,
-                            data: ddldata,
-                            placeholder: sharedFn().GetUiControlText(constrain.uibackendName),
-                            dropdownCssClass: "manageselect2zindex",
-                            dropdownParent: $("#ModalPopup"),
-                        });
-                        var datavalue = $dropdown.attr("data-value");
-                        if (datavalue) {
-                            $dropdown.val(datavalue).trigger('change');
-                        }
-                        else {
-                            $dropdown.val('').trigger('change');
-                        }
 
-                    
+                    var ddldata = EvalFormList.map(item => (
+                        {
+                            id: item.id,
+                            text: txtDir === "RTL" ? item.nameAr : item.nameEn
+                        }
+                    ));
+                    var $dropdown = $('#' + constrain.uibackendName);
+                    $dropdown.empty();
+                    $dropdown.select2({
+                        width: 'resolve',
+                        allowClear: true,
+                        data: ddldata,
+                        placeholder: sharedFn().GetUiControlText(constrain.uibackendName),
+                        dropdownCssClass: "manageselect2zindex",
+                        dropdownParent: $("#ModalPopup"),
+                    });
+                    var datavalue = $dropdown.attr("data-value");
+                    if (datavalue) {
+                        $dropdown.val(datavalue).trigger('change');
+                    }
+                    else {
+                        $dropdown.val('').trigger('change');
+                    }
+
+
                 };
             });
         }
@@ -868,7 +885,7 @@ function SetDropDown() {
                     if (selectdata) {
                         var selectedvalue = selectdata.type;
 
-                        if (selectedvalue == "dropdown" || selectedvalue == "select2" ) {
+                        if (selectedvalue == "dropdown" || selectedvalue == "select2") {
                             if (data == "in" || data == "not in") {
 
                                 var $FieldDropDown = $("#FieldConditionFieldDropDownValueIds");
@@ -882,7 +899,7 @@ function SetDropDown() {
                                     data: DropDownValueList,
                                     placeholder: sharedFn().GetUiControlText('FieldConditionFieldDropDownValueIds'),
                                     dropdownCssClass: "manageselect2zindex",
-                                    dropdownParent: $("#ModalPopup")   
+                                    dropdownParent: $("#ModalPopup")
                                 })
                                 if (fieldvalueselectedlist) {
                                     $FieldDropDown.val(fieldvalueselectedlist).trigger('change');
@@ -917,9 +934,9 @@ function SetDropDown() {
 
                         }
                     }
-                   
+
                 }
-                
+
             }
         });
 
@@ -946,7 +963,7 @@ function SetDropDown() {
                                     data: DropDownValueList,
                                     placeholder: sharedFn().GetUiControlText('FieldConditionFieldDropDownValueIds'),
                                     dropdownCssClass: "manageselect2zindex",
-                                    dropdownParent: $("#ModalPopup")   
+                                    dropdownParent: $("#ModalPopup")
                                 })
                                 if (fieldvalueselectedlist) {
                                     $FieldDropDown.val(fieldvalueselectedlist).trigger('change');
@@ -987,10 +1004,10 @@ function SetDropDown() {
             }
         });
     }
-    
+
 }
 function showdropdown(condition) {
-    
+
     if (condition == true) {
         $("#FieldDropDownType").parent().show();
         $("#FieldDropDownParentField").parent().show();
@@ -1005,7 +1022,7 @@ function showdropdown(condition) {
         $("#FieldDropDownType").val('').trigger('change');
         $("#FieldDropDownParentField").val('').trigger('change');
     }
-    
+
 }
 function FieldAttributeClick(event) {
     const cellElem = event.closest('section');
@@ -1016,7 +1033,7 @@ function FieldAttributeClick(event) {
     IsEdit = IsEdit_Field_ATTRIBUTE;
     IsDelete = IsDelete_Field_ATTRIBUTE;
     IsView = '';
-    var fieldAttributetabulatorcolumns = sharedFn().PopulateColumn(FieldAttributecolumnList);   
+    var fieldAttributetabulatorcolumns = sharedFn().PopulateColumn(FieldAttributecolumnList);
     var modaltitle = sharedFn().GetUiControlText('FieldAttributeHeader') + " " + (Lang == "ar" ? obj.titleAr : obj.titleEn);
 
     sharedFn().OpenFormPopup(modaltitle, FieldAttributecontrolvalidationlist, null, fieldAttributetabulatorcolumns);
@@ -1033,13 +1050,13 @@ function FieldConditionClick(event) {
     IsEdit = IsEdit_Field_CONDITION;
     IsDelete = IsDelete_Field_CONDITION;
     IsView = '';
-   
-    var fieldConditiontabulatorcolumns = sharedFn().PopulateColumn(FieldConditioncolumnList); 
+
+    var fieldConditiontabulatorcolumns = sharedFn().PopulateColumn(FieldConditioncolumnList);
     var modaltitle = sharedFn().GetUiControlText('FieldConditionHeader') + " " + (Lang == "ar" ? obj.titleAr : obj.titleEn);
     sharedFn().OpenFormPopup(modaltitle, FieldConditioncontrolvalidationlist, null, fieldConditiontabulatorcolumns);
     $("#fieldid").val(fieldid);
     popupname = "FieldCondition";
-    
+
 }
 const getlookup = () => {
     var systemmoduleid = $("#SystemModuleId").val();
@@ -1051,13 +1068,13 @@ const getlookup = () => {
                 if (data) {
                     const { FormGroupType } = data;
                     FormGroupTypeList = FormGroupType;
-                   
+
                 }
             }
         }
     };
     jqClientAdvanced(options).Get("FormGroup/GetAllFormGroupType");
-    
+
     const options1 = {
         success: function (result) {
             if (result) {
@@ -1065,12 +1082,24 @@ const getlookup = () => {
                 if (data) {
                     const { FieldType } = data;
                     FieldTypeList = FieldType;
-                    
+
                 }
             }
         }
     };
     jqClientAdvanced(options1).Get("FormGroup/GetAllFieldType");
+    const optionsFieldInfoType = {
+        success: function (result) {
+            if (result) {
+                const { data } = result;
+                if (data) {
+                    const { FieldInfoType } = data;
+                    FieldInfoTypeList = FieldInfoType;
+                }
+            }
+        }
+    };
+    jqClientAdvanced(optionsFieldInfoType).Get("FormGroup/GetAllFieldInfoType");
     const options2 = {
         success: function (result) {
             if (result) {
@@ -1078,7 +1107,7 @@ const getlookup = () => {
                 if (data) {
                     const { SystemField } = data;
                     SystemFieldList = SystemField.filter(x => x.serviceId != serviceid);
-                    
+
                 }
             }
         }
@@ -1146,7 +1175,7 @@ const getlookup = () => {
         };
         jqClientAdvanced(options6).Get("FormGroup/GetAllFieldFormGroupList".concat('?serviceid=', serviceid));
     }
-    
+
     const options7 = {
         success: function (result) {
             if (result) {
@@ -1164,7 +1193,7 @@ const getlookup = () => {
         }
     };
     jqClientAdvanced(options7).Get("FormGroup/GetAllAttribute");
-    
+
     const options8 = {
         success: function (result) {
             if (result) {
@@ -1172,7 +1201,7 @@ const getlookup = () => {
                 ParentDropDownFieldList = data.ParentDropDownField.map(item => (
                     {
                         id: item.id,
-                        text: txtDir === "RTL" ? item.formGroup.titleAr + " _ " + item.titleAr : item.formGroup.titleEn + " _ " +item.titleEn
+                        text: txtDir === "RTL" ? item.formGroup.titleAr + " _ " + item.titleAr : item.formGroup.titleEn + " _ " + item.titleEn
                     }
                 ));
             }
@@ -1248,7 +1277,7 @@ function searchFormGroup() {
 
         }
     }
-    
+
 
 
 
@@ -1260,7 +1289,7 @@ $('#btn-submit_popup').click(function () {
         var requestdata = {};
         var url = '';
         if (popupname == "FormGroup") {
-            
+
             requestdata = sharedFn().GetSaveObject(FormGroupcontrolvalidationlist, $('#Id').val());
             url = ($('#Id').val() != '' ? "FormGroup/UpdateFormGroup" : "FormGroup/SaveFormGroup");
         }
@@ -1296,7 +1325,7 @@ $('#btn-submit_popup').click(function () {
                             LoadAllFormGroup(ClickedFormGroupType);
                             notificationUtil.success(sharedFn().GetUiControlText('ADMIN_MSG_SAVE'));
                         }
-                        else if (data.responseStatus == '4') { 
+                        else if (data.responseStatus == '4') {
                             notificationUtil.error(sharedFn().GetUiControlText('BACKENDNAME_ALREADY_EXISTS'));
                         }
                     }
@@ -1381,11 +1410,10 @@ $('#btn-submit_popup').click(function () {
 
 
         jqClientAdvanced(options).PostFormData(url, requestdata);
-       
+
     }
 
     $("#FormGroupModal").modal("hide");
     $("#FormGroupForm").trigger("reset");
 
 });
-

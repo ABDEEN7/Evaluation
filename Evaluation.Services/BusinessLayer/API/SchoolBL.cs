@@ -43,16 +43,16 @@ public class SchoolBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvide
 
     public async Task<List<ResponseSchools>> GetSchoolsByDepartmentId(Guid depId)
     {
-        
+
         var result = await schoolRepository.GetSchoolsByDepartmentId(depId);
 
         var schoolsResponse = mapper.Map<List<ResponseSchools>>(result);
 
         return schoolsResponse;
     }
-	
+
     [HttpPost]
-    public async Task<PaginatedResult<ResponseSchools>> GetSchools([FromBody]SchoolRequest request)
+    public async Task<PaginatedResult<ResponseSchools>> GetSchools([FromBody] SchoolRequest request)
     {
         var result = await schoolRepository.GetSchoolsAsyncOld(request);
         return mapper.Map<PaginatedResult<ResponseSchools>>(result);
@@ -79,7 +79,7 @@ public class SchoolBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvide
             {
                 DepartmentCateogry.Schools =>
                     await schoolRepository.GetSchoolsAsync(request, targetOrgTreeIds, currentOrgTree),
-                    
+
                 DepartmentCateogry.Employee =>
                     await employeeService.GetEmployeeAsync(request, targetOrgTreeIds, currentOrgTree),
 
@@ -121,12 +121,19 @@ public class SchoolBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvide
 
     public async Task<List<SchoolVisits>> GetVisitsAsync()
     {
-        var responses = await schoolRepository.GetVisitTypes();
-        return await responses.Select(x => new SchoolVisits
-        {
-            Id = x.Id,
-            Name = LanguageStatic.SelectLang(requestInfo.Lang, x.NameAr, x.NameEn),
-			BackendName = x.EvaluationType.BackendName
-		}).ToListAsync();
+        var respons = await schoolRepository.GetVisitTypes();
+        return respons;
+    }
+    public async Task<List<GetEducationLevelDto>> GetEducationLevelAsync()
+    {
+        int? currentAcademicYear = await academicYearServices.GetCurrentAcademicYear();
+        var responses =await schoolRepository.GetEducationLevel(currentAcademicYear);
+        return responses;
+    }
+    public async Task<List<SchoolGenderDto>> GetSchoolGenderAsync()
+    {
+
+        var respons =await schoolRepository.GetSchoolGender();
+        return respons;
     }
 }

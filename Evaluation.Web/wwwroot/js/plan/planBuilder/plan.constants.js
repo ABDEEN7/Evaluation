@@ -50,9 +50,13 @@
         SCHOOL_NAME: 'schoolName',
         LAST_EVAL_DATE: 'lastEvalDate',
         CREATED_DATE: 'createdDate',
+        CREATEDTO_DATE: 'createdToDate',
         NEXT_EVAL_DATE: 'nextEvalDate',
         PREVIOUS_RESULT: 'previousResult',
-        VISIT_TYPE: 'visitType'
+        VISIT_TYPE: 'visitType',
+        SCHOOL_LEVEL: 'schoolLevel',
+        GENDER: 'gender',
+        GRADE: 'grade'
     };
 
     // Rating classes mapping
@@ -85,7 +89,11 @@
         UPDATE_PLAN: `/Plan/${deprouting}/UpdatePlan`,
         GET_PLAN_DETAILS: `/Plan/${deprouting}/GetPlansWithunSelectedSchoolsDetails`,
         GET_PARNT_ORGTREE: `/Org/${deprouting}/GetParentOrgTree`,
-        GetFomrEvalMatrixValue: `/Plan/${deprouting}/GetFomrEvalMatrixValueList`
+        GetFomrEvalMatrixValue: `/Plan/${deprouting}/GetFomrEvalMatrixValueList`,
+        GET_CurrentAcademicYear: `/AcademicYear/${deprouting}/GetCurrentAcademicYearByDepartment`,
+        GETEDUCATION_LEVEL: `/School/${deprouting}/GetEducationLevel`,
+        GET_SCHOOL_GENDER: `/School/${deprouting}/GetSchoolGender`
+
     };
 
     // Export all constants

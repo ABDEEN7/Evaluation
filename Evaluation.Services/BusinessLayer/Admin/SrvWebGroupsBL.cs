@@ -207,6 +207,24 @@ namespace Evaluation.Services.Models.Admin
            
 
         }
-       
+        public async Task<bool> UpdateDepWebGrouprder(List<OrderingDTO> message)
+        {
+            bool rtn = false;
+
+            var updatedRows = from updatedItem in message
+                              join rowToUpdate in uow.GetRepository<DepWebGroup>().GetAllNonDeleted() on updatedItem.Id equals rowToUpdate.Id
+                              select new { Row = rowToUpdate, updatedItem.OrderNo };
+
+
+
+            updatedRows.ToList().ForEach(x => x.Row.OrderNo = x.OrderNo);
+
+            await uow.CommitAsync();
+            rtn = true;
+
+
+            return rtn;
+        }
+
     }
 }
