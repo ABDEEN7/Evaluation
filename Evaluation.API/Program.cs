@@ -35,6 +35,7 @@ internal class Program
             ClsAppSetting.BlobSasUrl = config["AzureBlobStorage"] ?? "";
             ClsAppSetting.AllowWebCorsOnly = config["baseAppUrl"] ?? "";
             ClsAppSetting.OracleDBConnection = config["OracleDBConnection"] ?? "";
+            ClsAppSetting.QNEDSConnection = config["QNEDSConnection"] ?? "";
         }
         else
         {
@@ -43,6 +44,7 @@ internal class Program
 
 
             ClsAppSetting.OracleDBConnection = config["OracleDBConnection"] ?? "";
+            ClsAppSetting.QNEDSConnection = config["QNEDSConnection"] ?? "";
 
             // Form JWT
             ClsAppSetting.FormJwtConfigKey = (isKeyVault ? config["NSISStudentInfoURL"] : config["FormJwtConfig:Key"]) ?? "";
