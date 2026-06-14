@@ -355,10 +355,16 @@ namespace Evaluation.Services.Models.API
 			var requests = await uow.GetRepository<ServiceRequest>()
 				.GetAllActiveNonDeleted(x => x.EvaluationRequestId == requestId)
 				.Include(x => x.Service)
+				.ThenInclude(x => x.EvaluationParty)
+				.ThenInclude(x => x.EvalPartyCategory)
+				.Include(x => x.Service)
+				.ThenInclude(x=>x.ServiceType)
 				.Include(x => x.OrgTree)
 				.Include(x => x.EducationLevel)
 				.Include(x => x.GradeLevel)
 				.Include(x => x.SchoolCourse)
+				.Where(x=>x.Service.ServiceType.BackendName== "ClassroomObservation")
+				.Where(x=>x.Service.EvaluationParty.EvalPartyCategory.BackendName== "ClassroomObservation")
 				.ToListAsync();
 
 			var mainRequest = requests.FirstOrDefault();
@@ -369,7 +375,7 @@ namespace Evaluation.Services.Models.API
 			var requestIds = requests.Select(x => x.Id).ToList();
 
 			var values = await uow.GetRepository<FormItemValue>()
-				.GetAll(x =>
+				.GetAllActiveNonDeleted(x =>
 					x.ServiceRequestId.HasValue &&
 					requestIds.Contains(x.ServiceRequestId.Value) &&
 					!x.IsDeleted)
@@ -377,6 +383,8 @@ namespace Evaluation.Services.Models.API
 					.ThenInclude(x => x!.Scope)
 				.Include(x => x.FormItem)
 					.ThenInclude(x => x!.EvalForm)
+					.ThenInclude(x => x!.EvalFormType)
+				.Where(x=>x.FormItem.EvalForm.EvalFormType.BackendName== "ClassroomObservation")
 				.ToListAsync();
 
 			var observations = requests.Select(req =>
@@ -441,6 +449,25 @@ namespace Evaluation.Services.Models.API
 				};
 			}).ToList();
 
+			var matrixValues = await uow.GetRepository<FormEvalMatrixValue>()
+									.GetAllActiveNonDeleted()
+									.OrderBy(x => x.OrderNo)
+									.Select(x => new FormEvalMatrixValueDto
+									{
+										Id = x.Id,
+										FormEvalMatrixId = x.FormEvalMatrixId,
+										NameAr = x.NameAr,
+										NameEn = x.NameEn,
+										MinValue = x.MinValue,
+										MaxValue = x.MaxValue,
+										ActualMatrixValue = x.ActualMatrixValue,
+										DescAr = x.DescAr,
+										DescEn = x.DescEn,
+										OrderNo = x.OrderNo,
+										IsActive = x.IsActive
+									})
+									.ToListAsync();
+
 			return new FormAnalysisDto
 			{
 				RequestId = mainRequest.Id,
@@ -450,7 +477,8 @@ namespace Evaluation.Services.Models.API
 				ServiceNameEn = mainRequest.Service?.NameEn,
 				EvaluationRequestId = mainRequest.EvaluationRequestId,
 				EvaluationPartyId = mainRequest.EvaluationPartyId,
-				Observations = observations
+				Observations = observations,
+				MatrixValues = matrixValues
 			};
 		}
 	}

@@ -345,7 +345,8 @@
                   </div>
                 `
                 : ``;
-            const showFormAnalysis = true;// party?.type?.backendName === "ClassroomObservation";
+            const showFormAnalysis =
+                party?.evalPartyCategory?.toLowerCase() === "classroomobservation";
             const formAnalysisHtml = showFormAnalysis
                 ? `
                     <div class="mb-3 text-end">

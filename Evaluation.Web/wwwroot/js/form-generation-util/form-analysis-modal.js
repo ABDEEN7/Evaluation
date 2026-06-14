@@ -4,9 +4,11 @@
     let _data = null;
     let _filtered = null;
 
+    const lbl = key => uiControlsSetup().GetUiControlText(key) || key;
+
     window.openFormAnalysis = async function (requestId) {
         if (!requestId) {
-            notificationUtil?.error?.("Request Id is required");
+            notificationUtil?.error?.(lbl("lblRequestIdIsRequired"));
             return;
         }
 
@@ -23,16 +25,15 @@
         const container = document.getElementById("FormAnalysisContainer");
 
         container.innerHTML = `
-        <div class="text-center p-5">
-            <div class="spinner-border text-primary"></div>
-            <div class="mt-2">جاري تحميل تحليل الاستمارة...</div>
-        </div>
-    `;
+            <div class="text-center p-5">
+                <div class="spinner-border text-primary"></div>
+                <div class="mt-2">${lbl("lblLoadingFormAnalysis")}</div>
+            </div>
+        `;
 
         const options = {
             success: function (response) {
-
-                _data = response || [];
+                _data = response || {};
                 _filtered = structuredClone(_data);
 
                 renderMainLayout();
@@ -43,10 +44,10 @@
                 console.error(xhr);
 
                 container.innerHTML = `
-                <div class="alert alert-danger m-4">
-                    فشل تحميل تحليل الاستمارة
-                </div>
-            `;
+                    <div class="alert alert-danger m-4">
+                        ${lbl("lblFailedToLoadFormAnalysis")}
+                    </div>
+                `;
             }
         };
 
@@ -54,6 +55,7 @@
             `/ServiceRequest/${departmentRoutePath}/FormAnalysis?requestId=${requestId}`
         );
     }
+
     function renderMainLayout() {
         document.getElementById("FormAnalysisContainer").innerHTML = `
             <style>
@@ -63,7 +65,7 @@
                 .fa-card{background:#fff;border:1px solid #e5e5e5;border-radius:12px;margin-bottom:20px;overflow:hidden}
                 .fa-card-header{background:#97133f;color:#fff;padding:11px 16px;font-weight:700;display:flex;justify-content:space-between}
                 .fa-filter{border-top:3px solid #97133f;padding:16px}
-                .fa-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+                .fa-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
                 .fa-summary{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px}
                 .fa-summary-card{background:#fff;border:1px solid #ddd;border-radius:12px;padding:16px;border-top:3px solid #97133f}
                 .fa-label{font-size:12px;color:#666;margin-bottom:6px}
@@ -94,24 +96,22 @@
             </style>
 
             <div class="fa-page">
-
-                <div class="fa-title">نتائج المشاهدات الصفية</div>
-                <div class="fa-breadcrumb">الرئيسية / تحليل الاستمارة الصفية</div>
+                <div class="fa-title">${lbl("lblClassroomObservationResults")}</div>
+                <div class="fa-breadcrumb">${lbl("lblHome")} / ${lbl("lblFormAnalysis")}</div>
 
                 ${renderFilters()}
 
                 <div class="fa-tabs">
-                    <div class="fa-tab active" data-tab="results">نتائج المشاهدات</div>
-                    <div class="fa-tab" data-tab="criteria">تحليل المعايير</div>
-                    <div class="fa-tab" data-tab="subjects">تحليل المواد</div>
-                    <div class="fa-tab" data-tab="compare">مقارنة الصفوف</div>
+                    <div class="fa-tab active" data-tab="results">${lbl("lblObservationResults")}</div>
+                    <div class="fa-tab" data-tab="criteria">${lbl("lblCriteriaAnalysis")}</div>
+                    <div class="fa-tab" data-tab="subjects">${lbl("lblSubjectAnalysis")}</div>
+                    <div class="fa-tab" data-tab="compare">${lbl("lblGradeComparison")}</div>
                 </div>
 
                 <div id="tab-results" class="fa-page-section active"></div>
                 <div id="tab-criteria" class="fa-page-section"></div>
                 <div id="tab-subjects" class="fa-page-section"></div>
                 <div id="tab-compare" class="fa-page-section"></div>
-
             </div>
         `;
     }
@@ -120,38 +120,36 @@
         return `
             <div class="fa-card fa-filter">
                 <div class="fa-grid">
-
                     <div>
-                        <label class="form-label small fw-bold">المرحلة التعليمية</label>
+                        <label class="form-label small fw-bold">${lbl("lblEducationLevel")}</label>
                         <select id="fa-stage" class="form-select">
-                            <option value="">جميع المراحل</option>
+                            <option value="">${lbl("lblAllEducationLevels")}</option>
                         </select>
                     </div>
 
                     <div>
-                        <label class="form-label small fw-bold">الصف</label>
+                        <label class="form-label small fw-bold">${lbl("lblGrade")}</label>
                         <select id="fa-grade" class="form-select">
-                            <option value="">جميع الصفوف</option>
+                            <option value="">${lbl("lblAllGrades")}</option>
                         </select>
                     </div>
 
                     <div>
-                        <label class="form-label small fw-bold">المادة الدراسية</label>
+                        <label class="form-label small fw-bold">${lbl("lblSubject")}</label>
                         <select id="fa-subject" class="form-select">
-                            <option value="">جميع المواد</option>
+                            <option value="">${lbl("lblAllSubjects")}</option>
                         </select>
                     </div>
-
                 </div>
 
                 <div class="text-end mt-3">
                     <button class="btn btn-primary btn-sm" id="fa-search-btn">
                         <i class="las la-search"></i>
-                        بحث
+                        ${lbl("WebAppRequest_lblSearch")}
                     </button>
 
                     <button class="btn btn-secondary btn-sm" id="fa-reset-btn">
-                        إعادة تعيين
+                        ${lbl("lblReset")}
                     </button>
                 </div>
             </div>
@@ -174,8 +172,9 @@
         document.getElementById("fa-search-btn").addEventListener("click", applyFilters);
 
         document.getElementById("fa-reset-btn").addEventListener("click", function () {
-            [ "fa-stage", "fa-grade", "fa-subject"].forEach(id => {
-                document.getElementById(id).value = "";
+            ["fa-stage", "fa-grade", "fa-subject"].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = "";
             });
 
             applyFilters();
@@ -240,8 +239,6 @@
             (o.items || []).map(i => ({
                 ...i,
                 observationId: o.id,
-                schoolId: o.schoolId,
-                schoolName: o.schoolNameAr || o.schoolNameEn,
                 educationLevelId: o.educationLevelId,
                 educationLevelName: o.educationLevelNameAr || o.educationLevelNameEn,
                 gradeLevelId: o.gradeLevelId,
@@ -357,29 +354,29 @@
 
         document.getElementById("tab-results").innerHTML = `
             <div class="fa-summary">
-                ${summaryCard("عدد المشاهدات", s.totalSessions, "حصة صفية مشاهدة")}
-                ${summaryCard("المحصلة الكلية", `${fmt(s.overallAverage)} / 5`, `النسبة: ${fmt(s.overallPercentage)}%`)}
-                ${summaryCard("التقدير العام", s.overallRate, "بناءً على المتوسط الكلي")}
-                ${summaryCard("↑ أعلى معيار", s.bestCriteriaName, fmt(s.bestCriteriaAvg))}
-                ${summaryCard("↓ أقل معيار", s.worstCriteriaName, fmt(s.worstCriteriaAvg))}
+                ${summaryCard(lbl("lblObservationsCount"), s.totalSessions, lbl("lblClassroomObservationSession"))}
+                ${summaryCard(lbl("lblOverallResult"), `${fmt(s.overallAverage)} / 5`, `${lbl("lblPercentage")}: ${fmt(s.overallPercentage)}%`)}
+                ${summaryCard(lbl("lblOverallRate"), s.overallRate, lbl("lblBasedOnOverallAverage"))}
+                ${summaryCard(lbl("lblHighestCriteria"), s.bestCriteriaName, fmt(s.bestCriteriaAvg))}
+                ${summaryCard(lbl("lblLowestCriteria"), s.worstCriteriaName, fmt(s.worstCriteriaAvg))}
             </div>
 
             <div class="fa-card">
                 <div class="fa-card-header">
-                    <span>📋 نتائج المعايير</span>
-                    <span>${_filtered.criteria.length} معياراً</span>
+                    <span>📋 ${lbl("lblCriteriaResults")}</span>
+                    <span>${_filtered.criteria.length} ${lbl("lblCriteriaCount")}</span>
                 </div>
 
                 <div class="table-responsive">
                     <table class="table fa-table table-hover m-0">
                         <thead>
                             <tr>
-                                <th>م</th>
-                                <th>المعيار</th>
-                                <th>المتوسط</th>
-                                <th>النسبة</th>
-                                <th>التقدير</th>
-                                <th>التفاصيل</th>
+                                <th>${lbl("lblSerial")}</th>
+                                <th>${lbl("lblCriteria")}</th>
+                                <th>${lbl("lblAverage")}</th>
+                                <th>${lbl("lblPercentage")}</th>
+                                <th>${lbl("lblRate")}</th>
+                                <th>${lbl("lblDetails")}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -393,7 +390,7 @@
                                     <td>
                                         <button class="btn btn-sm btn-outline-danger"
                                                 onclick="showCriteriaDetails('${c.formItemId}')">
-                                            عرض
+                                            ${lbl("lblView")}
                                         </button>
                                     </td>
                                 </tr>
@@ -404,7 +401,7 @@
             </div>
 
             <div class="fa-card p-4">
-                <div class="fw-bold mb-3">مقارنة بصرية للمعايير</div>
+                <div class="fw-bold mb-3">${lbl("lblVisualCriteriaComparison")}</div>
                 ${chart(_filtered.criteria, "criteriaNameAr")}
             </div>
         `;
@@ -413,13 +410,13 @@
     function renderCriteriaTab() {
         document.getElementById("tab-criteria").innerHTML = `
             <div class="fa-card p-4">
-                <div class="fw-bold mb-3">متوسط كل معيار عبر المراحل</div>
+                <div class="fw-bold mb-3">${lbl("lblAverageCriteriaAcrossStages")}</div>
                 ${chart(_filtered.criteria, "criteriaNameAr")}
             </div>
 
             <div class="fa-card">
                 <div class="fa-card-header">
-                    <span>📋 تفصيل المعايير حسب الصف</span>
+                    <span>📋 ${lbl("lblCriteriaByGrade")}</span>
                 </div>
 
                 ${criteriaByGradeTable()}
@@ -433,26 +430,24 @@
         document.getElementById("tab-subjects").innerHTML = `
             <div class="fa-card">
                 <div class="fa-card-header">
-                    <span>📚 تحليل المواد</span>
+                    <span>📚 ${lbl("lblSubjectsAnalysis")}</span>
                 </div>
 
                 <div class="table-responsive">
                     <table class="table fa-table table-hover m-0">
                         <thead>
                             <tr>
-                                <th>المادة</th>
+                                <th>${lbl("lblSubject")}</th>
                                 ${criteriaNames.map(x => `<th>${escapeHtml(shortName(x))}</th>`).join("")}
-                                <th>المتوسط</th>
-                                <th>التقدير</th>
+                                <th>${lbl("lblAverage")}</th>
+                                <th>${lbl("lblRate")}</th>
                             </tr>
                         </thead>
                         <tbody>
                             ${_filtered.subjects.map(s => `
                                 <tr>
                                     <td>${escapeHtml(s.subjectName)}</td>
-                                    ${criteriaNames.map(cn => `
-                                        <td>${dash(s.criteriaValues[cn])}</td>
-                                    `).join("")}
+                                    ${criteriaNames.map(cn => `<td>${dash(s.criteriaValues[cn])}</td>`).join("")}
                                     <td class="fw-bold" style="color:#97133f">${dash(s.average)}</td>
                                     <td>${badge(s.rate)}</td>
                                 </tr>
@@ -467,25 +462,25 @@
     function renderCompareTab() {
         document.getElementById("tab-compare").innerHTML = `
             <div class="fa-card p-4">
-                <div class="fw-bold mb-3">مقارنة المحصلة الكلية لجميع الصفوف</div>
+                <div class="fw-bold mb-3">${lbl("lblOverallResultAllGradesComparison")}</div>
                 ${chart(_filtered.grades, "gradeLevelName")}
             </div>
 
             <div class="fa-card">
                 <div class="fa-card-header">
-                    <span>⚖️ جدول المقارنة الشامل</span>
+                    <span>⚖️ ${lbl("lblComprehensiveComparisonTable")}</span>
                 </div>
 
                 <div class="table-responsive">
                     <table class="table fa-table table-hover m-0">
                         <thead>
                             <tr>
-                                <th>الصف / الفئة</th>
-                                <th>عدد الحصص</th>
-                                <th>المتوسط</th>
-                                <th>النسبة</th>
-                                <th>التقدير</th>
-                                <th>ترتيب</th>
+                                <th>${lbl("lblGradeCategory")}</th>
+                                <th>${lbl("lblSessionsCount")}</th>
+                                <th>${lbl("lblAverage")}</th>
+                                <th>${lbl("lblPercentage")}</th>
+                                <th>${lbl("lblRate")}</th>
+                                <th>${lbl("lblRank")}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -514,10 +509,10 @@
                 <table class="table fa-table table-hover m-0">
                     <thead>
                         <tr>
-                            <th>المعيار</th>
+                            <th>${lbl("lblCriteria")}</th>
                             ${grades.map(g => `<th>${escapeHtml(g)}</th>`).join("")}
-                            <th>المتوسط العام</th>
-                            <th>التقدير</th>
+                            <th>${lbl("lblGeneralAverage")}</th>
+                            <th>${lbl("lblRate")}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -548,11 +543,11 @@
             <div class="p-3 mb-3 rounded" style="background:#fbeaf0">
                 <div class="row text-center">
                     <div class="col">
-                        <div class="small text-muted">المتوسط العام</div>
+                        <div class="small text-muted">${lbl("lblGeneralAverage")}</div>
                         <div class="fs-3 fw-bold" style="color:#97133f">${fmt(c.average)}</div>
                     </div>
                     <div class="col">
-                        <div class="small text-muted">النسبة</div>
+                        <div class="small text-muted">${lbl("lblPercentage")}</div>
                         <div class="fs-4 fw-bold" style="color:#97133f">${fmt(c.percentage)}%</div>
                     </div>
                     <div class="col d-flex align-items-center justify-content-center">
@@ -561,7 +556,7 @@
                 </div>
             </div>
 
-            <div class="fw-bold mb-2">النتائج حسب الصف</div>
+            <div class="fw-bold mb-2">${lbl("lblResultsByGrade")}</div>
 
             ${c.byGrade.map(g => `
                 <div class="d-flex align-items-center justify-content-between p-3 mb-2 rounded" style="background:#f8f8f8">
@@ -589,7 +584,9 @@
     }
 
     function chart(items, nameKey) {
-        if (!items.length) return `<div class="text-muted text-center p-4">لا توجد بيانات</div>`;
+        if (!items.length) {
+            return `<div class="text-muted text-center p-4">${lbl("lblNoData")}</div>`;
+        }
 
         return items
             .filter(x => x.average > 0)
@@ -626,41 +623,61 @@
 
     function badge(rate) {
         if (!rate || rate === "—") return "—";
-
-        return `<span class="fa-badge ${rateKey(rate)}">${escapeHtml(rate)}</span>`;
-    }
-
-    function rateKey(rate) {
-        switch ((rate || "").trim()) {
-            case "ممتاز": return "fa-ex";
-            case "جيد جداً": return "fa-vg";
-            case "جيد": return "fa-g";
-            case "مقبول": return "fa-ac";
-            case "ضعيف": return "fa-wk";
-            default: return "fa-wk";
-        }
-    }
-
-    function rateColor(rate) {
-        switch ((rate || "").trim()) {
-            case "ممتاز": return "#1D9E75";
-            case "جيد جداً": return "#378ADD";
-            case "جيد": return "#EF9F27";
-            case "مقبول": return "#E24B4A";
-            case "ضعيف": return "#999";
-            default: return "#ccc";
-        }
+        return `<span class="fa-badge ${rate.key}">${escapeHtml(rate.text)}</span>`;
     }
 
     function getRate(avg) {
+
         avg = num(avg);
 
-        if (avg <= 0) return "—";
-        if (avg < 3) return "ضعيف";
-        if (avg < 3.75) return "مقبول";
-        if (avg < 4.25) return "جيد";
-        if (avg < 4.75) return "جيد جداً";
-        return "ممتاز";
+        const matrix = (_data.matrixValues || [])
+            .find(x => avg >= x.minValue && avg <= x.maxValue);
+
+        if (!matrix)
+            return { key: "fa-wk", text: "—" };
+
+        return {
+            key: getRateCss(matrix.nameAr),
+            text: matrix.nameAr
+        };
+    }
+    function getRateCss(rateName) {
+
+        switch ((rateName || "").trim()) {
+
+            case "ممتاز":
+            case "Excellent":
+                return "fa-ex";
+
+            case "جيد جداً":
+            case "Very Good":
+                return "fa-vg";
+
+            case "جيد":
+            case "Good":
+                return "fa-g";
+
+            case "مقبول":
+            case "Acceptable":
+                return "fa-ac";
+
+            case "ضعيف":
+            case "Weak":
+                return "fa-wk";
+
+            default:
+                return "fa-wk";
+        }
+    }
+    function rateColor(rate) {
+        switch (rate?.key) {
+            case "fa-ex": return "#1D9E75";
+            case "fa-vg": return "#378ADD";
+            case "fa-g": return "#EF9F27";
+            case "fa-ac": return "#E24B4A";
+            case "fa-wk": return "#999";
+            default: return "#ccc";
+        }
     }
 
     function groupBy(arr, keySelector) {
@@ -681,6 +698,7 @@
     function average(arr) {
         const valid = arr.filter(x => x > 0);
         if (!valid.length) return 0;
+
         return valid.reduce((a, b) => a + b, 0) / valid.length;
     }
 
@@ -695,7 +713,7 @@
 
         return fmt(v);
     }
-    fa - school
+
     function num(v) {
         if (v === null || v === undefined || isNaN(v)) return 0;
         return Number(v);

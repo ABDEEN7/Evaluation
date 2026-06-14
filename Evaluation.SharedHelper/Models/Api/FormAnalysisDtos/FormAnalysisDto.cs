@@ -19,8 +19,33 @@ namespace Evaluation.SharedHelper.Models.Api.FormAnalysisDtos
 		public Guid? EvaluationPartyId { get; set; }
 
 		public List<FormAnalysisObservationDto> Observations { get; set; } = [];
-	}
+		public List<FormEvalMatrixValueDto> MatrixValues { get; set; }
 
+	}
+	public class FormEvalMatrixValueDto
+	{
+		public Guid Id { get; set; }
+
+		public Guid FormEvalMatrixId { get; set; }
+
+		public string? NameAr { get; set; }
+
+		public string? NameEn { get; set; }
+
+		public decimal MinValue { get; set; }
+
+		public decimal MaxValue { get; set; }
+
+		public decimal ActualMatrixValue { get; set; }
+
+		public string? DescAr { get; set; }
+
+		public string? DescEn { get; set; }
+
+		public int OrderNo { get; set; }
+
+		public bool IsActive { get; set; }
+	}
 	public class FormAnalysisObservationDto
 	{
 		public Guid Id { get; set; }

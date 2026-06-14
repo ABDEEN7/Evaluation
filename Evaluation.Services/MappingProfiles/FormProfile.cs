@@ -53,35 +53,34 @@ public class FormProfile : Profile
 		  .ReverseMap();
 
 		CreateMap<SubFormItemValue, SubFormItemEvaluationDto>()
-		 .ForMember(d => d.Value, opt => opt.MapFrom(src => src.FieldDropDownValueId))
 		 .ForMember(d => d.Note, opt => opt.MapFrom(src => src.Note))
 		 .ForMember(d => d.Id, opt => opt.MapFrom(src => src.SubFormItemId))
-		 .ForMember(d => d.ValueId, opt => opt.MapFrom(src => src.Id))
+		 .ForMember(d => d.ValueId, opt => opt.MapFrom(src => src.FieldDropDownValueId))
 		 .ReverseMap();
 
 		CreateMap<FormEvaluationDto, FormEvaluationValue>()
-			  .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.Items));
-			  //.ForMember(dest => dest.SubItems, opt => opt.Ignore()) // filled manually
-			  //.AfterMap((src, dest, ctx) =>
-			  //{
-				 // dest.SubItems = new List<SubFormItemValue>();
+			  .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.Items))
+			  .ForMember(dest => dest.SubItems, opt => opt.Ignore()) // filled manually
+			  .AfterMap((src, dest, ctx) =>
+			  {
+				  dest.SubItems = new List<SubFormItemValue>();
 
-				 // if (src.Items == null)
-					//  return;
+				  if (src.Items == null)
+					  return;
 
-				 // // Flatten subitems and assign parent FormItemId
-				 // foreach (var item in src.Items)
-				 // {
-					//  if (item.SubItems == null)
-					//	  continue;
+				  // Flatten subitems and assign parent FormItemId
+				  foreach (var item in src.Items)
+				  {
+					  if (item.SubItems == null)
+						  continue;
 
-					//  foreach (var sub in item.SubItems)
-					//  {
-					//	  var mappedSub = ctx.Mapper.Map<SubFormItemValue>(sub);
-					//	  dest.SubItems.Add(mappedSub);
-					//  }
-				 // }
-			  //});
+					  foreach (var sub in item.SubItems)
+					  {
+						  var mappedSub = ctx.Mapper.Map<SubFormItemValue>(sub);
+						  dest.SubItems.Add(mappedSub);
+					  }
+				  }
+			  });
 
 
 		CreateMap<FormEvalMatrixValue, FormEvalMarixValueDto>()
