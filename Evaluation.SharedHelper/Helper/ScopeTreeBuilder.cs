@@ -364,6 +364,11 @@ public static class ScopeTreeBuilder
                         HasNote = x.HasNote,
                         NoteRequired = x.NoteRequired,
                         HasMultiEvaluation = x.HasMuliEvaluation,
+                        SubFormItems = x.SubFormItems?.Select(c => new SubFormItemDto
+                        {
+                            Id = c.Id,
+                            Name = c.NameEn,//TODO: need to fix for selected language
+                        }).ToList(),
 
                         FormItemConfigs = configLookup.TryGetValue(x.Id, out var configs)
                             ? configs.Select(c => new FormItemConfigDto
