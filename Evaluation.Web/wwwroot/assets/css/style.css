@@ -6010,8 +6010,7 @@ table.dataTable tbody tr.child-row > td {
 .table-card-seperate-styling tbody tr:not(.card):not(.card-row) td,
 .table-card-seperate-styling tbody tr:not(.card):not(.card-row) .data-text,
 .table-card-seperate-styling tbody tr:not(.card):not(.card-row) .status-padding,
-.table-card-seperate-styling tbody tr:not(.card):not(.card-row) .period-label,
-.table-card-seperate-styling thead th {
+.table-card-seperate-styling tbody tr:not(.card):not(.card-row) .period-label {
     font-size: 15px !important;
     font-weight: 600;
 }
@@ -6020,4 +6019,18 @@ table.dataTable tbody tr.child-row > td {
 .table-card-seperate-styling tbody tr:not(.card):not(.card-row) .request-header {
     font-size: 15px !important;
     font-weight: 600 !important;
+}
+
+
+.table-card-seperate-styling tbody tr:not(.card):not(.card-row) .school-count-column {
+    text-align: center !important;
+}
+
+
+.table-card-seperate-styling thead th,
+.table-card-seperate-styling.dataTable thead th {
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    text-align: center !important;
+    vertical-align: middle !important;
 }
