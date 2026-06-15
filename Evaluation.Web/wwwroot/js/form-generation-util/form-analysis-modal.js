@@ -5,6 +5,7 @@
     let _filtered = null;
 
     const lbl = key => uiControlsSetup().GetUiControlText(key) || key;
+    const isAr = window.currentLang === "ar";
 
     window.openFormAnalysis = async function (requestId) {
         if (!requestId) {
@@ -136,7 +137,7 @@
 
                     <div>
                         <label class="form-label small fw-bold">${lbl("lblSubject")}</label>
-                        <select id="fa-subject" class="form-select">
+                       <select id="fa-subject" class="form-select">
                             <option value="">${lbl("lblAllSubjects")}</option>
                         </select>
                     </div>
@@ -192,7 +193,12 @@
 
         (_data.observations || []).forEach(x => {
             if (x[idKey]) {
-                map.set(x[idKey], x[arKey] || x[enKey] || "-");
+                map.set(
+                    x[idKey],
+                    isAr
+                        ? (x[arKey] || x[enKey] || "-")
+                        : (x[enKey] || x[arKey] || "-")
+                );
             }
         });
 
@@ -209,13 +215,13 @@
             );
         });
     }
-
     function applyFilters() {
         const stageId = document.getElementById("fa-stage").value;
         const gradeId = document.getElementById("fa-grade").value;
         const subjectId = document.getElementById("fa-subject").value;
 
-        let observations = [...(_data.observations || [])];
+        let observations = [...(_data.observations || [])]
+            .filter(x => x.items && x.items.length > 0);
 
         if (stageId)
             observations = observations.filter(x => x.educationLevelId === stageId);
@@ -240,11 +246,17 @@
                 ...i,
                 observationId: o.id,
                 educationLevelId: o.educationLevelId,
-                educationLevelName: o.educationLevelNameAr || o.educationLevelNameEn,
+                educationLevelName: isAr
+                    ? (o.educationLevelNameAr || o.educationLevelNameEn)
+                    : (o.educationLevelNameEn || o.educationLevelNameAr),
                 gradeLevelId: o.gradeLevelId,
-                gradeLevelName: o.gradeLevelNameAr || o.gradeLevelNameEn,
+                gradeLevelName: isAr
+                    ? (o.gradeLevelNameAr || o.gradeLevelNameEn)
+                    : (o.gradeLevelNameEn || o.gradeLevelNameAr),
                 schoolCourseId: o.schoolCourseId,
-                schoolCourseName: o.schoolCourseNameAr || o.schoolCourseNameEn
+                schoolCourseName: isAr
+                    ? (o.schoolCourseNameAr || o.schoolCourseNameEn)
+                    : (o.schoolCourseNameEn || o.schoolCourseNameAr)
             }))
         );
 
@@ -256,7 +268,9 @@
 
             return {
                 formItemId: g.key,
-                criteriaNameAr: first.itemNameAr || first.itemNameEn,
+                criteriaNameAr: isAr
+                    ? (first.itemNameAr || first.itemNameEn)
+                    : (first.itemNameEn || first.itemNameAr),
                 average: avg,
                 percentage: pct,
                 rate: getRate(avg),
@@ -315,7 +329,11 @@
             const criteriaValues = {};
             groupBy(g.items, x => x.formItemId).forEach(cg => {
                 const cFirst = cg.items[0];
-                criteriaValues[cFirst.itemNameAr || cFirst.itemNameEn || "-"] =
+                criteriaValues[
+                    isAr
+                        ? (cFirst.itemNameAr || cFirst.itemNameEn || "-")
+                        : (cFirst.itemNameEn || cFirst.itemNameAr || "-")
+                ] =
                     average(cg.items.map(x => num(x.actualValue)));
             });
 
@@ -353,13 +371,13 @@
         const s = _filtered.summary;
 
         document.getElementById("tab-results").innerHTML = `
-            <div class="fa-summary">
-                ${summaryCard(lbl("lblObservationsCount"), s.totalSessions, lbl("lblClassroomObservationSession"))}
-                ${summaryCard(lbl("lblOverallResult"), `${fmt(s.overallAverage)} / 5`, `${lbl("lblPercentage")}: ${fmt(s.overallPercentage)}%`)}
-                ${summaryCard(lbl("lblOverallRate"), s.overallRate, lbl("lblBasedOnOverallAverage"))}
-                ${summaryCard(lbl("lblHighestCriteria"), s.bestCriteriaName, fmt(s.bestCriteriaAvg))}
-                ${summaryCard(lbl("lblLowestCriteria"), s.worstCriteriaName, fmt(s.worstCriteriaAvg))}
-            </div>
+           <div class="fa-summary">
+            ${summaryCard(lbl("lblObservationsCount"), s.totalSessions, lbl("lblClassroomObservationSession"))}
+            ${summaryCard(lbl("lblOverallResult"), `${fmt(s.overallAverage)} / 5`, `${lbl("lblPercentage")}: ${fmt(s.overallPercentage)}%`)}
+            ${summaryCard(lbl("lblOverallRate"), s.overallRate?.text ?? "—", lbl("lblBasedOnOverallAverage"))}
+            ${summaryCard(lbl("lblHighestCriteria"), s.bestCriteriaName, fmt(s.bestCriteriaAvg))}
+            ${summaryCard(lbl("lblLowestCriteria"), s.worstCriteriaName, fmt(s.worstCriteriaAvg))}
+        </div>
 
             <div class="fa-card">
                 <div class="fa-card-header">
@@ -636,31 +654,40 @@
         if (!matrix)
             return { key: "fa-wk", text: "—" };
 
+        const name = isAr
+            ? (matrix.nameAr || matrix.nameEn)
+            : (matrix.nameEn || matrix.nameAr);
+
         return {
-            key: getRateCss(matrix.nameAr),
-            text: matrix.nameAr
+            key: getRateCss(name),
+            text: name
         };
     }
     function getRateCss(rateName) {
 
-        switch ((rateName || "").trim()) {
+        switch ((rateName || "").toString().trim()) {
 
+            case "5":
             case "ممتاز":
             case "Excellent":
                 return "fa-ex";
 
+            case "4":
             case "جيد جداً":
             case "Very Good":
                 return "fa-vg";
 
+            case "3":
             case "جيد":
             case "Good":
                 return "fa-g";
 
+            case "2":
             case "مقبول":
             case "Acceptable":
                 return "fa-ac";
 
+            case "1":
             case "ضعيف":
             case "Weak":
                 return "fa-wk";

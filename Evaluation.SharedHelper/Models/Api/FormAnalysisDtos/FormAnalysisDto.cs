@@ -66,7 +66,6 @@ namespace Evaluation.SharedHelper.Models.Api.FormAnalysisDtos
 		public Guid? SchoolCourseId { get; set; }
 		public string? SchoolCourseNameAr { get; set; }
 		public string? SchoolCourseNameEn { get; set; }
-
 		public List<FormAnalysisItemDto> Items { get; set; } = [];
 	}
 
@@ -88,5 +87,8 @@ namespace Evaluation.SharedHelper.Models.Api.FormAnalysisDtos
 		public decimal Weight { get; set; }
 
 		public string? Note { get; set; }
+		public Guid? FormEvalMatrixId { get; set; }
+		public string? MatrixNameAr { get; set; }
+		public string? MatrixNameEn { get; set; }
 	}
 }

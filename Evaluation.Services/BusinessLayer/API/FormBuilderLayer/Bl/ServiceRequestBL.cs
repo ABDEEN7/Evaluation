@@ -379,6 +379,7 @@ namespace Evaluation.Services.Models.API
 					x.ServiceRequestId.HasValue &&
 					requestIds.Contains(x.ServiceRequestId.Value) &&
 					!x.IsDeleted)
+				.Include(x => x.FormEvalMatrixValue)
 				.Include(x => x.FormItem)
 					.ThenInclude(x => x!.Scope)
 				.Include(x => x.FormItem)
@@ -440,7 +441,10 @@ namespace Evaluation.Services.Models.API
 								Min = item.Min,
 								Max = max,
 								Weight = item.Weight,
-								Note = v.Note
+								Note = v.Note,
+								FormEvalMatrixId = v.FormEvalMatrixValue?.Id,
+								MatrixNameAr = v.FormEvalMatrixValue?.NameAr,
+								MatrixNameEn = v.FormEvalMatrixValue?.NameEn,
 							};
 						})
 						.OrderBy(x => x.ScopeNameAr)
@@ -449,26 +453,36 @@ namespace Evaluation.Services.Models.API
 				};
 			}).ToList();
 
-			var matrixValues = await uow.GetRepository<FormEvalMatrixValue>()
-									.GetAllActiveNonDeleted()
-									.OrderBy(x => x.OrderNo)
-									.Select(x => new FormEvalMatrixValueDto
-									{
-										Id = x.Id,
-										FormEvalMatrixId = x.FormEvalMatrixId,
-										NameAr = x.NameAr,
-										NameEn = x.NameEn,
-										MinValue = x.MinValue,
-										MaxValue = x.MaxValue,
-										ActualMatrixValue = x.ActualMatrixValue,
-										DescAr = x.DescAr,
-										DescEn = x.DescEn,
-										OrderNo = x.OrderNo,
-										IsActive = x.IsActive
-									})
-									.ToListAsync();
+			var matrixId = values
+							.Where(x => x.FormItem.EvalForm.FormEvalMatrixId != null)
+							.Select(x => x.FormItem.EvalForm.FormEvalMatrixId)
+							.FirstOrDefault();
 
-			return new FormAnalysisDto
+			var matrixValues = new List<FormEvalMatrixValueDto>();
+
+			if (matrixId != Guid.Empty)
+			{
+				matrixValues = await uow.GetRepository<FormEvalMatrixValue>()
+					.GetAllActiveNonDeleted(x => x.FormEvalMatrixId == matrixId)
+					.OrderBy(x => x.OrderNo)
+					.Select(x => new FormEvalMatrixValueDto
+					{
+						Id = x.Id,
+						FormEvalMatrixId = x.FormEvalMatrixId,
+						NameAr = x.NameAr,
+						NameEn = x.NameEn,
+						MinValue = x.MinValue,
+						MaxValue = x.MaxValue,
+						ActualMatrixValue = x.ActualMatrixValue,
+						DescAr = x.DescAr,
+						DescEn = x.DescEn,
+						OrderNo = x.OrderNo,
+						IsActive = x.IsActive
+					})
+					.ToListAsync();
+			}
+
+			var result= new FormAnalysisDto
 			{
 				RequestId = mainRequest.Id,
 				RequestNumber = mainRequest.RequestNumber,
@@ -480,6 +494,7 @@ namespace Evaluation.Services.Models.API
 				Observations = observations,
 				MatrixValues = matrixValues
 			};
+			return result;
 		}
 	}
 }
