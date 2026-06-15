@@ -1787,6 +1787,10 @@ input.auto-fill {
     font-size: clamp(0.85rem, 1vw, 1rem) !important;
     color: #000 !important;
     font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
 }
 
 
@@ -5778,7 +5782,7 @@ table.dataTable tbody tr.child-row > td {
 
 
 .application-request.card .requeststableBody tr td.td-date-range-block {
-    min-height: 90px;
+    min-height: 75px;
 }
 
 

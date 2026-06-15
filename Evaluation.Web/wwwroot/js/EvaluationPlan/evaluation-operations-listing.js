@@ -128,7 +128,7 @@
         <div class="ellipsis school-name-row">
             <i class="las la-school card-only-icon me-1"></i>
 
-            <span class="ellipsis-text">
+            <span class="data-text">
                 ${data}
             </span>
         </div>
@@ -145,32 +145,13 @@
 
             return `  
                     
-                        <i class="las la-school card-only-icon me-1"></i>
-                        <span class ="text-truncate-2">${data}</span>
+                        <i class="las la-file-signature card-only-icon me-1"></i>
+                         <span class="data-text">${data}</span>
                     
                 `;
         }
     },
-            {
-                data: "status",
-                title: uiControlsSetup().GetUiControlText("lblRequestNo"),
-                className: "td-full",
-                render: function (data, type, row) {
-
-                    if (!data) return "_";
-
-                    const statusColor = row.statusColor || "#89153D";
-                    const textColor = getContrastingTextColor(statusColor);
-
-                    return `
-                    <span class="request-status m-0"
-                          style="color:${statusColor};">
-                        <i class="las la-edit card-only-icon me-1" style="color:${statusColor};"></i>
-                        ${data}
-                    </span>
-                `;
-                }
-            },
+         
                
   {
         data: "evlDateFrom",
@@ -286,7 +267,26 @@
             </div>`;
         }
     },
-      
+         {
+        data: "status",
+        title: uiControlsSetup().GetUiControlText("lblRequestNo"),
+        className: "td-full",
+        render: function(data, type, row) {
+
+            if (!data) return "_";
+
+            const statusColor = row.statusColor || "#89153D";
+            const textColor = getContrastingTextColor(statusColor);
+
+            return `
+                    <span class="request-status m-0"
+                          style="color:${statusColor};">
+                        <i class="las la-edit card-only-icon me-1" style="color:${statusColor};"></i>
+                        ${data}
+                    </span>
+                `;
+        }
+    },
             {
         data: "createOn",
         title: uiControlsSetup().GetUiControlText("lblRequestCreatedDate"),
@@ -667,11 +667,10 @@
         width: '100%',
         multiple: true
     });
-    flatpickr('#evaluationRequestDateFrom', {
-        dateFormat: "Y-m-d",
-        allowInput: true
-    });
-    flatpickr("#evaluationRequestDateTo", {
+const isAr = document.documentElement.lang.toLowerCase().startsWith("ar");
+
+    flatpickr(".datePicker", {
+        locale: isAr ? "ar" : "en",
         dateFormat: "Y-m-d",
         allowInput: true
     });

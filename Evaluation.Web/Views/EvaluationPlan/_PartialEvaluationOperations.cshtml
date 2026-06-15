@@ -1,5 +1,6 @@
 ﻿@using Evaluation.SharedHelper.Enums
-
+<script src="~/lib/flatpickr/l10n/ar.js"></script>
+<script src="~/lib/flatpickr/l10n/default.js"></script>
 <div class="m-4">
 
     <!-- Filter Header -->
@@ -65,16 +66,17 @@
 
                 <div class="col-md-4">
                     <label class="form-label @ConstantKeys.EvaluationOperations.PlanStartDate"></label>
+                  
                     <input id="evaluationRequestDateFrom"
-                           type="date"
-                           class="form-control filter-enter" />
+                           type="text"
+                           class="form-control filter-enter datePicker" />
                 </div>
 
                 <div class="col-md-4">
                     <label class="form-label @ConstantKeys.EvaluationOperations.PlanEndDate"></label>
                     <input id="evaluationRequestDateTo"
-                           type="date"
-                           class="form-control filter-enter" />
+                           type="text"
+                           class="form-control filter-enter datePicker" />
                 </div>
 
             </div>

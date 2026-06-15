@@ -39,5 +39,6 @@ namespace Evaluation.SharedHelper.Helper
         public static string NsisEnrollmentApi { get; set; } = "";
         public static int NsisLimit { get; set; } = 0;
         public static string? NsisStatus { get; set; } = "";
+        public static string QNEDSConnection { get; set; } = "";
     }
 }
