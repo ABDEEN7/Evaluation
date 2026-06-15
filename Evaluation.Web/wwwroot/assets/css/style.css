@@ -6068,3 +6068,127 @@ table.dataTable tbody tr.child-row > td {
 .table-card-seperate-styling tbody tr:not(.card):not(.card-row) .school-level-column {
     text-align: center !important;
 }
+
+
+
+
+
+
+/* Hide card status under title in table */
+.table-card-seperate-styling tbody tr:not(.card):not(.card-row) .request-status-text.card-only-row {
+    display: none !important;
+}
+
+/* Hide separate table status column in cards */
+.table-card-seperate-styling tbody tr.card .status-column,
+.table-card-seperate-styling tbody tr.card-row .status-column {
+    display: none !important;
+}
+
+
+
+
+.table-card-seperate-styling tbody tr:not(.card):not(.card-row) .period-column {
+    text-align: center !important;
+}
+
+
+
+
+.table-card-seperate-styling tbody tr:not(.card):not(.card-row) .date-range-wrapper > .d-flex:last-child {
+    justify-content: center !important;
+}
+
+
+
+
+
+.table-card-seperate-styling tbody tr:not(.card):not(.card-row) td,
+.table-card-seperate-styling tbody tr:not(.card):not(.card-row) .data-text,
+.table-card-seperate-styling tbody tr:not(.card):not(.card-row) .period-label,
+.table-card-seperate-styling tbody tr:not(.card):not(.card-row) .status-countdown-badge,
+.table-card-seperate-styling tbody tr:not(.card):not(.card-row) .evaluation-near-note {
+    font-size: 15px !important;
+    font-weight: 600 !important;
+}
+
+.table-card-seperate-styling tbody tr:not(.card):not(.card-row) .request-header {
+    font-size: 15px !important;
+    font-weight: 600 !important;
+}
+
+.table-card-seperate-styling thead th,
+.table-card-seperate-styling.dataTable thead th {
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    text-align: center !important;
+    vertical-align: middle !important;
+}
+
+
+
+
+    .table-card-seperate-styling thead th,
+    .table-card-seperate-styling.dataTable thead th,
+    .table-card-seperate-styling thead th.sorting,
+    .table-card-seperate-styling thead th.sorting_asc,
+    .table-card-seperate-styling thead th.sorting_desc {
+        text-align: center !important;
+        vertical-align: middle !important;
+    }
+
+
+
+.table-card-seperate-styling thead th,
+.table-card-seperate-styling.dataTable thead th {
+    text-align: center !important;
+    vertical-align: middle !important;
+}
+
+    .table-card-seperate-styling thead th div,
+    .table-card-seperate-styling thead th span {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+    }
+
+
+
+.period-status-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    justify-content: center;
+}
+
+    .period-status-wrapper .status-countdown-badge,
+    .period-status-wrapper .evaluation-near-note
+    .period-status-wrapper .evaluation-near-note {
+        max-width: 100%;
+    }
+
+
+.table-card-seperate-styling thead th.place-content-end {
+    place-content: center !important;
+}
+
+.table-card-seperate-styling thead th.place-content-end {
+    place-content: center !important;
+}
+
+
+.status-countdown-badge,
+.evaluation-near-note {
+    font-size: clamp(10px, 1vw, 13px) !important;
+}
+
+
+.period-status-wrapper .status-countdown-badge,
+.period-status-wrapper .evaluation-near-note {
+    font-size: 11px !important;
+    max-width: 100%;
+    text-align: center;
+    white-space: normal !important;
+    line-height: 1.2;
+}
