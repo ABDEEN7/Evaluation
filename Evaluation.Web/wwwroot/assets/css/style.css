@@ -6034,3 +6034,37 @@ table.dataTable tbody tr.child-row > td {
     text-align: center !important;
     vertical-align: middle !important;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.table-card-seperate-styling tbody tr:not(.card):not(.card-row) td,
+.table-card-seperate-styling tbody tr:not(.card):not(.card-row) .plan-title-text-school,
+.table-card-seperate-styling tbody tr:not(.card):not(.card-row) .data-text {
+    font-size: 15px !important;
+    font-weight: 600 !important;
+}
+
+.table-card-seperate-styling thead th,
+.table-card-seperate-styling.dataTable thead th {
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    text-align: center !important;
+    vertical-align: middle !important;
+}
+
+.table-card-seperate-styling tbody tr:not(.card):not(.card-row) .school-code-column,
+.table-card-seperate-styling tbody tr:not(.card):not(.card-row) .school-type-column,
+.table-card-seperate-styling tbody tr:not(.card):not(.card-row) .school-level-column {
+    text-align: center !important;
+}
