@@ -1096,6 +1096,7 @@ public static class ConstantKeys
 
         #region EvaluationRequest
         public const string VIEW_EVALUATION_REQUEST = "VIEW_EVALUATION_REQUEST";
+        public const string VIEW_EVALUATION_REQUEST_FormAnalysis = "VIEW_EVALUATION_REQUEST_FormAnalysis";
         public const string UPDATE_EVALUATION_REQUEST = "UPDATE_EVALUATION_REQUEST";
         #endregion
 
