@@ -76,6 +76,7 @@ namespace Evaluation.Services.BusinessLayer.API.EvaluationRequestLayer
 			var parties = await uow
 				.GetRepository<EvaluationParty>()
 				.GetAllQueryFiltered()
+				.Include(x => x.EvalPartyCategory)
 				.Include(x => x.PartyTypeEvalParties)
 					.ThenInclude(x => x.PartyTypeEvalPartyStatuses)
 				.Where(p =>
@@ -93,6 +94,7 @@ namespace Evaluation.Services.BusinessLayer.API.EvaluationRequestLayer
 				{
 					Id = p.Id,
 					DepartmentId = p.DepartmentId,
+					EvalPartyCategory = p.EvalPartyCategory.BackendName,
 					NameAr = p.NameAr,
 					NameEn = p.NameEn,
 					OrderNo = p.OrderNo,

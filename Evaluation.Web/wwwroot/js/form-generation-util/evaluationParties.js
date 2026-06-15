@@ -1,7 +1,6 @@
 ﻿(function (ns) {
     "use strict";
     if (!ns) return;
-
     const escapeHtml = (str) => {
         return (str ?? "").toString()
             .replaceAll("&", "&amp;")
@@ -302,8 +301,9 @@
             const cardsHtml = Object.keys(grouped).length
                 ? `
                   <div class="table-card rounded overflow-hidden mt-3">
-                    <div class="table-header">الاستمارات حسب الحالة</div>
-
+                    <div class="table-header">
+                        ${uiControlsSetup().GetUiControlText('lblEvaluationFormsByStatus')}
+                    </div>
                     <div class="status-cards-container p-3">
                       ${Object.entries(grouped).map(([statusId, requests]) => {
                     const count = requests.length;
@@ -327,25 +327,36 @@
                           `;
                 }).join("")}
                     </div>
-
-                    <div class="table-responsive px-3 pb-3">
+                     <div class="table-responsive px-3 pb-3">
                       <table class="table table-bordered text-center align-middle m-0" id="${gridId}">
                         <thead class="table-primary">
                           <tr>
-                            <th>الخدمة</th>
-                            <th>الحالة</th>
-                            <th>المنشئ</th>
-                            <th>تاريخ الإنشاء</th>
+                            <th>${uiControlsSetup().GetUiControlText('lblService')}</th>
+                            <th>${uiControlsSetup().GetUiControlText('lblStatus')}</th>
+                            <th>${uiControlsSetup().GetUiControlText('lblCreatedBy')}</th>
+                            <th>${uiControlsSetup().GetUiControlText('lblCreationDate')}</th>
                           </tr>
                         </thead>
                         <tbody></tbody>
                       </table>
                     </div>
-
                   </div>
                 `
                 : ``;
-
+            const showFormAnalysis =
+                party?.evalPartyCategory?.toLowerCase() === "classroomobservation";
+            const formAnalysisHtml = showFormAnalysis
+                ? `
+              <div class="mb-3 text-end">
+                <a href="javascript:void(0)"
+                   class="btn btn-sm btn-outline-primary"
+                   onclick="openFormAnalysis('${requestId}')">
+                    <i class="las la-chart-bar"></i>
+                    ${uiControlsSetup().GetUiControlText('lblFormAnalysis')}
+                </a>
+            </div>
+                  `
+                : '';
             const expanded = expandFirst && idx === 0;
             var filedivid = "Filediv_" + partyId;
             const filesHTML = `
@@ -355,13 +366,14 @@
                             class="btn btn-sm btn-primary btn-add-support-file"
                             data-party-id="${escapeHtml(partyId)}"
                             onclick="AddFileClick('${partyId}','${requestId}', true)">
-                        <i class="la la-plus"></i> Add Files
+                        <i class="la la-plus"></i> ${uiControlsSetup().GetUiControlText('lblAddFiles')}
                     </button>
-                ` : `
-                    <button type="button"
+                                    ` : `
+                                       <button type="button"
                             class="btn btn-sm btn-secondary"
                             disabled>
-                        <i class="la la-lock"></i> Add Files
+                        <i class="la la-lock"></i>
+                        ${uiControlsSetup().GetUiControlText('lblAddFiles')}
                     </button>
                 `}
                            </div>    
@@ -442,6 +454,8 @@
                      aria-labelledby="${headerId}"
                      data-bs-parent="#${escapeHtml(parentAccordionId)}">
                   <div class="accordion-body">
+
+                      ${formAnalysisHtml}
 
                     ${servicesHtml}
 

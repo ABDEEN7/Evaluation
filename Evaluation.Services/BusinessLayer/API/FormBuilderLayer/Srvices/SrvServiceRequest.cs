@@ -49,6 +49,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             {
                 return await uow.GetRepository<ServiceRequest>()
                     .GetAllQueryFiltered(x => x.Id == requestId)
+                    .Include(x => x.EvaluationRequest)
                     .Include(x => x.Status)
                     .Include(x => x.Service)
                     .FirstOrDefaultAsync();
@@ -58,6 +59,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
             return await scope.GetRepository<ServiceRequest>()
                 .GetAllQueryFiltered(x => x.Id == requestId)
+                .Include(x => x.EvaluationRequest)
                 .Include(x => x.Status)
                 .Include(x => x.Service)
                 .FirstOrDefaultAsync();
@@ -760,8 +762,8 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                         c.DropDownTypeId.Value,
 
 						request.EvaluationRequestId ?? request.Id,
-						request.PlanId
-                    );
+						request.OrgTreeId?? request.EvaluationRequest?.OrgTreeId
+					);
                 }
 
                 if (c!.Type == "list" && c.FormGroupListId != null && c.Value != null)
@@ -792,7 +794,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                                             updatedValue,
                                             field.DropDownTypeId.Value,
 											request.EvaluationRequestId ?? request.Id,
-											request.PlanId
+											request.OrgTreeId
                                         );
                                     }
                                     updatedItem[kvp.Key] = updatedValue;
@@ -854,6 +856,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                                         .Include(x => x.Field)
                                         .Include(x => x.Field!.MappingField)
                                         .Include(x => x.Field!.FieldType)
+                                        .Include(x => x.Field!.FieldInfoType)
                                         .Where(c => c.RefId == requestId).ToListAsync();
 
 

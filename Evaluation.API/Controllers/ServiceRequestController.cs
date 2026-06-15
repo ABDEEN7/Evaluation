@@ -1,5 +1,7 @@
-﻿using Evaluation.Services.Models.API;
+﻿using Evaluation.API.ActionFilter;
+using Evaluation.Services.Models.API;
 using Evaluation.SharedHelper.Dtos.TeamMemberDto;
+using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Api;
@@ -131,6 +133,15 @@ namespace Evaluation.API.Controllers
 		{
 			var result = await _serviceRequestBL.CanCreateEvaluationPlanRequestAsync();
 			return Ok(new { canCreate = result });
+		}
+
+		[HttpGet]
+		[CheckRolePermisionFilter(true, ConstantKeys.WebPermissions.VIEW_EVALUATION_REQUEST_FormAnalysis)]
+
+		public async Task<IActionResult> FormAnalysis(Guid requestId)
+		{
+			var result = await _serviceRequestBL.GetFormAnalysisAsync(requestId);
+			return Ok(result);
 		}
 	}
 }

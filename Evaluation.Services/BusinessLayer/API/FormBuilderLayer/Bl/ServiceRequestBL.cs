@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.ActionEntities;
+using Evaluation.DAL.Models.FormsModules;
+using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
 using Evaluation.DAL.Models.ServiceEnities;
 using Evaluation.DAL.Models.ServiceRequestEntities;
 using Evaluation.DAL.Models.UserEntiy;
@@ -16,6 +18,7 @@ using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Api;
 using Evaluation.SharedHelper.Models.Api.ActionEntitiesDTOs;
 using Evaluation.SharedHelper.Models.Api.EvaluationRequestEntities;
+using Evaluation.SharedHelper.Models.Api.FormAnalysisDtos;
 using Evaluation.SharedHelper.Models.Api.FormBuilderDTO;
 using Evaluation.SharedHelper.Models.Api.ServiceDTOs;
 using Evaluation.SharedHelper.Models.Api.ServiceRequestEntitiesDTO;
@@ -30,14 +33,14 @@ using static Evaluation.SharedHelper.Enums.ConstantKeys;
 namespace Evaluation.Services.Models.API
 {
 
-    public class ServiceRequestBL(
-        IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow, SrvNotification SrvNotification, SrvUser SrvUser, 
-        LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, SystemModuleSrv systemModuleSrv, SrvAction SrvAction, 
-        SrvStatus SrvStatus, SystemModuleSrv SrvSystemModule, SrvAssignment SrvAssignment,SrvEvaluationRequestAssignment _srvEvaluationRequestAssignment, SrvActionTransactionsLog SrvActionTransactionsLog,  PerformActionBL _performActionBL,
+	public class ServiceRequestBL(
+		IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider, UnitOfWork uow, SrvNotification SrvNotification, SrvUser SrvUser,
+		LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, SystemModuleSrv systemModuleSrv, SrvAction SrvAction,
+		SrvStatus SrvStatus, SystemModuleSrv SrvSystemModule, SrvAssignment SrvAssignment, SrvEvaluationRequestAssignment _srvEvaluationRequestAssignment, SrvActionTransactionsLog SrvActionTransactionsLog, PerformActionBL _performActionBL,
 
-		SrvService SrvService, SrvServiceRequest _srvServiceRequest, EvaluationRequestService _evaluationRequestService, SrvAttachments _srvAttachments, IServiceProvider serviceProvider,RequestInfo _requestInfo)
-            : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, _requestInfo)
-    {
+		SrvService SrvService, SrvServiceRequest _srvServiceRequest, EvaluationRequestService _evaluationRequestService, SrvAttachments _srvAttachments, IServiceProvider serviceProvider, RequestInfo _requestInfo)
+			: ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, _requestInfo)
+	{
 
 		public async Task<WebAppPlanRequestsDTO> GetPlanRequestsAsync(FilterRequestsDTO filter)
 		{
@@ -55,23 +58,23 @@ namespace Evaluation.Services.Models.API
 		{
 			return await _srvServiceRequest.GetRequestDetailsAsync(requestId);
 		}
-        public async Task<List<JsTreeNodeDto>> GetScopesList(Guid partyId)
-        {
-            return await _srvServiceRequest.GetScopeList(partyId);
-        }
-        public async Task<List<SupportedFileDto>> GetSupportedFiles(Guid requestId)
-        {
-            return await _srvServiceRequest.GetSupportedFiles(requestId);
-        }
-        public async Task<bool> SaveSupportFiles( IFormFile file, Guid EvaluationRequestId,Guid ScopeId)
-        {
-            return await _srvServiceRequest.SaveSupportFiles(file, EvaluationRequestId, ScopeId);
-        }
-        public async Task<EvaluationRequestDTO> GetEvaluationDetailsAsync(Guid requestId)
+		public async Task<List<JsTreeNodeDto>> GetScopesList(Guid partyId)
+		{
+			return await _srvServiceRequest.GetScopeList(partyId);
+		}
+		public async Task<List<SupportedFileDto>> GetSupportedFiles(Guid requestId)
+		{
+			return await _srvServiceRequest.GetSupportedFiles(requestId);
+		}
+		public async Task<bool> SaveSupportFiles(IFormFile file, Guid EvaluationRequestId, Guid ScopeId)
+		{
+			return await _srvServiceRequest.SaveSupportFiles(file, EvaluationRequestId, ScopeId);
+		}
+		public async Task<EvaluationRequestDTO> GetEvaluationDetailsAsync(Guid requestId)
 		{
 			return await _evaluationRequestService.GetEvaluationDetailsAsync(requestId);
 		}
-		public async Task<ServiceRequestDTO> HandleServiceRequestAsync(ActionFormDTO? actionFormDTO, Guid? planId,Guid? EvaluationRequestId,
+		public async Task<ServiceRequestDTO> HandleServiceRequestAsync(ActionFormDTO? actionFormDTO, Guid? planId, Guid? EvaluationRequestId,
 			Guid serviceId, string actionName, string fieldValuesJson, List<AssignUserDTO?> assignUsers, List<EvalTeamRequestDto> teamUsers,
 			IFormFileCollection files, string remarks, bool saveAsDraft = false)
 		{
@@ -118,7 +121,7 @@ namespace Evaluation.Services.Models.API
 
 			// Step 3: Create or update the request
 			ServiceRequestDTO resultRequest = new ServiceRequestDTO();
-			if(requestType == RequestType.Evaluation)
+			if (requestType == RequestType.Evaluation)
 			{
 				requestId = EvaluationRequestId;
 			}
@@ -129,7 +132,7 @@ namespace Evaluation.Services.Models.API
 				{
 					throw new BusinessException(ExceptionMessage.IncompleteRequest);
 				}
-			
+
 
 				var request = new ServiceRequest
 				{
@@ -137,9 +140,9 @@ namespace Evaluation.Services.Models.API
 					StatusId = status.Id,
 					ServiceId = serviceId,
 					//OrgTreeId = OrgTreeId,
-					EvaluationRequestId  = EvaluationRequestId ,
+					EvaluationRequestId = EvaluationRequestId,
 					//InitialHistoryId = InitialHistoryId,
-					
+
 
 				};
 
@@ -151,7 +154,7 @@ namespace Evaluation.Services.Models.API
 
 					var validatedFields = await validateActionTask;
 
-					actionFormDTO!.FieldValues = (await _srvAttachments.UploadAndInsertAttachments(validatedFields.ToList(),requestType, request.Id, request.EvaluationRequestId, fileFields, filesWithFieldId)).Cast<FieldValueDTO?>().ToList();
+					actionFormDTO!.FieldValues = (await _srvAttachments.UploadAndInsertAttachments(validatedFields.ToList(), requestType, request.Id, request.EvaluationRequestId, fileFields, filesWithFieldId)).Cast<FieldValueDTO?>().ToList();
 				}
 
 
@@ -159,9 +162,9 @@ namespace Evaluation.Services.Models.API
 
 				resultRequest!.Id = request.Id;
 
-				var actionResult = await _performActionBL.PerformAction(request, requestType, serviceObj, actionFormDTO!.FieldValues!, action.BackendName, assignUsers.Where(c => c!.IsSelected).ToList()!,null, remarks, saveAsDraft);
+				var actionResult = await _performActionBL.PerformAction(request, requestType, serviceObj, actionFormDTO!.FieldValues!, action.BackendName, assignUsers.Where(c => c!.IsSelected).ToList()!, null, remarks, saveAsDraft);
 
-				var otherAttachmentsTask = _srvAttachments.UploadAndInsertOtherAttachments(othersAttachement, actionResult.actionlog,requestType,requestId, request.EvaluationRequestId);
+				var otherAttachmentsTask = _srvAttachments.UploadAndInsertOtherAttachments(othersAttachement, actionResult.actionlog, requestType, requestId, request.EvaluationRequestId);
 				var sequence = request.Sequence;
 				var requestNumber = DateTime.Now.ToString(serviceObj.ReqNumberDef ?? "", new CultureInfo("en-US")) + sequence;
 
@@ -214,17 +217,17 @@ namespace Evaluation.Services.Models.API
 			{
 				if (requestType == RequestType.Evaluation)
 					requestId = EvaluationRequestId;
-				var application = await GetRequestUnifiedAsync(requestId!.Value,requestType, true);
+				var application = await GetRequestUnifiedAsync(requestId!.Value, requestType, true);
 
 				var allFields = JsonConvert.DeserializeObject<List<FieldValueDTO?>>(fieldValuesJson);
 				var validatedFields = await SrvAction.ValidateActionAndActionFieldAsync(application, allFields!, remarks, othersAttachement, serviceObj, application!.StatusId, action, fileFields, saveAsDraft);
 
 
-				actionFormDTO!.FieldValues = (await _srvAttachments.UploadAndInsertAttachments(validatedFields.ToList(),requestType, requestId, application.EvaluationRequestId??EvaluationRequestId, fileFields, filesWithFieldId)).Cast<FieldValueDTO?>().ToList();
+				actionFormDTO!.FieldValues = (await _srvAttachments.UploadAndInsertAttachments(validatedFields.ToList(), requestType, requestId, application.EvaluationRequestId ?? EvaluationRequestId, fileFields, filesWithFieldId)).Cast<FieldValueDTO?>().ToList();
 
-				var actionResult = await _performActionBL.PerformAction(application, requestType,serviceObj, actionFormDTO.FieldValues!, actionName, assignUsers.Where(c => c!.IsSelected).ToList()!, teamUsers, remarks, saveAsDraft);
+				var actionResult = await _performActionBL.PerformAction(application, requestType, serviceObj, actionFormDTO.FieldValues!, actionName, assignUsers.Where(c => c!.IsSelected).ToList()!, teamUsers, remarks, saveAsDraft);
 
-				var otherAttachments = await _srvAttachments.UploadAndInsertOtherAttachments(othersAttachement, actionResult.actionlog,requestType, application.Id, application.EvaluationRequestId);
+				var otherAttachments = await _srvAttachments.UploadAndInsertOtherAttachments(othersAttachement, actionResult.actionlog, requestType, application.Id, application.EvaluationRequestId);
 
 
 				await uow.CommitAsync();
@@ -274,11 +277,11 @@ namespace Evaluation.Services.Models.API
 
 			return (null, null, null);
 		}
-	
-	
-		public async Task<string> GetAttachmentUrlAsync(Guid attachmentId, Guid requestId, Guid EvlReqtId )
+
+
+		public async Task<string> GetAttachmentUrlAsync(Guid attachmentId, Guid requestId, Guid EvlReqtId)
 		{
-			if (requestId != Guid.Empty && EvlReqtId  != Guid.Empty)
+			if (requestId != Guid.Empty && EvlReqtId != Guid.Empty)
 			{
 				throw new UnauthorizedAccessException("You do not have permission to view this request.");
 			}
@@ -303,7 +306,7 @@ namespace Evaluation.Services.Models.API
 
 		public async Task<NdaApproveResponse> ApproveNda(NdaApproveRequest dto)
 		{
-			return  await _srvEvaluationRequestAssignment.ApproveNda(dto);
+			return await _srvEvaluationRequestAssignment.ApproveNda(dto);
 		}
 		public async Task<List<GetServiceStatusDR>> GetServiceStatus()
 		{
@@ -347,6 +350,151 @@ namespace Evaluation.Services.Models.API
 
 			return isInitiator;
 		}
+		public async Task<FormAnalysisDto> GetFormAnalysisAsync(Guid requestId)
+		{
+			var requests = await uow.GetRepository<ServiceRequest>()
+				.GetAllActiveNonDeleted(x => x.EvaluationRequestId == requestId)
+				.Include(x => x.Service)
+				.ThenInclude(x => x.EvaluationParty)
+				.ThenInclude(x => x.EvalPartyCategory)
+				.Include(x => x.Service)
+				.ThenInclude(x=>x.ServiceType)
+				.Include(x => x.OrgTree)
+				.Include(x => x.EducationLevel)
+				.Include(x => x.GradeLevel)
+				.Include(x => x.SchoolCourse)
+				.Where(x=>x.Service.ServiceType.BackendName== "ClassroomObservation")
+				.Where(x=>x.Service.EvaluationParty.EvalPartyCategory.BackendName== "ClassroomObservation")
+				.ToListAsync();
 
+			var mainRequest = requests.FirstOrDefault();
+
+			if (mainRequest == null)
+				throw new BusinessException("Service request not found");
+
+			var requestIds = requests.Select(x => x.Id).ToList();
+
+			var values = await uow.GetRepository<FormItemValue>()
+				.GetAllActiveNonDeleted(x =>
+					x.ServiceRequestId.HasValue &&
+					requestIds.Contains(x.ServiceRequestId.Value) &&
+					!x.IsDeleted)
+				.Include(x => x.FormEvalMatrixValue)
+				.Include(x => x.FormItem)
+					.ThenInclude(x => x!.Scope)
+				.Include(x => x.FormItem)
+					.ThenInclude(x => x!.EvalForm)
+					.ThenInclude(x => x!.EvalFormType)
+				.Where(x=>x.FormItem.EvalForm.EvalFormType.BackendName== "ClassroomObservation")
+				.ToListAsync();
+
+			var observations = requests.Select(req =>
+			{
+				var reqValues = values
+					.Where(v => v.ServiceRequestId == req.Id)
+					.ToList();
+
+				return new FormAnalysisObservationDto
+				{
+					Id = req.Id,
+					RequestNumber = req.RequestNumber,
+
+					SchoolId = req.OrgTreeId,
+					SchoolNameAr = req.OrgTree?.NameAr,
+					SchoolNameEn = req.OrgTree?.NameEn,
+
+					EducationLevelId = req.EducationLevelId,
+					EducationLevelNameAr = req.EducationLevel?.NameAr,
+					EducationLevelNameEn = req.EducationLevel?.NameEn,
+
+					GradeLevelId = req.GradeLevelId,
+					GradeLevelNameAr = req.GradeLevel?.NameAr,
+					GradeLevelNameEn = req.GradeLevel?.NameEn,
+
+					SchoolCourseId = req.SchoolCourseId,
+					SchoolCourseNameAr = req.SchoolCourse?.NameAr,
+					SchoolCourseNameEn = req.SchoolCourse?.NameEn,
+
+					Items = reqValues
+						.Where(v => v.FormItem != null)
+						.Select(v =>
+						{
+							var item = v.FormItem!;
+							var max = item.Max > 0 ? item.Max : 5;
+							var actual = v.ActualValue;
+
+							return new FormAnalysisItemDto
+							{
+								FormItemId = item.Id,
+
+								ItemNameAr = !string.IsNullOrWhiteSpace(v.RenameItem)
+									? v.RenameItem
+									: item.NameAr,
+
+								ItemNameEn = item.NameEn,
+
+								ScopeId = item.ScopeId,
+								ScopeNameAr = item.Scope?.NameAr,
+								ScopeNameEn = item.Scope?.NameEn,
+
+								ActualValue = actual,
+								Min = item.Min,
+								Max = max,
+								Weight = item.Weight,
+								Note = v.Note,
+								FormEvalMatrixId = v.FormEvalMatrixValue?.Id,
+								MatrixNameAr = v.FormEvalMatrixValue?.NameAr,
+								MatrixNameEn = v.FormEvalMatrixValue?.NameEn,
+							};
+						})
+						.OrderBy(x => x.ScopeNameAr)
+						.ThenBy(x => x.ItemNameAr)
+						.ToList()
+				};
+			}).ToList();
+
+			var matrixId = values
+							.Where(x => x.FormItem.EvalForm.FormEvalMatrixId != null)
+							.Select(x => x.FormItem.EvalForm.FormEvalMatrixId)
+							.FirstOrDefault();
+
+			var matrixValues = new List<FormEvalMatrixValueDto>();
+
+			if (matrixId != Guid.Empty)
+			{
+				matrixValues = await uow.GetRepository<FormEvalMatrixValue>()
+					.GetAllActiveNonDeleted(x => x.FormEvalMatrixId == matrixId)
+					.OrderBy(x => x.OrderNo)
+					.Select(x => new FormEvalMatrixValueDto
+					{
+						Id = x.Id,
+						FormEvalMatrixId = x.FormEvalMatrixId,
+						NameAr = x.NameAr,
+						NameEn = x.NameEn,
+						MinValue = x.MinValue,
+						MaxValue = x.MaxValue,
+						ActualMatrixValue = x.ActualMatrixValue,
+						DescAr = x.DescAr,
+						DescEn = x.DescEn,
+						OrderNo = x.OrderNo,
+						IsActive = x.IsActive
+					})
+					.ToListAsync();
+			}
+
+			var result= new FormAnalysisDto
+			{
+				RequestId = mainRequest.Id,
+				RequestNumber = mainRequest.RequestNumber,
+				ServiceId = mainRequest.ServiceId,
+				ServiceNameAr = mainRequest.Service?.NameAr,
+				ServiceNameEn = mainRequest.Service?.NameEn,
+				EvaluationRequestId = mainRequest.EvaluationRequestId,
+				EvaluationPartyId = mainRequest.EvaluationPartyId,
+				Observations = observations,
+				MatrixValues = matrixValues
+			};
+			return result;
+		}
 	}
 }

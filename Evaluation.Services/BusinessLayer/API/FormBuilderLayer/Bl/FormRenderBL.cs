@@ -678,8 +678,7 @@ namespace Evaluation.Services.BusinessLayer.API
 		public async Task<ServiceRequestDTO> GetActionFieldAsync(Guid serviceId,string actionBackendKey,Guid? requestId = null,Guid? PlanId = null, Guid? EvlReqId = null)
 		{
 			string lang = _requestInfo.Lang;
-			var userId = userInfo.UserId ?? throw new BusinessException(ExceptionMessage.UserNotFound); 
-
+			var userId = userInfo.UserId ?? throw new BusinessException(ExceptionMessage.UserNotFound);
 			var serviceTask = _srvService.GetServiceById(serviceId);
 			var actionTask = _srvAction.GetActionByBackendNameAsync(serviceId, actionBackendKey);
 			var statusIdTask = requestId is null
@@ -693,7 +692,7 @@ namespace Evaluation.Services.BusinessLayer.API
 			var action = await actionTask
 						 ?? throw new BusinessException($"Action with key {actionBackendKey} not found for service {service.NameEn}.");
 			ServiceRequest? requestObj = null;
-
+			
 			var requestType = systemModuleSrv.GetRequestType(service);
 			if (requestId is not null && requestId != Guid.Empty)
 			{
@@ -714,11 +713,11 @@ namespace Evaluation.Services.BusinessLayer.API
 					//if (!canAccess)
 					//	throw new UnauthorizedAccessException("You do not have permission to view this request.");
 				}
-
+				
 				PlanId = requestObj.PlanId ?? PlanId;
 			}
 
-		
+			
 			if (!service.Initialservice && action.IsInitialAction && PlanId == null)
 				//throw new BusinessException(ExceptionMessage.MissingPlan);
 
@@ -740,14 +739,31 @@ namespace Evaluation.Services.BusinessLayer.API
 			var statusId = requestId is not null
 				? requestObj?.StatusId ?? throw new BusinessException(ExceptionMessage.InvalidRequest)
 				: await statusIdTask ?? throw new BusinessException(ExceptionMessage.lblNoServiceStatusFound);
+			EvlReqId ??= requestObj?.EvaluationRequestId; 
+			Guid? OrgTreeId;
 
-			var OrgTreeId = requestId != null ? requestObj!.OrgTreeId : userId;
 
-			if (OrgTreeId == Guid.Empty)
-				throw new BusinessException(ExceptionMessage.UserNotFound);
+			if (requestId.HasValue)
+			{
+				OrgTreeId = requestObj?.OrgTreeId
+					?? requestObj?.EvaluationRequest?.OrgTreeId;
+			}
+			else if (EvlReqId.HasValue)
+			{
+				OrgTreeId = (await uow.GetRepository<EvaluationRequest>()
+					.GetByIDActiveNonDeleted(EvlReqId.Value))?.OrgTreeId;
+			}
+			else
+			{
+				OrgTreeId = requestObj?.EvaluationRequest?.OrgTreeId
+					?? requestObj?.OrgTreeId;
+			}
+
+			//if (OrgTreeId == Guid.Empty)
+			//	throw new BusinessException(ExceptionMessage.UserNotFound);
 
 			var dropDownTask = _srvDropdown.GetDropDownValuesForAction(
-				PlanId ?? requestObj?.PlanId,
+				 OrgTreeId,
 				EvlReqId,
 				action.Id,
 				null,
