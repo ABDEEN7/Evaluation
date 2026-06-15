@@ -11,6 +11,12 @@ const GET_FORMS_API = {
 
 let depRoutePath = sharedUtility().extractDepartmentName();
 
+
+const ItemPropertyType = Object.freeze({
+    SELECT: 1,
+    NOTE: 2
+});
+
 // Build MOCK_DATA-shaped structure dynamically from API tree
 // Top-level tree node  -> Criterion (criterion-card)
 // node.children        -> Aspects (aspect-card)
@@ -31,7 +37,6 @@ function buildFormData(tree) {
     }));
 }
 
-
 let MOCK_DATA;
 
 function toast(msg) {
@@ -42,8 +47,8 @@ function toast(msg) {
 }
 
 
-async function initForm(formId) {
 
+async function initForm(formId, readOnly, savedResults) {
     const response = await jqClient().Get(
         GET_FORMS_API.getItems(depRoutePath, formId)
     );
@@ -58,7 +63,14 @@ async function initForm(formId) {
 
     MOCK_DATA = buildFormData(tree);
 
+
     const root = document.getElementById('form-root');
+
+    // Build a lookup map: itemId -> saved result
+    const savedMap = {};
+    if (Array.isArray(savedResults)) {
+        savedResults.forEach(r => { savedMap[r.id] = r; });
+    }
 
     MOCK_DATA.forEach((crit, cIdx) => {
         const cCard = document.createElement('div');
@@ -113,20 +125,123 @@ async function initForm(formId) {
  
                         <input class="row-name" type="text" value="${row.text}" readonly />
  
-                        <select class="row-select">
-                            ${matrixValues.map(o => `<option value="${o.id}">${o.actualMatrixValue}</option>`).join('')}
+                        <select class="row-select" ${readOnly ? 'disabled' : ''} >
+                            <option disabled selected>Please Select</option>
+                            ${matrixValues.map(o => `<option value="${o.id}" data-actual-value="${o.actualMatrixValue}">${o.actualMatrixValue}</option>`).join('')}
                         </select>
  
                         ${row.hasNote
-                            ? `<input class="row-note" type="text" placeholder="اكتب ملاحظة هنا..." />`
+                        ? `<input class="row-note" ${readOnly ? 'disabled' : ''}  type="text" placeholder="اكتب ملاحظة هنا..." />`
                             : `<div class="row-note-placeholder"></div>`}
                     `;
 
                     rowsArea.appendChild(rowDiv);
+
+                    // Prefill from saved results, if available
+                    const saved = savedMap[row.id];
+                    if (saved) {
+                        const selectEl = rowDiv.querySelector('.row-select');
+                        if (selectEl && saved.valueId) {
+                            selectEl.value = saved.valueId;
+                        }
+
+                        const noteEl = rowDiv.querySelector('.row-note');
+                        if (noteEl && saved.note !== null && saved.note !== undefined) {
+                            noteEl.value = saved.note;
+                        }
+                    }
                 });
             });
     });
 }
+
+//async function initForm(formId, readOnly) {
+
+//    const response = await jqClient().Get(
+//        GET_FORMS_API.getItems(depRoutePath, formId)
+//    );
+
+//    let tree = response?.value?.tree ?? [];
+
+//    const matrixResponse = await jqClient().Get(
+//        GET_FORMS_API.getMatrixValues(depRoutePath, formId)
+//    );
+
+//    const matrixValues = matrixResponse?.value ?? matrixResponse ?? [];
+
+//    MOCK_DATA = buildFormData(tree);
+
+//    const root = document.getElementById('form-root');
+
+//    MOCK_DATA.forEach((crit, cIdx) => {
+//        const cCard = document.createElement('div');
+//        cCard.className = 'criterion-card';
+
+//        cCard.innerHTML = `
+//                <div class="criterion-header">
+//                    <span class="criterion-number">معيار ${cIdx + 1}</span>
+//                    <input class="criterion-title-input" type="text" value="${crit.title}" readonly />
+//                </div>
+//                <div class="criterion-body" id="crit-body-${cIdx}"></div>
+//            `;
+
+//        root.appendChild(cCard);
+
+//        const body = document.getElementById(`crit-body-${cIdx}`);
+
+//        crit.aspects
+//            .filter(asp => asp.rows && asp.rows.length > 0)
+//            .forEach((asp, aIdx) => {
+//                const aCard = document.createElement('div');
+//                aCard.className = 'aspect-card';
+
+//                const aId = `asp-${cIdx}-${aIdx}`;
+
+//                aCard.innerHTML = `
+//                    <div class="aspect-header">
+//                        <span class="aspect-label">جانب ${aIdx + 1}</span>
+//                        <input class="aspect-title-input" type="text" value="${asp.title}" readonly />
+//                    </div>
+ 
+//                    <div class="domain-row">
+//                        <div class="domain-title">
+//                            ${asp.domainTitle}
+//                        </div>
+ 
+//                        <div class="rows-area" id="rows-${aId}"></div>
+//                    </div>
+//                `;
+
+//                body.appendChild(aCard);
+
+//                const rowsArea = document.getElementById(`rows-${aId}`);
+
+//                asp.rows.forEach((row, rIdx) => {
+//                    const rowDiv = document.createElement('div');
+//                    rowDiv.className = 'row-item';
+//                    rowDiv.dataset.itemId = row.id;
+
+//                    rowDiv.innerHTML = `
+//                        <span class="row-index">${rIdx + 1}</span>
+ 
+//                        <input class="row-name" type="text" value="${row.text}" readonly />
+ 
+//                        <select class="row-select" ${readOnly ? 'disabled' : ''}>
+//                        <option disabled selected>Please Select</option>
+//                            ${matrixValues.map(o => `<option value="${o.id}" data-actual-value="${o.actualMatrixValue}">${o.actualMatrixValue}</option>`).join('')}
+//                        </select>
+ 
+//                        ${row.hasNote
+//                        ? `<input class="row-note" type="text" ${readOnly ? 'disabled' : ''} placeholder="اكتب ملاحظة هنا..." />`
+//                            : `<div class="row-note-placeholder"></div>`}
+//                    `;
+
+//                    rowsArea.appendChild(rowDiv);
+//                });
+//            });
+//    });
+//}
+
 
 function saveForm() {
     const results = [];
@@ -134,6 +249,7 @@ function saveForm() {
 
     document.querySelectorAll('.row-item').forEach(row => {
         const val = row.querySelector('.row-select').value;
+        const actualValue = row.querySelector('.row-select').selectedOptions[0]?.dataset.actualValue;
         const text = row.querySelector('.row-name').value;
         const noteEl = row.querySelector('.row-note');
         const note = noteEl ? noteEl.value.trim() : null;
@@ -143,7 +259,7 @@ function saveForm() {
         results.push({
             id: row.dataset.itemId,
             text,
-            value: val,
+            value: actualValue,
             valueId: val,
             note,
             weightPercentage: null,
