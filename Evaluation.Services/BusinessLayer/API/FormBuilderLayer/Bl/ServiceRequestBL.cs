@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.ActionEntities;
+using Evaluation.DAL.Models.FormsModules;
+using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
 using Evaluation.DAL.Models.ServiceEnities;
 using Evaluation.DAL.Models.ServiceRequestEntities;
 using Evaluation.DAL.Models.UserEntiy;
@@ -17,6 +19,7 @@ using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Api;
 using Evaluation.SharedHelper.Models.Api.ActionEntitiesDTOs;
 using Evaluation.SharedHelper.Models.Api.EvaluationRequestEntities;
+using Evaluation.SharedHelper.Models.Api.FormAnalysisDtos;
 using Evaluation.SharedHelper.Models.Api.FormBuilderDTO;
 using Evaluation.SharedHelper.Models.Api.ServiceDTOs;
 using Evaluation.SharedHelper.Models.Api.ServiceRequestEntitiesDTO;
@@ -36,7 +39,7 @@ namespace Evaluation.Services.Models.API
         LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, SystemModuleSrv systemModuleSrv, SrvAction SrvAction,
         SrvStatus SrvStatus, SystemModuleSrv SrvSystemModule, SrvAssignment SrvAssignment, SrvEvaluationRequestAssignment _srvEvaluationRequestAssignment, SrvActionTransactionsLog SrvActionTransactionsLog, PerformActionBL _performActionBL,
 
-        SrvService SrvService, SrvServiceRequest _srvServiceRequest, EvaluationRequestService _evaluationRequestService, SrvAttachments _srvAttachments, IServiceProvider serviceProvider, RequestInfo _requestInfo, PlanServiceRequestServices planService)
+        SrvService SrvService, SrvServiceRequest _srvServiceRequest, EvaluationRequestService _evaluationRequestService, SrvAttachments _srvAttachments, IServiceProvider serviceProvider, RequestInfo _requestInfo,PlanServiceRequestServices planService)
             : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, _requestInfo)
     {
 
@@ -174,38 +177,40 @@ namespace Evaluation.Services.Models.API
                 await otherAttachmentsTask;
 
                 await uow.CommitAsync();
-                    if (!saveAsDraft)
+
+
+                if (!saveAsDraft)
+                {
+                    // Handle main action notifications
+                    await SrvNotification.HandleNotification(actionResult.notifications, request, actionResult.actiondb.Id, lang, remarks, otherAttachmentsTask.Result);
+
+                    // Check if auto-assign logic is applicable
+                    bool shouldAutoAssign = request != null &&
+                                            serviceObj.IsAutoAssignEnabled == true &&
+                                            status.IsInitial &&
+                                            actionResult.actiondb.ActionType!.BackendName == ActionTypeKeys.Info;
+
+                    if (shouldAutoAssign)
                     {
-                        // Handle main action notifications
-                        await SrvNotification.HandleNotification(actionResult.notifications, request, actionResult.actiondb.Id, lang, remarks, otherAttachmentsTask.Result);
+                        using var scope = serviceScopeFactory.CreateScopedUow();
+                        var assignAction = await scope
+                            .GetRepository<ActionStatusConfiguration>()
+                            .GetAllQueryFiltered()
+                            .Include(x => x.Notifications)
+                            .Include(c => c.ServiceAction)
+                                .ThenInclude(c => c!.ActionType)
+                                .AsSplitQuery()
+                            .FirstOrDefaultAsync(c =>
+                                (c.ServiceAction!.ActionType!.BackendName == ActionTypeKeys.Assign || c.ServiceAction!.ActionType!.BackendName == ActionTypeKeys.Info)
+                                && c.CurrentStatusId == request!.StatusId
+                               && c.ServiceAction.IsAutoAssign);
 
-                        // Check if auto-assign logic is applicable
-                        bool shouldAutoAssign = request != null &&
-                                                serviceObj.IsAutoAssignEnabled == true &&
-                                                status.IsInitial &&
-                                                actionResult.actiondb.ActionType!.BackendName == ActionTypeKeys.Info;
-
-                        if (shouldAutoAssign)
+                        if (assignAction != null)
                         {
-                            using var scope = serviceScopeFactory.CreateScopedUow();
-                            var assignAction = await scope
-                                .GetRepository<ActionStatusConfiguration>()
-                                .GetAllQueryFiltered()
-                                .Include(x => x.Notifications)
-                                .Include(c => c.ServiceAction)
-                                    .ThenInclude(c => c!.ActionType)
-                                    .AsSplitQuery()
-                                .FirstOrDefaultAsync(c =>
-                                    (c.ServiceAction!.ActionType!.BackendName == ActionTypeKeys.Assign || c.ServiceAction!.ActionType!.BackendName == ActionTypeKeys.Info)
-                                    && c.CurrentStatusId == request!.StatusId
-                                   && c.ServiceAction.IsAutoAssign);
-
-                            if (assignAction != null)
-                            {
-                                await SrvNotification.HandleNotification(assignAction.Notifications, request!, assignAction.Id, lang, string.Empty);
-                            }
+                            await SrvNotification.HandleNotification(assignAction.Notifications, request!, assignAction.Id, lang, string.Empty);
                         }
                     }
+                }
 
 
             }
@@ -227,7 +232,6 @@ namespace Evaluation.Services.Models.API
 
 
                 await uow.CommitAsync();
-
                 if (actionResult.actiondb.ActionType!.BackendName == ActionTypeKeys.CLOSE_AND_UPDATE_PLAN)
                 {
                     await planService.UpdateRequestNumbersAsync();
@@ -351,6 +355,151 @@ namespace Evaluation.Services.Models.API
 
             return isInitiator;
         }
+        public async Task<FormAnalysisDto> GetFormAnalysisAsync(Guid requestId)
+        {
+            var requests = await uow.GetRepository<ServiceRequest>()
+                .GetAllActiveNonDeleted(x => x.EvaluationRequestId == requestId)
+                .Include(x => x.Service)
+                .ThenInclude(x => x.EvaluationParty)
+                .ThenInclude(x => x.EvalPartyCategory)
+                .Include(x => x.Service)
+                .ThenInclude(x => x.ServiceType)
+                .Include(x => x.OrgTree)
+                .Include(x => x.EducationLevel)
+                .Include(x => x.GradeLevel)
+                .Include(x => x.SchoolCourse)
+                .Where(x => x.Service.ServiceType.BackendName == "ClassroomObservation")
+                .Where(x => x.Service.EvaluationParty.EvalPartyCategory.BackendName == "ClassroomObservation")
+                .ToListAsync();
 
+            var mainRequest = requests.FirstOrDefault();
+
+            if (mainRequest == null)
+                throw new BusinessException("Service request not found");
+
+            var requestIds = requests.Select(x => x.Id).ToList();
+
+            var values = await uow.GetRepository<FormItemValue>()
+                .GetAllActiveNonDeleted(x =>
+                    x.ServiceRequestId.HasValue &&
+                    requestIds.Contains(x.ServiceRequestId.Value) &&
+                    !x.IsDeleted)
+                .Include(x => x.FormEvalMatrixValue)
+                .Include(x => x.FormItem)
+                    .ThenInclude(x => x!.Scope)
+                .Include(x => x.FormItem)
+                    .ThenInclude(x => x!.EvalForm)
+                    .ThenInclude(x => x!.EvalFormType)
+                .Where(x => x.FormItem.EvalForm.EvalFormType.BackendName == "ClassroomObservation")
+                .ToListAsync();
+
+            var observations = requests.Select(req =>
+            {
+                var reqValues = values
+                    .Where(v => v.ServiceRequestId == req.Id)
+                    .ToList();
+
+                return new FormAnalysisObservationDto
+                {
+                    Id = req.Id,
+                    RequestNumber = req.RequestNumber,
+
+                    SchoolId = req.OrgTreeId,
+                    SchoolNameAr = req.OrgTree?.NameAr,
+                    SchoolNameEn = req.OrgTree?.NameEn,
+
+                    EducationLevelId = req.EducationLevelId,
+                    EducationLevelNameAr = req.EducationLevel?.NameAr,
+                    EducationLevelNameEn = req.EducationLevel?.NameEn,
+
+                    GradeLevelId = req.GradeLevelId,
+                    GradeLevelNameAr = req.GradeLevel?.NameAr,
+                    GradeLevelNameEn = req.GradeLevel?.NameEn,
+
+                    SchoolCourseId = req.SchoolCourseId,
+                    SchoolCourseNameAr = req.SchoolCourse?.NameAr,
+                    SchoolCourseNameEn = req.SchoolCourse?.NameEn,
+
+                    Items = reqValues
+                        .Where(v => v.FormItem != null)
+                        .Select(v =>
+                        {
+                            var item = v.FormItem!;
+                            var max = item.Max > 0 ? item.Max : 5;
+                            var actual = v.ActualValue;
+
+                            return new FormAnalysisItemDto
+                            {
+                                FormItemId = item.Id,
+
+                                ItemNameAr = !string.IsNullOrWhiteSpace(v.RenameItem)
+                                    ? v.RenameItem
+                                    : item.NameAr,
+
+                                ItemNameEn = item.NameEn,
+
+                                ScopeId = item.ScopeId,
+                                ScopeNameAr = item.Scope?.NameAr,
+                                ScopeNameEn = item.Scope?.NameEn,
+
+                                ActualValue = actual,
+                                Min = item.Min,
+                                Max = max,
+                                Weight = item.Weight,
+                                Note = v.Note,
+                                FormEvalMatrixId = v.FormEvalMatrixValue?.Id,
+                                MatrixNameAr = v.FormEvalMatrixValue?.NameAr,
+                                MatrixNameEn = v.FormEvalMatrixValue?.NameEn,
+                            };
+                        })
+                        .OrderBy(x => x.ScopeNameAr)
+                        .ThenBy(x => x.ItemNameAr)
+                        .ToList()
+                };
+            }).ToList();
+
+            var matrixId = values
+                            .Where(x => x.FormItem.EvalForm.FormEvalMatrixId != null)
+                            .Select(x => x.FormItem.EvalForm.FormEvalMatrixId)
+                            .FirstOrDefault();
+
+            var matrixValues = new List<FormEvalMatrixValueDto>();
+
+            if (matrixId != Guid.Empty)
+            {
+                matrixValues = await uow.GetRepository<FormEvalMatrixValue>()
+                    .GetAllActiveNonDeleted(x => x.FormEvalMatrixId == matrixId)
+                    .OrderBy(x => x.OrderNo)
+                    .Select(x => new FormEvalMatrixValueDto
+                    {
+                        Id = x.Id,
+                        FormEvalMatrixId = x.FormEvalMatrixId,
+                        NameAr = x.NameAr,
+                        NameEn = x.NameEn,
+                        MinValue = x.MinValue,
+                        MaxValue = x.MaxValue,
+                        ActualMatrixValue = x.ActualMatrixValue,
+                        DescAr = x.DescAr,
+                        DescEn = x.DescEn,
+                        OrderNo = x.OrderNo,
+                        IsActive = x.IsActive
+                    })
+                    .ToListAsync();
+            }
+
+            var result = new FormAnalysisDto
+            {
+                RequestId = mainRequest.Id,
+                RequestNumber = mainRequest.RequestNumber,
+                ServiceId = mainRequest.ServiceId,
+                ServiceNameAr = mainRequest.Service?.NameAr,
+                ServiceNameEn = mainRequest.Service?.NameEn,
+                EvaluationRequestId = mainRequest.EvaluationRequestId,
+                EvaluationPartyId = mainRequest.EvaluationPartyId,
+                Observations = observations,
+                MatrixValues = matrixValues
+            };
+            return result;
+        }
     }
 }
