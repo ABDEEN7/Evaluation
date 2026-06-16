@@ -137,9 +137,9 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
 		if (formEvaluationDto == null)
 			return Result.Fail<FormEvaluationDto>(ConstantKeys.ExceptionMessage.FormDataIsNull);
 
-		var formValidation = await Validate(formEvaluationDto);
-		if (!formValidation.IsValid)
-			return Result.Fail<FormEvaluationDto>(ConstantKeys.ExceptionMessage.FormDataIsNotValid);
+		//var formValidation = await Validate(formEvaluationDto);
+		//if (!formValidation.IsValid)
+		//	return Result.Fail<FormEvaluationDto>(ConstantKeys.ExceptionMessage.FormDataIsNotValid);
 
 		var userId = userInfo.UserId;
 		if (userId == null)
@@ -154,8 +154,18 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
 		{
 			throw new BusinessException(ConstantKeys.ExceptionMessage.InvalidJson);
 		}
+        var form = new FormEvaluationValue();
 
-		var form = mapper.Map<FormEvaluationValue>(formEvaluationDto);
+		try
+        {
+		 form = mapper.Map<FormEvaluationValue>(formEvaluationDto);
+
+        }
+        catch (Exception ex)
+        {
+
+            throw;
+        }
 
 		if (evalForm.HasOneValue)
 		{
@@ -181,24 +191,27 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
 					uow.GetRepository<FormItemValue>().Insert(item);
 				}
 			}
-
-			foreach (var item in form.SubItems)
-			{
-				var subFormItemsValue = await formService.GetSubFormItemValue(item.Id);
-
-				if (subFormItemsValue != null)
+            if(form.SubItems !=null)
+            {
+				foreach (var item in form.SubItems)
 				{
-					subFormItemsValue.FieldDropDownValueId = item.FieldDropDownValueId;
-					subFormItemsValue.Note = item.Note;
+					var subFormItemsValue = await formService.GetSubFormItemValue(item.Id);
 
-					uow.GetRepository<SubFormItemValue>().Update(subFormItemsValue);
-				}
-				else
-				{
-					item.UserId = userId.Value;
+					if (subFormItemsValue != null)
+					{
+						subFormItemsValue.FieldDropDownValueId = item.FieldDropDownValueId;
+						subFormItemsValue.Note = item.Note;
 
-					uow.GetRepository<SubFormItemValue>().Insert(item);
+						uow.GetRepository<SubFormItemValue>().Update(subFormItemsValue);
+					}
+					else
+					{
+						item.UserId = userId.Value;
+
+						uow.GetRepository<SubFormItemValue>().Insert(item);
+					}
 				}
+
 			}
 
 		}

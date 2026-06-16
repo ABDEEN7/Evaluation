@@ -53,10 +53,9 @@ public class FormProfile : Profile
 		  .ReverseMap();
 
 		CreateMap<SubFormItemValue, SubFormItemEvaluationDto>()
-		 .ForMember(d => d.Value, opt => opt.MapFrom(src => src.FieldDropDownValueId))
 		 .ForMember(d => d.Note, opt => opt.MapFrom(src => src.Note))
 		 .ForMember(d => d.Id, opt => opt.MapFrom(src => src.SubFormItemId))
-		 .ForMember(d => d.ValueId, opt => opt.MapFrom(src => src.Id))
+		 .ForMember(d => d.ValueId, opt => opt.MapFrom(src => src.FieldDropDownValueId))
 		 .ReverseMap();
 
 		CreateMap<FormEvaluationDto, FormEvaluationValue>()
