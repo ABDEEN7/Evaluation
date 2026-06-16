@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Evaluation.DAL.Dtos;
 using Evaluation.DAL.Helper;
+using Evaluation.DAL.Models.DepartementEntites;
 using Evaluation.DAL.Models.FormsModules;
 using Evaluation.DAL.Models.Planing;
 using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
@@ -398,6 +399,15 @@ public class PlanServiceRequestServices(
         }
 
         await scope.CommitAsync();
+    }
+    public async Task<string> GetDepartmentConfigsAsync()
+    {
+        var response = await unitOfWork.GetRepository<Department>()
+            .GetAllActiveNonDeleted(x =>
+            x.Id == requestInfo.DepId)
+            .Select(x => x.DepConfig)
+            .FirstOrDefaultAsync();
+        return response;
     }
     private async Task SyncEvaluationRequests(
       Guid planId,
