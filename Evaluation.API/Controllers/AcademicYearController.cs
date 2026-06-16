@@ -1,5 +1,7 @@
-﻿using Evaluation.Services.BusinessLayer;
+﻿using Evaluation.API.ActionFilter;
+using Evaluation.Services.BusinessLayer;
 using Evaluation.Services.Models.Admin;
+using Evaluation.SharedHelper.Enums;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Evaluation.API.Controllers;
@@ -9,6 +11,7 @@ namespace Evaluation.API.Controllers;
 public class AcademicYearController(MasterBL masterBl) : ControllerBase
 {
     [HttpGet]
+    //[CheckRolePermisionFilter(true, ConstantKeys.WebPermissions.VIEW_WEB_AcademicYear)]
     public async Task<IActionResult> GetVcationDate()
     {
         //var vcationDate = await masterBL.GetApiService<>
@@ -29,6 +32,7 @@ public class AcademicYearController(MasterBL masterBl) : ControllerBase
         public DateTime Date { get; set; }
     }
     [HttpGet]
+    //[CheckRolePermisionFilter(true, ConstantKeys.WebPermissions.VIEW_WEB_AcademicYear)]
     public async Task<List<VacationDateDto>> GetVacationDatesAsync()
     {
         return new List<VacationDateDto>
@@ -38,12 +42,14 @@ public class AcademicYearController(MasterBL masterBl) : ControllerBase
     };
     }
     [HttpGet]
+    //[CheckRolePermisionFilter(true, ConstantKeys.WebPermissions.VIEW_WEB_AcademicYear)]
     public async Task<IActionResult> GetAcademicYearByDepartment()
     {
         var result = await masterBl.GetAdminService<SrvAcademicYearBL>().GetAcademicYearListByCureentDepartment();
         return Ok(result);
     }
     [HttpGet]
+    //[CheckRolePermisionFilter(true, ConstantKeys.WebPermissions.VIEW_WEB_AcademicYear)]
     public async Task<IActionResult> GetCurrentAcademicYearByDepartment()
     {
         var result = await masterBl.GetAdminService<SrvAcademicYearBL>().GetCurrentAcademicYearListByCureentDepartment();
