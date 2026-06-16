@@ -129,5 +129,9 @@ public class TestController : ControllerBase
     {
         return await _qnedsService.GetStudentDailyAttendanceByMonthByInstitutionAndYearAsync(institutionId, year);
     }
-
+	[HttpPost]
+	public async Task<bool> SyncQnedsIntegration(int year)
+	{
+		return await _qnedsService.SyncQnedsIntegrationAsync(year);
+	}
 }

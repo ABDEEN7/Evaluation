@@ -129,6 +129,9 @@ const loadData = (isSearch) => {
                 .concat('&DepartmentId=', DepartmentId)
                 .concat('&page=', currentPage));
     }
+    $("#ServiceParentSystemModuleId").prop("disabled", !$("#ServiceDepartmentId").val());
+    $("#ServiceSystemModuleId").prop("disabled", !$("#ServicesDepartmentId").val());
+
 };
 
 
@@ -561,15 +564,76 @@ $(window).scroll(function () {
         }
     }
 });
+function LoadSystemModuleDDL(departmentId) {
+    const options = {
+        success: function (result) {
+            if (result) {
+                if ($("#ServiceSystemModuleId").data('select2')) {
+                    $("#ServiceSystemModuleId").select2('destroy');
+                }
+
+                $("#ServiceSystemModuleId").empty();
+
+                result.forEach(item => {
+                    $("#ServiceSystemModuleId").append(
+                        $('<option>', {
+                            value: item.id,
+                            text: item.name,
+                            'data-backend-name': item.backendName
+                        })
+                    );
+                });
+
+                $("#ServiceSystemModuleId").select2({
+                    width: 'resolve',
+                    allowClear: true,
+                    placeholder: sharedFn().GetUiControlText('ServiceSystemModuleId'),
+                    dropdownCssClass: "manageselect2zindex"
+                });
+            }
+        }
+    };
+
+    jqClientAdvanced(options).Get("Service/GetSystemModule".concat('?departmentId=', departmentId));
+}
 $("#ServiceDepartmentId").on("change", function () {
     currentPage = 0;
     isLoading = false;
+
+    var departmentId = $(this).val();
 
     if (table && popupname == '') {
         table.setData([]);
     }
 
     loadData();
+});
+$("#ServicesDepartmentId").on("change", function () {
+    var departmentId = $(this).val();
+
+    $("#ServiceSystemModuleId").val('').trigger('change');
+
+    if (departmentId) {
+        $("#ServiceSystemModuleId").prop("disabled", false);
+        LoadSystemModuleDDL(departmentId);
+    } else {
+        $("#ServiceSystemModuleId").prop("disabled", true);
+    }
+});
+$("#ServiceSystemModuleId").on("change", function () {
+    var selectedOption = $(this).find("option:selected");
+    var backendName = selectedOption.attr("data-backend-name");
+
+    var $evaluationParty = $("#ServiceEvaluationPartyId");
+
+    if (backendName === "EvaluationParty") {
+        $evaluationParty.closest('.form-group').show();
+        $evaluationParty.attr("required", true).addClass("required-field");
+    } else {
+        $evaluationParty.closest('.form-group').hide();
+        $evaluationParty.attr("required", false).removeClass("required-field");
+        $evaluationParty.val('').trigger('change');
+    }
 });
 $("#ServiceParentSystemModuleId").on("change", function () {
     currentPage = 0;
@@ -764,7 +828,6 @@ $(document).ready(function () {
 
         }
     });
-
 
 
 });
