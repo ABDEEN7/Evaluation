@@ -77,7 +77,7 @@
         tabLabelSelector: '#tabEvaluationOperations .my-1',
         tabLabelKey: 'TabEvaluationOperations',
         columns: [
-         {
+        {
     data: "evaluationType",
         title: uiControlsSetup().GetUiControlText("lblEvaluationPlan"),
         className: "td-full mb-4",
@@ -88,31 +88,44 @@
             const statusText = isCompleted ? "مكتمل" : "غير مكتمل";
 
             return `
-        <div class="request-info">
+            <div class="request-info">
 
-            <div class="request-icon"
-                 style="background-color:${statusColor}; color:#000;">
-
-                <i class="las la-certificate"></i>
-
-            </div>
-
-            <div class="request-text">
-
-                <div class="request-header">
-                    ${data || ""}
+                <div class="request-icon"
+                     style="background-color:${statusColor}; color:#000;">
+                    <i class="las la-certificate"></i>
                 </div>
 
-                <div class="request-status-text"
-                     style="color:${statusColor};">
+                <div class="request-text">
 
-                    ${statusText}
+                    <div class="request-header">
+                        ${data || ""}
+                    </div>
+
+                    <div class="request-status-text card-only-row"
+                         style="color:${statusColor};">
+                        ${statusText}
+                    </div>
 
                 </div>
 
             </div>
+        `;
+        }
+    },
+    {
+        data: null,
+        title: uiControlsSetup().GetUiControlText("lblStatus"),
+        className: "status-column",
+        render: function(data, type, row) {
 
-        </div>
+            const isCompleted = row.StatusISOPen === false;
+            const statusColor = isCompleted ? "#0E6B32" : "#A63D40";
+            const statusText = isCompleted ? "مكتمل" : "غير مكتمل";
+
+            return `
+            <span class="status-padding" style="color:${statusColor};">
+                ${statusText}
+            </span>
         `;
         }
     },
@@ -128,7 +141,7 @@
         <div class="ellipsis school-name-row">
             <i class="las la-school card-only-icon me-1"></i>
 
-            <span class="ellipsis-text">
+            <span class="data-text">
                 ${data}
             </span>
         </div>
@@ -145,37 +158,18 @@
 
             return `  
                     
-                        <i class="las la-school card-only-icon me-1"></i>
-                        <span class ="text-truncate-2">${data}</span>
+                        <i class="las la-file-signature card-only-icon me-1"></i>
+                         <span class="data-text">${data}</span>
                     
                 `;
         }
     },
-            {
-                data: "status",
-                title: uiControlsSetup().GetUiControlText("lblRequestNo"),
-                className: "td-full",
-                render: function (data, type, row) {
-
-                    if (!data) return "_";
-
-                    const statusColor = row.statusColor || "#89153D";
-                    const textColor = getContrastingTextColor(statusColor);
-
-                    return `
-                    <span class="request-status m-0"
-                          style="color:${statusColor};">
-                        <i class="las la-edit card-only-icon me-1" style="color:${statusColor};"></i>
-                        ${data}
-                    </span>
-                `;
-                }
-            },
+         
                
   {
         data: "evlDateFrom",
         title: uiControlsSetup().GetUiControlText("lblEvaluationDateFrom"),
-        className: "td-full td-date-range-block",
+        className: "td-full td-date-range-block period-column",
         render: function(data, type, row) {
             if (!data) return "_";
 
@@ -238,37 +232,37 @@
                 ? moment(row.evlDateTo.split(' ')[0], fmt, false).format("DD-MM-YYYY")
                 : null;
 
-            const dateRange = displayTo
-                ? `
-                <span>
-                    <span class="card-only-label me-1">
-                        ${getUiText("lblFrom", "من")}
-                    </span>
+           const dateRange = displayTo
+        ? `
+    <span>
+        <span class="period-label me-1">
+            ${getUiText("lblFrom", "From")}
+        </span>
 
-                    <span class="data-text me-2">
-                        ${displayFrom}
-                    </span>
+        <span class="data-text me-1">
+            ${displayFrom}
+        </span>
 
-                    <span class="card-only-label me-1">
-                        ${getUiText("lblTo", "إلى")}
-                    </span>
+        <span class="period-label me-1">
+            ${getUiText("lblTo", "To")}
+        </span>
 
-                    <span class="data-text">
-                        ${displayTo}
-                    </span>
-                </span>
-            `
-                : `
-                <span>
-                    <span class="card-only-label me-1">
-                        ${getUiText("lblFrom", "من")}
-                    </span>
+        <span class="data-text me-1">
+            ${displayTo}
+        </span>
+    </span>
+`
+        : `
+    <span>
+        <span class="period-label me-1">
+            ${getUiText("lblFrom", "From")}
+        </span>
 
-                    <span class="data-text">
-                        ${displayFrom}
-                    </span>
-                </span>
-            `;
+        <span class="data-text">
+            ${displayFrom}
+        </span>
+    </span>
+`;
 
             return `
             <div class="date-range-wrapper">
@@ -278,7 +272,7 @@
                     ${dateRange}
                 </div>
 
-                <div class="d-flex flex-wrap gap-2 align-items-center">
+               <div class="period-status-wrapper">
                     ${countdownBadge}
                     ${nearNote}
                 </div>
@@ -286,7 +280,26 @@
             </div>`;
         }
     },
-      
+         {
+        data: "status",
+        title: uiControlsSetup().GetUiControlText("lblRequestNo"),
+        className: "td-full",
+        render: function(data, type, row) {
+
+            if (!data) return "_";
+
+            const statusColor = row.statusColor || "#89153D";
+            const textColor = getContrastingTextColor(statusColor);
+
+            return `
+                    <span class="request-status m-0"
+                          style="color:${statusColor};">
+                        <i class="las la-edit card-only-icon me-1" style="color:${statusColor};"></i>
+                        ${data}
+                    </span>
+                `;
+        }
+    },
             {
         data: "createOn",
         title: uiControlsSetup().GetUiControlText("lblRequestCreatedDate"),
@@ -667,11 +680,10 @@
         width: '100%',
         multiple: true
     });
-    flatpickr('#evaluationRequestDateFrom', {
-        dateFormat: "Y-m-d",
-        allowInput: true
-    });
-    flatpickr("#evaluationRequestDateTo", {
+const isAr = document.documentElement.lang.toLowerCase().startsWith("ar");
+
+    flatpickr(".datePicker", {
+        locale: isAr ? "ar" : "en",
         dateFormat: "Y-m-d",
         allowInput: true
     });
