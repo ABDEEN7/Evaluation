@@ -120,6 +120,7 @@ namespace Evaluation.Services.Models.Admin
             obj.ServiceSettings = message.ServiceSettings;
             obj.Initialservice = message.Initialservice;
             obj.IsActive = message.IsActive;
+            obj.ServiceTypeId = message.ServiceTypeId;
             await uow.GetRepository<Service>().InsertAsync(obj);
             if (!message.Initialservice)
             {
@@ -345,6 +346,7 @@ namespace Evaluation.Services.Models.Admin
                     obj.ServiceSettings = message.ServiceSettings;
                     obj.Initialservice = message.Initialservice;
                     obj.IsActive = message.IsActive;
+                    obj.ServiceTypeId = message.ServiceTypeId;
                     uow.GetRepository<Service>().Update(obj);
                     //update values to ServiceInitiatorPartyType
                     List<ServiceInitiatorPartyType> objServiceInitiatorentitydelete = await uow.GetRepository<ServiceInitiatorPartyType>()
