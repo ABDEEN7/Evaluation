@@ -1,5 +1,9 @@
 ﻿let childPicker = null;
 let parentPickerInstance = null;
+
+const isAr = document.documentElement.lang.toLowerCase().startsWith("ar");
+   const calendarLocale = isAr ? "ar" : "default";
+
 let holidays = [
     { date: '2025-01-01', name: 'New Year\'s Day' },
     { date: '2025-12-25', name: 'Christmas Day' }
@@ -108,7 +112,7 @@ function initCustomParentPicker() {
 
     parentPickerInstance = flatpickr("#parentDate", {
         mode: "range",
-        locale: "ar",
+        locale: calendarLocale,
         dateFormat: "Y-m-d",
         onDayCreate: function (dObj, dStr, fp, dayElem) {
             if (isHoliday(dayElem.dateObj)) {
@@ -188,7 +192,7 @@ function initChildPicker(minDate, maxDate) {
 
     childPicker = flatpickr(".childDate", {
         mode: "range",
-        locale: "ar",
+        locale: calendarLocale,
         dateFormat: "Y-m-d",
         allowInput: true,
         minDate: minDate,

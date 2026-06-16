@@ -49,7 +49,7 @@
         {
             data: "code",
             title: uiControlsSetup().GetUiControlText("lblSchoolCode"),
-            className: "td-full",
+            className: "td-full school-type-column",
             render: function(data) {
                 return `
                 <i class="las la-barcode card-only-icon me-1"></i>
@@ -61,7 +61,7 @@
         {
             data: "schoolTypeName",
             title: uiControlsSetup().GetUiControlText("lblSchoolType"),
-            className: "td-full",
+            className: "td-full school-type-column",
             render: function(data) {
                 return `
                 <i class="las la-graduation-cap card-only-icon me-1"></i>
@@ -73,7 +73,7 @@
         {
             data: "null",
             title: uiControlsSetup().GetUiControlText("lblSchoolLevel"),
-            className: "td-full",
+            className: "td-full school-type-column",
             render: function(data) {
                 return `
                 <i class="las la-school card-only-icon me-1"></i>

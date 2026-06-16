@@ -997,12 +997,7 @@ table.dataTable td p {
     color: #495057;
 }
 
-@media (max-width: 992px) {
-    div.dataTables_wrapper {
-        overflow-x: auto;
-        width: 100%;
-    }
-}
+
 /* small responsive tweak: stack info and pagination on small screens */
 @media (max-width: 576px) {
     #dtPagination {
@@ -4542,7 +4537,7 @@ input.auto-fill {
 .card-only-label {
     font-size: clamp(0.85rem, 1vw, 1rem) !important;
     font-weight: 700;
-    color: #222;
+   
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -5803,18 +5798,6 @@ table.dataTable tbody tr.child-row > td {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 .date-range-wrapper {
     display: flex;
     flex-direction: column;
@@ -5875,13 +5858,337 @@ table.dataTable tbody tr.child-row > td {
 
 
 /*/Temporary to test*/
-#planRequestCollapseDetails .accordion-body {
+/*#planRequestCollapseDetails .accordion-body {
     padding-top: 0 !important;
     padding-bottom: 0 !important;
-}
+}*/
 
 
 
 .form-container {
     border-radius: 8px !important;
+}
+
+
+
+.application-request.table-card-seperate-styling.table > :not(caption) > * > * {
+    padding: 0.75rem 1rem !important;
+}
+
+
+
+.table-responsive:has(table tbody tr:not(.card):not(.card-row)) {
+    padding-inline: 1.5rem !important;
+}
+
+
+    .table-responsive:has(table tbody tr:not(.card):not(.card-row))
+    .card-only-icon,
+    .table-responsive:has(table tbody tr:not(.card):not(.card-row))
+    .request-icon {
+        display: none;
+    }
+
+
+
+
+
+
+
+
+
+
+/* Hide card-only icons in table view */
+.table-card-seperate-styling tbody tr:not(.card):not(.card-row) .card-only-icon,
+.table-card-seperate-styling tbody tr:not(.card):not(.card-row) .card-only-label,
+.table-card-seperate-styling tbody tr:not(.card):not(.card-row) .request-icon,
+.table-card-seperate-styling tbody tr.card .status-column,
+.table-card-seperate-styling tbody tr.card-row .status-column,
+.table-card-seperate-styling tbody tr:not(.card):not(.card-row) .card-only {
+    display: none !important;
+}
+
+/* Add spacing around table only, not card view */
+.table-responsive:has(table tbody tr:not(.card):not(.card-row)) {
+    padding-inline: 1.5rem !important;
+}
+
+/* Status cell */
+.status-column {
+    white-space: nowrap;
+}
+
+    .status-column .status-padding {
+        display: inline-block;
+        font-size: 0.9rem;
+        font-weight: 700;
+        border-radius: 4px;
+        padding: 0.25rem 0.75rem;
+    }
+
+
+.period-label {
+    font-size: clamp(0.85rem, 1vw, 1rem) !important;
+    font-weight: 700;
+   
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: 600;
+    color: #666 !important;
+}
+
+
+.table-responsive:has(table tbody tr:not(.card):not(.card-row)) {
+    padding-inline: 1.5rem !important;
+    overflow-x: hidden !important;
+}
+
+    .table-responsive:has(table tbody tr:not(.card):not(.card-row)) table {
+        width: 100% !important;
+        table-layout: fixed !important;
+    }
+
+    .table-responsive:has(table tbody tr:not(.card):not(.card-row)) th,
+    .table-responsive:has(table tbody tr:not(.card):not(.card-row)) td {
+        white-space: normal !important;
+        word-break: break-word;
+    }
+
+
+.table.table-bordered.dataTable thead tr:first-child th, table.table-bordered.dataTable thead tr:first-child td {
+    align-content: center;
+}
+
+
+.table-card-seperate-styling tbody tr:not(.card):not(.card-row) .status-column {
+    white-space: normal !important;
+    text-align: center;
+    vertical-align: middle;
+}
+
+    .table-card-seperate-styling tbody tr:not(.card):not(.card-row) .status-column .status-padding {
+        white-space: normal !important;
+        overflow: visible !important;
+        text-overflow: unset !important;
+        display: inline-block;
+        max-width: 100%;
+        line-height: 1.3;
+        padding: 0;
+    }
+
+
+
+
+.table-card-seperate-styling tbody tr:not(.card):not(.card-row) .td-left.place-content-end,
+.table-card-seperate-styling tbody tr:not(.card):not(.card-row) .td-left.place-content-end > div {
+    place-content: center !important;
+    align-content: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+}
+
+
+/* Table only: allow Plan Name to fit inside its column */
+.table-card-seperate-styling tbody tr:not(.card):not(.card-row) .plan-name-column {
+    white-space: normal !important;
+    vertical-align: middle;
+}
+
+.table-card-seperate-styling tbody tr:not(.card):not(.card-row) .plan-name-text {
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: unset !important;
+    display: inline-block;
+    max-width: 100%;
+    line-height: 1.3;
+}
+
+
+
+
+.table-card-seperate-styling tbody tr:not(.card):not(.card-row) td,
+.table-card-seperate-styling tbody tr:not(.card):not(.card-row) .data-text,
+.table-card-seperate-styling tbody tr:not(.card):not(.card-row) .status-padding,
+.table-card-seperate-styling tbody tr:not(.card):not(.card-row) .period-label {
+    font-size: 15px !important;
+    font-weight: 600;
+}
+
+
+.table-card-seperate-styling tbody tr:not(.card):not(.card-row) .request-header {
+    font-size: 15px !important;
+    font-weight: 600 !important;
+}
+
+
+.table-card-seperate-styling tbody tr:not(.card):not(.card-row) .school-count-column {
+    text-align: center !important;
+}
+
+
+.table-card-seperate-styling thead th,
+.table-card-seperate-styling.dataTable thead th {
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    text-align: center !important;
+    vertical-align: middle !important;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.table-card-seperate-styling tbody tr:not(.card):not(.card-row) td,
+.table-card-seperate-styling tbody tr:not(.card):not(.card-row) .plan-title-text-school,
+.table-card-seperate-styling tbody tr:not(.card):not(.card-row) .data-text {
+    font-size: 15px !important;
+    font-weight: 600 !important;
+}
+
+.table-card-seperate-styling thead th,
+.table-card-seperate-styling.dataTable thead th {
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    text-align: center !important;
+    vertical-align: middle !important;
+}
+
+.table-card-seperate-styling tbody tr:not(.card):not(.card-row) .school-code-column,
+.table-card-seperate-styling tbody tr:not(.card):not(.card-row) .school-type-column,
+.table-card-seperate-styling tbody tr:not(.card):not(.card-row) .school-level-column {
+    text-align: center !important;
+}
+
+
+
+
+
+
+/* Hide card status under title in table */
+.table-card-seperate-styling tbody tr:not(.card):not(.card-row) .request-status-text.card-only-row {
+    display: none !important;
+}
+
+/* Hide separate table status column in cards */
+.table-card-seperate-styling tbody tr.card .status-column,
+.table-card-seperate-styling tbody tr.card-row .status-column {
+    display: none !important;
+}
+
+
+
+
+.table-card-seperate-styling tbody tr:not(.card):not(.card-row) .period-column {
+    text-align: center !important;
+}
+
+
+
+
+.table-card-seperate-styling tbody tr:not(.card):not(.card-row) .date-range-wrapper > .d-flex:last-child {
+    justify-content: center !important;
+}
+
+
+
+
+
+.table-card-seperate-styling tbody tr:not(.card):not(.card-row) td,
+.table-card-seperate-styling tbody tr:not(.card):not(.card-row) .data-text,
+.table-card-seperate-styling tbody tr:not(.card):not(.card-row) .period-label,
+.table-card-seperate-styling tbody tr:not(.card):not(.card-row) .status-countdown-badge,
+.table-card-seperate-styling tbody tr:not(.card):not(.card-row) .evaluation-near-note {
+    font-size: 15px !important;
+    font-weight: 600 !important;
+}
+
+.table-card-seperate-styling tbody tr:not(.card):not(.card-row) .request-header {
+    font-size: 15px !important;
+    font-weight: 600 !important;
+}
+
+.table-card-seperate-styling thead th,
+.table-card-seperate-styling.dataTable thead th {
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    text-align: center !important;
+    vertical-align: middle !important;
+}
+
+
+
+
+    .table-card-seperate-styling thead th,
+    .table-card-seperate-styling.dataTable thead th,
+    .table-card-seperate-styling thead th.sorting,
+    .table-card-seperate-styling thead th.sorting_asc,
+    .table-card-seperate-styling thead th.sorting_desc {
+        text-align: center !important;
+        vertical-align: middle !important;
+    }
+
+
+
+.table-card-seperate-styling thead th,
+.table-card-seperate-styling.dataTable thead th {
+    text-align: center !important;
+    vertical-align: middle !important;
+}
+
+    .table-card-seperate-styling thead th div,
+    .table-card-seperate-styling thead th span {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+    }
+
+
+
+.period-status-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    justify-content: center;
+}
+
+    .period-status-wrapper .status-countdown-badge,
+    .period-status-wrapper .evaluation-near-note
+    .period-status-wrapper .evaluation-near-note {
+        max-width: 100%;
+    }
+
+
+.table-card-seperate-styling thead th.place-content-end {
+    place-content: center !important;
+}
+
+.table-card-seperate-styling thead th.place-content-end {
+    place-content: center !important;
+}
+
+
+.status-countdown-badge,
+.evaluation-near-note {
+    font-size: clamp(10px, 1vw, 13px) !important;
+}
+
+
+.period-status-wrapper .status-countdown-badge,
+.period-status-wrapper .evaluation-near-note {
+    font-size: 11px !important;
+    max-width: 100%;
+    text-align: center;
+    white-space: normal !important;
+    line-height: 1.2;
 }
