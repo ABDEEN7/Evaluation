@@ -399,13 +399,11 @@ function SetDropDown() {
         const options = {
             success: function (result) {
                 if (result) {
+                    const ddlData = result.map(item => ({
+                        id: item.id,
+                        text: txtDir === "RTL" ? item.nameAr : item.nameEn
+                    }));
 
-                    const ddlData = result.map(item => (
-                        {
-                            id: item.id,
-                            text: txtDir === "RTL" ? item.nameAr : item.nameEn
-                        }
-                    ));
                     var $dropdown = $('#EvalFormItemFormItemRelated');
                     $dropdown.empty();
                     $dropdown.select2({
@@ -417,36 +415,40 @@ function SetDropDown() {
                         dropdownCssClass: "manageselect2zindex",
                         dropdownParent: $("#ModalPopup"),
                     });
-                    var raw = $dropdown.attr("data-value");   // NOT .data()
 
+                    var raw = $dropdown.attr("data-value");
                     if (raw) {
-                        var values = raw.split(",");         // convert CSV → array
-
-                        // Trim spaces (important)
-                        values = values.map(x => x.trim());
-
-                        // Set to Select2
+                        var values = raw.split(",").map(x => x.trim());
                         $dropdown.val(values).trigger("change.select2");
-                    }
-                    else {
+                    } else {
                         $dropdown.val(null).trigger("change.select2");
                     }
-
-
-
                 }
             }
         };
         jqClient(options).Get(API_ROUTES.getFormItemsFromDepartment(EvalformId));
-        //$("label[for='EvalFormItemNoteRequired']").hide();
 
-        //$("#EvalFormItemNoteRequired").parent().hide();
         toggleNoteRequired();
         $("#EvalFormItemHasNote").on("change", function () {
             toggleNoteRequired();
         });
-    }
+        $(document).off("change", "#AnalysisTypeId")
+            .on("change", "#AnalysisTypeId", function () {
+                disableDropdown("#EvalFormItemFormItemRelated", !!$(this).val());
+            });
 
+        $(document).off("change", "#EvalFormItemFormItemRelated")
+            .on("change", "#EvalFormItemFormItemRelated", function () {
+                disableDropdown("#AnalysisTypeId", $(this).val()?.length > 0);
+            });
+    }
+}
+
+function disableDropdown(selector, disabled) {
+    $(selector).prop("disabled", disabled).trigger("change.select2");
+    $(selector).next(".select2-container")
+        .css("opacity", disabled ? "0.5" : "")
+        .css("pointer-events", disabled ? "none" : "");
 }
 
 function BindFormItem() {
