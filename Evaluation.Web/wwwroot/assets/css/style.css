@@ -6192,3 +6192,116 @@ table.dataTable tbody tr.child-row > td {
     white-space: normal !important;
     line-height: 1.2;
 }
+
+
+
+
+
+
+
+/* Table column borders */
+.tabulator .tabulator-header .tabulator-col,
+.tabulator .tabulator-row .tabulator-cell {
+    border-inline-end: 1px solid #d8d8d8;
+}
+
+/* Optional: outer border */
+.tabulator {
+    border: 1px solid #d8d8d8;
+}
+
+    /* Remove extra border on last column */
+    .tabulator .tabulator-header .tabulator-col:last-child,
+    .tabulator .tabulator-row .tabulator-cell:last-child {
+        border-inline-end: none;
+    }
+
+
+
+    /* Table data color */
+    .tabulator .tabulator-cell {
+        color: #000 !important;
+    }
+
+
+
+    /* Allow header text to wrap and center it */
+    .tabulator .tabulator-header .tabulator-col .tabulator-col-content .tabulator-col-title {
+        white-space: normal !important;
+        overflow: visible !important;
+        text-overflow: unset !important;
+        line-height: 1.3;
+        text-align: center !important;
+    }
+
+
+
+    /* Center icons inside cells */
+    .tabulator .tabulator-cell svg {
+        display: block;
+        margin: 0 auto;
+    }
+
+
+
+
+.action-items {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    width: 100%;
+}
+
+    .action-items span {
+        background-color: #fff !important;
+        color: #0D4261 !important;
+        width: 42px;
+        height: 42px;
+        border-radius: 4px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        border: 1px solid #0D426140;
+    }
+
+        .action-items span:hover {
+            background-color: #0D4261 !important;
+            color: #fff !important;
+        }
+
+        .action-items span i {
+            font-size: 1.2rem;
+        }
+
+
+
+
+
+.tabulator .tabulator-row,
+.tabulator .tabulator-cell,
+.tabulator .tabulator-tableholder,
+.tabulator .tabulator-col-resize-handle {
+    text-align: start !important;
+}
+
+/* Put this AFTER the global rule */
+#tblAssessmentModels .tabulator-cell[tabulator-field="evalCountOfColumnsValue"] {
+    text-align: center !important;
+}
+
+.tabulator .tabulator-row .tabulator-cell[tabulator-field="evalCountOfColumnsValue"] {
+    text-align: center !important;
+}
+
+#tblAssessmentModels.tabulator .tabulator-row .tabulator-cell[tabulator-field="evalCountOfColumnsValue"] {
+    text-align: center !important;
+}
+
+.button, input, optgroup, select, textarea {
+    margin-top: 8px;
+    border: 1px solid #8A153860;
+    border-radius: 6px !important;
+}
+
