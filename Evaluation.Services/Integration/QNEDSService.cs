@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Dapper;
 using Evaluation.DAL.Helper;
+using Evaluation.DAL.Models.IntegrationEntity;
 using Evaluation.DAL.Models.Org;
 using Evaluation.DAL.Repositories;
 using Evaluation.Services.BusinessLayer.API;
@@ -369,7 +370,7 @@ public class QNEDSService : ApiBase
 			await uow.GetRepository<QnedsIntegration>().InsertAsync(entity);
 		}
 
-		await uow.SaveChangesAsync();
+		await uow.CommitAsync();
 
 		return true;
 	}
