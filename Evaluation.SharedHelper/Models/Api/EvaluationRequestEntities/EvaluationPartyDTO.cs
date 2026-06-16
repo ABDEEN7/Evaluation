@@ -11,6 +11,7 @@ namespace Evaluation.SharedHelper.Models.Api.EvaluationRequestEntities
 		public Guid Id { get; set; }
 		public Guid DepartmentId { get; set; }
 		public string NameAr { get; set; } = null!;
+		public string EvalPartyCategory { get; set; } = null!;
 		public string NameEn { get; set; } = null!;
 		public int OrderNo { get; set; }
         public bool IsSupportFiles { get; set; }

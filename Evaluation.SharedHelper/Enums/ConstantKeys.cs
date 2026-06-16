@@ -449,6 +449,7 @@ public static class ConstantKeys
         public static readonly string lblInvalidFileExtension = "lblInvalidFileExtension";
         public static readonly string lblCloseModal = "lblCloseModal";
         public static readonly string lblEvaluationFileScope = "lblEvaluationFileScope";
+        public static readonly string lblFormAnalysis = "lblFormAnalysis";
         public static readonly string lblEvaluationFileHeader = "lblEvaluationFileHeader";
         public static readonly string lblRequestNumber = "lblRequestNumber";
         public static readonly string lblSchoolEvalRequests = "lblSchoolEvalRequests";
@@ -1095,6 +1096,7 @@ public static class ConstantKeys
 
         #region EvaluationRequest
         public const string VIEW_EVALUATION_REQUEST = "VIEW_EVALUATION_REQUEST";
+        public const string VIEW_EVALUATION_REQUEST_FormAnalysis = "VIEW_EVALUATION_REQUEST_FormAnalysis";
         public const string UPDATE_EVALUATION_REQUEST = "UPDATE_EVALUATION_REQUEST";
         #endregion
 

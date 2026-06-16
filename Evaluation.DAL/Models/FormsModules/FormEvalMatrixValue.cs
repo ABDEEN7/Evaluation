@@ -21,5 +21,6 @@ namespace Evaluation.DAL.Models.FormsModules
         public string? DescEn { get; set; }
         public int OrderNo { get; set; } = 0;
         public int NextEvalDays { get; set; } = 0;
+        public string? ColorCode { get; set; }
     }
 }

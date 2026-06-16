@@ -38,7 +38,7 @@ namespace Evaluation.DAL.Models.ServiceEnities
         public EvaluationParty? EvaluationParty { get; set; }
 
         public bool ShowInCalendar { get; set; }
-        public Guid? ServiceTypeId { get; set; }
+        public Guid ServiceTypeId { get; set; }
         public ServiceType? ServiceType { get; set; }
 
         public virtual ICollection<FormGroup>? FormGroups { get; set; }
