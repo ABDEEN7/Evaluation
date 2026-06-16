@@ -2,6 +2,7 @@
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.ActionEntities;
 using Evaluation.DAL.Models.Attachments;
+using Evaluation.DAL.Models.DepartementEntites;
 using Evaluation.DAL.Models.FormBuilder;
 using Evaluation.DAL.Models.ServiceEnities;
 using Evaluation.DAL.Models.ServiceRequestEntities;
@@ -85,7 +86,10 @@ namespace Evaluation.Services.Models.Admin
 
                 }
             }
-
+            if(message.SystemModule == ConstantKeys.ModuleType.EvaluationParty)
+            {
+                throw new BusinessException(ConstantKeys.ExceptionMessage.EvaluationPartyRequriedDDL);
+            }
 
             var datacount = await uow.GetRepository<Service>()
                       .GetAllNonDeleted()
@@ -116,6 +120,7 @@ namespace Evaluation.Services.Models.Admin
             obj.ServiceSettings = message.ServiceSettings;
             obj.Initialservice = message.Initialservice;
             obj.IsActive = message.IsActive;
+            obj.ServiceTypeId = message.ServiceTypeId;
             await uow.GetRepository<Service>().InsertAsync(obj);
             if (!message.Initialservice)
             {
@@ -341,6 +346,7 @@ namespace Evaluation.Services.Models.Admin
                     obj.ServiceSettings = message.ServiceSettings;
                     obj.Initialservice = message.Initialservice;
                     obj.IsActive = message.IsActive;
+                    obj.ServiceTypeId = message.ServiceTypeId;
                     uow.GetRepository<Service>().Update(obj);
                     //update values to ServiceInitiatorPartyType
                     List<ServiceInitiatorPartyType> objServiceInitiatorentitydelete = await uow.GetRepository<ServiceInitiatorPartyType>()
@@ -882,6 +888,20 @@ namespace Evaluation.Services.Models.Admin
             }
             return result;
 
+        }
+        public async Task<List<SystemModuleDDL>> GetSystemModuleDDL(Guid departmentId)
+        {
+            var result = await uow.GetRepository<SystemModule>()
+                            .GetAllActiveNonDeleted(x => x.DepartmentId == departmentId)
+                            .Select(x => new SystemModuleDDL
+                            {
+                                Id = x.Id,
+                                Name = _requestInfo.Lang == "ar" ? x.NameAr : x.NameEn,
+                                BackendName = x.SystemModuleType.BackendName
+                            })
+                            .AsNoTracking()
+                            .ToListAsync();
+            return result;
         }
         #endregion
     }
