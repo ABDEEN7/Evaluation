@@ -331,3 +331,90 @@ body {
     #toast.show {
         transform: translateY(0);
     }
+
+/* ============================================================
+   ADDITIONS for form-style.css
+   Append these rules - they extend .row-item / .row-index
+   (which already exist) and add new classes used by the
+   updated build-form.js (collapsible sub-items + validation).
+   ============================================================ */
+
+/* .row-index now stacks the number and (optionally) the toggle button */
+.row-index {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+}
+
+.row-index-num {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--muted);
+}
+
+.row-toggle {
+    background: none;
+    border: none;
+    color: var(--accent-active);
+    font-size: 0.7rem;
+    line-height: 1;
+    padding: 2px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+    .row-toggle.is-open {
+        transform: rotate(90deg);
+    }
+
+/* Select and note are now wrapped to hold a validation message under each */
+.row-select-wrap,
+.row-note-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.validation-message {
+    display: none;
+    color: #c0392b;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+/* Collapsible sub-items container, toggled via .row-toggle on the parent row */
+.subitems-container {
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+    padding-inline-start: 36px;
+    padding-top: 10px;
+    border-top: 1px dashed var(--border);
+}
+
+    .subitems-container.expanded {
+        display: flex;
+    }
+
+.row-item.child-row {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+}
+
+    .row-item.child-row .row-index-num {
+        font-size: 0.7rem;
+    }
+
+@media (max-width: 768px) {
+    .subitems-container {
+        padding-inline-start: 12px;
+    }
+
+    .row-item.child-row {
+        background: #fdfbfc;
+    }
+}
