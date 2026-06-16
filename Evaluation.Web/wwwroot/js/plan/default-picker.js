@@ -26,3 +26,12 @@ $(".year-picker").each(function() {
         allowInput: true
     });
 });
+
+$("#parentDate").each(function() {
+    flatpickr(this, {
+        mode: "range",
+        dateFormat: "Y-m-d",
+        locale: calendarLocale,
+        allowInput: true
+    });
+});

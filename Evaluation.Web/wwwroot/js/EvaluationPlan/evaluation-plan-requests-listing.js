@@ -30,120 +30,128 @@
         cardViewBtnId: 'cardViewPlanRequest',
         tableViewBtnId: 'tblViewPlanRequest',
         rowClass: 'plan-request-card',
-        columns: [  
-            {
-    data: "service",
-        className: "td-full mb-4",
-        render: function(data, type, row) {
+       columns: [
+        {
+            data: "service",
+            className: "td-full mb-4",
+            render: function(data, type, row) {
+                const statusColor = row.statusColor || "#cccccc";
 
-            const statusColor = row.statusColor || "#cccccc";
+                return `
+                <div class="request-info">
+                    <div class="request-icon" style="background-color:${statusColor}; color:#000;">
+                        <i class="las la-file-signature"></i>
+                    </div>
 
-            return `
-        <div class="request-info">
+                    <div class="request-text">
+                        <div class="request-header">
+                          <span class="request-header card-only">  ${uiControlsSetup().GetUiControlText("lblRequest")}: </span> ${data || ""}
+                        </div>
 
-            <div class="request-icon"
-                 style="background-color:${statusColor}; color:#000;">
-                <i class="las la-file-signature"></i>
-            </div>
-
-            <div class="request-text">
-
-                <div class="request-header">
-                    ${uiControlsSetup().GetUiControlText("lblRequest")}: ${data || ""}
+                        <div class="request-status-text card-only-row" style="color:${statusColor};">
+                            ${row.status || ""}
+                        </div>
+                    </div>
                 </div>
+            `;
+            }
+        },
 
-                <div class="request-status-text" style="color:${statusColor};">
-                    ${row.status || ""}
-                </div>
+        {
+            data: "status",
+            className: "status-column",
+            render: function(data, type, row) {
+                return `
+                <span class="status-padding" style="color:${row.statusColor || "#666"};">
+                    ${data || "_"}
+                </span>
+            `;
+            }
+        },
 
-            </div>
+        {
+            data: "requestNumber",
+            className: "td-full",
+            render: function(data) {
+                return `
+                <i class="las la-file-alt card-only-icon me-1"></i>
+                <span class="card-only-label me-2">${uiControlsSetup().GetUiControlText("lblRequestNumber")}:</span>
+                <span class="data-text">${data || "_"}</span>
+            `;
+            }
+        },
 
-        </div>
-        `;
-        }
-    },
-       
-            {
-        data: "requestNumber",
-        className: "td-full",
-        render: function(data) {
-            return `
-            <i class="las la-file-alt card-only-icon me-1"></i>
-            <span class="card-only-label me-2">${uiControlsSetup().GetUiControlText("lblRequestNumber")}:</span>
-            <span class="data-text">${data || "_"}</span>
-        `;
-        }
-    },
-  
-    {
-        data: "schoolsCount",
-        className: "td-full",
-        render: function(data) {
-            return `
-            <i class="las la-school card-only-icon me-1"></i>
-            <span class="card-only-label me-2">${uiControlsSetup().GetUiControlText("lblSchoolsCount")}:</span>
-            <span class="data-text">${data || 0}</span>
-        `;
-        }
-    },
-    {
-        data: "planName",
-        className: "td-full",
-        render: function(data) {
-            return `
-        <i class="las la-school card-only-icon me-1"></i>
-        <span class="card-only-label me-2">
-            ${uiControlsSetup().GetUiControlText("lblPlanName")}:
-        </span>
-        <span class="data-text">${data || "_"}</span>
-        `;
-        }
-    },
-    {
-        data: null,
-        className: "td-full mb-3",
-        render: function(data, type, row) {
-            return `
-            <i class="las la-calendar-week card-only-icon me-1"></i>
-            <span class="card-only-label me-1">${uiControlsSetup().GetUiControlText("lblPeriod")}:</span>
-            <span>
-              <span class="card-only-label me-1">${uiControlsSetup().GetUiControlText("lblFrom")}</span><span class="data-text me-1">${moment(row.planDateFrom).format("DD/MM/YYYY")}</span>
-                        <span class="card-only-label me-1">${uiControlsSetup().GetUiControlText("lblTo")}</span><span class="data-text me-1">${moment(row.planDateTo).format("DD/MM/YYYY")}</span>
-            </span>
-        `;
-        }
-    },
-    {
-        data: "createOn",
-        title: uiControlsSetup().GetUiControlText("lblRequestCreatedDate"),
-        className: "td-right",
-        render: function(data) {
-            if (!data) return "_";
-            return `
-            <i class="las la-calendar card-only-icon color-primary me-1"></i>
+        {
+            data: "schoolsCount",
+            className: "td-full",
+            render: function(data) {
+                return `
+                <i class="las la-school card-only-icon me-1"></i>
+                <span class="card-only-label me-2">${uiControlsSetup().GetUiControlText("lblSchoolsCount")}:</span>
+                <span class="data-text">${data || 0}</span>
+            `;
+            }
+        },
+
+        {
+            data: "planName",
+            className: "td-full",
+            render: function(data) {
+                return `
+                <i class="las la-school card-only-icon me-1"></i>
+                <span class="card-only-label me-2">${uiControlsSetup().GetUiControlText("lblPlanName")}:</span>
+                <span class="data-text plan-name-text">${data || "_"}</span>
+            `;
+            }
+        },
+
+        {
+            data: null,
+            className: "td-full mb-3",
+            render: function(data, type, row) {
+                return `
+                <i class="las la-calendar-week card-only-icon me-1"></i>
+                <span class="card-only-label me-1">${uiControlsSetup().GetUiControlText("lblPeriod")}:</span>
+                <span>
+                    <span class="period-label me-1">${uiControlsSetup().GetUiControlText("lblFrom")}</span>
+                    <span class="data-text me-1">${moment(row.planDateFrom).format("DD/MM/YYYY")}</span>
+                    <span class="period-label me-1">${uiControlsSetup().GetUiControlText("lblTo")}</span>
+                    <span class="data-text me-1">${moment(row.planDateTo).format("DD/MM/YYYY")}</span>
+                </span>
+            `;
+            }
+        },
+
+        {
+            data: "createOn",
+            title: uiControlsSetup().GetUiControlText("lblRequestCreatedDate"),
+            className: "td-right",
          
-            <span class="data-text me-1">${moment(data).format("DD-MM-YYYY")}</span>
-        `;
-        }
-    },
-    {
-        data: "createOnTime",
-        title: uiControlsSetup().GetUiControlText("lblRequestCreatedTime"),
-        className: "td-left place-content-end",
-        render: function(data) {
-            if (!data) return "_";
+            render: function(data) {
+                if (!data) return "_";
+                return `
+                <i class="las la-calendar card-only-icon color-primary me-1"></i>
+                <span class="data-text me-1">${moment(data).format("DD-MM-YYYY")}</span>
+            `;
+            }
+        },
 
-            return `
-            <div class="d-flex justify-content-end place-content-end">
-                <i class="las la-clock card-only-icon color-primary me-1"></i>
-            
-                <span class="data-text me-1">${moment(data).format("hh:mm A")}</span>
-            </div>
-        `;
+        {
+            data: "createOnTime",
+            title: uiControlsSetup().GetUiControlText("lblRequestCreatedTime"),
+            className: "td-left place-content-end",
+            render: function(data) {
+                if (!data) return "_";
+
+                return `
+                <div class="d-flex justify-content-end place-content-end">
+                    <i class="las la-clock card-only-icon color-primary me-1"></i>
+                    <span class="data-text me-1">${moment(data).format("hh:mm A")}</span>
+                </div>
+            `;
+            }
         }
-    },
-     
-        ],
+    ],
         onRowClick: function (rowData) {
             openPlanRequestDetails(rowData.id);
         }
@@ -232,6 +240,6 @@
         };
 
         jqClient(options)
-            .Get(`/ServiceRequest/${DepartmentRouting}/CanCreateEvaluationPlanRequest`);
+            .Get(`/ServiceRequest/${DepartmecntRouting}/CanCreateEvaluationPlanRequest`);
     }
 });
