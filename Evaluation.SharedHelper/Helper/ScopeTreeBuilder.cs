@@ -8,7 +8,7 @@ public static class ScopeTreeBuilder
 {
     public static List<ScopeTreeDto> BuildTree(
         List<ScopeAcademicYear> academicYearScopes,
-        List<FormItem> formItems)
+        List<FormItem> formItems, List<FormItemValue>? formItemsValues = null)
     {
         // 1. Scope lookup
         var scopeLookup = academicYearScopes
@@ -57,7 +57,8 @@ public static class ScopeTreeBuilder
                 scopeLookup,
                 childrenLookup,
                 itemsLookup,
-                configLookup))
+                configLookup,
+                formItemsValues))
             .ToList();
     }
 
@@ -66,7 +67,8 @@ public static class ScopeTreeBuilder
         Dictionary<Guid, Scope> scopeLookup,
         Dictionary<Guid, List<Scope>> childrenLookup,
         Dictionary<Guid, List<FormItem>> itemsLookup,
-        Dictionary<Guid, List<FormItemConfig>> configLookup)
+        Dictionary<Guid, List<FormItemConfig>> configLookup,
+        List<FormItemValue>? formItemsValues)
     {
         var scope = scopeLookup[scopeId];
         var scopeType = scope.ScopeType!;
@@ -90,6 +92,7 @@ public static class ScopeTreeBuilder
                         HasNote = x.HasNote,
                         NoteRequired = x.NoteRequired,
                         HasMultiEvaluation = x.HasMuliEvaluation,
+                        Value = formItemsValues?.Where(iv=>iv.FormItemId == x.Id).Select(iv=>iv.ActualValue).FirstOrDefault(),// Just For analysis
                         SubFormItems = x.SubFormItems?.Select(c => new SubFormItemDto
                         {
                             Id = c.Id,
@@ -122,7 +125,8 @@ public static class ScopeTreeBuilder
                         scopeLookup,
                         childrenLookup,
                         itemsLookup,
-                        configLookup))
+                        configLookup,
+                        formItemsValues))
                     .ToList()
                 : new List<ScopeTreeDto>()
         };

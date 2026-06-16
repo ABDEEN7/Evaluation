@@ -1,5 +1,6 @@
 ﻿using Evaluation.DAL.Dtos.Form;
 using Evaluation.DAL.Helper;
+using Evaluation.DAL.Models.Calendars;
 using Evaluation.Services.BusinessLayer;
 using Evaluation.Services.BusinessLayer.API.FormLayer;
 using Evaluation.SharedHelper.Dtos.Form;
@@ -28,9 +29,15 @@ public class FormController : ControllerBase
 
 
     [HttpGet]
-    public async Task<Result<FormDto>> GetItems([FromQuery] Guid formId)
+    public async Task<Result<FormDto>> GetItems([FromQuery] Guid formId, [FromQuery] Guid academicYearId)
     {
-        return await _masterBl.GetApiService<FormBL>().GetFormItems(formId);
+        return await _masterBl.GetApiService<FormBL>().GetFormItems(formId, academicYearId);
+    }
+
+    [HttpGet]
+    public async Task<Result<FormDto>> GetFormItemsWithValues([FromQuery] Guid formId, [FromQuery] Guid academicYearId, [FromQuery] Guid evaluationRequestId)
+    {
+        return await _masterBl.GetApiService<FormBL>().GetFormItemsWithValues(formId, academicYearId, evaluationRequestId);
     }
 
     [HttpPost]

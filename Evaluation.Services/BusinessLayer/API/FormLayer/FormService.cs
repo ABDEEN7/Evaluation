@@ -118,4 +118,9 @@ public class FormService(IServiceScopeFactory serviceScopeFactory,
         return await unitOfWork.GetRepository<SubFormItemValue>().GetByIDActiveNonDeleted(ValueId!);
     }
 
+    public async Task<List<FormItemValue>> GetFormItemsValuesByEvaluationRequestId(Guid evaluationRequestId)
+    {
+        return await unitOfWork.GetRepository<FormItemValue>().GetAllActiveNonDeleted().Where(x => x.EvaluationRequestId == evaluationRequestId).ToListAsync();
+    }
+
 }

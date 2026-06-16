@@ -2,6 +2,7 @@
 using Evaluation.DAL.Dtos.Form;
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.FormsModules;
+using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
 using Evaluation.DAL.Repositories;
 using Evaluation.Services.BusinessLayer.API.ScopeLayer;
 using Evaluation.Services.Enums;
@@ -40,7 +41,7 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
     }
 
 
-    public async Task<Result<FormDto>> GetFormItems(Guid FormId)
+    public async Task<Result<FormDto>> GetFormItems(Guid FormId, Guid AcademicYearId)
     {
 
         var evalForm = await formService.GetEvalForm(FormId, IncludeCalcMethod: true);
@@ -74,9 +75,51 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
         //return new FormDto() { EvalForm = mappedEvalForm , Items = mappedData};
 
 
-        List<ScopeAcademicYear> scopeAcademicYears = await scopeRepostiory.GetScopeAcademicYearListByAcademicYearId(new Guid("cbbace9d-08e1-4267-8471-cb30d2217a6e"));
+        List<ScopeAcademicYear> scopeAcademicYears = await scopeRepostiory.GetScopeAcademicYearListByAcademicYearId(AcademicYearId);
 
         var tree = ScopeTreeBuilder.BuildTree(scopeAcademicYears, formItems);
+
+        return new FormDto() { EvalForm = mappedEvalForm, Tree = tree };
+    }
+    public async Task<Result<FormDto>> GetFormItemsWithValues(Guid FormId, Guid AcademicYearId, Guid EvaluationRequestId)
+    {
+
+        var evalForm = await formService.GetEvalForm(FormId, IncludeCalcMethod: true);
+        var mappedEvalForm = mapper.Map<TemplateFormDto>(evalForm);
+
+        var formItems = await formService.GetFormItems(FormId);
+        var mappedData = mapper.Map<List<FormItemDto>>(formItems);
+
+        var formItemsValues = await formService.GetFormItemsValuesByEvaluationRequestId(EvaluationRequestId);
+
+        foreach (var item in formItems)
+        {
+            var relatedItemDtos = new List<RelatedItemDto>();
+
+            foreach (var relatedFromItem in item.RelatedFrom) 
+            {
+                if (relatedFromItem.RelatedItemId != Guid.Empty)
+                {
+                    var formItemValue = await formService.GetFormItemValueByItemId(relatedFromItem.RelatedItemId);
+
+                        relatedItemDtos.Add(new RelatedItemDto()
+                        {
+                            Id = relatedFromItem.RelatedItemId,
+                            Note = formItemValue?.Note,
+                            Value = formItemValue?.ActualValue?.ToString(),
+                            Name = relatedFromItem.RelatedItem.NameAr
+                        });
+                }
+            }
+            mappedData.Where(md => md.Id == item.Id).FirstOrDefault().RelatedItems = relatedItemDtos;
+        }
+
+        //return new FormDto() { EvalForm = mappedEvalForm , Items = mappedData};
+
+
+        List<ScopeAcademicYear> scopeAcademicYears = await scopeRepostiory.GetScopeAcademicYearListByAcademicYearId(AcademicYearId);
+
+        var tree = ScopeTreeBuilder.BuildTree(scopeAcademicYears, formItems, formItemsValues);
 
         return new FormDto() { EvalForm = mappedEvalForm, Tree = tree };
     }
