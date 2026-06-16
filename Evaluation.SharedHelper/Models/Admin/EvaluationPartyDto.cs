@@ -9,4 +9,5 @@ public class EvaluationPartyDTO : EntityBaseDTO
     public bool IsSupportFiles { get; set; }
     public Guid DepartmentId { get; set; }
     public string Department { get; set; } = null!;
+    public Guid EvalPartyCategoryId { get; set; }
 }
