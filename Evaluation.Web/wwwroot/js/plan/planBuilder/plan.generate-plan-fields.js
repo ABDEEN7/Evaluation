@@ -215,164 +215,195 @@ const planUtility = window.planUtility;
 
     // ================== FILTER ==================
     function generateFilterOffcanvas(fieldId) {
-        return `
-            <div class="offcanvas offcanvas-end"
-                 tabindex="-1"
-                 id="${pid(fieldId, 'filterOffcanvas')}">
+        const cfg = window.planUtility?.depConfig || {};
+        const enabled = (key) => cfg[key] === true;
 
-                <div class="offcanvas-header justify-content-between p-4">
-                    <h5 class="offcanvas-title border d-flex align-items-center w-75 justify-content-between px-3 py-2 rounded">
-                        <span>${t('lblFilterResults')}</span>
-                        <i class="la la-filter"></i>
-                    </h5>
-                    <button type="button" class="btn btn-lg border d-flex align-items-center h-100"
-                            data-bs-dismiss="offcanvas">
-                        <i class="la la-angle-right"></i>
-                    </button>
-                </div>
+        const blocks = [];
 
-                <div class="offcanvas-body p-4">
-                    <form id="${pid(fieldId, 'filterForm')}">
+        if (enabled('schoolName')) {
+            blocks.push(`
+            <div class="mb-3">
+                <label class="form-label">${t('lblSchoolName')}</label>
+                <input type="text"
+                       id="${pid(fieldId, 'filterSchoolName')}"
+                       name="schoolName"
+                       class="form-control"
+                       placeholder="${t('plhWriteHere')}">
+            </div>
+            <hr>`);
+        }
 
-                        <div class="mb-3">
-                            <label class="form-label">${t('lblSchoolName')}</label>
-                            <input type="text"
-                                   id="${pid(fieldId, 'filterSchoolName')}"
-                                   name="schoolName"
-                                   class="form-control"
-                                   placeholder="${t('plhWriteHere')}">
-                        </div>
-                        <hr>
-
-                        <div class="mb-3">
-                            <label class="form-label">${t('lblLastEvalDate')}</label>
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="la la-calendar"></i></span>
-                                <input type="text"
-                                       id="${pid(fieldId, 'filterLastEvalDate')}"
-                                       name="lastEvalDate"
-                                     class="form-control datePicker"
-                                       placeholder="${t('plhChooseDate')}">
-                            </div>
-                        </div>
-                        <hr>
-
-                        
-                        <div class="mb-3">
-    <label class="form-label">${t('lblCreatedDateFrom') || 'تاريخ الإنشاء من'}</label>
-    <div id="${pid(fieldId, 'filterCreatedDate_wrap')}" style="position:relative;">
-        <input type="text"
-               id="${pid(fieldId, 'filterCreatedDate')}"
-               name="createdDate"
-             class="form-control datePicker"
-               placeholder="${t('plhChooseDate')}"
-               readonly>
-    </div>
-</div>
-<div class="mb-3">
-    <label class="form-label">${t('lblCreatedDateTo') || 'تاريخ الإنشاء إلى'}</label>
-    <div id="${pid(fieldId, 'filterToCreatedDate_wrap')}" style="position:relative;">
-        <input type="text"
-               id="${pid(fieldId, 'filterToCreatedDate')}"
-               name="toCreatedDate"
-             class="form-control datePicker"
-               placeholder="${t('plhChooseDate')}"
-               readonly>
-    </div>
-</div>
-                        <hr>
-
-                        <div class="mb-3">
-                            <label class="form-label">${t('lblNextEvalDate')}</label>
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="la la-calendar"></i></span>
-                                <input type="text"
-                                       id="${pid(fieldId, 'filterNextEvalDate')}"
-                                       name="nextEvalDate"
-                                     class="form-control datePicker"
-                                       placeholder="${t('plhChooseDate')}">
-                            </div>
-                        </div>
-                        <hr>
-
-                        <div class="mb-3">
-                            <label class="form-label">${t('lblPreviousResult')}</label>
-                            <select id="${pid(fieldId, 'filterPreviousResult')}"
-                                    name="previousResult"
-                                    class="form-control">
-                                    <option value="">${t('lblAll')}</option>
-                            </select>
-                        </div>
-                        <hr>
-
-                        <div class="mb-3">
-                            <label class="form-label">${t('lblVisitType')}</label>
-                            <select id="${pid(fieldId, 'filterVisitType')}"
-                                    name="visitType"
-                                    class="form-control">
-                                <option value="">${t('lblAll')}</option>
-                                <!-- Will be populated dynamically -->
-                            </select>
-                        </div>
-                        <hr>
-                        <div class="mb-3">
-                            <label class="form-label">${t('lblParentsSchool')}</label>
-                            <select id="${pid(fieldId, 'filterParentOrgTree')}"
-                                    name="parentOrgTree"
-                                    class="form-control">
-                                <option value="">${t('lblAll')}</option>
-                                <!-- Will be populated dynamically -->
-                            </select>
-                        </div>
-                        <div class="mb-3">
-    <label class="form-label">${t('lblSchoolLevel')}</label>
-    <select id="${pid(fieldId, 'filterSchoolLevel')}"
-            name="schoolLevel"
-            class="form-control">
-        <option value="">${t('lblAll')}</option>
-    </select>
-</div>
-<hr>
-
-<div class="mb-3">
-    <label class="form-label">${t('lblGender')}</label>
-    <select id="${pid(fieldId, 'filterGender')}"
-            name="gender"
-            class="form-control">
-        <option value="">${t('lblAll')}</option>
-        <option value="Male">${t('lblMale')}</option>
-        <option value="Female">${t('lblFemale')}</option>
-    </select>
-</div>
-<hr>
-
-<div class="mb-3">
-    <label class="form-label">${t('lblGrade')}</label>
-    <select id="${pid(fieldId, 'filterGrade')}"
-            name="grade"
-            class="form-control">
-        <option value="">${t('lblAll')}</option>
-        <!-- Will be populated dynamically -->
-    </select>
-</div>
-<hr>
-                        <div class="d-flex gap-2 mt-4">
-                            <button type="submit" class="btn btn-primary w-100">
-                                ${t('btnApply')}
-                            </button>
-                            <button type="button"
-                                    class="btn btn-outline-primary w-100"
-                                    id="${pid(fieldId, 'clearFiltersBtn')}">
-                                ${t('btnClear')}
-                            </button>
-                        </div>
-
-                    </form>
+        if (enabled('lastEvalDate')) {
+            blocks.push(`
+            <div class="mb-3">
+                <label class="form-label">${t('lblLastEvalDate')}</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="la la-calendar"></i></span>
+                    <input type="text"
+                           id="${pid(fieldId, 'filterLastEvalDate')}"
+                           name="lastEvalDate"
+                           class="form-control filter-date-picker"
+                           placeholder="${t('plhChooseDate')}">
                 </div>
             </div>
-        `;
-    }
+            <hr>`);
+        }
 
+        if (enabled('createdDate')) {
+            blocks.push(`
+            <div class="mb-3">
+                <label class="form-label">${t('lblCreatedDate')}</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="la la-calendar"></i></span>
+                    <input type="text"
+                           id="${pid(fieldId, 'filterCreatedDate')}"
+                           name="createdDate"
+                           class="form-control filter-date-picker"
+                           placeholder="${t('plhChooseDate')}">
+                </div>
+            </div>
+            <hr>`);
+        }
+
+        if (enabled('createdToDate')) {
+            blocks.push(`
+            <div class="mb-3">
+                <label class="form-label">${t('lblCreatedDateTo')}</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="la la-calendar"></i></span>
+                    <input type="text"
+                           id="${pid(fieldId, 'filterToCreatedDate')}"
+                           name="toCreatedDate"
+                           class="form-control filter-date-picker"
+                           placeholder="${t('plhChooseDate')}">
+                </div>
+            </div>
+            <hr>`);
+        }
+
+        if (enabled('nextEvalDate')) {
+            blocks.push(`
+            <div class="mb-3">
+                <label class="form-label">${t('lblNextEvalDate')}</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="la la-calendar"></i></span>
+                    <input type="text"
+                           id="${pid(fieldId, 'filterNextEvalDate')}"
+                           name="nextEvalDate"
+                           class="form-control filter-date-picker"
+                           placeholder="${t('plhChooseDate')}">
+                </div>
+            </div>
+            <hr>`);
+        }
+
+        if (enabled('previousResult')) {
+            blocks.push(`
+            <div class="mb-3">
+                <label class="form-label">${t('lblPreviousResult')}</label>
+                <select id="${pid(fieldId, 'filterPreviousResult')}"
+                        name="previousResult"
+                        class="form-control">
+                    <option value="">${t('lblAll')}</option>
+                    <option value="Perfect">${t('lblPerfect')}</option>
+                    <option value="VeryGood">${t('lblVeryGood')}</option>
+                    <option value="Good">${t('lblGood')}</option>
+                    <option value="Acceptable">${t('lblAcceptable')}</option>
+                    <option value="Week">${t('lblWeak')}</option>
+                </select>
+            </div>
+            <hr>`);
+        }
+
+        if (enabled('visitType')) {
+            blocks.push(`
+            <div class="mb-3">
+                <label class="form-label">${t('lblVisitType')}</label>
+                <select id="${pid(fieldId, 'filterVisitType')}"
+                        name="visitType"
+                        class="form-control">
+                    <option value="">${t('lblAll')}</option>
+                </select>
+            </div>
+            <hr>`);
+        }
+
+        if (enabled('parentOrgTree')) {
+            blocks.push(`
+            <div class="mb-3">
+                <label class="form-label">${t('lblParentsSchool')}</label>
+                <select id="${pid(fieldId, 'filterParentOrgTree')}"
+                        name="parentOrgTree"
+                        class="form-control">
+                    <option value="">${t('lblAll')}</option>
+                </select>
+            </div>
+            <hr>`);
+        }
+
+        if (enabled('schoolLevel')) {
+            blocks.push(`
+            <div class="mb-3">
+                <label class="form-label">${t('lblSchoolLevel')}</label>
+                <select id="${pid(fieldId, 'filterSchoolLevel')}"
+                        name="schoolLevel"
+                        class="form-control">
+                    <option value="">${t('lblAll')}</option>
+                </select>
+            </div>
+            <hr>`);
+        }
+
+        if (enabled('gender')) {
+            blocks.push(`
+            <div class="mb-3">
+                <label class="form-label">${t('lblGender')}</label>
+                <select id="${pid(fieldId, 'filterGender')}"
+                        name="gender"
+                        class="form-control">
+                    <option value="">${t('lblAll')}</option>
+                </select>
+            </div>
+            <hr>`);
+        }
+
+        if (enabled('grade')) {
+            blocks.push(`
+            <div class="mb-3">
+                <label class="form-label">${t('lblGrade')}</label>
+                <select id="${pid(fieldId, 'filterGrade')}"
+                        name="grade"
+                        class="form-control">
+                    <option value="">${t('lblAll')}</option>
+                </select>
+            </div>`);
+        }
+
+        return `
+        <div class="offcanvas offcanvas-end" tabindex="-1" id="${pid(fieldId, 'filterOffcanvas')}">
+            <div class="offcanvas-header justify-content-between p-4">
+                <h5 class="offcanvas-title border d-flex align-items-center w-75 justify-content-between px-3 py-2 rounded">
+                    <span>${t('lblFilterResults')}</span>
+                    <i class="la la-filter"></i>
+                </h5>
+                <button type="button" class="btn btn-lg border d-flex align-items-center h-100" data-bs-dismiss="offcanvas">
+                    <i class="la la-angle-right"></i>
+                </button>
+            </div>
+            <div class="offcanvas-body p-4">
+                <form id="${pid(fieldId, 'filterForm')}">
+                    ${blocks.join('')}
+                    <div class="d-flex gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary w-100">${t('btnApply')}</button>
+                        <button type="button" class="btn btn-outline-primary w-100" id="${pid(fieldId, 'clearFiltersBtn')}">
+                            ${t('btnClear')}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    `;
+    }
 
 
 })(planUtility);
