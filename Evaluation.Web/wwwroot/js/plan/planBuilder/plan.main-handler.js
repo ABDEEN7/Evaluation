@@ -88,6 +88,11 @@
                 ]);
             }
 
+    
+            if (!ns.depConfig) {
+                await loadDepartmentConfig();
+            }
+
             if (planObject) {
                 renderPlanWithData(fieldId, planObject, element);
             } else {
@@ -101,7 +106,7 @@
             populateFilterParentOrgTree(fieldId);
             populateFilterPreviousResult(fieldId);
             populateFilterSchoolLevels(fieldId);
-            populateFilterGenders(fieldId);   
+            populateFilterGenders(fieldId);
         } catch (e) {
             console.error(`[PlanHandler] Init failed for ${fieldId}`, e);
             alert('حدث خطأ أثناء التحميل');
@@ -230,19 +235,20 @@
 
     const populateFilterVisitTypes = (fieldId) => {
         const $select = $p(fieldId, 'filterVisitType');
-
-        ns.visitTypes.forEach(type => {
-            $select.append(`<option value="${type.id}">${type.name}</option>`);
-        });
+        if (!$select.length) return;
+        ns.visitTypes?.forEach(v => $select.append($('<option>').val(v.backendName).text(v.name)));
     };
+
     const populateFilterParentOrgTree = (fieldId) => {
         const $select = $p(fieldId, 'filterParentOrgTree');
+        if (!$select.length) return; 
         ns.parentSchool.forEach(parent => {
             $select.append(`<option value="${parent.id}">${parent.nameEn}</option>`)
         });
     }
     const populateFilterPreviousResult = (fieldId) => {
         const $select = $p(fieldId, 'filterPreviousResult');
+        if (!$select.length) return;
         ns.fomrEvalMatrixValue.forEach(fromEval => {
             $select.append(`<option value="${fromEval.id}">${fromEval.name}</option>`);
         });
@@ -267,6 +273,7 @@
     };
     const populateFilterSchoolLevels = (fieldId) => {
         const $select = $p(fieldId, 'filterSchoolLevel');
+        if (!$select.length) return; 
         ns.schoolLevels?.forEach(level => {
             $select.append($('<option>').val(level.id).text(level.name));
         });
@@ -274,6 +281,7 @@
 
     const populateFilterGenders = (fieldId) => {
         const $select = $p(fieldId, 'filterGender');
+        if (!$select.length) return;
         ns.schoolGenders?.forEach(g => {
             $select.append($('<option>').val(g.backendName).text(g.name));
         });
@@ -507,6 +515,17 @@
     const loadSchoolGenders = () =>
         jqClient().Get(API_ENDPOINTS.GET_SCHOOL_GENDER)
             .then(r => ns.schoolGenders = r?.result || []);
+
+    const loadDepartmentConfig = () =>
+        jqClient().Get(API_ENDPOINTS.GET_DEPARTMENT_CONFIG)
+            .then(r => {
+                try {
+                    ns.depConfig = JSON.parse(r?.result || '{}');
+                } catch (e) {
+                    console.error('[PlanHandler] Failed to parse DepConfig', e);
+                    ns.depConfig = {};
+                }
+            });
     /* ===================== PAGINATION ===================== */
 
     const renderPagination = (fieldId) => {
@@ -797,52 +816,40 @@
         e.preventDefault();
         const state = instances.get(fieldId);
 
-        // ✅ جمع قيم الفلاتر
+        const safeVal = (fieldId, name) => {
+            const $el = $p(fieldId, name);
+            return $el.length ? $el.val() : undefined;
+        };
         state.filters = {
-            name: $p(fieldId, 'filterSchoolName').val(),
-            lastEvalDate: $p(fieldId, 'filterLastEvalDate').val(),
-            establishmentDate: $p(fieldId, 'filterCreatedDate').val(),
-            nextEvalDate: $p(fieldId, 'filterNextEvalDate').val(),
-            fomrEvalMatrixValueId: $p(fieldId, 'filterPreviousResult').val(),
-            visitType: $p(fieldId, 'filterVisitType').val(),
-            schoolLevel: $p(fieldId, 'filterSchoolLevel').val(),
-            gender: $p(fieldId, 'filterGender').val(),
-            grade: $p(fieldId, 'filterGrade').val()
+            name: safeVal(fieldId, 'filterSchoolName'),
+            lastEvalDate: safeVal(fieldId, 'filterLastEvalDate'),
+            establishmentDate: safeVal(fieldId, 'filterCreatedDate'),
+            establishmentDateTo: safeVal(fieldId, 'filterToCreatedDate'),
+            nextEvalDate: safeVal(fieldId, 'filterNextEvalDate'),
+            fomrEvalMatrixValueId: safeVal(fieldId, 'filterPreviousResult'),
+            visitType: safeVal(fieldId, 'filterVisitType'),
+            schoolLevel: safeVal(fieldId, 'filterSchoolLevel'),
+            gender: safeVal(fieldId, 'filterGender'),
+            grade: safeVal(fieldId, 'filterGrade')
         };
 
-        // حذف القيم الفارغة
-        Object.keys(state.filters).forEach(key => {
-            if (!state.filters[key]) delete state.filters[key];
-        });
-        // ✅ استدعاء API مع الفلاتر
-        loadSchools(fieldId, 1, state.filters);
+        
+        Object.keys(state.filters).forEach(k => state.filters[k] === undefined && delete state.filters[k]);
 
-        // إغلاق الـ offcanvas
+        
+        loadSchools(fieldId, 1, state.filters);
         const offcanvas = bootstrap.Offcanvas.getInstance($p(fieldId, 'filterOffcanvas')[0]);
         if (offcanvas) offcanvas.hide();
     };
 
     const clearFilters = (fieldId) => {
-        const state = instances.get(fieldId);
-
-        // مسح state
-        state.filters = {};
-        state.searchTerm = '';
-
-
-        $p(fieldId, 'filterSchoolName').val('');
-        $p(fieldId, 'filterLastEvalDate').val('');
-        $p(fieldId, 'filterCreatedDate').val('');
-        $p(fieldId, 'filterNextEvalDate').val('');
-        $p(fieldId, 'filterPreviousResult').val('');
-        $p(fieldId, 'filterVisitType').val('');
-        $p(fieldId, 'customSearch').val('');
-        $p(fieldId, 'filterSchoolLevel').val('');
-        $p(fieldId, 'filterGender').val('');
-        $p(fieldId, 'filterGrade').val('');
-        populateFilterGrades(fieldId, '');
-
-        loadSchools(fieldId, 1);
+        ['filterSchoolName', 'filterLastEvalDate', 'filterCreatedDate', 'filterToCreatedDate',
+            'filterNextEvalDate', 'filterPreviousResult', 'filterVisitType', 'filterParentOrgTree',
+            'filterSchoolLevel', 'filterGender', 'filterGrade'].forEach(name => {
+                const $el = $p(fieldId, name);
+                if ($el.length) $el.val('');
+            });
+        if ($p(fieldId, 'filterGrade').length) populateFilterGrades(fieldId, '');
     };
 
     /* ===================== SAVE ===================== */

@@ -78,4 +78,11 @@ public class PlanController(MasterBL masterBL) : ControllerBase
         var result = await masterBL.GetApiService<PlanServiceRequestServices>().GetFomrEvalMatrixValueList();
         return Ok(new { result = result });
     }
+    [HttpGet]
+    public async Task<IActionResult> GetDepartmentConfig()
+    {
+        var result = await masterBL.GetApiService<PlanServiceRequestServices>().GetDepartmentConfigsAsync();
+        return Ok(new { result = result });
+    }
+
 }
