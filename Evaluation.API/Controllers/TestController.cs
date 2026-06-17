@@ -134,4 +134,10 @@ public class TestController : ControllerBase
 	{
 		return await _qnedsService.SyncQnedsIntegrationAsync(year);
 	}
+
+	[HttpPost]
+	public async Task<bool> GenerateOutputAnalysisFromQneds(Guid evaluationRequestId, int academicYear)
+	{
+		return await _qnedsService.GenerateOutputAnalysisFromQnedsAsync(evaluationRequestId, academicYear);
+	}
 }

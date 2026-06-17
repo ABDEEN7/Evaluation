@@ -19,6 +19,8 @@ namespace Evaluation.DAL.Models.FormsModules
         public DateOnly Startdate { get; set; }
         public DateOnly? EndDate { get; set; }
         public int OrderNo { get; set; }
+		public virtual ICollection<FormEvalMatrixValue>? FormEvalMatrixValues { get; set; }
 
-    }
+
+	}
 }
