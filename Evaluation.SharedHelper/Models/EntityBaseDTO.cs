@@ -24,6 +24,7 @@ namespace Evaluation.SharedHelper.Models
         public DBResult ResponseStatus { get; set; }
         public string? ResponseMessage { get; set; }
         public bool? ResponseState { get; set; }
+        public Guid ServiceTypeId { get; set; }
     }
     public class EntityBaseDTO : EntityTableDTO
     {

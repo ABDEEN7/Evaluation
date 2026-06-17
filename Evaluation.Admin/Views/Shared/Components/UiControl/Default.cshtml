@@ -1,5 +1,4 @@
 ﻿@model UiControlVM
-
 @if (Model.ControlItem != null)
 {
 
@@ -342,6 +341,7 @@
                             var mainduallistsearch = "main_" + @constraint.UibackendName + "searchList";
                             var duallistsearch = @constraint.UibackendName + "searchList";
                             <div class="dual-list-container">
+                                <label class="dual-list-label">Available</label>
                                 <div class="list-box card" id="@mainduallist">
                                     <input type="text" id="@mainduallistsearch" placeholder="Search Here" onkeyup="DualsearchList('@mainduallist', '@mainduallistsearch')">
                                     <ul></ul>
@@ -353,6 +353,8 @@
                                     <button class="listbutton btn btn-primary" id="@leftbutton"><i class="fa-solid fa-less-than"></i></button>
                                     <button class="listbutton btn btn-primary" id="@leftallbutton"><i class="fa fa-angle-double-left"></i></button>
                                 </div>
+                                <label class="dual-list-label">Selected</label>
+
                                 <div class="list-box card" id="@constraint.UibackendName">
                                     <input type="text" id="@duallistsearch" placeholder="Search Here" onkeyup="DualsearchList('@constraint.UibackendName', '@duallistsearch')">
                                     <ul id="sortable-list"></ul>

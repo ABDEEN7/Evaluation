@@ -14,6 +14,7 @@ namespace Evaluation.SharedHelper.Models.Admin
         public decimal ActualMatrixValue { get; set; }
         public string? DescAr { get; set; }
         public string? DescEn { get; set; }
+        public string? ColorCode { get; set; }
         public int OrderNo { get; set; } = 0;
         public int NextEvalDays { get; set; } = 0;
 
