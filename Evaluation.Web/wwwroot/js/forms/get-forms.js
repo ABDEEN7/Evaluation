@@ -3,7 +3,7 @@
 // ==============================
 const GET_FORMS_API = {
     getItems: (depRoutePath, formId) =>
-        `/Form/${depRoutePath}/GetItems?formId=${formId}`,
+        `/Form/${depRoutePath}/GetItems?formId=${formId}&`,
 
     getMatrixValues: (depRoutePath, formId) =>
         `/Form/${depRoutePath}/GetFormEvalMarixValues?formId=${formId}`,

@@ -43,12 +43,12 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
 
     public async Task<Result<FormDto>> GetFormItems(Guid FormId, Guid AcademicYearId)
     {
-
+        var lang = requestInfo.Lang;
         var evalForm = await formService.GetEvalForm(FormId, IncludeCalcMethod: true);
         var mappedEvalForm = mapper.Map<TemplateFormDto>(evalForm);
 
         var formItems = await formService.GetFormItems(FormId);
-        var mappedData = mapper.Map<List<FormItemDto>>(formItems);
+        var mappedData = mapper.Map<List<FormItemDto>>(formItems, opt => opt.Items["lang"] = lang);
 
         foreach (var item in formItems)
         {
@@ -156,7 +156,7 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
                 result.Errors.Add(new ItemError() { ItemId = item.Id, Message = ConstantKeys.ExceptionMessage.Requiredfield, ItemPropertyType = ItemPropertyType.Select });
             }
 
-            if (item.Note == null)
+            if (item.Note == null && formItem.HasNote)
             {
                 result.Errors.Add(new ItemError() { ItemId = item.Id, Message = ConstantKeys.ExceptionMessage.Requiredfield, ItemPropertyType = ItemPropertyType.Note });
 
@@ -168,9 +168,9 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
 
             foreach (var sub in item.SubItems)
             {
-                var currentSubItem = formItem.SubFormItems.Where(s => s.Id == sub.Id).FirstOrDefault();
+                var currentSubItem = formItem?.SubFormItems?.Where(s => s.Id == sub.Id).FirstOrDefault();
 
-                if (sub.Note == null)
+                if (sub.Note == null && currentSubItem.HasNote)
                 {
                     result.Errors.Add(new ItemError() { ItemId = sub.Id, Message = ConstantKeys.ExceptionMessage.Requiredfield, ItemPropertyType = ItemPropertyType.Note });
 
@@ -182,8 +182,16 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
 
                 if (sub.ValueId != null)
                 {
-                    if (!formEvalMatrixValues.Any(x => x.Id == sub.ValueId))
+                    if (!currentSubItem?.DropDownType?.FieldDropDownValues?.Any(x => x.Id == sub.ValueId) != null)
+                    {
+                        if (!currentSubItem.DropDownType.FieldDropDownValues.Any(x => x.Id == sub.ValueId))
+                            result.Errors.Add(new ItemError() { ItemId = sub.Id, Message = ConstantKeys.ExceptionMessage.TheSelectedValueIsNotRecognized, ItemPropertyType = ItemPropertyType.Select });
+                    }
+                    else
+                    {
                         result.Errors.Add(new ItemError() { ItemId = sub.Id, Message = ConstantKeys.ExceptionMessage.TheSelectedValueIsNotRecognized, ItemPropertyType = ItemPropertyType.Select });
+                    }
+
                 }
                 else
                 {

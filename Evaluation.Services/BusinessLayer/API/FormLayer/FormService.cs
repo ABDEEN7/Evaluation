@@ -3,6 +3,7 @@ using Evaluation.DAL.Dtos.Form;
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.FormsModules;
 using Evaluation.DAL.Repositories;
+using Evaluation.Services.Extensions;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Models;
 using Microsoft.EntityFrameworkCore;
@@ -53,20 +54,39 @@ public class FormService(IServiceScopeFactory serviceScopeFactory,
             .ToListAsync();
     }
 
+    //public async Task<List<FormItem>> GetFormItems(Guid formId)
+    //{
+    //    var formItems = await unitOfWork.GetRepository<FormItem>()
+    //              .GetAllActiveNonDeleted()
+    //              .Where(s => s.EvalFormId == formId)
+    //              .Include(f => f.FormItemConfigs)
+    //              .Include(d => d.SubFormItems)
+    //              .Include(f => f.RelatedFrom)
+    //              .ThenInclude(y => y.RelatedItem)
+    //              .OrderBy(x => x.OrderNo)
+    //              .ToListAsync();
+
+    //    return formItems;
+    //}
     public async Task<List<FormItem>> GetFormItems(Guid formId)
     {
-        var formItems = await unitOfWork.GetRepository<FormItem>()
-                  .GetAllActiveNonDeleted()
-                  .Where(s => s.EvalFormId == formId)
-                  .Include(f => f.FormItemConfigs)
-                  .Include(d => d.SubFormItems)
-                  .Include(f => f.RelatedFrom)
-                  .ThenInclude(y => y.RelatedItem)
-                  .OrderBy(x => x.OrderNo)
-                  .ToListAsync();
+        using var scope = serviceProvider.CreateScopedUow();
+
+        var formItems = await scope.GetRepository<FormItem>()
+        .GetAllActiveNonDeleted()
+        .Where(s => s.EvalFormId == formId)
+        .Include(f => f.FormItemConfigs)
+        .Include(x => x.SubFormItems)
+            .ThenInclude(x => x.DropDownType)
+                .ThenInclude(x => x.FieldDropDownValues)
+        .Include(f => f.RelatedFrom)
+            .ThenInclude(y => y.RelatedItem)
+        .OrderBy(x => x.OrderNo)
+        .ToListAsync();
 
         return formItems;
     }
+
 
     public async Task<FormItem> GetFormItem(Guid Id)
     {

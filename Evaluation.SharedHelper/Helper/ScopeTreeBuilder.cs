@@ -1,4 +1,5 @@
 ﻿using Evaluation.DAL.Dtos.Form;
+using Evaluation.DAL.Models.FormBuilder;
 using Evaluation.DAL.Models.FormsModules;
 using Evaluation.SharedHelper.Dtos.EvalFormDto;
 using Evaluation.SharedHelper.Dtos.Form;
@@ -97,6 +98,14 @@ public static class ScopeTreeBuilder
                         {
                             Id = c.Id,
                             Name = c.NameEn,//TODO: need to fix for selected language
+                            hasNote = c.HasNote,
+                            SubItemLists = c.DropDownType != null ? c.DropDownType.FieldDropDownValues.Select(d=> new SubItemList {
+                            Id = d.Id,
+                            NameAr = d.TitleAr,
+                            NameEn = d.TitleEn,
+                            OrderNo = d.OrderNo
+                            }).ToList() : new List<SubItemList>()
+
                         }).ToList(),
 
                         FormItemConfigs = configLookup.TryGetValue(x.Id, out var configs)

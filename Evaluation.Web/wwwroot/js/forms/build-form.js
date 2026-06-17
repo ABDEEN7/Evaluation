@@ -2,12 +2,13 @@
 // API Endpoints
 // ==============================
 const GET_FORMS_API = {
-    getItems: (depRoutePath, formId) =>
-        `/Form/${depRoutePath}/GetItems?formId=${formId}`,
+    getItems: (depRoutePath, formId, academicYearId) =>
+        `/Form/${depRoutePath}/GetItems?formId=${formId}&academicYearId=cbbace9d-08e1-4267-8471-cb30d2217a6e`,
 
     getMatrixValues: (depRoutePath, formId) =>
         `/Form/${depRoutePath}/GetFormEvalMarixValues?formId=${formId}`,
 };
+
 
 
 const SUBMIT_FORM_API = {
@@ -32,27 +33,31 @@ const ItemPropertyType = Object.freeze({
 
 
 // ==============================
-// Module-level state
-// (replaces the page-level P_* globals that used to be set
-//  inside generateFullFormPageHtml in the old get-forms.js)
+// Per-form state
 // ==============================
-let evalForm = null;          // set from response.value.evalForm in initForm
-let P_hasMuliEvaluation = false; // derived from evalForm.hasMuliEvaluation
-let P_matrixResponse = null;     // raw response from GetFormEvalMarixValues
+// Replaces the old single set of module-level globals (evalForm,
+// P_hasMuliEvaluation, P_matrixResponse, P_fieldId, P_evaluationRequestId,
+// P_serviceRequestId, MOCK_DATA). Each form rendered on the page gets its
+// own entry here, keyed by fieldId, so multiple forms can coexist on the
+// same page without overwriting each other's state.
+const formStates = new Map();
 
-// These three are NOT derivable from the API responses - the page
-// that calls initForm must pass them in (same values that used to be
-// passed into generateFullFormPageHtml).
-let P_fieldId = null;
-let P_evaluationRequestId = null;
-let P_serviceRequestId = null;
-
-let MOCK_DATA;
+function getFormState(fieldId) {
+    if (!formStates.has(fieldId)) {
+        formStates.set(fieldId, {
+            evalForm: null,
+            hasMuliEvaluation: false,
+            matrixResponse: null,
+            evaluationRequestId: null,
+            serviceRequestId: null,
+            formData: null
+        });
+    }
+    return formStates.get(fieldId);
+}
 
 
 // Minimal escaping for values placed inside HTML attributes (value="...").
-// The old build-form.js injected item.name directly with no escaping;
-// this guards against item names containing a double quote breaking the markup.
 function escapeAttr(text = '') {
     return String(text)
         .replace(/&/g, '&amp;')
@@ -60,26 +65,6 @@ function escapeAttr(text = '') {
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;');
 }
-
-//// Build MOCK_DATA-shaped structure dynamically from API tree
-//// Top-level tree node  -> Criterion (criterion-card)
-//// node.children        -> Aspects (aspect-card)
-//// child.items          -> Rows (row-item)
-//// child.name           -> Domain title (right-side column)
-//function buildFormData(tree) {
-//    return tree.map(criterionNode => ({
-//        title: criterionNode.name,
-//        aspects: (criterionNode.children || []).map(child => ({
-//            title: child.name,
-//            domainTitle: child.name,
-//            rows: (child.items || []).map(item => ({
-//                id: item.id,
-//                text: item.name,
-//                hasNote: !!item.hasNote
-//            }))
-//        }))
-//    }));
-//}
 
 // ==============================
 // Build MOCK_DATA-shaped structure dynamically from API tree
@@ -109,11 +94,12 @@ function buildFormData(tree, evalFormData) {
         subItems: (item.subFormItems || []).map(sub => ({
             id: sub.id,
             text: sub.name,
-            // NOTE: current "New Json Response" sample doesn't include
-            // hasNote/formItemConfigs on subFormItems. Defaults to
-            // false/0 until that structure is updated.
             hasNote: !!sub.hasNote,
-            weightPercentage: getWeightPercentage(sub)
+            weightPercentage: getWeightPercentage(sub),
+            // Sub-items can carry their own value list (subItemLists) that
+            // overrides the shared evaluation matrix for that row only.
+            // Mirrors the old subItemListsMap behavior in get-forms_Old.js.
+            subItemLists: sub.subItemLists ?? []
         }))
     });
 
@@ -131,27 +117,37 @@ function buildFormData(tree, evalFormData) {
 // ==============================
 // Row rendering
 // ==============================
+// fieldId is threaded through so the validation message ids stay unique
+// per form (validation-${fieldId}-${itemId}-${itemPropertyType}).
+function renderSelectAndNote(fieldId, itemId, hasNote, readOnly, matrixValues, customOptions = null) {
+    // If this item has its own subItemLists (non-empty), those options
+    // replace the shared evaluation matrix for this select only - same
+    // priority order as the old populateForm()/subItemListsMap logic.
+    const useCustomOptions = Array.isArray(customOptions) && customOptions.length > 0;
 
-function renderSelectAndNote(itemId, hasNote, readOnly, matrixValues) {
+    const optionsHtml = useCustomOptions
+        ? customOptions.map(o => `<option value="${o.id}">${escapeAttr(o.nameAr || o.nameEn)}</option>`).join('')
+        : matrixValues.map(o => `<option value="${o.id}" data-actual-value="${o.actualMatrixValue}">${o.actualMatrixValue}</option>`).join('');
+
     return `
         <div class="row-select-wrap">
             <select class="row-select" ${readOnly ? 'disabled' : ''}>
                 <option disabled selected>Please Select</option>
-                ${matrixValues.map(o => `<option value="${o.id}" data-actual-value="${o.actualMatrixValue}">${o.actualMatrixValue}</option>`).join('')}
+                ${optionsHtml}
             </select>
-            <span class="validation-message" id="validation-${itemId}-${ItemPropertyType.SELECT}"></span>
+            <span class="validation-message" id="validation-${fieldId}-${itemId}-${ItemPropertyType.SELECT}"></span>
         </div>
 
         <div class="row-note-wrap">
             ${hasNote
             ? `<input class="row-note" ${readOnly ? 'disabled' : ''} type="text" placeholder="اكتب ملاحظة هنا..." />`
             : `<div class="row-note-placeholder"></div>`}
-            <span class="validation-message" id="validation-${itemId}-${ItemPropertyType.NOTE}"></span>
+            <span class="validation-message" id="validation-${fieldId}-${itemId}-${ItemPropertyType.NOTE}"></span>
         </div>
     `;
 }
 
-function renderSubRowHtml(sub, parentId, label, readOnly, matrixValues) {
+function renderSubRowHtml(fieldId, sub, parentId, label, readOnly, matrixValues) {
     return `
         <div class="row-item child-row" data-item-id="${sub.id}" data-parent-id="${parentId}" data-weight="${sub.weightPercentage}">
             <span class="row-index">
@@ -160,13 +156,18 @@ function renderSubRowHtml(sub, parentId, label, readOnly, matrixValues) {
 
             <input class="row-name" type="text" value="${escapeAttr(sub.text)}" readonly />
 
-            ${renderSelectAndNote(sub.id, sub.hasNote, readOnly, matrixValues)}
+            ${renderSelectAndNote(fieldId, sub.id, sub.hasNote, readOnly, matrixValues, sub.subItemLists)}
         </div>
     `;
 }
 
-function toast(msg) {
-    const el = document.getElementById('toast');
+// fieldId is optional: pass it when the page has a dedicated toast per
+// form (id="${fieldId}-toast"); otherwise falls back to a single shared
+// #toast element.
+function toast(msg, fieldId = null) {
+    const el = (fieldId && document.getElementById(`${fieldId}-toast`)) || document.getElementById('toast');
+    if (!el) return;
+
     el.textContent = msg;
     el.classList.add('show');
     setTimeout(() => el.classList.remove('show'), 3000);
@@ -175,34 +176,55 @@ function toast(msg) {
 // ==============================
 // Init
 // ==============================
-
-// fieldId / evaluationRequestId / serviceRequestId are page-level values
-// that used to be passed into generateFullFormPageHtml; the page calling
-// initForm must supply them here.
-async function initForm(formId, readOnly, savedResults, fieldId, evaluationRequestId, serviceRequestId) {
-    P_fieldId = fieldId;
-    P_evaluationRequestId = evaluationRequestId;
-    P_serviceRequestId = serviceRequestId;
+// Requires a container element already present on the page with
+// id="${fieldId}-form-root". That's what makes it safe to call initForm
+// more than once on the same page (one call per fieldId/form instance).
+async function initForm(formId, fieldId, readOnly, savedResults, evaluationRequestId, serviceRequestId) {
+    const state = getFormState(fieldId);
+    state.evaluationRequestId = evaluationRequestId;
+    state.serviceRequestId = serviceRequestId;
 
     const response = await jqClient().Get(
         GET_FORMS_API.getItems(depRoutePath, formId)
     );
 
     let tree = response?.value?.tree ?? [];
-    evalForm = response?.value?.evalForm ?? null;
-    P_hasMuliEvaluation = !!(evalForm && evalForm.hasMuliEvaluation);
+    state.evalForm = response?.value?.evalForm ?? null;
+    state.hasMuliEvaluation = !!(state.evalForm && state.evalForm.hasMuliEvaluation);
 
     const matrixResponse = await jqClient().Get(
         GET_FORMS_API.getMatrixValues(depRoutePath, formId)
     );
 
-    P_matrixResponse = matrixResponse;
+    state.matrixResponse = matrixResponse;
     const matrixValues = matrixResponse?.value ?? matrixResponse ?? [];
 
-    MOCK_DATA = buildFormData(tree, evalForm);
 
-    const root = document.getElementById('form-root');
+    state.formData = buildFormData(tree, state.evalForm);
+
+    const root = document.getElementById(`${fieldId}-form-root`);
+    if (!root) {
+        console.error(`initForm: no element with id "${fieldId}-form-root" found on the page.`);
+        return;
+    }
     root.innerHTML = '';
+
+    const table = buildHorizontalTable(matrixValues);
+
+    const container = document.getElementById(`${fieldId}-form-root`);
+
+    container.appendChild(table);
+
+    // Result banner, scoped to this form. Inserted once per fieldId so
+    // repeated initForm calls (e.g. re-init) don't duplicate it.
+    if (!document.getElementById(`${fieldId}-form-result-div`)) {
+        root.insertAdjacentHTML('afterend', `
+            <div id="${fieldId}-form-result-div" class="d-none bg-primary d-flex justify-content-between align-items-center py-2">
+                <div class="text-white">Result:</div>
+                <div class="text-white" id="${fieldId}-form-result-value"></div>
+            </div>
+        `);
+    }
 
     // Build lookup maps: itemId -> saved result, subItemId -> saved sub-result
     const savedMap = {};
@@ -214,21 +236,23 @@ async function initForm(formId, readOnly, savedResults, fieldId, evaluationReque
         });
     }
 
-    MOCK_DATA.forEach((crit, cIdx) => {
+    state.formData.forEach((crit, cIdx) => {
         const cCard = document.createElement('div');
         cCard.className = 'criterion-card';
+
+        const critBodyId = `${fieldId}-crit-body-${cIdx}`;
 
         cCard.innerHTML = `
             <div class="criterion-header">
                 <span class="criterion-number">معيار ${cIdx + 1}</span>
                 <input class="criterion-title-input" type="text" value="${escapeAttr(crit.title)}" readonly />
             </div>
-            <div class="criterion-body" id="crit-body-${cIdx}"></div>
+            <div class="criterion-body" id="${critBodyId}"></div>
         `;
 
         root.appendChild(cCard);
 
-        const body = document.getElementById(`crit-body-${cIdx}`);
+        const body = document.getElementById(critBodyId);
 
         crit.aspects
             .filter(asp => asp.rows && asp.rows.length > 0)
@@ -236,7 +260,7 @@ async function initForm(formId, readOnly, savedResults, fieldId, evaluationReque
                 const aCard = document.createElement('div');
                 aCard.className = 'aspect-card';
 
-                const aId = `asp-${cIdx}-${aIdx}`;
+                const aId = `${fieldId}-asp-${cIdx}-${aIdx}`;
 
                 aCard.innerHTML = `
                     <div class="aspect-header">
@@ -275,7 +299,7 @@ async function initForm(formId, readOnly, savedResults, fieldId, evaluationReque
 
                         <input class="row-name" type="text" value="${escapeAttr(row.text)}" readonly />
 
-                        ${renderSelectAndNote(row.id, row.hasNote, readOnly, matrixValues)}
+                        ${renderSelectAndNote(fieldId, row.id, row.hasNote, readOnly, matrixValues)}
                     `;
 
                     rowsArea.appendChild(rowDiv);
@@ -294,6 +318,11 @@ async function initForm(formId, readOnly, savedResults, fieldId, evaluationReque
                         }
                     }
 
+                    // Recalculate the result banner whenever this row's value changes
+                    rowDiv.querySelector('.row-select').addEventListener('change', () => {
+                        calculateFE(formId, fieldId);
+                    });
+
                     // Sub-items: rendered into a collapsible container, toggled from the main row
                     if (hasSubItems) {
                         const subContainer = document.createElement('div');
@@ -303,7 +332,7 @@ async function initForm(formId, readOnly, savedResults, fieldId, evaluationReque
                         row.subItems.forEach((sub, sIdx) => {
                             subContainer.insertAdjacentHTML(
                                 'beforeend',
-                                renderSubRowHtml(sub, row.id, `${rIdx + 1}.${sIdx + 1}`, readOnly, matrixValues)
+                                renderSubRowHtml(fieldId, sub, row.id, `${rIdx + 1}.${sIdx + 1}`, readOnly, matrixValues)
                             );
                         });
 
@@ -324,6 +353,10 @@ async function initForm(formId, readOnly, savedResults, fieldId, evaluationReque
                                     noteEl.value = savedSub.note;
                                 }
                             }
+
+                            childRow.querySelector('.row-select').addEventListener('change', () => {
+                                calculateFE(formId, fieldId);
+                            });
                         });
 
                         // Toggle expand/collapse
@@ -337,16 +370,27 @@ async function initForm(formId, readOnly, savedResults, fieldId, evaluationReque
                 });
             });
     });
+
 }
 
 
 // ==============================
 // Build payload from current DOM state
 // ==============================
-function evaluationFormResult(formId) {
+// Scoped to this form's own container so it never picks up rows
+// belonging to a different form rendered on the same page.
+function evaluationFormResult(formId, fieldId) {
+    const state = getFormState(fieldId);
+    const root = document.getElementById(`${fieldId}-form-root`);
+
+    if (!root) {
+        console.error(`evaluationFormResult: no element with id "${fieldId}-form-root" found.`);
+        return { id: formId, items: [], formSettings: state.evalForm };
+    }
+
     const items = [];
 
-    document.querySelectorAll('.row-item.main-row').forEach(row => {
+    root.querySelectorAll('.row-item.main-row').forEach(row => {
         const itemId = row.dataset.itemId;
         const selectEl = row.querySelector('.row-select');
         const noteEl = row.querySelector('.row-note');
@@ -357,7 +401,7 @@ function evaluationFormResult(formId) {
         const weightPercentage = parseFloat(row.dataset.weight) || 0;
 
         const subItems = [];
-        document.querySelectorAll(`.row-item.child-row[data-parent-id="${itemId}"]`).forEach(childRow => {
+        root.querySelectorAll(`.row-item.child-row[data-parent-id="${itemId}"]`).forEach(childRow => {
             const childSelect = childRow.querySelector('.row-select');
             const childNote = childRow.querySelector('.row-note');
 
@@ -385,7 +429,7 @@ function evaluationFormResult(formId) {
     return {
         id: formId,
         items: items,
-        formSettings: evalForm
+        formSettings: state.evalForm
     };
 }
 
@@ -404,10 +448,63 @@ function calculate(result) {
 }
 
 // ==============================
+// Live calculation on select change (client-side, mirrors calcMethod)
+// ==============================
+function calculateFE(formId, fieldId) {
+    const state = getFormState(fieldId);
+    const formResult = evaluationFormResult(formId, fieldId);
+    const result = { Value: 0, Name: null, Id: '00000000-0000-0000-0000-000000000000' };
+
+    switch (state.evalForm?.calcMethod) {
+        case "AVERAGE": {
+            const hasWeights = formResult.items.some(item => item.weightPercentage > 0);
+
+            let total = 0;
+            formResult.items.forEach((item) => {
+                total += hasWeights
+                    ? (item.value * (item.weightPercentage / 100)) || 0
+                    : (item.value || 0);
+            });
+
+            result.Value = hasWeights
+                ? total
+                : total / (formResult.items.length || 1);
+
+            const matrixValues = state.matrixResponse?.value ?? state.matrixResponse ?? [];
+            const evalMatrixValue = matrixValues.find(
+                v => v.minValue <= result.Value && v.maxValue >= result.Value
+            );
+
+            result.Name = evalMatrixValue?.name ?? null;
+            result.Id = evalMatrixValue?.id ?? null;
+            break;
+        }
+
+        case "SUM":
+            break;
+
+        case "WithoutCalc":
+            break;
+    }
+
+    const resultValueEl = document.getElementById(`${fieldId}-form-result-value`);
+    const resultDiv = document.getElementById(`${fieldId}-form-result-div`);
+
+    if (resultValueEl) {
+        resultValueEl.textContent = `(${Number(result.Value).toFixed(2)}) ${result.Name ?? ''}`;
+    }
+    if (resultDiv) {
+        resultDiv.classList.remove('d-none');
+    }
+
+    return result;
+}
+
+// ==============================
 // Validate (calls backend, shows inline error spans)
 // ==============================
-async function validateForm(formId) {
-    const result = evaluationFormResult(formId);
+async function validateForm(formId, fieldId) {
+    const result = evaluationFormResult(formId, fieldId);
 
     return new Promise((resolve, reject) => {
         jqClient().Post(
@@ -415,13 +512,13 @@ async function validateForm(formId) {
             result
         )
             .done((res) => {
-                clearValidation();
+                clearValidation(fieldId);
 
                 if (res.value.isValid) {
                     resolve(true);
                 } else {
                     res.value.errors.forEach(error => {
-                        showValidation(error.itemId, error.message, error.itemPropertyType);
+                        showValidation(fieldId, error.itemId, error.message, error.itemPropertyType);
                     });
                     resolve(false);
                 }
@@ -433,9 +530,9 @@ async function validateForm(formId) {
 // ==============================
 // Save (validate -> calculate -> persist)
 // ==============================
-async function SubmitForm(formId) {
+async function SubmitForm(formId, fieldId) {
 
-    const finalResult = getFormResults(formId)
+    const finalResult = await getFormResults(formId, fieldId);
 
     return new Promise((resolve, reject) => {
         jqClient().Post(
@@ -443,11 +540,11 @@ async function SubmitForm(formId) {
             finalResult
         )
             .done((res) => {
-                toast('تم حفظ التقييم بنجاح');
+                toast('تم حفظ التقييم بنجاح', fieldId);
                 resolve(res);
             })
             .fail((err) => {
-                toast('حدث خطأ أثناء الحفظ');
+                toast('حدث خطأ أثناء الحفظ', fieldId);
                 reject(err);
             });
     });
@@ -456,23 +553,24 @@ async function SubmitForm(formId) {
 // ==============================
 // Save (validate -> calculate -> persist)
 // ==============================
-async function getFormResults(formId) {
-    //const isValid = await validateForm(formId);
-    //if (!isValid) {
-    //    toast('يوجد حقول غير مكتملة، يرجى مراجعة الأخطاء');
-    //    return null;
-    //}
+async function getFormResults(formId, fieldId) {
+    const isValid = await validateForm(formId, fieldId);
+    if (!isValid) {
+        toast('يوجد حقول غير مكتملة، يرجى مراجعة الأخطاء', fieldId);
+        return null;
+    }
 
-    const result = evaluationFormResult(formId);
+    const result = evaluationFormResult(formId, fieldId);
     const calculation = await calculate(result);
+    const state = getFormState(fieldId);
 
     const finalResult = {
         id: result.id,
         items: result.items,
         formSettings: result.formSettings,
         results: calculation.value,
-        evaluationRequestId: P_evaluationRequestId,
-        serviceRequestId: P_serviceRequestId
+        evaluationRequestId: state.evaluationRequestId,
+        serviceRequestId: state.serviceRequestId
     };
     return finalResult;
 }
@@ -480,21 +578,64 @@ async function getFormResults(formId) {
 // ==============================
 // Validation message helpers
 // ==============================
-function showValidation(itemId, message, itemPropertyType) {
-    const el = document.getElementById(`validation-${itemId}-${itemPropertyType}`);
+function showValidation(fieldId, itemId, message, itemPropertyType) {
+    const el = document.getElementById(`validation-${fieldId}-${itemId}-${itemPropertyType}`);
     if (!el) return;
 
     el.textContent = "*" + message;
     el.style.display = 'block';
 }
 
-function clearValidation() {
-    const els = document.getElementsByClassName('validation-message');
-    if (!els) return;
+function clearValidation(fieldId) {
+    const root = document.getElementById(`${fieldId}-form-root`);
+    if (!root) return;
 
-    for (const el of els) {
+    root.querySelectorAll('.validation-message').forEach(el => {
         el.textContent = '';
         el.style.display = 'none';
-    }
+    });
 }
 
+
+function buildHorizontalTable(data) {
+    const table = document.createElement("table");
+    table.border = "1";
+    table.style.borderCollapse = "collapse";
+    table.className = "table table-bordered table-hover align-middle w-100 dataTable no-footer";
+
+    const tHeadnameRow = document.createElement("thead");
+    tHeadnameRow.className = 'table-light';
+
+    const nameRow = document.createElement("tr");
+    const rangeRow = document.createElement("tr");
+
+    // Row 1: Names
+    const nameCell = document.createElement("th");
+    nameCell.textContent = "Name";
+    //nameCell.className = 'table-grey';
+    nameRow.appendChild(nameCell);
+    tHeadnameRow.appendChild(nameRow);
+    // Row 2: Range
+    const rangeCell = document.createElement("td");
+    rangeCell.textContent = `Range`;
+    rangeRow.appendChild(rangeCell);
+
+    data.forEach(item => {
+        // Row 1: Names
+        const nameCell = document.createElement("th");
+        nameCell.textContent = item.name;
+        //nameCell.className = 'table-grey';
+        nameRow.appendChild(nameCell);
+        tHeadnameRow.appendChild(nameRow);
+
+        // Row 2: Min - Max
+        const rangeCell = document.createElement("td");
+        rangeCell.textContent = `(${item.minValue} - ${item.maxValue})`;
+        rangeRow.appendChild(rangeCell);
+    });
+
+    table.appendChild(tHeadnameRow);
+    table.appendChild(rangeRow);
+
+    return table;
+}

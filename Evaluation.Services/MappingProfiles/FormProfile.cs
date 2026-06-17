@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Evaluation.DAL.Dtos.Form;
+using Evaluation.DAL.Models.FormBuilder;
 using Evaluation.DAL.Models.FormsModules;
 using Evaluation.SharedHelper.Dtos.Form;
 
@@ -21,9 +22,19 @@ public class FormProfile : Profile
             //.ForMember(d => d.RelatedItemId, opt => opt.MapFrom(src => src.RelatedFrom.FirstOrDefault().RelatedItemId))
             .ReverseMap();
 
+        CreateMap<FieldDropDownValue, SubItemList>()
+          .ForMember(d => d.Id, opt => opt.MapFrom(src => src.Id))
+          .ForMember(d => d.NameAr, opt => opt.MapFrom(src => src.TitleAr))
+          .ForMember(d => d.NameEn, opt => opt.MapFrom(src => src.TitleEn));
+
         CreateMap<SubFormItem, SubFormItemDto>()
-            .ForMember(d => d.Id, opt => opt.MapFrom(src => src.Id))
-            .ForMember(d => d.Name, opt => opt.MapFrom(src => src.NameAr))
+          .ForMember(d => d.Id, opt => opt.MapFrom(src => src.Id))
+          .ForMember(d => d.Name, opt => opt.MapFrom<LocalizedSubNameResolver>())
+          .ForMember(d => d.SubItemLists,
+          opt => opt.MapFrom(src =>
+              src.DropDownType != null
+                  ? src.DropDownType.FieldDropDownValues
+                  : new List<FieldDropDownValue>()))
             .ReverseMap();
 
         CreateMap<FormItemValue, FormItemEvaluationDto>()
@@ -42,11 +53,10 @@ public class FormProfile : Profile
           .ReverseMap();
 
         CreateMap<SubFormItemValue, SubFormItemEvaluationDto>()
-         .ForMember(d => d.Value, opt => opt.MapFrom(src => src.FieldDropDownValueId))
-         .ForMember(d => d.Note, opt => opt.MapFrom(src => src.Note))
-         .ForMember(d => d.Id, opt => opt.MapFrom(src => src.SubFormItemId))
-         .ForMember(d => d.ValueId, opt => opt.MapFrom(src => src.Id))
-         .ReverseMap();
+        .ForMember(d => d.Note, opt => opt.MapFrom(src => src.Note))
+        .ForMember(d => d.Id, opt => opt.MapFrom(src => src.SubFormItemId))
+        .ForMember(d => d.ValueId, opt => opt.MapFrom(src => src.FieldDropDownValueId))
+        .ReverseMap();
 
         CreateMap<FormEvaluationDto, FormEvaluationValue>()
               .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.Items))
@@ -81,5 +91,13 @@ public class FormProfile : Profile
          .ForMember(d => d.ActualMatrixValue, opt => opt.MapFrom(src => src.ActualMatrixValue))
          .ReverseMap();
 
+    }
+    public class LocalizedSubNameResolver : IValueResolver<SubFormItem, SubFormItemDto, string>
+    {
+        public string Resolve(SubFormItem src, SubFormItemDto dest, string destMember, ResolutionContext context)
+        {
+            var lang = context.Items["lang"]?.ToString();
+            return lang == "ar" ? src.NameAr : src.NameEn;
+        }
     }
 }
