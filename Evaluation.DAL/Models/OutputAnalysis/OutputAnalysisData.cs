@@ -30,5 +30,8 @@ namespace Evaluation.DAL.Models.OutputAnalysis
         public FormEvalMatrixValue? FormEvalMatrixValue { get; set; }
         public decimal ActualValue { get; set; }
         public string? Note { get; set; }
+        public int LastYearStudentCount { get; set; } = 0;
+        public int PreviousYearStudentCount { get; set; } = 0;
+        public string? TermCode { get; set; }
     }
 }

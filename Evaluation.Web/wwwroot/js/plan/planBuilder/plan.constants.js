@@ -92,7 +92,8 @@
         GetFomrEvalMatrixValue: `/Plan/${deprouting}/GetFomrEvalMatrixValueList`,
         GET_CurrentAcademicYear: `/AcademicYear/${deprouting}/GetCurrentAcademicYearByDepartment`,
         GETEDUCATION_LEVEL: `/School/${deprouting}/GetEducationLevel`,
-        GET_SCHOOL_GENDER: `/School/${deprouting}/GetSchoolGender`
+        GET_SCHOOL_GENDER: `/School/${deprouting}/GetSchoolGender`,
+        GET_DEPARTMENT_CONFIG: `/Plan/${deprouting}/GetDepartmentConfig`
 
     };
 
