@@ -378,7 +378,6 @@ public class QNEDSService : ApiBase
 
 		return true;
 	}
-
 	public async Task<bool> GenerateOutputAnalysisFromQnedsAsync(Guid evaluationRequestId, int academicYear)
 	{
 		var lastYear = academicYear;
@@ -394,17 +393,14 @@ public class QNEDSService : ApiBase
 
 		var orgTreeId = evaluationRequest.OrgTreeId;
 
-		var lastIntegration = await uow.GetRepository<QnedsIntegration>()
+		var integrations = await uow.GetRepository<QnedsIntegration>()
 			.GetAllActiveNonDeleted(x =>
 				x.OrgTreeId == orgTreeId &&
-				x.AcademicYear == lastYear)
-			.FirstOrDefaultAsync();
+				(x.AcademicYear == lastYear || x.AcademicYear == previousYear))
+			.ToListAsync();
 
-		var previousIntegration = await uow.GetRepository<QnedsIntegration>()
-			.GetAllActiveNonDeleted(x =>
-				x.OrgTreeId == orgTreeId &&
-				x.AcademicYear == previousYear)
-			.FirstOrDefaultAsync();
+		var lastIntegration = integrations.FirstOrDefault(x => x.AcademicYear == lastYear);
+		var previousIntegration = integrations.FirstOrDefault(x => x.AcademicYear == previousYear);
 
 		if (lastIntegration == null)
 			return false;
@@ -480,10 +476,7 @@ public class QNEDSService : ApiBase
 				detail.IsActive = true;
 				detail.CreateDate = DateTime.Now;
 				detail.IsDeleted = false;
-			}
 
-			foreach (var detail in details)
-			{
 				await uow.GetRepository<OutputAnalysisData>().InsertAsync(detail);
 			}
 		}
@@ -493,15 +486,23 @@ public class QNEDSService : ApiBase
 	}
 
 	private List<OutputAnalysisData> BuildOutputAnalysisDetails(
-	AnalysisType analysisType,
-	Guid evaluationRequestId,
-	int lastYear,
-	int previousYear,
-	QnedsIntegrationJsonDto lastJson,
-	QnedsIntegrationJsonDto? previousJson)
+		AnalysisType analysisType,
+		Guid evaluationRequestId,
+		int lastYear,
+		int previousYear,
+		QnedsIntegrationJsonDto lastJson,
+		QnedsIntegrationJsonDto? previousJson)
 	{
 		var result = new List<OutputAnalysisData>();
 		var allowedGrades = ParseGrades(analysisType.Grades);
+
+		var lastAttendanceLookup = BuildAttendanceStudentCountLookup(
+			lastJson.StudentDailyAttendance,
+			allowedGrades);
+
+		var previousAttendanceLookup = BuildAttendanceStudentCountLookup(
+			previousJson?.StudentDailyAttendance,
+			allowedGrades);
 
 		switch (analysisType.BackendName)
 		{
@@ -513,7 +514,9 @@ public class QNEDSService : ApiBase
 					previousYear,
 					lastJson.Achievement,
 					previousJson?.Achievement,
-					allowedGrades));
+					allowedGrades,
+					lastAttendanceLookup,
+					previousAttendanceLookup));
 
 				result.AddRange(BuildAchievementTrackNoSubject(
 					analysisType.Id,
@@ -522,7 +525,9 @@ public class QNEDSService : ApiBase
 					previousYear,
 					lastJson.AchievementTrackNoSubjectG11G12,
 					previousJson?.AchievementTrackNoSubjectG11G12,
-					allowedGrades));
+					allowedGrades,
+					lastAttendanceLookup,
+					previousAttendanceLookup));
 				break;
 
 			case "StudentsWithDisabilities":
@@ -533,7 +538,9 @@ public class QNEDSService : ApiBase
 					previousYear,
 					lastJson.AchievementSev3,
 					previousJson?.AchievementSev3,
-					allowedGrades));
+					allowedGrades,
+					lastAttendanceLookup,
+					previousAttendanceLookup));
 				break;
 
 			case "LowPerformanceStudents":
@@ -544,7 +551,9 @@ public class QNEDSService : ApiBase
 					previousYear,
 					lastJson.YearlyStudentBelow70Grade,
 					previousJson?.YearlyStudentBelow70Grade,
-					allowedGrades));
+					allowedGrades,
+					lastAttendanceLookup,
+					previousAttendanceLookup));
 				break;
 
 			case "FailedStudents":
@@ -555,7 +564,9 @@ public class QNEDSService : ApiBase
 					previousYear,
 					lastJson.SuccessRateByGrade,
 					previousJson?.SuccessRateByGrade,
-					allowedGrades));
+					allowedGrades,
+					lastAttendanceLookup,
+					previousAttendanceLookup));
 
 				result.AddRange(BuildSuccessByTrack(
 					analysisType.Id,
@@ -564,11 +575,366 @@ public class QNEDSService : ApiBase
 					previousYear,
 					lastJson.SuccessRateByTrack,
 					previousJson?.SuccessRateByTrack,
-					allowedGrades));
+					allowedGrades,
+					lastAttendanceLookup,
+					previousAttendanceLookup));
 				break;
 		}
 
 		return result;
+	}
+
+	private Dictionary<string, int> BuildAttendanceStudentCountLookup(
+		List<StudentDailyAttendanceByMonthDto>? rows,
+		HashSet<int> allowedGrades)
+	{
+		return rows?
+			.Where(x =>
+				allowedGrades.Contains(ToInt(x.Grade)) &&
+				string.Equals(x.AttendanceDescription?.Trim(), "Present", StringComparison.OrdinalIgnoreCase))
+			.GroupBy(x => $"{ToInt(x.Grade)}|{ToInt(x.Month)}")
+			.ToDictionary(
+				x => x.Key,
+				x => x.Sum(r => ToInt(r.Students)))
+			?? new Dictionary<string, int>();
+	}
+
+	private static int GetStudentCount(
+		Dictionary<string, int> lookup,
+		int grade,
+		string? termCode)
+	{
+		var key = $"{grade}|{ToInt(termCode)}";
+		return lookup.TryGetValue(key, out var count) ? count : 0;
+	}
+
+	private List<OutputAnalysisData> BuildAchievement(
+		Guid analysisTypeId,
+		Guid evaluationRequestId,
+		int lastYear,
+		int previousYear,
+		List<AchievementDto>? lastRows,
+		List<AchievementDto>? previousRows,
+		HashSet<int> allowedGrades,
+		Dictionary<string, int> lastAttendanceLookup,
+		Dictionary<string, int> previousAttendanceLookup)
+	{
+		var previousLookup = previousRows?
+			.Where(x => allowedGrades.Contains(ToInt(x.Grade)))
+			.GroupBy(x => $"{ToInt(x.Grade)}|{x.CourseCode?.Trim()}|{x.Timespan?.Trim()}")
+			.ToDictionary(x => x.Key, x => x.First())
+			?? new Dictionary<string, AchievementDto>();
+
+		return lastRows?
+			.Where(x => allowedGrades.Contains(ToInt(x.Grade)))
+			.Select(x =>
+			{
+				var grade = ToInt(x.Grade);
+				var subjectCode = x.CourseCode?.Trim();
+				var termCode = x.Timespan?.Trim();
+
+				var key = $"{grade}|{subjectCode}|{termCode}";
+				previousLookup.TryGetValue(key, out var prev);
+
+				var lastValue = ToDecimal(x.Grade_Achvment_NoSev3_And_Present_NoActivity);
+				var previousValue = ToDecimal(prev?.Grade_Achvment_NoSev3_And_Present_NoActivity);
+
+				return new OutputAnalysisData
+				{
+					Id = Guid.NewGuid(),
+					AnalysisTypeId = analysisTypeId,
+					EvaluationRequestId = evaluationRequestId,
+					Grade = grade,
+					SubjectCode = subjectCode,
+					Track = null,
+					TermCode = termCode,
+					LastYear = lastYear,
+					PreviousYear = previousYear,
+					LastYearValue = lastValue,
+					PreviousYearValue = previousValue,
+					Difference = lastValue - previousValue,
+					ActualValue = lastValue,
+					LastYearStudentCount = GetStudentCount(lastAttendanceLookup, grade, termCode),
+					PreviousYearStudentCount = GetStudentCount(previousAttendanceLookup, grade, termCode),
+					Note = x.CourseTitle
+				};
+			})
+			.ToList()
+			?? new List<OutputAnalysisData>();
+	}
+
+	private List<OutputAnalysisData> BuildAchievementTrackNoSubject(
+		Guid analysisTypeId,
+		Guid evaluationRequestId,
+		int lastYear,
+		int previousYear,
+		List<AchievementTrackNoSubjectG11G12Dto>? lastRows,
+		List<AchievementTrackNoSubjectG11G12Dto>? previousRows,
+		HashSet<int> allowedGrades,
+		Dictionary<string, int> lastAttendanceLookup,
+		Dictionary<string, int> previousAttendanceLookup)
+	{
+		var previousLookup = previousRows?
+			.Where(x => allowedGrades.Contains(ToInt(x.Grade)))
+			.GroupBy(x => $"{ToInt(x.Grade)}|{x.Track?.Trim()}|{x.Timespan?.Trim()}")
+			.ToDictionary(x => x.Key, x => x.First())
+			?? new Dictionary<string, AchievementTrackNoSubjectG11G12Dto>();
+
+		return lastRows?
+			.Where(x => allowedGrades.Contains(ToInt(x.Grade)))
+			.Select(x =>
+			{
+				var grade = ToInt(x.Grade);
+				var track = x.Track?.Trim();
+				var termCode = x.Timespan?.Trim();
+
+				var key = $"{grade}|{track}|{termCode}";
+				previousLookup.TryGetValue(key, out var prev);
+
+				var lastValue = ToDecimal(x.Track_Achvment_NoSev3_And_Present);
+				var previousValue = ToDecimal(prev?.Track_Achvment_NoSev3_And_Present);
+
+				return new OutputAnalysisData
+				{
+					Id = Guid.NewGuid(),
+					AnalysisTypeId = analysisTypeId,
+					EvaluationRequestId = evaluationRequestId,
+					Grade = grade,
+					SubjectCode = null,
+					Track = track,
+					TermCode = termCode,
+					LastYear = lastYear,
+					PreviousYear = previousYear,
+					LastYearValue = lastValue,
+					PreviousYearValue = previousValue,
+					Difference = lastValue - previousValue,
+					ActualValue = lastValue,
+					LastYearStudentCount = GetStudentCount(lastAttendanceLookup, grade, termCode),
+					PreviousYearStudentCount = GetStudentCount(previousAttendanceLookup, grade, termCode),
+					Note = $"Students: {x.Grade_NumberOf_Students_NoSev3_And_Present}"
+				};
+			})
+			.ToList()
+			?? new List<OutputAnalysisData>();
+	}
+
+	private List<OutputAnalysisData> BuildAchievementSev3(
+		Guid analysisTypeId,
+		Guid evaluationRequestId,
+		int lastYear,
+		int previousYear,
+		List<AchievementSev3Dto>? lastRows,
+		List<AchievementSev3Dto>? previousRows,
+		HashSet<int> allowedGrades,
+		Dictionary<string, int> lastAttendanceLookup,
+		Dictionary<string, int> previousAttendanceLookup)
+	{
+		var previousLookup = previousRows?
+			.Where(x => allowedGrades.Contains(ToInt(x.Grade)))
+			.GroupBy(x => $"{ToInt(x.Grade)}|{x.CourseCode?.Trim()}|{x.Timespan?.Trim()}")
+			.ToDictionary(x => x.Key, x => x.First())
+			?? new Dictionary<string, AchievementSev3Dto>();
+
+		return lastRows?
+			.Where(x => allowedGrades.Contains(ToInt(x.Grade)))
+			.Select(x =>
+			{
+				var grade = ToInt(x.Grade);
+				var subjectCode = x.CourseCode?.Trim();
+				var termCode = x.Timespan?.Trim();
+
+				var key = $"{grade}|{subjectCode}|{termCode}";
+				previousLookup.TryGetValue(key, out var prev);
+
+				var lastValue = ToDecimal(x.Grade_Achvment_Sev3_And_Present_NoActivity);
+				var previousValue = ToDecimal(prev?.Grade_Achvment_Sev3_And_Present_NoActivity);
+
+				return new OutputAnalysisData
+				{
+					Id = Guid.NewGuid(),
+					AnalysisTypeId = analysisTypeId,
+					EvaluationRequestId = evaluationRequestId,
+					Grade = grade,
+					SubjectCode = subjectCode,
+					Track = null,
+					TermCode = termCode,
+					LastYear = lastYear,
+					PreviousYear = previousYear,
+					LastYearValue = lastValue,
+					PreviousYearValue = previousValue,
+					Difference = lastValue - previousValue,
+					ActualValue = lastValue,
+					LastYearStudentCount = GetStudentCount(lastAttendanceLookup, grade, termCode),
+					PreviousYearStudentCount = GetStudentCount(previousAttendanceLookup, grade, termCode),
+					Note = x.CourseTitle
+				};
+			})
+			.ToList()
+			?? new List<OutputAnalysisData>();
+	}
+
+	private List<OutputAnalysisData> BuildBelow70Grade(
+		Guid analysisTypeId,
+		Guid evaluationRequestId,
+		int lastYear,
+		int previousYear,
+		List<YearlyStudentBelow70GradeDto>? lastRows,
+		List<YearlyStudentBelow70GradeDto>? previousRows,
+		HashSet<int> allowedGrades,
+		Dictionary<string, int> lastAttendanceLookup,
+		Dictionary<string, int> previousAttendanceLookup)
+	{
+		var previousLookup = previousRows?
+			.Where(x => allowedGrades.Contains(ToInt(x.Grade)))
+			.GroupBy(x => $"{ToInt(x.Grade)}|{x.CourseCode?.Trim()}|{x.TermCode?.Trim()}")
+			.ToDictionary(x => x.Key, x => x.First())
+			?? new Dictionary<string, YearlyStudentBelow70GradeDto>();
+
+		return lastRows?
+			.Where(x => allowedGrades.Contains(ToInt(x.Grade)))
+			.Select(x =>
+			{
+				var grade = ToInt(x.Grade);
+				var subjectCode = x.CourseCode?.Trim();
+				var termCode = x.TermCode?.Trim();
+
+				var key = $"{grade}|{subjectCode}|{termCode}";
+				previousLookup.TryGetValue(key, out var prev);
+
+				var lastValue = ToDecimal(x.No_of_Student_Grading_Assignment_Below_70);
+				var previousValue = ToDecimal(prev?.No_of_Student_Grading_Assignment_Below_70);
+
+				return new OutputAnalysisData
+				{
+					Id = Guid.NewGuid(),
+					AnalysisTypeId = analysisTypeId,
+					EvaluationRequestId = evaluationRequestId,
+					Grade = grade,
+					SubjectCode = subjectCode,
+					Track = null,
+					TermCode = termCode,
+					LastYear = lastYear,
+					PreviousYear = previousYear,
+					LastYearValue = lastValue,
+					PreviousYearValue = previousValue,
+					Difference = lastValue - previousValue,
+					ActualValue = lastValue,
+					LastYearStudentCount = GetStudentCount(lastAttendanceLookup, grade, termCode),
+					PreviousYearStudentCount = GetStudentCount(previousAttendanceLookup, grade, termCode),
+					Note = $"Term: {termCode}"
+				};
+			})
+			.ToList()
+			?? new List<OutputAnalysisData>();
+	}
+
+	private List<OutputAnalysisData> BuildSuccessByGrade(
+		Guid analysisTypeId,
+		Guid evaluationRequestId,
+		int lastYear,
+		int previousYear,
+		List<SuccessRateByGradeDto>? lastRows,
+		List<SuccessRateByGradeDto>? previousRows,
+		HashSet<int> allowedGrades,
+		Dictionary<string, int> lastAttendanceLookup,
+		Dictionary<string, int> previousAttendanceLookup)
+	{
+		var previousLookup = previousRows?
+			.Where(x => allowedGrades.Contains(ToInt(x.Grade)))
+			.GroupBy(x => $"{ToInt(x.Grade)}|{x.Timespan?.Trim()}")
+			.ToDictionary(x => x.Key, x => x.First())
+			?? new Dictionary<string, SuccessRateByGradeDto>();
+
+		return lastRows?
+			.Where(x => allowedGrades.Contains(ToInt(x.Grade)))
+			.Select(x =>
+			{
+				var grade = ToInt(x.Grade);
+				var termCode = x.Timespan?.Trim();
+
+				var key = $"{grade}|{termCode}";
+				previousLookup.TryGetValue(key, out var prev);
+
+				var lastValue = ToDecimal(x.NotSucceededPercentOfStudent);
+				var previousValue = ToDecimal(prev?.NotSucceededPercentOfStudent);
+
+				return new OutputAnalysisData
+				{
+					Id = Guid.NewGuid(),
+					AnalysisTypeId = analysisTypeId,
+					EvaluationRequestId = evaluationRequestId,
+					Grade = grade,
+					SubjectCode = null,
+					Track = null,
+					TermCode = termCode,
+					LastYear = lastYear,
+					PreviousYear = previousYear,
+					LastYearValue = lastValue,
+					PreviousYearValue = previousValue,
+					Difference = lastValue - previousValue,
+					ActualValue = lastValue,
+					LastYearStudentCount = GetStudentCount(lastAttendanceLookup, grade, termCode),
+					PreviousYearStudentCount = GetStudentCount(previousAttendanceLookup, grade, termCode),
+					Note = $"Succeeded: {x.SucceededPercentOfStudent}"
+				};
+			})
+			.ToList()
+			?? new List<OutputAnalysisData>();
+	}
+
+	private List<OutputAnalysisData> BuildSuccessByTrack(
+		Guid analysisTypeId,
+		Guid evaluationRequestId,
+		int lastYear,
+		int previousYear,
+		List<SuccessRateByTrackDto>? lastRows,
+		List<SuccessRateByTrackDto>? previousRows,
+		HashSet<int> allowedGrades,
+		Dictionary<string, int> lastAttendanceLookup,
+		Dictionary<string, int> previousAttendanceLookup)
+	{
+		var previousLookup = previousRows?
+			.Where(x => allowedGrades.Contains(ToInt(x.Grade)))
+			.GroupBy(x => $"{ToInt(x.Grade)}|{x.Track?.Trim()}|{x.Timespan?.Trim()}")
+			.ToDictionary(x => x.Key, x => x.First())
+			?? new Dictionary<string, SuccessRateByTrackDto>();
+
+		return lastRows?
+			.Where(x => allowedGrades.Contains(ToInt(x.Grade)))
+			.Select(x =>
+			{
+				var grade = ToInt(x.Grade);
+				var track = x.Track?.Trim();
+				var termCode = x.Timespan?.Trim();
+
+				var key = $"{grade}|{track}|{termCode}";
+				previousLookup.TryGetValue(key, out var prev);
+
+				var lastValue = ToDecimal(x.NotSucceededPercentOfStudent);
+				var previousValue = ToDecimal(prev?.NotSucceededPercentOfStudent);
+
+				return new OutputAnalysisData
+				{
+					Id = Guid.NewGuid(),
+					AnalysisTypeId = analysisTypeId,
+					EvaluationRequestId = evaluationRequestId,
+					Grade = grade,
+					SubjectCode = null,
+					Track = track,
+					TermCode = termCode,
+					LastYear = lastYear,
+					PreviousYear = previousYear,
+					LastYearValue = lastValue,
+					PreviousYearValue = previousValue,
+					Difference = lastValue - previousValue,
+					ActualValue = lastValue,
+					LastYearStudentCount = GetStudentCount(lastAttendanceLookup, grade, termCode),
+					PreviousYearStudentCount = GetStudentCount(previousAttendanceLookup, grade, termCode),
+					Note = $"Succeeded: {x.SucceededPercentOfStudent}"
+				};
+			})
+			.ToList()
+			?? new List<OutputAnalysisData>();
 	}
 
 	private static HashSet<int> ParseGrades(string? grades)
@@ -618,299 +984,6 @@ public class QNEDSService : ApiBase
 		return decimal.TryParse(value?.ToString(), out var result)
 			? result
 			: 0;
-	}
-
-	private List<OutputAnalysisData> BuildAchievement(
-	Guid analysisTypeId,
-	Guid evaluationRequestId,
-	int lastYear,
-	int previousYear,
-	List<AchievementDto>? lastRows,
-	List<AchievementDto>? previousRows,
-	HashSet<int> allowedGrades)
-	{
-		var previousLookup = previousRows?
-			.Where(x => allowedGrades.Contains(ToInt(x.Grade)))
-			.ToDictionary(x => $"{ToInt(x.Grade)}|{x.CourseCode}", x => x)
-			?? new Dictionary<string, AchievementDto>();
-
-		return lastRows?
-			.Where(x => allowedGrades.Contains(ToInt(x.Grade)))
-			.Select(x =>
-			{
-				var grade = ToInt(x.Grade);
-				var key = $"{grade}|{x.CourseCode}";
-
-				previousLookup.TryGetValue(key, out var prev);
-
-				var lastValue = ToDecimal(x.Grade_Achvment_NoSev3_And_Present_NoActivity);
-				var previousValue = ToDecimal(prev?.Grade_Achvment_NoSev3_And_Present_NoActivity);
-
-				return new OutputAnalysisData
-				{
-					Id = Guid.NewGuid(),
-					AnalysisTypeId = analysisTypeId,
-					EvaluationRequestId = evaluationRequestId,
-					Grade = grade,
-					LastYear = lastYear,
-					PreviousYear = previousYear,
-					LastYearValue = lastValue,
-					PreviousYearValue = previousValue,
-					Difference = lastValue - previousValue,
-					ActualValue = lastValue,
-					SubjectCode = x.CourseCode,
-					Track = null
-				};
-			})
-			.ToList()
-			?? new List<OutputAnalysisData>();
-	}
-
-	private List<OutputAnalysisData> BuildAchievementTrackNoSubject(
-	Guid analysisTypeId,
-	Guid evaluationRequestId,
-	int lastYear,
-	int previousYear,
-	List<AchievementTrackNoSubjectG11G12Dto>? lastRows,
-	List<AchievementTrackNoSubjectG11G12Dto>? previousRows,
-	HashSet<int> allowedGrades)
-	{
-		var previousLookup = previousRows?
-			.Where(x => allowedGrades.Contains(ToInt(x.Grade)))
-			.GroupBy(x => $"{ToInt(x.Grade)}|{x.Track}")
-			.ToDictionary(x => x.Key, x => x.First())
-			?? new Dictionary<string, AchievementTrackNoSubjectG11G12Dto>();
-
-		return lastRows?
-			.Where(x => allowedGrades.Contains(ToInt(x.Grade)))
-			.Select(x =>
-			{
-				var grade = ToInt(x.Grade);
-				var track = x.Track?.Trim();
-
-				var key = $"{grade}|{track}";
-				previousLookup.TryGetValue(key, out var prev);
-
-				var lastValue = ToDecimal(x.Track_Achvment_NoSev3_And_Present);
-				var previousValue = ToDecimal(prev?.Track_Achvment_NoSev3_And_Present);
-
-				return new OutputAnalysisData
-				{
-					Id = Guid.NewGuid(),
-					AnalysisTypeId = analysisTypeId,
-					EvaluationRequestId = evaluationRequestId,
-
-					Grade = grade,
-					Track = track,
-
-					LastYear = lastYear,
-					PreviousYear = previousYear,
-
-					LastYearValue = lastValue,
-					PreviousYearValue = previousValue,
-					Difference = lastValue - previousValue,
-					ActualValue = lastValue,
-
-					SubjectCode = null,
-					Note = $"Students: {x.Grade_NumberOf_Students_NoSev3_And_Present}"
-				};
-			})
-			.ToList()
-			?? new List<OutputAnalysisData>();
-	}
-	private List<OutputAnalysisData> BuildAchievementSev3(
-	Guid analysisTypeId,
-	Guid evaluationRequestId,
-	int lastYear,
-	int previousYear,
-	List<AchievementSev3Dto>? lastRows,
-	List<AchievementSev3Dto>? previousRows,
-	HashSet<int> allowedGrades)
-	{
-		var previousLookup = previousRows?
-			.Where(x => allowedGrades.Contains(ToInt(x.Grade)))
-			.GroupBy(x => $"{ToInt(x.Grade)}|{x.CourseCode}")
-			.ToDictionary(x => x.Key, x => x.First())
-			?? new Dictionary<string, AchievementSev3Dto>();
-
-		return lastRows?
-			.Where(x => allowedGrades.Contains(ToInt(x.Grade)))
-			.Select(x =>
-			{
-				var grade = ToInt(x.Grade);
-				var subjectCode = x.CourseCode?.Trim();
-
-				var key = $"{grade}|{subjectCode}";
-				previousLookup.TryGetValue(key, out var prev);
-
-				var lastValue = ToDecimal(x.Grade_Achvment_Sev3_And_Present_NoActivity);
-				var previousValue = ToDecimal(prev?.Grade_Achvment_Sev3_And_Present_NoActivity);
-
-				return new OutputAnalysisData
-				{
-					Id = Guid.NewGuid(),
-					AnalysisTypeId = analysisTypeId,
-					EvaluationRequestId = evaluationRequestId,
-
-					Grade = grade,
-					SubjectCode = subjectCode,
-					Track = null,
-
-					LastYear = lastYear,
-					PreviousYear = previousYear,
-
-					LastYearValue = lastValue,
-					PreviousYearValue = previousValue,
-					Difference = lastValue - previousValue,
-					ActualValue = lastValue,
-
-					Note = x.CourseTitle
-				};
-			})
-			.ToList()
-			?? new List<OutputAnalysisData>();
-	}
-	private List<OutputAnalysisData> BuildBelow70Grade(
-	Guid analysisTypeId,
-	Guid evaluationRequestId,
-	int lastYear,
-	int previousYear,
-	List<YearlyStudentBelow70GradeDto>? lastRows,
-	List<YearlyStudentBelow70GradeDto>? previousRows,
-	HashSet<int> allowedGrades)
-	{
-		var previousLookup = previousRows?
-			.Where(x => allowedGrades.Contains(ToInt(x.Grade)))
-			.GroupBy(x => $"{ToInt(x.Grade)}|{x.CourseCode}|{x.TermCode}")
-			.ToDictionary(x => x.Key, x => x.First())
-			?? new Dictionary<string, YearlyStudentBelow70GradeDto>();
-
-		return lastRows?
-			.Where(x => allowedGrades.Contains(ToInt(x.Grade)))
-			.Select(x =>
-			{
-				var grade = ToInt(x.Grade);
-				var subjectCode = x.CourseCode?.Trim();
-				var termCode = x.TermCode?.Trim();
-
-				var key = $"{grade}|{subjectCode}|{termCode}";
-				previousLookup.TryGetValue(key, out var prev);
-
-				var lastValue = ToDecimal(x.No_of_Student_Grading_Assignment_Below_70);
-				var previousValue = ToDecimal(prev?.No_of_Student_Grading_Assignment_Below_70);
-
-				return new OutputAnalysisData
-				{
-					Id = Guid.NewGuid(),
-					AnalysisTypeId = analysisTypeId,
-					EvaluationRequestId = evaluationRequestId,
-					Grade = grade,
-					SubjectCode = subjectCode,
-					Track = null,
-					LastYear = lastYear,
-					PreviousYear = previousYear,
-					LastYearValue = lastValue,
-					PreviousYearValue = previousValue,
-					Difference = lastValue - previousValue,
-					ActualValue = lastValue,
-					Note = $"Term: {termCode}"
-				};
-			})
-			.ToList()
-			?? new List<OutputAnalysisData>();
-	}
-	private List<OutputAnalysisData> BuildSuccessByGrade(
-	Guid analysisTypeId,
-	Guid evaluationRequestId,
-	int lastYear,
-	int previousYear,
-	List<SuccessRateByGradeDto>? lastRows,
-	List<SuccessRateByGradeDto>? previousRows,
-	HashSet<int> allowedGrades)
-	{
-		var previousLookup = previousRows?
-			.Where(x => allowedGrades.Contains(ToInt(x.Grade)))
-			.GroupBy(x => ToInt(x.Grade))
-			.ToDictionary(x => x.Key, x => x.First())
-			?? new Dictionary<int, SuccessRateByGradeDto>();
-
-		return lastRows?
-			.Where(x => allowedGrades.Contains(ToInt(x.Grade)))
-			.Select(x =>
-			{
-				var grade = ToInt(x.Grade);
-				previousLookup.TryGetValue(grade, out var prev);
-
-				var lastValue = ToDecimal(x.NotSucceededPercentOfStudent);
-				var previousValue = ToDecimal(prev?.NotSucceededPercentOfStudent);
-
-				return new OutputAnalysisData
-				{
-					Id = Guid.NewGuid(),
-					AnalysisTypeId = analysisTypeId,
-					EvaluationRequestId = evaluationRequestId,
-					Grade = grade,
-					SubjectCode = null,
-					Track = null,
-					LastYear = lastYear,
-					PreviousYear = previousYear,
-					LastYearValue = lastValue,
-					PreviousYearValue = previousValue,
-					Difference = lastValue - previousValue,
-					ActualValue = lastValue,
-					Note = $"Succeeded: {x.SucceededPercentOfStudent}"
-				};
-			})
-			.ToList()
-			?? new List<OutputAnalysisData>();
-	}
-	private List<OutputAnalysisData> BuildSuccessByTrack(
-	Guid analysisTypeId,
-	Guid evaluationRequestId,
-	int lastYear,
-	int previousYear,
-	List<SuccessRateByTrackDto>? lastRows,
-	List<SuccessRateByTrackDto>? previousRows,
-	HashSet<int> allowedGrades)
-	{
-		var previousLookup = previousRows?
-			.Where(x => allowedGrades.Contains(ToInt(x.Grade)))
-			.GroupBy(x => $"{ToInt(x.Grade)}|{x.Track}")
-			.ToDictionary(x => x.Key, x => x.First())
-			?? new Dictionary<string, SuccessRateByTrackDto>();
-
-		return lastRows?
-			.Where(x => allowedGrades.Contains(ToInt(x.Grade)))
-			.Select(x =>
-			{
-				var grade = ToInt(x.Grade);
-				var track = x.Track?.Trim();
-
-				var key = $"{grade}|{track}";
-				previousLookup.TryGetValue(key, out var prev);
-
-				var lastValue = ToDecimal(x.NotSucceededPercentOfStudent);
-				var previousValue = ToDecimal(prev?.NotSucceededPercentOfStudent);
-
-				return new OutputAnalysisData
-				{
-					Id = Guid.NewGuid(),
-					AnalysisTypeId = analysisTypeId,
-					EvaluationRequestId = evaluationRequestId,
-					Grade = grade,
-					SubjectCode = null,
-					Track = track,
-					LastYear = lastYear,
-					PreviousYear = previousYear,
-					LastYearValue = lastValue,
-					PreviousYearValue = previousValue,
-					Difference = lastValue - previousValue,
-					ActualValue = lastValue,
-					Note = $"Succeeded: {x.SucceededPercentOfStudent}"
-				};
-			})
-			.ToList()
-			?? new List<OutputAnalysisData>();
 	}
 }
 
