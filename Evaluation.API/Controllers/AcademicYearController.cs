@@ -11,10 +11,10 @@ namespace Evaluation.API.Controllers;
 public class AcademicYearController(MasterBL masterBl) : ControllerBase
 {
     [HttpGet]
-    //[CheckRolePermisionFilter(true, ConstantKeys.WebPermissions.VIEW_WEB_AcademicYear)]
+    [CheckRolePermisionFilter(true, ConstantKeys.WebPermissions.VIEW_WEB_AcademicYear)]
     public async Task<IActionResult> GetVcationDate()
     {
-        //var vcationDate = await masterBL.GetApiService<>
+        //var vcationDate = await masterBL.GetApiService<>sa
         var vacationDates = await GetVacationDatesAsync();
 
         // Return in the structure your JS expects
@@ -32,7 +32,7 @@ public class AcademicYearController(MasterBL masterBl) : ControllerBase
         public DateTime Date { get; set; }
     }
     [HttpGet]
-    //[CheckRolePermisionFilter(true, ConstantKeys.WebPermissions.VIEW_WEB_AcademicYear)]
+    [CheckRolePermisionFilter(true, ConstantKeys.WebPermissions.VIEW_WEB_AcademicYear)]
     public async Task<List<VacationDateDto>> GetVacationDatesAsync()
     {
         return new List<VacationDateDto>
@@ -42,14 +42,14 @@ public class AcademicYearController(MasterBL masterBl) : ControllerBase
     };
     }
     [HttpGet]
-    //[CheckRolePermisionFilter(true, ConstantKeys.WebPermissions.VIEW_WEB_AcademicYear)]
+    [CheckRolePermisionFilter(true, ConstantKeys.WebPermissions.VIEW_WEB_AcademicYear)]
     public async Task<IActionResult> GetAcademicYearByDepartment()
     {
         var result = await masterBl.GetAdminService<SrvAcademicYearBL>().GetAcademicYearListByCureentDepartment();
         return Ok(result);
     }
     [HttpGet]
-    //[CheckRolePermisionFilter(true, ConstantKeys.WebPermissions.VIEW_WEB_AcademicYear)]
+    [CheckRolePermisionFilter(true, ConstantKeys.WebPermissions.VIEW_WEB_AcademicYear)]
     public async Task<IActionResult> GetCurrentAcademicYearByDepartment()
     {
         var result = await masterBl.GetAdminService<SrvAcademicYearBL>().GetCurrentAcademicYearListByCureentDepartment();
