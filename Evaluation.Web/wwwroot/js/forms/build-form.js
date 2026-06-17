@@ -91,11 +91,16 @@ function buildFormData(tree, evalFormData) {
         text: item.name,
         hasNote: !!item.hasNote,
         weightPercentage: getWeightPercentage(item),
+        // Related items are shown via an info icon next to the row name,
+        // opening a read-only reference table. Mirrors relatedItems
+        // handling from get-forms_Old.js.
+        relatedItems: item.relatedItems ?? [],
         subItems: (item.subFormItems || []).map(sub => ({
             id: sub.id,
             text: sub.name,
             hasNote: !!sub.hasNote,
             weightPercentage: getWeightPercentage(sub),
+            relatedItems: sub.relatedItems ?? [],
             // Sub-items can carry their own value list (subItemLists) that
             // overrides the shared evaluation matrix for that row only.
             // Mirrors the old subItemListsMap behavior in get-forms_Old.js.
@@ -147,6 +152,31 @@ function renderSelectAndNote(fieldId, itemId, hasNote, readOnly, matrixValues, c
     `;
 }
 
+// ==============================
+// Row name cell (name + optional related-items info icon)
+// ==============================
+// The name input and the info icon are rendered together as ONE wrapper
+// element so a row's total number of top-level children is unchanged
+// from before the icon existed (index cell, name cell, select-wrap,
+// note-wrap). Adding the icon as a separate sibling node broke the
+// row-item grid/flex layout, which relies on a fixed set of cells -
+// this keeps the cell count stable regardless of the page's CSS.
+function renderRowName(fieldId, itemId, text, relatedItems) {
+    const hasRelated = Array.isArray(relatedItems) && relatedItems.length > 0;
+
+    return `
+        <div class="row-name-cell" style="display:flex;align-items:center;gap:6px;min-width:0;">
+            <input class="row-name" type="text" value="${escapeAttr(text)}" readonly style="flex:1 1 auto;min-width:0;" />
+            ${hasRelated
+        ? `<span class="info-icon info-button"
+                     title="عرض البنود المرتبطة"
+                     onclick="openRelatedItemModal('${fieldId}', '${itemId}')"
+                     >ⓘ</span>`
+            : ''}
+        </div>
+    `;
+}
+
 function renderSubRowHtml(fieldId, sub, parentId, label, readOnly, matrixValues) {
     return `
         <div class="row-item child-row" data-item-id="${sub.id}" data-parent-id="${parentId}" data-weight="${sub.weightPercentage}">
@@ -154,7 +184,7 @@ function renderSubRowHtml(fieldId, sub, parentId, label, readOnly, matrixValues)
                 <span class="row-index-num">${label}</span>
             </span>
 
-            <input class="row-name" type="text" value="${escapeAttr(sub.text)}" readonly />
+            ${renderRowName(fieldId, sub.id, sub.text, sub.relatedItems)}
 
             ${renderSelectAndNote(fieldId, sub.id, sub.hasNote, readOnly, matrixValues, sub.subItemLists)}
         </div>
@@ -171,6 +201,88 @@ function toast(msg, fieldId = null) {
     el.textContent = msg;
     el.classList.add('show');
     setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+// ==============================
+// Related items popup
+// ==============================
+// Read-only reference table shown when the user clicks the info icon next
+// to a row (or sub-row) name. Ported from get-forms_Old.js
+// (createRowRelatedItem / generateTableBodyHtmlForRelatedItems /
+// relatedItemPopup / openRelatedItemModal), adapted to be scoped per
+// fieldId so multiple forms on the same page don't collide on a shared
+// modal id.
+const createRowRelatedItem = ({ item, order, hasAnyNote }) => `
+    <tr class="main-row align-middle">
+        <td>${order}</td>
+        <td class="text-start">${escapeAttr(item.name)}</td>
+        <td>${escapeAttr(item.value)}</td>
+        ${hasAnyNote ? `<td>${escapeAttr(item.note)}</td>` : ''}
+    </tr>
+`;
+
+const generateTableBodyHtmlForRelatedItems = (items, hasAnyNote) =>
+    items.map((item, i) => createRowRelatedItem({
+        item,
+        order: i + 1,
+        hasAnyNote
+    })).join('');
+
+const relatedItemPopup = (fieldId, rowsHtml, hasAnyNote) => `
+    <div class="modal fade" id="${fieldId}-related-item-modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header align-items-start border-0">
+                    <div>
+                        <h4 class="modal-title fw-semibold mb-2">البنود المرتبطة</h4>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body py-0">
+                    <div class="row">
+                        <table class="table table-bordered text-center align-middle">
+                            <thead class="table-grey">
+                                <tr>
+                                    <th>#</th>
+                                    <th>البند</th>
+                                    <th>القيمة</th>
+                                    ${hasAnyNote ? '<th>ملاحظات</th>' : ''}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${rowsHtml}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+`;
+
+function openRelatedItemModal(fieldId, itemId) {
+    const state = getFormState(fieldId);
+    const relatedItems = state.relatedItemsMap?.get(itemId) ?? [];
+
+    const rowsHtml = generateTableBodyHtmlForRelatedItems(relatedItems, !!state.hasAnyNote);
+    const popupHtml = relatedItemPopup(fieldId, rowsHtml, !!state.hasAnyNote);
+
+    // Remove any stale instance of this form's modal before re-inserting.
+    const existing = document.getElementById(`${fieldId}-related-item-modal`);
+    if (existing) existing.remove();
+
+    document.body.insertAdjacentHTML('beforeend', popupHtml);
+
+    const modalElement = document.getElementById(`${fieldId}-related-item-modal`);
+    const modal = new bootstrap.Modal(modalElement);
+
+    // Remove modal from DOM after it is closed
+    modalElement.addEventListener('hidden.bs.modal', () => {
+        modalElement.remove();
+    });
+
+    modal.show();
 }
 
 // ==============================
@@ -201,6 +313,31 @@ async function initForm(formId, fieldId, readOnly, savedResults, evaluationReque
 
 
     state.formData = buildFormData(tree, state.evalForm);
+
+    // Lookup map (itemId -> relatedItems[]) used by openRelatedItemModal,
+    // plus a form-level "does any row have a note column" flag used to
+    // decide whether the related-items popup shows a notes column.
+    // Mirrors relatedItems handling from get-forms_Old.js.
+    state.relatedItemsMap = new Map();
+    state.hasAnyNote = false;
+
+    state.formData.forEach(crit => {
+        crit.aspects.forEach(asp => {
+            asp.rows.forEach(row => {
+                if (row.hasNote) state.hasAnyNote = true;
+                if (Array.isArray(row.relatedItems) && row.relatedItems.length > 0) {
+                    state.relatedItemsMap.set(row.id, row.relatedItems);
+                }
+
+                (row.subItems || []).forEach(sub => {
+                    if (sub.hasNote) state.hasAnyNote = true;
+                    if (Array.isArray(sub.relatedItems) && sub.relatedItems.length > 0) {
+                        state.relatedItemsMap.set(sub.id, sub.relatedItems);
+                    }
+                });
+            });
+        });
+    });
 
     const root = document.getElementById(`${fieldId}-form-root`);
     if (!root) {
@@ -297,7 +434,7 @@ async function initForm(formId, fieldId, readOnly, savedResults, evaluationReque
                             : ''}
                         </span>
 
-                        <input class="row-name" type="text" value="${escapeAttr(row.text)}" readonly />
+                        ${renderRowName(fieldId, row.id, row.text, row.relatedItems)}
 
                         ${renderSelectAndNote(fieldId, row.id, row.hasNote, readOnly, matrixValues)}
                     `;

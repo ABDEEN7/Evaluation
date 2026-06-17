@@ -418,3 +418,19 @@ body {
         background: #fdfbfc;
     }
 }
+
+.info-button {
+    flex-shrink: 0;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #8a1538;
+    color: #fff;
+    font-size: 11px;
+    line-height: 1;
+    user-select: none;
+}

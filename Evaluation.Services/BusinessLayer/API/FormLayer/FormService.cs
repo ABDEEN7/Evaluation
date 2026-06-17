@@ -125,6 +125,13 @@ public class FormService(IServiceScopeFactory serviceScopeFactory,
         return form;
     }
 
+    public async Task<List<FormItemValue>?> GetFormItemValues(Guid formId)
+    {
+        using var scope = serviceProvider.CreateScopedUow();
+
+        return await scope.GetRepository<FormItemValue>().GetAllActiveNonDeleted().Where(s => s.FormItem.EvalFormId == formId).ToListAsync();
+    }
+
     public async Task<FormItemValue?> GetFormItemValue(Guid ValueId)
     {
 		using var scope = serviceProvider.CreateScopedUow();
