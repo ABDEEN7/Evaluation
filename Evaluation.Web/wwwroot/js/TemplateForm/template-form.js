@@ -465,6 +465,7 @@ function renderFormItemTable() {
 
     formItems.forEach((p, pIndex) => {
         const jsonString = JSON.stringify(p);
+        const hasChildren = p.subFormItems && p.subFormItems.length > 0;
         var actionButtons = "";
         if (IsAddSubFormItem) {
             actionButtons += `<button type='button' class="btn btn-sm btn-link addSub p-0" data-id="${p.id}"><i class="las la-plus-square"></i></button>`;
@@ -477,7 +478,7 @@ function renderFormItemTable() {
         }
         html += `
         <tr class="parent-row" data-id="${p.id}">
-            <td class="toggle">➖</td>
+         <td class="${hasChildren ? 'toggle collapsed' : ''}"></td>
             <td>
             ${actionButtons}
             </td>
@@ -521,6 +522,7 @@ function renderFormItemTable() {
     });
 
     $("#formitemTable tbody").html(html);
+    $(".child-row").hide();
 }
 $(document).on("click", ".toggle", function () {
     let parentId = $(this).closest("tr").data("id");
@@ -528,10 +530,10 @@ $(document).on("click", ".toggle", function () {
 
     if (children.is(":visible")) {
         children.hide();
-        $(this).text("➕");
+        $(this).addClass("collapsed");
     } else {
         children.show();
-        $(this).text("➖");
+        $(this).removeClass("collapsed");
     }
 });
 
@@ -951,6 +953,7 @@ $("#btn-submit").click(function (e) {
 
 function GetformItemrow(response) {
     const jsonString = JSON.stringify(response);
+    const hasChildren = response.subFormItems && response.subFormItems.length > 0;
     var actionButtons = "";
     if (IsAddSubFormItem) {
         actionButtons += `<button type='button' class="btn btn-sm btn-link addSub p-0" data-id="${response.id}"><i class="las la-plus-square"></i></button>`;
@@ -963,7 +966,7 @@ function GetformItemrow(response) {
     }
     var formitemrow = `
                         <tr class="parent-row" data-id="${response.id}">
-                            <td class="toggle">➖</td>
+                          <td class="${hasChildren ? 'toggle collapsed' : ''}"></td>
                             <td>
                             ${actionButtons}
                             </td>
