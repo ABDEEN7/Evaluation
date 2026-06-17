@@ -2,6 +2,7 @@
 using Azure.Core;
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.Attachments;
+using Evaluation.DAL.Models.Calendars;
 using Evaluation.DAL.Models.DepartementEntites;
 using Evaluation.DAL.Models.FormsModules;
 using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
@@ -48,6 +49,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             {
                 return await uow.GetRepository<ServiceRequest>()
                     .GetAllQueryFiltered(x => x.Id == requestId)
+                    .Include(x => x.EvaluationRequest)
                     .Include(x => x.Status)
                     .Include(x => x.Service)
                     .FirstOrDefaultAsync();
@@ -57,6 +59,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
             return await scope.GetRepository<ServiceRequest>()
                 .GetAllQueryFiltered(x => x.Id == requestId)
+                .Include(x => x.EvaluationRequest)
                 .Include(x => x.Status)
                 .Include(x => x.Service)
                 .FirstOrDefaultAsync();
@@ -268,7 +271,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 			};
 			return ServiceRequest;
 		}
-        public async Task<List<JsTreeNodeDto>> GetScopeList(Guid partyId)
+        public async Task<List<JsTreeNodeDto>> GetScopeList_old(Guid partyId)
         {
            using var uow = serviceScopeFactory.CreateScopedUow();
             var departmentid=await uow.GetRepository<EvaluationParty>().GetAllNonDeleted().Where(x=>x.Id==partyId).Select(x=>x.DepartmentId).FirstOrDefaultAsync();
@@ -298,17 +301,54 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             return treeData;
 
         }
-        public async Task<List<SupportedFileDto>> GetSupportedFiles(Guid requestId)
+		public async Task<List<JsTreeNodeDto>> GetScopeList(Guid partyId)
+		{
+			using var uow = serviceScopeFactory.CreateScopedUow();
+
+            var departmentId = requestInfo.DepId; 
+
+			var currentAcademicYearId = await uow.GetRepository<AcademicYear>()
+				.GetAllNonDeleted()
+				.Where(x => x.IsCurrent && x.DepartmentId== departmentId) 
+				.Select(x => x.Id)
+				.FirstOrDefaultAsync();
+
+			var scopeAcademicYears = await uow.GetRepository<ScopeAcademicYear>()
+				.GetAllNonDeleted()
+				.Include(x => x.Scope)
+				.Where(x =>
+					x.DepartmentId == departmentId &&
+					x.AcademicYearId == currentAcademicYearId)
+				.OrderBy(x => x.OrderNo)
+				.ToListAsync();
+
+			var treeData = scopeAcademicYears.Select(x => new JsTreeNodeDto
+			{
+				id = x.ScopeId.ToString(),
+				text = _requestInfo.Lang == "ar"
+					? x.Scope?.NameAr ?? string.Empty
+					: x.Scope?.NameEn ?? string.Empty,
+
+				parent = x.ScopeParentId.HasValue
+					? x.ScopeParentId.Value.ToString()
+					: "#"
+			}).ToList();
+
+			return treeData;
+		}
+		public async Task<List<SupportedFileDto>> GetSupportedFiles(Guid requestId)
         {
             using var uow = serviceScopeFactory.CreateScopedUow();
-
+            var lang = requestInfo.Lang;
             var attachments = await uow.GetRepository<EvalAttachment>()
                 .GetAllNonDeleted()
+                .Include(x=>x.Scope)
                 .Where(x => x.EvaluationRequestId == requestId)
                 .Select(x => new SupportedFileDto
                 {
                     UiFileName = x.UiFileName,
-                    FileUrl = StorageService.GenerateSasToken(
+					ScopeName = lang =="ar"? x.Scope!.NameAr: x.Scope!.NameEn,
+					FileUrl = StorageService.GenerateSasToken(
                         x.FileName,
                         2,
                         x.UiFileName,
@@ -720,8 +760,10 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                         lang,
                         c.Value!,
                         c.DropDownTypeId.Value,
-                        request.PlanId
-                    );
+
+						request.EvaluationRequestId ?? request.Id,
+						request.OrgTreeId?? request.EvaluationRequest?.OrgTreeId
+					);
                 }
 
                 if (c!.Type == "list" && c.FormGroupListId != null && c.Value != null)
@@ -751,7 +793,8 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                                             lang,
                                             updatedValue,
                                             field.DropDownTypeId.Value,
-                                            request.PlanId
+											request.EvaluationRequestId ?? request.Id,
+											request.OrgTreeId
                                         );
                                     }
                                     updatedItem[kvp.Key] = updatedValue;
@@ -813,6 +856,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                                         .Include(x => x.Field)
                                         .Include(x => x.Field!.MappingField)
                                         .Include(x => x.Field!.FieldType)
+                                        .Include(x => x.Field!.FieldInfoType)
                                         .Where(c => c.RefId == requestId).ToListAsync();
 
 
@@ -1071,35 +1115,35 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
 			using var scopedUow = serviceScopeFactory.CreateScopedUow();
 
-            //var initiators = (await cacheDataProvider.GetServiceIntiator())
-            //    .Where(c => userInfo.PartyTypes.Contains(c.PartyTypeId) && c.service?.SystemModule?.DepartmentId == requestInfo.DepId)
-            //    .Select(c => c.serviceId)
-            //    .ToHashSet();
+            var initiators = (await cacheDataProvider.GetServiceIntiator())
+                .Where(c => userInfo.PartyTypes.Contains(c.PartyTypeId) && c.service?.SystemModule?.DepartmentId == requestInfo.DepId)
+                .Select(c => c.serviceId)
+                .ToHashSet();
 
-            //var statusConfig = (await cacheDataProvider.GetServiceStatusConfiguration())
-            //	.Where(c => distinctStatusIds.Contains(c.CurrentStatusId)
-            //			 && c.Service!.SystemModuleId == moduleId)
-            //	.Select(c => new { c.CurrentStatusId, c.ServiceId })
-            //	.ToList();
+            var statusConfig = (await cacheDataProvider.GetServiceStatusConfiguration())
+                .Where(c => distinctStatusIds.Contains(c.CurrentStatusId)
+                         && c.Service!.SystemModuleId == moduleId)
+                .Select(c => new { c.CurrentStatusId, c.ServiceId })
+                .ToList();
 
-            //var allowedServiceIds = statusConfig
-            //	.Where(c => initiators.Contains(c.ServiceId))
-            //	.Select(c => c.ServiceId)
-            //	.Distinct()
-            //	.ToList();
+            var allowedServiceIds = statusConfig
+                .Where(c => initiators.Contains(c.ServiceId))
+                .Select(c => c.ServiceId)
+                .Distinct()
+                .ToList();
 
             var services = await scopedUow
                 .GetRepository<Service>()
                 .GetAllQueryFiltered()
                 .Include(x => x.SystemModule)
                 .Where(s =>
-                    //allowedServiceIds.Contains(s.Id) &&
+                    allowedServiceIds.Contains(s.Id) &&
                     s.Initialservice != true &&
-                    s.SystemModule!.SystemModuleTypeId == moduleId && s.SystemModule.DepartmentId == requestInfo.DepId)
-                //&&
-                //s.StartDate.HasValue &&
-                //today >= s.StartDate.Value &&
-                //(!s.EndDate.HasValue || s.EndDate.Value.AddDays(1) >= today))
+                    s.SystemModule!.SystemModuleTypeId == moduleId && s.SystemModule.DepartmentId == requestInfo.DepId
+                &&
+                s.StartDate.HasValue &&
+                today >= s.StartDate.Value &&
+                (!s.EndDate.HasValue || s.EndDate.Value.AddDays(1) >= today))
                 .Select(s => new ServiceDTO
                 {
                     Id = s.Id,
@@ -1111,13 +1155,13 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
             foreach (var statusId in distinctStatusIds)
             {
-                //var serviceIdsForStatus = statusConfig
-                //	.Where(c => c.CurrentStatusId == statusId)
-                //	.Select(c => c.ServiceId)
-                //	.ToHashSet();
+                var serviceIdsForStatus = statusConfig
+                    .Where(c => c.CurrentStatusId == statusId)
+                    .Select(c => c.ServiceId)
+                    .ToList();
 
                 result[statusId] = services
-                    //.Where(s => serviceIdsForStatus.Contains(s.Id.Value))
+                    .Where(s => serviceIdsForStatus.Contains(s.Id.Value))
                     .ToList();
             }
 

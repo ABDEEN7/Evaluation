@@ -147,7 +147,9 @@ public class Repository<T>(DbContext context, UserInfo userInfo) : RepositoryBas
         entity.IsDeleted = false;
         if (userInfo.UserId.HasValue)
             entity.CreateById = userInfo.UserId.Value;
-        await _dbSet.AddAsync(entity);
+		
+
+		await _dbSet.AddAsync(entity);
         return entity;
     }
 	
@@ -219,6 +221,12 @@ public class Repository<T>(DbContext context, UserInfo userInfo) : RepositoryBas
         //    throw new Exception();
         return query;
     }
+    public async Task<bool> ExistsAsync(Expression<Func<T, bool>> filter)
+    {
+        return await _dbSet
+            .AsNoTracking()
+            .AnyAsync(filter);
+    }
     #endregion
 
     #region Audit
@@ -244,5 +252,6 @@ public class Repository<T>(DbContext context, UserInfo userInfo) : RepositoryBas
         }
         return logs;
     }
-    #endregion
+
+	#endregion
 }

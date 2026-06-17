@@ -89,71 +89,105 @@
         },
 
         columns: [
-           {
-            data: "name",
-           className: "td-left td-70 mt-1",
-            render: function(data, type, row) {
-                const isApproved = row.statusCode === "Approved";
-                return `
-                    <div class="plan-title-row mb-3">
- 
-                        <i class="las la-file-signature card-only-icon title-icon"></i>
- 
-                        <span class="plan-text-wrap px-2">
-                    <span class="card-only-label title-label">Plan: </span>
-                    <span class="plan-title-text">${data || ""}</span>
-                    </span>
- 
-                     
- 
-                    </div>
-                    `;
-                              }
-            },
-            {
-        data: "statusCode",
-        className: "td-right td-30 justify-content-end",
+        {
+    data: "name",
+        className: "td-full mb-4",
         render: function(data, type, row) {
 
-            const isApproved = row.statusCode === "Approved";
-
-            if (!isApproved) return "";
+            const statusColor =
+                row.statusCode === "Approved"
+                    ? "#198754"
+                    : "#cccccc";
 
             return `
-        <div class="d-flex justify-content-end">
-            <span class="request-status approved-status bg-success-light py-1 px-2">
-                <i class="las la-check"></i>
-                ${row.statusCode}
+            <div class="request-info">
+
+                <div class="request-icon"
+                     style="background-color:${statusColor}; color:#000;">
+                    <i class="las la-file-signature"></i>
+                </div>
+
+                <div class="request-text">
+
+                    <div class="request-header">
+                        ${data || ""}
+                    </div>
+
+                    <div class="request-status-text card-only-row"
+                         style="color:${statusColor};">
+                        ${row.statusCode || ""}
+                    </div>
+
+                </div>
+
+            </div>
+        `;
+        }
+    },
+    {
+        data: "statusCode",
+        className: "status-column",
+        render: function(data, type, row) {
+
+            const statusColor =
+                data === "Approved"
+                    ? "#198754"
+                    : "#cccccc";
+
+            return `
+            <span class="status-padding" style="color:${statusColor};">
+                ${data || "_"}
             </span>
-        </div>
+        `;
+        }
+    },
+         {
+        data: "countSchools",
+        className: "td-full school-count-column",
+        render: function(data) {
+            return `
+        <i class="las la-school card-only-icon me-1"></i>
+        <span class="card-only-label me-2">
+            ${uiControlsSetup().GetUiControlText("lblSchoolsCount")} :
+        </span>
+        ${data || ""}
+        `;
+        }
+    },
+             {
+        data: null,
+        className: "td-full",
+        render: function(data, type, row) {
+            return `
+            <i class="las la-calendar-week card-only-icon me-1"></i>
+
+            <span class="card-only-label me-1">
+                ${uiControlsSetup().GetUiControlText("lblTimePeriod")}:
+            </span>
+
+            <span>
+                <span class="period-label me-1">
+                    ${uiControlsSetup().GetUiControlText("lblFrom")}
+                </span>
+
+                <span class="data-text me-1">
+                    ${moment(row.startDate).format("DD/MM/YYYY")}
+                </span>
+
+                <span class="period-label me-1">
+                    ${uiControlsSetup().GetUiControlText("lblTo")}
+                </span>
+
+                <span class="data-text me-1">
+                    ${moment(row.endDate).format("DD/MM/YYYY")}
+                </span>
+            </span>
         `;
         }
     },
             {
-                data: "countSchools",
-                className: "td-left status-break-row align-content-center",
-                render: function(data) {
-                    return `
-                    <i class="las la-school card-only-icon"></i>
-                    <span class="card-only-label me-1"> Schools count: </span>
-                    ${data || ""}
-                    `;
-                }
-            },
-            {
-            data: null,
-            className: "td-left status-break-row",
-                render: function(data, type, row) {
-                    return `
-                    <i class="las la-calendar-week card-only-icon"></i>
-                    <span class="card-only-label me-1"> Period: </span>
-                    من ${row.startDate} إلى ${row.endDate}
-                    `;
-                }
-            },
-            {
                 data: 'services',
-                className: "td-full p-0 process",
+                className: "td-full p-0 process mt-4",
                 title: uiControlsSetup().GetUiControlText('lblActions'),
                 orderable: false,
                 render: function (data, type, row, meta) {
@@ -217,14 +251,14 @@
 
         ],
 
-        onRowClick: function(rowData, e) {
+        onRowClick: function (rowData, e) {
 
-          // prevent dropdown clicks from opening details
-          if ($(e.target).closest('.dropdown, .dropdown-menu, .dropdown-item').length) {
-                return;
-          }
-          InitializePlanDetails(rowData.id);
-    }
+            // prevent dropdown clicks from opening details
+            if ($(e.target).closest('.dropdown, .dropdown-menu, .dropdown-item').length) {
+                return;
+            }
+            InitializePlanDetails(rowData.id);
+        }
 
     });
 
@@ -372,7 +406,7 @@
     $('#filterPlanBtnsId').on('click', function () {
         plansListing.reload();
     });
-  
+
     $('#addPlanBtn').on('click', function () {
         window.location.href = '/Plan/Create';
     });

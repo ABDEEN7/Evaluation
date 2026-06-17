@@ -1,10 +1,12 @@
-﻿using Evaluation.DAL.Dtos.Form;
+﻿using Evaluation.API.ActionFilter;
+using Evaluation.DAL.Dtos.Form;
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.Calendars;
 using Evaluation.Services.BusinessLayer;
 using Evaluation.Services.BusinessLayer.API.FormLayer;
 using Evaluation.SharedHelper.Dtos.Form;
 using Evaluation.SharedHelper.Dtos.Shared;
+using Evaluation.SharedHelper.Enums;
 using FluentResults;
 using Microsoft.AspNetCore.Mvc;
 
@@ -41,18 +43,21 @@ public class FormController : ControllerBase
     }
 
     [HttpPost]
+    //[CheckRolePermisionFilter(true, ConstantKeys.WebPermissions.SAVE_EVALUATION_FORM)]
     public async Task<Result<FormEvaluationDto>> SaveEvaluationForm([FromBody] FormEvaluationDto formEvaluation)
     {
         return await _masterBl.GetApiService<FormBL>().SaveEvaluationForm(formEvaluation);
     }
 
     [HttpPost]
+    //[CheckRolePermisionFilter(true, ConstantKeys.WebPermissions.RENAME_EVALUATION_FORM)]
     public async Task<Result<FormEvaluationDto>> RenameFormItems([FromBody] FormEvaluationDto formEvaluation)
     {
         return await _masterBl.GetApiService<FormBL>().RenameFormItems(formEvaluation);
     }
 
     [HttpPost]
+    //[CheckRolePermisionFilter(true, ConstantKeys.WebPermissions.UPDATE_EVALUATION_FORM)]
     public async Task<Result<FormEvaluationDto>> UpdateEvaluationForm([FromBody] FormEvaluationDto formEvaluation)
     {
         return await _masterBl.GetApiService<FormBL>().UpdateEvaluationForm(formEvaluation);
@@ -60,6 +65,7 @@ public class FormController : ControllerBase
 
 
     [HttpGet]
+    //[CheckRolePermisionFilter(true, ConstantKeys.WebPermissions.SAVE_EVALUATION_FORM)]
     public async Task<Result<List<FormEvalMarixValueDto>>> GetFormEvalMarixValues([FromQuery] Guid formId)
     {
         return await _masterBl.GetApiService<FormBL>().GetFormEvalMarixValues(formId);
@@ -67,6 +73,7 @@ public class FormController : ControllerBase
 
 
     [HttpPost]
+    //[CheckRolePermisionFilter(true, ConstantKeys.WebPermissions.VALIDATE_EVALUATION_FORM)]
     public async Task<Result<ValidationResult>> ValidateEvaluationForm([FromBody] FormEvaluationDto formEvaluation)
     {
         return await _masterBl.GetApiService<FormBL>().ValidateEvaluationForm(formEvaluation);
@@ -74,6 +81,7 @@ public class FormController : ControllerBase
 
 
     [HttpPost]
+    //[CheckRolePermisionFilter(true, ConstantKeys.WebPermissions.CALCULATE_EVALUATION_FORM)]
     public async Task<Result<CalculationFormResult>> CalculateEvaluationFormResult([FromBody] FormEvaluationDto formEvaluation)
     {
 

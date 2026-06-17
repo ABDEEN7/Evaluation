@@ -14,6 +14,7 @@ namespace Evaluation.SharedHelper.Models.Admin
         public string? InfoAr { get; set; }
         public string? InfoEn { get; set; }
         public Guid FieldTypeId { get; set; }
+        public Guid? FieldInfoTypeId { get; set; }
         public string FieldType { get; set; } = null!;
         public string? Description { get; set; }
         public int Column { get; set; }

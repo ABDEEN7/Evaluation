@@ -143,6 +143,7 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
     {
         return await uow.GetRepository<EvalForm>()
             .GetAllActiveNonDeleted()
+            .Include(x=>x.EvaluationParties)
             .Where(x => x.IsFinalEval)
             .Where(x => x.EvaluationParties != null &&
                         x.EvaluationParties.DepartmentId == requestInfo.DepId)
@@ -170,9 +171,10 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
         }
         if (message.IsFinalEval)
         {
-            if (!await CheckEvaluationForm())
+            if (!await CheckEvaluationForm(message.Id))
             {
                 obj.IsFinalEval = message.IsFinalEval;
+                obj.FinalEvalMatrixId = message.FinalEvalMatrixId;
             }
             else
             {
@@ -224,6 +226,7 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
             if (!await CheckEvaluationForm(message.Id))
             {
                 obj.IsFinalEval = message.IsFinalEval;
+                obj.FinalEvalMatrixId = message.FinalEvalMatrixId;
             }
             else
             {

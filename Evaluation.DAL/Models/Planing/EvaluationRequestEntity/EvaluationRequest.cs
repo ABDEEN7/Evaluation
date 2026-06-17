@@ -1,4 +1,5 @@
-﻿using Evaluation.DAL.Models.Audit;
+﻿using Evaluation.DAL.Models.Attachments;
+using Evaluation.DAL.Models.Audit;
 using Evaluation.DAL.Models.BaseModule;
 using Evaluation.DAL.Models.DepartementEntites;
 using Evaluation.DAL.Models.FormsModules;
@@ -15,7 +16,8 @@ namespace Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
 
 public class EvaluationRequest : EntityBase, IAuditLogEntity
 {
-    public Guid PlanId { get; set; }
+	public string? Name { get; set; } = null!;
+	public Guid PlanId { get; set; }
     public Plan? Plan { get; set; }
     public Guid OrgTreeId { get; set; }
     public OrgTree? OrgTree { get; set; }
@@ -37,8 +39,13 @@ public class EvaluationRequest : EntityBase, IAuditLogEntity
     public DateOnly? EvaluationDate { get; set; }
     public DateOnly? NextEvaluationDate { get; set; }
     public decimal? FinalEvalValue { get; set; }
+    public Guid? FinalReportId { get; set; }
+
     public virtual ICollection<ServiceRequestFieldsValue>? ServiceRequestFieldsValues { get; set; }
     public virtual ICollection<EvaluationRequestAssignment>? EvaluationRequestAssignments { get; set; }
+
+   
+
 
 
 

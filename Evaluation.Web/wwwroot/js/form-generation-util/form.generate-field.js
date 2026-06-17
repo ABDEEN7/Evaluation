@@ -164,8 +164,10 @@ var formGenerateFieldUtility = window.formUtility;
                 const allowRenameFormItem = field.attributes?.find(c => c.name === 'allowRenameFormItem');
                 //const allowRename = field.attributes?.find(c => c.name === 'allowRename');
                 const params = new URLSearchParams(window.location.search);
-                var evaluationRequestId = (params.get("Evlid") ).replace("#", "");
-                var serviceRequestId = (params.get("id") ).replace("#", "");
+                var evaluationRequestId = (params.get("Evlid")).replace("#", "");
+                var serviceRequestId = null;
+                if (params.get("id"))
+                 serviceRequestId = (params.get("id") ).replace("#", "");
                 const controlValues = JSON.parse(field.value);
                 const html = await generateFullFormPageHtml({
                     formId,
@@ -180,7 +182,15 @@ var formGenerateFieldUtility = window.formUtility;
                 });
 
                 container.html(html);
+                console.log('🔴 container rendered');
 
+                if (allowRenameFormItem) {
+                    await fillRenameControls(fieldId, controlValues);
+                } else {
+                    await initializeControls(formId, fieldId, controlValues);
+                }
+
+                console.log('🟢 after initializeControls — check DOM now');
                 if (allowRenameFormItem) {
                    await fillRenameControls(fieldId, controlValues)
                 }
@@ -896,8 +906,11 @@ var formGenerateFieldUtility = window.formUtility;
 
         if (field.type === 'label' || field.type === 'checkbox') {
             fieldLabel.append(field.fieldName);
-        } else {
-            fieldLabel.append(document.createTextNode(field.fieldName || ''));
+        } 
+      else {
+            if ((field.fieldName || '').toLowerCase() !== 'plan details') {
+                fieldLabel.append(document.createTextNode(field.fieldName || ''));
+            }
         }
 
         if (field.type === 'checkbox') {
@@ -1335,7 +1348,7 @@ var formGenerateFieldUtility = window.formUtility;
             const legend = $('<legend>')
                 .addClass('cursor-pointer')
                 .attr('role', canCollapse ? 'button' : 'heading')
-                .text(group.formGroupName || 'Unnamed Group');
+                .text('');
             fieldset.append(legend);
 
             if (actionType === ACTION_TYPE.RETURNBACK || actionType === ACTION_TYPE.RequestDataChange) {
@@ -1386,11 +1399,11 @@ var formGenerateFieldUtility = window.formUtility;
 
                         }
                         if (field.type === 'label') {
-                            const block = $('<div>').addClass('mb-4');
+                            const block = $('<div>').addClass('mb-1');
                             block.append(fieldLabel);
                             colContainer.append(block);
                         } else {
-                            const block = $('<div>').addClass('mb-4');
+                            const block = $('<div>').addClass('mb-1');
 
                             if (actionType === ACTION_TYPE.RETURNBACK || actionType === ACTION_TYPE.RequestDataChange) {
                                 const DisableReturn = hasAttribute(field, 'disabled');

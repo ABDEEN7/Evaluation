@@ -1,4 +1,5 @@
-﻿using Evaluation.DAL.Models.Audit;
+﻿using Evaluation.DAL.Models.Attachments;
+using Evaluation.DAL.Models.Audit;
 using Evaluation.DAL.Models.BaseModule;
 using Evaluation.DAL.Models.Calendars;
 using Evaluation.DAL.Models.DepartementEntites;
@@ -22,7 +23,11 @@ public class Plan : EntityBase, IAuditLogEntity
     public Guid? SemesterId { get; set; }
     public Semester? Semester { get; set; }
     public string? PlanJsonValue { get; set; }
+    public Guid? PlanAttachmentId { get; set; }
+    public EvalAttachment? PlanAttachment { get; set; }
 
     public virtual ICollection<EvaluationRequest>? EvaluationRequests { get; set; }
+
+    
 
 }

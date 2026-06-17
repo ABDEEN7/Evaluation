@@ -28,7 +28,7 @@ window.serviceRequestForm = window.serviceRequestForm || {};
         history.pushState(null, "", url.pathname + url.search);
     }
     const getText = (key) =>
-        (window.uiControlsSetup && uiControlsSetup().GetUiControlText(key)) || "";
+        ( uiControlsSetup().GetUiControlText(key)) || "";
 
   
     const getRequestId = () => {
@@ -64,7 +64,7 @@ window.serviceRequestForm = window.serviceRequestForm || {};
                 e.preventDefault();
                 e.stopPropagation();
 
-                const doSubmit = () => {
+                const doSubmit = async () => {
                     ns.submitAction(actionDetails, formGroups,  saveAsDraft= false );
                 };
 
@@ -133,13 +133,34 @@ window.serviceRequestForm = window.serviceRequestForm || {};
                         formUtility.attachments.push(...attachments);
                     }
 
-                    if (Array.isArray(dropdownsData)) {
+                    if (Array.isArray(dropdownsData) && dropdownsData.length > 0) {
+
                         window.dropdowns = window.dropdowns || [];
                         window.dropDownTypeIds = window.dropDownTypeIds || [];
 
                         dropdownsData.forEach(item => {
-                            const exists = dropdowns.some(x => x.id === item.id && x.dropDownTypeId === item.dropDownTypeId);
-                            if (!exists) dropdowns.push(item);
+
+                            const itemId = item.id ?? item.Id;
+                            const typeId = item.dropDownTypeId ?? item.DropDownTypeId;
+
+                            const exists = window.dropdowns.some(x => {
+                                const xId = x.id ?? x.Id;
+                                const xTypeId = x.dropDownTypeId ?? x.DropDownTypeId;
+
+                                return xId === itemId && xTypeId === typeId;
+                            });
+
+                            if (!exists) {
+                                window.dropdowns.push({
+                                    ...item,
+                                    id: itemId,
+                                    dropDownTypeId: typeId
+                                });
+                            }
+
+                            if (typeId && !window.dropDownTypeIds.includes(typeId)) {
+                                window.dropDownTypeIds.push(typeId);
+                            }
                         });
                     }
 
@@ -174,7 +195,83 @@ window.serviceRequestForm = window.serviceRequestForm || {};
     };
 
 
-    const renderActionsDropDown = (serviceId,actions, containerId, templateContainerId, modalContainer, requestIdOverride, serviceIdOverride, ctx = {}) => {
+    //const renderActionsDropDown = (serviceId,actions, containerId, templateContainerId, modalContainer, requestIdOverride, serviceIdOverride, ctx = {}) => {
+
+    //    const root = ctx.root ? $(ctx.root) : $(document);
+
+    //    const actionsContainer = root.find(`#${containerId}`);
+    //    const templateContainer = root.find(`#${templateContainerId}`);
+
+    //    actionsContainer.empty().removeAttr('aria-busy');
+    //    templateContainer.empty();
+
+    //    if (!actions?.length) return;
+
+    //    const resolvedRequestId = requestIdOverride || null;
+    //    const resolvedServiceId = serviceId || null;
+
+    //    const renderDropdownUI = () => {
+    //        const dropdownWrapper = $('<div>').addClass('dropdown');
+
+    //        const buttonText = uiControlsSetup().GetUiControlText('lblProcedures') || 'Procedures';
+
+    //        const button = $('<button>', {
+    //            class: 'btn btn-primary btn-sm dropdown-toggle',
+    //            type: 'button',
+    //            'data-bs-toggle': 'dropdown'
+    //        }).text(buttonText);
+
+    //        const dropdownMenu = $('<ul>', { class: 'dropdown-menu' });
+
+    //        actions.forEach((action, index) => {
+    //            dropdownMenu.append(
+    //                $('<li>').append(
+    //                    $('<a>', {
+    //                        class: 'dropdown-item py-0',
+    //                        href: '#',
+    //                        'data-backend': action.bakendName,
+    //                        'data-actionTypeBackEndKey': action.actionTypeBackEndKey
+    //                    }).html(`<small>${action.title}</small>`)
+    //                )
+    //            );
+    //        });
+
+    //        dropdownMenu.off('click.actions').on('click.actions', 'a[data-backend]', function (e) {
+    //            e.preventDefault();
+
+    //            const backendName = $(this).data('backend');
+    //            const actionTypeBackEndKey = $(this).data('actiontypebackendkey');
+
+    //            fetchAndRenderActionData(
+    //                backendName,
+    //                resolvedRequestId,
+    //                resolvedServiceId,
+    //                modalContainer,
+    //                true,
+    //                ctx 
+    //            );
+    //        });
+
+    //        dropdownWrapper.append(button, dropdownMenu);
+    //        actionsContainer.append(dropdownWrapper);
+    //    };
+
+    //    renderDropdownUI();
+    //};
+
+    const renderActionsDropDown = (
+        serviceId,
+        actions,
+        containerId,
+        templateContainerId,
+        modalContainer,
+        requestIdOverride,
+        serviceIdOverride,
+        ctx = {}
+    ) => {
+        const MAX_RETRIES = 3;
+        let retryCount = 0;
+        let allTemplates = [];
 
         const root = ctx.root ? $(ctx.root) : $(document);
 
@@ -186,14 +283,32 @@ window.serviceRequestForm = window.serviceRequestForm || {};
 
         if (!actions?.length) return;
 
-        const resolvedRequestId = requestIdOverride || null;
-        const resolvedServiceId = serviceId || null;
+        const resolvedRequestId = requestIdOverride || getRequestId?.() || null;
+        const resolvedServiceId = serviceIdOverride || serviceId || getServiceId?.() || null;
+
+        const processTemplates = (templates) => {
+            if (!Array.isArray(templates)) return;
+
+            templates.forEach(template => {
+                const exists = allTemplates.some(t =>
+                    (t.id && template.id && t.id === template.id) ||
+                    (t.name && template.name && t.name === template.name)
+                );
+
+                if (!exists) {
+                    allTemplates.push(template);
+                }
+            });
+        };
+
+        processTemplates(actions.flatMap(action => action.templates || []));
 
         const renderDropdownUI = () => {
+            actionsContainer.find('.dropdown').remove();
+
             const dropdownWrapper = $('<div>').addClass('dropdown');
 
-            const buttonText =
-                (window.uiControlsSetup && uiControlsSetup().GetUiControlText('lblProcedures')) || 'Procedures';
+            const buttonText = uiControlsSetup().GetUiControlText('lblProcedures') || 'Procedures';
 
             const button = $('<button>', {
                 class: 'btn btn-primary btn-sm dropdown-toggle',
@@ -203,43 +318,85 @@ window.serviceRequestForm = window.serviceRequestForm || {};
 
             const dropdownMenu = $('<ul>', { class: 'dropdown-menu' });
 
-            actions.forEach((action, index) => {
+            actions.forEach(action => {
                 dropdownMenu.append(
                     $('<li>').append(
                         $('<a>', {
                             class: 'dropdown-item py-0',
                             href: '#',
                             'data-backend': action.bakendName,
-                            'data-actionTypeBackEndKey': action.actionTypeBackEndKey
+                            'data-action-type-backend-key': action.actionTypeBackEndKey
                         }).html(`<small>${action.title}</small>`)
                     )
                 );
             });
 
-            dropdownMenu.off('click.actions').on('click.actions', 'a[data-backend]', function (e) {
-                e.preventDefault();
+            dropdownMenu
+                .off('click.actions')
+                .on('click.actions', 'a[data-backend]', function (e) {
+                    e.preventDefault();
 
-                const backendName = $(this).data('backend');
-                const actionTypeBackEndKey = $(this).data('actiontypebackendkey');
+                    const backendName = $(this).data('backend');
 
-                fetchAndRenderActionData(
-                    backendName,
-                    resolvedRequestId,
-                    resolvedServiceId,
-                    modalContainer,
-                    true,
-                    ctx 
-                );
-            });
+                    fetchAndRenderActionData(
+                        backendName,
+                        resolvedRequestId,
+                        resolvedServiceId,
+                        modalContainer,
+                        true,
+                        ctx
+                    );
+                });
 
             dropdownWrapper.append(button, dropdownMenu);
             actionsContainer.append(dropdownWrapper);
         };
 
-        renderDropdownUI();
+        const fetchTemplates = () => {
+            actionsContainer.attr('aria-busy', 'true');
+            templateContainer.empty();
+
+            const url =
+                `/FormRender/${DepartmentRouting}/GetActionTemplatesByStatus` +
+                `?requestId=${encodeURIComponent(resolvedRequestId || "")}`;
+
+            jqClient({
+                success: function (data) {
+                    actionsContainer.removeAttr('aria-busy');
+
+                    processTemplates(data || []);
+
+                    if (allTemplates.length > 0 && typeof renderTemplateFirst === "function") {
+                        renderTemplateFirst(allTemplates, templateContainerId);
+                    }
+
+                    renderDropdownUI();
+                },
+                error: function (xhr, status, error) {
+                    console.error(`Error fetching templates attempt ${retryCount + 1}:`, error);
+
+                    if (retryCount < MAX_RETRIES) {
+                        retryCount++;
+                        setTimeout(fetchTemplates, 1000 * retryCount);
+                        return;
+                    }
+
+                    actionsContainer.removeAttr('aria-busy');
+
+                    if (typeof showUserNotification === "function") {
+                        showUserNotification(
+                            'Failed to load templates. Please try again later.',
+                            'error'
+                        );
+                    }
+
+                    renderDropdownUI();
+                }
+            }).Get(url);
+        };
+
+        fetchTemplates();
     };
-
-
     function renderTransactionsSection(actionTransactions, ctx = {}) {
 
         const root = ctx.root ? $(ctx.root) : $(document);

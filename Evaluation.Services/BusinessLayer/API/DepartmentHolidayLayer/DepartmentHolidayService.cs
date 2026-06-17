@@ -32,15 +32,9 @@ public class DepartmentHolidayService(IServiceScopeFactory serviceScopeFactory,
     }
     public async Task<List<DepartmentHoliday>> GetDepartmentHolidayList()
     {
-        var departmentId = unitOfWork
-            .GetRepository<Department>()
-            .GetAllActiveNonDeleted(x => x.UserDepartments.Any(x => x.UserId == userInfo.UserId))
-            .Select(x => x.Id)
-            .FirstOrDefault();
-
         var academicYearId = unitOfWork
             .GetRepository<AcademicYear>()
-            .GetAllActiveNonDeleted(x => x.DepartmentId == departmentId && x.IsCurrent)
+            .GetAllActiveNonDeleted(x => x.DepartmentId == requestInfo.DepId && x.IsCurrent)
             .Select(s => s.Id)
             .FirstOrDefault();
 

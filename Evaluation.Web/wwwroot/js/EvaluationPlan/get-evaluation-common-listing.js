@@ -95,7 +95,12 @@
                 deferRender: true,
                 dom: 'ftipr',
                 order: config.order || [],
-
+                language: {
+                    paginate: {
+                        previous: `السابق <i class="fas fa-angle-left"></i>`,
+                        next: `التالي <i class="fas fa-angle-right"></i>`
+                    }
+                },
                 ajax: function (dt, callback) {
 
                     const queryObject = buildQuery(dt);

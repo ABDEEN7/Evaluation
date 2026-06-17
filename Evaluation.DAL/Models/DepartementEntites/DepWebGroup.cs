@@ -15,5 +15,6 @@ namespace Evaluation.DAL.Models.DepartementEntites
         public WebGroup? WebGroup { get; set; }
         public Guid DepartmentId { get; set; }
         public Department? Department { get; set; }
+        public int OrderNo { get; set; } = 0;
     }
 }

@@ -64,12 +64,8 @@
             return;
         }
 
-        const serviceName =
-            (w.currentLang === "ar"
-                ? CreateEvaluationPartyService.nameAr
-                : CreateEvaluationPartyService.nameEn) || "";
-
-        const headerEl = document.getElementById("CreateRequestModalLabel");
+        const serviceName = CreateEvaluationPartyService.name;
+        const headerEl = document.getElementById("CreateRequestServiceNameLabel");
         if (headerEl) headerEl.textContent = serviceName ? " - " + serviceName : "";
 
         const actions = CreateEvaluationPartyService.actions || [];

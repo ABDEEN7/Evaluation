@@ -1,5 +1,6 @@
 ﻿using Evaluation.DAL.Models.Audit;
 using Evaluation.DAL.Models.BaseModule;
+using Evaluation.DAL.Models.Master;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +13,8 @@ namespace Evaluation.DAL.Models.DepartementEntites
     {
         public Guid DepartmentId { get; set; }
         public Department? Department { get; set; }
+        public Guid? EvaluationTypeId { get; set; }
+        public EvaluationType? EvaluationType { get; set; }
         public string BackendName { get; set; } = null!;
         public string NameAr { get; set; } = null!;
         public string NameEn { get; set; } = null!;

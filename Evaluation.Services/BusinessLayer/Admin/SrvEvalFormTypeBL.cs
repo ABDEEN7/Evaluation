@@ -17,9 +17,9 @@ namespace Evaluation.Services.Models.Admin
 {
     public class SrvEvalFormTypeBL : AdminBase
     {
-        public SrvEvalFormTypeBL(IServiceProvider serviceProvider, UnitOfWork uow, LoggingServices loggingServices, IMapper mapper, UserInfo userInfo,IServiceScopeFactory serviceScopeFactory,RequestInfo requestInfo) : base(serviceProvider, uow, loggingServices, mapper, userInfo, serviceScopeFactory, requestInfo)
+        public SrvEvalFormTypeBL(IServiceProvider serviceProvider, UnitOfWork uow, LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, IServiceScopeFactory serviceScopeFactory, RequestInfo requestInfo) : base(serviceProvider, uow, loggingServices, mapper, userInfo, serviceScopeFactory, requestInfo)
         {
-            
+
         }
 
 
@@ -35,7 +35,7 @@ namespace Evaluation.Services.Models.Admin
                 .Include(x => x.CreateBy)
                 .OrderBy(x => x.OrderNo)
                 .ThenByDescending(x => x.CreateDate)
-                 .Skip(Page*PageSize)
+                 .Skip(Page * PageSize)
                 .Take(PageSize)
                 .ToListAsync();
 
@@ -44,8 +44,8 @@ namespace Evaluation.Services.Models.Admin
 
 
         }
-       
-      
+
+
         public async Task<EvalFormTypeDTO> SaveEvalFormType(EvalFormTypeDTO message)
         {
 
@@ -53,34 +53,35 @@ namespace Evaluation.Services.Models.Admin
 
             var mapper = await CreateMapperForAdmin<EvalFormType, EvalFormTypeDTO>();
 
-            var BackendName= await GenerateBackendNameByTitle(message.NameEn);
-                var existBackendName = await uow
-             .GetRepository<EvalFormType>()
-                  .GetAllNonDeleted(x => x.BackendName == BackendName)
-                  .FirstOrDefaultAsync();
+            var BackendName = await GenerateBackendNameByTitle(message.NameEn);
+            var existBackendName = await uow
+         .GetRepository<EvalFormType>()
+              .GetAllNonDeleted(x => x.BackendName == BackendName)
+              .FirstOrDefaultAsync();
 
-                if (existBackendName != null)
-                {
+            if (existBackendName != null)
+            {
 
                 throw new BusinessException(ConstantKeys.ExceptionMessage.BackendNameAlreadyExists);
             }
 
             EvalFormType obj = new EvalFormType();
 
-                obj.NameAr = message.NameAr;
-                obj.NameEn = message.NameEn;
-                obj.BackendName = BackendName;
-                obj.IsActive = message.IsActive;
+            obj.NameAr = message.NameAr;
+            obj.NameEn = message.NameEn;
+            obj.BackendName = BackendName;
+            obj.IsActive = message.IsActive;
+            obj.DepartmentId = message.EvalFormDepartmentId;
 
-                uow.GetRepository<EvalFormType>().Insert(obj);
-            
+            uow.GetRepository<EvalFormType>().Insert(obj);
+
             await uow.CommitAsync();
             var result = mapper.Map<EvalFormTypeDTO>(obj);
             result.ResponseStatus = DBResult.Inserted;
-                return result;
-           
-           
-            
+            return result;
+
+
+
         }
         public async Task<EvalFormTypeDTO> UpdateEvalFormType(EvalFormTypeDTO message)
         {
@@ -102,6 +103,7 @@ namespace Evaluation.Services.Models.Admin
                 obj.NameEn = message.NameEn;
                 obj.BackendName = obj.BackendName;
                 obj.IsActive = message.IsActive;
+                obj.DepartmentId = message.EvalFormDepartmentId;
 
                 uow.GetRepository<EvalFormType>().Update(obj);
 
@@ -109,8 +111,8 @@ namespace Evaluation.Services.Models.Admin
                 result = mapper.Map<EvalFormTypeDTO>(obj);
                 result.ResponseStatus = DBResult.Updated;
             }
-                return result;
-           
+            return result;
+
         }
 
         public async Task<bool> UpdateEvalFormTypeOrder(List<OrderingDTO> message)
@@ -139,8 +141,8 @@ namespace Evaluation.Services.Models.Admin
 
             var mapper = await CreateMapperForAdmin<EvalFormType, EvalFormTypeDTO>();
             var result = new EvalFormTypeDTO();
-                if (Id is not null)
-                {
+            if (Id is not null)
+            {
                 EvalFormType obj = await uow.GetRepository<EvalFormType>()
                                       .GetAllNonDeleted()
                                       .Where(x => x.Id == Id)
@@ -155,16 +157,16 @@ namespace Evaluation.Services.Models.Admin
                     throw new BusinessException(ConstantKeys.ExceptionMessage.EvalFormTypeExistsEvalForms);
                 }
 
-                
+
                 uow.GetRepository<EvalFormType>().Delete(obj);
-                    await uow.CommitAsync();
+                await uow.CommitAsync();
                 result = mapper.Map<EvalFormTypeDTO>(obj);
                 result.ResponseStatus = DBResult.Deleted;
-                }
-                return result;
-           
+            }
+            return result;
+
 
         }
-       
+
     }
 }

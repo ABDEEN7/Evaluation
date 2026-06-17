@@ -21,9 +21,9 @@
             <!-- Right: Filter Toggle Button -->
             <button id="advancedSearchPlansBtn"
                     type="button"
-                    class="btn btn-outline-secondary d-flex align-items-center gap-2 px-3 py-2">
+                    class="btn btn-outline-secondary d-flex align-items-center gap-2">
                 <i class="la la-filter"></i>
-                <span class="@ConstantKeys.EvaluationPlans.Search"></span>
+                @* <span class="@ConstantKeys.EvaluationPlans.Search"></span> *@
             </button>
 
         </div>
@@ -31,7 +31,7 @@
 
     <!-- Filter Form: hidden by default -->
     <div id="plan-filter-wrapper" style="display:none;">
-        <div class="filter-section p-3 mb-3">
+        <div class="filter-section mb-3">
             <form id="plan-filter-form-id">
                 <div class="row g-3 align-items-end">
 
@@ -76,9 +76,10 @@
                 <thead>
                     <tr>
                         <th class="@ConstantKeys.EvaluationPlans.PlanName"></th>
+                        <th class="@ConstantKeys.EvaluationPlans.Status"></th>
                         <th class="@ConstantKeys.EvaluationPlans.SchoolsCount"></th>
                         <th class="@ConstantKeys.EvaluationPlans.Period"></th>
-                        <th class="@ConstantKeys.EvaluationPlans.Status"></th>
+                      
                         <th class="@ConstantKeys.EvaluationPlans.Actions"></th>
                     </tr>
                 </thead>

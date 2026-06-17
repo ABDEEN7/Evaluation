@@ -9,4 +9,6 @@ public class EducationLevel : EntityBase, IAuditLogEntity
     public string NameEn { get; set; } = null!;
     public string BackendName { get; set; } = null!;
     public int OrderNo { get; set; }
+    public string? IntegrationCode { get; set; }
+    public virtual ICollection<SchoolLevel>? SchoolLevels { get; set; }
 }

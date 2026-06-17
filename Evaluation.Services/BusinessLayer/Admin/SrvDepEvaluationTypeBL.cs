@@ -17,17 +17,19 @@ public class SrvDepEvaluationTypeBL : AdminBase
     public SrvDepEvaluationTypeBL(IServiceProvider serviceProvider, UnitOfWork uow, LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, IServiceScopeFactory serviceScopeFactory, RequestInfo requestInfo) : base(serviceProvider, uow, loggingServices, mapper, userInfo, serviceScopeFactory, requestInfo)
     {
     }
-    public async Task<List<DepEvaluationTypeDto>> GetDepEvaluationTypeList(int page, int pageSize)
+    public async Task<List<ResponseDepEvaluationTypeDto>> GetDepEvaluationTypeList(int page, int pageSize)
     {
         var list = await uow.GetRepository<DepEvaluationType>()
             .GetAllActiveNonDeleted()
             .Include(x => x.CreateBy)
+            .Include(x => x.Department)
+            .Include(x=>x.EvaluationType)
             .OrderByDescending(x => x.OrderNo)
             .ThenByDescending(x => x.CreateDate)
             .Skip(page * pageSize)
             .Take(pageSize)
             .ToListAsync();
-        var result = mapper.Map<List<DepEvaluationTypeDto>>(list, opts => opts.Items["Language"] = _requestInfo.Lang);
+        var result = mapper.Map<List<ResponseDepEvaluationTypeDto>>(list, opts => opts.Items["Language"] = _requestInfo.Lang);
         return result;
     }
     public async Task<DepEvaluationTypeDto> SaveDepEvaluationType(DepEvaluationTypeDto message)
@@ -46,6 +48,7 @@ public class SrvDepEvaluationTypeBL : AdminBase
         DepEvaluationType.NameEn = message.NameEn;
         DepEvaluationType.NameAr = message.NameAr;
         DepEvaluationType.DepartmentId = message.DepartmentId;
+        DepEvaluationType.EvaluationTypeId = message.EvaluationTypeId;
         DepEvaluationType.IsActive = message.IsActive;
         DepEvaluationType.BackendName = bacendName;
         uow.GetRepository<DepEvaluationType>().Insert(DepEvaluationType);
@@ -99,6 +102,7 @@ public class SrvDepEvaluationTypeBL : AdminBase
         job.NameEn = DepEvaluationType.NameEn;
         job.IsActive = DepEvaluationType.IsActive;
         job.DepartmentId = DepEvaluationType.DepartmentId;
+        job.EvaluationTypeId = DepEvaluationType.DepartmentId;
         job.UpdateById = userInfo.UserId;
         job.UpdateDate = DateTime.UtcNow;
 

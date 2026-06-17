@@ -87,8 +87,18 @@ namespace Evaluation.Admin.Controllers
                 return Ok(result);
             
         }
+        [HttpPost]
+        [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.AdminPermission.EDIT_ADMIN_WEBGROUPS })]
+        public async Task<IActionResult> UpdateWebGroupsOrder()
+        {
 
-        
+            var model = Request.Form["OrderObj"][0]?.StringToObject<List<OrderingDTO>>();
+            var result = await masterBL.GetAdminService<SrvWebGroupsBL>().UpdateDepWebGrouprder(model!);
+            return Ok(result);
+
+        }
+
+
         [HttpPost]
         [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.AdminPermission.DELETE_ADMIN_WEBGROUPS })]
         public async Task<IActionResult> DeleteWebGroups(Guid Id)

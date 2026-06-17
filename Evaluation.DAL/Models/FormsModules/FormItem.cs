@@ -1,6 +1,7 @@
 ﻿using Evaluation.DAL.Models.Audit;
 using Evaluation.DAL.Models.BaseModule;
 using Evaluation.DAL.Models.FormBuilder;
+using Evaluation.DAL.Models.OutputAnalysis;
 
 namespace Evaluation.DAL.Models.FormsModules;
 
@@ -23,11 +24,14 @@ public class FormItem : EntityBase, IAuditLogEntity
     public string? ColorCode { get; set; }
     public bool HasMuliEvaluation { get; set; }
 
+    public Guid? AnalysisTypeId { get; set; }
+    public AnalysisType? AnalysisType { get; set; }
 
     public virtual ICollection<SubFormItem>? SubFormItems { get; set; }
     public ICollection<FormItemRelated>? RelatedFrom { get; set; }
     public ICollection<FormItemRelated>? RelatedTo { get; set; }
     public ICollection<FormItemConfig>? FormItemConfigs { get; set; }
+	public virtual ICollection<FormItemValue> FormItemValues { get; set; } = [];
 
 
 }

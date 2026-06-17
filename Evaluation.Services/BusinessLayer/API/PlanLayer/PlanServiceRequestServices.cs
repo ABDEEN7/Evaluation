@@ -1,5 +1,4 @@
-﻿using Aspose.Words.Lists;
-using AutoMapper;
+﻿using AutoMapper;
 using Evaluation.DAL.Dtos;
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.DepartementEntites;
@@ -21,8 +20,8 @@ using Evaluation.SharedHelper.Dtos.SchoolDto;
 using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Models;
-using Evaluation.SharedHelper.Models.Api;
 using FluentResults;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System.Globalization;
@@ -75,6 +74,7 @@ public class PlanServiceRequestServices(
      ? await InsertPlan(modelDto)
      : await UpdatePlan(modelDto);
     }
+
     //Plan Type Module
     public async Task<List<PlanTypeDto>> GetPlanTypes()
     {
@@ -143,6 +143,18 @@ public class PlanServiceRequestServices(
     }
     public async Task DeletePlanById(Guid id)
     {
+        var hasResquestsCannotDelete = unitOfWork
+       .GetRepository<EvaluationRequest>()
+       .GetAllNonDeleted(x => x.PlanId == id).ToList();
+        var hasRequestsCannotDelete = unitOfWork
+       .GetRepository<EvaluationRequest>()
+       .GetAllNonDeleted(x => x.PlanId == id)
+       .Any(x => !x.ServiceStatus.IsInitial);
+
+        if (hasRequestsCannotDelete)
+        {
+            throw new BusinessException(ConstantKeys.ExceptionMessage.CannotDeletePlanInProcess);
+        }
         var request = await planRepository.DeletePlan(id);
     }
     private static void ValidateSchool(SelectedSchool school,
@@ -270,7 +282,7 @@ public class PlanServiceRequestServices(
 
         var requests = modelDto.Schools.Select(school =>
         {
-      
+
             return new EvaluationRequest
             {
                 Id = Guid.NewGuid(),
@@ -281,23 +293,14 @@ public class PlanServiceRequestServices(
                 FromDate = school.StartEvaluationDate,
                 ToDate = school.EndEvaluationDate,
                 ServiceStatusId = serviceStatusId,
-                RequestNumber = "",
                 CreateDate = DateTime.UtcNow,
-                IsDeleted = false
+                IsDeleted = false,
+                RequestNumber = "default"
             };
         }).ToList();
 
         await unitOfWork.GetRepository<EvaluationRequest>()
      .InsertRange(requests);
-
-        foreach (var request in requests)
-        {
-            request.RequestNumber =
-                DateTime.Now.ToString(
-                    serviceObj.ReqNumberDef ?? "",
-                    new CultureInfo("en-US"))
-                + request.Sequence;
-        }
     }
     private async Task ReplaceEvaluationRequests(
     Guid planId,
@@ -345,18 +348,18 @@ public class PlanServiceRequestServices(
     public async Task<List<DDLFomrEvalMatrixValueDto>> GetFomrEvalMatrixValueList()
     {
         var latestIds = await unitOfWork
-    .GetRepository<EvaluationRequest>()
-    .GetAllActiveNonDeleted(x =>
-        x.FormEvalMatrixValueId != null &&
-        x.FormEvalMatrixValue.FormEvalMatrix.DepartmentId == requestInfo.DepId)
-    .GroupBy(x => x.OrgTreeId)
-    .Select(g => g
-        .OrderByDescending(x => x.EvaluationDate ?? DateOnly.MinValue)
-        .Select(x => x.FormEvalMatrixValueId)
-        .FirstOrDefault())
-    .Where(x => x != null)
-    .Distinct()
-    .ToListAsync();
+                        .GetRepository<EvaluationRequest>()
+                        .GetAllActiveNonDeleted(x =>
+                            x.FormEvalMatrixValueId != null &&
+                            x.FormEvalMatrixValue.FormEvalMatrix.DepartmentId == requestInfo.DepId)
+                        .GroupBy(x => x.OrgTreeId)
+                        .Select(g => g
+                            .OrderByDescending(x => x.EvaluationDate ?? DateOnly.MinValue)
+                            .Select(x => x.FormEvalMatrixValueId)
+                            .FirstOrDefault())
+                        .Where(x => x != null)
+                        .Distinct()
+                        .ToListAsync();
         var data = await unitOfWork
             .GetRepository<FormEvalMatrixValue>()
             .GetAllActiveNonDeleted(x => latestIds.Contains(x.Id))
@@ -371,6 +374,40 @@ public class PlanServiceRequestServices(
         x.NameEn)
         }).ToList();
         return result;
+    }
+    public async Task UpdateRequestNumbersAsync()
+    {
+        using var scope = serviceScopeFactory.CreateScopedUow();
+
+        var reqNumberDef = await unitOfWork.GetRepository<Service>()
+                        .GetAllActiveNonDeleted(x =>
+                            x.Initialservice == true
+                            && x.SystemModule!.DepartmentId == requestInfo.DepId
+                            && x.SystemModule!.SystemModuleType!.BackendName == ModuleType.EvaluationRequest
+                        )
+                        .Select(x => x.ReqNumberDef)
+                        .FirstAsync();
+        var requestNumber = DateTime.Now.ToString(reqNumberDef! ?? "", new CultureInfo("en-US"));
+        var requests = await scope
+            .GetRepository<EvaluationRequest>()
+            .GetAll(x => x.RequestNumber == "default")
+            .ToListAsync();
+
+        foreach (var request in requests)
+        {
+            request.RequestNumber = $"{requestNumber}{request.Sequence}";
+        }
+
+        await scope.CommitAsync();
+    }
+    public async Task<string> GetDepartmentConfigsAsync()
+    {
+        var response = await unitOfWork.GetRepository<Department>()
+            .GetAllActiveNonDeleted(x =>
+            x.Id == requestInfo.DepId)
+            .Select(x => x.DepConfig)
+            .FirstOrDefaultAsync();
+        return response;
     }
     private async Task SyncEvaluationRequests(
       Guid planId,
@@ -437,12 +474,6 @@ public class PlanServiceRequestServices(
             else
             {
 
-                // INSERT NEW
-
-                lastSequence++;
-                var requestNumber = DateTime.Now.ToString(serviceObj!.ReqNumberDef ?? "", new CultureInfo("en-US"))
-                                    + lastSequence;
-
                 await repo.InsertAsync(new EvaluationRequest
                 {
                     Id = Guid.NewGuid(),
@@ -452,8 +483,7 @@ public class PlanServiceRequestServices(
                     DepEvaluationTypeId = school.VisitTypeId,
                     FromDate = school.StartEvaluationDate,
                     ToDate = school.EndEvaluationDate,
-                    ServiceStatusId = serviceStatusId,
-                    RequestNumber = requestNumber,
+                    ServiceStatusId = serviceStatusId
 
                 });
             }

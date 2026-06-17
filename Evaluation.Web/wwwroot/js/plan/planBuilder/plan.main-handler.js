@@ -81,8 +81,16 @@
                     loadVisitTypes(),
                     loadVacationDays(),
                     loadParentOrgTree(),
-                    loadFomrEvalMatrixValue()
+                    loadFomrEvalMatrixValue(),
+                    loadCurrentAcademicYear(),
+                    loadSchoolLevels(),
+                    loadSchoolGenders()
                 ]);
+            }
+
+    
+            if (!ns.depConfig) {
+                await loadDepartmentConfig();
             }
 
             if (planObject) {
@@ -97,6 +105,8 @@
             populateFilterVisitTypes(fieldId);
             populateFilterParentOrgTree(fieldId);
             populateFilterPreviousResult(fieldId);
+            populateFilterSchoolLevels(fieldId);
+            populateFilterGenders(fieldId);
         } catch (e) {
             console.error(`[PlanHandler] Init failed for ${fieldId}`, e);
             alert('حدث خطأ أثناء التحميل');
@@ -137,6 +147,14 @@
     const loadFomrEvalMatrixValue = () =>
         jqClient().Get(API_ENDPOINTS.GetFomrEvalMatrixValue)
             .then(r => ns.fomrEvalMatrixValue = r?.result || []);
+
+    const loadCurrentAcademicYear = () =>
+        jqClient().Get(API_ENDPOINTS.GET_CurrentAcademicYear)
+            .then(r => {
+                ns.currentAcademicYear = r
+                    ? { start: new Date(r.startDate), end: new Date(r.endDate) }
+                    : null;
+            });
 
     /* ===================== POPULATE ===================== */
 
@@ -217,38 +235,58 @@
 
     const populateFilterVisitTypes = (fieldId) => {
         const $select = $p(fieldId, 'filterVisitType');
-
-        ns.visitTypes.forEach(type => {
-            $select.append(`<option value="${type.id}">${type.name}</option>`);
-        });
+        if (!$select.length) return;
+        ns.visitTypes?.forEach(v => $select.append($('<option>').val(v.backendName).text(v.name)));
     };
+
     const populateFilterParentOrgTree = (fieldId) => {
         const $select = $p(fieldId, 'filterParentOrgTree');
+        if (!$select.length) return; 
         ns.parentSchool.forEach(parent => {
             $select.append(`<option value="${parent.id}">${parent.nameEn}</option>`)
         });
     }
     const populateFilterPreviousResult = (fieldId) => {
         const $select = $p(fieldId, 'filterPreviousResult');
+        if (!$select.length) return;
         ns.fomrEvalMatrixValue.forEach(fromEval => {
             $select.append(`<option value="${fromEval.id}">${fromEval.name}</option>`);
         });
     };
-    const initializeFilterDatePickers = (fieldId) => {
+ const initializeFilterDatePickers = (fieldId) => {
         const dateFields = ['filterLastEvalDate', 'filterCreatedDate', 'filterNextEvalDate'];
+
+        const isAr = document.documentElement.lang.toLowerCase().startsWith('ar');
 
         dateFields.forEach(field => {
             const $input = $p(fieldId, field);
 
             if ($input.length && typeof flatpickr !== 'undefined') {
                 flatpickr($input[0], {
-                    locale: "en",
+                    locale: isAr ? "ar" : "default",
                     dateFormat: "Y-m-d",
-                    allowInput: true
+                    allowInput: true,
+                    disableMobile: true
                 });
             }
         });
     };
+    const populateFilterSchoolLevels = (fieldId) => {
+        const $select = $p(fieldId, 'filterSchoolLevel');
+        if (!$select.length) return; 
+        ns.schoolLevels?.forEach(level => {
+            $select.append($('<option>').val(level.id).text(level.name));
+        });
+    };
+
+    const populateFilterGenders = (fieldId) => {
+        const $select = $p(fieldId, 'filterGender');
+        if (!$select.length) return;
+        ns.schoolGenders?.forEach(g => {
+            $select.append($('<option>').val(g.backendName).text(g.name));
+        });
+    };
+
 
     /* ===================== RENDER ===================== */
 
@@ -258,7 +296,7 @@
         const form = ns.renderPlanForm(fieldId, null, state.isReadOnly);
         $p(fieldId, 'planFormContainer').find('.form-container').html(form);
 
-        // ✅ تحميل المدارس من Backend
+        
         loadSchools(fieldId, 1);
         initCustomMode(fieldId);
     };
@@ -333,7 +371,7 @@
 
         // Build query parameters
         const params = new URLSearchParams({
-            page,
+            pageNumber: page,
             pageSize: state.pageSize
         });
 
@@ -382,11 +420,14 @@
         const state = instances.get(fieldId);
 
         // Build query parameters with school IDs
-        const params = new URLSearchParams({
-            schoolIds: schoolIds.join(','), // Send comma-separated IDs
-            page: 1,
-            pageSize: schoolIds.length // Set page size to number of schools to get all in one request
+        const params = new URLSearchParams();
+
+        schoolIds.forEach(id => {
+            params.append('schoolIds', id);
         });
+
+        params.append('page', 1);
+        params.append('pageSize', schoolIds.length);
 
         showLoadingState(fieldId);
 
@@ -424,13 +465,13 @@
         state.currentPage = page;
         state.filters = filters;
 
-        // ✅ بناء الـ query parameters
+        // query parameters
         const params = new URLSearchParams({
-            page,
+            pageNumber: page,
             pageSize: state.pageSize
         });
 
-        // ✅ إضافة البحث
+        // 
         if (state.searchTerm) {
             params.append('search', state.searchTerm);
         }
@@ -467,6 +508,24 @@
             });
     };
 
+    const loadSchoolLevels = () =>
+        jqClient().Get(API_ENDPOINTS.GETEDUCATION_LEVEL)
+            .then(r => ns.schoolLevels = r?.result || []);
+
+    const loadSchoolGenders = () =>
+        jqClient().Get(API_ENDPOINTS.GET_SCHOOL_GENDER)
+            .then(r => ns.schoolGenders = r?.result || []);
+
+    const loadDepartmentConfig = () =>
+        jqClient().Get(API_ENDPOINTS.GET_DEPARTMENT_CONFIG)
+            .then(r => {
+                try {
+                    ns.depConfig = JSON.parse(r?.result || '{}');
+                } catch (e) {
+                    console.error('[PlanHandler] Failed to parse DepConfig', e);
+                    ns.depConfig = {};
+                }
+            });
     /* ===================== PAGINATION ===================== */
 
     const renderPagination = (fieldId) => {
@@ -580,13 +639,11 @@
                 onSemesterChange(fieldId, this);
             });
 
-        // ✅ البحث: استدعاء API بعد 300ms من التوقف عن الكتابة
         $wrapper.off('input', pid(fieldId, 'customSearch'))
             .on('input', pid(fieldId, 'customSearch'), function () {
                 onSearch(fieldId, this);
             });
 
-        // ✅ الفلتر: استدعاء API مع الفلاتر
         $wrapper.off('submit', pid(fieldId, 'filterForm'))
             .on('submit', pid(fieldId, 'filterForm'), function (e) {
                 onFilter(fieldId, e);
@@ -596,23 +653,59 @@
             .on('click', pid(fieldId, 'clearFiltersBtn'), function () {
                 clearFilters(fieldId);
             });
+        $wrapper.off('change', `#${pidRaw(fieldId, 'filterSchoolLevel')}`)
+            .on('change', `#${pidRaw(fieldId, 'filterSchoolLevel')}`, function () {
+                populateFilterGrades(fieldId, $(this).val());
+            });
     };
 
     const attachRowEvents = (fieldId) => {
         const $table = $p(fieldId, 'planTable');
+        const state = instances.get(fieldId);
 
         $table.find('.selectRow').off('change').on('change', function () {
             updateSelectedSchools(fieldId);
         });
 
         $table.find('.childDate').off('change').on('change', function () {
-            updateSelectedSchools(fieldId);
+            const schoolId = $(this).data('school-id');
+            const newDate = $(this).val();
+            if (state.selectedSchoolsMap && state.selectedSchoolsMap.has(schoolId)) {
+                state.selectedSchoolsMap.get(schoolId).visitDate = newDate;
+                state.selectedSchools = Array.from(state.selectedSchoolsMap.values());
+            }
         });
 
         $table.find('.visitTypeSelect').off('change').on('change', function () {
-            updateSelectedSchools(fieldId);
+            const schoolId = $(this).data('school-id');
+            const newType = $(this).val();
+
+            if (newType) {
+                const $checkbox = $table.find(`.selectRow[data-school-id="${schoolId}"]`);
+                if (!$checkbox.is(':checked')) {
+                    $checkbox.prop('checked', true);
+                }
+
+                if (!state.selectedSchoolsMap.has(schoolId)) {
+                    const schoolName = $checkbox.data('name');
+                    state.selectedSchoolsMap.set(schoolId, {
+                        id: schoolId,
+                        name: schoolName,
+                        visitDate: $table.find(`.childDate[data-school-id="${schoolId}"]`).val() || '',
+                        visitTypeId: newType
+                    });
+                } else {
+                    state.selectedSchoolsMap.get(schoolId).visitTypeId = newType;
+                }
+                state.selectedSchools = Array.from(state.selectedSchoolsMap.values());
+                updateSelectionCounter(fieldId);
+            } else if (state.selectedSchoolsMap.has(schoolId)) {
+                state.selectedSchoolsMap.get(schoolId).visitTypeId = newType;
+                state.selectedSchools = Array.from(state.selectedSchoolsMap.values());
+            }
         });
     };
+
 
     /* ===================== HANDLERS ===================== */
 
@@ -642,12 +735,20 @@
     };
 
     const initYearMode = (fieldId) => {
-        const y = new Date().getFullYear();
-        const start = `${y}-01-01`;
-        const end = `${y}-12-31`;
-
-        $p(fieldId, 'parentDate').val(`${start} to ${end}`).prop('disabled', true);
-        ns.initChildPicker(new Date(start), new Date(end));
+        const ay = ns.currentAcademicYear;
+        if (ay?.start && ay?.end) {
+            const start = ns.formatDateISO(ay.start);
+            const end = ns.formatDateISO(ay.end);
+            $p(fieldId, 'parentDate').val(`${start} to ${end}`).prop('disabled', true);
+            ns.initChildPicker(ay.start, ay.end);
+        } else {
+            // fallback to calendar year
+            const y = new Date().getFullYear();
+            const start = `${y}-01-01`;
+            const end = `${y}-12-31`;
+            $p(fieldId, 'parentDate').val(`${start} to ${end}`).prop('disabled', true);
+            ns.initChildPicker(new Date(start), new Date(end));
+        }
     };
 
     const initMonthMode = (fieldId) => {
@@ -687,6 +788,16 @@
             }
         }
     };
+    const updateSelectionCounter = (fieldId) => {
+        const state = instances.get(fieldId);
+        const count = state.selectedSchoolsMap ? state.selectedSchoolsMap.size : 0;
+        const $counter = $p(fieldId, 'selectedSchoolsCounter');
+        if ($counter.length) {
+            $counter.text(count);
+            $counter.closest('.selection-counter-badge')
+                .toggleClass('badge-active', count > 0);
+        }
+    };
 
     /* ===================== SEARCH & FILTER (Backend) ===================== */
 
@@ -696,7 +807,7 @@
 
         clearTimeout(state.searchTimeout);
         state.searchTimeout = setTimeout(() => {
-            // ✅ استدعاء API مع البحث
+
             loadSchools(fieldId, 1, state.filters);
         }, 300);
     };
@@ -705,45 +816,40 @@
         e.preventDefault();
         const state = instances.get(fieldId);
 
-        // ✅ جمع قيم الفلاتر
+        const safeVal = (fieldId, name) => {
+            const $el = $p(fieldId, name);
+            return $el.length ? $el.val() : undefined;
+        };
         state.filters = {
-            name: $p(fieldId, 'filterSchoolName').val(),
-            lastEvalDate: $p(fieldId, 'filterLastEvalDate').val(),
-            establishmentDate: $p(fieldId, 'filterCreatedDate').val(),
-            nextEvalDate: $p(fieldId, 'filterNextEvalDate').val(),
-            fomrEvalMatrixValueId: $p(fieldId, 'filterPreviousResult').val(),
-            visitType: $p(fieldId, 'filterVisitType').val()
+            name: safeVal(fieldId, 'filterSchoolName'),
+            lastEvalDate: safeVal(fieldId, 'filterLastEvalDate'),
+            establishmentDate: safeVal(fieldId, 'filterCreatedDate'),
+            establishmentDateTo: safeVal(fieldId, 'filterToCreatedDate'),
+            nextEvalDate: safeVal(fieldId, 'filterNextEvalDate'),
+            fomrEvalMatrixValueId: safeVal(fieldId, 'filterPreviousResult'),
+            visitType: safeVal(fieldId, 'filterVisitType'),
+            schoolLevel: safeVal(fieldId, 'filterSchoolLevel'),
+            gender: safeVal(fieldId, 'filterGender'),
+            grade: safeVal(fieldId, 'filterGrade')
         };
 
-        // حذف القيم الفارغة
-        Object.keys(state.filters).forEach(key => {
-            if (!state.filters[key]) delete state.filters[key];
-        });
-        // ✅ استدعاء API مع الفلاتر
-        loadSchools(fieldId, 1, state.filters);
+        
+        Object.keys(state.filters).forEach(k => state.filters[k] === undefined && delete state.filters[k]);
 
-        // إغلاق الـ offcanvas
+        
+        loadSchools(fieldId, 1, state.filters);
         const offcanvas = bootstrap.Offcanvas.getInstance($p(fieldId, 'filterOffcanvas')[0]);
         if (offcanvas) offcanvas.hide();
     };
 
     const clearFilters = (fieldId) => {
-        const state = instances.get(fieldId);
-
-        // مسح state
-        state.filters = {};
-        state.searchTerm = '';
-
-        // مسح الحقول من UI
-        $p(fieldId, 'filterSchoolName').val('');
-        $p(fieldId, 'filterLastEvalDate').val('');
-        $p(fieldId, 'filterCreatedDate').val('');
-        $p(fieldId, 'filterNextEvalDate').val('');
-        $p(fieldId, 'filterPreviousResult').val('');
-        $p(fieldId, 'filterVisitType').val('');
-        $p(fieldId, 'customSearch').val('');
-        // ✅ إعادة تحميل كل المدارس
-        loadSchools(fieldId, 1);
+        ['filterSchoolName', 'filterLastEvalDate', 'filterCreatedDate', 'filterToCreatedDate',
+            'filterNextEvalDate', 'filterPreviousResult', 'filterVisitType', 'filterParentOrgTree',
+            'filterSchoolLevel', 'filterGender', 'filterGrade'].forEach(name => {
+                const $el = $p(fieldId, name);
+                if ($el.length) $el.val('');
+            });
+        if ($p(fieldId, 'filterGrade').length) populateFilterGrades(fieldId, '');
     };
 
     /* ===================== SAVE ===================== */
@@ -780,23 +886,37 @@
 
     const updateSelectedSchools = (fieldId) => {
         const state = instances.get(fieldId);
-        state.selectedSchools = [];
 
+        if (!state.selectedSchoolsMap) {
+            state.selectedSchoolsMap = new Map();
+        }
+
+        $p(fieldId, 'planTable').find('.selectRow').each(function () {
+            const schoolId = $(this).data('school-id');
+            if (!$(this).is(':checked')) {
+                state.selectedSchoolsMap.delete(schoolId);
+            }
+        });
         $p(fieldId, 'planTable').find('.selectRow:checked').each(function () {
             const $checkbox = $(this);
             const schoolId = $checkbox.data('school-id');
             const schoolName = $checkbox.data('name');
+            const visitDate = $p(fieldId, 'planTable')
+                .find(`.childDate[data-school-id="${schoolId}"]`).val();
+            const visitTypeId = $p(fieldId, 'planTable')
+                .find(`.visitTypeSelect[data-school-id="${schoolId}"]`).val();
 
-            const visitDate = $p(fieldId, 'planTable').find(`.childDate[data-school-id="${schoolId}"]`).val();
-            const visitTypeId = $p(fieldId, 'planTable').find(`.visitTypeSelect[data-school-id="${schoolId}"]`).val();
-
-            state.selectedSchools.push({
+            state.selectedSchoolsMap.set(schoolId, {
                 id: schoolId,
                 name: schoolName,
                 visitDate: visitDate,
                 visitTypeId: visitTypeId
             });
         });
+
+        state.selectedSchools = Array.from(state.selectedSchoolsMap.values());
+
+        updateSelectionCounter(fieldId);
     };
 
     const showLoadingState = (fieldId) => {

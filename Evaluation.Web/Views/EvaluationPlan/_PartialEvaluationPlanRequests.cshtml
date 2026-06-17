@@ -31,9 +31,9 @@
 
                 <button id="advancedSearchPlanRequestBtn"
                         type="button"
-                        class="btn btn-outline-secondary d-flex align-items-center gap-2 px-3">
+                        class="btn btn-outline-secondary d-flex align-items-center gap-2">
                     <i class="la la-filter"></i>
-                    <span class="@ConstantKeys.EvaluationPlanRequests.lblSearchPlan"></span>
+                    @* <span class="@ConstantKeys.EvaluationPlanRequests.lblSearchPlan"></span> *@
                 </button>
 
             </div>
@@ -43,7 +43,7 @@
 
     <!-- Filter Form: hidden by default -->
     <div id="plan-request-filter-wrapper" style="display:none;">
-        <div class="filter-section p-3 mb-3 border rounded">
+        <div class="filter-section">
             <form id="plan-request-filter-form-id">
                 <div class="row g-3 align-items-end">
 
@@ -88,19 +88,24 @@
         <div id="card-container" class="m-0 p-0"></div>
 
         <div id="requestTableDiv" class="table-responsive col-md-12 m-0 p-0">
-            <table class="table table-striped table-bordered card application-request p-0 m-0"
+            <table class="table table-striped table-bordered application-request table-card-seperate-styling p-0 m-0"
                    cellspacing="0"
                    width="100%"
                    id="planRequestTable">
+                
                 <thead>
                     <tr>
-                        <th class="@ConstantKeys.EvaluationPlanRequests.lblRequestNo"></th>
+                        <th>Service Name</th>
                         <th class="@ConstantKeys.EvaluationPlanRequests.lblRequestStatus"></th>
-                        <th class="@ConstantKeys.EvaluationPlanRequests.lblRequestService"></th>
-                        <th class="@ConstantKeys.EvaluationPlanRequests.lblScholarships"></th>
-                        <th class="@ConstantKeys.EvaluationPlanRequests.lblRequestCreatedDate"></th>
+                        <th class="@ConstantKeys.EvaluationPlanRequests.lblRequestNo"></th>
+                        <th>School Count</th>
+                        <th>Plan Name</th>
+                        <th>Period</th>
+                        <th>Created Date</th>
+                        <th>Created Time</th>
                     </tr>
                 </thead>
+
                 <tbody id="requeststableBody" class="requeststableBody p-0 m-0"></tbody>
             </table>
         </div>

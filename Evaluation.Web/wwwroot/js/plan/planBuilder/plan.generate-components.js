@@ -31,13 +31,13 @@
     } = window.PlanConstants || {};
 
     // ================== STATE MANAGEMENT (Per Instance) ==================
-    // ⚠️ تم نقل الـ state إلى main-handler ليكون منفصل لكل instance
     ns.visitTypes = [];
     ns.planTypes = [];
     ns.semesters = [];
     ns.holidays = [];
     ns.parentSchool = [];
     ns.fomrEvalMatrixValue = [];
+    ns.currentAcademicYear = null;
     ns.currentPage = 1;
     ns.pageSize = 10;
 
@@ -157,7 +157,7 @@
         const container = $('<div>')
             .attr('id', `${fieldId}_semesterContainer`)
             .addClass('col-md-4')
-            .css('display', field?.visible !== false ? 'block' : 'none');
+            .css('display', field?.visible === true ? 'block' : 'none');
 
         const selectElement = $('<select>')
             .attr('id', `${fieldId}_ddlSemester`)
@@ -240,7 +240,7 @@
             checkbox.prop('checked', true);
         }
 
-        if (readonly) {
+        if (readonly || school.IsOpen) {
             checkbox.prop('disabled', true);
         }
 
@@ -249,7 +249,8 @@
         return label;
     };
 
-    const generateSchoolNameCell = (fieldId, school) => {
+
+    const generateSchoolNameCell_old = (fieldId, school) => {
         const ratingClass = RATING_CLASSES[school.rating] || 'bg-light';
         const container = $('<div>').addClass('d-flex align-items-center justify-content-between');
 
@@ -260,6 +261,17 @@
         infoDiv
             .append($('<h6>').addClass('mb-1').text(school.name || '-'))
             .attr('data-name', nameId);
+
+
+        if (school.lastEvaluationDate) {
+            infoDiv.append(
+                $('<small>')
+                    .addClass('text-muted')
+                    .text(
+                        `${t('lblLastEvaluation')}: ${school.lastEvaluationDate}    ${school.formEvalMatrixNameValue}`
+                    )
+            );
+        }
 
         // Org parent (small label)
         if (school.orgParent?.nameEn) {
@@ -274,7 +286,7 @@
         const levelBadge = $('<div>').addClass('square-bullet mt-1');
         const levelText = (school.schoolLevel && school.schoolLevel.length > 0)
             ? school.schoolLevel.map(l => l.name).join(', ')
-            : '-';
+            : t('lblPrimary') || 'ابتدائي';
 
         levelBadge.append($('<div>').text(levelText));
         infoDiv.append(levelBadge);
@@ -288,7 +300,64 @@
         return container;
     };
 
+    const generateSchoolNameCell = (fieldId, school) => {
+        const container = $('<div>').addClass('school-cell d-flex align-items-start justify-content-between gap-2');
+        const infoDiv = $('<div>').addClass('school-info d-flex flex-column gap-1');
 
+        // School name
+        infoDiv.append(
+            $('<span>').addClass('school-name fw-500').text(school.name || '-')
+        );
+
+        // Eval badge + date row
+        if (school.lastEvaluationDate) {
+            const score = parseFloat(school.formEvalMatrixNameValue) || null;
+            let tier = 'poor', label = 'ضعيف';
+            if (score >= 90) { tier = 'excellent'; label = t('lblExcellent') || 'ممتاز'; }
+            else if (score >= 70) { tier = 'good'; label = t('lblGood') || 'جيد'; }
+            else if (score >= 50) { tier = 'average'; label = t('lblAverage') || 'مقبول'; }
+
+            const evalRow = $('<div>').addClass('eval-row d-flex align-items-center flex-wrap gap-1');
+            evalRow.append(
+                $('<span>').addClass(`eval-badge score-${tier}`)
+                    .html(`<span class="eval-dot dot-${tier}"></span>${label} &mdash; ${score ?? school.formEvalMatrixNameValue}`)
+            );
+            evalRow.append(
+                $('<span>').addClass('eval-date-pill')
+                    .html(`<i class="la la-calendar"></i> ${school.lastEvaluationDate}`)
+            );
+            infoDiv.append(evalRow);
+        }
+
+        // Org parent
+        if (school.orgParent?.nameEn) {
+            infoDiv.append(
+                $('<div>').addClass('org-parent')
+                    .html(`<i class="la la-building"></i> ${school.orgParent.nameEn}`)
+            );
+        }
+
+        // School levels
+        if (school.schoolLevel?.length > 0) {
+            const levelsRow = $('<div>').addClass('levels-row d-flex flex-wrap gap-1');
+            school.schoolLevel.forEach(l => {
+                levelsRow.append($('<span>').addClass('level-chip').text(l.name));
+            });
+            infoDiv.append(levelsRow);
+        }
+
+        container.append(infoDiv);
+
+        // Rating badge (right side)
+        if (school.rating) {
+            const ratingClass = RATING_CLASSES[school.rating] || '';
+            container.append(
+                $('<span>').addClass(`rating-badge ${ratingClass}`).text(school.rating)
+            );
+        }
+
+        return container;
+    };
     const generateVisitDateField = (fieldId, school, readonly) => {
         let visitDateValue = '';
 
@@ -318,8 +387,14 @@
         return inputElement;
     };
 
-    const generateVisitTypeField = (fieldId, school, readonly) => {
+    const generateVisitTypeField = (fieldId, school, readonly, isSelected = false) => {
         const selectId = `${fieldId}_${school.id}_visitType`;
+
+        const currentYear = new Date().getFullYear();
+        const lastEvalYear = school.nextEvaluationDate
+            ? new Date(school.nextEvaluationDate).getFullYear()
+            : null;
+        const shouldAutoSelect = !isSelected && lastEvalYear === currentYear;
 
         const selectElement = $('<select>')
             .addClass('form-select visitTypeSelect')
@@ -330,9 +405,14 @@
         ns.visitTypes.forEach(type => {
             const option = $('<option>')
                 .val(type.id)
-                .text(type.name);
+                .text(type.name)
+                .attr('data-backendname', type.backendName);
 
-            if (school.visitType === type.name || school.visitTypeId === type.id) {
+            if (shouldAutoSelect && type.backendName === 'Periodicevaluation') {
+
+                option.prop('selected', true);
+            } else if (school.visitType === type.name || school.visitTypeId === type.id) {
+
                 option.prop('selected', true);
             }
 
@@ -368,11 +448,21 @@
         const readonly = isReadOnly;
         const row = $('<tr>');
 
+
+        const currentYear = new Date().getFullYear();
+        const lastEvalYear = school.nextEvaluationDate
+            ? new Date(school.nextEvaluationDate).getFullYear()
+            : null;
+        const shouldAutoSelect = !isSelected && lastEvalYear === currentYear;
+
         // Checkbox cell
         const checkboxCell = $('<td>');
-        checkboxCell.append(generateSelectCheckbox(fieldId, school, readonly, isSelected));
+        checkboxCell.append(generateSelectCheckbox(fieldId, school, readonly, isSelected || shouldAutoSelect));
         row.append(checkboxCell);
 
+        if (shouldAutoSelect) {
+            row.attr('data-auto-selected', 'true');
+        }
         // School name cell
         const nameCell = $('<td>');
         nameCell.append(generateSchoolNameCell(fieldId, school));
@@ -383,19 +473,18 @@
         visitDateCell.append(generateVisitDateField(fieldId, school, readonly));
         row.append(visitDateCell);
 
-        // Last evaluation date cell
+        // establishmentDate date cell
         const lastEvalCell = $('<td>');
-        lastEvalCell.text(school.lastEvaluationDate || '-');
+        lastEvalCell.text(school.establishmentDate || '-');
         row.append(lastEvalCell);
-
         // Visit type cell
         const visitTypeCell = $('<td>');
-        visitTypeCell.append(generateVisitTypeField(fieldId, school, readonly));
+        visitTypeCell.append(generateVisitTypeField(fieldId, school, readonly, isSelected));
         row.append(visitTypeCell);
 
         // Academic year cell
         const academicYearCell = $('<td>');
-        const academicYearText = school.academicYear || '-';
+        const academicYearText = school.NEX || '-';
         const yearAcdemicYearText = school.yearAcdemicYear;
 
         academicYearCell.text(
@@ -529,17 +618,23 @@
 
         if (ns.currentPage > 1) {
             const prevItem = $('<li>').addClass('page-item');
+
             const prevLink = $('<a>')
                 .addClass('page-link')
                 .attr('href', '#')
                 .attr('data-page', ns.currentPage - 1)
-                .text(`${t('lblPrevious')}`);
+                .html(`
+                <i class="fas fa-angle-right "></i>
+                ${uiControlsSetup().GetUiControlText("lblPrevious")}
+            `);
+
             prevItem.append(prevLink);
             pagination.append(prevItem);
         }
 
         for (let i = 1; i <= totalPages; i++) {
             const pageItem = $('<li>').addClass('page-item');
+
             if (i === ns.currentPage) {
                 pageItem.addClass('active');
             }
@@ -556,11 +651,16 @@
 
         if (ns.currentPage < totalPages) {
             const nextItem = $('<li>').addClass('page-item');
+
             const nextLink = $('<a>')
                 .addClass('page-link')
                 .attr('href', '#')
                 .attr('data-page', ns.currentPage + 1)
-                .text(`${t('lblNext')}`);
+                .html(`
+                ${uiControlsSetup().GetUiControlText("lblNext")}
+                <i class="fas fa-angle-left"></i>
+            `);
+
             nextItem.append(nextLink);
             pagination.append(nextItem);
         }
@@ -581,7 +681,7 @@
 
         // Destroy previous instance for this specific fieldId
         if ($input.data('flatpickr')) {
-                $input.data('flatpickr').destroy();
+            $input.data('flatpickr').destroy();
         }
 
         const config = {

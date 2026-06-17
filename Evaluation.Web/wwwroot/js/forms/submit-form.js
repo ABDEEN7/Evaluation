@@ -14,245 +14,231 @@ const SUBMIT_FORM_API = {
 
 let departmentPath = sharedUtility().extractDepartmentName();
 
-// ==============================
-// TREE HELPERS (NEW)
-// ==============================
-function flattenTreeItems(nodes = []) {
-    const result = [];
-
-    function walk(list) {
-        for (const node of list) {
-            if (node.items?.length) {
-                result.push(...node.items);
-            }
-            if (node.children?.length) {
-                walk(node.children);
-            }
-        }
-    }
-
-    walk(nodes);
-    return result;
-}
-
-// ==============================
-// MAIN RESULT BUILDER (UPDATED)
-// ==============================
-function evaluationFormResult(formId) {
-
+function evaluationFormResult(formId) { 
     const mainItems = [];
 
-    // Select ALL tbodies generated from scopes
-    $(`tbody[id^="${P_fieldId}_"][id$="-${SELECTORS.tbody}"]`)
-        .each(function () {
+    // ========== LOOP MAIN ITEMS ONLY ==========
+    $(`#${P_fieldId}-${SELECTORS.tbody} tr.main-row`).each(function () {
 
-            const tbody = $(this);
+        const row = $(this);
+        const selects = row.find("select.eval-select");
+        let mainObj;
 
-            tbody.find("tr.main-row").each(function () {
+        selects.each(function (index, element) {
 
-                const row = $(this);
+            const $select = $(element);
 
-                const selects = row.find("select.eval-select");
 
-                if (!selects.length) {
-                    return;
-                }
 
-                const firstSelect = selects.first();
+            const mainId = $select.data("id");
 
-                const mainId = firstSelect.data("id");
+            const selectedValue =
+                $select.find("option:selected").data("id") ||
+                $select.val() ||
+                null;
 
-                const note =
-                    row.find("textarea.note-input").val() || null;
+            const note =
+                row.find("textarea.note-input").val() || null;
 
-                const subItems = [];
+            mainObj = {
+                id: mainId,
+                valueId: selectedValue,
+                value: $("option:selected", $select).data("actual-value") || 0,
+                weightPercentage: $select.data("config-weight-percentage") || 0,
+                note: note,
+                subItems: []
+            };
 
-                // Child rows INSIDE SAME TBODY ONLY
-                tbody.find(
-                    `tr.child-row[data-parent-id="${mainId}"]`
-                ).each(function () {
+            // ========== LOOP SUB ITEMS RELATED TO THIS MAIN ==========
+            $(`tr.child-row[data-parent-id="${mainId}"]`).each(function () {
 
-                    const childRow = $(this);
+                const childRow = $(this);
+                const childSelect = childRow.find("select.eval-select");
 
-                    const childSelect =
-                        childRow.find("select.eval-select");
+                const childId = childSelect.data("id");
 
-                    if (!childSelect.length) {
-                        return;
-                    }
+                const childValue =
+                    childSelect.find("option:selected").data("id") ||
+                    childSelect.val() ||
+                    null;
 
-                    const selectedChildOption =
-                        childSelect.find("option:selected");
+                const childnote =
+                    childRow.find("textarea.note-input").val() || null;
 
-                    subItems.push({
-                        id: childSelect.data("id"),
-
-                        valueId:
-                            childSelect.val() || null,
-
-                        value:
-                            parseFloat(
-                                selectedChildOption.data("actual-value")
-                            ) || 0,
-
-                        note:
-                            childRow.find("textarea.note-input").val() ||
-                            null
-                    });
-                });
-
-                const selectedMainOption =
-                    firstSelect.find("option:selected");
-
-                mainItems.push({
-                    id: mainId,
-
-                    valueId:
-                        firstSelect.val() || null,
-
-                    value:
-                        parseFloat(
-                            selectedMainOption.data("actual-value")
-                        ) || 0,
-
-                    weightPercentage:
-                        parseFloat(
-                            firstSelect.data(
-                                "config-weight-percentage"
-                            )
-                        ) || 0,
-
-                    note,
-
-                    subItems
+                mainObj.subItems.push({
+                    id: childId,
+                    valueId: childValue,
+                    value: $("option:selected", $select).text(),//NEED TO CHECK
+                    note: childnote
                 });
             });
+
+
+            mainItems.push(mainObj);
         });
 
-    return {
-        id: formId,
-        items: mainItems,
-        formSettings: evalForm
-    };
-}
-
-// ==============================
-// CALCULATION (UPDATED SAFE)
-// ==============================
-async function calculate(result) {
-    return jqClient()
-        .Post(
-            SUBMIT_FORM_API.calculateEvaluationResult(depRoutePath),
-            result
-        )
-        .then(res => res)
-        .catch(err => {
-            console.error(err);
-            throw err;
-        });
-}
-
-// ==============================
-// FE LIVE CALCULATION (FIXED)
-// ==============================
-function calculateFE(select, formId) {
-
-    const formResult = evaluationFormResult(formId);
-
-    let total = 0;
-    let count = 0;
-
-    formResult.items.forEach(item => {
-
-        if (P_hasMuliEvaluation) {
-            total += (item.value * (item.weightPercentage / 100)) || 0;
-        } else {
-            total += item.value || 0;
-        }
-
-        count++;
     });
 
-    let resultValue = 0;
+    // Strengths & Improvements
+    const strengths = $("textarea[data-row='1']").eq(0).val() || null;
+    const improvements = $("textarea[data-row='1']").eq(1).val() || null;
 
-    if (evalForm.calcMethod === "AVERAGE") {
-
-        if (P_hasMuliEvaluation) {
-            resultValue = total / (formResult.items.length / P_countOfColumnsValue);
-        } else {
-            resultValue = total / (formResult.items.length || 1);
-        }
-    }
-
-    const evalMatrixValue = (P_matrixResponse?.value || []).find(v =>
-        v.minValue <= resultValue && v.maxValue >= resultValue
-    );
-
-    const result = {
-        Value: resultValue,
-        Name: evalMatrixValue?.name ?? "",
-        Id: evalMatrixValue?.id ?? ""
+    const payload = {
+        id: formId,
+        items: mainItems,
+        formSettings: evalForm,
     };
 
-    $(`#${P_fieldId}-result-value`)
-        .text(`(${Number(result.Value).toFixed(2)}) ${result.Name}`);
+    console.log("FINAL NESTED JSON:", payload);
 
-    $(`#${P_fieldId}-result-div`)
-        .removeClass("d-none");
+    return payload;
+}
+async function evaluationFormWithCalculationResult(formId) {
+    var result = evaluationFormResult(formId);
+    var calculation = await calculate(result);
 
-    return result;
+    var finalResult = {
+        id: result.id,
+        items: result.items,
+        formSettings: result.formSettings,
+        results: calculation.value,
+        evaluationRequestId: P_evaluationRequestId,
+        serviceRequestId: P_serviceRequestId
+    };
+
+    console.log(finalResult);
+
+    return finalResult;
+
+}
+async function calculate(result) {
+    return new Promise((resolve, reject) => {
+        jqClient().Post(
+            SUBMIT_FORM_API.calculateEvaluationResult(depRoutePath)
+            , result)
+        .done((res) => {
+            console.log(res);
+            resolve(res); 
+        }).fail((err) => {
+            reject(err);
+        });
+    });
 }
 
-// ==============================
-// VALIDATION (FIXED)
-// ==============================
-function validateForm(formId) {
+function calculateFE(select, formId) {
+    let formResult = evaluationFormResult(formId);
+    let result = { Value: 0, Name: "", Id:"00000000-0000-0000-0000-000000000000"};
 
-    const result = evaluationFormResult(formId);
+    switch (evalForm.calcMethod) {
+        case "AVERAGE": {
 
-    jqClient()
-        .Post(
-            SUBMIT_FORM_API.validateEvaluationForm(depRoutePath),
-            result
-        )
-        .done(res => {
+            let total = 0;
 
-            if (res.value.isValid) return true;
-
-            clearValidation();
-
-            res.value.errors.forEach(error => {
-                showValidation(
-                    error.itemId,
-                    error.message,
-                    error.itemPropertyType
-                );
+            formResult.items.forEach((item) => {
+                if (P_hasMuliEvaluation) {
+                    total += (item.value * (item.weightPercentage / 100)) || 0;
+                }
+                else {
+                    total += item.value || 0;
+                }
             });
 
-            return false;
-        });
+            if (P_hasMuliEvaluation) {
+                result.Value = total / (formResult.items.length / P_countOfColumnsValue);
+
+            }
+            else {
+                result.Value = total / formResult.items.length;
+            }
+
+            const evalMatrixValue = P_matrixResponse.value.find(
+                v => v.minValue <= result.Value && v.maxValue >= result.Value
+            );
+
+            result.Name = evalMatrixValue?.name ?? null;
+            result.Id = evalMatrixValue?.id ?? null;
+
+            break;
+        }
+
+        case "SUM":
+            break;
+
+        case "WithoutCalc":
+            break;
+    }
+
+    $(`#${P_fieldId}-result-value`).text(`(${Number(result.Value).toFixed(2)})${result.Name}`);
+    $(`#${P_fieldId}-result-div`).removeClass("d-none");
+
+    return result
 }
 
-// ==============================
-// SAVE / SUBMIT (UNCHANGED STRUCTURE)
-// ==============================
+function validateForm(formId) {
+    var result = evaluationFormResult(formId);
+    jqClient().Post(
+        SUBMIT_FORM_API.validateEvaluationForm(depRoutePath)
+        , result)
+        .done((res) => {
+
+            if (res.value.isValid) {
+                return res.value.isValid;
+            }
+            else {
+                clearValidation();
+                res.value.errors.forEach(error => {
+                    showValidation(error.itemId, error.message, error.itemPropertyType);
+                });
+                return res.value.isValid;
+            }
+        });
+}
+function renameFormItems(formId) {
+    const mainItems = [];
+
+    // ========== LOOP MAIN ITEMS ONLY ==========
+    $(`#${P_fieldId}-${SELECTORS.tbody} tr.main-row`).each(function () {
+
+        const row = $(this);
+
+        const itemInput = row.find("input.item-name");
+
+        const itemInputVal =
+            itemInput.val() || null;
+
+        const mainId = itemInput.data("id");
+
+
+        const mainObj = {
+            id: mainId,
+            name: itemInputVal,
+            subItems: []
+        };
+
+        mainItems.push(mainObj);
+    });
+
+    const payload = {
+        id: formId,
+        renamedItems: mainItems
+    };
+
+    console.log("FINAL NESTED JSON:", payload);
+
+    return payload;
+}
+
 function submitForm(formId) {
-
-    const result = evaluationFormResult(formId);
-
-    jqClient()
-        .Post(
-            SUBMIT_FORM_API.saveEvaluationForm(depRoutePath),
-            result
-        )
-        .done(() => {
-
+    var result = evaluationFormResult(formId);
+    jqClient().Post(
+        SUBMIT_FORM_API.saveEvaluationForm(depRoutePath)
+        , result)
+        .done((res) => {
             Swal.fire({
                 icon: "success",
                 title: "تم الإرسال",
                 text: "تم إرسال الاستمارة للاعتماد بنجاح"
             });
-
         });
 }
 
@@ -266,57 +252,26 @@ async function saveForm(formId) {
         formSettings: result.formSettings,
         results: calculation.value,
         evaluationRequestId: P_evaluationRequestId,
-        serviceRequestId: P_serviceRequestId
+        serviceRequestId: P_serviceRequestId,
+       // renamedItems: P_renamedItems
     };
     return finalResult;
 }
 
-// ==============================
-// RENAME (WORKS WITH TREE UI)
-// ==============================
-function renameFormItems(formId) {
-
-    const mainItems = [];
-
-    $(`#${P_fieldId}-${SELECTORS.tbody} tr.main-row`).each(function () {
-
-        const row = $(this);
-        const input = row.find("input.item-name");
-
-        mainItems.push({
-            id: input.data("id"),
-            name: input.val() || null,
-            subItems: []
-        });
-    });
-
-    return {
-        id: formId,
-        items: mainItems
-    };
-}
-
-// ==============================
-// VALIDATION UI HELPERS
-// ==============================
 function showValidation(itemId, message, itemPropertyType) {
-
-    const el =
-        document.getElementById(`validation-${itemId}-${itemPropertyType}`);
-
+    const el = document.getElementById(`validation-${itemId}-${itemPropertyType}`);
     if (!el) return;
 
     el.textContent = "*" + message;
-    el.style.display = "block";
+    el.style.display = 'block';
 }
 
 function clearValidation() {
-
-    const els =
-        document.getElementsByClassName("validation-message");
+    const els = document.getElementsByClassName(`validation-message`);
+    if (!els) return;
 
     for (const el of els) {
-        el.textContent = '';
+        el.style.textContent = '';
         el.style.display = 'none';
     }
 }

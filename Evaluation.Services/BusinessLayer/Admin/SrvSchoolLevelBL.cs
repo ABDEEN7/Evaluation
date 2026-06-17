@@ -49,10 +49,9 @@ namespace Evaluation.Services.Models.Admin
 
             SchoolLevel obj = new SchoolLevel();
 
-                obj.Year = message.Year;
+                obj.AcademicYear = message.Year;
                 obj.SchoolId = message.SchoolId;
                 obj.EducationLevelId = message.EducationLevelId;
-                obj.NSISCode = message.NSISCode;
                 obj.IsActive = message.IsActive;
 
                 uow.GetRepository<SchoolLevel>().Insert(obj);
@@ -81,10 +80,9 @@ namespace Evaluation.Services.Models.Admin
                                       .Where(x => x.Id == message.Id)
                                       .FirstAsync();
 
-                obj.Year = message.Year;
+                obj.AcademicYear = message.Year;
                 obj.SchoolId = message.SchoolId;
                 obj.EducationLevelId = message.EducationLevelId;
-                obj.NSISCode = message.NSISCode;
                 obj.IsActive = message.IsActive;
 
                 uow.GetRepository<SchoolLevel>().Update(obj);

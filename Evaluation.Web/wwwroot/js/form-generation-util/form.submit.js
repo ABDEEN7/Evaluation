@@ -78,79 +78,72 @@ window.serviceRequestForm = window.serviceRequestForm || {};
     // ================================
     // #region 🔹 collectFieldValues (from formGroups)
     // ================================
-    function collectFieldValues(formGroups, renderType) {
+    async function collectFieldValues(formGroups, renderType) {
         const fields = flattenFieldsFromFormGroups(formGroups);
         const valuesMap = {};
 
-        fields.forEach(field => {
+        for (const field of fields) {
             const id = getFieldDomId(field, renderType);
             const $el = $("#" + id);
 
             let value = null;
-
             switch ((field.type || "").toLowerCase()) {
+
                 case "checkbox":
-                    value = $el.is(":checked");
-                    break;
-
+            value = $el.is(":checked");
+            break;
                 case "list": {
-                    const tableId = getListDomId(field, renderType);
+                const tableId = getListDomId(field, renderType);
 
-                    let tableData = [];
-                    if (window.Tabulator) {
-                        const tables = Tabulator.findTable("#" + tableId);
-                        tableData = (tables && tables.length) ? (tables[0].getData() || []) : [];
-                    }
-
-                    value = (tableData || []).map(row => {
-                        const r = { ...(row || {}) };
-
-                        if (r.file != null && r.file !== "") {
-                            r.file = Array.isArray(r.file) ? r.file : [r.file];
-                        }
-
-                        if (r.IsOld === undefined || r.IsOld === null || r.IsOld === "") {
-                            r.IsOld = false;
-                        }
-
-                        return r;
-                    });
-
-                    value = JSON.stringify(value);
-                    break;
+                let tableData = [];
+                if (window.Tabulator) {
+                    const tables = Tabulator.findTable("#" + tableId);
+                    tableData = (tables && tables.length) ? (tables[0].getData() || []) : [];
                 }
 
+                value = (tableData || []).map(row => {
+                    const r = { ...(row || {}) };
+
+                    if (r.file != null && r.file !== "") {
+                        r.file = Array.isArray(r.file) ? r.file : [r.file];
+                    }
+
+                    if (r.IsOld === undefined || r.IsOld === null || r.IsOld === "") {
+                        r.IsOld = false;
+                    }
+
+                    return r;
+                });
+
+                value = JSON.stringify(value);
+                break;
+            }
                 case "select2":
                 case "dropdown": {
-                    const v = $el.val();
-                    if ($el.attr("multiple")) {
-                        value = Array.isArray(v) ? v : (v ? [v] : []);
-                    } else {
-                        value = v;
-                    }
-                    break;
+                const v = $el.val();
+                if ($el.attr("multiple")) {
+                    value = Array.isArray(v) ? v : (v ? [v] : []);
+                } else {
+                    value = v;
                 }
+                break;
+            }
                 case "evaluationplan": {
-                    const fieldId = `field_${field.fieldId}`;
-                    const planObj = window.SubmitPlanHandler?.getFormPlanJson(fieldId);
-                    value = planObj ? JSON.stringify(planObj) : null;
-                    break;
-                }
-
+                const fieldId = `field_${field.fieldId}`;
+                const planObj = window.SubmitPlanHandler?.getFormPlanJson(fieldId);
+                value = planObj ? JSON.stringify(planObj) : null;
+                break;
+            }
                 case "evl_form": {
-                    const allowRenameFormItem = field.attributes?.find(c => c.name === 'allowRenameFormItem');
-                    if (allowRenameFormItem) {
-                        const formObj = renameFormItems(field.formId);
-                        value = formObj ? JSON.stringify(formObj) : null;
-                        break;
-                    }
-                    else {
-                        const formObj = saveForm(field.formId);
-                        value = formObj ? JSON.stringify(formObj) : null;
-                        break;
-                    }
-                   
-                }
+                const allowRenameFormItem = field.attributes?.find(c => c.name === 'allowRenameFormItem');
+
+                const formObj = allowRenameFormItem
+                    ? renameFormItems(field.formId)
+                    : await saveForm(field.formId);
+
+                value = formObj ? JSON.stringify(formObj) : null;
+                break;
+            }
                 case "time":
                 case "datetime":
                 case "date":
@@ -161,35 +154,30 @@ window.serviceRequestForm = window.serviceRequestForm || {};
                 case "tinymce":
                 case "jqte":
                 default:
-                    value = $el.val();
-                    break;
-            }
+            value = $el.val();
+            break;
+        }
 
-            valuesMap[field.fieldId] = value;
-        });
+        valuesMap[field.fieldId] = value;
+    } 
 
-        return { fields, valuesMap };
-    }
+         return { fields, valuesMap };
+}
+        
 
     // ================================
     // #region 🔹 validation
     // ================================
-    function validateAll(formGroups, renderType) {
+    async function validateAll(formGroups, renderType) {
         fu.resetValidationErrors && fu.resetValidationErrors();
 
-        const { fields, valuesMap } = collectFieldValues(formGroups, renderType);
+        const { fields, valuesMap } = await collectFieldValues(formGroups, renderType);
 
-        let errors = [];
+        let errors = fu.validateFields(fields, valuesMap) || [];
 
-            errors = fu.validateFields(fields, valuesMap) || [];
-
-        const dateErrors = fu.validateDateFields() || [];
-            errors = errors.concat(dateErrors);
-       
-            const notEqualErrors = fu.validateNotEqualFields(fields) || [];
-            errors = errors.concat(notEqualErrors);
-    
-        errors = errors.concat(fu.validateTimeRange(fields, valuesMap));
+        errors = errors.concat(fu.validateDateFields() || []);
+        errors = errors.concat(fu.validateNotEqualFields(fields) || []);
+        errors = errors.concat(fu.validateTimeRange(fields, valuesMap) || []);
 
         fu.showErrors(errors);
 
@@ -199,10 +187,11 @@ window.serviceRequestForm = window.serviceRequestForm || {};
     // ================================
     // #region 🔹 buildFormData
     // ================================
-    function buildFormData(actionDetails, formGroups, renderType) {
+    async function buildFormData(actionDetails, formGroups, renderType) {
         const formData = new FormData();
-        let actionTypeName = actionDetails.actionType.backEndName;
-        const { fields, valuesMap } = collectFieldValues(formGroups, renderType);
+        const actionTypeName = actionDetails.actionType.backEndName;
+
+        const { fields, valuesMap } = await collectFieldValues(formGroups, renderType);
 
         const payloadFields = fields.map(f => ({
             fieldId: f.fieldId,
@@ -213,27 +202,18 @@ window.serviceRequestForm = window.serviceRequestForm || {};
 
         formData.append("requestId", getRequestId());
         formData.append("evaluationRequestId", getEvlRequestId());
-
         formData.append("fieldValues", JSON.stringify(payloadFields));
 
         if (actionTypeName === ACTION_TYPE.ASSIGNT_TEAM) {
+            //const validation = validateTeamByFieldId('assign');
 
-            const validation = validateTeamByFieldId('assign');
-            if (!validation.isValid) {
+            //if (!validation.isValid) {
+            //    DisplayAlert('يرجى تصحيح الأخطاء التالية:\n' + validation.errors.join('\n'), "danger");
+            //    return { formData: null, ok: false };
+            //}
 
-                DisplayAlert('يرجى تصحيح الأخطاء التالية:\n' + validation.errors.join('\n'), "danger");
-                return {
-                    formData: null,
-                    ok: false
-                };
-            }
-
-            const teamData = getAssignmentsDataByFieldId('assign');
-
-            formData.append("teamUsers", JSON.stringify(teamData));
+            formData.append("teamUsers", JSON.stringify(getAssignmentsDataByFieldId('assign')));
         }
-
-         //formData.append("ActionRemarks", remarksValue);
 
         if (typeof fu.validateRemarks === "function") {
             const remarksOk = fu.validateRemarks(formData);
@@ -241,15 +221,12 @@ window.serviceRequestForm = window.serviceRequestForm || {};
         }
 
         if (typeof fu.addAssignmentData === "function") {
-            const actionTypeName = actionDetails?.actionType?.backEndName || actionDetails?.bakendName || "";
             const assignOk = fu.addAssignmentData(formData, actionTypeName);
             if (!assignOk) return { formData, ok: false };
         }
 
         return { formData, ok: true };
     }
-
-
     // ================================
     // #region 🔹 submitAction
     // ================================
@@ -258,22 +235,22 @@ window.serviceRequestForm = window.serviceRequestForm || {};
     async function submitAction(actionDetails, formGroups, saveAsDraft) {
         var DepartmentRouting = sharedUtility().extractDepartmentName();
 
-        const baseUrl =  `/ServiceRequest/${DepartmentRouting}/HandleRequest`;
+        const baseUrl = `/ServiceRequest/${DepartmentRouting}/HandleRequest`;
         const renderType = RENDER_TYPE.ACTION;
 
         const normalizedGroups = normalizeFormGroups(formGroups);
 
-        const validationResult = validateAll(normalizedGroups, renderType);
+        const validationResult = await validateAll(normalizedGroups, renderType);
         if (!validationResult.isValid) return;
 
-        const { formData, ok } = buildFormData(actionDetails, normalizedGroups, renderType);
+        const { formData, ok } = await buildFormData(actionDetails, normalizedGroups, renderType);
         if (!ok) return;
 
-        const actionName =actionDetails?.bakendName ||"";
+        const actionName = actionDetails?.bakendName || "";
 
         const planId = getPlanId();
 
-        const serviceId =  actionDetails?.serviceId;
+        const serviceId = actionDetails?.serviceId;
         if (serviceId) formData.set("serviceId", serviceId);
 
         formData.set("saveAsDraft", String(saveAsDraft));
@@ -283,7 +260,6 @@ window.serviceRequestForm = window.serviceRequestForm || {};
         if (planId) qs.set("planId", planId);
 
         const postUrl = `${baseUrl}?${qs.toString()}`;
-
         const successFunction = function (result) {
             if (!result) {
                 DisplayAlert("Unexpected empty response.", "danger");
@@ -292,7 +268,7 @@ window.serviceRequestForm = window.serviceRequestForm || {};
             let RequestId = getRequestOrEvalId();
             if (RequestId) {
                 window.tempFileStorage = {};
-               DisplayAlert('Form submitted successfully!', 'success');
+                DisplayAlert('Form submitted successfully!', 'success');
                 setTimeout(() => {
                     sharedUtility().RedirectToModuleOrDefault({
                         Evlid: getEvlRequestId()
@@ -333,13 +309,11 @@ window.serviceRequestForm = window.serviceRequestForm || {};
                 DisplayAlert("An unexpected error occurred.", 'danger');
             }
         };
-
         jqClient({})
             .PostFormData(postUrl, formData)
             .done(successFunction)
             .fail(errorFunction);
     }
-
 
 
 

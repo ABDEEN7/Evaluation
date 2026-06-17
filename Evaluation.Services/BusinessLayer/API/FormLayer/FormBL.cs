@@ -83,12 +83,12 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
     }
     public async Task<Result<FormDto>> GetFormItemsWithValues(Guid FormId, Guid AcademicYearId, Guid EvaluationRequestId)
     {
-
+        var lang = requestInfo.Lang;
         var evalForm = await formService.GetEvalForm(FormId, IncludeCalcMethod: true);
         var mappedEvalForm = mapper.Map<TemplateFormDto>(evalForm);
 
         var formItems = await formService.GetFormItems(FormId);
-        var mappedData = mapper.Map<List<FormItemDto>>(formItems);
+		var mappedData = mapper.Map<List<FormItemDto>>(formItems,opt => opt.Items["lang"] = lang);
 
         var formItemsValues = await formService.GetFormItemsValuesByEvaluationRequestId(EvaluationRequestId);
 
@@ -107,8 +107,8 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
                             Id = relatedFromItem.RelatedItemId,
                             Note = formItemValue?.Note,
                             Value = formItemValue?.ActualValue?.ToString(),
-                            Name = relatedFromItem.RelatedItem.NameAr
-                        });
+                            Name = lang=="ar"? relatedFromItem.RelatedItem!.NameAr: relatedFromItem.RelatedItem!.NameEn
+						});
                 }
             }
             mappedData.Where(md => md.Id == item.Id).FirstOrDefault().RelatedItems = relatedItemDtos;
@@ -204,91 +204,128 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
         return result;
     }
 
-    public async Task<Result<FormEvaluationDto>> SaveEvaluationForm(FormEvaluationDto formEvaluationDto)
-    {
+	public async Task<Result<FormEvaluationDto>> SaveEvaluationForm(FormEvaluationDto formEvaluationDto)
+	{
+		if (formEvaluationDto == null)
+			return Result.Fail<FormEvaluationDto>(ConstantKeys.ExceptionMessage.FormDataIsNull);
+
         var formValidation = await Validate(formEvaluationDto);
         if (!formValidation.IsValid)
             return Result.Fail<FormEvaluationDto>(ConstantKeys.ExceptionMessage.FormDataIsNotValid);
 
-        if (formEvaluationDto == null)
-            return Result.Fail<FormEvaluationDto>(ConstantKeys.ExceptionMessage.FormDataIsNull); 
-
         var userId = userInfo.UserId;
+		if (userId == null)
+			return Result.Fail<FormEvaluationDto>(ConstantKeys.ExceptionMessage.UserNotFound);
 
-        if (userId == null)
-            return Result.Fail<FormEvaluationDto>(ConstantKeys.ExceptionMessage.UserNotFound);
+		var evalForm = await formService.GetEvalForm(formEvaluationDto.Id);
+		if (evalForm == null)
+			return Result.Fail<FormEvaluationDto>("Eval form not found");
 
-        var form = mapper.Map<FormEvaluationValue>(formEvaluationDto);
+		if (evalForm.IsFinalEval &&
+			(formEvaluationDto.EvaluationRequestId == null || formEvaluationDto.EvaluationRequestId == Guid.Empty))
+		{
+			throw new BusinessException(ConstantKeys.ExceptionMessage.InvalidJson);
+		}
+        var form = new FormEvaluationValue();
 
-        var evalForm = await formService.GetEvalForm(formEvaluationDto.Id);
-
-        if (evalForm.IsFinalEval)
-            if(formEvaluationDto.EvaluationRequestId == null || formEvaluationDto.EvaluationRequestId == Guid.Empty)
-                throw new BusinessException(ConstantKeys.ExceptionMessage.InvalidJson);
-
-
-        if (evalForm != null)
+		try
         {
-            if (evalForm.HasOneValue)
-            {
-                foreach (var item in form.Items)
-                {
-                    var formItemsValue = await formService.GetFormItemValue(item.Id);
-                    if (formItemsValue != null)
-                    {
-                        formItemsValue.ActualValue = item.ActualValue;
-                        formItemsValue.Note = item.Note;
-                    }
-                    await formService.UpdateFormItemValue(formItemsValue);
-                }
+		 form = mapper.Map<FormEvaluationValue>(formEvaluationDto);
 
-                foreach (var item in form.SubItems)
-                {
-                    var subFormItemsValue = await formService.GetSubFormItemValue(item.Id);
-                    if (subFormItemsValue != null)
-                    {
-                        subFormItemsValue.FieldDropDownValueId = item.FieldDropDownValueId;
-                        subFormItemsValue.Note = item.Note;
-                    }
-                    await formService.UpdateSubFormItemValue(subFormItemsValue);
-                }
-                await formService.SaveFormItemsAndSubs(form);
-            }
         }
-        else
+        catch (Exception ex)
         {
-            foreach (var item in form.Items)
-            {
-                item.UserId = userId.Value;
-            }
 
-            foreach (var item in form.SubItems)
-            {
-                item.UserId = userId.Value;
-            }
-
-            await formService.SaveFormItemsAndSubs(form);
-
-            if (evalForm.IsFinalEval)
-            {
-                var calculationResult = await CalculateFormResult(formEvaluationDto);
-
-                var evaluationRequest = await _evaluationRequestService.GetEvaluationRequestByIdAsync((Guid)formEvaluationDto.EvaluationRequestId);
-
-                evaluationRequest.FormEvalMatrixValueId = calculationResult.Value.Id;
-                evaluationRequest.EvalDays = calculationResult.Value.NextEvalDays;
-                evaluationRequest.EvaluationDate = DateOnly.Parse(DateTime.Now.ToString());
-                evaluationRequest.NextEvaluationDate = DateOnly.Parse(DateTime.Now.AddDays(calculationResult.Value.NextEvalDays).ToString());
-
-                await _evaluationRequestService.UpdateEvaluationRequest(evaluationRequest);
-
-            }
+            throw;
         }
 
-        return Result.Ok(formEvaluationDto);
-    }
+		if (evalForm.HasOneValue)
+		{
+			foreach (var item in form.Items)
+			{
+				var formItemsValue = await formService.GetFormItemValue(item.Id);
 
-    public async Task<Result<FormEvaluationDto>> UpdateEvaluationForm(FormEvaluationDto formEvaluationDto)
+				if (formItemsValue != null)
+				{
+					formItemsValue.ActualValue = item.ActualValue;
+					formItemsValue.Note = item.Note;
+					formItemsValue.EvaluationRequestId = formEvaluationDto.EvaluationRequestId;
+					formItemsValue.ServiceRequestId = formEvaluationDto.ServiceRequestId;
+
+					uow.GetRepository<FormItemValue>().Update(formItemsValue);
+				}
+				else
+				{
+					item.UserId = userId.Value;
+					item.EvaluationRequestId = formEvaluationDto.EvaluationRequestId;
+					item.ServiceRequestId = formEvaluationDto.ServiceRequestId;
+
+					uow.GetRepository<FormItemValue>().Insert(item);
+				}
+			}
+            if(form.SubItems !=null)
+            {
+				foreach (var item in form.SubItems)
+				{
+					var subFormItemsValue = await formService.GetSubFormItemValue(item.Id);
+
+					if (subFormItemsValue != null)
+					{
+						subFormItemsValue.FieldDropDownValueId = item.FieldDropDownValueId;
+						subFormItemsValue.Note = item.Note;
+
+						uow.GetRepository<SubFormItemValue>().Update(subFormItemsValue);
+					}
+					else
+					{
+						item.UserId = userId.Value;
+
+						uow.GetRepository<SubFormItemValue>().Insert(item);
+					}
+				}
+
+			}
+
+		}
+		else
+		{
+			foreach (var item in form.Items)
+			{
+				item.UserId = userId.Value;
+				item.EvaluationRequestId = formEvaluationDto.EvaluationRequestId;
+				item.ServiceRequestId = formEvaluationDto.ServiceRequestId;
+			}
+
+			foreach (var item in form.SubItems)
+			{
+				item.UserId = userId.Value;
+			}
+
+			await formService.SaveFormItemsAndSubs(form);
+		}
+
+		if (evalForm.IsFinalEval)
+		{
+			var calculationResult = await CalculateFormResult(formEvaluationDto);
+
+			var evaluationRequest =
+				await _evaluationRequestService.GetEvaluationRequestByIdAsync(formEvaluationDto.EvaluationRequestId.Value);
+
+			evaluationRequest.FormEvalMatrixValueId = calculationResult.Value.Id;
+			evaluationRequest.EvalDays = calculationResult.Value.NextEvalDays;
+			evaluationRequest.EvaluationDate = DateOnly.FromDateTime(DateTime.Now);
+			evaluationRequest.NextEvaluationDate =
+				DateOnly.FromDateTime(DateTime.Now.AddDays(calculationResult.Value.NextEvalDays));
+			evaluationRequest.FinalEvalValue = calculationResult.Value.Value;
+
+			uow.GetRepository<EvaluationRequest>().Update(evaluationRequest);
+		}
+
+		return Result.Ok(formEvaluationDto);
+	}
+
+
+	public async Task<Result<FormEvaluationDto>> UpdateEvaluationForm(FormEvaluationDto formEvaluationDto)
     {
         if (formEvaluationDto == null)
             return Result.Fail<FormEvaluationDto>(ConstantKeys.ExceptionMessage.FormDataIsNull);
@@ -308,8 +345,8 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
                 formItemsValue.ActualValue = item.ActualValue;
                 formItemsValue.Note = item.Note;
             }
-            await formService.UpdateFormItemValue(formItemsValue);
-        }
+			uow.GetRepository<FormItemValue>().Update(formItemsValue);
+		}
 
         foreach (var item in form.SubItems)
         {
@@ -319,7 +356,7 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
                 subFormItemsValue.FieldDropDownValueId = item.FieldDropDownValueId;
                 subFormItemsValue.Note = item.Note;
             }
-            await formService.UpdateSubFormItemValue(subFormItemsValue);
+			 uow.GetRepository<SubFormItemValue>().Update(subFormItemsValue);
         }
 
         return Result.Ok(formEvaluationDto);

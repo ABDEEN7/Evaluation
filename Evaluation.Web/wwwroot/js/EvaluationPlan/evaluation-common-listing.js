@@ -5,7 +5,7 @@ let departmentRoutePath = sharedUtility().extractDepartmentName();
 
     function createListing(config) {
         let datatable = null;
-        let isCardView = true;
+        let isCardView = config.enableCardView;
 
         const tableSelector = '#' + config.tableId;
         const $table = $(tableSelector);
@@ -15,7 +15,7 @@ let departmentRoutePath = sharedUtility().extractDepartmentName();
         const $filterBtn = $('#' + (config.filterBtnId || ''));
 
         function applyViewMode() {
-            if (!config.enableCardView) return;
+            //if (!config.enableCardView) return;
 
             const $table = $("#" + config.tableId);
             if (!$table.length) return;
@@ -100,8 +100,8 @@ let departmentRoutePath = sharedUtility().extractDepartmentName();
                 language: {
                     info: uiControlsSetup().GetUiControlText("lblShowingEntries"),
                     paginate: {
-                        previous: `${uiControlsSetup().GetUiControlText("lblprevious")} <i class="fas fa-angle-left"></i>`,
-                        next: `${uiControlsSetup().GetUiControlText("lblnext")} <i class="fas fa-angle-right"></i>`
+                        previous: `السابق <i class="fas fa-angle-left"></i>`,
+                        next: `التالي <i class="fas fa-angle-right"></i>`
                     }
                 },
                 ajax: function (dt, callback) {

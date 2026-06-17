@@ -218,23 +218,33 @@
         box-shadow: rgba(0, 0, 0, 0.05) 0px 5px 15px;
         max-height: 220px;
         overflow-y: scroll;
-        background: transparent !important;
+        background: #fff !important;
+        z-index: 999999999 !important;
     }
-        .application-request.card .requeststableBody .plan-request-card td.process .dropdown-menu a{
-            padding:10px 5px;
+
+        .application-request.card .requeststableBody .plan-request-card td.process .dropdown-menu:hover {
+            max-height: 220px;
+            overflow-y: scroll;
+            background: #fff !important;
+            z-index: 999999999 !important;
         }
-            .application-request.card .requeststableBody .plan-request-card td.process .dropdown-menu a i{
-                color:var(--accent-color)
-            }
+
+    .application-request.card .requeststableBody .plan-request-card td.process .dropdown-menu a {
+        padding: 10px 5px;
+    }
+
+        .application-request.card .requeststableBody .plan-request-card td.process .dropdown-menu a i {
+            color: var(--accent-color)
+        }
 
     .application-request.card .requeststableBody .plan-request-card td.process .dropdown-item:hover i,
     .application-request.card .requeststableBody .plan-request-card td.process .dropdown-item.active:hover i,
     .application-request.card .requeststableBody .plan-request-card td.process .dropdown-item.active i {
-        color: transparent;
+        color: #fff !important;
+        z-index: 9999999999999999;
     }
-    .application-request.card .requeststableBody .plan-request-card td.process .dropdown-menu:hover a#AddNote i,
-    .application-request.card .requeststableBody .plan-request-card td.process .dropdown-menu a#AddNote i
-    .application-request.card .requeststableBody .plan-request-card td.process .dropdown-menuactive a#AddNote i {
+
+    .application-request.card .requeststableBody .plan-request-card td.process .dropdown-menu:hover a#AddNote i, .application-request.card .requeststableBody .plan-request-card td.process .dropdown-menu a#AddNote i .application-request.card .requeststableBody .plan-request-card td.process .dropdown-menuactive a#AddNote i {
         color: #085f5c !important;
     }
     .application-request.card .requeststableBody .plan-request-card td.process .dropdown-menu:hover a#ChangeEmployee i,
@@ -604,7 +614,7 @@ table#requesttable.dataTable thead th.card-img {
 .application-request .requeststableBody .request-status {
     font-size: 0.9rem;
     font-weight: 700;
-    background-color: #D8F4DD;
+    background-color: transparent;
     color: #0E6B32;
     border-radius: 4px;
     display: inline-block;
@@ -612,7 +622,7 @@ table#requesttable.dataTable thead th.card-img {
     overflow: hidden !important;
     text-overflow: ellipsis;
     align-items: center;
-    justify-content: center
+    justify-content: center;
 }
 .table-responsive .application-request .requeststableBody .request-status {
     display: block;
@@ -624,11 +634,12 @@ table#requesttable.dataTable thead th.card-img {
 }
 .application-request.card .requeststableBody .request-status {
     max-width: 100%;
-    width: 100%;
+    width: fit-content !important;
     display: block;
     line-height: 30px;
-    text-align: center;
+    text-align: end;
     font-size: 0.88rem;
+/*    font-size: 16px !important;*/
 }
 .application-request.card .requeststableBody .service-icon {
     width: 30px;

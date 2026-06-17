@@ -76,6 +76,7 @@ namespace Evaluation.Services.BusinessLayer.API.EvaluationRequestLayer
 			var parties = await uow
 				.GetRepository<EvaluationParty>()
 				.GetAllQueryFiltered()
+				.Include(x => x.EvalPartyCategory)
 				.Include(x => x.PartyTypeEvalParties)
 					.ThenInclude(x => x.PartyTypeEvalPartyStatuses)
 				.Where(p =>
@@ -93,6 +94,7 @@ namespace Evaluation.Services.BusinessLayer.API.EvaluationRequestLayer
 				{
 					Id = p.Id,
 					DepartmentId = p.DepartmentId,
+					EvalPartyCategory = p.EvalPartyCategory.BackendName,
 					NameAr = p.NameAr,
 					NameEn = p.NameEn,
 					OrderNo = p.OrderNo,
@@ -177,10 +179,16 @@ namespace Evaluation.Services.BusinessLayer.API.EvaluationRequestLayer
 
 			IQueryable<ServiceRequest> requestsQuery = uow
 				.GetRepository<ServiceRequest>()
+
 				.GetAllActiveNonDeleted(r => r.EvaluationRequestId == evaluationRequestId)
 				.Include(x => x.Status)
 					.ThenInclude(x => x!.ServiceStatusType)
+				.Include(x => x.Status)
+					.ThenInclude(x => x!.StatusPreventPartyTypes)
 				.Include(x => x.Service)
+					.ThenInclude(x => x!.RequestShowPartyType)
+	            .Include(x => x.EvaluationRequest)
+					.ThenInclude(x => x!.EvaluationRequestAssignments)
 				.Include(x => x.CreateBy);
 
 			requestsQuery = await requestAccessService.ApplyServiceRequestAccess(requestsQuery);

@@ -145,6 +145,7 @@ namespace Evaluation.Services.Models.Admin
                     TitleAr = g.TitleAr,
                     TitleEn = g.TitleEn,
                     FieldTypeId=g.FieldTypeId,
+                    FieldInfoTypeId = g.FieldInfoTypeId,
                     FieldType= _requestInfo.Lang == "ar" ? g.FieldType!.NameAr : g.FieldType!.NameEn,
                     Type = g.FieldType.BackendName,
                     Title = _requestInfo.Lang == "ar" ? g.TitleAr : g.TitleEn,
@@ -391,6 +392,21 @@ namespace Evaluation.Services.Models.Admin
                     .OrderByDescending(x => x.CreateDate)
                     .ToListAsync();
             var result = mapper.Map<List<FieldTypeDTO>>(rslt);
+
+            return result;
+
+
+        }
+        public async Task<List<FieldInfoTypeDTO>> GetAllFieldInfoTypes()
+        {
+            var mapper = await CreateMapperForAdmin<FieldInfoType, FieldInfoTypeDTO>();
+
+
+            var rslt = await uow.GetRepository<FieldInfoType>()
+                    .GetAllNonDeleted()
+                    .OrderByDescending(x => x.CreateDate)
+                    .ToListAsync();
+            var result = mapper.Map<List<FieldInfoTypeDTO>>(rslt);
 
             return result;
 
@@ -959,6 +975,7 @@ namespace Evaluation.Services.Models.Admin
                 obj.Description = message.Description;
                 obj.DropDownParentFieldId = message.DropDownParentFieldId;
                 obj.FieldTypeId = message.FieldTypeId;
+                obj.FieldInfoTypeId = message.FieldInfoTypeId;
                 obj.DropDownTypeId = message.DropDownTypeId;
                 obj.IsActive = message.IsActive;
                 obj.ReadFieldId = message.ReadFieldId;
@@ -1040,6 +1057,7 @@ namespace Evaluation.Services.Models.Admin
                     obj.Description = message.Description;
                     obj.DropDownParentFieldId = message.DropDownParentFieldId;
                     obj.FieldTypeId = message.FieldTypeId;
+                    obj.FieldInfoTypeId = message.FieldInfoTypeId;
                     obj.DropDownTypeId = message.DropDownTypeId;
 
                     obj.ReadFieldId = message.ReadFieldId;

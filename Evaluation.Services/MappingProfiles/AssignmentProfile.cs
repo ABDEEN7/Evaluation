@@ -2,6 +2,7 @@
 using Evaluation.DAL.Models.Planing.TeamsModule;
 using Evaluation.DAL.Models.UserEntiy;
 using Evaluation.SharedHelper.Consts;
+using Evaluation.SharedHelper.Dtos.OrgDto;
 using Evaluation.SharedHelper.Dtos.TeamMemberDto;
 using Evaluation.SharedHelper.Models;
 
@@ -15,16 +16,22 @@ public class AssignmentProfile : Profile
             ForMember(x => x.Name, opt => opt.MapFrom(src => src.NameEn)).
             ReverseMap();
 
-        CreateMap<MinistryUser, AssignmentDto>()
-           .ForMember(x => x.Name, opt =>
-               opt.MapFrom<TeamResolver, Guid>(src => src.Id))
-           .ForMember(x => x.JobTitle, opt =>
-               opt.MapFrom<JobTitleResolver, Guid>(src => src.Id))
-           .ForMember(x => x.UserPartyTypes, opt =>
-               opt.MapFrom(src => src.UserPartTypes))
-           .ReverseMap();
-
-        CreateMap<UserPartyType, UserPartyTypeDto>()
+		CreateMap<MinistryUser, AssignmentDto>()
+		.ForMember(x => x.Name,
+			opt => opt.MapFrom<TeamResolver, Guid>(src => src.Id))
+		.ForMember(x => x.JobTitle,
+			opt => opt.MapFrom<JobTitleResolver, Guid>(src => src.Id))
+		.ForMember(x => x.UserPartyTypes,
+			opt => opt.MapFrom(src => src.UserPartTypes))
+		.ForMember(x => x.ScopeIds,
+			opt => opt.MapFrom(src =>
+				src.UserTeams!
+					.SelectMany(ut => ut.UserTeamScope)
+					.Select(uts => uts.ScopeId)
+					.Distinct()
+			))
+		.ReverseMap();
+		CreateMap<UserPartyType, UserPartyTypeDto>()
             .ReverseMap();
 
         CreateMap<PartyType, PartyTypeDto>()
@@ -101,3 +108,4 @@ public class JobTitleResolver : IMemberValueResolver<MinistryUser, AssignmentDto
         );
     }
 }
+

@@ -140,7 +140,7 @@ namespace Evaluation.Services.Models.Admin
                     throw new BusinessException(ConstantKeys.ExceptionMessage.ScopeExistsScopeAcademicYear);
                 }
 
-                var AcademicYearScope = await uow.GetRepository<AcademicYearScope>()
+                var AcademicYearScope = await uow.GetRepository<ScopeAcademicYear>()
 .GetAllNonDeleted()
                       .Where(x => x.ScopeId == obj.Id)
                       .ToListAsync();

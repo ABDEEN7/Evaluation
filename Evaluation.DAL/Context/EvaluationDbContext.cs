@@ -11,6 +11,7 @@ using Evaluation.DAL.Models.FormsModules;
 using Evaluation.DAL.Models.IntegrationEntity;
 using Evaluation.DAL.Models.Master;
 using Evaluation.DAL.Models.Org;
+using Evaluation.DAL.Models.OutputAnalysis;
 using Evaluation.DAL.Models.PermissionEntity;
 using Evaluation.DAL.Models.Planing;
 using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
@@ -129,6 +130,18 @@ public partial class EvaluationDbContext : DbContext
     public virtual DbSet<FieldInfoType> FieldInfoType { get; set; }
     public virtual DbSet<IntegrationPointLog> IntegrationPointLog { get; set; }
     public virtual DbSet<IntegrationPointDataLog> IntegrationPointDataLog { get; set; }
+    public virtual DbSet<SchoolStatus> SchoolStatus { get; set; }
+    public virtual DbSet<SchoolModel> SchoolModel { get; set; }
+    public virtual DbSet<SchoolGender> SchoolGender { get; set; }
+    public virtual DbSet<SchoolGrade> SchoolGrade { get; set; }
+    public virtual DbSet<SchoolGradeSection> SchoolGradeSction { get; set; }
+    public virtual DbSet<SchoolGradeSectionCourse> SchoolGradeSectionCourse { get; set; }
+    public virtual DbSet<SchoolProgram> SchoolProgram { get; set; }
+    public virtual DbSet<EvalPartyCategory> EvalPartyCategory { get; set; }
+    public virtual DbSet<QnedsIntegration> QnedsIntegration { get; set; }
+    public virtual DbSet<AnalysisType> AnalysisType { get; set; }
+    public virtual DbSet<OutputAnalysisData> OutputAnalysisData { get; set; }
+    public virtual DbSet<OutputAnalysisFinalResult> OutputAnalysisFinalResult { get; set; }
 
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

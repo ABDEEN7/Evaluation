@@ -209,6 +209,12 @@ public static class ConstantKeys
         public static readonly string UserNotExsistInThisEvaluationRequest = "UserNotExsistInThisEvaluationRequest";
         public static readonly string UnsupportedDepartmentCategory = "UnsupportedDepartmentCategory";
         public static readonly string lblNoPartyTypeFound = "lblNoPartyTypeFound";
+        public static readonly string NoEvaluationRequestsFoundForTheSelectedUser = "NoEvaluationRequestsFoundForTheSelectedUser";
+        public static readonly string NoneOfTheSelectedEvaluationRequestsWereFoundForThisUser = "NoneOfTheSelectedEvaluationRequestsWereFoundForThisUser";
+        public static readonly string UnExpectedException = "UnExpectedException";
+        public static readonly string NoEvaluationRequestsWereSelected = "NoEvaluationRequestsWereSelected";
+        public static readonly string CannotDeletePlanInProcess = "CannotDeletePlanInProcess";
+        public static readonly string EvaluationPartyRequriedDDL = "EvaluationPartyRequriedDDL";
     }
 
     public static class AdminSettings
@@ -299,6 +305,7 @@ public static class ConstantKeys
         public static readonly string EXPANDALL = "EXPANDALL";
         public static readonly string COLLAPSEALL = "COLLAPSEALL";
         public static readonly string lblDepartment = "lblDepartment";
+        public static readonly string SELECTALLACTIVE = "SELECTALLACTIVE";
     }
 
     public static class AdminPages
@@ -370,6 +377,7 @@ public static class ConstantKeys
         public static readonly string AdminPartyTypeEvalPartyStatus = "AdminPartyTypeEvalPartyStatus";
         public static readonly string AdminServiceStatusConfiguration = "AdminServiceStatusConfiguration";
     }
+
     public static class WebAppPages
     {
         public static readonly string WebEvaluationForm = "WebEvaluationForm";
@@ -382,6 +390,19 @@ public static class ConstantKeys
         public static readonly string AssignmentUserTeam = "AssignmentUserTeam";
         public static readonly string EducationalEntitiesDescription = "EducationalEntitiesDescription";
         public static readonly string FormEducationalEntitiesTitle = "FormEducationalEntitiesTitle";
+        public static readonly string ReassignAssignment = "WebReassignAssignment";
+    }
+
+    public static class WebAppOrgDetails
+    {
+        public static readonly string lblOrgDetailsCurrentEvaluation = "lblOrgDetailsCurrentEvaluation";
+        public static readonly string lblOrgDetailsCurrentSituation = "lblOrgDetailsCurrentSituation";
+        public static readonly string lblOrgDetailsLastEvaluation = "lblOrgDetailsLastEvaluation";
+        public static readonly string lblOrgDetailsInProgressEvaluation = "lblOrgDetailsInProgressEvaluation";
+        public static readonly string lblOrgDetailsBasicInformation = "lblOrgDetailsBasicInformation";
+        public static readonly string lblOrgDetailsManager = "lblOrgDetailsManager";
+        public static readonly string lblOrgDetailsEstablishmentDate = "lblOrgDetailsEstablishmentDate";
+        public static readonly string lblOrgDetailsLevels= "lblOrgDetailsLevels";
     }
     public static class WebAppRequest
     {
@@ -430,7 +451,16 @@ public static class ConstantKeys
         public static readonly string lblInvalidFileExtension = "lblInvalidFileExtension";
         public static readonly string lblCloseModal = "lblCloseModal";
         public static readonly string lblEvaluationFileScope = "lblEvaluationFileScope";
+        public static readonly string lblFormAnalysis = "lblFormAnalysis";
         public static readonly string lblEvaluationFileHeader = "lblEvaluationFileHeader";
+        public static readonly string lblRequestNumber = "lblRequestNumber";
+        public static readonly string lblSchoolEvalRequests = "lblSchoolEvalRequests";
+        public static readonly string lblFromDate = "lblFromDate";
+        public static readonly string lblToDate = "lblToDate";
+        public static readonly string lblEvaluationDate = "lblEvaluationDate";
+        public static readonly string lblNextEvaluationDate = "lblNextEvaluationDate";
+        public static readonly string lblEvaluationResult = "lblEvaluationResult";
+        public static readonly string lblStatus = "lblStatus";
     }
 
     public static class AdminPermission
@@ -985,6 +1015,9 @@ public static class ConstantKeys
         public const string GET_FORM_ITEMS = "GET_FORM_ITEMS";
         public const string SAVE_EVALUATION_FORM = "SAVE_EVALUATION_FORM";
         public const string UPDATE_EVALUATION_FORM = "UPDATE_EVALUATION_FORM";
+        public const string RENAME_EVALUATION_FORM = "RENAME_EVALUATION_FORM";
+        public const string VALIDATE_EVALUATION_FORM = "VALIDATE_EVALUATION_FORM";
+        public const string CALCULATE_EVALUATION_FORM = "CALCULATE_EVALUATION_FORM";
 
         #region EVALFORMS
 
@@ -1056,9 +1089,26 @@ public static class ConstantKeys
         public const string VIEW_WEB_PLAN = "VIEW_WEB_PLAN";
         public const string DELETE_WEB_PLAN = "DELETE_WEB_PLAN";
         #endregion
+        #region Reassign
+        public const string VIEW_WEB_ReassignAssignment = "VIEW_WEB_ReassignAssignment";
+        public const string ADD_WEB_ReassignAssignment = "ADD_WEB_ReassignAssignment";
+        public const string EDIT_WEB_ReassignAssignment = "EDIT_WEB_ReassignAssignment";
+        public const string DELETE_WEB_ReassignAssignment = "DELETE_WEB_ReassignAssignment";
+        #endregion
+
+        #region EvaluationRequest
+        public const string VIEW_EVALUATION_REQUEST = "VIEW_EVALUATION_REQUEST";
+        public const string VIEW_EVALUATION_REQUEST_FormAnalysis = "VIEW_EVALUATION_REQUEST_FormAnalysis";
+        public const string UPDATE_EVALUATION_REQUEST = "UPDATE_EVALUATION_REQUEST";
+        #endregion
+
+        #region School
+        public const string VIEW_WEB_SCHOOL = "VIEW_WEB_SCHOOL";
+        #endregion
     }
     public static class WebAppSettings
     {
+        public static readonly string PAGE_SIZE_FOR_SCHOOL_EVALUATION_REQUESTS = "PageSizeForSchoolEvaluationRequests";
         public static readonly string PAGE_SIZE = "PAGE_SIZE";
         public static readonly string DefaultWebsiteBannerImage = "DefaultWebsiteBannerImage";
     }
@@ -1272,6 +1322,55 @@ public static class ConstantKeys
         public const string TableView = Prefix + nameof(TableView);
         public const string All = Prefix + nameof(All);
     }
+    public static class ReassignAssignment
+    {
+        // Page Header
+        public const string ReassignAssignmentTitle = "ReassignAssignmentTitle";
+        public const string ReassignAssignmentSubTitle = "ReassignAssignmentSubTitle";
+
+        // Sections
+        public const string SelectUsersSectionTitle = "SelectUsersSectionTitle";
+        public const string AssignmentsTableTitle = "AssignmentsTableTitle";
+
+        // Labels
+        public const string FromUserLabel = "FromUserLabel";
+        public const string ToUserLabel = "ToUserLabel";
+
+        // Placeholders
+        public const string SelectUserPlaceholder = "SelectUserPlaceholder";
+
+        // Buttons
+        public const string LoadButton = "LoadButton";
+        public const string SelectAllButton = "SelectAllButton";
+        public const string ClearAllButton = "ClearAllButton";
+        public const string ResetButton = "ResetButton";
+        public const string SaveReassignButton = "SaveReassignButton";
+
+        // Table Headers
+        public const string RowNumberHeader = "RowNumberHeader";
+        public const string RequestNumberHeader = "RequestNumberHeader";
+        public const string ServiceNameArHeader = "ServiceNameArHeader";
+        public const string ServiceNameEnHeader = "ServiceNameEnHeader";
+
+        // Selection Info
+        public const string SelectedCountText = "SelectedCountText";
+        public const string TotalCountText = "TotalCountText";
+
+        // Messages
+        public const string NoAssignmentsMessage = "NoAssignmentsMessage";
+        public const string ReassignSuccessMessage = "ReassignSuccessMessage";
+        public const string ReassignFailedMessage = "ReassignFailedMessage";
+        public const string ConfirmReassignMessage = "ConfirmReassignMessage";
+
+        // Validation Messages
+        public const string FromUserRequiredMessage = "FromUserRequiredMessage";
+        public const string ToUserRequiredMessage = "ToUserRequiredMessage";
+        public const string SelectAssignmentRequiredMessage = "SelectAssignmentRequiredMessage";
+
+        // Loading
+        public const string LoadingMessage = "LoadingMessage";
+        public const string SavingMessage = "SavingMessage";
+    }
     public static class EvaluationPlans
     {
         private const string Prefix = "lblEvaluationPlans";
@@ -1303,7 +1402,7 @@ public static class ConstantKeys
         public const string PageDescription = Prefix + "PageDescription";
 
         public const string TabEvaluationPlans = Prefix + "TabEvaluationPlans";
-        public const string TabEvaluationOperations = Prefix + "TabEvaluationOperations";
+        public const string TabEvaluationOperations = "TabEvaluationOperations";
         public const string TabSchools = Prefix + "TabSchools";
 
         public const string SubTabPlanRequests = Prefix + "SubTabPlanRequests";
@@ -1375,8 +1474,8 @@ public static class ConstantKeys
 
     public static class LanguageConst
     {
-        public static readonly string En = "En";
-        public static readonly string Ar = "Ar";
+        public static readonly string En = "en";
+        public static readonly string Ar = "ar";
     }
 
     public static class SystemSettings
@@ -1486,7 +1585,11 @@ public static class ConstantKeys
 		public const string VisitDateTo = "VisitDateTo";
 		public const string VisitName = "VisitName";
 
-
+		public const string EducationLevel = "EducationLevel";
+		public const string GradeLevel = "GradeLevel";
+		public const string SchoolGradeSection = "SchoolGradeSection";
+		public const string SchoolCourse = "SchoolCourse";
+		public const string Teacher = "Teacher";
 	}
 	public static class ServiceSettings
     {
@@ -1603,4 +1706,28 @@ public static class ConstantKeys
         public static readonly Guid UPDATE = Guid.Parse("550e8400-e29b-41d4-a716-446655440004");
         public static readonly Guid REQUESTMISSING = Guid.Parse("550e8400-e29b-41d4-a716-446655440005");
     }
+    public static class ServiceStatusTypeBackend
+    {
+        public static string Open = "Open";
+        public static string Completed = "Completed";
+        public static string Closed = "Closed";
+    }
+     public static class SystemModuleBackend
+	{
+        public static string EvaluationRequest = "EvaluationRequest";
+    }
+    public static class SystemModuleTypeBackend
+	{
+        public static string EvaluationParty = "EvaluationParty";
+        public static string EvaluationPlan = "EvaluationPlan";
+        public static string EvaluationRequest = "EvaluationRequest";
+    }
+    public static class SystemModuleRouting
+	{
+        public static string EvaluationParty = "/evaluation-party";
+        public static string EvaluationPlan = "/evaluation-plan";
+        public static string EvaluationRequest = "/evaluation-plan-request";
+    }
+
+  
 }

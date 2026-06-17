@@ -4,6 +4,8 @@ public class OrgDetailsDto
 {
     public Guid Id { get; set; }
     public string Name { get; set; }
+    public string NameAr { get; set; }
+    public string NameEn { get; set; }
 
     ///School Info
     public string? TeachersCount { get; set; }
@@ -27,6 +29,12 @@ public class OrgDetailsDto
     public string? OrgEmail { get; set; }
     public string? Address { get; set; }
     public string? Phone { get; set; }
-    public string? Mobile { get; set; }
+    public string? CurrentEvaluationResult { get; set; }
+    public string? CurrentEvaluationDate { get; set; }
+	public string? LastEvaluationResult { get; set; }
+	public string? LastEvaluationDate { get; set; }
+
+	public string? LastEvaluationResult2 { get; set; }
+	public string? LastEvaluationDate2 { get; set; }
 
 }

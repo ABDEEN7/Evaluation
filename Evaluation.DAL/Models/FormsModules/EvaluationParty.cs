@@ -6,6 +6,8 @@ namespace Evaluation.DAL.Models.FormsModules;
 
 public class EvaluationParty : EntityBase, IAuditLogEntity
 {
+    public Guid EvalPartyCategoryId { get; set; }
+    public EvalPartyCategory? EvalPartyCategory { get; set; }
     public Guid DepartmentId { get; set; }
     public Department? Department { get; set; }
     public string NameAr { get; set; } = null!;

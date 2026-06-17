@@ -13,5 +13,5 @@ public class PartyTypeDTO : EntityBaseDTO
     public Guid DepartmentId { get; set; }
     public string? Department { get; set; }
     public Guid[]? UserPartyType { get; set; }
-
+    public bool CanViewAllPlan { get; set; }
 }

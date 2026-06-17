@@ -10,6 +10,7 @@
 <link href="~/vendor/flatpickr/css/style.css" rel="stylesheet" />
 <!-- Custom CSS -->
 <link href="~/plan-assets/css/style.css" rel="stylesheet">
+<link href="~/plan-assets/css/form-template.css" rel="stylesheet">
 <link href="~/lib/tabulator/css/tabulator.min.css" rel="stylesheet" />
 <link href="~/lib/tabulator/css/tabulator.css" rel="stylesheet" />
 <link href="~/lib/jstree/3.3.12/themes/default/style.min.css" rel="stylesheet" />
@@ -39,6 +40,10 @@
                     <li id="tabEvaluationOperations" class="nav-item col-md-4">
                         <a class="nav-link fs-6 text-center" data-bs-toggle="tab" href="#tab-operations">
                             <span class="my-1 @ConstantKeys.EvaluationForm.TabEvaluationOperations"></span>
+                            <span id="evaluationOperationsCount" class="badge ms-2"
+                                  style="background:#89153D;color:#fff;border-radius:20px;padding:2px 8px;font-size:11px;display:none;">
+                                0
+                            </span>
                         </a>
                     </li>
                     <li id="tabSchools" class="nav-item col-md-4">
@@ -93,30 +98,59 @@
 <div class="modal fade" id="evaluationRequestDetailsModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-fullscreen modal-dialog-scrollable">
         <div class="modal-content">
-            <div class="modal-header align-items-start border-0 justify-content-between">
-                <div>
-                    <h4 class="fw-bold m-0" id="breadcrumbSchoolName"></h4>
-                    <nav aria-label="breadcrumb">
-                        <ol class="breadcrumb">
-                            <li class="breadcrumb-item">
-                                <a href="#" id="evaluationRequeststatus"
-                                   class="@ConstantKeys.EvaluationForm.BreadcrumbSchool"></a>
-                            </li>
-                            <li class="breadcrumb-item active" aria-current="page">
-                                <span class="@ConstantKeys.EvaluationForm.BreadcrumbRequestNo"></span>
-                                <strong id="evaluationRequestNoText"></strong>
-                            </li>
-                        </ol>
-                    </nav>
+            <div class="modal-header align-items-center border-0 justify-content-between py-0 px-0"
+                 style="background:#6B1E35; direction:rtl;">
+
+                <div class="d-flex align-items-center px-4 py-3" style="flex:1; min-width:0;">
+                    <h4 class="fw-bold m-0 text-white text-truncate fs-18"
+                        id="breadcrumbSchoolName"></h4>
                 </div>
-                <div class="d-flex justify-content-end align-items-center gap-3">
+
+                <div class="d-flex justify-content-end align-items-center gap-2 px-4 py-3 flex-shrink-0">
                     <div class="dropdown" id="actions-container"></div>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
-                        <i class="la la-close mt-1"></i>
+
+                    <button type="button"
+                            class="btn btn-sm d-flex align-items-center gap-1"
+                            data-bs-dismiss="modal"
+                            aria-label="Close"
+                            style="background:rgba(255,255,255,0.12); color:#fff;
+                       border:1px solid rgba(255,255,255,0.28);
+                       border-radius:7px; font-family:Tajawal,sans-serif;
+                       font-size:13px; font-weight:500;">
+                        <i class="la la-close fs-14"></i>
+                        <span class="close-text">إغلاق</span>
                     </button>
                 </div>
             </div>
 
+            <div class="d-flex align-items-center justify-content-between flex-wrap px-4 py-2 gap-3"
+                 style="background:#fff; border-top:2px solid #6B1E35;
+            border-bottom:1px solid rgba(0,0,0,0.08); direction:rtl;">
+
+                <nav aria-label="breadcrumb" class="m-0">
+                    <ol class="breadcrumb m-0" style="font-family:Tajawal,sans-serif;">
+                        <li class="breadcrumb-item">
+                            <a href="#"
+                               id="evaluationRequeststatus"
+                               class="@ConstantKeys.EvaluationForm.BreadcrumbSchool"
+                               style="color:#6B1E35; font-size:13px; font-weight:500; text-decoration:none;">
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item active d-flex align-items-center gap-1"
+                            aria-current="page"
+                            style="font-size:13px;">
+                            <span class="@ConstantKeys.EvaluationForm.BreadcrumbRequestNo"
+                                  style="color:#6c757d;"></span>
+                            <strong id="evaluationRequestNo"
+                                    style="color:#212529;"></strong>
+                        </li>
+                    </ol>
+                </nav>
+
+                <div id="evaluationDateRangeContainer"
+                     class="d-flex align-items-center gap-2 flex-wrap">
+                </div>
+            </div>
             <div class="modal-body py-0">
                 <div class="card card-table mb-4">
                     <div class="card-body">
@@ -234,7 +268,9 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title @ConstantKeys.EvaluationForm.PlanDetailsTitle" id="PlanDetailsModalLabel"></h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="la la-close me-1 fs-14"></i><span class="close-text">Close</span>
+                </button>
             </div>
             <div class="modal-body"></div>
             <div class="modal-footer">
@@ -273,20 +309,22 @@
                 <div class="d-flex justify-content-end align-items-center gap-3">
                     <h5 class="fw-semibold m-0" id="planRequestModalSubTitle"></h5>
                     <div class="dropdown" id="plan-actions-container"></div>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
-                        <i class="la la-close mt-1"></i>
+
+
+                    <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal" aria-label="Close">
+                        <i class="la la-close me-1 fs-14"></i><span class="close-text">Close</span>
                     </button>
                 </div>
             </div>
             <div class="modal-body py-0">
                 <div class="card card-table mb-4">
                     <div class="card-body">
-                        <div class="mb-4">
+                        <div>
                             <div class="divNotes" id="divNotes"></div>
                             <div class="divTemplates" id="plan-divTemplates"></div>
                         </div>
                         <div class="accordion" id="planRequestViewAccordion">
-                            <div class="accordion-item mb-3 rounded">
+                            <div class="accordion-item mb-3 pb-3 rounded">
                                 <h2 class="accordion-header" id="planRequestHeadingDetails">
                                     <button class="accordion-button d-flex align-items-center justify-content-between"
                                             type="button" data-bs-toggle="collapse"
@@ -358,8 +396,9 @@
                 <div class="d-flex justify-content-end align-items-center gap-3">
                     <h5 class="fw-semibold m-0" id="RequestModalSubTitle"></h5>
                     <div class="dropdown" id="Request-actions-container"></div>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
-                        <i class="la la-close mt-1"></i>
+
+                    <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal" aria-label="Close">
+                        <i class="la la-close me-1 fs-14"></i><span class="close-text">Close</span>
                     </button>
                 </div>
             </div>
@@ -421,8 +460,9 @@
         <div class="modal-content">
             <div class="modal-header align-items-start border-0">
                 <h4 class="modal-title fw-semibold mb-2" id="ActionModalTitle"></h4>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
-                    <i class="la la-close mt-1"></i>
+
+                <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="la la-close me-1 fs-14"></i><span class="close-text">Close</span>
                 </button>
             </div>
             <div class="modal-body py-0">
@@ -436,7 +476,7 @@
                                 <div class="row">
                                     <div class="col-12">
                                         <div id="progress-container"></div>
-                                        <div class="accordion mt-4" id="actionAccordion">
+                                        <div class="accordion" id="actionAccordion">
                                             <div id="Action-container-fields"></div>
                                         </div>
                                     </div>
@@ -472,8 +512,13 @@
         <div class="modal-content">
             <div class="modal-header align-items-start border-0">
                 <div>
-                    <h4 class="modal-title fw-semibold mb-2 @ConstantKeys.EvaluationForm.CreateRequestTitle"
-                        id="CreateRequestModalLabel"></h4>
+                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                        <h4 class="modal-title fw-semibold mb-0 @ConstantKeys.EvaluationForm.CreateRequestTitle"
+                            id="CreateRequestModalLabel"></h4>
+
+                        <h4 class="modal-title fw-semibold mb-0"
+                            id="CreateRequestServiceNameLabel"></h4>
+                    </div>
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb">
                             <li class="breadcrumb-item">
@@ -485,8 +530,9 @@
                         </ol>
                     </nav>
                 </div>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
-                    <i class="la la-close mt-1"></i>
+
+                <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="la la-close me-1 fs-14"></i><span class="close-text">Close</span>
                 </button>
             </div>
             <div class="modal-body py-0">
@@ -522,7 +568,9 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title @ConstantKeys.WebAppRequest.actionTransactionsdetailsLabel" id="actionTransactionsdetailsLabel"></h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="la la-close me-1 fs-14"></i><span class="close-text">Close</span>
+                </button>
             </div>
             <div class="modal-body">
 
@@ -543,7 +591,9 @@
                 <h5 class="modal-title @ConstantKeys.WebAppRequest.lblEvaluationFileHeader"
                     id="EvaluationfileLabel">
                 </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="la la-close me-1 fs-14"></i><span class="close-text">Close</span>
+                </button>
             </div>
             <div class="modal-body">
                 <div class="row mb-2">
@@ -564,7 +614,47 @@
     </div>
 </div>
 <partial name="_PartialFileModal" />
+<div class="modal fade" id="FormAnalysisModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen">
+        <div class="modal-content">
 
+            <div class="modal-header" style="background:#97133f;color:#fff">
+                <h5 class="modal-title">
+                    <i class="las la-chart-bar @ConstantKeys.WebAppRequest.lblFormAnalysis"></i>
+                </h5>
+
+                <button type="button"
+                        class="btn-close btn-close-white"
+                        data-bs-dismiss="modal">
+                </button>
+            </div>
+
+            <div class="modal-body p-0" style="background:#f5f5f5">
+                <div id="FormAnalysisContainer"></div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="CriteriaDetailsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header" style="background:#97133f;color:#fff">
+                <h5 class="modal-title" id="CriteriaDetailsTitle"></h5>
+
+                <button type="button"
+                        class="btn-close btn-close-white"
+                        data-bs-dismiss="modal">
+                </button>
+            </div>
+
+            <div class="modal-body" id="CriteriaDetailsBody"></div>
+
+        </div>
+    </div>
+</div>
 
 @section Scripts {
     <!-- Tables -->
@@ -593,6 +683,7 @@
     <script src="~/js/evaluationplan/evaluation-operations-listing.js"></script>
     <script src="~/js/evaluationplan/evaluation-plan-requests-listing.js"></script>
 
+    <script src="~/js/form-generation-util/form-analysis-modal.js"></script>
 
     <!-- Form Generation -->
     <script src="/js/form-generation-util/form.constants.js"></script>
@@ -642,7 +733,9 @@
                     '@nameof(ConstantKeys.EvaluationDetailsModal)',
                     '@nameof(ConstantKeys.EvaluationForm)',
                     '@nameof(ConstantKeys.WebSchools)',
-                    '@nameof(ConstantKeys.Assignment)'
+                    '@nameof(ConstantKeys.Assignment)',
+                    '@nameof(ConstantKeys.WebAppOrgDetails)',
+
                 ],
                 pages: [
                     '@nameof(ConstantKeys.WebAppCommon)',
@@ -650,73 +743,76 @@
                     '@nameof(ConstantKeys.EvaluationOperations)'
                 ]
             }).then((result) => {
-                permissionsList = result.permissionsList;
+                 permissionsList = result.permissionsList;
+                 IsCanUpdatePlan = permissionsList?.some(p =>p === '@ConstantKeys.WebPermissions.EDIT_WEB_PLAN') ?? false;
 
-                IsCanUpdatePlan = permissionsList?.some(p =>
-                    p === '@ConstantKeys.WebPermissions.EDIT_WEB_PLAN'
-                ) ?? false;
-
-                uiControlsSetup().UpdatPageTitle('WebAppScholarship');
+                 uiControlsSetup().UpdatPageTitle('WebAppScholarship');
                  InitNavbarSection();
-                $('body').show();
-            });
+                 $('body').show();
 
-            if (!sharedUtility().ExistingToken()) {
-                sharedUtility().RedirectUnauthorized();
-                return;
-            }
+                if (!sharedUtility().ExistingToken()) {
+                        sharedUtility().RedirectUnauthorized();
+                        return;
+                    }
+
+              });
 
             window.formUtility = window.formUtility || {};
 
             const searchParams = new URLSearchParams(window.location.search);
-           
-            const reqId = searchParams.get('id');
+            const reqId     = searchParams.get('id');
             const serviceId = searchParams.get('serviceId');
-            const EvlId = searchParams.get('Evlid');
-            const planId = searchParams.get('planId');
-            const SerReqid = searchParams.get('SerReqid');
+            const EvlId     = searchParams.get('Evlid');
+            const planId    = searchParams.get('planId');
+            const SerReqid  = searchParams.get('SerReqid');
 
-            if (reqId) {
-                openPlanRequestDetails(reqId);
-            }
+            const hasDeepLink = reqId || EvlId || SerReqid || planId;
 
-            if (EvlId) {
-                openEvaluationRequestDetails(EvlId);
-            }
-
-            if (SerReqid) {
-                openRequestDetails(SerReqid);
-            }
-
-            if (planId) {
-                if (IsCanUpdatePlan) {
-                    InitializeCreatePlanRequestService(serviceId, planId);
-                } else {
-                    InitializePlanDetails(planId);
+            if (hasDeepLink) {
+                if (reqId)     openPlanRequestDetails(reqId);
+                if (EvlId)     openEvaluationRequestDetails(EvlId);
+                if (SerReqid)  openRequestDetails(SerReqid);
+                if (planId) {
+                    if (IsCanUpdatePlan) {
+                        InitializeCreatePlanRequestService(serviceId, planId);
+                    } else {
+                        InitializePlanDetails(planId);
+                    }
                 }
+
+                $('#evaluationRequestDetailsModal, #planRequestModal, #RequestModal, #PlanDetailsModal')
+                    .one('shown.bs.modal', function () {
+                        loadAllListings();
+                    });
+
+            } else {
+                loadAllListings();
             }
 
             $('#evaluationRequestDetailsModal').on('hidden.bs.modal', function () {
                 formUtility.removeQueryParameter(['Evlid', 'serviceId']);
             });
-
             $('#planRequestModal').on('hidden.bs.modal', function () {
                 formUtility.removeQueryParameter(['id', 'serviceId']);
             });
-
             $('#RequestModal').on('hidden.bs.modal', function () {
                 formUtility.removeQueryParameter(['SerReqid', 'serviceId']);
             });
-
             $('#PlanDetailsModal').on('hidden.bs.modal', function () {
                 formUtility.removeQueryParameter(['planId', 'serviceId']);
             });
 
             await LoadUserDetails();
-           toggleAddEvaluationPlanRequestButton();
-            //GetScopes();
+            toggleAddEvaluationPlanRequestButton();
             CheckAndResumeSessionTimer();
         });
+
+         function loadAllListings() {
+            if (typeof plansListing !== 'undefined')                plansListing.reload();  
+            if (typeof schoolsListing !== 'undefined')              schoolsListing.reload();        
+            if (typeof evaluationRequestsListing !== 'undefined')   evaluationRequestsListing.reload(); 
+            if (typeof planRequestsListing !== 'undefined')         planRequestsListing.reload();    
+        }
     </script>
 
 

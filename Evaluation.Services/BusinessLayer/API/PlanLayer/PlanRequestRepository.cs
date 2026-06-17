@@ -37,6 +37,7 @@ public class PlanRequestRepository(IServiceScopeFactory serviceScopeFactory, Srv
 
     public async Task GetPlanEvaluationWithSchools(Guid planId)
     {
+        var lang = requestInfo.Lang;
         var planQuery =
             unitOfWork
             .GetRepository<Plan>()
@@ -61,21 +62,17 @@ public class PlanRequestRepository(IServiceScopeFactory serviceScopeFactory, Srv
                 Schools = schoolsQuery.Select(s => new SchoolEvaluationEditDto
                 {
                     SchoolId = s.Id,
-                    SchoolName = s.NameEn, // or NameAr by culture
-
+                    SchoolName = lang=="ar"? s.NameAr:s.NameEn, 
                     IsSelected = p.EvaluationRequests!
                         .Any(er => er.OrgTreeId == s.Id),
-
                     DepEvaluationTypeId = p.EvaluationRequests!
                         .Where(er => er.OrgTreeId == s.Id)
                         .Select(er => (Guid?)er.DepEvaluationTypeId)
                         .FirstOrDefault(),
-
                     FromDate = p.EvaluationRequests!
                         .Where(er => er.OrgTreeId == s.Id)
                         .Select(er => (DateTime?)er.FromDate)
                         .FirstOrDefault(),
-
                     ToDate = p.EvaluationRequests!
                         .Where(er => er.OrgTreeId == s.Id)
                         .Select(er => (DateTime?)er.ToDate)
@@ -89,9 +86,9 @@ public class PlanRequestRepository(IServiceScopeFactory serviceScopeFactory, Srv
     {
         var planRepo = unitOfWork.GetRepository<Plan>();
         var schoolRepo = unitOfWork.GetRepository<School>();
-
-        // Query 1: Get the plan with evaluation requests
-        var plan = await planRepo
+		var lang = requestInfo.Lang;
+		// Query 1: Get the plan with evaluation requests
+		var plan = await planRepo
             .GetAllActiveNonDeleted(p => p.Id == id && p.EvaluationRequests.Any())
             .Include(p => p.EvaluationRequests)
             .FirstOrDefaultAsync();
@@ -120,8 +117,8 @@ public class PlanRequestRepository(IServiceScopeFactory serviceScopeFactory, Srv
                 return new SchoolEvaluationDto
                 {
                     Id = s.Id,
-                    Name = s.NameEn,
-                    HasEvaluationRequest = evalRequest != null,
+                    Name = lang == "ar" ? s.NameAr : s.NameEn,
+					HasEvaluationRequest = evalRequest != null,
                     EvaluationRequestId = evalRequest?.Id,
                     VisitTypeId = evalRequest?.DepEvaluationTypeId,
                     FromDate = evalRequest?.ToDate,
@@ -145,7 +142,7 @@ public class PlanRequestRepository(IServiceScopeFactory serviceScopeFactory, Srv
     {
         var repo = unitOfWork.GetRepository<Plan>();
         repo.Update(plan);
-        await unitOfWork.CommitAsync();
+        //await unitOfWork.CommitAsync();
         return true;
     }
 
@@ -169,7 +166,7 @@ public class PlanRequestRepository(IServiceScopeFactory serviceScopeFactory, Srv
         // Link EvaluationRequest to the new Plan
 
         //await unitOfWork.SaveChangesAsync()
-        await unitOfWork.CommitAsync();
+        //await unitOfWork.CommitAsync();
 
         return model;
     }
@@ -182,7 +179,6 @@ public class PlanRequestRepository(IServiceScopeFactory serviceScopeFactory, Srv
         if (evaluationPlan is null)
             throw new BusinessException(ConstantKeys.ExceptionMessage.PlanIsNotFound);
         unitOfWork.GetRepository<PlanServiceRequest>().Delete(evaluationPlan);
-        await unitOfWork.CommitAsync();
         return true;
     }
     public async Task<bool> DeletePlan(Guid? id)
@@ -199,19 +195,9 @@ public class PlanRequestRepository(IServiceScopeFactory serviceScopeFactory, Srv
             throw new BusinessException(ConstantKeys.ExceptionMessage.UserPartyTypeSignatureHeightError);
         unitOfWork.GetRepository<Plan>().Delete(model);
         unitOfWork.GetRepository<EvaluationRequest>().DeleteRange(model.EvaluationRequests);
-        await unitOfWork.CommitAsync();
         return true;
     }
 
-    //public async Task<bool> DeleteSchoolFromPlan(Guid requestId, Guid schoolId)
-    //{
-    //    var plan = await unitOfWork.GetRepository<Plan>().GetByIdAsync(changeRequest.PlanId);
-    //    var schoolPlan = await unitOfWork.GetRepository<EvaluationRequest>()
-    //        .GetAllActiveNonDeleted().FirstOrDefaultAsync(x => x.PlanId == plan.Id && x.OrgTreeId == schoolId);
-    //    unitOfWork.GetRepository<EvaluationRequest>().Delete(schoolPlan);
-    //    await unitOfWork.CommitAsync();
-    //    return true;
-    //}
     public IQueryable<PlanTypeDep> GetPlanType()
     {
         return serviceScopeFactory.CreateScopedUow()
@@ -237,8 +223,8 @@ public class PlanRequestRepository(IServiceScopeFactory serviceScopeFactory, Srv
                 Name = x.PlanName,
                 StartDate = x.StartDate,
                 EndDate = x.EndDate,
-
-                PlanStatusId = x.PlanStatusId.Value,
+				CreateDate = x.CreateDate,
+				PlanStatusId = x.PlanStatusId.Value,
                 StatusCode = x.PlanStatus.BackendName,
 
                 CountSchools = x.EvaluationRequests
@@ -246,7 +232,7 @@ public class PlanRequestRepository(IServiceScopeFactory serviceScopeFactory, Srv
                     .Distinct()
                     .Count()
             })
-            .OrderByDescending(x => x.StartDate);
+            .OrderByDescending(x => x.CreateDate);
 
         var finalResult = await query.GetPaginatedResult(request.PageNumber, request.PageSize = 10);
 

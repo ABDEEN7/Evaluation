@@ -2,7 +2,6 @@
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.Attachments;
 using Evaluation.DAL.Models.DepartementEntites;
-using Evaluation.DAL.Models.FormsModules;
 using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
 using Evaluation.DAL.Models.ServiceRequestEntities;
 using Evaluation.DAL.Models.UserEntiy;
@@ -16,18 +15,17 @@ using Evaluation.Services.Shared;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Dtos.SchoolDto;
 using Evaluation.SharedHelper.Dtos.TeamMemberDto;
+using Evaluation.SharedHelper.Dtos.TeamMemberDto.ReassignDto;
 using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Api.AttachmentsDTOs;
-using Evaluation.SharedHelper.Models.Api.EvaluationRequestEntities;
 using Evaluation.SharedHelper.Models.Api.FormBuilderDTO;
 using Evaluation.SharedHelper.Models.Api.ServiceRequestEntitiesDTO;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.IdentityModel.Tokens;
+using Microsoft.VisualBasic;
 using Newtonsoft.Json;
-using System.Globalization;
 using static Evaluation.SharedHelper.Enums.ConstantKeys;
 
 namespace Evaluation.Services.BusinessLayer.API;
@@ -74,9 +72,25 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 
         return query.ToList();
     }
+    public async Task<List<EvaluationRequest>> GetEvaluationRequestsByOrgTreeId(Guid OrgTreeId, FilterRequestsDTO model)
+    {
+		using var uow = serviceScopeFactory.CreateScopedUow();
+		IQueryable<EvaluationRequest> query = uow.GetRepository<EvaluationRequest>()
+					.GetAllActiveNonDeleted()
+					.Include(d => d.ServiceStatus)
+					.Include(d => d.FormEvalMatrixValue)
+					.Include(d => d.DepEvaluationType)
+					 .Where(er => er.OrgTreeId == OrgTreeId &&
+						er.DepEvaluationType.DepartmentId == requestInfo.DepId)
+					 .OrderByDescending(er => er.CreateDate);
 
+        query = await requestAccessService.ApplyEvaluationRequestAccess(query);
 
-	public async Task<WebAppEvaluationRequestsDTO> GetEvaluationRequestsAsync(Guid userId, FilterRequestsDTO model)
+        return query.ToList();
+    }
+
+  
+    public async Task<WebAppEvaluationRequestsDTO> GetEvaluationRequestsAsync(Guid userId, FilterRequestsDTO model)
 	{
 		string lang = requestInfo!.Lang;
 
@@ -143,7 +157,8 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 			CreateDate = x.CreateDate,
 			CreateOn = x.CreateDate.ToString(dateFormat),
 			CreateOnTime = x.CreateDate.ToString(timeFormat),
-
+			EvlDateFrom=x.FromDate.ToString(dateFormat),
+			EvlDateTo = x.ToDate.ToString(dateFormat),
 			PlanId = x.PlanId,
 			PlanName = x.Plan != null ? x.Plan.PlanName : "",
 
@@ -187,13 +202,7 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 			.FirstOrDefaultAsync(x => x.IsActive && !x.IsDeleted);
 	}
 
-    public async Task<EvaluationRequest> UpdateEvaluationRequest(EvaluationRequest request)
-    {
-        uow.GetRepository<EvaluationRequest>().Update(request);
-        await uow.CommitAsync();
-
-        return request;
-    }
+    
 
     public  ServiceRequest MapEvaluationToServiceRequest(EvaluationRequest er)
 	{
@@ -223,6 +232,7 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 
 		if (request.Service == null || request.ServiceStatus == null)
 			throw new BusinessException(ExceptionMessage.lblRequestNotValid);
+		var dateFormatTask = cacheDataProvider.GetSystemSettingValue(SystemSettings.DateFormat);
 
 		var userTask = srvUser.GetByIDActiveNonDeleted(userId);
 		var moduleTask = SrvSystemModule.GetSystemModuleByIdAsync(request.Service.SystemModuleId);
@@ -241,7 +251,7 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 		var assignmentResult = await assignmentTask;
 		var assignment = assignmentResult.Value ?? new List<EvaluationRequestAssignmentDto>();
 		bool departmentRequiresNda =  module?.Department?.IsNDA == true;
-		bool userAssignmentRequiresNda = departmentRequiresNda && assignment.Any(x=>x.MinistryUserId== userId && x.IsNDA == false && (x.NdaDate == null || x.NdaStatusId == null));
+		bool userAssignmentRequiresNda = departmentRequiresNda && assignment.Any(x=>x.MinistryUserId== userId && x.IsNDA == false && (x.NdaDate == null || x.NdaStatusId == NDAStatusIds.Pending));
 
 		var formGroups = await fieldsTask;
 
@@ -281,6 +291,7 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 		var actionTransactions = await actionTransactionsTask;
 		var actions = await actionsTask;
 		var evaluationParties = await evaluationPartiesTask;
+		var dateFormat = await dateFormatTask;
 		var requestDetails= new EvaluationRequestDTO
 		{
 			RequestNumber=request.RequestNumber,
@@ -301,6 +312,9 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 			//CanViewAllFieldHistory = hasAllFieldHistoryPermission
 			IsNdaApprovalPending= userAssignmentRequiresNda,
 			Assignment= showAllRequestsPermission ? assignment: null,
+
+			EvlDateFrom = request.FromDate.ToString(dateFormat),
+			EvlDateTo = request.ToDate.ToString(dateFormat),
 		};
 		
 		return requestDetails;
@@ -441,6 +455,7 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 					lang,
 					c.Value!,
 					c.DropDownTypeId.Value,
+					request.Id,
 					request.PlanId
 				);
 			}
@@ -472,6 +487,7 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 										lang,
 										updatedValue,
 										field.DropDownTypeId.Value,
+										request.Id,
 										request.PlanId
 									);
 								}
@@ -712,5 +728,20 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 		return result;
 	}
 
+    public async Task<IReadOnlyList<ReassignRequestTableDto>> GetUserAssignments(Guid userId)
+    {
+        return await uow.GetRepository<EvaluationRequestAssignment>()
+            .GetAllActiveNonDeleted()
+            .Where(x => x.MinistryUserId == userId && x.EvaluationRequest.DepEvaluationType.DepartmentId == requestInfo.DepId && x.EvaluationRequest.ServiceStatus.ServiceStatusType.IsOpen)
+            .Select(x => new ReassignRequestTableDto
+            {
+                EvaluationRequestId = x.EvaluationRequestId,
+                RequestNumber = x.EvaluationRequest!.RequestNumber,
 
+                ServiceNameAr = x.EvaluationRequest.Service!.NameAr,
+                ServiceNameEn = x.EvaluationRequest.Service!.NameEn,
+                PartyTypeId = x.PartyTypeId
+            })
+            .ToListAsync();
+    }
 }

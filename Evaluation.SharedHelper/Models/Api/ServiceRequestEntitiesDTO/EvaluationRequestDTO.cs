@@ -29,7 +29,7 @@ namespace Evaluation.SharedHelper.Models.Api.ServiceRequestEntitiesDTO
 		public string? StatusColor { get; set; }
 		public Guid? StatusId { get; set; }
 		public bool? StatusISOPen { get; set; }
-		
+
 		public string? Service { get; set; }
 		public Guid? ServiceId { get; set; }
 		public string? CreateOn { get; set; }
@@ -75,5 +75,13 @@ namespace Evaluation.SharedHelper.Models.Api.ServiceRequestEntitiesDTO
 
 		public List<EvaluationPartyDTO> EvaluationParties { get; set; }
 		public List<EvaluationRequestAssignmentDto> Assignment { get; set; }
-	}
+
+        public DateOnly FromDate { get; set; }
+        public DateOnly ToDate { get; set; }
+        public string? EvlDateFrom { get; set; }
+        public string? EvlDateTo { get; set; }
+        public DateOnly? EvaluationDate { get; set; }
+        public DateOnly? NextEvaluationDate { get; set; }
+        public string? EvaluationResult { get; set; }
+    }
 }

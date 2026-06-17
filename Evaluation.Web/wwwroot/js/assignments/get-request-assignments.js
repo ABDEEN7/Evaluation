@@ -245,7 +245,6 @@
             <th>${t('lblDomain')}</th>
             <th>${t('lblPartyType')}</th>
             <th>${t('lblTeamLeader')}</th>
-            ${state.evaluationRequestId ? `<th>${t('lblSendMail')}</th>` : ''}
         `;
 
         $thead.html(headerHTML);
@@ -359,16 +358,6 @@
             // Check if this member is team leader
             const isLeaderChecked = member.id === state.teamLeaderId || member.isLeader ? 'checked' : '';
 
-            const sendMailBtnHTML = state.evaluationRequestId ? `
-    <td>
-        <button class="btn btn-sm btn-outline-primary send-mail-btn"
-                data-member-id="${member.id}"
-                data-member-name="${memberName}">
-            <i class="las la-envelope"></i>
-        </button>
-    </td>
-` : ``;
-
             return `
     <tr data-selected-id="${member.id}">
         <td>
@@ -409,7 +398,6 @@
                 <span class="checkmark"></span>
             </label>
         </td>
-        ${sendMailBtnHTML}
     </tr>
 `;
         }).join('');
@@ -667,7 +655,7 @@
                 });
             });
 
-        // إضافة عضو للفريق المحدد
+        
         $(document).off('change', `${id('userTable')} .row-select`)
             .on('change', `${id('userTable')} .row-select`, function () {
                 if (!this.checked) {
@@ -696,9 +684,12 @@
                     ? userPartyTypes[0].partyType.id
                     : null;
 
+                
+                const defaultScopes = (member.scopeIds || []).map(String);
+
                 state.selectedAssignments.push({
                     ...member,
-                    scopes: [],
+                    scopes: defaultScopes, 
                     nda: null,
                     partyTypeId: autoSelectedPartyTypeId,
                     isLeader: false
@@ -818,7 +809,7 @@
                     cancelText: sharedFn().GetUiControlText('WEB_CANCEL')
                 },
                     result => {
-                        
+
                         const response = jqClient().Post(API_ENDPOINTS.SEND_MAIL_NOTIFICATION,
                             { userId: memberId, evaluationRequestId: state.evaluationRequestId });
 
@@ -830,7 +821,49 @@
                     });
             });
     }
+    window.sendAssignmentEmail = async function (ministryUserId, evaluationRequestId, ministryUser) {
 
+        const confirmMessage =
+            uiControlsSetup().GetUiControlText("WEB_CONFIRM_SEND_EMAIL")
+                .replace("{0}", ` <span style="font-weight:bold;color:maroon;">${ministryUser}</span> `);
+
+        notificationUtil.confirmation({
+            title: confirmMessage,
+            okText: uiControlsSetup().GetUiControlText("WEB_CONFIRM_BUTTON"),
+            cancelText: uiControlsSetup().GetUiControlText("WEB_CANCEL")
+        }, async function (confirmed) {
+
+            if (!confirmed) return;
+
+            try {
+
+                const response = await jqClient().Post(
+                    API_ENDPOINTS.SEND_MAIL_NOTIFICATION,
+                    {
+                        userId: ministryUserId,
+                        evaluationRequestId: evaluationRequestId
+                    });
+
+                if (response?.isSuccess || response?.success) {
+                    notificationUtil.success(
+                        uiControlsSetup().GetUiControlText("msgMailSentSuccess")
+                    );
+                } else {
+                    notificationUtil.error(
+                        response?.message ||
+                        uiControlsSetup().GetUiControlText("msgMailSentFailed")
+                    );
+                }
+
+            } catch (e) {
+                console.error(e);
+
+                notificationUtil.error(
+                    sharedFn().GetUiControlText("msgMailSentFailed")
+                );
+            }
+        });
+    };
     // ================== HELPERS ==================
 
     function showMembersLoading() {

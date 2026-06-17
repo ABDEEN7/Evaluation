@@ -74,122 +74,282 @@
         cardViewBtnId: 'cardViewEvaluationRequest',
         tableViewBtnId: 'tblViewEvaluationRequest',
         rowClass: 'plan-request-card',
-
+        tabLabelSelector: '#tabEvaluationOperations .my-1',
+        tabLabelKey: 'TabEvaluationOperations',
         columns: [
+        {
+    data: "evaluationType",
+        title: uiControlsSetup().GetUiControlText("lblEvaluationPlan"),
+        className: "td-full mb-4",
+        render: function(data, type, row) {
+
+            const isCompleted = row.StatusISOPen === false;
+            const statusColor = isCompleted ? "#0E6B32" : "#A63D40";
+            const statusText = isCompleted ? "مكتمل" : "غير مكتمل";
+
+            return `
+            <div class="request-info">
+
+                <div class="request-icon"
+                     style="background-color:${statusColor}; color:#000;">
+                    <i class="las la-certificate"></i>
+                </div>
+
+                <div class="request-text">
+
+                    <div class="request-header">
+                        ${data || ""}
+                    </div>
+
+                    <div class="request-status-text card-only-row"
+                         style="color:${statusColor};">
+                        ${statusText}
+                    </div>
+
+                </div>
+
+            </div>
+        `;
+        }
+    },
+    {
+        data: null,
+        title: uiControlsSetup().GetUiControlText("lblStatus"),
+        className: "status-column",
+        render: function(data, type, row) {
+
+            const isCompleted = row.StatusISOPen === false;
+            const statusColor = isCompleted ? "#0E6B32" : "#A63D40";
+            const statusText = isCompleted ? "مكتمل" : "غير مكتمل";
+
+            return `
+            <span class="status-padding" style="color:${statusColor};">
+                ${statusText}
+            </span>
+        `;
+        }
+    },
           {
-            data: "evaluationType",
-                title: uiControlsSetup().GetUiControlText("lblEvaluationPlan"),
-                className: "td-left py-1 td-70",
-                render: function(data) {
+        data: "orgTreeName",
+        title: uiControlsSetup().GetUiControlText("lblSchoolName"),
+        className: "td-full",
+        render: function(data) {
 
-                    return `
-                <div class="plan-title-row">
-                    <i class="las la-certificate card-only-icon title-icon"></i>
+            if (!data) return "_";
 
-                    <span class="plan-text-wrap px-1">
-                        <span class="card-only-label title-label">Operation: </span>
-                        <span class="plan-title-text">${data || ""}</span>
-                    </span>
-                </div>
-                `;
-                }
-            },
-            {
-            data: "Status",
-            title: uiControlsSetup().GetUiControlText("lblRequestStatus"),
-            className: "td-right py-1 place-content-end td-30",
-            render: function(data, type, row) {
+            return `  
+        <div class="ellipsis school-name-row">
+            <i class="las la-school card-only-icon me-1"></i>
 
-                const isCompleted = row.StatusISOPen === false;
+            <span class="data-text">
+                ${data}
+            </span>
+        </div>
+        `;
+        }
+    },
+      {
+        data: "planName",
+        title: uiControlsSetup().GetUiControlText("lblPlanName"),
+        className: "td-full",
+        render: function(data) {
 
-               return `
-                <div class="d-flex justify-content-end">
-                    ${isCompleted ? `
-                    <span class="request-status approved-status bg-success-light py-1 px-2">
-                        <i class="las la-check"></i>
-                        مكتمل
-                    </span>
-                    ` : `
-                    <span class="request-status approved-status bg-danger-light text-danger py-1 px-2">
-                        <i class="las la-times"></i>
-                        غير مكتمل
-                    </span>
-                    `}
-                </div>
-                `;
-                }
-            },
-            {
-                data: "orgTreeName",
-                title: uiControlsSetup().GetUiControlText("lblSchoolName"),
-                className: "td-left py-0 status-break-row  align-content-end",
-                render: function(data) {
+            if (!data) return "_";
 
-                    if (!data) return "_";
-
-                    return `  
+            return `  
                     
-                        <i class="las la-school card-only-icon me-1"></i>
-                        <strong class ="text-truncate-2">${data}</strong>
+                        <i class="las la-file-signature card-only-icon me-1"></i>
+                         <span class="data-text">${data}</span>
                     
                 `;
-                }
-             },
-            {
-                data: "status",
-                title: uiControlsSetup().GetUiControlText("lblRequestNo"),
-                className: "td-left status-break-row py-0 align-content-end",
-                render: function (data, type, row) {
+        }
+    },
+         
+               
+  {
+        data: "evlDateFrom",
+        title: uiControlsSetup().GetUiControlText("lblEvaluationDateFrom"),
+        className: "td-full td-date-range-block period-column",
+        render: function(data, type, row) {
+            if (!data) return "_";
 
-                    if (!data) return "_";
+            const daysLeft = getDaysUntil(data);
+            const isOverdue = daysLeft !== null && daysLeft < 0;
+            const isUrgent = daysLeft !== null && daysLeft >= 0 && daysLeft <= 3;
+            const isWarning = daysLeft !== null && daysLeft > 3 && daysLeft <= 10;
 
-                    const statusColor = row.statusColor || "#cccccc";
-                    const textColor = getContrastingTextColor(statusColor);
+            let countdownBadge = '';
+            let nearNote = '';
 
-                    return `
+           if (isOverdue) {
+
+        countdownBadge = `
+        <span class="status-countdown-badge info">
+            <i class="las la-exclamation-circle"></i>
+            متأخر ${Math.abs(daysLeft)} يوم
+        </span>`;
+
+        nearNote = `
+        <span class="evaluation-near-note success">
+            <i class="las la-exclamation-triangle"></i>
+            تجاوز موعد التقييم
+        </span>`;
+
+    }
+    else if (isUrgent) {
+
+        countdownBadge = `
+        <span class="status-countdown-badge info">
+            <i class="las la-clock"></i>
+            ${daysLeft} يوم متبقي
+        </span>`;
+
+        nearNote = `
+        <span class="evaluation-near-note success">
+            <i class="las la-exclamation-triangle"></i>
+            هذه المدرسة على وشك التقييم
+        </span>`;
+
+    }
+    else if (isWarning) {
+
+        countdownBadge = `
+        <span class="status-countdown-badge info">
+            <i class="las la-clock"></i>
+            ${daysLeft} يوم متبقي
+        </span>`;
+
+        nearNote = `
+        <span class="evaluation-near-note success">
+            <i class="las la-exclamation-triangle"></i>
+            هذه المدرسة على وشك التقييم
+        </span>`;
+    }
+
+            const fmt = ["M/D/YYYY", "MM/DD/YYYY", "YYYY-MM-DD", "DD-MM-YYYY"];
+            const displayFrom = moment(data.split(' ')[0], fmt, false).format("DD-MM-YYYY");
+            const displayTo = row.evlDateTo
+                ? moment(row.evlDateTo.split(' ')[0], fmt, false).format("DD-MM-YYYY")
+                : null;
+
+           const dateRange = displayTo
+        ? `
+    <span>
+        <span class="period-label me-1">
+            ${getUiText("lblFrom", "From")}
+        </span>
+
+        <span class="data-text me-1">
+            ${displayFrom}
+        </span>
+
+        <span class="period-label me-1">
+            ${getUiText("lblTo", "To")}
+        </span>
+
+        <span class="data-text me-1">
+            ${displayTo}
+        </span>
+    </span>
+`
+        : `
+    <span>
+        <span class="period-label me-1">
+            ${getUiText("lblFrom", "From")}
+        </span>
+
+        <span class="data-text">
+            ${displayFrom}
+        </span>
+    </span>
+`;
+
+            return `
+            <div class="date-range-wrapper">
+
+                <div class="d-flex align-items-center gap-1 flex-wrap">
+                    <i class="las la-calendar card-only-icon"></i>
+                    ${dateRange}
+                </div>
+
+               <div class="period-status-wrapper">
+                    ${countdownBadge}
+                    ${nearNote}
+                </div>
+
+            </div>`;
+        }
+    },
+         {
+        data: "status",
+        title: uiControlsSetup().GetUiControlText("lblRequestNo"),
+        className: "td-full",
+        render: function(data, type, row) {
+
+            if (!data) return "_";
+
+            const statusColor = row.statusColor || "#89153D";
+            const textColor = getContrastingTextColor(statusColor);
+
+            return `
                     <span class="request-status m-0"
-                          style="background-color:${statusColor};color:${textColor};">
-                        <i class="las la-edit card-only-icon me-1"></i>
+                          style="color:${statusColor};">
+                        <i class="las la-edit card-only-icon me-1" style="color:${statusColor};"></i>
                         ${data}
                     </span>
                 `;
-                }
-            },
+        }
+    },
             {
-                data: "createOn",
-                title: uiControlsSetup().GetUiControlText("lblRequestCreatedDate"),
-                className: "td-left py-0",
-                render: function(data) {
+        data: "createOn",
+        title: uiControlsSetup().GetUiControlText("lblRequestCreatedDate"),
+        className: "td-right",
+        render: function(data) {
 
-                    if (!data) return "_";
+            if (!data) return "_";
 
-                    return `
-                <i class="las la-calendar card-only-icon"></i>
-                <span class="card-only-label mx-1"> Created on:  </span>
-                ${moment(data).format("DD-MM-YYYY")}
-                `;
-                }
-            },
-            {
-                data: "createOn",
-                title: uiControlsSetup().GetUiControlText("lblRequestCreatedTime"),
-                className: "td-right bg-grey justify-content-end py-0",
-                render: function(data) {
+            return `
+        <i class="las la-calendar card-only-icon color-primary me-1"></i>
 
-                    if (!data) return "_";
+        <span class="data-text me-1">
+            ${moment(data).format("DD-MM-YYYY")}
+        </span>
+        `;
+        }
+    },
+    {
+        data: "createOn",
+        title: uiControlsSetup().GetUiControlText("lblRequestCreatedTime"),
+        className: "td-left place-content-end",
+        render: function(data) {
 
-                    return `
-                <div class="d-flex justify-content-end align-items-center">
-                    <i class="las la-clock card-only-icon"></i>
-                    <span class="card-only-label mx-1">Created at: </span>
-                    ${moment(data).format("hh:mm A")}
-                </div>
-                `;
-                }
-            },
+            if (!data) return "_";
+
+            return `
+        <div class="d-flex justify-content-end place-content-end">
+
+            <i class="las la-clock card-only-icon color-primary me-1"></i>
+
+            <span class="data-text me-1">
+                ${moment(data).format("hh:mm A")}
+            </span>
+
+        </div>
+        `;
+        }
+    },
             
         ],
-
+        rowCallback: function (row, data) {
+            const days = getDaysUntil(data.evlDateFrom);
+            if (days !== null && days < 0) {
+                $(row).css('border-left', '3px solid #E24B4A');    
+            } else if (days !== null && days <= 3) {
+                $(row).css('border-left', '3px solid #E24B4A');    
+            } else if (days !== null && days <= 10) {
+                $(row).css('border-left', '3px solid #BA7517');    
+            }
+        },
         onRowClick: function (rowData) {
             openEvaluationRequestDetails(rowData.id);
         }
@@ -201,12 +361,12 @@
 
                 formUtility.attachments = response.attachments || [];
                 $('#evaluationRequeststatus').text(response.status || '');
-                $('#evaluationRequestNoText').text(response.requestNumber || '');
+                $('#evaluationRequestNo').text(response.requestNumber || '444');
 
                 $('#breadcrumbSchoolName').text((window.currentLang === "ar" ? response.school.nameAr : response.school.nameEn) || '');
                 $('#evaluationRequestDetailsModal').modal('show');
 
-
+                window.isEvaluationRequestOpen = response.statusISOPen;
                 const formAccordionItem = document.getElementById("formAccordionItem");
 
                 if (!response.formGroups || response.formGroups.length === 0) {
@@ -245,7 +405,7 @@
                 }
 
                 bindSchoolDetails(response);
-
+                bindEvaluationDates(response);
                 if (response.assignment && response.assignment.length > 0) {
 
                     $("#forceAssignmentAccordion").removeClass("d-none");
@@ -275,6 +435,87 @@
         $root.find("#email").text(s.orgEmail || '');
         $root.find("#address").text(s.address || '');
     }
+
+  function bindEvaluationDates(response) {
+        const fmt = ["M/D/YYYY", "MM/DD/YYYY", "YYYY-MM-DD", "DD-MM-YYYY"];
+        const fromRaw = response.evlDateFrom || '';
+        const toRaw = response.evlDateTo || '';
+
+        const $container = $('#evaluationDateRangeContainer').empty();
+        if (!fromRaw) return;
+
+        const displayFrom = moment(fromRaw.split(' ')[0], fmt, false).format("DD-MM-YYYY");
+        const displayTo = toRaw
+            ? moment(toRaw.split(' ')[0], fmt, false).format("DD-MM-YYYY")
+            : null;
+
+        const daysLeft = getDaysUntil(fromRaw);
+        const isOverdue = daysLeft !== null && daysLeft < 0;
+        const isUrgent = daysLeft !== null && daysLeft >= 0 && daysLeft <= 3;
+        const isWarning = daysLeft !== null && daysLeft > 3 && daysLeft <= 10;
+
+        let badge = '';
+        let note = '';
+
+        if (isOverdue) {
+            badge = `
+            <span class="status-countdown-badge danger">
+                <i class="las la-exclamation-circle"></i>
+                متأخر ${Math.abs(daysLeft)} يوم
+            </span>`;
+
+            note = `
+            <span class="evaluation-near-note danger">
+                <i class="las la-exclamation-triangle"></i>
+                تجاوز موعد التقييم
+            </span>`;
+
+        } else if (isUrgent) {
+            badge = `
+            <span class="status-countdown-badge danger">
+                <i class="las la-clock"></i>
+                ${daysLeft} يوم متبقي
+            </span>`;
+
+            note = `
+            <span class="evaluation-near-note danger">
+                <i class="las la-exclamation-triangle"></i>
+                هذه المدرسة على وشك التقييم
+            </span>`;
+
+        } else if (isWarning) {
+            badge = `
+            <span class="status-countdown-badge warning">
+                <i class="las la-clock"></i>
+                ${daysLeft} يوم متبقي
+            </span>`;
+
+            note = `
+            <span class="evaluation-near-note warning">
+                <i class="las la-exclamation-triangle"></i>
+                هذه المدرسة على وشك التقييم
+            </span>`;
+        }
+
+        const dateRange = displayTo
+            ? `${displayFrom} <i class="las la-arrow-right mx-1 opacity-50"></i> ${displayTo}`
+            : displayFrom;
+
+        $container.html(`
+        <div class="date-range-wrapper">
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+                <i class="las la-calendar text-muted fs-14"></i>
+                <span class="modal-date-range-text">${dateRange}</span>
+            </div>
+
+            <div class="d-flex flex-wrap gap-2 align-items-center">
+                ${badge}
+                ${note}
+            </div>
+        </div>
+    `);
+    }
+
     function renderEvaluationPartiesSection(response, requestId) {
         const parties = response?.evaluationParties || [];
 
@@ -359,6 +600,15 @@
       </div>
     </div>`;
     }
+
+    function getDaysUntil(dateStr) {
+        if (!dateStr) return null;
+        // strip time portion: "10/8/2025 12:00:00 AM" → "10/8/2025"
+        const datePart = dateStr.split(' ')[0];
+        const target = moment(datePart, ["M/D/YYYY", "MM/DD/YYYY", "YYYY-MM-DD", "DD-MM-YYYY"], false).startOf('day');
+        if (!target.isValid()) return null;
+        return target.diff(moment().startOf('day'), 'days');
+    }
     function NdaSubmit(response, requestId) {
         const btn = document.getElementById('ndaSubmitBtn');
         const reasonEl = document.getElementById('ndaConflictReason');
@@ -430,11 +680,10 @@
         width: '100%',
         multiple: true
     });
-    flatpickr('#evaluationRequestDateFrom', {
-        dateFormat: "Y-m-d",
-        allowInput: true
-    });
-    flatpickr("#evaluationRequestDateTo", {
+const isAr = document.documentElement.lang.toLowerCase().startsWith("ar");
+
+    flatpickr(".datePicker", {
+        locale: isAr ? "ar" : "en",
         dateFormat: "Y-m-d",
         allowInput: true
     });

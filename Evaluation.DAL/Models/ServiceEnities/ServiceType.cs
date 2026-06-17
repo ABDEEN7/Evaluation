@@ -13,5 +13,6 @@ namespace Evaluation.DAL.Models.ServiceEnities
         public string BackendName { get; set; } = null!;
         public string NameAr { get; set; } = null!;
         public string NameEn { get; set; } = null!;
+        public int OrderNo { get; set; } = 0;
     }
 }
