@@ -97,6 +97,7 @@ public class SrvEvaluationPartyBL : AdminBase
 		EvaluationParty.IsActive = message.IsActive;
 		EvaluationParty.DepartmentId = message.DepartmentId;
 		EvaluationParty.IsSupportFiles = message.IsSupportFiles;
+		EvaluationParty.EvalPartyCategoryId = message.EvalPartyCategoryId;
 
 		uow.GetRepository<EvaluationParty>().Insert(EvaluationParty);
 		await uow.CommitAsync();
@@ -146,7 +147,8 @@ public class SrvEvaluationPartyBL : AdminBase
 		response.NameEn = EvaluationParty.NameEn;
 		response.IsActive = EvaluationParty.IsActive;
 		response.IsSupportFiles = EvaluationParty.IsSupportFiles;
-		repository.Update(response);
+        EvaluationParty.EvalPartyCategoryId = EvaluationParty.EvalPartyCategoryId;
+        repository.Update(response);
 		await uow.CommitAsync().ConfigureAwait(false);
 		var result = mapper.Map<EvaluationPartyDTO>(response, opts => opts.Items["Language"] = _requestInfo.Lang);
 		result.ResponseStatus = DBResult.Updated;

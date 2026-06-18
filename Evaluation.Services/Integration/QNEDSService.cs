@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using Dapper;
 using Evaluation.DAL.Helper;
+using Evaluation.DAL.Models.IntegrationEntity;
+using Evaluation.DAL.Models.Org;
 using Evaluation.DAL.Repositories;
 using Evaluation.Services.BusinessLayer.API;
 using Evaluation.Services.Special;
@@ -8,6 +10,7 @@ using Evaluation.SharedHelper.Dtos.QNEDsDto;
 using Evaluation.SharedHelper.Helper;
 using Evaluation.SharedHelper.Models;
 using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Evaluation.Services.Integration;
@@ -310,4 +313,67 @@ public class QNEDSService : ApiBase
         var result = await con.QueryAsync<StudentDailyAttendanceByMonthDto>(sql, new { Institution = institutionId, Year = year });
         return result.ToList();
     }
+
+	public async Task<bool> SyncQnedsIntegrationAsync(int academicYear)
+	{
+		var schools = await uow.GetRepository<OrgTree>()
+			.GetAllActiveNonDeleted()
+			.Where(x => x.NSISCode != null)
+			.Select(x => new
+			{
+				x.Id,
+				x.NSISCode
+			})
+			.ToListAsync();
+
+		foreach (var school in schools)
+		{
+			var exists = await uow.GetRepository<QnedsIntegration>()
+				.GetAllActiveNonDeleted()
+				.AnyAsync(x =>
+					x.OrgTreeId == school.Id &&
+					x.AcademicYear == academicYear);
+
+			if (exists)
+				continue;
+
+			var institutionId = school.NSISCode.ToString();
+
+			var qnedsData = new QnedsIntegrationJsonDto
+			{
+				Achievement = await GetAchievementByInstitutionAndYearAsync(institutionId, academicYear),
+				AchievementSev3 = await GetAchievementSev3ByInstitutionAndYearAsync(institutionId, academicYear),
+				AchievementG12 = await GetAchievementG12ByInstitutionAndYearAsync(institutionId, academicYear),
+				AchievementTrackSubjectG11G12 = await GetAchievementTrackSubjectG11G12ByInstitutionAndYearAsync(institutionId, academicYear),
+				SuccessRateByGrade = await GetSuccessRateByGradeByInstitutionAndYearAsync(institutionId, academicYear),
+				YearlyStudentBelow70Track = await GetYearlyStudentBelow70TrackByInstitutionAndYearAsync(institutionId, academicYear),
+				YearlyStudentBelow70Grade = await GetYearlyStudentBelow70GradeByInstitutionAndYearAsync(institutionId, academicYear),
+				SuccessRateByTrack = await GetSuccessRateByTrackByInstitutionAndYearAsync(institutionId, academicYear),
+				AchievementTrackNoSubjectG11G12 = await GetAchievementTrackNoSubjectG11G12ByInstitutionAndYearAsync(institutionId, academicYear),
+				AchievementG1G11 = await GetAchievementG1G11ByInstitutionAndYearAsync(institutionId, academicYear),
+				TeacherSchedule = await GetTeacherScheduleByInstitutionAndYearAsync(institutionId, academicYear),
+				StudentDailyAttendance = await GetStudentDailyAttendanceByMonthByInstitutionAndYearAsync(institutionId, academicYear)
+			};
+
+			var entity = new QnedsIntegration
+			{
+				Id = Guid.NewGuid(),
+				AcademicYear = academicYear,
+				OrgTreeId = school.Id,
+				JsonValue = System.Text.Json.JsonSerializer.Serialize(qnedsData),
+				QnedsConfig = null,
+				IsActive = true,
+				CreateDate = DateTime.Now,
+				IsDeleted = false
+			};
+
+			await uow.GetRepository<QnedsIntegration>().InsertAsync(entity);
+		}
+
+		await uow.CommitAsync();
+
+		return true;
+	}
 }
+
+

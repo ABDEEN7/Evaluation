@@ -192,6 +192,14 @@ namespace Evaluation.Admin.Controllers
             return Ok(result);
 
         }
+        [HttpGet]
+        [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.AdminPermission.ADD_ADMIN_SERVICE_PLACEHOLDER })]
+        public async Task<IActionResult> GetSystemModule(Guid departmentId)
+        {
+             var   result = await masterBL.GetAdminService<SrvServiceBL>().GetSystemModuleDDL(departmentId);
+            return Ok(result);
+
+        }
 
     }
 }

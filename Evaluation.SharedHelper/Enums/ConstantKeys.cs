@@ -214,6 +214,7 @@ public static class ConstantKeys
         public static readonly string UnExpectedException = "UnExpectedException";
         public static readonly string NoEvaluationRequestsWereSelected = "NoEvaluationRequestsWereSelected";
         public static readonly string CannotDeletePlanInProcess = "CannotDeletePlanInProcess";
+        public static readonly string EvaluationPartyRequriedDDL = "EvaluationPartyRequriedDDL";
         public static readonly string ShouldOnlyOneOfFormItemAndAnalysisTypeSelected = "ShouldOnlyOneOfFormItemAndAnalysisTypeSelected";
     }
 
@@ -377,6 +378,7 @@ public static class ConstantKeys
         public static readonly string AdminPartyTypeEvalPartyStatus = "AdminPartyTypeEvalPartyStatus";
         public static readonly string AdminServiceStatusConfiguration = "AdminServiceStatusConfiguration";
     }
+
     public static class WebAppPages
     {
         public static readonly string WebEvaluationForm = "WebEvaluationForm";

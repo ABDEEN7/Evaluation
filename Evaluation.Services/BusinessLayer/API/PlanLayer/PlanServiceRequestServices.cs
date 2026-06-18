@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Evaluation.DAL.Dtos;
 using Evaluation.DAL.Helper;
+using Evaluation.DAL.Models.DepartementEntites;
 using Evaluation.DAL.Models.FormsModules;
 using Evaluation.DAL.Models.Planing;
 using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
@@ -73,6 +74,7 @@ public class PlanServiceRequestServices(
      ? await InsertPlan(modelDto)
      : await UpdatePlan(modelDto);
     }
+
     //Plan Type Module
     public async Task<List<PlanTypeDto>> GetPlanTypes()
     {
@@ -280,7 +282,7 @@ public class PlanServiceRequestServices(
 
         var requests = modelDto.Schools.Select(school =>
         {
-      
+
             return new EvaluationRequest
             {
                 Id = Guid.NewGuid(),
@@ -291,23 +293,14 @@ public class PlanServiceRequestServices(
                 FromDate = school.StartEvaluationDate,
                 ToDate = school.EndEvaluationDate,
                 ServiceStatusId = serviceStatusId,
-                RequestNumber = "",
                 CreateDate = DateTime.UtcNow,
-                IsDeleted = false
+                IsDeleted = false,
+                RequestNumber = "default"
             };
         }).ToList();
 
         await unitOfWork.GetRepository<EvaluationRequest>()
      .InsertRange(requests);
-
-        foreach (var request in requests)
-        {
-            request.RequestNumber =
-                DateTime.Now.ToString(
-                    serviceObj.ReqNumberDef ?? "",
-                    new CultureInfo("en-US"))
-                + request.Sequence;
-        }
     }
     private async Task ReplaceEvaluationRequests(
     Guid planId,
@@ -367,20 +360,54 @@ public class PlanServiceRequestServices(
                         .Where(x => x != null)
                         .Distinct()
                         .ToListAsync();
-                            var data = await unitOfWork
-                                .GetRepository<FormEvalMatrixValue>()
-                                .GetAllActiveNonDeleted(x => latestIds.Contains(x.Id))
-                                .OrderByDescending(x => x.OrderNo)
-                                .ToListAsync();
-                            var result = data.Select(x => new DDLFomrEvalMatrixValueDto
-                            {
-                                Id = x.Id,
-                                Name = LanguageStatic.SelectLang(
-                            requestInfo.Lang,
-                            x.NameAr,
-                            x.NameEn)
-                            }).ToList();
+        var data = await unitOfWork
+            .GetRepository<FormEvalMatrixValue>()
+            .GetAllActiveNonDeleted(x => latestIds.Contains(x.Id))
+            .OrderByDescending(x => x.OrderNo)
+            .ToListAsync();
+        var result = data.Select(x => new DDLFomrEvalMatrixValueDto
+        {
+            Id = x.Id,
+            Name = LanguageStatic.SelectLang(
+        requestInfo.Lang,
+        x.NameAr,
+        x.NameEn)
+        }).ToList();
         return result;
+    }
+    public async Task UpdateRequestNumbersAsync()
+    {
+        using var scope = serviceScopeFactory.CreateScopedUow();
+
+        var reqNumberDef = await unitOfWork.GetRepository<Service>()
+                        .GetAllActiveNonDeleted(x =>
+                            x.Initialservice == true
+                            && x.SystemModule!.DepartmentId == requestInfo.DepId
+                            && x.SystemModule!.SystemModuleType!.BackendName == ModuleType.EvaluationRequest
+                        )
+                        .Select(x => x.ReqNumberDef)
+                        .FirstAsync();
+        var requestNumber = DateTime.Now.ToString(reqNumberDef! ?? "", new CultureInfo("en-US"));
+        var requests = await scope
+            .GetRepository<EvaluationRequest>()
+            .GetAll(x => x.RequestNumber == "default")
+            .ToListAsync();
+
+        foreach (var request in requests)
+        {
+            request.RequestNumber = $"{requestNumber}{request.Sequence}";
+        }
+
+        await scope.CommitAsync();
+    }
+    public async Task<string> GetDepartmentConfigsAsync()
+    {
+        var response = await unitOfWork.GetRepository<Department>()
+            .GetAllActiveNonDeleted(x =>
+            x.Id == requestInfo.DepId)
+            .Select(x => x.DepConfig)
+            .FirstOrDefaultAsync();
+        return response;
     }
     private async Task SyncEvaluationRequests(
       Guid planId,
@@ -447,12 +474,6 @@ public class PlanServiceRequestServices(
             else
             {
 
-                // INSERT NEW
-
-                lastSequence++;
-                var requestNumber = DateTime.Now.ToString(serviceObj!.ReqNumberDef ?? "", new CultureInfo("en-US"))
-                                    + lastSequence;
-
                 await repo.InsertAsync(new EvaluationRequest
                 {
                     Id = Guid.NewGuid(),
@@ -462,8 +483,7 @@ public class PlanServiceRequestServices(
                     DepEvaluationTypeId = school.VisitTypeId,
                     FromDate = school.StartEvaluationDate,
                     ToDate = school.EndEvaluationDate,
-                    ServiceStatusId = serviceStatusId,
-                    RequestNumber = requestNumber,
+                    ServiceStatusId = serviceStatusId
 
                 });
             }
