@@ -25,6 +25,7 @@ namespace Evaluation.Services.Mappers.Admin
                  .ForMember(dest => dest.EmailTemplate, opt => opt.MapFrom<EmailTemplateResolver, Guid?>(src => src.EmailTemplateId))
                  .ForMember(dest => dest.SMSTemplate, opt => opt.MapFrom<SMSTemplateResolver, Guid?>(src => src.SMSTemplateId))
                  .ForMember(dest => dest.NotificationTemplate, opt => opt.MapFrom<NotificationTemplateResolver, Guid?>(src => src.NotificationTemplateId));
+            
         }
 
     }

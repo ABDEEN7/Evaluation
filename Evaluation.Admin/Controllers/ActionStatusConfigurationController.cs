@@ -73,10 +73,10 @@ namespace Evaluation.Admin.Controllers
         }
         [HttpGet]
         [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.AdminPermission.VIEW_ADMIN_ACTIONSTATUSCONFIGURATION })]
-        public async Task<IActionResult> GetActionStatusConfigurationByAction(Guid ServiceId, Guid actionId)
+        public async Task<IActionResult> GetActionStatusConfigurationByAction(Guid ServiceId,Guid systemModuleId, Guid actionId)
         {
             
-            var response = await masterBL.GetAdminService<SrvActionStatusConfigurationBL>().GetActionStatusConfigurationByActionList(ServiceId,actionId);
+            var response = await masterBL.GetAdminService<SrvActionStatusConfigurationBL>().GetActionStatusConfigurationByActionList(ServiceId, systemModuleId, actionId);
             return Ok(response);
         }
 

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.ActionEntities;
+using Evaluation.DAL.Models.DepartementEntites;
 using Evaluation.DAL.Models.StatusEntities;
 using Evaluation.DAL.Repositories;
 using Evaluation.Services.Special;
@@ -15,9 +16,11 @@ namespace Evaluation.Services.Models.Admin
     public class SrvActionStatusConfigurationBL : AdminBase
     {
         private readonly CacheDataProvider _CacheDataProvider;
-        public SrvActionStatusConfigurationBL(IServiceProvider serviceProvider, UnitOfWork uow, LoggingServices loggingServices, IMapper mapper, UserInfo userInfo,IServiceScopeFactory serviceScopeFactory,RequestInfo requestInfo, CacheDataProvider CacheDataProvider) : base(serviceProvider, uow, loggingServices, mapper, userInfo, serviceScopeFactory, requestInfo)
+        private readonly ISystemModuleService _systemModule;
+        public SrvActionStatusConfigurationBL(IServiceProvider serviceProvider, UnitOfWork uow, LoggingServices loggingServices, IMapper mapper, UserInfo userInfo,IServiceScopeFactory serviceScopeFactory,RequestInfo requestInfo, CacheDataProvider CacheDataProvider, ISystemModuleService systemModule) : base(serviceProvider, uow, loggingServices, mapper, userInfo, serviceScopeFactory, requestInfo)
         {
             _CacheDataProvider = CacheDataProvider;
+            _systemModule = systemModule;
         }
 
         #region Action Status Configuration
@@ -56,10 +59,10 @@ namespace Evaluation.Services.Models.Admin
             return result;
 
         }
-        public async Task<List<ActionStatusConfigurationDTO>> GetActionStatusConfigurationByActionList(Guid ServiceId, Guid actionId)
+        public async Task<List<ActionStatusConfigurationDTO>> GetActionStatusConfigurationByActionList(Guid ServiceId,Guid systemModuleId, Guid actionId)
         {
 
-           
+            var backendName = await _systemModule.GetBackendNameOfSystemModule(systemModuleId);
             var list = await uow.GetRepository<ActionStatusConfiguration>()
                 .GetAllNonDeleted()
                 .Include(x => x.ServiceAction)
@@ -71,15 +74,20 @@ namespace Evaluation.Services.Models.Admin
                 .ThenByDescending(x => x.CreateDate)
                 .ToListAsync();
 
-            var result = mapper.Map<List<ActionStatusConfigurationDTO>>(list, opts => opts.Items["Language"] = _requestInfo.Lang);
+            var result = mapper.Map<List<ActionStatusConfigurationDTO>>(list, opts =>
+                    {
+                        opts.Items["Language"] = _requestInfo.Lang;
+                        opts.Items["SystemModuleBackendName"] = backendName;
+                    }
+);
 
             return result;
 
         }
         public async Task<List<ActionStatusConfigurationDTO>> GetActionStatusConfigurationByStatusList(Guid ServiceId, Guid statusIdId)
         {
+            
 
-          
             var list = await uow.GetRepository<ActionStatusConfiguration>()
                 .GetAllNonDeleted()
                 .Include(x => x.ServiceAction)

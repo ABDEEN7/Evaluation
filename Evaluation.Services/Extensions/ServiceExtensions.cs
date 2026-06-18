@@ -61,6 +61,7 @@ public static class ServiceExtensions
         services.AddScoped<LoggingServices>();
         services.AddScoped<IMapper, Mapper>();
         services.AddScoped<ISmsServices, SmsServices>();
+        services.AddScoped<ISystemModuleService, SystemModuleService>();
         services.AddScoped<IEmailServices, EmailServices>();
         services.AddScoped<ResponseInfo>();
         services.AddScoped<ServiceRequestBL>();
