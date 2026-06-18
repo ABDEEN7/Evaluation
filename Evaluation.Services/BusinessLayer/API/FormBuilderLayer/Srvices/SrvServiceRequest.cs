@@ -1097,7 +1097,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             }
             return transactions;
         }
-        public async Task<Dictionary<Guid, List<ServiceDTO>>> GetServicesByStatusesAsync(List<Guid> statusIds, Guid moduleId, string lang)
+        public async Task<Dictionary<Guid, List<ServiceDTO>>> GetServicesByStatusesAsync(List<Guid> statusIds, string modulebackend, string lang)
         {
             var result = new Dictionary<Guid, List<ServiceDTO>>();
             var today = DateTime.Today;
@@ -1119,10 +1119,10 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                 .Where(c => userInfo.PartyTypes.Contains(c.PartyTypeId) && c.service?.SystemModule?.DepartmentId == requestInfo.DepId)
                 .Select(c => c.serviceId)
                 .ToHashSet();
-
+            
             var statusConfig = (await cacheDataProvider.GetServiceStatusConfiguration())
                 .Where(c => distinctStatusIds.Contains(c.CurrentStatusId)
-                         && c.Service!.SystemModuleId == moduleId)
+                         && c.Service!.SystemModule?.BackendName == modulebackend)
                 .Select(c => new { c.CurrentStatusId, c.ServiceId })
                 .ToList();
 
@@ -1139,7 +1139,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                 .Where(s =>
                     allowedServiceIds.Contains(s.Id) &&
                     s.Initialservice != true &&
-                    s.SystemModule!.SystemModuleTypeId == moduleId && s.SystemModule.DepartmentId == requestInfo.DepId
+                    s.SystemModule!.SystemModuleType!.BackendName == modulebackend && s.SystemModule.DepartmentId == requestInfo.DepId
                 &&
                 s.StartDate.HasValue &&
                 today >= s.StartDate.Value &&

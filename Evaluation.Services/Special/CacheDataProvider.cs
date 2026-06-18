@@ -69,34 +69,34 @@ namespace Evaluation.Services.Special
             }
             return result;
         }
-		private async Task<List<SystemSettingDTO>> GetSystemSettings(List<string> keys)
-		{
-			using (var uow = serviceScopeFactory.CreateScopedUow())
-			{
-				var result = new List<SystemSettingDTO>();
+        private async Task<List<SystemSettingDTO>> GetSystemSettings(List<string> keys)
+        {
+            using (var uow = serviceScopeFactory.CreateScopedUow())
+            {
+                var result = new List<SystemSettingDTO>();
 
-				if (keys != null)
-				{
-					var list = await uow.GetRepository<SystemSetting>()
-						.GetAllActiveNonDeleted()
-						.Where(x => keys.Contains(x.SettingKey))
-						.Select(x => new SystemSettingDTO
-						{
-							SettingGroup = x.SettingGroup,
-							SettingKey = x.SettingKey,
-							SettingValue = x.SettingValue
-						}).ToListAsync();
+                if (keys != null)
+                {
+                    var list = await uow.GetRepository<SystemSetting>()
+                        .GetAllActiveNonDeleted()
+                        .Where(x => keys.Contains(x.SettingKey))
+                        .Select(x => new SystemSettingDTO
+                        {
+                            SettingGroup = x.SettingGroup,
+                            SettingKey = x.SettingKey,
+                            SettingValue = x.SettingValue
+                        }).ToListAsync();
 
-					result = list;
-				}
+                    result = list;
+                }
 
-				return result;
-			}
+                return result;
+            }
 
 
-		}
+        }
 
-		private async Task<List<T>> GetOrSetCacheAsync<T>(string key, Func<Task<List<T>>> dataFetcher)
+        private async Task<List<T>> GetOrSetCacheAsync<T>(string key, Func<Task<List<T>>> dataFetcher)
         {
             if (!await IsCachingEnabledAsync())
                 return await dataFetcher();
@@ -282,6 +282,7 @@ namespace Evaluation.Services.Special
 
                 var list = await repo.GetAllQueryFiltered()
                                      .Include(c => c.Service)
+                                     .ThenInclude(c => c.SystemModule)
                                      .ToListAsync();
 
                 return mapper.Map<List<ServiceStatusConfigurationDTO>>(list);
@@ -299,7 +300,9 @@ namespace Evaluation.Services.Special
             {
                 using var scopedUow = serviceScopeFactory.CreateScopedUow();
                 var repo = scopedUow.GetRepository<ServiceInitiatorPartyType>();
-                var list = await repo.GetAllActiveNonDeleted().ToListAsync();
+                var list = await repo.GetAllActiveNonDeleted()
+                .Include(x => x.service)
+                .ThenInclude(s => s.SystemModule).ToListAsync();
                 return list;
             });
         }
