@@ -215,6 +215,7 @@ public static class ConstantKeys
         public static readonly string NoEvaluationRequestsWereSelected = "NoEvaluationRequestsWereSelected";
         public static readonly string CannotDeletePlanInProcess = "CannotDeletePlanInProcess";
         public static readonly string EvaluationPartyRequriedDDL = "EvaluationPartyRequriedDDL";
+        public static readonly string ShouldOnlyOneOfFormItemAndAnalysisTypeSelected = "ShouldOnlyOneOfFormItemAndAnalysisTypeSelected";
     }
 
     public static class AdminSettings
@@ -1104,6 +1105,15 @@ public static class ConstantKeys
 
         #region School
         public const string VIEW_WEB_SCHOOL = "VIEW_WEB_SCHOOL";
+        #endregion
+
+        #region WebAcademicYear
+        public const string VIEW_WEB_AcademicYear = "VIEW_WEB_AcademicYear";
+        public const string CREATE_WEB_AcademicYear = "CREATE_WEB_AcademicYear";
+        public const string UPDATE_WEB_AcademicYear = "UPDATE_WEB_AcademicYear";
+        public const string DELETE_WEB_AcademicYear = "DELETE_WEB_AcademicYear";
+
+
         #endregion
     }
     public static class WebAppSettings
