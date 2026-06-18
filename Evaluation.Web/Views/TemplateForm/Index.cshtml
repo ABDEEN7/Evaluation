@@ -36,12 +36,19 @@
                 <div id="view-container"></div>
         </div>
     </section>
-        <section class="display-none pt-3" id="formsection">
+        <section class="display-none pt-0" id="formsection">
+        <div class="justify-content-start d-flex align-items-center">
+            <button type="button" id="btn-back-top" class="btn btn-secondary mb-3">
+                <i class="las la-angle-left me-1"></i>
+                <span class="BACKBUTTON"></span>
+            </button>
+        </div>
             <div class="card app-card">
                 <form enctype="multipart/form-data" id="app-form">
                     <input id="Id" hidden />
                     <input id="evalformidvalue" hidden />
                     <input id="evalformitemidvalue" hidden />
+               
                     <div class="card-body">
                         <div id="formcontent"></div>
                         <div id="itemcontent">

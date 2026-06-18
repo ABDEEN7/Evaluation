@@ -64,6 +64,11 @@ $btnAddbutton.click(function () {
     $itemcontent.hide();
     $('#Id').val('');
 });
+
+$(document).on("click", "#btn-back-top", function () {
+    $("#btn-back").trigger("click");
+});
+
 function CreateEditForFormGroup(pkId) {
     CommonLogicAfterInitial();
 }

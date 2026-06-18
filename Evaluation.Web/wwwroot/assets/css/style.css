@@ -6438,4 +6438,10 @@ tr.child-row td {
 html[dir="rtl"] .top-back-btn i {
     transform: rotate(180deg);
 }
+html[dir="rtl"] #btn-back-top i {
+    transform: scaleX(-1);
+}
 
+#btn-back-top i {
+    font-size: 14px;
+}
