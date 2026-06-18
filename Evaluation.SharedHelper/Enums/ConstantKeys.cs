@@ -215,6 +215,7 @@ public static class ConstantKeys
         public static readonly string NoEvaluationRequestsWereSelected = "NoEvaluationRequestsWereSelected";
         public static readonly string CannotDeletePlanInProcess = "CannotDeletePlanInProcess";
         public static readonly string EvaluationPartyRequriedDDL = "EvaluationPartyRequriedDDL";
+        public static readonly string ShouldOnlyOneOfFormItemAndAnalysisTypeSelected = "ShouldOnlyOneOfFormItemAndAnalysisTypeSelected";
     }
 
     public static class AdminSettings
