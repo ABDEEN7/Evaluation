@@ -21,32 +21,33 @@
 
     <link href="assets/css/istemara-styles.css" rel="stylesheet">
 }
-<section class="evaluation-form mt-5 p-4">
-    <div class="text-center mt-5">
-        <br/>
-        <h2 class="fw-bold mb-3" style="color: #8A1538; font-size: 2rem;">نماذج التقييم</h2>
-        <p class="text-muted mb-0" style="font-size: 0.95rem;">
-            إدارة نماذج التقييم وبنودها وإضافة أقسام ومعايير التقييم المختلفة.
-        </p>
+<section class="evaluation-form mt-5 mb-0 p-4">
+    <div class="d-flex justify-content-between align-items-center bg-light mb-3 mt-5 p-2">
+
+        <button type="button" id="btn-back-top" class="top-back-btn">
+            <i class="las la-arrow-left"></i>
+            <span class="BACKBUTTON"></span>
+        </button>
+
+        <h2 class="mb-0 fw-bold page-title-center">
+            نماذج التقييم
+        </h2>
+
+        <button id="btnaddcontent" type="button" class="btn btn-primary">
+            <i class="las la-plus me-1"></i>
+            <span class="ADDRECORD"></span>
+        </button>
+
     </div>
-        <section id="tbltemplatecontainer" class="section-container">
-            <div class="card app-card">
-                <div class="card-header justify-content-end d-flex align-items-center bg-light">
 
-                    <button id="btnaddcontent" type="button" class="btn btn-primary ADDRECORD">
-                        <i class="fa fa-plus-circle"></i>
-                    </button>
-
-
-                </div>
-                <div class="card-body">
-
-                    <div id="view-container"></div>
-                </div>
+    <section id="tbltemplatecontainer" class="section-container pt-2">
+        <div>
+            <div class="card-body">
+                <div id="view-container"></div>
             </div>
-        </section>
-
-        <section class="display-none" id="formsection">
+        </div>
+    </section>
+        <section class="display-none pt-3" id="formsection">
             <div class="card app-card">
                 <form enctype="multipart/form-data" id="app-form">
                     <input id="Id" hidden />
@@ -77,11 +78,17 @@
                             <button type="button" id="btn-submit" class="btn btn-primary SAVEBUTTON"></button>
                         </div>
                     </div>
-                </form>
+              
+                <button id="btnScrollTop" class="scroll-top-btn" type="button">
+                    <i class="las la-arrow-up"></i>
+                </button>
+
+            </form>
+           
             </div>
         </section>
     
-    </div>
+
     <div>
         <input id="formIdValue" hidden />
     </div>
@@ -94,9 +101,38 @@
     <script>
         $(document).ready(async function () {
 
-            if (!sharedUtility().ExistingToken()) {
-                sharedUtility().RedirectUnauthorized();
-            }
+      $(window).on("scroll", function() {
+
+                if ($(this).scrollTop() > 50) {
+                    $("#btnScrollTop").fadeIn();
+                } else {
+                    $("#btnScrollTop").fadeOut();
+                }
+
+                const footer = $("footer");
+                const btn = $("#btnScrollTop");
+
+                if (footer.length) {
+                    const footerTop = footer.offset().top;
+                    const scrollBottom = $(window).scrollTop() + $(window).height();
+
+                    if (scrollBottom > footerTop) {
+                        btn.css(
+                            "bottom",
+                            (scrollBottom - footerTop + 24) + "px"
+                        );
+                    } else {
+                        btn.css("bottom", "24px");
+                    }
+                }
+            });
+
+            $("#btnScrollTop").on("click", function() {
+                $("html, body").animate(
+                    { scrollTop: 0 },
+                    400
+                );
+            });
 
             await webAppConfigsSetup().Init({
                 pageNames: [
