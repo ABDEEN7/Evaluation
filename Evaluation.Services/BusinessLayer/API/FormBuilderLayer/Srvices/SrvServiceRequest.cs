@@ -1149,7 +1149,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                     Id = s.Id,
                     BackendName = s.BackendName,
                     Icon = s.Icon,
-                    NameAr = lang == "ar" ? s.NameAr : s.NameEn
+                    Name = lang == "ar" ? s.NameAr : s.NameEn
                 })
                 .ToListAsync();
 
