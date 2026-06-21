@@ -3,10 +3,12 @@ using Evaluation.DAL.Dtos;
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.DepartementEntites;
 using Evaluation.DAL.Models.FormsModules;
+using Evaluation.DAL.Models.Org;
 using Evaluation.DAL.Models.Planing;
 using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
 using Evaluation.DAL.Models.ServiceEnities;
 using Evaluation.DAL.Models.StatusEntities;
+using Evaluation.DAL.Models.Template;
 using Evaluation.DAL.Repositories;
 using Evaluation.Services.BusinessLayer.API.AcademicYearLayer;
 using Evaluation.Services.BusinessLayer.API.DepartmentLayer;
@@ -23,6 +25,7 @@ using Evaluation.SharedHelper.Models;
 using FluentResults;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using Microsoft.Extensions.DependencyInjection;
 using System.Globalization;
 using System.Text.Json;
@@ -42,7 +45,8 @@ public class PlanServiceRequestServices(
     RequestInfo requestInfo,
     PlanRequestRepository planRepository,
     AcademicYearRepository academicYearRepository,
-    DepartmentService departmentService
+    DepartmentService departmentService,
+    IEmailNotificationService emailNotificationService
     ) : ApiBase(serviceScopeFactory, cacheDataProvider, unitOfWork, loggingServices, mapper, userInfo,
         serviceProvider, requestInfo)
 {
@@ -408,6 +412,20 @@ public class PlanServiceRequestServices(
             .Select(x => x.DepConfig)
             .FirstOrDefaultAsync();
         return response;
+    }
+    public async Task<Result<bool>> ResendEmail(Guid planId, Guid schoolId)
+    {
+        var checkPlansUsers = await unitOfWork.GetRepository<Plan>().GetAllActiveNonDeleted().AnyAsync(x => x.Id == planId && x.EvaluationRequests.Any(x => x.OrgTreeId == schoolId));
+        if(checkPlansUsers == false )
+            throw new BusinessException(ConstantKeys.ExceptionMessage.NoEmailProvided);
+        string? emailUser = await unitOfWork.
+            GetRepository<School>().GetAllActiveNonDeleted(x => x.Id == schoolId)
+            .Select(s => s.OrgEmail).FirstOrDefaultAsync();
+        if (emailUser == null)
+            throw new BusinessException(ConstantKeys.ExceptionMessage.NoEmailProvided);
+        var reminderMailTemplateKey = await cacheDataProvider.GetSystemSettingValue(SystemSettings.ResendEmailToSchool);
+        var result = await emailNotificationService.SendByTemplateAsync(SystemSettings.ResendEmailToSchool, new List<string> { emailUser });
+        return Result.Ok(result);
     }
     private async Task SyncEvaluationRequests(
       Guid planId,

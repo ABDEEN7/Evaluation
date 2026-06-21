@@ -6,7 +6,6 @@ using Evaluation.SharedHelper.Dtos.PlanDto;
 using Evaluation.SharedHelper.Models;
 using FluentResults;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
 
 namespace Evaluation.API.Controllers;
 
@@ -83,6 +82,12 @@ public class PlanController(MasterBL masterBL) : ControllerBase
     {
         var result = await masterBL.GetApiService<PlanServiceRequestServices>().GetDepartmentConfigsAsync();
         return Ok(new { result = result });
+    }
+    [HttpPost]
+    public async Task<Result<bool>> ResendEmailSchool([FromBody] Guid planId,Guid schoolId)
+    {
+        var result = await masterBL.GetApiService<PlanServiceRequestServices>().ResendEmail(planId, schoolId);
+        return result;
     }
 
 }

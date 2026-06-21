@@ -704,6 +704,27 @@
                 state.selectedSchools = Array.from(state.selectedSchoolsMap.values());
             }
         });
+        if (fieldId === 'resendemail') {
+            $table.find('[data-action="resend-email"]').off('click').on('click', function (e) {
+                e.preventDefault();
+                const schoolId = $(this).data('id');
+                const planId = state.planId;
+                const $btn = $(this);
+
+                $btn.addClass('disabled');
+
+                jqClient().Post(API_ENDPOINTS.RESEND_EMAIL_SCHOOLS, { planId, schoolId })
+                    .done(() => {
+                        toastr?.success(t('ResendEmailSuccess'));
+                    })
+                    .fail(() => {
+                        toastr?.error(t('ResendEmailFailed'));
+                    })
+                    .always(() => {
+                        $btn.removeClass('disabled');
+                    });
+            });
+        };
     };
 
 
@@ -733,7 +754,7 @@
 
         ns.initChildPicker(start, end);
     };
-
+    
     const initYearMode = (fieldId) => {
         const ay = ns.currentAcademicYear;
         if (ay?.start && ay?.end) {

@@ -66,6 +66,7 @@ public static class ServiceExtensions
         services.AddScoped<ServiceRequestBL>();
         services.AddScoped<SrvNotification>();
         services.AddScoped<EmailTemplateProvider>();
+        services.AddScoped<IEmailNotificationService, EmailNotificationService>();
 
         services.Configure<AzureADConfig>(config.GetSection("AzureADConfig"));
         services.Configure<FormJwtConfig>(config.GetSection("FormJwtConfig"));
