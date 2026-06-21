@@ -1,4 +1,5 @@
 ﻿using Evaluation.API.ActionFilter;
+using Evaluation.Services.Integration;
 using Evaluation.Services.Models.API;
 using Evaluation.SharedHelper.Dtos.TeamMemberDto;
 using Evaluation.SharedHelper.Enums;
@@ -7,6 +8,7 @@ using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Api;
 using Evaluation.SharedHelper.Models.Api.ActionEntitiesDTOs;
 using Evaluation.SharedHelper.Models.Api.EvaluationRequestEntities;
+using Evaluation.SharedHelper.Models.Api.FormAnalysisDtos;
 using Evaluation.SharedHelper.Models.Api.FormBuilderDTO;
 using Evaluation.SharedHelper.Models.Api.ServiceRequestEntitiesDTO;
 using Microsoft.AspNetCore.Authorization;
@@ -22,11 +24,13 @@ namespace Evaluation.API.Controllers
 	public class ServiceRequestController : ControllerBase
     {
         private readonly ServiceRequestBL _serviceRequestBL;
+        private readonly QNEDSService _qnedsService;
 
-        public ServiceRequestController(ServiceRequestBL serviceRequestBL)
+        public ServiceRequestController(ServiceRequestBL serviceRequestBL, QNEDSService qnedsService)
         {
             _serviceRequestBL = serviceRequestBL;
-        }
+			_qnedsService = qnedsService;
+		}
 
 		[HttpPost]
 		public async Task<WebAppPlanRequestsDTO> GetPlanRequests([FromBody] FilterRequestsDTO data)
@@ -142,6 +146,12 @@ namespace Evaluation.API.Controllers
 		{
 			var result = await _serviceRequestBL.GetFormAnalysisAsync(requestId);
 			return Ok(result);
+		}
+
+		[HttpGet]
+		public async Task<List<OutputAnalysisViewDto>> GetOutputAnalysis(Guid evaluationRequestId)
+		{
+			return await _qnedsService.GetOutputAnalysisAsync(evaluationRequestId);
 		}
 	}
 }
