@@ -8,6 +8,7 @@ using Evaluation.DAL.Models.OutputAnalysis;
 using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
 using Evaluation.DAL.Repositories;
 using Evaluation.Services.BusinessLayer.API;
+using Evaluation.Services.Models.NSISSchool;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Dtos.QNEDsDto;
 using Evaluation.SharedHelper.Helper;
@@ -515,7 +516,9 @@ public class QNEDSService : ApiBase
 				x.BackendName == "StudentsWithDisabilities" ||
 				x.BackendName == "LowPerformanceStudents" ||
 				x.BackendName == "FailedStudents")
-			.Include(x => x.FormEvalMatrix)
+			.Include(x => x.DataFormEvalMatrix)
+			.ThenInclude(x => x.FormEvalMatrixValues)
+			.Include(x => x.ResultFormEvalMatrix)
 			.ThenInclude(x => x.FormEvalMatrixValues)
 			.OrderBy(x => x.OrderNo)
 			.ToListAsync();
@@ -536,11 +539,11 @@ public class QNEDSService : ApiBase
 			foreach (var detail in details)
 			{
 				detail.FormEvalMatrixValueId = GetMatrixValueId(
-					analysisType.FormEvalMatrix?.FormEvalMatrixValues,
+					analysisType.DataFormEvalMatrix?.FormEvalMatrixValues,
 					detail.ActualValue);
 
 				detail.Note = GetMatrixNameAr(
-					analysisType.FormEvalMatrix?.FormEvalMatrixValues,
+					analysisType.DataFormEvalMatrix?.FormEvalMatrixValues,
 					detail.ActualValue);
 			}
 
@@ -553,10 +556,10 @@ public class QNEDSService : ApiBase
 				EvaluationRequestId = evaluationRequestId,
 				ActualValue = finalActualValue,
 				FormEvalMatrixValueId = GetMatrixValueId(
-					analysisType.FormEvalMatrix?.FormEvalMatrixValues,
+					analysisType.ResultFormEvalMatrix?.FormEvalMatrixValues,
 					finalActualValue),
 				Note = GetMatrixNameAr(
-					analysisType.FormEvalMatrix?.FormEvalMatrixValues,
+					analysisType.ResultFormEvalMatrix?.FormEvalMatrixValues,
 					finalActualValue),
 				IsActive = true,
 				CreateDate = DateTime.Now,
@@ -1079,6 +1082,147 @@ public class QNEDSService : ApiBase
 		return decimal.TryParse(value?.ToString(), out var result)
 			? result
 			: 0;
+	}
+	public async Task<OutputAnalysisResponseDto> GetOutputAnalysisAsync(Guid evaluationRequestId)
+	{
+		evaluationRequestId = Guid.Parse("82DE8371-49D4-402F-96BE-3B53B8E92B00");
+
+		await EnsureOutputAnalysisExistsAsync(evaluationRequestId);
+
+		var analysisTypes = await uow.GetRepository<AnalysisType>()
+			.GetAllActiveNonDeleted()
+			.OrderBy(x => x.OrderNo)
+			.ToListAsync();
+
+		var finals = await uow.GetRepository<OutputAnalysisFinalResult>()
+			.GetAllActiveNonDeleted(x => x.EvaluationRequestId == evaluationRequestId)
+			.ToListAsync();
+
+		var details = await uow.GetRepository<OutputAnalysisData>()
+			.GetAllActiveNonDeleted(x => x.EvaluationRequestId == evaluationRequestId)
+			.ToListAsync();
+
+		return new OutputAnalysisResponseDto
+		{
+			AnalysisTypes = analysisTypes.Select(type =>
+			{
+				var final = finals.FirstOrDefault(x => x.AnalysisTypeId == type.Id);
+
+				return new OutputAnalysisTypeDto
+				{
+					AnalysisTypeId = type.Id,
+					AnalysisTypeNameAr = type.NameAr,
+					AnalysisTypeNameEn = type.NameEn,
+					BackendName = type.BackendName,
+
+					OutputAnalysisFinalResult = final == null
+						? null
+						: new OutputAnalysisFinalResultDto
+						{
+							Id = final.Id,
+							ActualValue = final.ActualValue,
+							Note = final.Note,
+							FormEvalMatrixValueId = final.FormEvalMatrixValueId
+						},
+
+					OutputAnalysisData = details
+						.Where(x => x.AnalysisTypeId == type.Id)
+						.OrderBy(x => x.Grade)
+						.ThenBy(x => x.SubjectCode)
+						.Select(x => new OutputAnalysisDataDto
+						{
+							Id = x.Id,
+							Grade = x.Grade,
+							LastYear = x.LastYear,
+							PreviousYear = x.PreviousYear,
+							LastYearValue = x.LastYearValue,
+							PreviousYearValue = x.PreviousYearValue,
+							Difference = x.Difference,
+							SubjectCode = x.SubjectCode,
+							Track = x.Track,
+							ActualValue = x.ActualValue,
+							MartixTextValue = x.MartixTextValue,
+							Note = x.Note,
+							LastYearStudentCount = x.LastYearStudentCount,
+							PreviousYearStudentCount = x.PreviousYearStudentCount,
+							TermCode = x.TermCode,
+							DataConfig = x.DataConfig
+						})
+						.ToList()
+				};
+			}).ToList()
+		};
+	}
+
+	private async Task EnsureOutputAnalysisExistsAsync(Guid evaluationRequestId)
+	{
+		var analysisTypes = await uow.GetRepository<AnalysisType>()
+			.GetAllActiveNonDeleted()
+			.ToListAsync();
+
+		var finals = await uow.GetRepository<OutputAnalysisFinalResult>()
+			.GetAllActiveNonDeleted(x =>
+				x.EvaluationRequestId == evaluationRequestId)
+			.ToListAsync();
+
+		var details = await uow.GetRepository<OutputAnalysisData>()
+			.GetAllActiveNonDeleted(x =>
+				x.EvaluationRequestId == evaluationRequestId)
+			.ToListAsync();
+
+		bool needGenerate = false;
+
+		if (!finals.Any())
+		{
+			needGenerate = true;
+		}
+		else if (!details.Any())
+		{
+			needGenerate = true;
+		}
+		else
+		{
+			foreach (var analysisType in analysisTypes)
+			{
+				var finalExists = finals.Any(x =>
+					x.AnalysisTypeId == analysisType.Id);
+
+				if (!finalExists)
+				{
+					needGenerate = true;
+					break;
+				}
+
+				var detailExists = details.Any(x =>
+					x.AnalysisTypeId == analysisType.Id);
+
+				if (!detailExists)
+				{
+					needGenerate = true;
+					break;
+				}
+			}
+		}
+
+		if (!needGenerate)
+			return;
+
+		var evaluationRequest = await uow.GetRepository<EvaluationRequest>()
+			.GetAllActiveNonDeleted(x => x.Id == evaluationRequestId)
+			//.Include(x => x.OrgAcademicYear)
+			.FirstOrDefaultAsync();
+
+		if (evaluationRequest == null)
+			return;
+
+		var academicYear =
+			//evaluationRequest.OrgAcademicYear?.AcademicYear
+			//?? 
+			DateTime.Now.Year;
+
+		await GenerateOutputAnalysisFromQnedsAsync(
+			evaluationRequestId,
+			academicYear);
 	}
 }
 

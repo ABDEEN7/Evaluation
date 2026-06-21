@@ -247,6 +247,7 @@
 
             const services = Array.isArray(party.services) ? party.services : [];
             const { open, closed } = countOpenClosedInParty(party);
+            const showOutputsAnalysis = party?.evalPartyCategory?.toLowerCase() === "outputsanalysis";
 
             const grouped = services
                 .flatMap(s => Array.isArray(s?.requests) ? s.requests : [])
@@ -353,8 +354,7 @@
                                         </a>
                                     </div>`: '';
 
-            const showOutputsAnalysis =party?.evalPartyCategory?.toLowerCase() === "outputsanalysis";
-
+            
             const outputsAnalysisHtml = showOutputsAnalysis? `
                                         <div class="text-end">
                                             <a href="javascript:void(0)"
@@ -435,27 +435,57 @@
                
             }
             else if (showOutputsAnalysis) {
+
                 $accordion.append(`
-                                  <div class="accordion-item mb-3 rounded">
-                                    <h2 class="accordion-header" id="${headerId}">
-                                      <button class="accordion-button ${expanded ? "" : "collapsed"}"
-                                              type="button"
-                                              data-bs-toggle="collapse"
-                                              data-bs-target="#${collapseId}">
-                                            ${escapeHtml(title)}
-                                      </button>
-                                    </h2>
+        <div class="accordion-item mb-3 rounded">
 
-                                    <div id="${collapseId}"
-                                         class="accordion-collapse collapse ${expanded ? "show" : ""}">
-                                      <div class="accordion-body">
+            <h2 class="accordion-header" id="${headerId}" data-id="${escapeHtml(partyId)}">
 
-                                          ${outputsAnalysisHtml}
+                <button class="accordion-button ${expanded ? "" : "collapsed"} d-flex align-items-center justify-content-between"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#${collapseId}"
+                        aria-expanded="${expanded ? "true" : "false"}"
+                        aria-controls="${collapseId}">
 
-                                      </div>
-                                    </div>
-                                  </div>
-                                `);
+                    <div class="d-flex align-items-center gap-2 fs-18">
+                        <i class="las la-chart-line text-danger fs-25"></i>
+                        <span class="fw-semibold">
+                            ${escapeHtml(title)}
+                        </span>
+                    </div>
+
+                    <span class="toggle-icon">
+                        <i class="la la-angle-up fs-22"></i>
+                    </span>
+
+                </button>
+
+            </h2>
+
+            <div id="${collapseId}"
+                 class="accordion-collapse collapse ${expanded ? "show" : ""}"
+                 aria-labelledby="${headerId}"
+                 data-bs-parent="#${escapeHtml(parentAccordionId)}">
+
+                <div class="accordion-body text-center">
+
+                    <button type="button"
+                            class="btn btn-success btn-lg"
+                            onclick="openOutputsAnalysis('${requestId}')">
+
+                        <i class="las la-chart-line me-1"></i>
+
+                        ${uiControlsSetup().GetUiControlText('lblOutputsAnalysis')}
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+    `);
             }
             else {
                 $accordion.append(`

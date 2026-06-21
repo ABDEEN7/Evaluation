@@ -149,7 +149,7 @@ namespace Evaluation.API.Controllers
 		}
 
 		[HttpGet]
-		public async Task<List<OutputAnalysisViewDto>> GetOutputAnalysis(Guid evaluationRequestId)
+		public async Task<OutputAnalysisResponseDto> GetOutputAnalysis(Guid evaluationRequestId)
 		{
 			return await _qnedsService.GetOutputAnalysisAsync(evaluationRequestId);
 		}

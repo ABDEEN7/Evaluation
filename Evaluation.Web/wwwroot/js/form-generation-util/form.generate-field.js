@@ -169,6 +169,8 @@ var formGenerateFieldUtility = window.formUtility;
                 if (params.get("id"))
                  serviceRequestId = (params.get("id") ).replace("#", "");
                 const controlValues = JSON.parse(field.value);
+
+
                 const html = await generateFullFormPageHtml({
                     formId,
                     evaluationRequestId,
