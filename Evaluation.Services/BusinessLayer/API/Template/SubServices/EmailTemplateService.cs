@@ -30,9 +30,9 @@ namespace Evaluation.Services.BusinessLayer.API.Template
             result.AddRange(await placeholderService.GetRequestFieldPlaceHolders(scopedUow, 
                 placeholders.Where(p => p.TypeDisplay == ConstantKeys.PlaceHolderTypes.RequestField).ToList(), 
                 request, lang));
-            result.AddRange(await placeholderService.GetScholarshipFieldPlaceHolders(scopedUow, 
+            result.AddRange(await placeholderService.GetEvaluationRequestFieldPlaceHolders(scopedUow, 
                 placeholders.Where(p => p.TypeDisplay == ConstantKeys.PlaceHolderTypes.EvaluationField).ToList(), 
-                request, lang));
+                request.EvaluationRequest, lang));
 
             return templateService.GetTextFromHtml(template, result);
         }

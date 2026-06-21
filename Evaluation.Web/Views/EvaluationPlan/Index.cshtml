@@ -152,6 +152,9 @@
                 </div>
             </div>
             <div class="modal-body py-0">
+
+                <div id="evaluationRequestDetailsModal_divTemplates" class="px-4 pt-3" style="direction:rtl;"></div>
+
                 <div class="card card-table mb-4">
                     <div class="card-body">
                         <div class="accordion" id="customAccordion">
@@ -684,7 +687,7 @@
     <script src="~/js/evaluationplan/evaluation-plan-requests-listing.js"></script>
 
     <script src="~/js/form-generation-util/form-analysis-modal.js"></script>
-
+    <script src="~/js/form-generation-util/outputs-analysis-modal.js"></script>
     <!-- Form Generation -->
     <script src="/js/form-generation-util/form.constants.js"></script>
 
@@ -699,6 +702,7 @@
     <script src="~/js/forms/get-forms.js"></script>
     <script src="~/js/forms/submit-form.js"></script>
 
+    <script src="~/js/form-generation-util/form.templates.js"></script>
     <script src="/js/form-generation-util/form.generate-field.js"></script>
     <script src="/js/form-generation-util/form.render.js"></script>
     <script src="~/js/form-generation-util/form.validation.js"></script>
@@ -717,7 +721,6 @@
     <script src="~/js/evaluationplan/createrequest.js"></script>
     <script src="~/lib/uuid/uuid.min.js"></script>
     <script src="~/lib/jstree/3.3.12/jstree.min.js"></script>
-
 
     <script>
         $(document).ready(async function () {
