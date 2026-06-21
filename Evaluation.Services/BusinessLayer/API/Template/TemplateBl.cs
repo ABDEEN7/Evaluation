@@ -49,9 +49,9 @@ public class TemplateBl(IServiceScopeFactory serviceScopeFactory, CacheDataProvi
 		var placeholders = scopedUow.GetRepository<PlaceHolder>().GetAllQueryFiltered()
 			.Where(c => c.ServiceId == request.ServiceId).ToList();
 
-		//result.AddRange(await placeholderService.GetEvaluationRequestFieldPlaceHolders(scopedUow,
-		//	placeholders.Where(p => p.TypeDisplay == ConstantKeys.PlaceHolderTypes.RequestField).ToList(), request,
-		//	lang));
+		result.AddRange(await placeholderService.GetEvaluationRequestFieldPlaceHolders(scopedUow,
+			placeholders.Where(p => p.TypeDisplay == ConstantKeys.PlaceHolderTypes.RequestField).ToList(), request,
+			lang));
 
 		result.AddRange(await placeholderService.GetDepartmentPlaceHoldersByTemplateId(templateId, lang));
 
