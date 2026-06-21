@@ -9,6 +9,7 @@ public class FormItem : EntityBase, IAuditLogEntity
 {
     public Guid EvalFormId { get; set; }
     public EvalForm? EvalForm { get; set; }
+    public string? ItemNumber { get; set; }
     public string NameAr { get; set; } = null!;
     public string NameEn { get; set; } = null!;
     public decimal Min { get; set; } = 0;

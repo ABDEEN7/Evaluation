@@ -399,13 +399,11 @@ function SetDropDown() {
         const options = {
             success: function (result) {
                 if (result) {
+                    const ddlData = result.map(item => ({
+                        id: item.id,
+                        text: txtDir === "RTL" ? item.nameAr : item.nameEn
+                    }));
 
-                    const ddlData = result.map(item => (
-                        {
-                            id: item.id,
-                            text: txtDir === "RTL" ? item.nameAr : item.nameEn
-                        }
-                    ));
                     var $dropdown = $('#EvalFormItemFormItemRelated');
                     $dropdown.empty();
                     $dropdown.select2({
@@ -417,36 +415,40 @@ function SetDropDown() {
                         dropdownCssClass: "manageselect2zindex",
                         dropdownParent: $("#ModalPopup"),
                     });
-                    var raw = $dropdown.attr("data-value");   // NOT .data()
 
+                    var raw = $dropdown.attr("data-value");
                     if (raw) {
-                        var values = raw.split(",");         // convert CSV → array
-
-                        // Trim spaces (important)
-                        values = values.map(x => x.trim());
-
-                        // Set to Select2
+                        var values = raw.split(",").map(x => x.trim());
                         $dropdown.val(values).trigger("change.select2");
-                    }
-                    else {
+                    } else {
                         $dropdown.val(null).trigger("change.select2");
                     }
-
-
-
                 }
             }
         };
         jqClient(options).Get(API_ROUTES.getFormItemsFromDepartment(EvalformId));
-        //$("label[for='EvalFormItemNoteRequired']").hide();
 
-        //$("#EvalFormItemNoteRequired").parent().hide();
         toggleNoteRequired();
         $("#EvalFormItemHasNote").on("change", function () {
             toggleNoteRequired();
         });
-    }
+        $(document).off("change", "#AnalysisTypeId")
+            .on("change", "#AnalysisTypeId", function () {
+                disableDropdown("#EvalFormItemFormItemRelated", !!$(this).val());
+            });
 
+        $(document).off("change", "#EvalFormItemFormItemRelated")
+            .on("change", "#EvalFormItemFormItemRelated", function () {
+                disableDropdown("#AnalysisTypeId", $(this).val()?.length > 0);
+            });
+    }
+}
+
+function disableDropdown(selector, disabled) {
+    $(selector).prop("disabled", disabled).trigger("change.select2");
+    $(selector).next(".select2-container")
+        .css("opacity", disabled ? "0.5" : "")
+        .css("pointer-events", disabled ? "none" : "");
 }
 
 function BindFormItem() {
@@ -465,6 +467,7 @@ function renderFormItemTable() {
 
     formItems.forEach((p, pIndex) => {
         const jsonString = JSON.stringify(p);
+        const hasChildren = p.subFormItems && p.subFormItems.length > 0;
         var actionButtons = "";
         if (IsAddSubFormItem) {
             actionButtons += `<button type='button' class="btn btn-sm btn-link addSub p-0" data-id="${p.id}"><i class="las la-plus-square"></i></button>`;
@@ -477,7 +480,7 @@ function renderFormItemTable() {
         }
         html += `
         <tr class="parent-row" data-id="${p.id}">
-            <td class="toggle">➖</td>
+         <td class="${hasChildren ? 'toggle collapsed' : ''}"></td>
             <td>
             ${actionButtons}
             </td>
@@ -521,6 +524,7 @@ function renderFormItemTable() {
     });
 
     $("#formitemTable tbody").html(html);
+    $(".child-row").hide();
 }
 $(document).on("click", ".toggle", function () {
     let parentId = $(this).closest("tr").data("id");
@@ -528,10 +532,10 @@ $(document).on("click", ".toggle", function () {
 
     if (children.is(":visible")) {
         children.hide();
-        $(this).text("➕");
+        $(this).addClass("collapsed");
     } else {
         children.show();
-        $(this).text("➖");
+        $(this).removeClass("collapsed");
     }
 });
 
@@ -951,6 +955,7 @@ $("#btn-submit").click(function (e) {
 
 function GetformItemrow(response) {
     const jsonString = JSON.stringify(response);
+    const hasChildren = response.subFormItems && response.subFormItems.length > 0;
     var actionButtons = "";
     if (IsAddSubFormItem) {
         actionButtons += `<button type='button' class="btn btn-sm btn-link addSub p-0" data-id="${response.id}"><i class="las la-plus-square"></i></button>`;
@@ -963,7 +968,7 @@ function GetformItemrow(response) {
     }
     var formitemrow = `
                         <tr class="parent-row" data-id="${response.id}">
-                            <td class="toggle">➖</td>
+                          <td class="${hasChildren ? 'toggle collapsed' : ''}"></td>
                             <td>
                             ${actionButtons}
                             </td>

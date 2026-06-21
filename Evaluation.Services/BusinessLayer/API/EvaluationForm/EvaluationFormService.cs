@@ -143,7 +143,7 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
     {
         return await uow.GetRepository<EvalForm>()
             .GetAllActiveNonDeleted()
-            .Include(x=>x.EvaluationParties)
+            .Include(x => x.EvaluationParties)
             .Where(x => x.IsFinalEval)
             .Where(x => x.EvaluationParties != null &&
                         x.EvaluationParties.DepartmentId == requestInfo.DepId)
@@ -167,7 +167,7 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
         obj.HasMuliEvaluation = message.HasMuliEvaluation;
         if (message.HasMuliEvaluation)
         {
-            obj.CountOfColumnsValue = message.EvalCountOfColumnsValue.Value;
+            obj.CountOfColumnsValue = message.EvalCountOfColumnsValue is 0 ? 1 : message.EvalCountOfColumnsValue.Value;
         }
         if (message.IsFinalEval)
         {
@@ -221,7 +221,7 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
             obj.HasMuliEvaluation = message.HasMuliEvaluation;
             if (message.HasMuliEvaluation)
             {
-                obj.CountOfColumnsValue = message.EvalCountOfColumnsValue.Value;
+                obj.CountOfColumnsValue = message.EvalCountOfColumnsValue is 0 ? 1 : message.EvalCountOfColumnsValue.Value;
             }
             if (!await CheckEvaluationForm(message.Id))
             {
@@ -309,6 +309,14 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
         obj.HasMuliEvaluation = message.HasMulitEvaluation;
 
         uow.GetRepository<FormItem>().Insert(obj);
+        if (message.AnalysisTypeId != null && message.FormItemRelated != null)
+        {
+            throw new BusinessException(ConstantKeys.ExceptionMessage.ShouldOnlyOneOfFormItemAndAnalysisTypeSelected);
+        }
+        if (message.AnalysisTypeId != null)
+        {
+            obj.AnalysisTypeId = message.AnalysisTypeId;
+        }
         //insert values to FormItemRelated
         if (message.FormItemRelated != null)
         {
@@ -378,6 +386,14 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
                     }
 
                 }
+            }
+            if (message.AnalysisTypeId != null && message.FormItemRelated != null)
+            {
+                throw new BusinessException(ConstantKeys.ExceptionMessage.ShouldOnlyOneOfFormItemAndAnalysisTypeSelected);
+            }
+            if (message.AnalysisTypeId != null)
+            {
+                obj.AnalysisTypeId = message.AnalysisTypeId;
             }
             if (message.FormItemRelated != null)
             {

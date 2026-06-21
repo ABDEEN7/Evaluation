@@ -15,6 +15,7 @@ public class FormItemDto
     public List<RelatedItemDto>? RelatedItems { get; set; }
     public List<FormItemConfigDto>? FormItemConfigs { get; set; }
     public bool HasMultiEvaluation { get; set; }
+    public decimal? Value { get; set; }
 
     //public Guid RelatedItemId { get; set; } 
     //public string RelatedItemName { get; set; } = null!;

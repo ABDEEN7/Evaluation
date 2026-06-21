@@ -22,20 +22,21 @@ public class FormProfile : Profile
 			//.ForMember(d => d.RelatedItemName, opt => opt.MapFrom(src => src.RelatedFrom.FirstOrDefault().RelatedItem.NameAr))
 			//.ForMember(d => d.RelatedItemId, opt => opt.MapFrom(src => src.RelatedFrom.FirstOrDefault().RelatedItemId))
 			.ReverseMap();
-		CreateMap<FieldDropDownValue, SubItenList>()
-		.ForMember(d => d.Id, opt => opt.MapFrom(src => src.Id))
-		.ForMember(d => d.NameAr, opt => opt.MapFrom(src => src.TitleAr))
-		.ForMember(d => d.NameEn, opt => opt.MapFrom(src => src.TitleEn));
 
-		CreateMap<SubFormItem, SubFormItemDto>()
-		.ForMember(d => d.Id, opt => opt.MapFrom(src => src.Id))
-		.ForMember(d => d.Name, opt => opt.MapFrom<LocalizedSubNameResolver>())
-		.ForMember(d => d.SubItemLists,
-		opt => opt.MapFrom(src =>
-			src.DropDownType != null
-				? src.DropDownType.FieldDropDownValues
-				: new List<FieldDropDownValue>()))
-	.ReverseMap();
+        CreateMap<FieldDropDownValue, SubItemList>()
+          .ForMember(d => d.Id, opt => opt.MapFrom(src => src.Id))
+          .ForMember(d => d.NameAr, opt => opt.MapFrom(src => src.TitleAr))
+          .ForMember(d => d.NameEn, opt => opt.MapFrom(src => src.TitleEn));
+
+        CreateMap<SubFormItem, SubFormItemDto>()
+          .ForMember(d => d.Id, opt => opt.MapFrom(src => src.Id))
+          .ForMember(d => d.Name, opt => opt.MapFrom<LocalizedSubNameResolver>())
+          .ForMember(d => d.SubItemLists,
+          opt => opt.MapFrom(src =>
+              src.DropDownType != null
+                  ? src.DropDownType.FieldDropDownValues
+                  : new List<FieldDropDownValue>()))
+            .ReverseMap();
 
 		CreateMap<FormItemValue, FormItemEvaluationDto>()
 		  .ForMember(d => d.Value, opt => opt.MapFrom(src => src.ActualValue))
@@ -52,11 +53,11 @@ public class FormProfile : Profile
 		  .ForMember(d => d.Id, opt => opt.MapFrom(src => src.FormItemId))
 		  .ReverseMap();
 
-		CreateMap<SubFormItemValue, SubFormItemEvaluationDto>()
-		 .ForMember(d => d.Note, opt => opt.MapFrom(src => src.Note))
-		 .ForMember(d => d.Id, opt => opt.MapFrom(src => src.SubFormItemId))
-		 .ForMember(d => d.ValueId, opt => opt.MapFrom(src => src.FieldDropDownValueId))
-		 .ReverseMap();
+        CreateMap<SubFormItemValue, SubFormItemEvaluationDto>()
+        .ForMember(d => d.Note, opt => opt.MapFrom(src => src.Note))
+        .ForMember(d => d.Id, opt => opt.MapFrom(src => src.SubFormItemId))
+        .ForMember(d => d.ValueId, opt => opt.MapFrom(src => src.FieldDropDownValueId))
+        .ReverseMap();
 
 		CreateMap<FormEvaluationDto, FormEvaluationValue>()
 			  .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.Items))

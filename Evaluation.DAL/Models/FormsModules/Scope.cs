@@ -6,6 +6,7 @@ namespace Evaluation.DAL.Models.FormsModules;
 
 public class Scope : EntityBase, IAuditLogEntity
 {
+    public string? ScopeNumber { get; set; }
     public string NameAr { get; set; } = null!;
     public string NameEn { get; set; } = null!;
     public Guid ScopeTypeId { get; set; }

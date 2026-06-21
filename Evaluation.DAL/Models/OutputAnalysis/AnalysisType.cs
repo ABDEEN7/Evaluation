@@ -17,8 +17,10 @@ namespace Evaluation.DAL.Models.OutputAnalysis
         public string? Grades { get; set; }
         public string? SubjectCode { get; set; } // CourceCode
         public string? AnalysisConfig { get; set; }
-        public Guid? FormEvalMatrixId { get; set; }
-        public FormEvalMatrix? FormEvalMatrix { get; set; }
+        public Guid? DataFormEvalMatrixId { get; set; }
+        public FormEvalMatrix? DataFormEvalMatrix { get; set; }
+        public Guid? ResultFormEvalMatrixId { get; set; }
+        public FormEvalMatrix? ResultFormEvalMatrix { get; set; }
         public int OrderNo { get; set; } = 0;
     }
 }
