@@ -704,7 +704,8 @@
                 state.selectedSchools = Array.from(state.selectedSchoolsMap.values());
             }
         });
-        if (fieldId === 'resendemail') {
+        const cfg = window.planUtility?.depConfig || {};
+        if (fieldId === 'resendemail' && cfg.resendEmail === true) {
             $table.find('[data-action="resend-email"]').off('click').on('click', function (e) {
                 e.preventDefault();
                 const schoolId = $(this).data('id');

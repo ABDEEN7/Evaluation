@@ -439,7 +439,8 @@
             .html('<i class="la la-eye"></i>');
 
         container.append(link);
-        if (fieldId === 'resendemail') {
+        const cfg = window.planUtility?.depConfig || {};
+        if (fieldId === 'resendemail' && cfg.resendEmail === true) {
             const resendBtn = $('<a>')
                 .attr('href', '#')
                 .addClass('text-dark ms-2')
