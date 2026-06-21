@@ -2,6 +2,7 @@
 using Azure.Core;
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.ActionEntities;
+using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
 using Evaluation.DAL.Models.ServiceRequestEntities;
 using Evaluation.DAL.Models.UserEntiy;
 using Evaluation.DAL.Repositories;
@@ -105,10 +106,10 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
             var userTask = srvUser.GetByIDActiveNonDeleted(userInfo.UserId!.Value);
 			using var ScopedUow = serviceScopeFactory.CreateScopedUow();
 
-			var request = await ScopedUow.GetRepository<ServiceRequest>().GetByIDActiveNonDeleted(requestId);
+			var request = await ScopedUow.GetRepository<EvaluationRequest>().GetByIDActiveNonDeleted(requestId);
 
             if (request == null) { throw new BusinessException(ConstantKeys.ExceptionMessage.ServiceRequestNotFound); }
-            var statusId = request.StatusId;
+            var statusId = request.ServiceStatusId;
             var user = await userTask;
 
             var isMinistry = user is MinistryUser;
@@ -130,6 +131,8 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
                 {
                     Id = m.TemplateDocId,
                     Name = lang == "ar" ? m.TemplateDoc!.NameAr : m.TemplateDoc!.NameEn,
+                    NameAr =  m.TemplateDoc!.NameAr ,
+                    NameEn = m.TemplateDoc!.NameEn,
                     TemplateConfiguration = m.TemplateDoc.TemplateGenrationTypeId,
                     ActionBackEndName = x.BackendName,
                 })).ToList();
