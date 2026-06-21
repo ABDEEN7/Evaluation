@@ -57,6 +57,7 @@ namespace Evaluation.Services.Models.Admin
                 obj.NameEn = message.NameEn;
                 obj.ScopeTypeId = message.ScopeTypeId;
                 obj.IsActive = message.IsActive;
+                obj.ScopeNumber = message.ScopeNumber;
 
                 uow.GetRepository<Scope>().Insert(obj);
            
@@ -88,6 +89,7 @@ namespace Evaluation.Services.Models.Admin
                 obj.NameEn = message.NameEn;
                 obj.ScopeTypeId = message.ScopeTypeId;
                 obj.IsActive = message.IsActive;
+                obj.ScopeNumber = message.ScopeNumber;
 
                 uow.GetRepository<Scope>().Update(obj);
 
