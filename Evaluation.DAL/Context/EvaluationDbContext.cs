@@ -153,7 +153,13 @@ public partial class EvaluationDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.HasSequence<long>("Request_Sequence")
+                .StartsAt(1)
+                .IncrementsBy(1);
 
+        modelBuilder.HasSequence<long>("EvaluationRequest_Sequence")
+                .StartsAt(1)
+                .IncrementsBy(1);
 
         base.OnModelCreating(modelBuilder);
         var typesToRegister = Assembly.GetExecutingAssembly().GetTypes();
@@ -174,20 +180,20 @@ public partial class EvaluationDbContext : DbContext
 
     private void ApplyGeneralConfigurations(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<EvaluationRequest>(entity =>
-        {
-            entity.Property(e => e.Sequence)
-                .ValueGeneratedOnAdd()
-                .UseIdentityColumn(1, 1)
-                .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore); // seed: 1, increment: 1
-        });
-        modelBuilder.Entity<ServiceRequest>(entity =>
-        {
-            entity.Property(e => e.Sequence)
-                .ValueGeneratedOnAdd()
-                .UseIdentityColumn(1, 1)
-                .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore); // seed: 1, increment: 1
-        });
+        //modelBuilder.Entity<EvaluationRequest>(entity =>
+        //{
+        //    entity.Property(e => e.Sequence)
+        //        .ValueGeneratedOnAdd()
+        //        .UseIdentityColumn(1, 1)
+        //        .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore); // seed: 1, increment: 1
+        //});
+        //modelBuilder.Entity<ServiceRequest>(entity =>
+        //{
+        //    entity.Property(e => e.Sequence)
+        //        .ValueGeneratedOnAdd()
+        //        .UseIdentityColumn(1, 1)
+        //        .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore); // seed: 1, increment: 1
+        //});
         modelBuilder.Entity<OrgTree>()
            .HasOne(x => x.OrgType)
                    .WithMany()
