@@ -142,6 +142,7 @@ public partial class EvaluationDbContext : DbContext
     public virtual DbSet<AnalysisType> AnalysisType { get; set; }
     public virtual DbSet<OutputAnalysisData> OutputAnalysisData { get; set; }
     public virtual DbSet<OutputAnalysisFinalResult> OutputAnalysisFinalResult { get; set; }
+    public virtual DbSet<FormItemValueHistory> FormItemValueHistory { get; set; }
 
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
