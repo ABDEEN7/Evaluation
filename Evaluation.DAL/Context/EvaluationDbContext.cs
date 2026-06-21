@@ -203,13 +203,7 @@ public partial class EvaluationDbContext : DbContext
         modelBuilder.Entity<Employee>()
             .HasOne(e => e.JobTitle)
             .WithMany()
-            .HasForeignKey(e => e.JobTitleId);
-
-        // Organization relations
-        modelBuilder.Entity<Organization>()
-            .HasOne(o => o.SchoolType)
-            .WithMany()
-            .HasForeignKey(o => o.TypeId);
+            .HasForeignKey(e => e.JobTitleId);               
 
         // School relations
         modelBuilder.Entity<School>()
