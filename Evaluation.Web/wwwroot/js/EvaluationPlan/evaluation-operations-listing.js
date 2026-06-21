@@ -361,7 +361,7 @@
                         requestId: requestId,
                         serviceId: response.serviceId,
                         actionsContainerId: 'actions-container',
-                        templateContainerId: 'divTemplates',
+                        templateContainerId: 'evaluationRequestDetailsModal_divTemplates',
                         modalContainerId: 'Action-container-fields',
                         root: '#evaluationRequestDetailsModal'
                     }

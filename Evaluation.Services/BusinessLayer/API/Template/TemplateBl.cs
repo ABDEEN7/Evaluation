@@ -1,6 +1,7 @@
 using AutoMapper;
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.Attachments;
+using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
 using Evaluation.DAL.Models.ServiceRequestEntities;
 using Evaluation.DAL.Models.Template;
 using Evaluation.DAL.Repositories;
@@ -35,12 +36,12 @@ public class TemplateBl(IServiceScopeFactory serviceScopeFactory, CacheDataProvi
 		string lang)
 		=> await emailTemplateService.GetRequestEmailAttachment(requestData, emailTemplateId, lang);
 
-	public async Task<byte[]?> GetLetterTemplate(Guid requestId, Guid templateId, string lang)
+	public async Task<byte[]?> GetLetterTemplate(Guid EvalRequestId, Guid templateId, string lang)
 	{
 		var result = new List<PlaceholderDto>();
 		using var scopedUow = serviceScopeFactory.CreateScopedUow();
 
-		var request = await scopedUow.GetRepository<ServiceRequest>().GetAllQueryFiltered(x => x.Id == requestId)
+		var request = await scopedUow.GetRepository<EvaluationRequest>().GetAllQueryFiltered(x => x.Id == EvalRequestId)
 			.Include(x => x.Service).FirstOrDefaultAsync();
 		if (request == null)
 			throw new BusinessException(ConstantKeys.ExceptionMessage.InActiveData);
@@ -48,15 +49,12 @@ public class TemplateBl(IServiceScopeFactory serviceScopeFactory, CacheDataProvi
 		var placeholders = scopedUow.GetRepository<PlaceHolder>().GetAllQueryFiltered()
 			.Where(c => c.ServiceId == request.ServiceId).ToList();
 
-		result.AddRange(await placeholderService.GetRequestFieldPlaceHolders(scopedUow,
+		result.AddRange(await placeholderService.GetEvaluationRequestFieldPlaceHolders(scopedUow,
 			placeholders.Where(p => p.TypeDisplay == ConstantKeys.PlaceHolderTypes.RequestField).ToList(), request,
 			lang));
 
 		result.AddRange(await placeholderService.GetDepartmentPlaceHoldersByTemplateId(templateId, lang));
 
-		result.AddRange(await placeholderService.GetScholarshipFieldPlaceHolders(scopedUow,
-			placeholders.Where(p => p.TypeDisplay == ConstantKeys.PlaceHolderTypes.EvaluationField).ToList(), request,
-			lang));
 
 		var useAsposeKeyValue = await cacheDataProvider.GetSystemSettingValue(ConstantKeys.SystemSettings.useAsposeLib);
 		bool useAspose = !string.IsNullOrWhiteSpace(useAsposeKeyValue) && bool.TryParse(useAsposeKeyValue, out var parsedValue) ? parsedValue : false;

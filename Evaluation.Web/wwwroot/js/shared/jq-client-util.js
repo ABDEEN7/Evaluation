@@ -43,8 +43,6 @@
                 throw error;
             });
     }
-
-
     function HttpDelete(url) {
 
         settings.options = options;
