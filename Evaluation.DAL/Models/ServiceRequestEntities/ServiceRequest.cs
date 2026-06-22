@@ -26,8 +26,6 @@ namespace Evaluation.DAL.Models.ServiceRequestEntities
 		public Service? Service { get; set; }
 		public Guid? OrgTreeId { get; set; }
 		public OrgTree? OrgTree { get; set; }
-
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)] 
 		public long Sequence { get; set; }
 		public Guid? PlanId { get; set; }
 		public Plan? Plan { get; set; }
