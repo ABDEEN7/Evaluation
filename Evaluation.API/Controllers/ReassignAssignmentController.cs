@@ -17,7 +17,7 @@ public class ReassignAssignmentController : ControllerBase
     {
         _masterBl = masterBL;
     }
-    //[CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.VIEW_WEB_ReassignAssignment })]
+    [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.VIEW_WEB_ReassignAssignment })]
     [HttpGet]
     public async Task<IActionResult> GetEvalFormItemLists(Guid? userId)
     {
@@ -25,7 +25,7 @@ public class ReassignAssignmentController : ControllerBase
             .GetReAssignedDropList(userId);
         return Ok(new ResponseEntity(response));
     }
-    //[CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.VIEW_WEB_ReassignAssignment })]
+    [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.VIEW_WEB_ReassignAssignment })]
     [HttpGet]
     public async Task<IActionResult> GetUserAssignments(Guid userId)
     {
@@ -33,7 +33,7 @@ public class ReassignAssignmentController : ControllerBase
             .GetEvaluationUserAssignments(userId);
         return Ok(new ResponseEntity(response));
     }
-    //[CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.ADD_WEB_ReassignAssignment })]
+    [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.ADD_WEB_ReassignAssignment })]
     [HttpPost]
     public async Task<ResponseDto> ReassignEvaluationRequestUser(
     [FromBody] RequestReassignDto request)

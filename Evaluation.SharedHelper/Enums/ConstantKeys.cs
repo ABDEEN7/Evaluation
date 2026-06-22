@@ -386,6 +386,7 @@ public static class ConstantKeys
         public static readonly string WebEvaluationSubFormItem = "WebEvaluationSubFormItem";
         public static readonly string WebEvaluationFormScopes = "WebEvaluationFormScopes";
         public static readonly string WebDepartmentHoliday = "WebDepartmentHoliday";
+        public static readonly string WebEvaluationFormItemConfig = "WebEvaluationFormItemConfig";
         public static readonly string WebAppRequest = "WebAppRequest";
         public static readonly string WebAppCommon = "WebAppCommon";
         public static readonly string AssignmentUserTeam = "AssignmentUserTeam";
@@ -1089,6 +1090,8 @@ public static class ConstantKeys
         public const string EDIT_WEB_PLAN = "EDIT_WEB_PLAN";
         public const string VIEW_WEB_PLAN = "VIEW_WEB_PLAN";
         public const string DELETE_WEB_PLAN = "DELETE_WEB_PLAN";
+        public const string GET_SEMESTERS_REQUEST = "GET_SEMESTERS_REQUEST";
+        public const string GET_WEB_PLAN_DETAILS_REQUEST = "GET_WEB_PLAN_DETAILS_REQUEST";
         #endregion
         #region Reassign
         public const string VIEW_WEB_ReassignAssignment = "VIEW_WEB_ReassignAssignment";
@@ -1112,9 +1115,15 @@ public static class ConstantKeys
         public const string CREATE_WEB_AcademicYear = "CREATE_WEB_AcademicYear";
         public const string UPDATE_WEB_AcademicYear = "UPDATE_WEB_AcademicYear";
         public const string DELETE_WEB_AcademicYear = "DELETE_WEB_AcademicYear";
-
+        #endregion
+        #region WebDepartmentHoliday
+        public const string VIEW_WEB_DepartmentHoliday = "VIEW_WEB_DepartmentHoliday";
+        public const string CREATE_WEB_DepartmentHoliday = "CREATE_WEB_DepartmentHoliday";
+        public const string UPDATE_WEB_DepartmentHoliday = "UPDATE_WEB_DepartmentHoliday";
+        public const string DELETE_WEB_DepartmentHoliday = "DELETE_WEB_DepartmentHoliday";
 
         #endregion
+
     }
     public static class WebAppSettings
     {

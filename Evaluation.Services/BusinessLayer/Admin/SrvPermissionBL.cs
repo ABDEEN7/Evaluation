@@ -53,72 +53,74 @@ namespace Evaluation.Services.Models.Admin
         {
             try
             {
-                if (message.Count > 0)
+                if (message == null || !message.Any())
+                    return message;
+
+                var roleId = message[0].RoleId!.Value;
+                List<RolePermission> existingPermissions = await uow.GetRepository<RolePermission>()
+                    .GetAllNonDeleted()
+                    .Where(x => x.RoleId == roleId)
+                    .ToListAsync();
+
+                List<Guid> selectedPermissionIds = message
+                    .Where(x => x.PermissionId.HasValue)
+                    .Select(x => x.PermissionId!.Value)
+                    .ToList();
+
+
+                var permissionsToDelete = existingPermissions
+                    .Where(x => !selectedPermissionIds.Contains(x.PermissionId))
+                    .ToList();
+
+                if (permissionsToDelete.Any())
                 {
-                    var RoleId=message[0].RoleId;
-
-
-                    List<RolePermission>  objentity = await uow.GetRepository<RolePermission>()
-                                      .GetAllNonDeleted()
-                                      .Where(x => x.RoleId == RoleId)
-                                      .ToListAsync();
-                    List<RolePermission>  updateentity=new List<RolePermission>();
-
-                    if (objentity.Count > 0)
-                    {
-                        foreach (var item in objentity)
-                        {
-                            bool exists = message.Any(x => x.PermissionId == item.PermissionId);
-                            if (exists)
-                            {
-                                item.IsActive = true;
-                                updateentity.Add(item);
-
-                            }
-                            else
-                            {
-                                uow.GetRepository<RolePermission>().Delete(item);
-                            }
-
-                        }
-                    }
-
-                    if (updateentity.Count > 0)
-                    {
-                        uow.GetRepository<RolePermission>().UpdateRange(updateentity);
-                    }
-                    if (message.Count > 0)
-                    {
-                        var notInSelected = message.Select(x=>x.PermissionId!.Value).Except(updateentity.Select(x=>x.PermissionId)).ToList();
-                        List<RolePermission> objentitylist=new List<RolePermission>();
-                        foreach (var item in notInSelected)
-                        {
-                            RolePermission objentityinsert = new RolePermission();
-                            objentityinsert.RoleId = RoleId!.Value;
-                            objentityinsert.PermissionId = item;
-                            objentityinsert.IsActive = true;
-                            objentitylist.Add(objentityinsert);
-                        }
-                        if (objentitylist.Count > 0)
-                        {
-                            await uow.GetRepository<RolePermission>().InsertRange(objentitylist);
-                        }
-
-
-                    }
-                    await uow.CommitAsync();
-                    message[0].ResponseStatus = DBResult.Updated;
+                    uow.GetRepository<RolePermission>().DeleteRange(permissionsToDelete);
                 }
+
+
+                var permissionsToUpdate = existingPermissions
+                    .Where(x => selectedPermissionIds.Contains(x.PermissionId))
+                    .ToList();
+
+                foreach (var item in permissionsToUpdate)
+                {
+                    item.IsActive = true;
+                }
+
+                if (permissionsToUpdate.Any())
+                {
+                    uow.GetRepository<RolePermission>().UpdateRange(permissionsToUpdate);
+                }
+
+                List<Guid> existingPermissionIds = existingPermissions
+                    .Select(x => x.PermissionId)
+                    .ToList();
+
+                var permissionsToInsert = selectedPermissionIds
+                    .Except(existingPermissionIds)
+                    .Select(permissionId => new RolePermission
+                    {
+                        RoleId = roleId,
+                        PermissionId = permissionId,
+                        IsActive = true
+                    })
+                    .ToList();
+
+                if (permissionsToInsert.Any())
+                {
+                    await uow.GetRepository<RolePermission>().InsertRange(permissionsToInsert);
+                }
+
+                await uow.CommitAsync();
+
+                message[0].ResponseStatus = DBResult.Updated;
             }
-            catch(Exception)
+            catch
             {
                 throw;
             }
 
-          
             return message;
-
         }
-
     }
 }
