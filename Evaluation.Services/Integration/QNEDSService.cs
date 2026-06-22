@@ -472,11 +472,20 @@ public class QNEDSService : ApiBase
 
 			foreach (var detail in details)
 			{
-				detail.FormEvalMatrixValueId = GetMatrixValueId(analysisType.DataFormEvalMatrix?.FormEvalMatrixValues, detail.ActualValue);
-				detail.Note = GetMatrixNameAr(analysisType.DataFormEvalMatrix?.FormEvalMatrixValues, detail.ActualValue);
+				var dataMatrixValue = GetMatrixValue(
+					analysisType.DataFormEvalMatrix?.FormEvalMatrixValues,
+					detail.ActualValue);
+
+				detail.FormEvalMatrixValueId = dataMatrixValue?.Id;
+				detail.Note = dataMatrixValue?.NameAr;
+				detail.MartixTextValue = dataMatrixValue?.ReportTextAr;
 			}
 
 			var avgActualValue = details.Average(x => x.ActualValue);
+
+			var resultMatrixValue = GetMatrixValue(
+				analysisType.ResultFormEvalMatrix?.FormEvalMatrixValues,
+				avgActualValue);
 
 			var finalResult = new OutputAnalysisFinalResult
 			{
@@ -484,13 +493,12 @@ public class QNEDSService : ApiBase
 				AnalysisTypeId = analysisType.Id,
 				EvaluationRequestId = evaluationRequestId,
 				ActualValue = avgActualValue,
-				FormEvalMatrixValueId = GetMatrixValueId(analysisType.ResultFormEvalMatrix?.FormEvalMatrixValues, avgActualValue),
-				Note = GetMatrixNameAr(analysisType.ResultFormEvalMatrix?.FormEvalMatrixValues, avgActualValue),
+				FormEvalMatrixValueId = resultMatrixValue?.Id,
+				Note = resultMatrixValue?.NameAr,
 				IsActive = true,
 				CreateDate = DateTime.Now,
 				IsDeleted = false
 			};
-
 			await uow.GetRepository<OutputAnalysisFinalResult>().InsertAsync(finalResult);
 
 			foreach (var detail in details)
@@ -506,8 +514,20 @@ public class QNEDSService : ApiBase
 		await uow.CommitAsync();
 		return true;
 	}
-
-	private static readonly HashSet<string> AnalysisBackendNames =
+	private static FormEvalMatrixValue? GetMatrixValue(
+	IEnumerable<FormEvalMatrixValue>? values,
+	decimal actualValue)
+	{
+		return values?
+			.Where(x =>
+				x.IsActive &&
+				!x.IsDeleted &&
+				actualValue >= x.MinValue &&
+				actualValue <= x.MaxValue)
+			.OrderBy(x => x.OrderNo)
+			.FirstOrDefault();
+	}
+	private static readonly List<string> AnalysisBackendNames =
 [
 	"AcademicAchievement",
 	"StudentsWithDisabilities",
@@ -589,10 +609,10 @@ public class QNEDSService : ApiBase
 		Guid EvaluationRequestId,
 		int LastYear,
 		int PreviousYear,
-		HashSet<int> AllowedGrades,
-		HashSet<string> AllowedSubjects,
-		HashSet<string> AllowedTracks,
-	    HashSet<string> AllowedTerms,
+		List<int> AllowedGrades,
+		List<string> AllowedSubjects,
+		List<string> AllowedTracks,
+	    List<string> AllowedTerms,
 		Dictionary<string, int> LastAttendance,
 		Dictionary<string, int> PreviousAttendance);
 
@@ -1062,7 +1082,7 @@ public class QNEDSService : ApiBase
 
 	private static Dictionary<string, int> BuildAttendanceStudentCountLookup(
 		List<StudentDailyAttendanceByMonthDto>? rows,
-		HashSet<int> allowedGrades) =>
+		List<int> allowedGrades) =>
 		rows?
 			.Where(x =>
 				allowedGrades.Contains(ToInt(x.Grade)) &&
@@ -1074,14 +1094,14 @@ public class QNEDSService : ApiBase
 	private static int GetStudentCount(Dictionary<string, int> lookup, int grade, string? termCode) =>
 		lookup.TryGetValue($"{grade}|{ToInt(termCode)}", out var count) ? count : 0;
 
-	private static HashSet<int> ParseGrades(string? grades) =>
+	private static List<int> ParseGrades(string? grades) =>
 		(grades ?? "")
 			.Split(',', StringSplitOptions.RemoveEmptyEntries)
 			.Select(x => int.TryParse(x.Trim(), out var g) ? g : 0)
 			.Where(x => x > 0)
-			.ToHashSet();
+			.ToList();
 
-	private static HashSet<string> ParseSubjectCodes(string? subjectCodes)
+	private static List<string> ParseSubjectCodes(string? subjectCodes)
 	{
 		if (string.IsNullOrWhiteSpace(subjectCodes) ||
 			subjectCodes.Trim().Equals("NULL", StringComparison.OrdinalIgnoreCase))
@@ -1091,10 +1111,10 @@ public class QNEDSService : ApiBase
 			.Split(',', StringSplitOptions.RemoveEmptyEntries)
 			.Select(x => x.Trim())
 			.Where(x => !string.IsNullOrWhiteSpace(x))
-			.ToHashSet(StringComparer.OrdinalIgnoreCase);
+			.ToList();
 	}
 
-	private static bool IsAllowedSubject(string? subjectCode, HashSet<string> allowed) =>
+	private static bool IsAllowedSubject(string? subjectCode, List<string> allowed) =>
 		!allowed.Any() || (!string.IsNullOrWhiteSpace(subjectCode) && allowed.Contains(subjectCode.Trim()));
 
 	private static AnalysisConfigDto GetAnalysisConfig(string? json)
@@ -1103,16 +1123,16 @@ public class QNEDSService : ApiBase
 		try { return JsonSerializer.Deserialize<AnalysisConfigDto>(json) ?? new(); }
 		catch { return new(); }
 	}
-	private static HashSet<string> ToFilterSet(IEnumerable<string>? values)
+	private static List<string> ToFilterSet(IEnumerable<string>? values)
 	{
 		return values?
 			.Where(x => !string.IsNullOrWhiteSpace(x))
 			.Select(x => x.Trim())
-			.ToHashSet(StringComparer.OrdinalIgnoreCase)
+			.ToList()
 			?? [];
 	}
 
-	private static bool MatchFilter(string? value, HashSet<string> filter)
+	private static bool MatchFilter(string? value, List<string> filter)
 	{
 		if (!filter.Any())
 			return true;
@@ -1120,19 +1140,6 @@ public class QNEDSService : ApiBase
 		return !string.IsNullOrWhiteSpace(value)
 			&& filter.Contains(value.Trim());
 	}
-	private static Guid? GetMatrixValueId(IEnumerable<FormEvalMatrixValue>? values, decimal actualValue) =>
-		values?
-			.Where(x => x.IsActive && !x.IsDeleted && actualValue >= x.MinValue && actualValue <= x.MaxValue)
-			.OrderBy(x => x.OrderNo)
-			.Select(x => (Guid?)x.Id)
-			.FirstOrDefault();
-
-	private static string? GetMatrixNameAr(IEnumerable<FormEvalMatrixValue>? values, decimal actualValue) =>
-		values?
-			.Where(x => x.IsActive && !x.IsDeleted && actualValue >= x.MinValue && actualValue <= x.MaxValue)
-			.OrderBy(x => x.OrderNo)
-			.Select(x => x.NameAr)
-			.FirstOrDefault();
 
 	private static MatrixValueDto? MapMatrixValue(FormEvalMatrixValue? value) =>
 		value == null ? null : new MatrixValueDto
