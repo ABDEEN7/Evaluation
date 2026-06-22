@@ -17,7 +17,7 @@ public class PlanController(MasterBL masterBL) : ControllerBase
 {
 
     [HttpPost]
-    //[CheckRolePermisionFilter(true, ConstantKeys.WebPermission.APPROVE_WEB_PLAN_REQUEST)]
+    [CheckRolePermisionFilter(true, ConstantKeys.WebPermissions.ADD_WEB_PLAN)]
     public async Task<IActionResult> InsertOrUpdatePlan([FromBody] CreateEvaluationPlanDto approveDto)
     {
         await masterBL.GetApiService<PlanServiceRequestServices>().InsertOrUpdatePlan(approveDto);
@@ -29,10 +29,8 @@ public class PlanController(MasterBL masterBL) : ControllerBase
     [CheckRolePermisionFilter(true, ConstantKeys.WebPermissions.GET_SEMESTERS_REQUEST)]
     public async Task<IActionResult> GetSemesters()
     {
-        //var semester = await masterBL.GetApiService<SemesterRequestServices>().GetSemestersAsync(new Guid("37689d34-4928-4bb9-92b4-8a11abc0dbaf"));
         var semester = await masterBL.GetApiService<SemesterRequestServices>().GetSemestersAsync();
         return Ok(new { result = semester });
-        //return semester.ToActionResult();
     }
     [HttpGet]
     //[CheckRolePermisionFilter(true, ConstantKeys.WebPermission.GET_WEB_PLAN_DETAILS_REQUEST)]
@@ -43,7 +41,7 @@ public class PlanController(MasterBL masterBL) : ControllerBase
     }
 
     [HttpGet("{planId:guid}")]
-    //[CheckRolePermisionFilter(true, ConstantKeys.WebPermission.GET_WEB_PLAN_DETAILS_REQUEST)]
+    //[CheckRolePermisionFilter(true, ConstantKeys.WebPermissions.GET_WEB_PLAN_DETAILS_REQUEST)]
     public async Task<IActionResult> GetPlansWithunSelectedSchoolsDetails(Guid planId)
     {
         var plan = await masterBL.GetApiService<PlanServiceRequestServices>().GetPlanWithSchoolsByIdAsync(planId);
@@ -51,6 +49,7 @@ public class PlanController(MasterBL masterBL) : ControllerBase
     }
 
     [HttpGet]
+    [CheckRolePermisionFilter(true, ConstantKeys.WebPermissions.VIEW_WEB_PLAN)]
     public async Task<IActionResult> GetPlans([FromQuery] PlanDetailsRequestDto request)
     {
         var result = Ok(await masterBL
@@ -64,23 +63,27 @@ public class PlanController(MasterBL masterBL) : ControllerBase
         return await masterBL.GetApiService<PlanServiceRequestServices>().ValidateEvaluationPlan(planDtoRequest);
     }
     [HttpPost]
+    [CheckRolePermisionFilter(true, ConstantKeys.WebPermissions.DELETE_WEB_PLAN)]
     public async Task<IActionResult> DeletePlan(Guid id)
     {
         await masterBL.GetApiService<PlanServiceRequestServices>().DeletePlanById(id);
         return Ok();
     }
     [HttpGet]
+    [CheckRolePermisionFilter(true, ConstantKeys.WebPermissions.VIEW_WEB_PLAN)]
     public async Task<IActionResult> GetPlansDDL()
     {
         return Ok(await masterBL.GetApiService<PlanServiceRequestServices>().GetPlans());
     }
     [HttpGet]
+    [CheckRolePermisionFilter(true, ConstantKeys.WebPermissions.VIEW_WEB_PLAN)]
     public async Task<IActionResult> GetFomrEvalMatrixValueList()
     {
         var result = await masterBL.GetApiService<PlanServiceRequestServices>().GetFomrEvalMatrixValueList();
         return Ok(new { result = result });
     }
     [HttpGet]
+    [CheckRolePermisionFilter(true, ConstantKeys.WebPermissions.VIEW_WEB_PLAN)]
     public async Task<IActionResult> GetDepartmentConfig()
     {
         var result = await masterBL.GetApiService<PlanServiceRequestServices>().GetDepartmentConfigsAsync();
