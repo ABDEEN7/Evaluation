@@ -215,6 +215,9 @@ public static class ConstantKeys
         public static readonly string NoEvaluationRequestsWereSelected = "NoEvaluationRequestsWereSelected";
         public static readonly string CannotDeletePlanInProcess = "CannotDeletePlanInProcess";
         public static readonly string EvaluationPartyRequriedDDL = "EvaluationPartyRequriedDDL";
+        public static readonly string NoEmailProvided = "NoEmailProvided";
+        public static readonly string TemplateNotFound = "TemplateNotFound";
+        public static readonly string NotRelatedUserPlan = "NotRelatedUserPlan";
         public static readonly string ShouldOnlyOneOfFormItemAndAnalysisTypeSelected = "ShouldOnlyOneOfFormItemAndAnalysisTypeSelected";
     }
 
@@ -1092,6 +1095,7 @@ public static class ConstantKeys
         public const string DELETE_WEB_PLAN = "DELETE_WEB_PLAN";
         public const string GET_SEMESTERS_REQUEST = "GET_SEMESTERS_REQUEST";
         public const string GET_WEB_PLAN_DETAILS_REQUEST = "GET_WEB_PLAN_DETAILS_REQUEST";
+        public const string ResendSchoolEmail = "ResendSchoolEmail";
         #endregion
         #region Reassign
         public const string VIEW_WEB_ReassignAssignment = "VIEW_WEB_ReassignAssignment";
@@ -1515,6 +1519,7 @@ public static class ConstantKeys
         public static readonly string AddAttachment_FILE_COUNT = "AddAttachment_FILE_COUNT";
         public static readonly string useAsposeLib = "useAsposeLib";
         public static readonly string TemplateSendReminderToUser = "TemplateSendReminderToUser";
+        public static readonly string ResendEmailToSchool = "ResendEmailToSchool";
     }
     public static class EvalFormSettings
     {

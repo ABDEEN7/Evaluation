@@ -233,6 +233,16 @@
         </a>
     `;
                     });
+                    actionsHtml += `
+    <div class="dropdown-divider"></div>
+
+    <a class="dropdown-item"
+       href="#"
+       onclick="InitializeResendEmail('${planId}'); return false;">
+        <i class="fas fa-envelope mx-1"></i>
+        ${uiControlsSetup().GetUiControlText('lblResendEmail')}
+    </a>
+`;
 
                     actionsHtml += `</div></div>`;
                     return actionsHtml;
@@ -256,6 +266,55 @@
     /* =========================
      * EVENTS
      * ========================= */
+    window.InitializeResendEmail = async function (planId) {
+        try {
+            if (!planId) {
+                console.error("Missing planId", { planId });
+                return;
+            }
+
+            // Fetch plan details to get the selected schools
+            const response = await fapi.fetchJSON(
+                `/Plan/${departmentRoutePath}/GetPlanDetails?planId=${encodeURIComponent(planId)}`
+            );
+
+            if (!response || !response.result) {
+                console.error("No plan details received");
+                return;
+            }
+
+            // Extract the actual plan data from the result property
+            const planDetails = response.result;
+
+            // Show the modal
+            const el = document.getElementById("PlanDetailsModal");
+            const modal = bootstrap.Modal.getOrCreateInstance(el);
+            formUtility.addQueryParameter('planId', planId);
+            modal.show();
+
+            // Clear any previous content in modal body
+            const modalBody = el.querySelector('.modal-body');
+            if (modalBody) {
+                modalBody.innerHTML = '';
+            }
+
+            // Generate the plan fields HTML - but this time with resend email mode
+            const fieldId = 'resendemail';
+            const html = planUtility.generatePlanFieldsHTML(fieldId);
+
+            // Insert the HTML into the modal body
+            if (modalBody) {
+                modalBody.innerHTML = html;
+            }
+
+            // Initialize the plan handler with resend email mode
+            // Pass a flag to indicate this is for resending email
+            PlanHandler.init(true, fieldId, planDetails);
+
+        } catch (err) {
+            console.error("InitializeResendEmail error:", err);
+        }
+    };
     window.InitializeCreatePlanRequestService = async function (serviceId, planId) {
         try {
             if (!serviceId || !planId) {
