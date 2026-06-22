@@ -1117,7 +1117,7 @@ $(document).ready(function () {
 var LoadAllActionStatusConfiguration = (actionId) => {
     maintable.setData([]);
     const serviceId = $("#ServiceId").val();
-
+    const systemModuleId = $('#SystemModuleId').val();
     const options = {
         success: function (data) {
             if (data) {
@@ -1136,7 +1136,10 @@ var LoadAllActionStatusConfiguration = (actionId) => {
             }
         }
     };
-    jqClientAdvanced(options).Get("ActionStatusConfiguration/GetActionStatusConfigurationByAction".concat('?serviceId=', serviceId).concat('&actionId=', actionId));
+    jqClientAdvanced(options).Get("ActionStatusConfiguration/GetActionStatusConfigurationByAction"
+        .concat('?serviceId=', serviceId)
+        .concat('&systemModuleId=', systemModuleId)
+        .concat('&actionId=', actionId));
 }
 
 var LoadAllActionCondition = (actionId) => {
