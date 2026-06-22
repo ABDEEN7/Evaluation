@@ -33,7 +33,7 @@ public class PlanController(MasterBL masterBL) : ControllerBase
         return Ok(new { result = semester });
     }
     [HttpGet]
-    //[CheckRolePermisionFilter(true, ConstantKeys.WebPermission.GET_WEB_PLAN_DETAILS_REQUEST)]
+    [CheckRolePermisionFilter(true, ConstantKeys.WebPermissions.GET_WEB_PLAN_DETAILS_REQUEST)]
     public async Task<IActionResult> GetPlanDetails(Guid planId)
     {
         var plan = await masterBL.GetApiService<PlanServiceRequestServices>().GetPlanByIdAsync(planId);
@@ -41,7 +41,7 @@ public class PlanController(MasterBL masterBL) : ControllerBase
     }
 
     [HttpGet("{planId:guid}")]
-    //[CheckRolePermisionFilter(true, ConstantKeys.WebPermissions.GET_WEB_PLAN_DETAILS_REQUEST)]
+    [CheckRolePermisionFilter(true, ConstantKeys.WebPermissions.GET_WEB_PLAN_DETAILS_REQUEST)]
     public async Task<IActionResult> GetPlansWithunSelectedSchoolsDetails(Guid planId)
     {
         var plan = await masterBL.GetApiService<PlanServiceRequestServices>().GetPlanWithSchoolsByIdAsync(planId);

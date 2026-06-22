@@ -386,6 +386,7 @@ public static class ConstantKeys
         public static readonly string WebEvaluationSubFormItem = "WebEvaluationSubFormItem";
         public static readonly string WebEvaluationFormScopes = "WebEvaluationFormScopes";
         public static readonly string WebDepartmentHoliday = "WebDepartmentHoliday";
+        public static readonly string WebEvaluationFormItemConfig = "WebEvaluationFormItemConfig";
         public static readonly string WebAppRequest = "WebAppRequest";
         public static readonly string WebAppCommon = "WebAppCommon";
         public static readonly string AssignmentUserTeam = "AssignmentUserTeam";
@@ -1090,6 +1091,7 @@ public static class ConstantKeys
         public const string VIEW_WEB_PLAN = "VIEW_WEB_PLAN";
         public const string DELETE_WEB_PLAN = "DELETE_WEB_PLAN";
         public const string GET_SEMESTERS_REQUEST = "GET_SEMESTERS_REQUEST";
+        public const string GET_WEB_PLAN_DETAILS_REQUEST = "GET_WEB_PLAN_DETAILS_REQUEST";
         #endregion
         #region Reassign
         public const string VIEW_WEB_ReassignAssignment = "VIEW_WEB_ReassignAssignment";
