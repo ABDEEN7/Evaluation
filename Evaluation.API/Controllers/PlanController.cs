@@ -89,6 +89,7 @@ public class PlanController(MasterBL masterBL) : ControllerBase
         return Ok(new { result = result });
     }
     [HttpPost]
+    [CheckRolePermisionFilter(true, ConstantKeys.WebPermissions.ADD_WEB_PLAN)]
     public async Task<Result<bool>> ResendEmailSchool([FromBody] Guid planId,Guid schoolId)
     {
         var result = await masterBL.GetApiService<PlanServiceRequestServices>().ResendEmail(planId, schoolId);
