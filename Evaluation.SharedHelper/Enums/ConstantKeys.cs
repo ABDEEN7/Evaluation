@@ -1115,9 +1115,15 @@ public static class ConstantKeys
         public const string CREATE_WEB_AcademicYear = "CREATE_WEB_AcademicYear";
         public const string UPDATE_WEB_AcademicYear = "UPDATE_WEB_AcademicYear";
         public const string DELETE_WEB_AcademicYear = "DELETE_WEB_AcademicYear";
-
+        #endregion
+        #region WebDepartmentHoliday
+        public const string VIEW_WEB_DepartmentHoliday = "VIEW_WEB_DepartmentHoliday";
+        public const string CREATE_WEB_DepartmentHoliday = "CREATE_WEB_DepartmentHoliday";
+        public const string UPDATE_WEB_DepartmentHoliday = "UPDATE_WEB_DepartmentHoliday";
+        public const string DELETE_WEB_DepartmentHoliday = "DELETE_WEB_DepartmentHoliday";
 
         #endregion
+
     }
     public static class WebAppSettings
     {
