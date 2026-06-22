@@ -5,7 +5,7 @@ public class FormItemEvaluationDto
 {
     public Guid Id { get; set; }
     public Guid? ValueId { get; set; }
-    public decimal Value { get; set; }
+    public decimal Value { get; set; }//TODO: Convert to string!!!
     public string? Note { get; set; }
     public string? Name{ get; set; }
     public decimal WeightPercentage { get; set; }
