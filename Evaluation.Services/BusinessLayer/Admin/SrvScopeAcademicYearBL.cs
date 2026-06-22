@@ -5,6 +5,7 @@ using Evaluation.DAL.Models.DepartementEntites;
 using Evaluation.DAL.Models.FormsModules;
 using Evaluation.DAL.Repositories;
 using Evaluation.Services.Special;
+using Evaluation.SharedHelper.Consts;
 using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Models;
@@ -22,10 +23,8 @@ namespace Evaluation.Services.Models.Admin
         }
 
 
-        public async Task<List<ScopeAcademicYearDTO>> GetScopeAcademicYearList(ScopeFormItemRequest request, int PageSize)
+        public async Task<List<GetScopeAcademicYearDTO>> GetScopeAcademicYearList(ScopeFormItemRequest request, int PageSize)
         {
-
-
             var list = uow.GetRepository<ScopeAcademicYear>()
                 .GetAllNonDeleted()
                 .Include(x => x.CreateBy)
@@ -36,11 +35,18 @@ namespace Evaluation.Services.Models.Admin
             {
                 list = list.Where(x => x.DepartmentId == request.DepartmentId);
             }
-
-            var result = mapper.Map<List<ScopeAcademicYearDTO>>(list, opts => opts.Items["Language"] = _requestInfo.Lang);
+            var result = await list.Select(x => new GetScopeAcademicYearDTO
+            {
+                AcademicYear = LanguageStatic.SelectLang(_requestInfo.Lang, x.AcademicYear.NameAr, x.AcademicYear.NameEn),
+                Scope = LanguageStatic.SelectLang(_requestInfo.Lang, x.Scope.NameAr, x.Scope.NameAr),
+                ScopeAcademicYearScopeParent = LanguageStatic.SelectLang(_requestInfo.Lang, x.Scope.NameAr, x.Scope.NameAr),
+                Department = LanguageStatic.SelectLang(_requestInfo.Lang, x.AcademicYear.NameAr, x.AcademicYear.NameAr),
+                CreateBy =
+                LanguageStatic.SelectLang(_requestInfo.Lang, x.CreateBy.NameAr, x.CreateBy.NameAr),
+                UpdateDate = x.UpdateDate.ToString(),
+                IsActive = x.IsActive
+            }).ToListAsync();
             return result;
-
-
         }
 
         public async Task<ScopeAcademicYearDTO> SaveScopeAcademicYear(ScopeAcademicYearDTO message)
