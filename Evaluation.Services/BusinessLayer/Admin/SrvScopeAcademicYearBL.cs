@@ -4,6 +4,7 @@ using Evaluation.DAL.Models.Calendars;
 using Evaluation.DAL.Models.DepartementEntites;
 using Evaluation.DAL.Models.FormsModules;
 using Evaluation.DAL.Repositories;
+using Evaluation.Services.BusinessLayer.API.DepartmentLayer;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Consts;
 using Evaluation.SharedHelper.Enums;
@@ -37,14 +38,20 @@ namespace Evaluation.Services.Models.Admin
             }
             var result = await list.Select(x => new GetScopeAcademicYearDTO
             {
+                Id = x.Id,
                 AcademicYear = LanguageStatic.SelectLang(_requestInfo.Lang, x.AcademicYear.NameAr, x.AcademicYear.NameEn),
-                Scope = LanguageStatic.SelectLang(_requestInfo.Lang, x.Scope.NameAr, x.Scope.NameAr),
-                ScopeAcademicYearScopeParent = LanguageStatic.SelectLang(_requestInfo.Lang, x.Scope.NameAr, x.Scope.NameAr),
-                Department = LanguageStatic.SelectLang(_requestInfo.Lang, x.AcademicYear.NameAr, x.AcademicYear.NameAr),
+                Scope = LanguageStatic.SelectLang(_requestInfo.Lang, x.Scope.NameAr, x.Scope.NameEn),
+                ScopeAcademicYearScopeParent = LanguageStatic.SelectLang(_requestInfo.Lang, x.ScopeParent.NameAr, x.ScopeParent.NameEn),
+                Department = LanguageStatic.SelectLang(_requestInfo.Lang, x.AcademicYear.NameAr, x.AcademicYear.NameEn),
                 CreateBy =
-                LanguageStatic.SelectLang(_requestInfo.Lang, x.CreateBy.NameAr, x.CreateBy.NameAr),
+                LanguageStatic.SelectLang(_requestInfo.Lang, x.CreateBy.NameAr, x.CreateBy.NameEn),
                 UpdateDate = x.UpdateDate.ToString(),
-                IsActive = x.IsActive
+                IsActive = x.IsActive,
+                ScopeParentId = x.ScopeParentId,
+                ScopeId = x.ScopeId,
+                AcademicYearId = x.AcademicYearId,
+                DepartmentId = x.DepartmentId,
+                ScopeAcademicYearScopeParentId = x.ScopeParentId
             }).ToListAsync();
             return result;
         }
@@ -60,7 +67,7 @@ namespace Evaluation.Services.Models.Admin
             obj.DepartmentId = message.DepartmentId;
             obj.AcademicYearId = message.AcademicYearId;
             obj.IsActive = message.IsActive;
-
+            obj.ScopeParentId = message.ScopeAcademicYearScopeParentId;
             uow.GetRepository<ScopeAcademicYear>().Insert(obj);
             await uow.CommitAsync();
             var result = mapper.Map<ScopeAcademicYearDTO>(obj, opts => opts.Items["Language"] = _requestInfo.Lang);
@@ -89,6 +96,7 @@ namespace Evaluation.Services.Models.Admin
                 obj.DepartmentId = message.DepartmentId;
                 obj.AcademicYearId = message.AcademicYearId;
                 obj.IsActive = message.IsActive;
+                obj.ScopeParentId = message.ScopeAcademicYearScopeParentId;
 
                 uow.GetRepository<ScopeAcademicYear>().Update(obj);
                 await uow.CommitAsync();
