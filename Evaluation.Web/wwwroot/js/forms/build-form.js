@@ -253,15 +253,7 @@ function renderSelectsAndNote(fieldId, itemId, hasNote, readOnly, matrixValues, 
         renderMultiSelectWrap(fieldId, itemId, readOnly, matrixValues, formItemConfigs, index, selectedValueIds[index] ?? null)
     ).join('');
 
-    return `
-        ${selectsHtml}
-        <div class="row-note-wrap">
-            ${hasNote
-            ? `<input class="row-note" ${readOnly ? 'disabled' : ''} type="text" placeholder="اكتب ملاحظة هنا..." value="${escapeAttr(noteValue ?? '')}" />`
-            : `<div class="row-note-placeholder"></div>`}
-            <span class="validation-message" id="validation-${fieldId}-${itemId}-${ItemPropertyType.NOTE}"></span>
-        </div>
-    `;
+    return selectsHtml;
 }
 
 // Selects-only variant (no note column) used by rename mode, where the
@@ -687,7 +679,10 @@ async function initForm(formId, fieldId, readOnly, savedResults, evaluationReque
                     // Row label = savedResults.name; selects render normally;
                     // name cell is readonly display (no .item-name class).
                 } else if (evaluateRenamedItems) {
-                    rowsAreaHtml = asp.rows.map((row, rIdx) => {
+                    // ✅ Only render rows that were actually renamed (exist in savedResults)
+                    const renamedRows = asp.rows.filter(row => savedMap[row.id]);
+
+                    rowsAreaHtml = renamedRows.map((row, rIdx) => {
                         const saved = savedMap[row.id];
                         // Use saved name as the display label, fall back to
                         // template name if this row has no saved entry yet.
