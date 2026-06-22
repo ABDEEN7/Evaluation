@@ -1089,6 +1089,7 @@ public static class ConstantKeys
         public const string EDIT_WEB_PLAN = "EDIT_WEB_PLAN";
         public const string VIEW_WEB_PLAN = "VIEW_WEB_PLAN";
         public const string DELETE_WEB_PLAN = "DELETE_WEB_PLAN";
+        public const string GET_SEMESTERS_REQUEST = "GET_SEMESTERS_REQUEST";
         #endregion
         #region Reassign
         public const string VIEW_WEB_ReassignAssignment = "VIEW_WEB_ReassignAssignment";

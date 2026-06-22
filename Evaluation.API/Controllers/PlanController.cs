@@ -1,8 +1,10 @@
 ﻿
+using Evaluation.API.ActionFilter;
 using Evaluation.Services.BusinessLayer;
 using Evaluation.Services.BusinessLayer.API.PlanLayer;
 using Evaluation.Services.BusinessLayer.API.SteamerLayer;
 using Evaluation.SharedHelper.Dtos.PlanDto;
+using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Models;
 using FluentResults;
 using Microsoft.AspNetCore.Mvc;
@@ -24,7 +26,7 @@ public class PlanController(MasterBL masterBL) : ControllerBase
 
 
     [HttpGet]
-    //[CheckRolePermisionFilter(true, ConstantKeys.WebPermission.GET_SEMESTERS_REQUEST)]
+    [CheckRolePermisionFilter(true, ConstantKeys.WebPermissions.GET_SEMESTERS_REQUEST)]
     public async Task<IActionResult> GetSemesters()
     {
         //var semester = await masterBL.GetApiService<SemesterRequestServices>().GetSemestersAsync(new Guid("37689d34-4928-4bb9-92b4-8a11abc0dbaf"));
