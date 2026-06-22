@@ -116,7 +116,7 @@ namespace Evaluation.Services.Models.Admin
 
                 var Organization = await uow.GetRepository<Organization>()
 .GetAllNonDeleted()
-                      .Where(x => x.TypeId == obj.Id)
+                      .Where(x => x.OrgTypeId == obj.Id)
                       .ToListAsync();
                 if (Organization.Count > 0)
                 {

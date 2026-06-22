@@ -1,6 +1,7 @@
 ﻿using Evaluation.DAL.Models.Attachments;
 using Evaluation.DAL.Models.Audit;
 using Evaluation.DAL.Models.BaseModule;
+using Evaluation.DAL.Models.Calendars;
 using Evaluation.DAL.Models.DepartementEntites;
 using Evaluation.DAL.Models.FormsModules;
 using Evaluation.DAL.Models.Master;
@@ -21,7 +22,9 @@ public class EvaluationRequest : EntityBase, IAuditLogEntity
     public Plan? Plan { get; set; }
     public Guid OrgTreeId { get; set; }
     public OrgTree? OrgTree { get; set; }
-    public Guid DepEvaluationTypeId { get; set; }
+    //public Guid AcademicYearId { get; set; }
+    //public AcademicYear? AcademicYear { get; set; }
+	public Guid DepEvaluationTypeId { get; set; }
     public DepEvaluationType? DepEvaluationType { get; set; }
 	public DateTime FromDate { get; set; }
 	public DateTime ToDate { get; set; }
@@ -30,7 +33,6 @@ public class EvaluationRequest : EntityBase, IAuditLogEntity
 	public Guid ServiceStatusId { get; set; }
 	public ServiceStatus? ServiceStatus { get; set; }
     public string RequestNumber { get; set; } = null!;
-    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public long Sequence { get; set; }
     public Guid? FormEvalMatrixValueId { get; set; }
     public FormEvalMatrixValue? FormEvalMatrixValue { get; set; }
@@ -43,6 +45,7 @@ public class EvaluationRequest : EntityBase, IAuditLogEntity
 
     public virtual ICollection<ServiceRequestFieldsValue>? ServiceRequestFieldsValues { get; set; }
     public virtual ICollection<EvaluationRequestAssignment>? EvaluationRequestAssignments { get; set; }
+    public virtual ICollection<ServiceRequest>? ServiceRequest { get; set; }
 
    
 

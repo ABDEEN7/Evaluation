@@ -89,17 +89,17 @@
         },
 
         columns: [
-        {
-    data: "name",
-        className: "td-full mb-4",
-        render: function(data, type, row) {
+            {
+                data: "name",
+                className: "td-full mb-4",
+                render: function (data, type, row) {
 
-            const statusColor =
-                row.statusCode === "Approved"
-                    ? "#198754"
-                    : "#cccccc";
+                    const statusColor =
+                        row.statusCode === "Approved"
+                            ? "#198754"
+                            : "#cccccc";
 
-            return `
+                    return `
             <div class="request-info">
 
                 <div class="request-icon"
@@ -122,43 +122,43 @@
 
             </div>
         `;
-        }
-    },
-    {
-        data: "statusCode",
-        className: "status-column",
-        render: function(data, type, row) {
+                }
+            },
+            {
+                data: "statusCode",
+                className: "status-column",
+                render: function (data, type, row) {
 
-            const statusColor =
-                data === "Approved"
-                    ? "#198754"
-                    : "#cccccc";
+                    const statusColor =
+                        data === "Approved"
+                            ? "#198754"
+                            : "#cccccc";
 
-            return `
+                    return `
             <span class="status-padding" style="color:${statusColor};">
                 ${data || "_"}
             </span>
         `;
-        }
-    },
-         {
-        data: "countSchools",
-        className: "td-full school-count-column",
-        render: function(data) {
-            return `
+                }
+            },
+            {
+                data: "countSchools",
+                className: "td-full school-count-column",
+                render: function (data) {
+                    return `
         <i class="las la-school card-only-icon me-1"></i>
         <span class="card-only-label me-2">
             ${uiControlsSetup().GetUiControlText("lblSchoolsCount")} :
         </span>
         ${data || ""}
         `;
-        }
-    },
-             {
-        data: null,
-        className: "td-full",
-        render: function(data, type, row) {
-            return `
+                }
+            },
+            {
+                data: null,
+                className: "td-full",
+                render: function (data, type, row) {
+                    return `
             <i class="las la-calendar-week card-only-icon me-1"></i>
 
             <span class="card-only-label me-1">
@@ -183,8 +183,8 @@
                 </span>
             </span>
         `;
-        }
-    },
+                }
+            },
             {
                 data: 'services',
                 className: "td-full p-0 process mt-4",
@@ -218,29 +218,20 @@
                     const planId = row?.id || "";
 
                     services.forEach(function (service) {
-
                         const serviceId = service?.id || service?.Id || "";
                         if (!serviceId) return;
 
-                        const lang = window.currentLang || "ar";
-
-                        const serviceName =
-                            (lang === "ar"
-                                ? (service?.nameAr || service?.NameAr)
-                                : (service?.nameEn || service?.NameEn)
-                            ) ||
-                            service?.name || service?.Name || "";
-
+                        const serviceName = service?.name || service?.Name || "";
                         const serviceIcon = service?.icon || service?.Icon || "fa-solid fa-file";
 
                         actionsHtml += `
-                                        <a class="dropdown-item"
-                                           href="#"
-                                           onclick="InitializeCreatePlanRequestService('${serviceId}','${planId}'); return false;">
-                                            <i class="${serviceIcon} mx-1"></i>
-                                            ${serviceName}
-                                        </a>
-                                    `;
+        <a class="dropdown-item"
+           href="#"
+           onclick="InitializeCreatePlanRequestService('${serviceId}','${planId}'); return false;">
+            <i class="${serviceIcon} mx-1"></i>
+            ${serviceName}
+        </a>
+    `;
                     });
                     actionsHtml += `
     <div class="dropdown-divider"></div>

@@ -26,4 +26,5 @@ public class EvaluationFormItemDto : EntityBaseDTO
     public Guid[]? FormItemRelated { get; set; }
     public Guid? AnalysisTypeId { get; set; }
     public bool HasMulitEvaluation { get; set; }
+    public string? ItemNumber { get; set; }
 }

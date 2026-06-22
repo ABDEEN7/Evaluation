@@ -366,9 +366,8 @@ window.serviceRequestForm = window.serviceRequestForm || {};
 
                     processTemplates(data || []);
 
-                    if (allTemplates.length > 0 && typeof renderTemplateFirst === "function") {
-                        renderTemplateFirst(allTemplates, templateContainerId);
-                    }
+                    if (allTemplates.length > 0 ) {
+                        formUtility.renderTemplateFirst(allTemplates, templateContainerId);                 }
 
                     renderDropdownUI();
                 },

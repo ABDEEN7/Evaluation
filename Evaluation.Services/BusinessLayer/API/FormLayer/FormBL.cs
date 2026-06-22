@@ -6,6 +6,7 @@ using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
 using Evaluation.DAL.Repositories;
 using Evaluation.Services.BusinessLayer.API.ScopeLayer;
 using Evaluation.Services.Enums;
+using Evaluation.Services.MappingProfiles;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Dtos.EvalFormDto;
 using Evaluation.SharedHelper.Dtos.Form;
@@ -14,6 +15,7 @@ using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Models;
 using FluentResults;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.SqlServer.Server;
 using ValidationResult = Evaluation.SharedHelper.Dtos.Shared.ValidationResult;
@@ -141,7 +143,83 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
         return new FormDto() { EvalForm = mappedEvalForm, Tree = tree };
     }
 
-    public async Task<Result<ValidationResult>> ValidateEvaluationForm(FormEvaluationDto formEvaluationDto)
+	public async Task<Result<FormDto>> GetFinalFormItemsWithValues(Guid evaluationRequestId)
+	{
+		var lang = requestInfo.Lang;
+
+		var evaluationRequest = await uow.GetRepository<EvaluationRequest>()
+			.GetAllQueryFiltered(x => x.Id == evaluationRequestId)
+			.FirstOrDefaultAsync();
+
+		if (evaluationRequest == null)
+			throw new BusinessException(ConstantKeys.ExceptionMessage.InActiveData);
+
+		var finalForm = await uow.GetRepository<EvalForm>()
+			.GetAll(x => x.IsFinalEval == true)
+			.FirstOrDefaultAsync();
+
+		if (finalForm == null)
+			throw new BusinessException("Final form doesn't exist!");
+
+		var formId = finalForm.Id;
+        var academicYearId = Guid.Parse("646471F1-3063-41D8-95C6-A43094850612");//evaluationRequest.AcademicYearId;
+
+		var evalForm = await formService.GetEvalForm(formId, IncludeCalcMethod: true);
+		var mappedEvalForm = mapper.Map<TemplateFormDto>(evalForm);
+
+		var formItems = await formService.GetFormItems(formId);
+
+		var formItemsValues = await formService
+			.GetFormItemsValuesByEvaluationRequestId(evaluationRequestId);
+
+		var mappedData = mapper.Map<List<FormItemDto>>(formItems, opt =>
+		{
+			opt.Items["lang"] = lang;
+		});
+
+		foreach (var item in formItems)
+		{
+			var relatedItemDtos = new List<RelatedItemDto>();
+
+			foreach (var relatedFromItem in item.RelatedFrom)
+			{
+				if (relatedFromItem.RelatedItemId == Guid.Empty)
+					continue;
+
+				var formItemValue = formItemsValues
+					.FirstOrDefault(x => x.FormItemId == relatedFromItem.RelatedItemId);
+
+				relatedItemDtos.Add(new RelatedItemDto
+				{
+					Id = relatedFromItem.RelatedItemId,
+					Note = formItemValue?.Note,
+					Value = formItemValue?.ActualValue?.ToString(),
+					Name = lang == "ar"
+						? relatedFromItem.RelatedItem!.NameAr
+						: relatedFromItem.RelatedItem!.NameEn
+				});
+			}
+
+			var mappedItem = mappedData.FirstOrDefault(md => md.Id == item.Id);
+			if (mappedItem != null)
+				mappedItem.RelatedItems = relatedItemDtos;
+		}
+
+		var scopeAcademicYears = await scopeRepostiory
+			.GetScopeAcademicYearListByAcademicYearId(academicYearId);
+
+		var tree = ScopeTreeBuilder.BuildTree(
+			scopeAcademicYears,
+			formItems,
+			formItemsValues);
+
+		return new FormDto
+		{
+			EvalForm = mappedEvalForm,
+			Tree = tree
+		};
+	}
+	public async Task<Result<ValidationResult>> ValidateEvaluationForm(FormEvaluationDto formEvaluationDto)
     {
         return await Validate(formEvaluationDto);
     }

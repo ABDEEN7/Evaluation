@@ -19,12 +19,10 @@ window.formUtility = window.formUtility || {};
 
     const buildTemplateUrl = (templateId) => {
         const params = new URLSearchParams(window.location.search);
-        const rawRequestId = params.get("id") || "";
+        const rawRequestId = params.get("Evlid") || "";
         const requestId = rawRequestId.replace("#", "");
 
-        let url = `/Templates/GetLetterDocument?requestId=${encodeURIComponent(requestId)}&templeteId=${encodeURIComponent(templateId)}`;
-
-        try {
+        let url = `/Templates/GetLetterDocument?requestId=${encodeURIComponent(requestId)}&templateId=${encodeURIComponent(templateId)}`;        try {
             if (typeof sharedUtility === "function" && sharedUtility().BaseApiUrl) {
                 let baseApi = sharedUtility().BaseApiUrl() || "";
                 baseApi = decodeURIComponent(baseApi).replace(/\/+$/, "");
@@ -42,11 +40,8 @@ window.formUtility = window.formUtility || {};
     const openBlobInModal = (blob, name) => {
         if (!blob) return;
         const url = URL.createObjectURL(blob);
-        if (typeof OpenFileModal === "function") {
-            OpenFileModal("modal-fullscreen", name, url, name);
-        } else {
-            window.open(url, "_blank");
-        }
+        sharedFn().OpenFileModal("modal-fullscreen", name, url, name);
+       
         setTimeout(() => URL.revokeObjectURL(url), 10000);
     };
 
