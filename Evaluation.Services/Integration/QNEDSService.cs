@@ -320,65 +320,25 @@ public class QNEDSService : ApiBase
 		return result.ToList();
 	}
 
+	// ─── Sync ─────────────────────────────────────────────────────────────────
+
 	public async Task<bool> SyncQnedsIntegrationAsync(int academicYear)
 	{
 		var schools = await uow.GetRepository<OrgTree>()
 			.GetAllActiveNonDeleted()
 			.Where(x => x.NSISCode != null)
-			.Select(x => new
-			{
-				x.Id,
-				x.NSISCode
-			})
+			.Select(x => new { x.Id, x.NSISCode })
 			.ToListAsync();
 
 		foreach (var school in schools)
 		{
-			var exists = await uow.GetRepository<QnedsIntegration>()
+			var alreadySynced = await uow.GetRepository<QnedsIntegration>()
 				.GetAllActiveNonDeleted()
-				.AnyAsync(x =>
-					x.OrgTreeId == school.Id &&
-					x.AcademicYear == academicYear);
+				.AnyAsync(x => x.OrgTreeId == school.Id && x.AcademicYear == academicYear);
 
-			if (exists)
-				continue;
-
-			var institutionId = school.NSISCode.ToString();
-
-			var qnedsData = new QnedsIntegrationJsonDto
-			{
-				Achievement = await GetAchievementByInstitutionAndYearAsync(institutionId, academicYear),
-				AchievementSev3 = await GetAchievementSev3ByInstitutionAndYearAsync(institutionId, academicYear),
-				AchievementG12 = await GetAchievementG12ByInstitutionAndYearAsync(institutionId, academicYear),
-				AchievementTrackSubjectG11G12 = await GetAchievementTrackSubjectG11G12ByInstitutionAndYearAsync(institutionId, academicYear),
-				SuccessRateByGrade = await GetSuccessRateByGradeByInstitutionAndYearAsync(institutionId, academicYear),
-				YearlyStudentBelow70Track = await GetYearlyStudentBelow70TrackByInstitutionAndYearAsync(institutionId, academicYear),
-				YearlyStudentBelow70Grade = await GetYearlyStudentBelow70GradeByInstitutionAndYearAsync(institutionId, academicYear),
-				SuccessRateByTrack = await GetSuccessRateByTrackByInstitutionAndYearAsync(institutionId, academicYear),
-				AchievementTrackNoSubjectG11G12 = await GetAchievementTrackNoSubjectG11G12ByInstitutionAndYearAsync(institutionId, academicYear),
-				AchievementG1G11 = await GetAchievementG1G11ByInstitutionAndYearAsync(institutionId, academicYear),
-				TeacherSchedule = await GetTeacherScheduleByInstitutionAndYearAsync(institutionId, academicYear),
-				StudentDailyAttendance = await GetStudentDailyAttendanceByMonthByInstitutionAndYearAsync(institutionId, academicYear)
-			};
-
-			var entity = new QnedsIntegration
-			{
-				Id = Guid.NewGuid(),
-				AcademicYear = academicYear,
-				OrgTreeId = school.Id,
-				JsonValue = System.Text.Json.JsonSerializer.Serialize(qnedsData),
-				QnedsConfig = null,
-				IsActive = true,
-				CreateDate = DateTime.Now,
-				IsDeleted = false
-			};
-
-			await uow.GetRepository<QnedsIntegration>().InsertAsync(entity);
-			await uow.CommitAsync();
-
+			if (!alreadySynced)
+				await SyncSchoolYear(school.Id, academicYear);
 		}
-
-		await uow.CommitAsync();
 
 		return true;
 	}
@@ -387,7 +347,6 @@ public class QNEDSService : ApiBase
 	{
 		await SyncSchoolYear(schoolId, academicYear);
 		await SyncSchoolYear(schoolId, academicYear - 1);
-
 		return true;
 	}
 
@@ -395,66 +354,29 @@ public class QNEDSService : ApiBase
 	{
 		var school = await uow.GetRepository<OrgTree>()
 			.GetAllActiveNonDeleted(x => x.Id == schoolId)
-			.Select(x => new
-			{
-				x.Id,
-				x.NSISCode
-			})
+			.Select(x => new { x.Id, x.NSISCode })
 			.FirstOrDefaultAsync();
 
 		if (school == null || string.IsNullOrEmpty(school.NSISCode))
 			return;
 
-		var institutionId = school.NSISCode;
+		var data = await FetchAllQnedsDataAsync(school.NSISCode, academicYear);
 
-		var qnedsData = new QnedsIntegrationJsonDto
-		{
-			Achievement = await GetAchievementByInstitutionAndYearAsync(institutionId, academicYear),
-			AchievementSev3 = await GetAchievementSev3ByInstitutionAndYearAsync(institutionId, academicYear),
-			AchievementG12 = await GetAchievementG12ByInstitutionAndYearAsync(institutionId, academicYear),
-			AchievementTrackSubjectG11G12 = await GetAchievementTrackSubjectG11G12ByInstitutionAndYearAsync(institutionId, academicYear),
-			SuccessRateByGrade = await GetSuccessRateByGradeByInstitutionAndYearAsync(institutionId, academicYear),
-			YearlyStudentBelow70Track = await GetYearlyStudentBelow70TrackByInstitutionAndYearAsync(institutionId, academicYear),
-			YearlyStudentBelow70Grade = await GetYearlyStudentBelow70GradeByInstitutionAndYearAsync(institutionId, academicYear),
-			SuccessRateByTrack = await GetSuccessRateByTrackByInstitutionAndYearAsync(institutionId, academicYear),
-			AchievementTrackNoSubjectG11G12 = await GetAchievementTrackNoSubjectG11G12ByInstitutionAndYearAsync(institutionId, academicYear),
-			AchievementG1G11 = await GetAchievementG1G11ByInstitutionAndYearAsync(institutionId, academicYear),
-			TeacherSchedule = await GetTeacherScheduleByInstitutionAndYearAsync(institutionId, academicYear),
-			StudentDailyAttendance = await GetStudentDailyAttendanceByMonthByInstitutionAndYearAsync(institutionId, academicYear)
-		};
-
-		var hasAnyData =
-			(qnedsData.Achievement?.Any() ?? false) ||
-			(qnedsData.AchievementSev3?.Any() ?? false) ||
-			(qnedsData.AchievementG12?.Any() ?? false) ||
-			(qnedsData.AchievementTrackSubjectG11G12?.Any() ?? false) ||
-			(qnedsData.SuccessRateByGrade?.Any() ?? false) ||
-			(qnedsData.YearlyStudentBelow70Track?.Any() ?? false) ||
-			(qnedsData.YearlyStudentBelow70Grade?.Any() ?? false) ||
-			(qnedsData.SuccessRateByTrack?.Any() ?? false) ||
-			(qnedsData.AchievementTrackNoSubjectG11G12?.Any() ?? false) ||
-			(qnedsData.AchievementG1G11?.Any() ?? false) ||
-			(qnedsData.TeacherSchedule?.Any() ?? false) ||
-			(qnedsData.StudentDailyAttendance?.Any() ?? false);
-
-		if (!hasAnyData)
+		if (!HasAnyData(data))
 			return;
 
-		var jsonValue = JsonSerializer.Serialize(qnedsData);
+		var json = JsonSerializer.Serialize(data);
 
 		var existing = await uow.GetRepository<QnedsIntegration>()
 			.GetAllActiveNonDeleted()
-			.FirstOrDefaultAsync(x =>
-				x.OrgTreeId == school.Id &&
-				x.AcademicYear == academicYear);
+			.FirstOrDefaultAsync(x => x.OrgTreeId == school.Id && x.AcademicYear == academicYear);
 
 		if (existing != null)
 		{
-			existing.JsonValue = jsonValue;
+			existing.JsonValue = json;
 			existing.UpdateDate = DateTime.Now;
 			existing.IsActive = true;
 			existing.IsDeleted = false;
-
 			uow.GetRepository<QnedsIntegration>().Update(existing);
 		}
 		else
@@ -464,7 +386,7 @@ public class QNEDSService : ApiBase
 				Id = Guid.NewGuid(),
 				AcademicYear = academicYear,
 				OrgTreeId = school.Id,
-				JsonValue = jsonValue,
+				JsonValue = json,
 				QnedsConfig = null,
 				IsActive = true,
 				CreateDate = DateTime.Now,
@@ -474,93 +396,96 @@ public class QNEDSService : ApiBase
 
 		await uow.CommitAsync();
 	}
+
+	private async Task<QnedsIntegrationJsonDto> FetchAllQnedsDataAsync(string institutionId, int year) => new()
+	{
+		Achievement = await GetAchievementByInstitutionAndYearAsync(institutionId, year),
+		AchievementSev3 = await GetAchievementSev3ByInstitutionAndYearAsync(institutionId, year),
+		AchievementG12 = await GetAchievementG12ByInstitutionAndYearAsync(institutionId, year),
+		AchievementTrackSubjectG11G12 = await GetAchievementTrackSubjectG11G12ByInstitutionAndYearAsync(institutionId, year),
+		SuccessRateByGrade = await GetSuccessRateByGradeByInstitutionAndYearAsync(institutionId, year),
+		YearlyStudentBelow70Track = await GetYearlyStudentBelow70TrackByInstitutionAndYearAsync(institutionId, year),
+		YearlyStudentBelow70Grade = await GetYearlyStudentBelow70GradeByInstitutionAndYearAsync(institutionId, year),
+		SuccessRateByTrack = await GetSuccessRateByTrackByInstitutionAndYearAsync(institutionId, year),
+		AchievementTrackNoSubjectG11G12 = await GetAchievementTrackNoSubjectG11G12ByInstitutionAndYearAsync(institutionId, year),
+		AchievementG1G11 = await GetAchievementG1G11ByInstitutionAndYearAsync(institutionId, year),
+		TeacherSchedule = await GetTeacherScheduleByInstitutionAndYearAsync(institutionId, year),
+		StudentDailyAttendance = await GetStudentDailyAttendanceByMonthByInstitutionAndYearAsync(institutionId, year)
+	};
+
+	private static bool HasAnyData(QnedsIntegrationJsonDto data) =>
+		(data.Achievement?.Any() ?? false) ||
+		(data.AchievementSev3?.Any() ?? false) ||
+		(data.AchievementG12?.Any() ?? false) ||
+		(data.AchievementTrackSubjectG11G12?.Any() ?? false) ||
+		(data.SuccessRateByGrade?.Any() ?? false) ||
+		(data.YearlyStudentBelow70Track?.Any() ?? false) ||
+		(data.YearlyStudentBelow70Grade?.Any() ?? false) ||
+		(data.SuccessRateByTrack?.Any() ?? false) ||
+		(data.AchievementTrackNoSubjectG11G12?.Any() ?? false) ||
+		(data.AchievementG1G11?.Any() ?? false) ||
+		(data.TeacherSchedule?.Any() ?? false) ||
+		(data.StudentDailyAttendance?.Any() ?? false);
+
+	// ─── Output Analysis Generation ───────────────────────────────────────────
+
 	public async Task<bool> GenerateOutputAnalysisFromQnedsAsync(Guid evaluationRequestId, int academicYear)
 	{
-		var lastYear = academicYear;
-		var previousYear = academicYear - 1;
-
 		var evaluationRequest = await uow.GetRepository<EvaluationRequest>()
 			.GetAllActiveNonDeleted(x => x.Id == evaluationRequestId)
 			.Include(x => x.OrgTree)
 			.FirstOrDefaultAsync();
 
-		if (evaluationRequest == null || evaluationRequest.OrgTreeId == null)
+		if (evaluationRequest?.OrgTreeId == null)
 			return false;
 
 		var orgTreeId = evaluationRequest.OrgTreeId;
+		var previousYear = academicYear - 1;
 
 		var integrations = await uow.GetRepository<QnedsIntegration>()
 			.GetAllActiveNonDeleted(x =>
 				x.OrgTreeId == orgTreeId &&
-				(x.AcademicYear == lastYear || x.AcademicYear == previousYear))
+				(x.AcademicYear == academicYear || x.AcademicYear == previousYear))
 			.ToListAsync();
 
-		var lastIntegration = integrations.FirstOrDefault(x => x.AcademicYear == lastYear);
-		var previousIntegration = integrations.FirstOrDefault(x => x.AcademicYear == previousYear);
+		var lastJson = Deserialize(integrations.FirstOrDefault(x => x.AcademicYear == academicYear)?.JsonValue);
+		if (lastJson == null) return false;
 
-		if (lastIntegration == null)
-			return false;
-
-		var lastJson = JsonSerializer.Deserialize<QnedsIntegrationJsonDto>(lastIntegration.JsonValue);
-		var previousJson = previousIntegration == null
-			? null
-			: JsonSerializer.Deserialize<QnedsIntegrationJsonDto>(previousIntegration.JsonValue);
-
-		if (lastJson == null)
-			return false;
+		var previousJson = Deserialize(integrations.FirstOrDefault(x => x.AcademicYear == previousYear)?.JsonValue);
 
 		var analysisTypes = await uow.GetRepository<AnalysisType>()
 			.GetAllActiveNonDeleted()
-			.Where(x =>
-				x.BackendName == "AcademicAchievement" ||
-				x.BackendName == "StudentsWithDisabilities" ||
-				x.BackendName == "LowPerformanceStudents" ||
-				x.BackendName == "FailedStudents")
-			.Include(x => x.DataFormEvalMatrix)
-			.ThenInclude(x => x.FormEvalMatrixValues)
-			.Include(x => x.ResultFormEvalMatrix)
-			.ThenInclude(x => x.FormEvalMatrixValues)
+			.Where(x => AnalysisBackendNames.Contains(x.BackendName))
+			.Include(x => x.DataFormEvalMatrix).ThenInclude(x => x.FormEvalMatrixValues)
+			.Include(x => x.ResultFormEvalMatrix).ThenInclude(x => x.FormEvalMatrixValues)
 			.OrderBy(x => x.OrderNo)
 			.ToListAsync();
 
 		foreach (var analysisType in analysisTypes)
 		{
 			var details = BuildOutputAnalysisDetails(
-				analysisType,
-				evaluationRequestId,
-				lastYear,
-				previousYear,
-				lastJson,
-				previousJson);
+				analysisType, evaluationRequestId,
+				academicYear, previousYear,
+				lastJson, previousJson);
 
-			if (!details.Any())
-				continue;
+			if (!details.Any()) continue;
 
 			foreach (var detail in details)
 			{
-				detail.FormEvalMatrixValueId = GetMatrixValueId(
-					analysisType.DataFormEvalMatrix?.FormEvalMatrixValues,
-					detail.ActualValue);
-
-				detail.Note = GetMatrixNameAr(
-					analysisType.DataFormEvalMatrix?.FormEvalMatrixValues,
-					detail.ActualValue);
+				detail.FormEvalMatrixValueId = GetMatrixValueId(analysisType.DataFormEvalMatrix?.FormEvalMatrixValues, detail.ActualValue);
+				detail.Note = GetMatrixNameAr(analysisType.DataFormEvalMatrix?.FormEvalMatrixValues, detail.ActualValue);
 			}
 
-			var finalActualValue = details.Average(x => x.ActualValue);
+			var avgActualValue = details.Average(x => x.ActualValue);
 
 			var finalResult = new OutputAnalysisFinalResult
 			{
 				Id = Guid.NewGuid(),
 				AnalysisTypeId = analysisType.Id,
 				EvaluationRequestId = evaluationRequestId,
-				ActualValue = finalActualValue,
-				FormEvalMatrixValueId = GetMatrixValueId(
-					analysisType.ResultFormEvalMatrix?.FormEvalMatrixValues,
-					finalActualValue),
-				Note = GetMatrixNameAr(
-					analysisType.ResultFormEvalMatrix?.FormEvalMatrixValues,
-					finalActualValue),
+				ActualValue = avgActualValue,
+				FormEvalMatrixValueId = GetMatrixValueId(analysisType.ResultFormEvalMatrix?.FormEvalMatrixValues, avgActualValue),
+				Note = GetMatrixNameAr(analysisType.ResultFormEvalMatrix?.FormEvalMatrixValues, avgActualValue),
 				IsActive = true,
 				CreateDate = DateTime.Now,
 				IsDeleted = false
@@ -574,7 +499,6 @@ public class QNEDSService : ApiBase
 				detail.IsActive = true;
 				detail.CreateDate = DateTime.Now;
 				detail.IsDeleted = false;
-
 				await uow.GetRepository<OutputAnalysisData>().InsertAsync(detail);
 			}
 		}
@@ -582,6 +506,25 @@ public class QNEDSService : ApiBase
 		await uow.CommitAsync();
 		return true;
 	}
+
+	private static readonly HashSet<string> AnalysisBackendNames =
+[
+	"AcademicAchievement",
+	"StudentsWithDisabilities",
+	"LowPerformanceStudents",
+	"FailedStudents",
+	"StudentLevelsAnalysis",
+	"AchievementTests",
+	"GeneralSecondaryAchievement",
+	"GeneralSecondarySuccess"
+];
+
+	private static QnedsIntegrationJsonDto? Deserialize(string? json) =>
+		string.IsNullOrWhiteSpace(json)
+			? null
+			: JsonSerializer.Deserialize<QnedsIntegrationJsonDto>(json);
+
+	// ─── Detail Builders ──────────────────────────────────────────────────────
 
 	private List<OutputAnalysisData> BuildOutputAnalysisDetails(
 		AnalysisType analysisType,
@@ -591,506 +534,356 @@ public class QNEDSService : ApiBase
 		QnedsIntegrationJsonDto lastJson,
 		QnedsIntegrationJsonDto? previousJson)
 	{
-		var result = new List<OutputAnalysisData>();
 		var allowedGrades = ParseGrades(analysisType.Grades);
+		var allowedSubjects = ParseSubjectCodes(analysisType.SubjectCode);
+		var config = GetAnalysisConfig(analysisType.AnalysisConfig);
 
-		var lastAttendanceLookup = BuildAttendanceStudentCountLookup(
-			lastJson.StudentDailyAttendance,
-			allowedGrades);
+		var allowedTracks = ToFilterSet(config.Tracks);
+		var allowedTerms = ToFilterSet(config.Terms);
 
-		var previousAttendanceLookup = BuildAttendanceStudentCountLookup(
-			previousJson?.StudentDailyAttendance,
-			allowedGrades);
+		var lastAttendance = BuildAttendanceStudentCountLookup(lastJson.StudentDailyAttendance, allowedGrades);
+		var previousAttendance = BuildAttendanceStudentCountLookup(previousJson?.StudentDailyAttendance, allowedGrades);
 
-		switch (analysisType.BackendName)
+		var ctx = new BuilderContext(analysisType.Id, evaluationRequestId, lastYear, previousYear,
+									 allowedGrades, allowedSubjects, allowedTracks,
+	allowedTerms, lastAttendance, previousAttendance);
+
+		return analysisType.BackendName switch
 		{
-			case "AcademicAchievement":
-				result.AddRange(BuildAchievement(
-					analysisType.Id,
-					evaluationRequestId,
-					lastYear,
-					previousYear,
-					lastJson.Achievement,
-					previousJson?.Achievement,
-					allowedGrades,
-					lastAttendanceLookup,
-					previousAttendanceLookup));
+			"AcademicAchievement" =>
+			[
+				..BuildAchievement(ctx, lastJson.Achievement, previousJson?.Achievement),
+		..BuildAchievementTrackSubjectG11G12(ctx, lastJson.AchievementTrackSubjectG11G12, previousJson?.AchievementTrackSubjectG11G12)
+			],
 
-				result.AddRange(BuildAchievementTrackNoSubject(
-					analysisType.Id,
-					evaluationRequestId,
-					lastYear,
-					previousYear,
-					lastJson.AchievementTrackNoSubjectG11G12,
-					previousJson?.AchievementTrackNoSubjectG11G12,
-					allowedGrades,
-					lastAttendanceLookup,
-					previousAttendanceLookup));
-				break;
+			"StudentsWithDisabilities" =>
+				BuildAchievementSev3(ctx, lastJson.AchievementSev3, previousJson?.AchievementSev3),
 
-			case "StudentsWithDisabilities":
-				result.AddRange(BuildAchievementSev3(
-					analysisType.Id,
-					evaluationRequestId,
-					lastYear,
-					previousYear,
-					lastJson.AchievementSev3,
-					previousJson?.AchievementSev3,
-					allowedGrades,
-					lastAttendanceLookup,
-					previousAttendanceLookup));
-				break;
+			"LowPerformanceStudents" =>
+				BuildBelow70Grade(ctx, lastJson.YearlyStudentBelow70Grade, previousJson?.YearlyStudentBelow70Grade),
 
-			case "LowPerformanceStudents":
-				result.AddRange(BuildBelow70Grade(
-					analysisType.Id,
-					evaluationRequestId,
-					lastYear,
-					previousYear,
-					lastJson.YearlyStudentBelow70Grade,
-					previousJson?.YearlyStudentBelow70Grade,
-					allowedGrades,
-					lastAttendanceLookup,
-					previousAttendanceLookup));
-				break;
+			"FailedStudents" =>
+			[
+				..BuildSuccessByGrade(ctx, lastJson.SuccessRateByGrade, previousJson?.SuccessRateByGrade),
+		..BuildSuccessByTrack(ctx, lastJson.SuccessRateByTrack, previousJson?.SuccessRateByTrack)
+			],
 
-			case "FailedStudents":
-				result.AddRange(BuildSuccessByGrade(
-					analysisType.Id,
-					evaluationRequestId,
-					lastYear,
-					previousYear,
-					lastJson.SuccessRateByGrade,
-					previousJson?.SuccessRateByGrade,
-					allowedGrades,
-					lastAttendanceLookup,
-					previousAttendanceLookup));
+			"StudentLevelsAnalysis" =>
+				BuildAchievement(ctx, lastJson.Achievement, previousJson?.Achievement),
 
-				result.AddRange(BuildSuccessByTrack(
-					analysisType.Id,
-					evaluationRequestId,
-					lastYear,
-					previousYear,
-					lastJson.SuccessRateByTrack,
-					previousJson?.SuccessRateByTrack,
-					allowedGrades,
-					lastAttendanceLookup,
-					previousAttendanceLookup));
-				break;
-		}
+			"AchievementTests" =>
+				BuildAchievement(ctx, lastJson.Achievement, previousJson?.Achievement),
 
-		return result;
+			"GeneralSecondaryAchievement" =>
+				BuildAchievementTrackNoSubject(ctx, lastJson.AchievementTrackNoSubjectG11G12, previousJson?.AchievementTrackNoSubjectG11G12),
+
+			"GeneralSecondarySuccess" =>
+				BuildSuccessByTrack(ctx, lastJson.SuccessRateByTrack, previousJson?.SuccessRateByTrack),
+
+			_ => []
+		};
 	}
 
-	private Dictionary<string, int> BuildAttendanceStudentCountLookup(
-		List<StudentDailyAttendanceByMonthDto>? rows,
-		HashSet<int> allowedGrades)
-	{
-		return rows?
-			.Where(x =>
-				allowedGrades.Contains(ToInt(x.Grade)) &&
-				string.Equals(x.AttendanceDescription?.Trim(), "Present", StringComparison.OrdinalIgnoreCase))
-			.GroupBy(x => $"{ToInt(x.Grade)}|{ToInt(x.Month)}")
-			.ToDictionary(
-				x => x.Key,
-				x => x.Sum(r => ToInt(r.Students)))
-			?? new Dictionary<string, int>();
-	}
+	private record BuilderContext(
+		Guid AnalysisTypeId,
+		Guid EvaluationRequestId,
+		int LastYear,
+		int PreviousYear,
+		HashSet<int> AllowedGrades,
+		HashSet<string> AllowedSubjects,
+		HashSet<string> AllowedTracks,
+	    HashSet<string> AllowedTerms,
+		Dictionary<string, int> LastAttendance,
+		Dictionary<string, int> PreviousAttendance);
 
-	private static int GetStudentCount(
-		Dictionary<string, int> lookup,
-		int grade,
-		string? termCode)
-	{
-		var key = $"{grade}|{ToInt(termCode)}";
-		return lookup.TryGetValue(key, out var count) ? count : 0;
-	}
+	private OutputAnalysisData MakeDetail(BuilderContext ctx, int grade, string? subjectCode,
+		string? track, string? termCode, decimal lastValue, decimal previousValue, string? note) => new()
+		{
+			Id = Guid.NewGuid(),
+			AnalysisTypeId = ctx.AnalysisTypeId,
+			EvaluationRequestId = ctx.EvaluationRequestId,
+			Grade = grade,
+			SubjectCode = subjectCode,
+			Track = track,
+			TermCode = termCode,
+			LastYear = ctx.LastYear,
+			PreviousYear = ctx.PreviousYear,
+			LastYearValue = lastValue,
+			PreviousYearValue = previousValue,
+			Difference = lastValue - previousValue,
+			ActualValue = lastValue,
+			LastYearStudentCount = GetStudentCount(ctx.LastAttendance, grade, termCode),
+			PreviousYearStudentCount = GetStudentCount(ctx.PreviousAttendance, grade, termCode),
+			Note = note
+		};
 
 	private List<OutputAnalysisData> BuildAchievement(
-		Guid analysisTypeId,
-		Guid evaluationRequestId,
-		int lastYear,
-		int previousYear,
+		BuilderContext ctx,
 		List<AchievementDto>? lastRows,
-		List<AchievementDto>? previousRows,
-		HashSet<int> allowedGrades,
-		Dictionary<string, int> lastAttendanceLookup,
-		Dictionary<string, int> previousAttendanceLookup)
+		List<AchievementDto>? previousRows)
 	{
-		var previousLookup = previousRows?
-			.Where(x => allowedGrades.Contains(ToInt(x.Grade)))
-			.GroupBy(x => $"{ToInt(x.Grade)}|{x.CourseCode?.Trim()}|{x.Timespan?.Trim()}")
-			.ToDictionary(x => x.Key, x => x.First())
-			?? new Dictionary<string, AchievementDto>();
+		var lookup = BuildLookup(
+			previousRows?
+				.Where(x =>
+					ctx.AllowedGrades.Contains(ToInt(x.Grade)) &&
+					IsAllowedSubject(x.CourseCode, ctx.AllowedSubjects) &&
+					MatchFilter(x.Timespan, ctx.AllowedTerms)),
+			x => $"{ToInt(x.Grade)}|{x.CourseCode?.Trim()}|{x.Timespan?.Trim()}");
 
 		return lastRows?
-			.Where(x => allowedGrades.Contains(ToInt(x.Grade)))
+			.Where(x =>
+				ctx.AllowedGrades.Contains(ToInt(x.Grade)) &&
+				IsAllowedSubject(x.CourseCode, ctx.AllowedSubjects) &&
+				MatchFilter(x.Timespan, ctx.AllowedTerms))
 			.Select(x =>
 			{
 				var grade = ToInt(x.Grade);
 				var subjectCode = x.CourseCode?.Trim();
 				var termCode = x.Timespan?.Trim();
 
-				var key = $"{grade}|{subjectCode}|{termCode}";
-				previousLookup.TryGetValue(key, out var prev);
+				lookup.TryGetValue(
+					$"{grade}|{subjectCode}|{termCode}",
+					out var prev);
 
-				var lastValue = ToDecimal(x.Grade_Achvment_NoSev3_And_Present_NoActivity);
-				var previousValue = ToDecimal(prev?.Grade_Achvment_NoSev3_And_Present_NoActivity);
-
-				return new OutputAnalysisData
-				{
-					Id = Guid.NewGuid(),
-					AnalysisTypeId = analysisTypeId,
-					EvaluationRequestId = evaluationRequestId,
-					Grade = grade,
-					SubjectCode = subjectCode,
-					Track = null,
-					TermCode = termCode,
-					LastYear = lastYear,
-					PreviousYear = previousYear,
-					LastYearValue = lastValue,
-					PreviousYearValue = previousValue,
-					Difference = lastValue - previousValue,
-					ActualValue = lastValue,
-					LastYearStudentCount = GetStudentCount(lastAttendanceLookup, grade, termCode),
-					PreviousYearStudentCount = GetStudentCount(previousAttendanceLookup, grade, termCode),
-					Note = x.CourseTitle
-				};
+				return MakeDetail(
+					ctx,
+					grade,
+					subjectCode,
+					null,
+					termCode,
+					ToDecimal(x.Grade_Achvment_NoSev3_And_Present_NoActivity),
+					ToDecimal(prev?.Grade_Achvment_NoSev3_And_Present_NoActivity),
+					x.CourseTitle);
 			})
-			.ToList()
-			?? new List<OutputAnalysisData>();
+			.ToList() ?? [];
 	}
-
-	private List<OutputAnalysisData> BuildAchievementTrackNoSubject(
-		Guid analysisTypeId,
-		Guid evaluationRequestId,
-		int lastYear,
-		int previousYear,
-		List<AchievementTrackNoSubjectG11G12Dto>? lastRows,
-		List<AchievementTrackNoSubjectG11G12Dto>? previousRows,
-		HashSet<int> allowedGrades,
-		Dictionary<string, int> lastAttendanceLookup,
-		Dictionary<string, int> previousAttendanceLookup)
+	private List<OutputAnalysisData> BuildAchievementTrackSubjectG11G12(
+	BuilderContext ctx,
+	List<AchievementTrackSubjectG11G12Dto>? lastRows,
+	List<AchievementTrackSubjectG11G12Dto>? previousRows)
 	{
-		var previousLookup = previousRows?
-			.Where(x => allowedGrades.Contains(ToInt(x.Grade)))
-			.GroupBy(x => $"{ToInt(x.Grade)}|{x.Track?.Trim()}|{x.Timespan?.Trim()}")
-			.ToDictionary(x => x.Key, x => x.First())
-			?? new Dictionary<string, AchievementTrackNoSubjectG11G12Dto>();
+		var lookup = BuildLookup(
+			previousRows?
+				.Where(x =>
+					ctx.AllowedGrades.Contains(ToInt(x.Grade)) &&
+					IsAllowedSubject(x.CourseCode, ctx.AllowedSubjects) &&
+					MatchFilter(x.Track, ctx.AllowedTracks) &&
+					MatchFilter(x.Timespan, ctx.AllowedTerms)),
+			x => $"{ToInt(x.Grade)}|{x.Track?.Trim()}|{x.CourseCode?.Trim()}|{x.Timespan?.Trim()}");
 
 		return lastRows?
-			.Where(x => allowedGrades.Contains(ToInt(x.Grade)))
+			.Where(x =>
+				ctx.AllowedGrades.Contains(ToInt(x.Grade)) &&
+				IsAllowedSubject(x.CourseCode, ctx.AllowedSubjects) &&
+				MatchFilter(x.Track, ctx.AllowedTracks) &&
+				MatchFilter(x.Timespan, ctx.AllowedTerms))
+			.Select(x =>
+			{
+				var grade = ToInt(x.Grade);
+				var track = x.Track?.Trim();
+				var subjectCode = x.CourseCode?.Trim();
+				var termCode = x.Timespan?.Trim();
+
+				lookup.TryGetValue(
+					$"{grade}|{track}|{subjectCode}|{termCode}",
+					out var prev);
+
+				return MakeDetail(
+					ctx,
+					grade,
+					subjectCode,
+					track,
+					termCode,
+					ToDecimal(x.Grade_Achvment_NoSev3_And_Present),
+					ToDecimal(prev?.Grade_Achvment_NoSev3_And_Present),
+					x.CourseTitle);
+			})
+			.ToList() ?? [];
+	}
+	private List<OutputAnalysisData> BuildAchievementTrackNoSubject(
+	BuilderContext ctx,
+	List<AchievementTrackNoSubjectG11G12Dto>? lastRows,
+	List<AchievementTrackNoSubjectG11G12Dto>? previousRows)
+	{
+		var lookup = BuildLookup(
+			previousRows?
+				.Where(x =>
+					ctx.AllowedGrades.Contains(ToInt(x.Grade)) &&
+					MatchFilter(x.Track, ctx.AllowedTracks) &&
+					MatchFilter(x.Timespan, ctx.AllowedTerms)),
+			x => $"{ToInt(x.Grade)}|{x.Track?.Trim()}|{x.Timespan?.Trim()}");
+
+		return lastRows?
+			.Where(x =>
+				ctx.AllowedGrades.Contains(ToInt(x.Grade)) &&
+				MatchFilter(x.Track, ctx.AllowedTracks) &&
+				MatchFilter(x.Timespan, ctx.AllowedTerms))
 			.Select(x =>
 			{
 				var grade = ToInt(x.Grade);
 				var track = x.Track?.Trim();
 				var termCode = x.Timespan?.Trim();
 
-				var key = $"{grade}|{track}|{termCode}";
-				previousLookup.TryGetValue(key, out var prev);
+				lookup.TryGetValue($"{grade}|{track}|{termCode}", out var prev);
 
-				var lastValue = ToDecimal(x.Track_Achvment_NoSev3_And_Present);
-				var previousValue = ToDecimal(prev?.Track_Achvment_NoSev3_And_Present);
-
-				return new OutputAnalysisData
-				{
-					Id = Guid.NewGuid(),
-					AnalysisTypeId = analysisTypeId,
-					EvaluationRequestId = evaluationRequestId,
-					Grade = grade,
-					SubjectCode = null,
-					Track = track,
-					TermCode = termCode,
-					LastYear = lastYear,
-					PreviousYear = previousYear,
-					LastYearValue = lastValue,
-					PreviousYearValue = previousValue,
-					Difference = lastValue - previousValue,
-					ActualValue = lastValue,
-					LastYearStudentCount = GetStudentCount(lastAttendanceLookup, grade, termCode),
-					PreviousYearStudentCount = GetStudentCount(previousAttendanceLookup, grade, termCode),
-					Note = $"Students: {x.Grade_NumberOf_Students_NoSev3_And_Present}"
-				};
+				return MakeDetail(ctx, grade, null, track, termCode,
+					ToDecimal(x.Track_Achvment_NoSev3_And_Present),
+					ToDecimal(prev?.Track_Achvment_NoSev3_And_Present),
+					$"Students: {x.Grade_NumberOf_Students_NoSev3_And_Present}");
 			})
-			.ToList()
-			?? new List<OutputAnalysisData>();
+			.ToList() ?? [];
 	}
 
 	private List<OutputAnalysisData> BuildAchievementSev3(
-		Guid analysisTypeId,
-		Guid evaluationRequestId,
-		int lastYear,
-		int previousYear,
+		BuilderContext ctx,
 		List<AchievementSev3Dto>? lastRows,
-		List<AchievementSev3Dto>? previousRows,
-		HashSet<int> allowedGrades,
-		Dictionary<string, int> lastAttendanceLookup,
-		Dictionary<string, int> previousAttendanceLookup)
+		List<AchievementSev3Dto>? previousRows)
 	{
-		var previousLookup = previousRows?
-			.Where(x => allowedGrades.Contains(ToInt(x.Grade)))
-			.GroupBy(x => $"{ToInt(x.Grade)}|{x.CourseCode?.Trim()}|{x.Timespan?.Trim()}")
-			.ToDictionary(x => x.Key, x => x.First())
-			?? new Dictionary<string, AchievementSev3Dto>();
+		var lookup = BuildLookup(
+			previousRows?
+				.Where(x =>
+					ctx.AllowedGrades.Contains(ToInt(x.Grade)) &&
+					IsAllowedSubject(x.CourseCode, ctx.AllowedSubjects) &&
+					MatchFilter(x.Timespan, ctx.AllowedTerms)),
+			x => $"{ToInt(x.Grade)}|{x.CourseCode?.Trim()}|{x.Timespan?.Trim()}");
 
 		return lastRows?
-			.Where(x => allowedGrades.Contains(ToInt(x.Grade)))
+			.Where(x =>
+				ctx.AllowedGrades.Contains(ToInt(x.Grade)) &&
+				IsAllowedSubject(x.CourseCode, ctx.AllowedSubjects) &&
+				MatchFilter(x.Timespan, ctx.AllowedTerms))
 			.Select(x =>
 			{
 				var grade = ToInt(x.Grade);
 				var subjectCode = x.CourseCode?.Trim();
 				var termCode = x.Timespan?.Trim();
 
-				var key = $"{grade}|{subjectCode}|{termCode}";
-				previousLookup.TryGetValue(key, out var prev);
+				lookup.TryGetValue($"{grade}|{subjectCode}|{termCode}", out var prev);
 
-				var lastValue = ToDecimal(x.Grade_Achvment_Sev3_And_Present_NoActivity);
-				var previousValue = ToDecimal(prev?.Grade_Achvment_Sev3_And_Present_NoActivity);
-
-				return new OutputAnalysisData
-				{
-					Id = Guid.NewGuid(),
-					AnalysisTypeId = analysisTypeId,
-					EvaluationRequestId = evaluationRequestId,
-					Grade = grade,
-					SubjectCode = subjectCode,
-					Track = null,
-					TermCode = termCode,
-					LastYear = lastYear,
-					PreviousYear = previousYear,
-					LastYearValue = lastValue,
-					PreviousYearValue = previousValue,
-					Difference = lastValue - previousValue,
-					ActualValue = lastValue,
-					LastYearStudentCount = GetStudentCount(lastAttendanceLookup, grade, termCode),
-					PreviousYearStudentCount = GetStudentCount(previousAttendanceLookup, grade, termCode),
-					Note = x.CourseTitle
-				};
+				return MakeDetail(ctx, grade, subjectCode, null, termCode,
+					ToDecimal(x.Grade_Achvment_Sev3_And_Present_NoActivity),
+					ToDecimal(prev?.Grade_Achvment_Sev3_And_Present_NoActivity),
+					x.CourseTitle);
 			})
-			.ToList()
-			?? new List<OutputAnalysisData>();
+			.ToList() ?? [];
 	}
 
 	private List<OutputAnalysisData> BuildBelow70Grade(
-		Guid analysisTypeId,
-		Guid evaluationRequestId,
-		int lastYear,
-		int previousYear,
-		List<YearlyStudentBelow70GradeDto>? lastRows,
-		List<YearlyStudentBelow70GradeDto>? previousRows,
-		HashSet<int> allowedGrades,
-		Dictionary<string, int> lastAttendanceLookup,
-		Dictionary<string, int> previousAttendanceLookup)
+	BuilderContext ctx,
+	List<YearlyStudentBelow70GradeDto>? lastRows,
+	List<YearlyStudentBelow70GradeDto>? previousRows)
 	{
-		var previousLookup = previousRows?
-			.Where(x => allowedGrades.Contains(ToInt(x.Grade)))
-			.GroupBy(x => $"{ToInt(x.Grade)}|{x.CourseCode?.Trim()}|{x.TermCode?.Trim()}")
-			.ToDictionary(x => x.Key, x => x.First())
-			?? new Dictionary<string, YearlyStudentBelow70GradeDto>();
+		var lookup = BuildLookup(
+			previousRows?
+				.Where(x =>
+					ctx.AllowedGrades.Contains(ToInt(x.Grade)) &&
+					IsAllowedSubject(x.CourseCode, ctx.AllowedSubjects) &&
+					MatchFilter(x.TermCode, ctx.AllowedTerms)),
+			x => $"{ToInt(x.Grade)}|{x.CourseCode?.Trim()}|{x.TermCode?.Trim()}");
 
 		return lastRows?
-			.Where(x => allowedGrades.Contains(ToInt(x.Grade)))
+			.Where(x =>
+				ctx.AllowedGrades.Contains(ToInt(x.Grade)) &&
+				IsAllowedSubject(x.CourseCode, ctx.AllowedSubjects) &&
+				MatchFilter(x.TermCode, ctx.AllowedTerms))
 			.Select(x =>
 			{
 				var grade = ToInt(x.Grade);
-				var subjectCode = x.CourseCode?.Trim();
-				var termCode = x.TermCode?.Trim();
 
-				var key = $"{grade}|{subjectCode}|{termCode}";
-				previousLookup.TryGetValue(key, out var prev);
+				lookup.TryGetValue(
+					$"{grade}|{x.CourseCode?.Trim()}|{x.TermCode?.Trim()}",
+					out var prev);
 
-				var lastValue = ToDecimal(x.No_of_Student_Grading_Assignment_Below_70);
-				var previousValue = ToDecimal(prev?.No_of_Student_Grading_Assignment_Below_70);
-
-				return new OutputAnalysisData
-				{
-					Id = Guid.NewGuid(),
-					AnalysisTypeId = analysisTypeId,
-					EvaluationRequestId = evaluationRequestId,
-					Grade = grade,
-					SubjectCode = subjectCode,
-					Track = null,
-					TermCode = termCode,
-					LastYear = lastYear,
-					PreviousYear = previousYear,
-					LastYearValue = lastValue,
-					PreviousYearValue = previousValue,
-					Difference = lastValue - previousValue,
-					ActualValue = lastValue,
-					LastYearStudentCount = GetStudentCount(lastAttendanceLookup, grade, termCode),
-					PreviousYearStudentCount = GetStudentCount(previousAttendanceLookup, grade, termCode),
-					Note = $"Term: {termCode}"
-				};
+				return MakeDetail(
+					ctx,
+					grade,
+					x.CourseCode?.Trim(),
+					null,
+					x.TermCode?.Trim(),
+					ToDecimal(x.No_of_Student_Grading_Assignment_Below_70),
+					ToDecimal(prev?.No_of_Student_Grading_Assignment_Below_70),
+					$"Term: {x.TermCode?.Trim()}");
 			})
-			.ToList()
-			?? new List<OutputAnalysisData>();
+			.ToList() ?? [];
 	}
 
 	private List<OutputAnalysisData> BuildSuccessByGrade(
-		Guid analysisTypeId,
-		Guid evaluationRequestId,
-		int lastYear,
-		int previousYear,
-		List<SuccessRateByGradeDto>? lastRows,
-		List<SuccessRateByGradeDto>? previousRows,
-		HashSet<int> allowedGrades,
-		Dictionary<string, int> lastAttendanceLookup,
-		Dictionary<string, int> previousAttendanceLookup)
+	BuilderContext ctx,
+	List<SuccessRateByGradeDto>? lastRows,
+	List<SuccessRateByGradeDto>? previousRows)
 	{
-		var previousLookup = previousRows?
-			.Where(x => allowedGrades.Contains(ToInt(x.Grade)))
-			.GroupBy(x => $"{ToInt(x.Grade)}|{x.Timespan?.Trim()}")
-			.ToDictionary(x => x.Key, x => x.First())
-			?? new Dictionary<string, SuccessRateByGradeDto>();
+		var lookup = BuildLookup(
+			previousRows?
+				.Where(x =>
+					ctx.AllowedGrades.Contains(ToInt(x.Grade)) &&
+					MatchFilter(x.Timespan, ctx.AllowedTerms)),
+			x => $"{ToInt(x.Grade)}|{x.Timespan?.Trim()}");
 
 		return lastRows?
-			.Where(x => allowedGrades.Contains(ToInt(x.Grade)))
+			.Where(x =>
+				ctx.AllowedGrades.Contains(ToInt(x.Grade)) &&
+				MatchFilter(x.Timespan, ctx.AllowedTerms))
 			.Select(x =>
 			{
 				var grade = ToInt(x.Grade);
 				var termCode = x.Timespan?.Trim();
 
-				var key = $"{grade}|{termCode}";
-				previousLookup.TryGetValue(key, out var prev);
+				lookup.TryGetValue($"{grade}|{termCode}", out var prev);
 
-				var lastValue = ToDecimal(x.NotSucceededPercentOfStudent);
-				var previousValue = ToDecimal(prev?.NotSucceededPercentOfStudent);
-
-				return new OutputAnalysisData
-				{
-					Id = Guid.NewGuid(),
-					AnalysisTypeId = analysisTypeId,
-					EvaluationRequestId = evaluationRequestId,
-					Grade = grade,
-					SubjectCode = null,
-					Track = null,
-					TermCode = termCode,
-					LastYear = lastYear,
-					PreviousYear = previousYear,
-					LastYearValue = lastValue,
-					PreviousYearValue = previousValue,
-					Difference = lastValue - previousValue,
-					ActualValue = lastValue,
-					LastYearStudentCount = GetStudentCount(lastAttendanceLookup, grade, termCode),
-					PreviousYearStudentCount = GetStudentCount(previousAttendanceLookup, grade, termCode),
-					Note = $"Succeeded: {x.SucceededPercentOfStudent}"
-				};
+				return MakeDetail(ctx, grade, null, null, termCode,
+					ToDecimal(x.NotSucceededPercentOfStudent),
+					ToDecimal(prev?.NotSucceededPercentOfStudent),
+					$"Succeeded: {x.SucceededPercentOfStudent}");
 			})
-			.ToList()
-			?? new List<OutputAnalysisData>();
+			.ToList() ?? [];
 	}
 
 	private List<OutputAnalysisData> BuildSuccessByTrack(
-		Guid analysisTypeId,
-		Guid evaluationRequestId,
-		int lastYear,
-		int previousYear,
+		BuilderContext ctx,
 		List<SuccessRateByTrackDto>? lastRows,
-		List<SuccessRateByTrackDto>? previousRows,
-		HashSet<int> allowedGrades,
-		Dictionary<string, int> lastAttendanceLookup,
-		Dictionary<string, int> previousAttendanceLookup)
+		List<SuccessRateByTrackDto>? previousRows)
 	{
-		var previousLookup = previousRows?
-			.Where(x => allowedGrades.Contains(ToInt(x.Grade)))
-			.GroupBy(x => $"{ToInt(x.Grade)}|{x.Track?.Trim()}|{x.Timespan?.Trim()}")
-			.ToDictionary(x => x.Key, x => x.First())
-			?? new Dictionary<string, SuccessRateByTrackDto>();
+		var lookup = BuildLookup(
+			previousRows?
+				.Where(x =>
+					ctx.AllowedGrades.Contains(ToInt(x.Grade)) &&
+					MatchFilter(x.Track, ctx.AllowedTracks) &&
+					MatchFilter(x.Timespan, ctx.AllowedTerms)),
+			x => $"{ToInt(x.Grade)}|{x.Track?.Trim()}|{x.Timespan?.Trim()}");
 
 		return lastRows?
-			.Where(x => allowedGrades.Contains(ToInt(x.Grade)))
+			.Where(x =>
+				ctx.AllowedGrades.Contains(ToInt(x.Grade)) &&
+				MatchFilter(x.Track, ctx.AllowedTracks) &&
+				MatchFilter(x.Timespan, ctx.AllowedTerms))
 			.Select(x =>
 			{
 				var grade = ToInt(x.Grade);
 				var track = x.Track?.Trim();
 				var termCode = x.Timespan?.Trim();
 
-				var key = $"{grade}|{track}|{termCode}";
-				previousLookup.TryGetValue(key, out var prev);
+				lookup.TryGetValue($"{grade}|{track}|{termCode}", out var prev);
 
-				var lastValue = ToDecimal(x.NotSucceededPercentOfStudent);
-				var previousValue = ToDecimal(prev?.NotSucceededPercentOfStudent);
-
-				return new OutputAnalysisData
-				{
-					Id = Guid.NewGuid(),
-					AnalysisTypeId = analysisTypeId,
-					EvaluationRequestId = evaluationRequestId,
-					Grade = grade,
-					SubjectCode = null,
-					Track = track,
-					TermCode = termCode,
-					LastYear = lastYear,
-					PreviousYear = previousYear,
-					LastYearValue = lastValue,
-					PreviousYearValue = previousValue,
-					Difference = lastValue - previousValue,
-					ActualValue = lastValue,
-					LastYearStudentCount = GetStudentCount(lastAttendanceLookup, grade, termCode),
-					PreviousYearStudentCount = GetStudentCount(previousAttendanceLookup, grade, termCode),
-					Note = $"Succeeded: {x.SucceededPercentOfStudent}"
-				};
+				return MakeDetail(ctx, grade, null, track, termCode,
+					ToDecimal(x.NotSucceededPercentOfStudent),
+					ToDecimal(prev?.NotSucceededPercentOfStudent),
+					$"Succeeded: {x.SucceededPercentOfStudent}");
 			})
-			.ToList()
-			?? new List<OutputAnalysisData>();
+			.ToList() ?? [];
 	}
 
-	private static HashSet<int> ParseGrades(string? grades)
-	{
-		return (grades ?? "")
-			.Split(',', StringSplitOptions.RemoveEmptyEntries)
-			.Select(x => int.TryParse(x.Trim(), out var grade) ? grade : 0)
-			.Where(x => x > 0)
-			.ToHashSet();
-	}
+	// ─── Query / Get Output Analysis ─────────────────────────────────────────
 
-	private static Guid? GetMatrixValueId(IEnumerable<FormEvalMatrixValue>? values, decimal actualValue)
-	{
-		return values?
-			.Where(x =>
-				x.IsActive &&
-				!x.IsDeleted &&
-				actualValue >= x.MinValue &&
-				actualValue <= x.MaxValue)
-			.OrderBy(x => x.OrderNo)
-			.Select(x => (Guid?)x.Id)
-			.FirstOrDefault();
-	}
-
-	private static string? GetMatrixNameAr(IEnumerable<FormEvalMatrixValue>? values, decimal actualValue)
-	{
-		return values?
-			.Where(x =>
-				x.IsActive &&
-				!x.IsDeleted &&
-				actualValue >= x.MinValue &&
-				actualValue <= x.MaxValue)
-			.OrderBy(x => x.OrderNo)
-			.Select(x => x.NameAr)
-			.FirstOrDefault();
-	}
-
-	private static int ToInt(object? value)
-	{
-		return int.TryParse(value?.ToString(), out var result)
-			? result
-			: 0;
-	}
-
-	private static decimal ToDecimal(object? value)
-	{
-		return decimal.TryParse(value?.ToString(), out var result)
-			? result
-			: 0;
-	}
 	public async Task<OutputAnalysisResponseDto> GetOutputAnalysisAsync(Guid evaluationRequestId)
 	{
-		evaluationRequestId = Guid.Parse("82DE8371-49D4-402F-96BE-3B53B8E92B00");
+		evaluationRequestId = Guid.Parse("82DE8371-49D4-402F-96BE-3B53B8E92B00"); // TODO: remove hardcoded override
 
 		await EnsureOutputAnalysisExistsAsync(evaluationRequestId);
 
 		var analysisTypes = await uow.GetRepository<AnalysisType>()
 			.GetAllActiveNonDeleted()
+			.Include(x => x.ResultFormEvalMatrix).ThenInclude(x => x.FormEvalMatrixValues)
+			.Include(x => x.DataFormEvalMatrix).ThenInclude(x => x.FormEvalMatrixValues)
 			.OrderBy(x => x.OrderNo)
 			.ToListAsync();
 
@@ -1102,11 +895,41 @@ public class QNEDSService : ApiBase
 			.GetAllActiveNonDeleted(x => x.EvaluationRequestId == evaluationRequestId)
 			.ToListAsync();
 
+		var subjectCodes = details
+			.Where(x => !string.IsNullOrWhiteSpace(x.SubjectCode))
+			.Select(x => x.SubjectCode!.Trim())
+			.Distinct().ToList();
+
+		var courses = await uow.GetRepository<SchoolCourse>()
+			.GetAllActiveNonDeleted(x => x.IntegrationCode != null && subjectCodes.Contains(x.IntegrationCode))
+			.ToListAsync();
+
+		var gradeCodes = details.Select(x => x.Grade.ToString()).Distinct().ToList();
+
+		var gradeLevels = await uow.GetRepository<GradeLevel>()
+			.GetAllActiveNonDeleted(x => gradeCodes.Contains(x.Grade))
+			.Include(x => x.EducationLevel)
+			.ToListAsync();
+
+		var analysisTypeIds = analysisTypes.Select(x => x.Id).ToList();
+
+		var formItems = await uow.GetRepository<FormItem>()
+			.GetAllActiveNonDeleted(x => x.AnalysisTypeId != null && analysisTypeIds.Contains(x.AnalysisTypeId.Value))
+			.Include(x => x.Scope)
+			.OrderBy(x => x.Scope!.OrderNo).ThenBy(x => x.OrderNo)
+			.ToListAsync();
+
 		return new OutputAnalysisResponseDto
 		{
 			AnalysisTypes = analysisTypes.Select(type =>
 			{
 				var final = finals.FirstOrDefault(x => x.AnalysisTypeId == type.Id);
+
+				var resultMatrixValue = final == null ? null
+					: type.ResultFormEvalMatrix?.FormEvalMatrixValues?
+						.Where(v => final.ActualValue >= v.MinValue && final.ActualValue <= v.MaxValue)
+						.OrderBy(v => v.OrderNo)
+						.FirstOrDefault();
 
 				return new OutputAnalysisTypeDto
 				{
@@ -1115,40 +938,81 @@ public class QNEDSService : ApiBase
 					AnalysisTypeNameEn = type.NameEn,
 					BackendName = type.BackendName,
 
-					OutputAnalysisFinalResult = final == null
-						? null
-						: new OutputAnalysisFinalResultDto
-						{
-							Id = final.Id,
-							ActualValue = final.ActualValue,
-							Note = final.Note,
-							FormEvalMatrixValueId = final.FormEvalMatrixValueId
-						},
+					OutputAnalysisFinalResult = final == null ? null : new OutputAnalysisFinalResultDto
+					{
+						Id = final.Id,
+						ActualValue = final.ActualValue,
+						Note = final.Note,
+						FormEvalMatrixValueId = final.FormEvalMatrixValueId,
+						MatrixValue = MapMatrixValue(resultMatrixValue)
+					},
 
 					OutputAnalysisData = details
 						.Where(x => x.AnalysisTypeId == type.Id)
-						.OrderBy(x => x.Grade)
-						.ThenBy(x => x.SubjectCode)
-						.Select(x => new OutputAnalysisDataDto
+						.OrderBy(x => x.Grade).ThenBy(x => x.SubjectCode)
+						.Select(x =>
 						{
-							Id = x.Id,
-							Grade = x.Grade,
-							LastYear = x.LastYear,
-							PreviousYear = x.PreviousYear,
-							LastYearValue = x.LastYearValue,
-							PreviousYearValue = x.PreviousYearValue,
-							Difference = x.Difference,
-							SubjectCode = x.SubjectCode,
-							Track = x.Track,
-							ActualValue = x.ActualValue,
-							MartixTextValue = x.MartixTextValue,
-							Note = x.Note,
-							LastYearStudentCount = x.LastYearStudentCount,
-							PreviousYearStudentCount = x.PreviousYearStudentCount,
-							TermCode = x.TermCode,
-							DataConfig = x.DataConfig
-						})
-						.ToList()
+							var course = !string.IsNullOrWhiteSpace(x.SubjectCode)
+								? courses.FirstOrDefault(c => c.IntegrationCode == x.SubjectCode)
+								: null;
+
+							var grade = gradeLevels.FirstOrDefault(g => g.Grade == x.Grade.ToString());
+
+							var dataMatrixValue = type.DataFormEvalMatrix?.FormEvalMatrixValues?
+								.Where(v => x.ActualValue >= v.MinValue && x.ActualValue <= v.MaxValue)
+								.OrderBy(v => v.OrderNo)
+								.FirstOrDefault();
+
+							return new OutputAnalysisDataDto
+							{
+								Id = x.Id,
+								Grade = x.Grade,
+
+								GradeNameAr = grade?.NameAr,
+								GradeNameEn = grade?.NameEn,
+
+								EducationLevelId = grade?.EducationLevelId,
+								EducationLevelNameAr = grade?.EducationLevel?.NameAr,
+								EducationLevelNameEn = grade?.EducationLevel?.NameEn,
+								EducationLevelBackendName = grade?.EducationLevel?.BackendName,
+
+								SubjectCode = x.SubjectCode,
+								SubjectNameAr = course?.NameAr,
+								SubjectNameEn = course?.NameEn,
+
+								Track = x.Track,
+								LastYear = x.LastYear,
+								PreviousYear = x.PreviousYear,
+								LastYearValue = x.LastYearValue,
+								PreviousYearValue = x.PreviousYearValue,
+								Difference = x.Difference,
+								ActualValue = x.ActualValue,
+								MartixTextValue = x.MartixTextValue,
+								Note = x.Note,
+								LastYearStudentCount = x.LastYearStudentCount,
+								PreviousYearStudentCount = x.PreviousYearStudentCount,
+								TermCode = x.TermCode,
+								DataConfig = x.DataConfig,
+
+								FormEvalMatrixValueId = dataMatrixValue?.Id,
+								MatrixValue = MapMatrixValue(dataMatrixValue)
+							};
+						}).ToList(),
+
+					FormItems = formItems
+						.Where(i => i.AnalysisTypeId == type.Id)
+						.OrderBy(i => i.Scope?.OrderNo).ThenBy(i => i.OrderNo)
+						.Select(i => new OutputAnalysisFormItemDto
+						{
+							Id = i.Id,
+							ItemNumber = i.ItemNumber,
+							NameAr = i.NameAr,
+							NameEn = i.NameEn,
+							OrderNo = i.OrderNo,
+							ScopeId = i.ScopeId,
+							ScopeNameAr = i.Scope?.NameAr,
+							ScopeNameEn = i.Scope?.NameEn
+						}).ToList()
 				};
 			}).ToList()
 		};
@@ -1161,69 +1025,128 @@ public class QNEDSService : ApiBase
 			.ToListAsync();
 
 		var finals = await uow.GetRepository<OutputAnalysisFinalResult>()
-			.GetAllActiveNonDeleted(x =>
-				x.EvaluationRequestId == evaluationRequestId)
+			.GetAllActiveNonDeleted(x => x.EvaluationRequestId == evaluationRequestId)
 			.ToListAsync();
 
 		var details = await uow.GetRepository<OutputAnalysisData>()
-			.GetAllActiveNonDeleted(x =>
-				x.EvaluationRequestId == evaluationRequestId)
+			.GetAllActiveNonDeleted(x => x.EvaluationRequestId == evaluationRequestId)
 			.ToListAsync();
 
-		bool needGenerate = false;
+		bool needsGeneration =
+			!finals.Any() ||
+			!details.Any() ||
+			analysisTypes.Any(t =>
+				!finals.Any(f => f.AnalysisTypeId == t.Id) ||
+				!details.Any(d => d.AnalysisTypeId == t.Id));
 
-		if (!finals.Any())
-		{
-			needGenerate = true;
-		}
-		else if (!details.Any())
-		{
-			needGenerate = true;
-		}
-		else
-		{
-			foreach (var analysisType in analysisTypes)
-			{
-				var finalExists = finals.Any(x =>
-					x.AnalysisTypeId == analysisType.Id);
-
-				if (!finalExists)
-				{
-					needGenerate = true;
-					break;
-				}
-
-				var detailExists = details.Any(x =>
-					x.AnalysisTypeId == analysisType.Id);
-
-				if (!detailExists)
-				{
-					needGenerate = true;
-					break;
-				}
-			}
-		}
-
-		if (!needGenerate)
+		if (!needsGeneration)
 			return;
 
 		var evaluationRequest = await uow.GetRepository<EvaluationRequest>()
 			.GetAllActiveNonDeleted(x => x.Id == evaluationRequestId)
-			//.Include(x => x.OrgAcademicYear)
 			.FirstOrDefaultAsync();
 
 		if (evaluationRequest == null)
 			return;
 
-		var academicYear =
-			//evaluationRequest.OrgAcademicYear?.AcademicYear
-			//?? 
-			DateTime.Now.Year;
-
-		await GenerateOutputAnalysisFromQnedsAsync(
-			evaluationRequestId,
-			academicYear);
+		await GenerateOutputAnalysisFromQnedsAsync(evaluationRequestId, DateTime.Now.Year);
 	}
+
+	// ─── Helpers ─────────────────────────────────────────────────────────────
+
+	private static Dictionary<string, T> BuildLookup<T>(IEnumerable<T>? source, Func<T, string> keySelector) =>
+		source?
+			.GroupBy(keySelector)
+			.ToDictionary(g => g.Key, g => g.First())
+		?? [];
+
+	private static Dictionary<string, int> BuildAttendanceStudentCountLookup(
+		List<StudentDailyAttendanceByMonthDto>? rows,
+		HashSet<int> allowedGrades) =>
+		rows?
+			.Where(x =>
+				allowedGrades.Contains(ToInt(x.Grade)) &&
+				string.Equals(x.AttendanceDescription?.Trim(), "Present", StringComparison.OrdinalIgnoreCase))
+			.GroupBy(x => $"{ToInt(x.Grade)}|{ToInt(x.Month)}")
+			.ToDictionary(g => g.Key, g => g.Sum(r => ToInt(r.Students)))
+		?? [];
+
+	private static int GetStudentCount(Dictionary<string, int> lookup, int grade, string? termCode) =>
+		lookup.TryGetValue($"{grade}|{ToInt(termCode)}", out var count) ? count : 0;
+
+	private static HashSet<int> ParseGrades(string? grades) =>
+		(grades ?? "")
+			.Split(',', StringSplitOptions.RemoveEmptyEntries)
+			.Select(x => int.TryParse(x.Trim(), out var g) ? g : 0)
+			.Where(x => x > 0)
+			.ToHashSet();
+
+	private static HashSet<string> ParseSubjectCodes(string? subjectCodes)
+	{
+		if (string.IsNullOrWhiteSpace(subjectCodes) ||
+			subjectCodes.Trim().Equals("NULL", StringComparison.OrdinalIgnoreCase))
+			return [];
+
+		return subjectCodes
+			.Split(',', StringSplitOptions.RemoveEmptyEntries)
+			.Select(x => x.Trim())
+			.Where(x => !string.IsNullOrWhiteSpace(x))
+			.ToHashSet(StringComparer.OrdinalIgnoreCase);
+	}
+
+	private static bool IsAllowedSubject(string? subjectCode, HashSet<string> allowed) =>
+		!allowed.Any() || (!string.IsNullOrWhiteSpace(subjectCode) && allowed.Contains(subjectCode.Trim()));
+
+	private static AnalysisConfigDto GetAnalysisConfig(string? json)
+	{
+		if (string.IsNullOrWhiteSpace(json)) return new();
+		try { return JsonSerializer.Deserialize<AnalysisConfigDto>(json) ?? new(); }
+		catch { return new(); }
+	}
+	private static HashSet<string> ToFilterSet(IEnumerable<string>? values)
+	{
+		return values?
+			.Where(x => !string.IsNullOrWhiteSpace(x))
+			.Select(x => x.Trim())
+			.ToHashSet(StringComparer.OrdinalIgnoreCase)
+			?? [];
+	}
+
+	private static bool MatchFilter(string? value, HashSet<string> filter)
+	{
+		if (!filter.Any())
+			return true;
+
+		return !string.IsNullOrWhiteSpace(value)
+			&& filter.Contains(value.Trim());
+	}
+	private static Guid? GetMatrixValueId(IEnumerable<FormEvalMatrixValue>? values, decimal actualValue) =>
+		values?
+			.Where(x => x.IsActive && !x.IsDeleted && actualValue >= x.MinValue && actualValue <= x.MaxValue)
+			.OrderBy(x => x.OrderNo)
+			.Select(x => (Guid?)x.Id)
+			.FirstOrDefault();
+
+	private static string? GetMatrixNameAr(IEnumerable<FormEvalMatrixValue>? values, decimal actualValue) =>
+		values?
+			.Where(x => x.IsActive && !x.IsDeleted && actualValue >= x.MinValue && actualValue <= x.MaxValue)
+			.OrderBy(x => x.OrderNo)
+			.Select(x => x.NameAr)
+			.FirstOrDefault();
+
+	private static MatrixValueDto? MapMatrixValue(FormEvalMatrixValue? value) =>
+		value == null ? null : new MatrixValueDto
+		{
+			Id = value.Id,
+			NameAr = value.NameAr,
+			NameEn = value.NameEn,
+			ReportTextAr = value.ReportTextAr,
+			ReportTextEn = value.ReportTextEn
+		};
+
+	private static int ToInt(object? value) =>
+		int.TryParse(value?.ToString(), out var r) ? r : 0;
+
+	private static decimal ToDecimal(object? value) =>
+		decimal.TryParse(value?.ToString(), out var r) ? r : 0;
 }
-
-
