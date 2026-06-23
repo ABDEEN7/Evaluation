@@ -896,7 +896,7 @@ public class QNEDSService : ApiBase
 
 	public async Task<OutputAnalysisResponseDto> GetOutputAnalysisAsync(Guid evaluationRequestId)
 	{
-		evaluationRequestId = Guid.Parse("82DE8371-49D4-402F-96BE-3B53B8E92B00"); // TODO: remove hardcoded override
+		//evaluationRequestId = Guid.Parse("82DE8371-49D4-402F-96BE-3B53B8E92B00"); // TODO: remove hardcoded override
 
 		await EnsureOutputAnalysisExistsAsync(evaluationRequestId);
 
@@ -1052,15 +1052,9 @@ public class QNEDSService : ApiBase
 			.GetAllActiveNonDeleted(x => x.EvaluationRequestId == evaluationRequestId)
 			.ToListAsync();
 
-		bool needsGeneration =
-			!finals.Any() ||
-			!details.Any() ||
-			analysisTypes.Any(t =>
-				!finals.Any(f => f.AnalysisTypeId == t.Id) ||
-				!details.Any(d => d.AnalysisTypeId == t.Id));
-
-		if (!needsGeneration)
+		if (hasFinals && hasDetails)
 			return;
+
 
 		var evaluationRequest = await uow.GetRepository<EvaluationRequest>()
 			.GetAllActiveNonDeleted(x => x.Id == evaluationRequestId)
@@ -1069,7 +1063,7 @@ public class QNEDSService : ApiBase
 		if (evaluationRequest == null)
 			return;
 
-		await GenerateOutputAnalysisFromQnedsAsync(evaluationRequestId, DateTime.Now.Year);
+		await GenerateOutputAnalysisFromQnedsAsync(evaluationRequestId, 2025);
 	}
 
 	// ─── Helpers ─────────────────────────────────────────────────────────────
