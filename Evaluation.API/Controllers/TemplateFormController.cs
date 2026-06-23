@@ -2,12 +2,10 @@
 using Evaluation.API.ActionFilter;
 using Evaluation.DAL.Models.FormsModules;
 using Evaluation.Services.BusinessLayer;
-using Evaluation.Services.BusinessLayer.Admin;
 using Evaluation.Services.BusinessLayer.API.EvaluationForm;
 using Evaluation.SharedHelper.Dtos.EvalFormDto;
 using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Models.Admin;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Evaluation.API.Controllers;
@@ -24,35 +22,35 @@ public class TemplateFormController : ControllerBase
     }
 
     [HttpGet]
-    //[CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.VIEW_WEB_TemplateFormS })]
+    [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.VIEW_WEB_EVALFORMS })]
     public async Task<IActionResult> GetAllTemplateForm([FromQuery] SearchTemplateForm Page)
     {
         return Ok(await _masterBl.GetApiService<EvaluationFormBL>().GetEvaluationForm(Page));
     }
 
     [HttpGet]
-    //[CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.VIEW_WEB_FORMITEMS })]
+    [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.VIEW_WEB_FORMITEMS })]
     public async Task<IActionResult> GetAllTemplateFormItems(Guid TemplateFormId)
     {
         return Ok(await _masterBl.GetApiService<EvaluationFormBL>().GetAllTemplateFormItems(TemplateFormId));
     }
 
     [HttpGet]
-    //[CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.VIEW_WEB_FORMSCOPES })]
+    [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.VIEW_WEB_FORMSCOPES })]
     public async Task<IActionResult> GetAllFormScope(Guid formIdValue)
     {
         return Ok(await _masterBl.GetApiService<EvaluationFormBL>().GetAllFormScope(formIdValue));
     }
 
     [HttpGet]
-    //[CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.VIEW_WEB_FORMITEMS })]
+    [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.VIEW_WEB_FORMITEMS })]
     public async Task<IActionResult> GetAllFormItemsFromDepartment(Guid TemplateFormId)
     {
         return Ok(await _masterBl.GetApiService<EvaluationFormBL>().GetAllFormItemsFromDepartment(TemplateFormId));
     }
 
     [HttpPost]
-    //[CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.ADD_WEB_TemplateFormS })]
+    [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.ADD_WEB_EVALFORMS })]
     public async Task<IActionResult> SaveTemplateForm()
     {
         var request = Request.Form["request"][0]?.StringToObject<TemplateFormDto>();
@@ -60,14 +58,14 @@ public class TemplateFormController : ControllerBase
     }
 
     [HttpPost]
-    //[CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.EDIT_WEB_TemplateFormS })]
+    [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.EDIT_WEB_EVALFORMS })]
     public async Task<IActionResult> UpdateTemplateForm()
     {
         var request = Request.Form["request"][0]?.StringToObject<TemplateFormDto>();
         return Ok(await _masterBl.GetApiService<EvaluationFormBL>().UpdateEvaluationForm(request!));
     }
     [HttpPost]
-    // [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.DELETE_WEB_TemplateFormS })]
+    [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.DELETE_WEB_EVALFORMS })]
     public async Task<IActionResult> DeleteTemplateForm(Guid Id)
     {
 
@@ -76,7 +74,7 @@ public class TemplateFormController : ControllerBase
     }
 
     [HttpPost]
-    //[CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.ADD_WEB_FORMITEMS })]
+    [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.ADD_WEB_FORMITEMS })]
     public async Task<IActionResult> SaveTemplateFormItem()
     {
         var request = Request.Form["request"][0]?.StringToObject<EvaluationFormItemDto>();
@@ -84,14 +82,14 @@ public class TemplateFormController : ControllerBase
     }
 
     [HttpPost]
-    //[CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.EDIT_WEB_FORMITEMS })]
+    [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.EDIT_WEB_FORMITEMS })]
     public async Task<IActionResult> UpdateTemplateFormItem()
     {
         var request = Request.Form["request"][0]?.StringToObject<EvaluationFormItemDto>();
         return Ok(await _masterBl.GetApiService<EvaluationFormBL>().UpdateEvaluationFormItem(request!));
     }
     [HttpPost]
-    //[CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.DELETE_WEB_FORMITEMS })]
+    [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.DELETE_WEB_FORMITEMS })]
     public async Task<IActionResult> DeleteTemplateFormItem(Guid Id)
     {
 
@@ -99,7 +97,7 @@ public class TemplateFormController : ControllerBase
 
     }
     [HttpPost]
-    //[CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.ADD_WEB_SUBFORMITEMS })]
+    [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.ADD_WEB_SUBFORMITEMS })]
     public async Task<IActionResult> SaveEvaluationSubFormItem()
     {
         var request = Request.Form["request"][0]?.StringToObject<EvaluationFormSubItemDto>();
@@ -107,14 +105,14 @@ public class TemplateFormController : ControllerBase
     }
 
     [HttpPost]
-    //[CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.EDIT_WEB_SUBFORMITEMS })]
+    [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.EDIT_WEB_SUBFORMITEMS })]
     public async Task<IActionResult> UpdateEvaluationSubFormItem()
     {
         var request = Request.Form["request"][0]?.StringToObject<EvaluationFormSubItemDto>();
         return Ok(await _masterBl.GetApiService<EvaluationFormBL>().UpdateEvaluationSubFormItem(request!));
     }
     [HttpPost]
-    //[CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.DELETE_WEB_SUBFORMITEMS })]
+    [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.DELETE_WEB_SUBFORMITEMS })]
     public async Task<IActionResult> DeleteEvaluationSubFormItem(Guid Id)
     {
 
@@ -123,7 +121,7 @@ public class TemplateFormController : ControllerBase
     }
 
     [HttpPost]
-    //[CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.ADD_WEB_FORMSCOPES })]
+    [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.ADD_WEB_FORMSCOPES })]
     public async Task<IActionResult> SaveFormScope()
     {
         var request = Request.Form["request"][0]?.StringToObject<FormScopeDTO>();
@@ -131,14 +129,14 @@ public class TemplateFormController : ControllerBase
     }
 
     [HttpPost]
-    //[CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.EDIT_WEB_FORMSCOPES })]
+    [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.EDIT_WEB_FORMSCOPES })]
     public async Task<IActionResult> UpdateFormScope()
     {
         var request = Request.Form["request"][0]?.StringToObject<FormScopeDTO>();
         return Ok(await _masterBl.GetApiService<EvaluationFormBL>().UpdateFormScope(request!));
     }
     [HttpPost]
-    // [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.DELETE_WEB_FORMSCOPES })]
+    [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.DELETE_WEB_FORMSCOPES })]
     public async Task<IActionResult> DeleteFormScope(Guid Id)
     {
 
@@ -146,7 +144,7 @@ public class TemplateFormController : ControllerBase
 
     }
     [HttpGet]
-    //[CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.VIEW_WEB_FORMITEMS })]
+    [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.VIEW_WEB_FORMITEMS })]
     public async Task<IActionResult> GetEvalFormItemLists(Guid formId)
     {
         Dictionary<string, object> response = new Dictionary<string, object>();
@@ -160,28 +158,28 @@ public class TemplateFormController : ControllerBase
     }
    
     [HttpGet]
-    //[CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.VIEW_WEB_FORMITEMCONFIG })]
+    [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.VIEW_WEB_FORMITEMCONFIG })]
     public async Task<IActionResult> GetAllFormItemConfig(Guid? evalFormId)
     {
         var data = await _masterBl.GetApiService<EvaluationFormBL>().GetAllFormItemConfig(evalFormId);
         return Ok(data);
     }
     [HttpPost]
-    //[CheckRolePermisionFilter(true, PermisionNames: new[] {ConstantKeys.WebPermissions.ADD_WEB_FORMITEMCONFIG})]
+    [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.ADD_WEB_FORMITEMCONFIG })]
     public async Task<IActionResult> SaveFormItemConfig()
     {
         var request = Request.Form["request"][0]?.StringToObject<List<CreateFormItemConfigDto>>();
         return Ok(await _masterBl.GetApiService<EvaluationFormBL>().SaveFormItemConfig(request!));
     }
     [HttpPost]
-    //[CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.EDIT_WEB_FORMITEMCONFIG })]
+    [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.EDIT_WEB_FORMITEMCONFIG })]
     public async Task<IActionResult> UpdateFormItemConfig()
     {
         var request = Request.Form["request"][0]?.StringToObject<CreateFormItemConfigDto>();
         return Ok(await _masterBl.GetApiService<EvaluationFormBL>().UpdateFormItemConfig(request!));
     }
     [HttpPost]
-    //[CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.DELETE_WEB_FORMITEMCONFIG })]
+    [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.DELETE_WEB_FORMITEMCONFIG })]
     public async Task<IActionResult> DeleteFormItemConfig(Guid formId)
     {
         return Ok(await _masterBl.GetApiService<EvaluationFormBL>().DeleteFormItemConfig(formId));

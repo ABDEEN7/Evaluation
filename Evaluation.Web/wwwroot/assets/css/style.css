@@ -6445,3 +6445,8 @@ html[dir="rtl"] #btn-back-top i {
 #btn-back-top i {
     font-size: 14px;
 }
+
+
+.border-top-card {
+    border-top: 1px solid #dee2e6 !important;
+}

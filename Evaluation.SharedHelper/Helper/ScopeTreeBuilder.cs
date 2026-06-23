@@ -1,4 +1,5 @@
-﻿using Evaluation.DAL.Dtos.Form;
+﻿using AutoMapper;
+using Evaluation.DAL.Dtos.Form;
 using Evaluation.DAL.Models.FormBuilder;
 using Evaluation.DAL.Models.FormsModules;
 using Evaluation.SharedHelper.Dtos.EvalFormDto;
@@ -7,7 +8,7 @@ using Evaluation.SharedHelper.Dtos.Form;
 namespace Evaluation.DAL.Helper;
 public static class ScopeTreeBuilder
 {
-    public static List<ScopeTreeDto> BuildTree(
+    public static List<ScopeTreeDto> BuildTree(IMapper mapper,
         List<ScopeAcademicYear> academicYearScopes,
         List<FormItem> formItems,
         List<FormItemValue>? formItemsValues = null)
@@ -85,9 +86,9 @@ public static class ScopeTreeBuilder
         return new ScopeTreeDto
         {
             Id = scope.Id,
-            Name = scope.NameEn,
+            Name = scope.NameEn,//TODO: Need to translate
             ScopeTypeId = scopeType.Id,
-            ScopeTypeName = scopeType.NameEn,
+            ScopeTypeName = scopeType.NameEn,//TODO: Need to translate
             OrderNo = scope.OrderNo,
             ColorCode = scope.ColorCode,
 
@@ -105,7 +106,7 @@ public static class ScopeTreeBuilder
                         return new FormItemDto
                         {
                             Id = x.Id,
-                            Name = x.NameEn,
+                            Name = x.NameEn,//TODO: Need to translate
                             OrderNo = x.OrderNo,
                             HasNote = x.HasNote,
                             NoteRequired = x.NoteRequired,
@@ -127,7 +128,7 @@ public static class ScopeTreeBuilder
                                     return new RelatedItemDto
                                     {
                                         Id = r.RelatedItemId,
-                                        Name = r.RelatedItem?.NameEn,
+                                        Name = r.RelatedItem?.NameEn,//TODO: Need to translate
                                         Note = relatedValue?.Note,
                                         Value = relatedValue?.ActualValue?.ToString()
                                     };
@@ -140,7 +141,7 @@ public static class ScopeTreeBuilder
                                 .Select(c => new SubFormItemDto
                                 {
                                     Id = c.Id,
-                                    Name = c.NameEn,
+                                    Name = c.NameEn,//TODO: Need to translate
                                     hasNote = c.HasNote,
 
                                     SubItemLists = c.DropDownType != null

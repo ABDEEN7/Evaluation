@@ -50,9 +50,11 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
                     academicYearId);
 
         var tree = ScopeTreeBuilder.BuildTree(
+            mapper,
             scopeAcademicYears,
             formItems,
-            formItemValues);
+            formItemValues
+            );
 
         return new FormDto
         {
@@ -60,46 +62,7 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
             Tree = tree
         };
     }
-    //public async Task<Result<FormDto>> GetFormItems(Guid FormId, Guid AcademicYearId)
-    //{
-    //    var lang = requestInfo.Lang;
-    //    var evalForm = await formService.GetEvalForm(FormId, IncludeCalcMethod: true);
-    //    var mappedEvalForm = mapper.Map<TemplateFormDto>(evalForm);
 
-    //    var formItems = await formService.GetFormItems(FormId);
-    //    var mappedData = mapper.Map<List<FormItemDto>>(formItems, opt => opt.Items["lang"] = lang);
-
-    //    foreach (var item in formItems)
-    //    {
-    //        var relatedItemDtos = new List<RelatedItemDto>();
-
-    //        foreach (var relatedFromItem in item.RelatedFrom) 
-    //        {
-    //            if (relatedFromItem.RelatedItemId != Guid.Empty)
-    //            {
-    //                var formItemValue = await formService.GetFormItemValueByItemId(relatedFromItem.RelatedItemId);
-
-    //                    relatedItemDtos.Add(new RelatedItemDto()
-    //                    {
-    //                        Id = relatedFromItem.RelatedItemId,
-    //                        Note = formItemValue?.Note,
-    //                        Value = formItemValue?.ActualValue?.ToString(),
-    //                        Name = relatedFromItem.RelatedItem.NameAr
-    //                    });
-    //            }
-    //        }
-    //        mappedData.Where(md => md.Id == item.Id).FirstOrDefault().RelatedItems = relatedItemDtos;
-    //    }
-
-    //    //return new FormDto() { EvalForm = mappedEvalForm , Items = mappedData};
-
-
-    //    List<ScopeAcademicYear> scopeAcademicYears = await scopeRepostiory.GetScopeAcademicYearListByAcademicYearId(AcademicYearId);
-
-    //    var tree = ScopeTreeBuilder.BuildTree(scopeAcademicYears, formItems);
-
-    //    return new FormDto() { EvalForm = mappedEvalForm, Tree = tree };
-    //}
     public async Task<Result<FormDto>> GetFormItemsWithValues(Guid FormId, Guid AcademicYearId, Guid EvaluationRequestId)
     {
         var lang = requestInfo.Lang;
@@ -138,7 +101,7 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
 
         List<ScopeAcademicYear> scopeAcademicYears = await scopeRepostiory.GetScopeAcademicYearListByAcademicYearId(AcademicYearId);
 
-        var tree = ScopeTreeBuilder.BuildTree(scopeAcademicYears, formItems, formItemsValues);
+        var tree = ScopeTreeBuilder.BuildTree(mapper, scopeAcademicYears, formItems, formItemsValues);
 
         return new FormDto() { EvalForm = mappedEvalForm, Tree = tree };
     }
@@ -209,7 +172,8 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
 			.GetScopeAcademicYearListByAcademicYearId(academicYearId);
 
 		var tree = ScopeTreeBuilder.BuildTree(
-			scopeAcademicYears,
+            mapper,
+            scopeAcademicYears,
 			formItems,
 			formItemsValues);
 
@@ -255,10 +219,6 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
             {
                 result.Errors.Add(new ItemError() { ItemId = item.Id, Message = ConstantKeys.ExceptionMessage.Requiredfield, ItemPropertyType = ItemPropertyType.Note });
 
-                //if (formItem.NoteRequired)
-                //{
-                //    result.Errors.Add(new ItemError() {ItemId = item.Id, Message= ConstantKeys.ExceptionMessage.Requiredfield, ItemPropertyType = ItemPropertyType.Note });
-                //}
             }
 
             foreach (var sub in item.SubItems)
@@ -268,11 +228,6 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
                 if (sub.Note == null && currentSubItem.HasNote)
                 {
                     result.Errors.Add(new ItemError() { ItemId = sub.Id, Message = ConstantKeys.ExceptionMessage.Requiredfield, ItemPropertyType = ItemPropertyType.Note });
-
-                    //if (currentSubItem.NoteRequired)
-                    //{
-                    //    result.Errors.Add(new ItemError() { ItemId = sub.Id, Message = ConstantKeys.ExceptionMessage.Requiredfield, ItemPropertyType = ItemPropertyType.Note });
-                    //}
                 }
 
                 if (sub.ValueId != null)

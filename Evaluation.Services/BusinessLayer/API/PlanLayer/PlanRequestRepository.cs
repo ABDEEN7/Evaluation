@@ -243,7 +243,7 @@ public class PlanRequestRepository(IServiceScopeFactory serviceScopeFactory, Srv
                 .Distinct()
                 .ToList();
 
-            var servicesByStatusTask = _srvServiceRequest.GetServicesByStatusesAsync(statusIds, ConstantKeys.ModuleTypeIds.EvaluationPlan, requestInfo.Lang);
+            var servicesByStatusTask = _srvServiceRequest.GetServicesByStatusesAsync(statusIds, ConstantKeys.SystemModuleTypeBackend.EvaluationPlan, requestInfo.Lang);
 
             await Task.WhenAll(servicesByStatusTask);
 

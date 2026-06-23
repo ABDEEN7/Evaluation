@@ -307,6 +307,7 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
         obj.DropDownTypeId = message.DropDownTypeId;
         obj.IsActive = message.IsActive;
         obj.HasMuliEvaluation = message.HasMulitEvaluation;
+        obj.ItemNumber = message.ItemNumber;
 
         uow.GetRepository<FormItem>().Insert(obj);
         if (message.AnalysisTypeId != null && message.FormItemRelated != null)
@@ -364,6 +365,7 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
             obj.DropDownTypeId = message.DropDownTypeId;
             obj.IsActive = message.IsActive;
             obj.HasMuliEvaluation = message.HasMulitEvaluation;
+            obj.ItemNumber = message.ItemNumber;
             uow.GetRepository<FormItem>().Update(obj);
             //update values to FormItemRelated
             List<FormItemRelated> objFormItemRelateddelete = await uow.GetRepository<FormItemRelated>()
