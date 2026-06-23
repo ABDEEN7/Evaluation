@@ -83,9 +83,9 @@
                 className: "td-full mb-4",
                 render: function (data, type, row) {
 
-                    const isCompleted = row.StatusISOPen === false;
-                    const statusColor = isCompleted ? "#0E6B32" : "#A63D40";
-                    const statusText = row.status;
+            const statusColor = row.statusColor || "#A63D40";
+            const statusText = `${row.status || ""}
+`;
 
                     return `
             <div class="request-info">
@@ -275,13 +275,14 @@
                 </div>
 
             </div>`;
-                }
-            },
+        }
+    },
+       
             {
-                data: "createOn",
-                title: uiControlsSetup().GetUiControlText("lblRequestCreatedDate"),
-                className: "td-right",
-                render: function (data) {
+        data: "createOn",
+        title: uiControlsSetup().GetUiControlText("lblRequestCreatedDate"),
+        className: "td-right border-top-card",
+        render: function(data) {
 
                     if (!data) return "_";
 
@@ -292,13 +293,13 @@
             ${moment(data).format("DD-MM-YYYY")}
         </span>
         `;
-                }
-            },
-            {
-                data: "createOn",
-                title: uiControlsSetup().GetUiControlText("lblRequestCreatedTime"),
-                className: "td-left place-content-end",
-                render: function (data) {
+        }
+    },
+    {
+        data: "createOn",
+        title: uiControlsSetup().GetUiControlText("lblRequestCreatedTime"),
+        className: "td-left place-content-end border-top-card",
+        render: function(data) {
 
                     if (!data) return "_";
 

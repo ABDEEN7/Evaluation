@@ -125,7 +125,7 @@
         {
             data: "createOn",
             title: uiControlsSetup().GetUiControlText("lblRequestCreatedDate"),
-            className: "td-right",
+            className: "td-right border-top-card",
          
             render: function(data) {
                 if (!data) return "_";
@@ -139,7 +139,7 @@
         {
             data: "createOnTime",
             title: uiControlsSetup().GetUiControlText("lblRequestCreatedTime"),
-            className: "td-left place-content-end",
+            className: "td-left place-content-end border-top-card",
             render: function(data) {
                 if (!data) return "_";
 

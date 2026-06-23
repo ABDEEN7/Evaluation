@@ -88,9 +88,12 @@
                 ]);
             }
 
-    
             if (!ns.depConfig) {
                 await loadDepartmentConfig();
+            }
+            const $placeholder = $(`#${fieldId}_filterOffcanvasPlaceholder`);
+            if ($placeholder.length) {
+                $placeholder.replaceWith(ns.generateFilterOffcanvasHTML(fieldId));
             }
 
             if (planObject) {
@@ -141,6 +144,9 @@
             .then(r => ns.parentSchool = r?.result || []);
 
     const loadPlanData = async (fieldId, planId) => {
+        if (!ns.depConfig) {
+            await loadDepartmentConfig();
+        }
         const r = await jqClient().Get(`${API_ENDPOINTS.GET_PLAN_DETAILS}/${planId}`);
         renderPlanWithData(fieldId, r.result);
     };
@@ -241,7 +247,7 @@
 
     const populateFilterParentOrgTree = (fieldId) => {
         const $select = $p(fieldId, 'filterParentOrgTree');
-        if (!$select.length) return; 
+        if (!$select.length) return;
         ns.parentSchool.forEach(parent => {
             $select.append(`<option value="${parent.id}">${parent.nameEn}</option>`)
         });
@@ -253,7 +259,7 @@
             $select.append(`<option value="${fromEval.id}">${fromEval.name}</option>`);
         });
     };
- const initializeFilterDatePickers = (fieldId) => {
+    const initializeFilterDatePickers = (fieldId) => {
         const dateFields = ['filterLastEvalDate', 'filterCreatedDate', 'filterNextEvalDate'];
 
         const isAr = document.documentElement.lang.toLowerCase().startsWith('ar');
@@ -273,7 +279,7 @@
     };
     const populateFilterSchoolLevels = (fieldId) => {
         const $select = $p(fieldId, 'filterSchoolLevel');
-        if (!$select.length) return; 
+        if (!$select.length) return;
         ns.schoolLevels?.forEach(level => {
             $select.append($('<option>').val(level.id).text(level.name));
         });
@@ -296,7 +302,7 @@
         const form = ns.renderPlanForm(fieldId, null, state.isReadOnly);
         $p(fieldId, 'planFormContainer').find('.form-container').html(form);
 
-        
+
         loadSchools(fieldId, 1);
         initCustomMode(fieldId);
     };
@@ -704,6 +710,28 @@
                 state.selectedSchools = Array.from(state.selectedSchoolsMap.values());
             }
         });
+        const cfg = window.planUtility?.depConfig || {};
+        if (fieldId === 'resendemail' && cfg.resendEmail === true) {
+            $table.find('[data-action="resend-email"]').off('click').on('click', function (e) {
+                e.preventDefault();
+                const schoolId = $(this).data('id');
+                const planId = state.planId;
+                const $btn = $(this);
+
+                $btn.addClass('disabled');
+
+                jqClient().Post(API_ENDPOINTS.RESEND_EMAIL_SCHOOLS, { planId, schoolId })
+                    .done(() => {
+                        toastr?.success(t('ResendEmailSuccess'));
+                    })
+                    .fail(() => {
+                        toastr?.error(t('ResendEmailFailed'));
+                    })
+                    .always(() => {
+                        $btn.removeClass('disabled');
+                    });
+            });
+        };
     };
 
 
@@ -733,7 +761,7 @@
 
         ns.initChildPicker(start, end);
     };
-
+    
     const initYearMode = (fieldId) => {
         const ay = ns.currentAcademicYear;
         if (ay?.start && ay?.end) {
@@ -833,10 +861,10 @@
             grade: safeVal(fieldId, 'filterGrade')
         };
 
-        
+
         Object.keys(state.filters).forEach(k => state.filters[k] === undefined && delete state.filters[k]);
 
-        
+
         loadSchools(fieldId, 1, state.filters);
         const offcanvas = bootstrap.Offcanvas.getInstance($p(fieldId, 'filterOffcanvas')[0]);
         if (offcanvas) offcanvas.hide();

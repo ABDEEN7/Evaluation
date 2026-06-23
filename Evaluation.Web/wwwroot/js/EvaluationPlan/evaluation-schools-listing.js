@@ -76,6 +76,7 @@
             className: "td-full school-type-column",
             render: function(data) {
                 return `
+                
                 <i class="las la-school card-only-icon me-1"></i>
                 <span class="card-only-label me-2">Level: </span>
                 <span>${ currentLang == 'ar' ? "ابتدائي, اعدادي" : "Primary, Preparatory"}</span>

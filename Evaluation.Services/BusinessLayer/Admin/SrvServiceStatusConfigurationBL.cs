@@ -22,15 +22,16 @@ namespace Evaluation.Services.Models.Admin
 {
     public class SrvServiceStatusConfigurationBL : AdminBase
     {
-        public SrvServiceStatusConfigurationBL(IServiceProvider serviceProvider, UnitOfWork uow, LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, IServiceScopeFactory serviceScopeFactory, RequestInfo requestInfo) : base(serviceProvider, uow, loggingServices, mapper, userInfo, serviceScopeFactory, requestInfo)
+        private readonly ISystemModuleService _systemModule;
+        public SrvServiceStatusConfigurationBL(IServiceProvider serviceProvider, UnitOfWork uow, LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, IServiceScopeFactory serviceScopeFactory, RequestInfo requestInfo, ISystemModuleService systemModule) : base(serviceProvider, uow, loggingServices, mapper, userInfo, serviceScopeFactory, requestInfo)
         {
-
+            _systemModule = systemModule;
         }
 
 
         public async Task<List<ServiceStatusConfigurationDTO>> GetServiceStatusConfigurationList(int Page, int PageSize, Guid ServiceId,Guid systemModuleId)
         {
-           var systemModuleBackendName=await GetBackendNameOfSystemModule(systemModuleId);
+           var systemModuleBackendName=await _systemModule.GetBackendNameOfSystemModule(systemModuleId);
             var list = await uow.GetRepository<ServiceStatusConfiguration>()
                 .GetAllNonDeleted()
                 .Include(x => x.Service)
@@ -154,7 +155,7 @@ namespace Evaluation.Services.Models.Admin
       Guid systemModuleId,
       Guid departmentId)
         {
-            string? backendName = await GetBackendNameOfSystemModule(systemModuleId);
+            string? backendName = await _systemModule.GetBackendNameOfSystemModule(systemModuleId);
 
             var isArabic = _requestInfo.Lang == LanguageConst.Ar;
 
@@ -186,12 +187,6 @@ namespace Evaluation.Services.Models.Admin
             };
         }
 
-        private async Task<string?> GetBackendNameOfSystemModule(Guid systemModuleId)
-        {
-            return await uow.GetRepository<SystemModule>()
-                            .GetAllActiveNonDeleted(x => x.Id == systemModuleId)
-                            .Select(x => x.BackendName)
-                            .FirstOrDefaultAsync();
-        }
+        
     }
 }

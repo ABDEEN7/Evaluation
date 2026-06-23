@@ -212,6 +212,7 @@
     .application-request.card .requeststableBody .plan-request-card td.process .dropdown-toggle {
         border-radius: 8px;
         height: 45px;
+
 /*        margin-bottom: 20px !important;*/
     }
     .application-request.card .requeststableBody .plan-request-card td.process .dropdown-menu {
@@ -1074,3 +1075,14 @@ table#requesttable.dataTable thead th.card-img {
         transform: translateY(-2px) !important;
         box-shadow: 0 6px 18px rgba(0,0,0,0.1) !important;
     }
+
+
+
+.application-request.card .requeststableBody .plan-request-card:not(.school-card) {
+    padding: 1.5rem 0.7rem 0 0.7rem !important;
+}
+
+
+#schoolTable .plan-request-card {
+    padding: 1.5rem 0.7rem !important;
+}
