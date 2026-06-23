@@ -664,7 +664,7 @@ async function initForm(formId, fieldId, readOnly, savedResults, evaluationReque
                             .map((row, idx) => {
                                 const saved = savedMap[row.id];
                                 // Prefill name from savedResults
-                                const rowWithSavedName = { ...row, text: saved?.name ?? row.text };
+                                const rowWithSavedName = { ...row, text: saved?.name ?? '' };
                                 return renderRenameRowHtml(fieldId, aId, rowWithSavedName, idx + 1, state.allowDelete, state);
                             }).join('');
 
@@ -833,17 +833,18 @@ async function initForm(formId, fieldId, readOnly, savedResults, evaluationReque
 // expand/collapse, rename-row selects once they exist). Split out from
 // initForm because listeners can't be serialized into the HTML string -
 // call this right after assigning the returned markup into
-// `#${fieldId}-form-root`.
+// `#${fieldId}`.
 //
 // Typical usage:
 //   const html = await initForm(formId, fieldId, ...);
-//   document.getElementById(`${fieldId}-form-root`).innerHTML = html;
+//   document.getElementById(`${fieldId}`).innerHTML = html;
 //   bindFormEvents(fieldId);
 function bindFormEvents(fieldId) {
     const state = getFormState(fieldId);
-    const root = document.getElementById(`${fieldId}-form-root`);
+    const root = document.getElementById(`${fieldId}`);
+
     if (!root) {
-        console.error(`bindFormEvents: no element with id "${fieldId}-form-root" found on the page.`);
+        console.error(`bindFormEvents: no element with id "${fieldId}" found on the page.`);
         return;
     }
 
@@ -1105,10 +1106,10 @@ async function fillRenameControls(fieldId, controlValues) {
 // belonging to a different form rendered on the same page.
 function getFormResult(formId, fieldId) {
     const state = getFormState(fieldId);
-    const root = document.getElementById(`${fieldId}-form-root`);
+    const root = document.getElementById(`${fieldId}`);
 
     if (!root) {
-        console.error(`getFormResult: no element with id "${fieldId}-form-root" found.`);
+        console.error(`getFormResult: no element with id "${fieldId}" found.`);
         return { id: formId, items: [], formSettings: state.evalForm ?? null };
     }
 
@@ -1340,7 +1341,7 @@ function showValidation(fieldId, itemId, message, itemPropertyType) {
 }
 
 function clearValidation(fieldId) {
-    const root = document.getElementById(`${fieldId}-form-root`);
+    const root = document.getElementById(`${fieldId}`);
     if (!root) return;
 
     root.querySelectorAll('.validation-message').forEach(el => {
