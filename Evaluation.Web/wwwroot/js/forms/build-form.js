@@ -529,6 +529,13 @@ function openRelatedItemModal(fieldId, itemId) {
 //   5  Eval renamed items, blank selects     — evaluateRenamedItems, savedResults with name only
 //   6  Eval renamed items, prefilled selects — evaluateRenamedItems, savedResults with name+valueId
 async function initForm(formId, fieldId, readOnly, savedResults, evaluationRequestId, serviceRequestId, allowRename = false, allowDelete = false, allowAdd = false, evaluateRenamedItems = false) {
+
+    if (evaluationRequestId == null)
+    {
+        console.log("initialization failed !");
+        return;
+    }
+
     const state = getFormState(fieldId);
     state.formId = formId;
     state.evaluationRequestId = evaluationRequestId;
