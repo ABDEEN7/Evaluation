@@ -6544,3 +6544,8 @@ html[dir="rtl"] .corner-ribbon {
         right: auto;
         transform: rotate(-45deg);
     }
+
+/* Hide ribbon in table view */
+.application-request.table-card-seperate-styling tbody tr:not(.card):not(.card-row) .corner-ribbon {
+    display: none !important;
+}
