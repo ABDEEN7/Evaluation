@@ -6531,3 +6531,16 @@ html[dir="rtl"] #btn-back-top i {
         right: -50px; 
         box-shadow: 0 2px 6px rgba(0,0,0,.2);
     }
+
+
+
+html[dir="rtl"] .corner-ribbon {
+    left: 0;
+    right: auto;
+}
+
+    html[dir="rtl"] .corner-ribbon span {
+        left: -50px;
+        right: auto;
+        transform: rotate(-45deg);
+    }
