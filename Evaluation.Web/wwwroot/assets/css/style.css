@@ -6491,3 +6491,43 @@ html[dir="rtl"] #btn-back-top i {
     box-shadow: none;
 }
 
+
+
+
+
+
+
+
+
+
+
+.plan-request-card {
+    position: relative;
+    overflow: hidden;
+}
+
+.corner-ribbon {
+    position: absolute;
+    top: -24px;
+    right: -12px;
+    z-index: 100;
+    width: 90px;
+    height: 90px;
+    overflow: hidden;
+}
+
+    .corner-ribbon span {
+        position: absolute;
+        display: block;
+        width: 170px; 
+        padding: 6px 0;
+        background: #A63D40;
+        color: #fff;
+        text-align: center;
+        font-size: 12px;
+        font-weight: 700;
+        transform: rotate(45deg);
+        top: 20px;
+        right: -50px; 
+        box-shadow: 0 2px 6px rgba(0,0,0,.2);
+    }
