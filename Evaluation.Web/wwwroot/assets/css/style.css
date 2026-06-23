@@ -6570,3 +6570,20 @@ html[dir="rtl"] .corner-ribbon {
 }
 
 
+
+
+/*Modal*/
+
+.modal-desc-breadcrumb {
+    font-size: 15px;
+    background:#fff; 
+    border-top:2px solid #6B1E35; 
+    border-bottom:1px solid rgba(0,0,0,0.08);
+}
+
+.modal-desc-breadcrumb-a {
+    color: #000 !important;
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    text-decoration: none !important;
+}
