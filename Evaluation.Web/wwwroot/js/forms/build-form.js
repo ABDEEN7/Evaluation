@@ -24,6 +24,7 @@ const SUBMIT_FORM_API = {
 
 
 let depRoutePath = sharedUtility().extractDepartmentName();
+let selectPleaceHolder = currentLang == 'ar' ? 'يرجى الاختيار' : 'Please Select';
 
 
 const ItemPropertyType = Object.freeze({
@@ -157,13 +158,13 @@ function renderSelectAndNote(fieldId, itemId, hasNote, readOnly, matrixValues, c
     const isSelected = (id) => selectedValueId && String(id) === String(selectedValueId);
 
     const optionsHtml = useCustomOptions
-        ? customOptions.map(o => `<option value="${o.id}" ${isSelected(o.id) ? 'selected' : ''}>${escapeAttr(o.nameAr || o.nameEn)}</option>`).join('')
+        ? customOptions.map(o => `<option value="${o.id}" ${isSelected(o.id) ? 'selected' : ''}>${escapeAttr(currentLang == 'ar' ? o.nameAr : o.nameEn)}</option>`).join('')
         : matrixValues.map(o => `<option value="${o.id}" data-actual-value="${o.actualMatrixValue}" ${isSelected(o.id) ? 'selected' : ''}>${o.actualMatrixValue}</option>`).join('');
 
     return `
         <div class="row-select-wrap">
             <select class="row-select" ${readOnly ? 'disabled' : ''}>
-                <option disabled ${selectedValueId ? '' : 'selected'}>Please Select</option>
+                <option disabled ${selectedValueId ? '' : 'selected'}>${selectPleaceHolder}</option>
                 ${optionsHtml}
             </select>
             <span class="validation-message" id="validation-${fieldId}-${itemId}-${ItemPropertyType.SELECT}"></span>
@@ -210,7 +211,7 @@ function renderMultiSelectWrap(fieldId, itemId, readOnly, matrixValues, formItem
     return `
         <div class="row-select-wrap">
             <select class="row-select" data-config-weight-percentage="${weight}" ${readOnly ? 'disabled' : ''}>
-                <option disabled ${selectedValueId ? '' : 'selected'}>Please Select</option>
+                <option disabled ${selectedValueId ? '' : 'selected'}>${selectPleaceHolder}</option>
                 ${optionsHtml}
             </select>
             <span class="validation-message" id="validation-${fieldId}-${itemId}-${ItemPropertyType.SELECT}_${index}"></span>
@@ -273,7 +274,7 @@ function renderSelectsOnly(fieldId, itemId, readOnly, matrixValues, hasMuliEvalu
         return `
             <div class="row-select-wrap">
                 <select class="row-select" ${readOnly ? 'disabled' : ''}>
-                    <option disabled ${selectedValueIdOrIds ? '' : 'selected'}>Please Select</option>
+                    <option disabled ${selectedValueIdOrIds ? '' : 'selected'}>${selectPleaceHolder}</option>
                     ${optionsHtml}
                 </select>
                 <span class="validation-message" id="validation-${fieldId}-${itemId}-${ItemPropertyType.SELECT}"></span>
@@ -434,8 +435,8 @@ const createRowRelatedItem = ({ item, order, hasAnyNote }) => `
     <tr class="main-row align-middle">
         <td>${order}</td>
         <td class="text-start">${escapeAttr(item.name)}</td>
-        <td>${escapeAttr(item.value)}</td>
-        ${hasAnyNote ? `<td>${escapeAttr(item.note)}</td>` : ''}
+        <td>${escapeAttr(item.value ?? '')}</td>
+        ${hasAnyNote ? `<td>${escapeAttr(item.note ?? '')}</td>` : ''}
     </tr>
 `;
 
@@ -1390,7 +1391,7 @@ function buildHorizontalTable(data) {
 // Same markup/structure as the DOM version above.
 function buildHorizontalTableHtml(data) {
     const nameCellsHtml = data.map(item => `<th>${escapeAttr(item.name)}</th>`).join('');
-    const rangeCellsHtml = data.map(item => `<td>(${escapeAttr(item.minValue)} - ${escapeAttr(item.maxValue)})</td>`).join('');
+    const rangeCellsHtml = data.map(item => `<td>${item.displayRange}</td>`).join('');
 
     return `
         <table border="1" style="border-collapse: collapse;" class="table table-bordered table-hover align-middle w-100 dataTable no-footer">
