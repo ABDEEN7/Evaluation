@@ -6494,7 +6494,26 @@ html[dir="rtl"] #btn-back-top i {
 
 
 
+/*it is hiding again*/
 
+
+.plan-request-card {
+    position: relative;
+    overflow: visible !important;
+}
+
+    .plan-request-card .card-body {
+        overflow: visible !important;
+    }
+
+    .plan-request-card:hover,
+    .plan-request-card:has(.dropdown-menu.show) {
+        z-index: 1000;
+    }
+
+    .plan-request-card .dropdown-menu {
+        z-index: 1001;
+    }
 
 
 
@@ -6549,3 +6568,5 @@ html[dir="rtl"] .corner-ribbon {
 .application-request.table-card-seperate-styling tbody tr:not(.card):not(.card-row) .corner-ribbon {
     display: none !important;
 }
+
+
