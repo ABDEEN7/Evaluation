@@ -147,7 +147,8 @@ var formGenerateFieldUtility = window.formUtility;
 
         const container = $('<div>')
             .addClass('evl-form-wrapper')
-            .attr('data-field-id', field.fieldId);
+            .attr('data-field-id', field.fieldId)
+            .attr('id', fieldId);
 
         container.html(`<div class="text-muted py-2">Loading evaluation form...</div>`);
 
@@ -162,6 +163,7 @@ var formGenerateFieldUtility = window.formUtility;
                 const allowAddFormItem = field.attributes?.find(c => c.name === 'allowAddFormItem');
                 const allowDeleteFormItem = field.attributes?.find(c => c.name === 'allowDeleteFormItem');
                 const allowRenameFormItem = field.attributes?.find(c => c.name === 'allowRenameFormItem');
+                const evaluateRenamedItems = field.attributes?.find(c => c.name === 'evaluateRenamedItems');
                 //const allowRename = field.attributes?.find(c => c.name === 'allowRename');
                 const params = new URLSearchParams(window.location.search);
                 var evaluationRequestId = (params.get("Evlid")).replace("#", "");
@@ -169,36 +171,27 @@ var formGenerateFieldUtility = window.formUtility;
                 if (params.get("id"))
                  serviceRequestId = (params.get("id") ).replace("#", "");
                 const controlValues = JSON.parse(field.value);
-                const html = await generateFullFormPageHtml({
-                    formId,
-                    evaluationRequestId,
-                    serviceRequestId,
-                    fieldId: fieldId,
-                    readOnly: readonly,
-                    allowRename: allowRenameFormItem != undefined && (!allowRenameFormItem || allowRenameFormItem.value == true || allowRenameFormItem.value == "true"),
-                    allowDelete: allowDeleteFormItem != undefined && (!allowDeleteFormItem || allowDeleteFormItem.value == true || allowDeleteFormItem.value == "true"),
-                    allowAdd: allowAddFormItem != undefined && (!allowAddFormItem || allowAddFormItem.value == true || allowAddFormItem.value == "true"),
-                    namingResult: controlValues
-                });
+ 
+                let allowRename = allowRenameFormItem != undefined && (!allowRenameFormItem || allowRenameFormItem.value == true || allowRenameFormItem.value == "true");
+                let allowDelete = allowDeleteFormItem != undefined && (!allowDeleteFormItem || allowDeleteFormItem.value == true || allowDeleteFormItem.value == "true");
+                let allowAdd = allowAddFormItem != undefined && (!allowAddFormItem || allowAddFormItem.value == true || allowAddFormItem.value == "true");
+                let allowEvaluateRenamedItems = evaluateRenamedItems != undefined && (!evaluateRenamedItems || evaluateRenamedItems.value == true || evaluateRenamedItems.value == "true");
+
+
+                const html = await initForm(formId, fieldId, readonly, controlValues, evaluationRequestId, serviceRequestId, allowRename, allowDelete, allowAdd, allowEvaluateRenamedItems);
 
                 container.html(html);
+
                 console.log('🔴 container rendered');
 
-                if (allowRenameFormItem) {
-                    await fillRenameControls(fieldId, controlValues);
-                } else {
-                    await initializeControls(formId, fieldId, controlValues);
-                }
+                bindFormEvents(fieldId);
 
-                console.log('🟢 after initializeControls — check DOM now');
-                if (allowRenameFormItem) {
-                   await fillRenameControls(fieldId, controlValues)
-                }
-                else {
-                    await initializeControls(formId, fieldId, controlValues);
+                //if (allowRenameFormItem) {
+                //    await fillRenameControls(fieldId, controlValues);
+                //} else {
+                //    await initializeControls(formId, fieldId, controlValues);
+                //}
 
-                }
-                    
 
             } catch (err) {
                 console.error('evl_Form render failed:', err);
