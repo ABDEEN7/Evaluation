@@ -1727,7 +1727,7 @@ input.auto-fill {
 }
 
 .table-card-seperate-styling .process .dropdown {
-    margin-top: 14px;
+/*    margin-top: 14px;*/
 }
 
 
@@ -4523,7 +4523,7 @@ input.auto-fill {
 }
 
 .table-card-seperate-styling .process .dropdown {
-    margin-top: 14px;
+/*    margin-top: 14px;*/
 }
 
 
@@ -6450,3 +6450,44 @@ html[dir="rtl"] #btn-back-top i {
 .border-top-card {
     border-top: 1px solid #dee2e6 !important;
 }
+
+
+/*ACTION BUTTON*/
+.plan-request-card {
+    position: relative;
+}
+
+    .plan-request-card:hover {
+        z-index: 1000;
+    }
+
+    .plan-request-card .dropdown-menu {
+        z-index: 1001;
+    }
+
+
+.dropdown-menu .dropdown-item:hover,
+.dropdown-menu .dropdown-item:focus {
+    background-color: #89153D;
+    color: #fff;
+}
+
+/* Open dropdown */
+.dropdown.show > .btn-primary,
+.btn-primary.dropdown-toggle.show {
+    background-color: rgba(13, 67, 97, 1);
+    border-color: rgba(13, 67, 97, 1);
+}
+
+/* Closed dropdown */
+.btn-primary.dropdown-toggle:not(.show) {
+    background-color: #89153D;
+    border-color: #89153D;
+}
+
+/* Remove focus styling after click */
+.btn-primary.dropdown-toggle:focus,
+.btn-primary.dropdown-toggle:focus-visible {
+    box-shadow: none;
+}
+
