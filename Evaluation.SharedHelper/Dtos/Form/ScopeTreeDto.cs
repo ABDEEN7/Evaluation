@@ -14,16 +14,3 @@ public class ScopeTreeDto
     public List<ScopeTreeDto> Children { get; set; } = new();
     public List<FormItemDto> Items { get; set; } = new();
 }
-
-public class ScopeReportNoteDto
-{
-	public Guid ScopeId { get; set; }
-
-	public string ScopeName { get; set; } = null!;
-
-	public string PositivePoint { get; set; } = null!;
-
-	public string NegativePoint { get; set; } = null!;
-
-	public string? Note { get; set; }
-}

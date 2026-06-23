@@ -135,11 +135,11 @@ window.serviceRequestForm = window.serviceRequestForm || {};
                 break;
             }
                 case "evl_form": {
+                const fieldId = `field_${field.fieldId}`;
                 const allowRenameFormItem = field.attributes?.find(c => c.name === 'allowRenameFormItem');
 
-                const formObj = allowRenameFormItem
-                    ? renameFormItems(field.formId)
-                    : await saveForm(field.formId);
+                    const formObj = await getFormResults(field.formId, fieldId, !allowRenameFormItem, !allowRenameFormItem);
+               
 
                 value = formObj ? JSON.stringify(formObj) : null;
                 break;
