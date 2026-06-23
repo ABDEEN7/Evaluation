@@ -1,6 +1,6 @@
 <script>
-    <script src="~/lib/flatpickr/l10n/ar.js"></script>
-    <script src="~/lib/flatpickr/l10n/default.js"></script>
+    {/*<script src="~/lib/flatpickr/l10n/ar.js"></script>*/}
+    {/*<script src="~/lib/flatpickr/l10n/default.js"></script>*/}
 </script>
 /**
  * Template Name: Evalution Dashboard

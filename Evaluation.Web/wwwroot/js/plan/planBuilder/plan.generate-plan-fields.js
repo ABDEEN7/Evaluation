@@ -30,7 +30,7 @@ const planUtility = window.planUtility;
         let html = '';
         html += generatePlanFormContainer(fieldId);
         html += generateSchoolsTableSection(fieldId);
-        html += generateFilterOffcanvas(fieldId);
+        html += `<div id="${pid(fieldId, 'filterOffcanvasPlaceholder')}"></div>`;
         return html;
     };
 
@@ -49,6 +49,7 @@ const planUtility = window.planUtility;
         mainContent.appendChild(wrapper);
     };
 
+    ns.generateFilterOffcanvasHTML = generateFilterOffcanvas;
     // ================== FORM ==================
     function generatePlanFormContainer(fieldId) {
         return `

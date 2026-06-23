@@ -7,15 +7,9 @@ namespace Evaluation.DAL.EFConfiguration;
 public class EvaluationRequestConfiguration : IEntityTypeConfiguration<EvaluationRequest>
 {
     public void Configure(EntityTypeBuilder<EvaluationRequest> builder)
-    {
-        builder
-           .HasOne(x => x.Plan)
-           .WithMany(p=>p.EvaluationRequests)
-           .HasForeignKey(x => x.PlanId)
-           .OnDelete(DeleteBehavior.Restrict);
+    {        
+        builder.HasAlternateKey(o => o.Sequence);
 
-        builder.HasOne(x => x.Service)
-            .WithMany()
-            .HasForeignKey(s => s.ServiceId);
+        builder.Property(x => x.Sequence).UseHiLo("EvaluationRequest_Sequence");
     }
 }

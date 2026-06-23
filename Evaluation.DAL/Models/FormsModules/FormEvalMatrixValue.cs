@@ -14,6 +14,7 @@ namespace Evaluation.DAL.Models.FormsModules
         public FormEvalMatrix? FormEvalMatrix { get; set; }
         public string NameAr { get; set; } = null!;
         public string NameEn { get; set; } = null!;
+        public string DisplayRange { get; set; } = null!;
         public decimal MinValue { get; set; } 
         public decimal MaxValue { get; set; }
         public decimal ActualMatrixValue { get; set; }

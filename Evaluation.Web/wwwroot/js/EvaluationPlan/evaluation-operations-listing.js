@@ -83,9 +83,9 @@
         className: "td-full mb-4",
         render: function(data, type, row) {
 
-            const isCompleted = row.StatusISOPen === false;
-            const statusColor = isCompleted ? "#0E6B32" : "#A63D40";
-            const statusText = isCompleted ? "مكتمل" : "غير مكتمل";
+            const statusColor = row.statusColor || "#A63D40";
+            const statusText = `${row.status || ""}
+`;
 
             return `
             <div class="request-info">
@@ -111,7 +111,7 @@
             </div>
         `;
         }
-    },
+            },
     {
         data: null,
         title: uiControlsSetup().GetUiControlText("lblStatus"),
@@ -126,7 +126,7 @@
             <span class="status-padding" style="color:${statusColor};">
                 ${statusText}
             </span>
-        `;
+            `;
         }
     },
           {
@@ -280,30 +280,11 @@
             </div>`;
         }
     },
-         {
-        data: "status",
-        title: uiControlsSetup().GetUiControlText("lblRequestNo"),
-        className: "td-full",
-        render: function(data, type, row) {
-
-            if (!data) return "_";
-
-            const statusColor = row.statusColor || "#89153D";
-            const textColor = getContrastingTextColor(statusColor);
-
-            return `
-                    <span class="request-status m-0"
-                          style="color:${statusColor};">
-                        <i class="las la-edit card-only-icon me-1" style="color:${statusColor};"></i>
-                        ${data}
-                    </span>
-                `;
-        }
-    },
+       
             {
         data: "createOn",
         title: uiControlsSetup().GetUiControlText("lblRequestCreatedDate"),
-        className: "td-right",
+        className: "td-right border-top-card",
         render: function(data) {
 
             if (!data) return "_";
@@ -320,7 +301,7 @@
     {
         data: "createOn",
         title: uiControlsSetup().GetUiControlText("lblRequestCreatedTime"),
-        className: "td-left place-content-end",
+        className: "td-left place-content-end border-top-card",
         render: function(data) {
 
             if (!data) return "_";
@@ -385,7 +366,7 @@
                         requestId: requestId,
                         serviceId: response.serviceId,
                         actionsContainerId: 'actions-container',
-                        templateContainerId: 'divTemplates',
+                        templateContainerId: 'evaluationRequestDetailsModal_divTemplates',
                         modalContainerId: 'Action-container-fields',
                         root: '#evaluationRequestDetailsModal'
                     }

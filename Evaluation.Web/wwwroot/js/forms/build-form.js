@@ -50,7 +50,18 @@ function getFormState(fieldId) {
             matrixResponse: null,
             evaluationRequestId: null,
             serviceRequestId: null,
-            formData: null
+            formData: null,
+            // Rename-mode state (ported from get-forms_Old.js /
+            // submit-form_Old.js: renameItems, P_isRename, P_allowRename,
+            // P_allowDelete, P_allowAdd). Scoped per fieldId/per aspect so
+            // multiple forms - and multiple aspect cards within a form -
+            // each manage their own pool of not-yet-added top-level items.
+            isRename: false,
+            allowRename: false,
+            allowDelete: false,
+            allowAdd: false,
+            renamePools: new Map(),    // aspectKey -> top-level items not yet rendered
+            renameItemsById: new Map() // itemId -> { item, aspectKey }
         });
     }
     return formStates.get(fieldId);
@@ -91,6 +102,13 @@ function buildFormData(tree, evalFormData) {
         text: item.name,
         hasNote: !!item.hasNote,
         weightPercentage: getWeightPercentage(item),
+        // Full config list (one entry per evaluation column when
+        // hasMuliEvaluation is true) kept around so the row can render one
+        // select per column, each carrying its own name/weight - mirrors
+        // the old buildSelection(item, fieldId, readOnly, index) loop in
+        // get-forms_Old.js. Only ever populated on top-level items, same
+        // as getWeightPercentage above.
+        formItemConfigs: item.formItemConfigs ?? [],
         // Related items are shown via an info icon next to the row name,
         // opening a read-only reference table. Mirrors relatedItems
         // handling from get-forms_Old.js.
@@ -124,20 +142,28 @@ function buildFormData(tree, evalFormData) {
 // ==============================
 // fieldId is threaded through so the validation message ids stay unique
 // per form (validation-${fieldId}-${itemId}-${itemPropertyType}).
-function renderSelectAndNote(fieldId, itemId, hasNote, readOnly, matrixValues, customOptions = null) {
+//
+// selectedValueId/noteValue let a saved result be baked directly into
+// the returned HTML string (via the option's `selected` attribute and
+// the input's `value` attribute) instead of being applied afterward via
+// element.value - required now that initForm returns a string instead
+// of mutating live DOM nodes.
+function renderSelectAndNote(fieldId, itemId, hasNote, readOnly, matrixValues, customOptions = null, selectedValueId = null, noteValue = null) {
     // If this item has its own subItemLists (non-empty), those options
     // replace the shared evaluation matrix for this select only - same
     // priority order as the old populateForm()/subItemListsMap logic.
     const useCustomOptions = Array.isArray(customOptions) && customOptions.length > 0;
 
+    const isSelected = (id) => selectedValueId && String(id) === String(selectedValueId);
+
     const optionsHtml = useCustomOptions
-        ? customOptions.map(o => `<option value="${o.id}">${escapeAttr(o.nameAr || o.nameEn)}</option>`).join('')
-        : matrixValues.map(o => `<option value="${o.id}" data-actual-value="${o.actualMatrixValue}">${o.actualMatrixValue}</option>`).join('');
+        ? customOptions.map(o => `<option value="${o.id}" ${isSelected(o.id) ? 'selected' : ''}>${escapeAttr(o.nameAr || o.nameEn)}</option>`).join('')
+        : matrixValues.map(o => `<option value="${o.id}" data-actual-value="${o.actualMatrixValue}" ${isSelected(o.id) ? 'selected' : ''}>${o.actualMatrixValue}</option>`).join('');
 
     return `
         <div class="row-select-wrap">
             <select class="row-select" ${readOnly ? 'disabled' : ''}>
-                <option disabled selected>Please Select</option>
+                <option disabled ${selectedValueId ? '' : 'selected'}>Please Select</option>
                 ${optionsHtml}
             </select>
             <span class="validation-message" id="validation-${fieldId}-${itemId}-${ItemPropertyType.SELECT}"></span>
@@ -145,11 +171,120 @@ function renderSelectAndNote(fieldId, itemId, hasNote, readOnly, matrixValues, c
 
         <div class="row-note-wrap">
             ${hasNote
-            ? `<input class="row-note" ${readOnly ? 'disabled' : ''} type="text" placeholder="اكتب ملاحظة هنا..." />`
+            ? `<input class="row-note" ${readOnly ? 'disabled' : ''} type="text" placeholder="اكتب ملاحظة هنا..." value="${escapeAttr(noteValue ?? '')}" />`
             : `<div class="row-note-placeholder"></div>`}
             <span class="validation-message" id="validation-${fieldId}-${itemId}-${ItemPropertyType.NOTE}"></span>
         </div>
     `;
+}
+
+// ==============================
+// Multi-evaluation select rendering (top-level rows only)
+// ==============================
+// When the form's evalForm.hasMuliEvaluation is true, a top-level row
+// gets one select PER evaluation column (evalCountOfColumnsValue), each
+// one scoped to its own formItemConfigs entry and carrying its own
+// data-config-weight-percentage - mirrors the old buildSelection(item,
+// fieldId, readOnly, index) loop + data-config-weight-percentage
+// attribute from get-forms_Old.js. The note column is still rendered
+// once per row, not once per select, same as before.
+//
+// Column names (formItemConfig_NameAr/NameEn) are NOT rendered inline
+// per select anymore - they're shown once, as a shared header row above
+// all rows in the aspect (see renderMultiSelectHeaderRow), the same way
+// a table header applies to a whole column rather than repeating per
+// data row.
+//
+// Falls back to the existing single-select renderSelectAndNote when
+// hasMuliEvaluation is false or there are no formItemConfigs to drive
+// multiple columns from.
+function renderMultiSelectWrap(fieldId, itemId, readOnly, matrixValues, formItemConfigs, index, selectedValueId = null) {
+    const cfg = formItemConfigs[index];
+    const weight = cfg ? (Number(cfg.formItemConfig_Percentage) || 0) : 0;
+    const isSelected = (id) => selectedValueId && String(id) === String(selectedValueId);
+
+    const optionsHtml = matrixValues
+        .map(o => `<option value="${o.id}" data-actual-value="${o.actualMatrixValue}" ${isSelected(o.id) ? 'selected' : ''}>${o.actualMatrixValue}</option>`)
+        .join('');
+
+    return `
+        <div class="row-select-wrap">
+            <select class="row-select" data-config-weight-percentage="${weight}" ${readOnly ? 'disabled' : ''}>
+                <option disabled ${selectedValueId ? '' : 'selected'}>Please Select</option>
+                ${optionsHtml}
+            </select>
+            <span class="validation-message" id="validation-${fieldId}-${itemId}-${ItemPropertyType.SELECT}_${index}"></span>
+        </div>
+    `;
+}
+
+// Shared column-header row for multi-evaluation selects: one label per
+// column (formItemConfig_NameAr/NameEn), rendered once above the rows
+// instead of repeating inside every row's select. The empty leading
+// cells line up with the row-index/name cells so labels sit directly
+// over their corresponding select column.
+function renderMultiSelectHeaderRow(formItemConfigs, countOfColumnsValue, extraLeadingCells = 2) {
+    const leadingCells = Array.from({ length: extraLeadingCells }, () => '<div class="row-select-header-spacer"></div>').join('');
+
+    const labelCells = Array.from({ length: countOfColumnsValue }, (_, index) => {
+        const cfg = formItemConfigs[index];
+        const label = cfg ? (cfg.formItemConfig_NameAr || cfg.formItemConfig_NameEn || '') : '';
+        return `<div class="row-select-col-label">${escapeAttr(label)}</div>`;
+    }).join('');
+
+    return `
+        <div class="row-item row-select-header">
+            ${leadingCells}
+            ${labelCells}
+        </div>
+    `;
+}
+
+function renderSelectsAndNote(fieldId, itemId, hasNote, readOnly, matrixValues, hasMuliEvaluation, formItemConfigs = [], countOfColumnsValue = 1, selectedValueIdOrIds = null, noteValue = null) {
+    const useMulti = !!hasMuliEvaluation && Array.isArray(formItemConfigs) && formItemConfigs.length > 0;
+
+    if (!useMulti) {
+        return renderSelectAndNote(fieldId, itemId, hasNote, readOnly, matrixValues, null, selectedValueIdOrIds, noteValue);
+    }
+
+    const selectedValueIds = Array.isArray(selectedValueIdOrIds) ? selectedValueIdOrIds : [];
+
+    const selectsHtml = Array.from({ length: countOfColumnsValue }, (_, index) =>
+        renderMultiSelectWrap(fieldId, itemId, readOnly, matrixValues, formItemConfigs, index, selectedValueIds[index] ?? null)
+    ).join('');
+
+    return selectsHtml;
+}
+
+// Selects-only variant (no note column) used by rename mode, where the
+// note input is intentionally not rendered (rename rows only collect a
+// renamed label + an evaluation value, no free-text note - see
+// fillRenameControls). Mirrors renderSelectsAndNote's column-count logic
+// without the trailing note wrap.
+function renderSelectsOnly(fieldId, itemId, readOnly, matrixValues, hasMuliEvaluation, formItemConfigs = [], countOfColumnsValue = 1, selectedValueIdOrIds = null) {
+    const useMulti = !!hasMuliEvaluation && Array.isArray(formItemConfigs) && formItemConfigs.length > 0;
+
+    if (!useMulti) {
+        const isSelected = (id) => selectedValueIdOrIds && String(id) === String(selectedValueIdOrIds);
+        const optionsHtml = matrixValues
+            .map(o => `<option value="${o.id}" data-actual-value="${o.actualMatrixValue}" ${isSelected(o.id) ? 'selected' : ''}>${o.actualMatrixValue}</option>`)
+            .join('');
+
+        return `
+            <div class="row-select-wrap">
+                <select class="row-select" ${readOnly ? 'disabled' : ''}>
+                    <option disabled ${selectedValueIdOrIds ? '' : 'selected'}>Please Select</option>
+                    ${optionsHtml}
+                </select>
+                <span class="validation-message" id="validation-${fieldId}-${itemId}-${ItemPropertyType.SELECT}"></span>
+            </div>
+        `;
+    }
+
+    const selectedValueIds = Array.isArray(selectedValueIdOrIds) ? selectedValueIdOrIds : [];
+    return Array.from({ length: countOfColumnsValue }, (_, index) =>
+        renderMultiSelectWrap(fieldId, itemId, readOnly, matrixValues, formItemConfigs, index, selectedValueIds[index] ?? null)
+    ).join('');
 }
 
 // ==============================
@@ -166,9 +301,9 @@ function renderRowName(fieldId, itemId, text, relatedItems) {
 
     return `
         <div class="row-name-cell" style="display:flex;align-items:center;gap:6px;min-width:0;">
-            <input class="row-name" type="text" value="${escapeAttr(text)}" readonly style="flex:1 1 auto;min-width:0;" />
+            <input class="row-name item-name" type="text" value="${escapeAttr(text)}" readonly style="flex:1 1 auto;min-width:0;" />
             ${hasRelated
-        ? `<span class="info-icon info-button"
+            ? `<span class="info-icon info-button"
                      title="عرض البنود المرتبطة"
                      onclick="openRelatedItemModal('${fieldId}', '${itemId}')"
                      >ⓘ</span>`
@@ -177,7 +312,7 @@ function renderRowName(fieldId, itemId, text, relatedItems) {
     `;
 }
 
-function renderSubRowHtml(fieldId, sub, parentId, label, readOnly, matrixValues) {
+function renderSubRowHtml(fieldId, sub, parentId, label, readOnly, matrixValues, savedValueId = null, savedNote = null) {
     return `
         <div class="row-item child-row" data-item-id="${sub.id}" data-parent-id="${parentId}" data-weight="${sub.weightPercentage}">
             <span class="row-index">
@@ -186,7 +321,90 @@ function renderSubRowHtml(fieldId, sub, parentId, label, readOnly, matrixValues)
 
             ${renderRowName(fieldId, sub.id, sub.text, sub.relatedItems)}
 
-            ${renderSelectAndNote(fieldId, sub.id, sub.hasNote, readOnly, matrixValues, sub.subItemLists)}
+            ${renderSelectAndNote(fieldId, sub.id, sub.hasNote, readOnly, matrixValues, sub.subItemLists, savedValueId, savedNote)}
+        </div>
+    `;
+}
+
+// ==============================
+// Rename-mode row rendering
+// ==============================
+// In rename mode, a row shows an editable name input (instead of the
+// select+note pair) plus an optional delete button. No sub-items are
+// rendered or tracked here - rename mode only ever operates on top-level
+// row items, same as the old isRename branch of createRow().
+//
+// The "item-name" class and "data-id" attribute are kept identical to the
+// old markup so getFormResult()/fillRenameControls() can keep using the
+// same lookup convention ($(...).find("input.item-name").data("id")).
+function renderRenameRowName(itemId, text, readOnly = false) {
+    return `
+        <div class="row-name-cell" style="display:flex;align-items:center;gap:6px;min-width:0;">
+            <input class="row-name item-name" type="text" value="${escapeAttr(text)}" data-id="${itemId}"
+                   ${readOnly ? 'readonly' : ''} style="flex:1 1 auto;min-width:0;" />
+        </div>
+    `;
+}
+
+function renderDeleteButton(allowDelete) {
+    return `
+        <div class="row-delete-wrap">
+            ${allowDelete
+            ? `<button type="button" class="btn btn-sm delete-btn" onclick="deleteRow(this)"><i class="la la-trash"></i></button>`
+            : ''}
+        </div>
+    `;
+}
+
+// data-field-id/data-aspect-key let addNewRow/deleteRow find their way
+// back to the right per-aspect pool in formStates without needing to
+// thread fieldId/aspectKey through every caller.
+//
+// Rename-mode rows render ONLY the editable name input + delete button
+// at creation time (initForm / addNewRow). They intentionally do NOT
+// render any evaluation select(s) or a note input here - selects are
+// inserted later, on demand, by fillRenameControls (see
+// insertRenameRowSelects), once there's saved data to drive them. No
+// note input is rendered for rename rows at all.
+function renderRenameRowHtml(fieldId, aspectKey, item, orderLabel, allowDelete, state) {
+    const readOnly = !!(state && state.readOnly);
+    return `
+        <div class="row-item main-row rename-row" data-item-id="${item.id}" data-field-id="${fieldId}" data-aspect-key="${aspectKey}" data-weight="${item.weightPercentage ?? 0}">
+            <span class="row-index">
+                <span class="row-index-num">${orderLabel}</span>
+            </span>
+
+            ${renderRenameRowName(item.id, item.text, readOnly)}
+
+            ${renderDeleteButton(allowDelete)}
+        </div>
+    `;
+}
+
+// Wires change -> calculateFE on every select inside a freshly-inserted
+// rename-mode row, same as eval-mode rows do. Needed because rename rows
+// are inserted via insertAdjacentHTML (raw markup), so listeners have to
+// be attached afterward rather than declared inline.
+function bindRenameRowSelects(fieldId, rowEl) {
+    if (!rowEl) return;
+    const state = getFormState(fieldId);
+    const formId = state.formId;
+
+    rowEl.querySelectorAll('.row-select').forEach(sel => {
+        sel.addEventListener('change', () => {
+            calculateFE(formId, fieldId);
+        });
+    });
+}
+
+// Mirrors the old "Add New" button rendered below the table in
+// generateFormAccordionItem() when allowAdd is true.
+function renderAddNewRowButton(fieldId, aspectKey) {
+    return `
+        <div class="add-row-wrap">
+            <button type="button" class="btn btn-sm add-btn" onclick="addNewRow(this, '${fieldId}', '${aspectKey}')">
+                <i class="la la-plus"></i> Add New
+            </button>
         </div>
     `;
 }
@@ -288,13 +506,34 @@ function openRelatedItemModal(fieldId, itemId) {
 // ==============================
 // Init
 // ==============================
-// Requires a container element already present on the page with
-// id="${fieldId}-form-root". That's what makes it safe to call initForm
-// more than once on the same page (one call per fieldId/form instance).
-async function initForm(formId, fieldId, readOnly, savedResults, evaluationRequestId, serviceRequestId) {
+// initForm no longer touches the DOM. It fetches the form's data,
+// populates per-fieldId state, and returns the FULL HTML string. The
+// caller inserts it then calls bindFormEvents(fieldId).
+//
+// savedResults — the full object returned by getFormResults():
+//   { id, items: [{ id, name, valueId, valueIds, note, subItems }], ... }
+//   Pass null for a blank/new form.
+//
+// evaluateRenamedItems — when true, the form is in "evaluate renamed
+//   items" mode: row labels come from savedResults.items[i].name instead
+//   of the API template name, and evaluation selects are rendered
+//   alongside a readonly name display (no editable .item-name input).
+//   Used for cases 5 & 6.
+//
+// Six cases covered:
+//   1  Regular form, get result              — no savedResults, !evaluateRenamedItems
+//   2  Regular form, fill eval (edit)        — savedResults with valueId, !evaluateRenamedItems
+//   3  Rename edit                           — isRename, savedResults with name, !readOnly
+//   4  Rename view                           — isRename, savedResults with name, readOnly
+//   5  Eval renamed items, blank selects     — evaluateRenamedItems, savedResults with name only
+//   6  Eval renamed items, prefilled selects — evaluateRenamedItems, savedResults with name+valueId
+async function initForm(formId, fieldId, readOnly, savedResults, evaluationRequestId, serviceRequestId, allowRename = false, allowDelete = false, allowAdd = false, evaluateRenamedItems = false) {
     const state = getFormState(fieldId);
+    state.formId = formId;
     state.evaluationRequestId = evaluationRequestId;
     state.serviceRequestId = serviceRequestId;
+    state.readOnly = readOnly;
+    state.evaluateRenamedItems = evaluateRenamedItems;
 
     const response = await jqClient().Get(
         GET_FORMS_API.getItems(depRoutePath, formId)
@@ -304,20 +543,29 @@ async function initForm(formId, fieldId, readOnly, savedResults, evaluationReque
     state.evalForm = response?.value?.evalForm ?? null;
     state.hasMuliEvaluation = !!(state.evalForm && state.evalForm.hasMuliEvaluation);
 
+    if (readOnly) {
+        allowRename = false;
+        allowDelete = false;
+        allowAdd = false;
+    }
+
+    state.isRename = !!(state.evalForm && state.evalForm.allowRename);
+    state.allowRename = allowRename;
+    state.allowDelete = allowDelete;
+    state.allowAdd = allowAdd;
+    state.renamePools = new Map();
+    state.renameItemsById = new Map();
+
     const matrixResponse = await jqClient().Get(
         GET_FORMS_API.getMatrixValues(depRoutePath, formId)
     );
 
     state.matrixResponse = matrixResponse;
     const matrixValues = matrixResponse?.value ?? matrixResponse ?? [];
-
+    state.matrixValues = matrixValues;
 
     state.formData = buildFormData(tree, state.evalForm);
 
-    // Lookup map (itemId -> relatedItems[]) used by openRelatedItemModal,
-    // plus a form-level "does any row have a note column" flag used to
-    // decide whether the related-items popup shows a notes column.
-    // Mirrors relatedItems handling from get-forms_Old.js.
     state.relatedItemsMap = new Map();
     state.hasAnyNote = false;
 
@@ -328,7 +576,6 @@ async function initForm(formId, fieldId, readOnly, savedResults, evaluationReque
                 if (Array.isArray(row.relatedItems) && row.relatedItems.length > 0) {
                     state.relatedItemsMap.set(row.id, row.relatedItems);
                 }
-
                 (row.subItems || []).forEach(sub => {
                     if (sub.hasNote) state.hasAnyNote = true;
                     if (Array.isArray(sub.relatedItems) && sub.relatedItems.length > 0) {
@@ -339,203 +586,536 @@ async function initForm(formId, fieldId, readOnly, savedResults, evaluationReque
         });
     });
 
-    const root = document.getElementById(`${fieldId}-form-root`);
-    if (!root) {
-        console.error(`initForm: no element with id "${fieldId}-form-root" found on the page.`);
-        return;
-    }
-    root.innerHTML = '';
-
-    const table = buildHorizontalTable(matrixValues);
-
-    const container = document.getElementById(`${fieldId}-form-root`);
-
-    container.appendChild(table);
-
-    // Result banner, scoped to this form. Inserted once per fieldId so
-    // repeated initForm calls (e.g. re-init) don't duplicate it.
-    if (!document.getElementById(`${fieldId}-form-result-div`)) {
-        root.insertAdjacentHTML('afterend', `
-            <div id="${fieldId}-form-result-div" class="d-none bg-primary d-flex justify-content-between align-items-center py-2">
-                <div class="text-white">Result:</div>
-                <div class="text-white" id="${fieldId}-form-result-value"></div>
-            </div>
-        `);
-    }
-
-    // Build lookup maps: itemId -> saved result, subItemId -> saved sub-result
-    const savedMap = {};
+    // savedResults is the full getFormResults() object. Build lookup maps
+    // from its .items array. Multi-evaluation rows are expanded into N
+    // flat items with the same id (one per column) by getFormResult — so
+    // we group them back by id here, collecting each column's valueId in
+    // order, so renderSelectsAndNote can prefill column[i] from valueIds[i].
+    const savedItems = savedResults?.items ?? [];
+    const savedMap = {};   // id -> { name, valueIds: [], note, subItems }
     const savedSubMap = {};
-    if (Array.isArray(savedResults)) {
-        savedResults.forEach(r => {
-            savedMap[r.id] = r;
-            (r.subItems || []).forEach(sub => { savedSubMap[sub.id] = sub; });
-        });
-    }
 
-    state.formData.forEach((crit, cIdx) => {
-        const cCard = document.createElement('div');
-        cCard.className = 'criterion-card';
-
-        const critBodyId = `${fieldId}-crit-body-${cIdx}`;
-
-        cCard.innerHTML = `
-            <div class="criterion-header">
-                <span class="criterion-number">معيار ${cIdx + 1}</span>
-                <input class="criterion-title-input" type="text" value="${escapeAttr(crit.title)}" readonly />
-            </div>
-            <div class="criterion-body" id="${critBodyId}"></div>
-        `;
-
-        root.appendChild(cCard);
-
-        const body = document.getElementById(critBodyId);
-
-        crit.aspects
-            .filter(asp => asp.rows && asp.rows.length > 0)
-            .forEach((asp, aIdx) => {
-                const aCard = document.createElement('div');
-                aCard.className = 'aspect-card';
-
-                const aId = `${fieldId}-asp-${cIdx}-${aIdx}`;
-
-                aCard.innerHTML = `
-                    <div class="aspect-header">
-                        <span class="aspect-label">جانب ${aIdx + 1}</span>
-                        <input class="aspect-title-input" type="text" value="${escapeAttr(asp.title)}" readonly />
-                    </div>
-
-                    <div class="domain-row">
-                        <div class="domain-title">
-                            ${asp.domainTitle}
-                        </div>
-
-                        <div class="rows-area" id="rows-${aId}"></div>
-                    </div>
-                `;
-
-                body.appendChild(aCard);
-
-                const rowsArea = document.getElementById(`rows-${aId}`);
-
-                asp.rows.forEach((row, rIdx) => {
-                    const hasSubItems = Array.isArray(row.subItems) && row.subItems.length > 0;
-
-                    const rowDiv = document.createElement('div');
-                    rowDiv.className = 'row-item main-row' + (hasSubItems ? ' has-subitems' : '');
-                    rowDiv.dataset.itemId = row.id;
-                    rowDiv.dataset.weight = row.weightPercentage;
-
-                    rowDiv.innerHTML = `
-                        <span class="row-index">
-                            <span class="row-index-num">${rIdx + 1}</span>
-                            ${hasSubItems
-                            ? `<button type="button" class="row-toggle" aria-expanded="false" aria-label="toggle sub items">&#9656;</button>`
-                            : ''}
-                        </span>
-
-                        ${renderRowName(fieldId, row.id, row.text, row.relatedItems)}
-
-                        ${renderSelectAndNote(fieldId, row.id, row.hasNote, readOnly, matrixValues)}
-                    `;
-
-                    rowsArea.appendChild(rowDiv);
-
-                    // Prefill main row from saved results
-                    const saved = savedMap[row.id];
-                    if (saved) {
-                        const selectEl = rowDiv.querySelector('.row-select');
-                        if (selectEl && saved.valueId) {
-                            selectEl.value = saved.valueId;
-                        }
-
-                        const noteEl = rowDiv.querySelector('.row-note');
-                        if (noteEl && saved.note !== null && saved.note !== undefined) {
-                            noteEl.value = saved.note;
-                        }
-                    }
-
-                    // Recalculate the result banner whenever this row's value changes
-                    rowDiv.querySelector('.row-select').addEventListener('change', () => {
-                        calculateFE(formId, fieldId);
-                    });
-
-                    // Sub-items: rendered into a collapsible container, toggled from the main row
-                    if (hasSubItems) {
-                        const subContainer = document.createElement('div');
-                        subContainer.className = 'subitems-container';
-                        subContainer.dataset.parentId = row.id;
-
-                        row.subItems.forEach((sub, sIdx) => {
-                            subContainer.insertAdjacentHTML(
-                                'beforeend',
-                                renderSubRowHtml(fieldId, sub, row.id, `${rIdx + 1}.${sIdx + 1}`, readOnly, matrixValues)
-                            );
-                        });
-
-                        rowsArea.appendChild(subContainer);
-
-                        // Prefill sub-items from saved results
-                        subContainer.querySelectorAll('.row-item.child-row').forEach(childRow => {
-                            const childId = childRow.dataset.itemId;
-                            const savedSub = savedSubMap[childId];
-                            if (savedSub) {
-                                const selectEl = childRow.querySelector('.row-select');
-                                if (selectEl && savedSub.valueId) {
-                                    selectEl.value = savedSub.valueId;
-                                }
-
-                                const noteEl = childRow.querySelector('.row-note');
-                                if (noteEl && savedSub.note !== null && savedSub.note !== undefined) {
-                                    noteEl.value = savedSub.note;
-                                }
-                            }
-
-                            childRow.querySelector('.row-select').addEventListener('change', () => {
-                                calculateFE(formId, fieldId);
-                            });
-                        });
-
-                        // Toggle expand/collapse
-                        const toggleBtn = rowDiv.querySelector('.row-toggle');
-                        toggleBtn.addEventListener('click', () => {
-                            const expanded = subContainer.classList.toggle('expanded');
-                            toggleBtn.classList.toggle('is-open', expanded);
-                            toggleBtn.setAttribute('aria-expanded', String(expanded));
-                        });
-                    }
-                });
-            });
+    savedItems.forEach(r => {
+        if (!savedMap[r.id]) {
+            savedMap[r.id] = {
+                name: r.name ?? null,
+                valueIds: [],
+                note: r.note ?? null,
+                subItems: r.subItems ?? []
+            };
+        }
+        // Collect valueId for each column in the order they appear.
+        // Single-select rows produce exactly one entry → valueIds[0].
+        if (r.valueId !== undefined) {
+            savedMap[r.id].valueIds.push(r.valueId ?? null);
+        }
+        (r.subItems || []).forEach(sub => { savedSubMap[sub.id] = sub; });
     });
 
+    const tableHtml = buildHorizontalTableHtml(matrixValues);
+
+    const resultBannerHtml = `
+        <div id="${fieldId}-form-result-div" class="d-none bg-primary d-flex justify-content-between align-items-center py-2">
+            <div class="text-white">Result:</div>
+            <div class="text-white" id="${fieldId}-form-result-value"></div>
+        </div>
+    `;
+
+    const critCardsHtml = state.formData.map((crit, cIdx) => {
+        const critBodyId = `${fieldId}-crit-body-${cIdx}`;
+
+        const aspectCardsHtml = crit.aspects
+            .filter(asp => asp.rows && asp.rows.length > 0)
+            .map((asp, aIdx) => {
+                const aId = `${fieldId}-asp-${cIdx}-${aIdx}`;
+
+                let rowsAreaHtml = '';
+                let addButtonHtml = '';
+
+                // ── Branch A: rename mode (cases 3 & 4) ──────────────────
+                // state.isRename comes from evalForm.allowRename (server flag).
+                // evaluateRenamedItems overrides this to eval mode even when
+                // the form template is rename-capable, so check it first.
+                if (state.isRename && !evaluateRenamedItems) {
+                    asp.rows.forEach(row => {
+                        state.renameItemsById.set(row.id, { item: row, aspectKey: aId });
+                    });
+
+                    if (savedItems.length > 0) {
+                        // Case 3 / 4: render every row that appears in
+                        // savedResults upfront with its saved name; rows not
+                        // in savedResults stay in the pool (addNewRow).
+                        // Pool still populated in original order so Add New
+                        // continues to work for unsaved items.
+                        const savedIds = new Set(savedItems.map(s => s.id));
+                        const poolRows = asp.rows.filter(row => !savedIds.has(row.id));
+                        state.renamePools.set(aId, poolRows);
+
+                        const renderedRows = asp.rows
+                            .filter(row => savedIds.has(row.id))
+                            .map((row, idx) => {
+                                const saved = savedMap[row.id];
+                                // Prefill name from savedResults
+                                const rowWithSavedName = { ...row, text: saved?.name ?? row.text };
+                                return renderRenameRowHtml(fieldId, aId, rowWithSavedName, idx + 1, state.allowDelete, state);
+                            }).join('');
+
+                        rowsAreaHtml = renderedRows;
+                    } else {
+                        // No savedResults — blank rename form (first open).
+                        // Only the first row renders; rest go into pool.
+                        const [firstRow, ...poolRows] = asp.rows;
+                        state.renamePools.set(aId, poolRows);
+                        if (firstRow) {
+                            rowsAreaHtml = renderRenameRowHtml(fieldId, aId, firstRow, 1, state.allowDelete, state);
+                        }
+                    }
+
+                    if (state.allowAdd && state.renamePools.get(aId)?.length > 0) {
+                        addButtonHtml = renderAddNewRowButton(fieldId, aId);
+                    }
+
+                    // ── Branch B: evaluate renamed items (cases 5 & 6) ───────
+                    // Row label = savedResults.name; selects render normally;
+                    // name cell is readonly display (no .item-name class).
+                } else if (evaluateRenamedItems) {
+                    // ✅ Only render rows that were actually renamed (exist in savedResults)
+                    const renamedRows = asp.rows.filter(row => savedMap[row.id]);
+
+                    rowsAreaHtml = renamedRows.map((row, rIdx) => {
+                        const saved = savedMap[row.id];
+                        // Use saved name as the display label, fall back to
+                        // template name if this row has no saved entry yet.
+                        const displayName = saved?.name ?? row.text;
+                        const hasSubItems = Array.isArray(row.subItems) && row.subItems.length > 0;
+
+                        // savedMap.valueIds is always a flat array (one
+                        // entry per column) produced by the grouped savedMap
+                        // build above. Single-select → [valueId], multi → [id1, id2, ...].
+                        const savedValueIdOrIds = saved?.valueIds?.length > 0 ? saved.valueIds : null;
+
+                        const mainRowHtml = `
+                            <div class="row-item main-row${hasSubItems ? ' has-subitems' : ''}" data-item-id="${row.id}" data-weight="${row.weightPercentage}">
+                                <span class="row-index">
+                                    <span class="row-index-num">${rIdx + 1}</span>
+                                    ${hasSubItems
+                                ? `<button type="button" class="row-toggle" aria-expanded="false" aria-label="toggle sub items">&#9656;</button>`
+                                : ''}
+                                </span>
+
+                                ${renderRowName(fieldId, row.id, displayName, row.relatedItems)}
+
+                                ${renderSelectsAndNote(
+                                    fieldId, row.id, row.hasNote, readOnly, matrixValues,
+                                    state.hasMuliEvaluation, row.formItemConfigs,
+                                    state.evalForm?.evalCountOfColumnsValue || 1,
+                                    savedValueIdOrIds,
+                                    saved?.note ?? null
+                                )}
+                            </div>
+                        `;
+                        let subItemsHtml = '';
+                        if (hasSubItems) {
+                            const subRowsHtml = row.subItems.map((sub, sIdx) => {
+                                const savedSub = savedSubMap[sub.id];
+                                return renderSubRowHtml(
+                                    fieldId, sub, row.id, `${rIdx + 1}.${sIdx + 1}`, readOnly, matrixValues,
+                                    savedSub?.valueId ?? null,
+                                    savedSub?.note ?? null
+                                );
+                            }).join('');
+
+                            subItemsHtml = `
+                                <div class="subitems-container" data-parent-id="${row.id}">
+                                    ${subRowsHtml}
+                                </div>
+                            `;
+                        }
+
+                        return mainRowHtml + subItemsHtml;
+                    }).join('');
+
+                    // ── Branch C: regular eval (cases 1 & 2) ─────────────────
+                } else {
+                    rowsAreaHtml = asp.rows.map((row, rIdx) => {
+                        const hasSubItems = Array.isArray(row.subItems) && row.subItems.length > 0;
+                        const saved = savedMap[row.id];
+
+                        const savedValueIdOrIds = saved?.valueIds?.length > 0 ? saved.valueIds : null;
+
+                        const mainRowHtml = `
+                            <div class="row-item main-row${hasSubItems ? ' has-subitems' : ''}" data-item-id="${row.id}" data-weight="${row.weightPercentage}">
+                                <span class="row-index">
+                                    <span class="row-index-num">${rIdx + 1}</span>
+                                    ${hasSubItems
+                                ? `<button type="button" class="row-toggle" aria-expanded="false" aria-label="toggle sub items">&#9656;</button>`
+                                : ''}
+                                </span>
+
+                                ${renderRowName(fieldId, row.id, row.text, row.relatedItems)}
+
+                                ${renderSelectsAndNote(
+                                    fieldId, row.id, row.hasNote, readOnly, matrixValues,
+                                    state.hasMuliEvaluation, row.formItemConfigs,
+                                    state.evalForm?.evalCountOfColumnsValue || 1,
+                                    savedValueIdOrIds,
+                                    saved?.note ?? null
+                                )}
+                            </div>
+                        `;
+
+                        let subItemsHtml = '';
+                        if (hasSubItems) {
+                            const subRowsHtml = row.subItems.map((sub, sIdx) => {
+                                const savedSub = savedSubMap[sub.id];
+                                return renderSubRowHtml(
+                                    fieldId, sub, row.id, `${rIdx + 1}.${sIdx + 1}`, readOnly, matrixValues,
+                                    savedSub?.valueId ?? null,
+                                    savedSub?.note ?? null
+                                );
+                            }).join('');
+
+                            subItemsHtml = `
+                                <div class="subitems-container" data-parent-id="${row.id}">
+                                    ${subRowsHtml}
+                                </div>
+                            `;
+                        }
+
+                        return mainRowHtml + subItemsHtml;
+                    }).join('');
+                }
+
+                return `
+                    <div class="aspect-card">
+                        <div class="aspect-header">
+                            <span class="aspect-label">جانب ${aIdx + 1}</span>
+                            <input class="aspect-title-input" type="text" value="${escapeAttr(asp.title)}" readonly />
+                        </div>
+
+                        <div class="domain-row">
+                            <div class="domain-title">
+                                ${asp.domainTitle}
+                            </div>
+
+                            <div class="rows-area" id="rows-${aId}">${rowsAreaHtml}</div>
+                        </div>
+
+                        ${addButtonHtml}
+                    </div>
+                `;
+            }).join('');
+
+        return `
+            <div class="criterion-card">
+                <div class="criterion-header">
+                    <span class="criterion-number">معيار ${cIdx + 1}</span>
+                    <input class="criterion-title-input" type="text" value="${escapeAttr(crit.title)}" readonly />
+                </div>
+                <div class="criterion-body" id="${critBodyId}">${aspectCardsHtml}</div>
+            </div>
+        `;
+    }).join('');
+
+    return `${tableHtml}${critCardsHtml}${resultBannerHtml}`;
+}
+
+// Inserts the HTML returned by initForm into the page and wires up all
+// event listeners (row-select change -> calculateFE, row-toggle
+// expand/collapse, rename-row selects once they exist). Split out from
+// initForm because listeners can't be serialized into the HTML string -
+// call this right after assigning the returned markup into
+// `#${fieldId}-form-root`.
+//
+// Typical usage:
+//   const html = await initForm(formId, fieldId, ...);
+//   document.getElementById(`${fieldId}-form-root`).innerHTML = html;
+//   bindFormEvents(fieldId);
+function bindFormEvents(fieldId) {
+    const state = getFormState(fieldId);
+    const root = document.getElementById(`${fieldId}-form-root`);
+    if (!root) {
+        console.error(`bindFormEvents: no element with id "${fieldId}-form-root" found on the page.`);
+        return;
+    }
+
+    const formId = state.formId;
+
+    // Eval-mode rows: change -> recalc, toggle -> expand/collapse
+    root.querySelectorAll('.row-item.main-row:not(.rename-row) .row-select').forEach(sel => {
+        sel.addEventListener('change', () => calculateFE(formId, fieldId));
+    });
+
+    root.querySelectorAll('.row-item.child-row .row-select').forEach(sel => {
+        sel.addEventListener('change', () => calculateFE(formId, fieldId));
+    });
+
+    root.querySelectorAll('.row-item.main-row.has-subitems').forEach(rowDiv => {
+        const itemId = rowDiv.dataset.itemId;
+        const subContainer = root.querySelector(`.subitems-container[data-parent-id="${itemId}"]`);
+        const toggleBtn = rowDiv.querySelector('.row-toggle');
+        if (!subContainer || !toggleBtn) return;
+
+        toggleBtn.addEventListener('click', () => {
+            const expanded = subContainer.classList.toggle('expanded');
+            toggleBtn.classList.toggle('is-open', expanded);
+            toggleBtn.setAttribute('aria-expanded', String(expanded));
+        });
+    });
+
+    // Rename-mode rows: only the first row per aspect exists at this
+    // point (the rest live in state.renamePools until added) - bind
+    // whatever selects are already present (normally none, since rename
+    // rows get their selects inserted later by fillRenameControls, but
+    // this stays harmless/idempotent either way).
+    root.querySelectorAll('.row-item.rename-row').forEach(rowEl => {
+        bindRenameRowSelects(fieldId, rowEl);
+    });
 }
 
 
 // ==============================
+// Rename mode: add / delete / collect / prefill
+// ==============================
+// Ported from get-forms_Old.js (addNewRow, deleteRow, fillRenameControls)
+// and submit-form_Old.js (renameFormItems). The old versions worked
+// against a single flat table (one tbody, one "renameItems" pool, one
+// global "lastOrder"); these versions are scoped per fieldId AND per
+// aspect, since rename mode now renders grouped under criterion/aspect
+// cards like eval mode instead of one flat table.
+
+// Pulls the next pooled item for this aspect into the DOM. `button` is
+// the clicked "Add New" button (used to hide itself once the pool is
+// empty) - pass null when calling programmatically, e.g. from
+// fillRenameControls.
+function addNewRow(button, fieldId, aspectKey) {
+    const state = getFormState(fieldId);
+    const pool = state.renamePools.get(aspectKey);
+
+    if (!pool || pool.length === 0) {
+        return; // nothing left in this aspect's pool to add
+    }
+
+    const item = pool.shift();
+    const rowsArea = document.getElementById(`rows-${aspectKey}`);
+    if (!rowsArea) return;
+
+    const order = rowsArea.querySelectorAll('.row-item.rename-row').length + 1;
+
+    rowsArea.insertAdjacentHTML(
+        'beforeend',
+        renderRenameRowHtml(fieldId, aspectKey, item, order, state.allowDelete, state)
+    );
+    bindRenameRowSelects(fieldId, rowsArea.lastElementChild);
+
+    if (pool.length === 0 && button) {
+        button.style.display = 'none';
+    }
+}
+
+// Removes a rename row from the DOM, renumbers the remaining rows in
+// that aspect, and returns the item to the back of its aspect's pool
+// (using the original item data, not whatever the user may have typed
+// into the name field - mirrors the old itemsResult lookup).
+function deleteRow(button) {
+    const row = button.closest('.row-item.rename-row');
+    if (!row) return;
+
+    const itemId = row.dataset.itemId;
+    const fieldId = row.dataset.fieldId;
+    const aspectKey = row.dataset.aspectKey;
+
+    const state = getFormState(fieldId);
+    const meta = state.renameItemsById.get(itemId);
+
+    row.remove();
+
+    const rowsArea = document.getElementById(`rows-${aspectKey}`);
+    if (rowsArea) {
+        rowsArea.querySelectorAll('.row-item.rename-row').forEach((r, index) => {
+            const numEl = r.querySelector('.row-index-num');
+            if (numEl) numEl.textContent = index + 1;
+        });
+    }
+
+    if (!meta) return;
+
+    const pool = state.renamePools.get(aspectKey) || [];
+    pool.push(meta.item);
+    state.renamePools.set(aspectKey, pool);
+
+    // Re-show this aspect's "Add New" button if it had been hidden when
+    // the pool ran out.
+    const addBtn = rowsArea?.closest('.aspect-card')?.querySelector('.add-btn');
+    if (addBtn) addBtn.style.display = '';
+}
+
+// renameFormItems was retired - its logic (collecting the edited `name`
+// per rename row) is now folded into getFormResult, which reports both
+// the rename payload (name) and the eval payload (valueId/value/note/
+// subItems) together for every row. See getFormResult below.
+
+// Inserts the evaluation select(s) into a single rename row, on demand.
+// Safe to call more than once per row - if selects are already present
+// (e.g. the row was already filled by an earlier fillRenameControls
+// pass) it does nothing and returns the existing wraps unchanged. The
+// select(s) are inserted right before the delete-button wrap so the
+// column order stays name -> select(s) -> delete, matching eval-mode
+// rows' name -> select(s) -> note layout.
+function insertRenameRowSelects(fieldId, row, item, state, selectedValueIdOrIds = null) {
+    if (row.querySelector('.row-select')) return; // already inserted
+
+    const matrixValues = state.matrixValues ?? (state.matrixResponse?.value ?? state.matrixResponse ?? []);
+    const countOfColumnsValue = state.evalForm?.evalCountOfColumnsValue || 1;
+
+    const selectsHtml = renderSelectsOnly(
+        fieldId, item.id, false, matrixValues,
+        state.hasMuliEvaluation, item.formItemConfigs, countOfColumnsValue,
+        selectedValueIdOrIds
+    );
+
+    const deleteWrap = row.querySelector('.row-delete-wrap');
+    if (deleteWrap) {
+        deleteWrap.insertAdjacentHTML('beforebegin', selectsHtml);
+    } else {
+        row.insertAdjacentHTML('beforeend', selectsHtml);
+    }
+
+    bindRenameRowSelects(fieldId, row);
+}
+
+// Inserts the shared multi-evaluation column-header row once above an
+// aspect's rename rows (see renderMultiSelectHeaderRow). No-op when the
+// form isn't multi-evaluation, or the header was already inserted for
+// this aspect. Mirrors the per-row column labels eval-mode used to show,
+// but rendered once for the whole aspect instead of once per row - see
+// request to stop repeating the column title on every row.
+function insertRenameAspectHeader(fieldId, aspectKey, item, rowsArea, state) {
+    if (!state.hasMuliEvaluation) return;
+    if (rowsArea.previousElementSibling?.classList?.contains('row-select-header')) return; // already inserted
+
+    const countOfColumnsValue = state.evalForm?.evalCountOfColumnsValue || 1;
+    const headerHtml = renderMultiSelectHeaderRow(item.formItemConfigs || [], countOfColumnsValue);
+
+    rowsArea.insertAdjacentHTML('beforebegin', headerHtml);
+}
+
+// Prefills previously-saved rename values (e.g. a prior renameFormItems
+// payload) into the rendered form. For each saved item: if its row is
+// already on the page, just set the name; otherwise pull it (and
+// anything queued ahead of it) out of its aspect's pool via addNewRow
+// until it appears. Call this after the caller has inserted initForm's
+// returned HTML into the page (and ideally after bindFormEvents).
+//
+// This is also where the evaluation select(s) actually get built for
+// rename rows - they are NOT rendered upfront by initForm/addNewRow.
+// Once a row's select(s) are inserted, the shared column-header row for
+// that aspect is inserted too (multi-evaluation forms only), then the
+// saved valueId/valueIds are applied. There is no note input in rename
+// mode, so no note prefill happens here.
+async function fillRenameControls(fieldId, controlValues) {
+    if (!controlValues || !controlValues.items) return;
+
+    const state = getFormState(fieldId);
+    if (!state.isRename) return;
+
+    // Group expanded items by id (multi-eval produces N flat items with
+    // the same id, one per column) to reconstruct the valueIds array
+    // needed by insertRenameRowSelects. Single-select rows produce one
+    // entry → valueIds: [valueId]. Also deduplicate so we process each
+    // row id exactly once.
+    const groupedById = new Map();
+    controlValues.items.forEach(r => {
+        if (!groupedById.has(r.id)) {
+            groupedById.set(r.id, { id: r.id, name: r.name ?? null, valueIds: [] });
+        }
+        groupedById.get(r.id).valueIds.push(r.valueId ?? null);
+    });
+
+    groupedById.forEach(savedItem => {
+        const meta = state.renameItemsById.get(savedItem.id);
+        if (!meta) return;
+
+        const { item, aspectKey } = meta;
+        const rowsArea = document.getElementById(`rows-${aspectKey}`);
+        if (!rowsArea) return;
+
+        let row = rowsArea.querySelector(`.row-item.rename-row[data-item-id="${savedItem.id}"]`);
+
+        if (!row) {
+            const pool = state.renamePools.get(aspectKey) || [];
+            const poolIndex = pool.findIndex(p => p.id === savedItem.id);
+            if (poolIndex === -1) return;
+
+            for (let i = 0; i <= poolIndex; i++) {
+                addNewRow(null, fieldId, aspectKey);
+            }
+
+            if ((state.renamePools.get(aspectKey) || []).length === 0) {
+                const addBtn = rowsArea.closest('.aspect-card')?.querySelector('.add-btn');
+                if (addBtn) addBtn.style.display = 'none';
+            }
+
+            row = rowsArea.querySelector(`.row-item.rename-row[data-item-id="${savedItem.id}"]`);
+        }
+
+        if (!row) return;
+
+        const nameInput = row.querySelector('.item-name');
+        if (nameInput) nameInput.value = savedItem.name || '';
+
+        // savedItem.valueIds is the grouped array: [valueId_col0, valueId_col1, ...]
+        const savedValueIdOrIds = savedItem.valueIds.length > 0 ? savedItem.valueIds : null;
+
+        insertRenameAspectHeader(fieldId, aspectKey, item, rowsArea, state);
+        insertRenameRowSelects(fieldId, row, item, state, savedValueIdOrIds);
+    });
+}
+
+// ==============================
 // Build payload from current DOM state
 // ==============================
+// Produces the canonical result object consumed by getFormResults,
+// validateForm, calculateFE, and saved back as savedResults into initForm.
+//
+// Every item always carries:
+//   - id, name (null for eval-mode rows with no .item-name input)
+//   - valueId, value, weightPercentage, note
+//   - subItems[]
+//
+// Multi-evaluation rows (hasMuliEvaluation, N selects per row) are
+// EXPANDED into N individual flat items — one per select column — each
+// carrying its own valueId/value/weightPercentage. Array fields
+// (valueIds/values/weightPercentages) are NOT produced. This keeps the
+// payload shape uniform regardless of how many columns a form has, and
+// lets initForm prefill each column independently via savedResults.items.
+//
+// calculateFE reads item.value * item.weightPercentage per item, so the
+// expanded shape produces identical arithmetic to the old array shape.
+//
 // Scoped to this form's own container so it never picks up rows
 // belonging to a different form rendered on the same page.
-function evaluationFormResult(formId, fieldId) {
+function getFormResult(formId, fieldId) {
     const state = getFormState(fieldId);
     const root = document.getElementById(`${fieldId}-form-root`);
 
     if (!root) {
-        console.error(`evaluationFormResult: no element with id "${fieldId}-form-root" found.`);
-        return { id: formId, items: [], formSettings: state.evalForm };
+        console.error(`getFormResult: no element with id "${fieldId}-form-root" found.`);
+        return { id: formId, items: [], formSettings: state.evalForm ?? null };
     }
 
     const items = [];
 
     root.querySelectorAll('.row-item.main-row').forEach(row => {
         const itemId = row.dataset.itemId;
-        const selectEl = row.querySelector('.row-select');
-        const noteEl = row.querySelector('.row-note');
 
-        const valueId = selectEl.value || null;
-        const actualValue = parseFloat(selectEl.selectedOptions[0]?.dataset.actualValue) || 0;
+        const nameInput = row.querySelector('.item-name');
+        const name = nameInput ? (nameInput.value.trim() || null) : null;
+
+        const noteEl = row.querySelector('.row-note');
         const note = noteEl ? (noteEl.value.trim() || null) : null;
-        const weightPercentage = parseFloat(row.dataset.weight) || 0;
+
+        const selectEls = Array.from(row.querySelectorAll('.row-select'));
 
         const subItems = [];
         root.querySelectorAll(`.row-item.child-row[data-parent-id="${itemId}"]`).forEach(childRow => {
@@ -544,29 +1124,46 @@ function evaluationFormResult(formId, fieldId) {
 
             subItems.push({
                 id: childRow.dataset.itemId,
-                valueId: childSelect.value || null,
-                // NOTE: ported as-is from the old code, which used the
-                // selected option's display text here (not actualMatrixValue)
-                // for sub-items - flagged "NEED TO CHECK" in the original.
-                value: childSelect.selectedOptions[0]?.textContent ?? '',
+                valueId: childSelect?.value || null,
+                value: childSelect?.selectedOptions[0]?.textContent ?? null,
                 note: childNote ? (childNote.value.trim() || null) : null
             });
         });
 
-        items.push({
-            id: itemId,
-            value: actualValue,
-            valueId: valueId,
-            weightPercentage: weightPercentage,
-            note: note,
-            subItems: subItems
-        });
+        if (selectEls.length > 1) {
+            // Multi-evaluation: expand into one flat item per select column.
+            // Each carries its own valueId/value/weightPercentage so the
+            // payload is always a uniform array of flat items.
+            selectEls.forEach(sel => {
+                items.push({
+                    id: itemId,
+                    name: name,
+                    valueId: sel.value || null,
+                    value: parseFloat(sel.selectedOptions[0]?.dataset.actualValue) || null,
+                    weightPercentage: parseFloat(sel.dataset.configWeightPercentage) || 0,
+                    note: note,
+                    subItems: subItems
+                });
+            });
+        } else {
+            // Single-select (the common case): one item as before.
+            const sel = selectEls[0];
+            items.push({
+                id: itemId,
+                name: name,
+                valueId: sel?.value || null,
+                value: sel ? (parseFloat(sel.selectedOptions[0]?.dataset.actualValue) || null) : null,
+                weightPercentage: parseFloat(row.dataset.weight) || 0,
+                note: note,
+                subItems: subItems
+            });
+        }
     });
 
     return {
         id: formId,
         items: items,
-        formSettings: state.evalForm
+        formSettings: state.evalForm ?? null
     };
 }
 
@@ -589,7 +1186,7 @@ function calculate(result) {
 // ==============================
 function calculateFE(formId, fieldId) {
     const state = getFormState(fieldId);
-    const formResult = evaluationFormResult(formId, fieldId);
+    const formResult = getFormResult(formId, fieldId);
     const result = { Value: 0, Name: null, Id: '00000000-0000-0000-0000-000000000000' };
 
     switch (state.evalForm?.calcMethod) {
@@ -641,7 +1238,7 @@ function calculateFE(formId, fieldId) {
 // Validate (calls backend, shows inline error spans)
 // ==============================
 async function validateForm(formId, fieldId) {
-    const result = evaluationFormResult(formId, fieldId);
+    const result = getFormResult(formId, fieldId);
 
     return new Promise((resolve, reject) => {
         jqClient().Post(
@@ -690,24 +1287,35 @@ async function SubmitForm(formId, fieldId) {
 // ==============================
 // Save (validate -> calculate -> persist)
 // ==============================
-async function getFormResults(formId, fieldId) {
-    const isValid = await validateForm(formId, fieldId);
-    if (!isValid) {
-        toast('يوجد حقول غير مكتملة، يرجى مراجعة الأخطاء', fieldId);
-        return null;
+async function getFormResults(formId, fieldId, enableValidation = false, enableCalculation = false) {
+
+
+    if (enableValidation) {
+
+        const isValid = await validateForm(formId, fieldId);
+        if (!isValid) {
+            toast('يوجد حقول غير مكتملة، يرجى مراجعة الأخطاء', fieldId);
+            return null;
+        }
+
     }
 
-    const result = evaluationFormResult(formId, fieldId);
-    const calculation = await calculate(result);
     const state = getFormState(fieldId);
+
+    const result = getFormResult(formId, fieldId);
+    let calculation;
+
+    if (enableCalculation) {
+        calculation = await calculate(result);
+    }
 
     const finalResult = {
         id: result.id,
         items: result.items,
         formSettings: result.formSettings,
-        results: calculation.value,
-        evaluationRequestId: state.evaluationRequestId,
-        serviceRequestId: state.serviceRequestId
+        results: calculation?.value ?? null,
+        evaluationRequestId: state.evaluationRequestId ?? null,
+        serviceRequestId: state.serviceRequestId ?? null
     };
     return finalResult;
 }
@@ -775,4 +1383,27 @@ function buildHorizontalTable(data) {
     table.appendChild(rangeRow);
 
     return table;
+}
+
+// String-returning twin of buildHorizontalTable, used by initForm now
+// that it returns an HTML string instead of building DOM nodes directly.
+// Same markup/structure as the DOM version above.
+function buildHorizontalTableHtml(data) {
+    const nameCellsHtml = data.map(item => `<th>${escapeAttr(item.name)}</th>`).join('');
+    const rangeCellsHtml = data.map(item => `<td>(${escapeAttr(item.minValue)} - ${escapeAttr(item.maxValue)})</td>`).join('');
+
+    return `
+        <table border="1" style="border-collapse: collapse;" class="table table-bordered table-hover align-middle w-100 dataTable no-footer">
+            <thead class="table-light">
+                <tr>
+                    <th>Name</th>
+                    ${nameCellsHtml}
+                </tr>
+            </thead>
+            <tr>
+                <td>Range</td>
+                ${rangeCellsHtml}
+            </tr>
+        </table>
+    `;
 }

@@ -61,11 +61,13 @@ public static class ServiceExtensions
         services.AddScoped<LoggingServices>();
         services.AddScoped<IMapper, Mapper>();
         services.AddScoped<ISmsServices, SmsServices>();
+        services.AddScoped<ISystemModuleService, SystemModuleService>();
         services.AddScoped<IEmailServices, EmailServices>();
         services.AddScoped<ResponseInfo>();
         services.AddScoped<ServiceRequestBL>();
         services.AddScoped<SrvNotification>();
         services.AddScoped<EmailTemplateProvider>();
+        services.AddScoped<IEmailNotificationService, EmailNotificationService>();
 
         services.Configure<AzureADConfig>(config.GetSection("AzureADConfig"));
         services.Configure<FormJwtConfig>(config.GetSection("FormJwtConfig"));

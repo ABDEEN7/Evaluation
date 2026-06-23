@@ -667,10 +667,10 @@ namespace Evaluation.Services.BusinessLayer.API
 		{
 			var userId = userInfo.UserId;
 
-			if (!await _srvServiceRequest.HasAccessToRequestAsync(requestId, userId!.Value))
-			{
-				throw new UnauthorizedAccessException("You do not have permission to view this request.");
-			}
+			//if (!await _srvServiceRequest.HasAccessToRequestAsync(requestId, userId!.Value))
+			//{
+			//	throw new UnauthorizedAccessException("You do not have permission to view this request.");
+			//}
 
 			return await _srvActionStatusConfiguration.GetActionTemplatesByStatus(requestId);
 		}

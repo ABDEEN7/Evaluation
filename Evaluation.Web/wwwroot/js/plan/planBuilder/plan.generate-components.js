@@ -426,7 +426,7 @@
         return selectElement;
     };
 
-    const generateActionsCell = (school, readonly) => {
+    const generateActionsCell = (school, readonly, fieldId) => {
         const container = $('<p>').addClass('m-0');
 
         const link = $('<a>')
@@ -439,6 +439,18 @@
             .html('<i class="la la-eye"></i>');
 
         container.append(link);
+        const cfg = window.planUtility?.depConfig || {};
+        if (fieldId === 'resendemail' && cfg.resendEmail === true) {
+            const resendBtn = $('<a>')
+                .attr('href', '#')
+                .addClass('text-dark ms-2')
+                .attr('type', 'button')
+                .attr('data-id', school.id)
+                .attr('data-action', 'resend-email')
+                .html('<i class="la la-envelope"></i>');
+
+            container.append(resendBtn);
+        }
         return container;
     };
 
@@ -497,7 +509,7 @@
 
         // Actions cell
         const actionsCell = $('<td>');
-        actionsCell.append(generateActionsCell(school, readonly));
+        actionsCell.append(generateActionsCell(school, readonly, fieldId));
         row.append(actionsCell);
 
         return row;
