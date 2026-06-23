@@ -50,7 +50,7 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
                     academicYearId);
 
         var tree = ScopeTreeBuilder.BuildTree(
-            mapper,
+            requestInfo.Lang,
             scopeAcademicYears,
             formItems,
             formItemValues
@@ -101,7 +101,7 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
 
         List<ScopeAcademicYear> scopeAcademicYears = await scopeRepostiory.GetScopeAcademicYearListByAcademicYearId(AcademicYearId);
 
-        var tree = ScopeTreeBuilder.BuildTree(mapper, scopeAcademicYears, formItems, formItemsValues);
+        var tree = ScopeTreeBuilder.BuildTree(requestInfo.Lang, scopeAcademicYears, formItems, formItemsValues);
 
         return new FormDto() { EvalForm = mappedEvalForm, Tree = tree };
     }
@@ -172,7 +172,7 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
 			.GetScopeAcademicYearListByAcademicYearId(academicYearId);
 
 		var tree = ScopeTreeBuilder.BuildTree(
-            mapper,
+            requestInfo.Lang,
             scopeAcademicYears,
 			formItems,
 			formItemsValues);
@@ -454,7 +454,7 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
         var evalForm = await formService.GetEvalForm(FormId);
         var formEvalMatrixValues = await formService.GetFormEvalMatrixValues(evalForm.FormEvalMatrixId);
 
-        return mapper.Map<List<FormEvalMarixValueDto>>(formEvalMatrixValues);
+        return mapper.Map<List<FormEvalMarixValueDto>>(formEvalMatrixValues, opt => opt.Items["lang"] = requestInfo.Lang);
     }
 
     public async Task<Result<CalculationFormResult>> CalculateFormResult(FormEvaluationDto formEvaluationDto)
