@@ -187,7 +187,7 @@
             },
             {
                 data: 'services',
-                className: "td-full p-0 process mt-4",
+                className: "td-full p-0 process my-3",
                 title: uiControlsSetup().GetUiControlText('lblActions'),
                 orderable: false,
                 render: function (data, type, row, meta) {
@@ -201,7 +201,7 @@
 
                     actionsHtml += `
                                 <button
-                                    class="btn dropdown-toggle w-100 btn-primary mt-1 py-2"
+                                    class="btn dropdown-toggle w-100 btn-primary py-2"
                                     type="button"
                                     id="${dropdownId}"
                                     data-bs-toggle="dropdown"
