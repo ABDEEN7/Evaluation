@@ -59,6 +59,10 @@ namespace Evaluation.Services.Models.Admin
                 obj.DescAr = message.DescAr;
                 obj.DescEn = message.DescEn;
                 obj.ColorCode = message.ColorCode;
+                obj.ReportTextAr = message.ReportTextAr;
+                obj.ReportTextEn = message.ReportTextEn;
+                obj.ReportDescAr = message.ReportDescAr;
+                obj.ReportDescEn = message.ReportDescEn;
                 obj.IsActive = message.IsActive;
 
                 uow.GetRepository<FormEvalMatrixValue>().Insert(obj);
@@ -97,6 +101,10 @@ namespace Evaluation.Services.Models.Admin
                 obj.NextEvalDays = message.NextEvalDays;
                 obj.ActualMatrixValue = message.ActualMatrixValue;
                 obj.ColorCode = message.ColorCode;
+                obj.ReportTextAr = message.ReportTextAr;
+                obj.ReportTextEn = message.ReportTextEn;
+                obj.ReportDescAr = message.ReportDescAr;
+                obj.ReportDescEn = message.ReportDescEn;
                 obj.IsActive = message.IsActive;
 
                 uow.GetRepository<FormEvalMatrixValue>().Update(obj);
