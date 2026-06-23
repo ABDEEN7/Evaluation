@@ -23,7 +23,7 @@
         public Guid? AcademicYearId { get; set; }
         public Guid? CountryId { get; set; }
         public Guid? OrgClassId { get; set; }
-       
+       public Guid? SystemModuleId { get; set; }
 
     }
 }
