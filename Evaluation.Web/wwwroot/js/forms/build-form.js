@@ -1197,6 +1197,8 @@ function calculateFE(formId, fieldId) {
     const state = getFormState(fieldId);
     const formResult = getFormResult(formId, fieldId);
     const result = { Value: 0, Name: null, Id: '00000000-0000-0000-0000-000000000000' };
+    const hasMuliEvaluation = state.evalForm.hasMuliEvaluation;
+    const countOfColumnsValue = state.evalForm.evalCountOfColumnsValue;
 
     switch (state.evalForm?.calcMethod) {
         case "AVERAGE": {
@@ -1204,13 +1206,13 @@ function calculateFE(formId, fieldId) {
 
             let total = 0;
             formResult.items.forEach((item) => {
-                total += hasWeights
+                total += hasMuliEvaluation
                     ? (item.value * (item.weightPercentage / 100)) || 0
                     : (item.value || 0);
             });
 
-            result.Value = hasWeights
-                ? total
+            result.Value = hasMuliEvaluation
+                ? total / (formResult.items.length / countOfColumnsValue)
                 : total / (formResult.items.length || 1);
 
             const matrixValues = state.matrixResponse?.value ?? state.matrixResponse ?? [];
