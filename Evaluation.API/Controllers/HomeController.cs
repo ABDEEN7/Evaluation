@@ -1,14 +1,11 @@
 ﻿using Evaluation.Api.Extensions;
 using Evaluation.API.Filters;
 using Evaluation.Services.BusinessLayer;
-using Evaluation.Services.Models.Admin;
 using Evaluation.Services.Models.API;
 using Evaluation.Services.Shared;
-using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Api;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
