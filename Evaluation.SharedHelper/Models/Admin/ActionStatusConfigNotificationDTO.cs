@@ -17,8 +17,8 @@ namespace Evaluation.SharedHelper.Models.Admin
         public bool IsNotificationSend { get; set; }
         public Guid? NotificationTemplateId { get; set; }
         public string? NotificationTemplate { get; set; }
-        public int EmailMinsFromActionId { get; set; } = 0;
-        public int SMSMinsFromActionId { get; set; } = 0;
-        public int NotificationMinsFromActionId { get; set; } = 0;
+        public int EmailMinsFromAction { get; set; } = 0;
+        public int SMSMinsFromAction { get; set; } = 0;
+        public int NotificationMinsFromAction { get; set; } = 0;
     }
 }
