@@ -397,10 +397,10 @@ public class PlanServiceRequestServices(
             .GetAll(x => x.RequestNumber == "default")
             .ToListAsync();
 
-        foreach (var request in requests)
-        {
-            request.RequestNumber = $"{requestNumber}{request.Sequence}";
-        }
+        //foreach (var request in requests)
+        //{
+        //    request.RequestNumber = $"{requestNumber}{request.Sequence}";
+        //}
 
         await scope.CommitAsync();
     }
@@ -463,10 +463,10 @@ public class PlanServiceRequestServices(
                     .ThenInclude(sm => sm.SystemModuleType)
                 .FirstAsync();
 
-            lastSequence = await unitOfWork.GetRepository<EvaluationRequest>()
-                .GetAllNonDeleted(x => x.ServiceId == serviceId)
-                .Select(x => (int?)x.Sequence)
-                .MaxAsync() ?? 0;
+            //lastSequence = await unitOfWork.GetRepository<EvaluationRequest>()
+            //    .GetAllNonDeleted(x => x.ServiceId == serviceId)
+            //    .Select(x => (int?)x.Sequence)
+            //    .MaxAsync() ?? 0;
         }
         //--------------------------------------------
         // UPDATE + INSERT
