@@ -9,5 +9,6 @@ public class DepartmentRoleAttributeValue : EntityBase,IAuditLogEntity
     public Department? Department { get; set; }
     public Guid SystemAttributeId { get; set; }
     public SystemAttribute? SystemAttribute { get; set; }
-    public string? Value { get; set; } 
+    public string? Value { get; set; }
+    public string? AttributeConfig { get; set; }
 }
