@@ -63,6 +63,7 @@ namespace Evaluation.Services.Models.Admin
                 obj.ReportTextEn = message.ReportTextEn;
                 obj.ReportDescAr = message.ReportDescAr;
                 obj.ReportDescEn = message.ReportDescEn;
+                obj.DisplayRange = message.DisplayRange;
                 obj.IsActive = message.IsActive;
 
                 uow.GetRepository<FormEvalMatrixValue>().Insert(obj);

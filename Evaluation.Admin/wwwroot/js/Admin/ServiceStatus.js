@@ -844,6 +844,7 @@ function SetPopupCount() {
 var LoadAllActionStatusConfiguration = (statusIdId) => {
     maintable.setData([]);
     const serviceId = $("#ServiceId").val();
+    const systemModuleId = $("#SystemModuleId").val();
 
     const options = {
         success: function (data) {
@@ -862,7 +863,7 @@ var LoadAllActionStatusConfiguration = (statusIdId) => {
             }
         }
     };
-    jqClientAdvanced(options).Get("ActionStatusConfiguration/GetActionStatusConfigurationByStatus".concat('?serviceId=', serviceId).concat('&statusIdId=', statusIdId));
+    jqClientAdvanced(options).Get("ActionStatusConfiguration/GetActionStatusConfigurationByStatus".concat('?serviceId=', serviceId).concat('&statusIdId=', statusIdId).concat('&systemModuleId=', systemModuleId));
 }
 $("#btnActionStatusConfigAdd").click(function () {
 

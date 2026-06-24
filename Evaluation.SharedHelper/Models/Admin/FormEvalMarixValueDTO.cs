@@ -21,5 +21,6 @@ namespace Evaluation.SharedHelper.Models.Admin
         public string? ReportTextEn { get; set; }
         public string? ReportDescAr { get; set; }
         public string? ReportDescEn { get; set; }
+        public string DisplayRange { get; set; } = null!;
     }
 }
