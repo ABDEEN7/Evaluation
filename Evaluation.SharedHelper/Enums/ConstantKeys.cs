@@ -1289,6 +1289,12 @@ public static class ConstantKeys
         public const string lblCloseModal = "lblCloseModal";
         public const string lblAddPlan = "lblAddPlan";
         public const string lblPlanRequests = "lblPlanRequests";
+        public const string lblServiceName = "lblServiceName";
+        public const string lblSchoolCount = "lblSchoolCount";
+        public const string lblPeriod = "lblPeriod";
+        public const string lblCreatedDate = "lblCreatedDate";
+        public const string lblCreatedTime = "lblCreatedTime";
+
     }
     public static class EvaluationOperations
     {
