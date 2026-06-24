@@ -365,6 +365,7 @@ namespace Evaluation.Services.Models.Admin
             obj.SMSTemplateId = message.SMSTemplateId.HasValue ? message.SMSTemplateId : null;
             obj.IsNotificationSend = message.IsNotificationSend;
             obj.NotificationTemplateId = message.NotificationTemplateId.HasValue ? message.NotificationTemplateId : null;
+            obj.EmailMinsFromAction = message.EmailMinsFromAction;
             obj.IsActive = message.IsActive;
             uow.GetRepository<ActionStatusConfigNotification>().Insert(obj);
             await uow.CommitAsync();
