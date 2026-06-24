@@ -7,6 +7,5 @@ public class FormEvalMarixValueDto
     public decimal MaxValue { get; set; }
     public decimal MinValue { get; set; }
     public decimal ActualMatrixValue { get; set; }
-
-
+    public string DisplayRange { get; set; } = null!;
 }

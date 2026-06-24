@@ -1,11 +1,16 @@
 ﻿using AutoMapper;
+using Evaluation.DAL.Models.ActionEntities;
+using Evaluation.DAL.Models.Planing;
 using Evaluation.DAL.Models.ServiceRequestEntities;
-using Evaluation.Services.Mappers.Admin;
+using Evaluation.DAL.Models.StatusEntities;
+using Evaluation.DAL.Repositories;
+using Evaluation.SharedHelper.Enums;
+using Evaluation.SharedHelper.Models;
 using Evaluation.SharedHelper.Models.Admin;
 
 
 
-namespace Scholarship.Services.Mappers.Admin
+namespace Evaluation.Services.Mappers.Admin
 {
     public class ServiceStatusConfigurationProfile : Profile
     {
@@ -20,8 +25,60 @@ namespace Scholarship.Services.Mappers.Admin
                 .ForMember(dest => dest.NextStatus, opt => opt.MapFrom<ServiceStatusResolver, Guid?>(src => src.NextStatusId));
 
         }
+        public class ServiceActionResolver : IMemberValueResolver<object, object, Guid?, string>
+        {
+            private readonly UnitOfWork _uow;
+            private readonly RequestInfo _requestInfo;
 
+            public ServiceActionResolver(UnitOfWork uow, RequestInfo requestInfo)
+            {
+                _uow = uow;
+                _requestInfo = requestInfo;
+            }
+
+            public string Resolve(object source, object destination, Guid? sourceMember, string destMember, ResolutionContext context)
+            {
+                if (!sourceMember.HasValue) return "";
+                var status = _uow.GetRepository<ServiceAction>()
+                             .GetAllNonDeleted()
+                             .FirstOrDefault(x => x.Id == sourceMember);
+
+                return _requestInfo.Lang == "ar" ? status?.NameAr ?? string.Empty : status?.NameEn ?? string.Empty;
+            }
+        }
+        public class ServiceStatusResolver : IMemberValueResolver<object, object, Guid?, string>
+        {
+            private readonly UnitOfWork _uow;
+            private readonly RequestInfo _requestInfo;
+
+            public ServiceStatusResolver(UnitOfWork uow, RequestInfo requestInfo)
+            {
+                _uow = uow;
+                _requestInfo = requestInfo;
+            }
+
+            public string Resolve(object source, object destination, Guid? sourceMember, string destMember, ResolutionContext context)
+            {
+                if (!sourceMember.HasValue) return "";
+                var backendName = context.Items["SystemModuleBackendName"]?.ToString();
+                if (backendName == ConstantKeys.ModuleType.EvaluationParty)
+                {
+
+                    var status = _uow.GetRepository<ServiceStatus>()
+                                 .GetAllNonDeleted()
+                                 .FirstOrDefault(x => x.Id == sourceMember);
+
+                    return _requestInfo.Lang == "ar" ? status?.NameAr ?? string.Empty : status?.NameEn ?? string.Empty;
+                }
+                else
+                {
+                    var status = _uow.GetRepository<PlanStatus>()
+                          .GetAllNonDeleted()
+                          .FirstOrDefault(x => x.Id == sourceMember);
+
+                    return _requestInfo.Lang == "ar" ? status?.NameAr ?? string.Empty : status?.NameEN ?? string.Empty;
+                }
+            }
+        }
     }
-   
-    
 }

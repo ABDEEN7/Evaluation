@@ -8,7 +8,8 @@ using Evaluation.SharedHelper.Dtos.Form;
 namespace Evaluation.DAL.Helper;
 public static class ScopeTreeBuilder
 {
-    public static List<ScopeTreeDto> BuildTree(IMapper mapper,
+    public static List<ScopeTreeDto> BuildTree(
+        string langCode,
         List<ScopeAcademicYear> academicYearScopes,
         List<FormItem> formItems,
         List<FormItemValue>? formItemsValues = null)
@@ -63,6 +64,7 @@ public static class ScopeTreeBuilder
         // 7. Build tree
         return rootScopes
             .Select(root => BuildNode(
+                langCode,
                 root.Id,
                 scopeLookup,
                 childrenLookup,
@@ -73,6 +75,7 @@ public static class ScopeTreeBuilder
     }
 
     private static ScopeTreeDto BuildNode(
+        string langCode,
         Guid scopeId,
         Dictionary<Guid, Scope> scopeLookup,
         Dictionary<Guid, List<Scope>> childrenLookup,
@@ -86,9 +89,9 @@ public static class ScopeTreeBuilder
         return new ScopeTreeDto
         {
             Id = scope.Id,
-            Name = scope.NameEn,//TODO: Need to translate
+            Name = langCode.ToLower() == "ar"? scope.NameAr : scope.NameEn,//TODO: Need to translate
             ScopeTypeId = scopeType.Id,
-            ScopeTypeName = scopeType.NameEn,//TODO: Need to translate
+            ScopeTypeName = langCode.ToLower() == "ar" ? scopeType.NameAr : scopeType.NameEn,//TODO: Need to translate
             OrderNo = scope.OrderNo,
             ColorCode = scope.ColorCode,
 
@@ -106,7 +109,7 @@ public static class ScopeTreeBuilder
                         return new FormItemDto
                         {
                             Id = x.Id,
-                            Name = x.NameEn,//TODO: Need to translate
+                            Name = langCode.ToLower() == "ar" ? x.NameAr : x.NameEn,//TODO: Need to translate
                             OrderNo = x.OrderNo,
                             HasNote = x.HasNote,
                             NoteRequired = x.NoteRequired,
@@ -128,7 +131,7 @@ public static class ScopeTreeBuilder
                                     return new RelatedItemDto
                                     {
                                         Id = r.RelatedItemId,
-                                        Name = r.RelatedItem?.NameEn,//TODO: Need to translate
+                                        Name = langCode.ToLower() == "ar" ? r.RelatedItem?.NameAr : r.RelatedItem?.NameEn,//TODO: Need to translate
                                         Note = relatedValue?.Note,
                                         Value = relatedValue?.ActualValue?.ToString()
                                     };
@@ -141,7 +144,7 @@ public static class ScopeTreeBuilder
                                 .Select(c => new SubFormItemDto
                                 {
                                     Id = c.Id,
-                                    Name = c.NameEn,//TODO: Need to translate
+                                    Name = langCode.ToLower() == "ar" ? c.NameAr : c.NameEn,//TODO: Need to translate
                                     hasNote = c.HasNote,
 
                                     SubItemLists = c.DropDownType != null
@@ -192,6 +195,7 @@ public static class ScopeTreeBuilder
                 ? children
                     .OrderBy(x => x.OrderNo)
                     .Select(x => BuildNode(
+                        langCode,
                         x.Id,
                         scopeLookup,
                         childrenLookup,

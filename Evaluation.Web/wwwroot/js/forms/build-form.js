@@ -24,6 +24,7 @@ const SUBMIT_FORM_API = {
 
 
 let depRoutePath = sharedUtility().extractDepartmentName();
+let selectPleaceHolder = currentLang == 'ar' ? 'يرجى الاختيار' : 'Please Select';
 
 
 const ItemPropertyType = Object.freeze({
@@ -157,13 +158,13 @@ function renderSelectAndNote(fieldId, itemId, hasNote, readOnly, matrixValues, c
     const isSelected = (id) => selectedValueId && String(id) === String(selectedValueId);
 
     const optionsHtml = useCustomOptions
-        ? customOptions.map(o => `<option value="${o.id}" ${isSelected(o.id) ? 'selected' : ''}>${escapeAttr(o.nameAr || o.nameEn)}</option>`).join('')
+        ? customOptions.map(o => `<option value="${o.id}" ${isSelected(o.id) ? 'selected' : ''}>${escapeAttr(currentLang == 'ar' ? o.nameAr : o.nameEn)}</option>`).join('')
         : matrixValues.map(o => `<option value="${o.id}" data-actual-value="${o.actualMatrixValue}" ${isSelected(o.id) ? 'selected' : ''}>${o.actualMatrixValue}</option>`).join('');
 
     return `
         <div class="row-select-wrap">
             <select class="row-select" ${readOnly ? 'disabled' : ''}>
-                <option disabled ${selectedValueId ? '' : 'selected'}>Please Select</option>
+                <option disabled ${selectedValueId ? '' : 'selected'}>${selectPleaceHolder}</option>
                 ${optionsHtml}
             </select>
             <span class="validation-message" id="validation-${fieldId}-${itemId}-${ItemPropertyType.SELECT}"></span>
@@ -210,7 +211,7 @@ function renderMultiSelectWrap(fieldId, itemId, readOnly, matrixValues, formItem
     return `
         <div class="row-select-wrap">
             <select class="row-select" data-config-weight-percentage="${weight}" ${readOnly ? 'disabled' : ''}>
-                <option disabled ${selectedValueId ? '' : 'selected'}>Please Select</option>
+                <option disabled ${selectedValueId ? '' : 'selected'}>${selectPleaceHolder}</option>
                 ${optionsHtml}
             </select>
             <span class="validation-message" id="validation-${fieldId}-${itemId}-${ItemPropertyType.SELECT}_${index}"></span>
@@ -273,7 +274,7 @@ function renderSelectsOnly(fieldId, itemId, readOnly, matrixValues, hasMuliEvalu
         return `
             <div class="row-select-wrap">
                 <select class="row-select" ${readOnly ? 'disabled' : ''}>
-                    <option disabled ${selectedValueIdOrIds ? '' : 'selected'}>Please Select</option>
+                    <option disabled ${selectedValueIdOrIds ? '' : 'selected'}>${selectPleaceHolder}</option>
                     ${optionsHtml}
                 </select>
                 <span class="validation-message" id="validation-${fieldId}-${itemId}-${ItemPropertyType.SELECT}"></span>
@@ -434,8 +435,8 @@ const createRowRelatedItem = ({ item, order, hasAnyNote }) => `
     <tr class="main-row align-middle">
         <td>${order}</td>
         <td class="text-start">${escapeAttr(item.name)}</td>
-        <td>${escapeAttr(item.value)}</td>
-        ${hasAnyNote ? `<td>${escapeAttr(item.note)}</td>` : ''}
+        <td>${escapeAttr(item.value ?? '')}</td>
+        ${hasAnyNote ? `<td>${escapeAttr(item.note ?? '')}</td>` : ''}
     </tr>
 `;
 
@@ -528,6 +529,13 @@ function openRelatedItemModal(fieldId, itemId) {
 //   5  Eval renamed items, blank selects     — evaluateRenamedItems, savedResults with name only
 //   6  Eval renamed items, prefilled selects — evaluateRenamedItems, savedResults with name+valueId
 async function initForm(formId, fieldId, readOnly, savedResults, evaluationRequestId, serviceRequestId, allowRename = false, allowDelete = false, allowAdd = false, evaluateRenamedItems = false) {
+
+    if (evaluationRequestId == null)
+    {
+        console.log("initialization failed !");
+        return;
+    }
+
     const state = getFormState(fieldId);
     state.formId = formId;
     state.evaluationRequestId = evaluationRequestId;
@@ -656,7 +664,7 @@ async function initForm(formId, fieldId, readOnly, savedResults, evaluationReque
                             .map((row, idx) => {
                                 const saved = savedMap[row.id];
                                 // Prefill name from savedResults
-                                const rowWithSavedName = { ...row, text: saved?.name ?? row.text };
+                                const rowWithSavedName = { ...row, text: saved?.name ?? '' };
                                 return renderRenameRowHtml(fieldId, aId, rowWithSavedName, idx + 1, state.allowDelete, state);
                             }).join('');
 
@@ -825,17 +833,18 @@ async function initForm(formId, fieldId, readOnly, savedResults, evaluationReque
 // expand/collapse, rename-row selects once they exist). Split out from
 // initForm because listeners can't be serialized into the HTML string -
 // call this right after assigning the returned markup into
-// `#${fieldId}-form-root`.
+// `#${fieldId}`.
 //
 // Typical usage:
 //   const html = await initForm(formId, fieldId, ...);
-//   document.getElementById(`${fieldId}-form-root`).innerHTML = html;
+//   document.getElementById(`${fieldId}`).innerHTML = html;
 //   bindFormEvents(fieldId);
 function bindFormEvents(fieldId) {
     const state = getFormState(fieldId);
-    const root = document.getElementById(`${fieldId}-form-root`);
+    const root = document.getElementById(`${fieldId}`);
+
     if (!root) {
-        console.error(`bindFormEvents: no element with id "${fieldId}-form-root" found on the page.`);
+        console.error(`bindFormEvents: no element with id "${fieldId}" found on the page.`);
         return;
     }
 
@@ -1097,10 +1106,10 @@ async function fillRenameControls(fieldId, controlValues) {
 // belonging to a different form rendered on the same page.
 function getFormResult(formId, fieldId) {
     const state = getFormState(fieldId);
-    const root = document.getElementById(`${fieldId}-form-root`);
+    const root = document.getElementById(`${fieldId}`);
 
     if (!root) {
-        console.error(`getFormResult: no element with id "${fieldId}-form-root" found.`);
+        console.error(`getFormResult: no element with id "${fieldId}" found.`);
         return { id: formId, items: [], formSettings: state.evalForm ?? null };
     }
 
@@ -1332,7 +1341,7 @@ function showValidation(fieldId, itemId, message, itemPropertyType) {
 }
 
 function clearValidation(fieldId) {
-    const root = document.getElementById(`${fieldId}-form-root`);
+    const root = document.getElementById(`${fieldId}`);
     if (!root) return;
 
     root.querySelectorAll('.validation-message').forEach(el => {
@@ -1390,7 +1399,7 @@ function buildHorizontalTable(data) {
 // Same markup/structure as the DOM version above.
 function buildHorizontalTableHtml(data) {
     const nameCellsHtml = data.map(item => `<th>${escapeAttr(item.name)}</th>`).join('');
-    const rangeCellsHtml = data.map(item => `<td>(${escapeAttr(item.minValue)} - ${escapeAttr(item.maxValue)})</td>`).join('');
+    const rangeCellsHtml = data.map(item => `<td>${item.displayRange}</td>`).join('');
 
     return `
         <table border="1" style="border-collapse: collapse;" class="table table-bordered table-hover align-middle w-100 dataTable no-footer">

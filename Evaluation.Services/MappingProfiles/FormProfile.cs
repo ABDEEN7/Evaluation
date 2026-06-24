@@ -86,10 +86,11 @@ public class FormProfile : Profile
 
 		CreateMap<FormEvalMatrixValue, FormEvalMarixValueDto>()
 		 .ForMember(d => d.Id, opt => opt.MapFrom(src => src.Id))
-		 .ForMember(d => d.Name, opt => opt.MapFrom(src => src.NameEn))
+		 .ForMember(d => d.Name, opt => opt.MapFrom<LocalizedMarixValueNameResolver>())
 		 .ForMember(d => d.MaxValue, opt => opt.MapFrom(src => src.MaxValue))
 		 .ForMember(d => d.MinValue, opt => opt.MapFrom(src => src.MinValue))
 		 .ForMember(d => d.ActualMatrixValue, opt => opt.MapFrom(src => src.ActualMatrixValue))
+		 .ForMember(d => d.DisplayRange, opt => opt.MapFrom(src => src.DisplayRange))
 		 .ReverseMap();
 
 	}
@@ -109,4 +110,12 @@ public class FormProfile : Profile
 			return lang == "ar" ? src.NameAr : src.NameEn;
 		}
 	}
+    public class LocalizedMarixValueNameResolver : IValueResolver<FormEvalMatrixValue, FormEvalMarixValueDto, string>
+    {
+        public string Resolve(FormEvalMatrixValue src, FormEvalMarixValueDto dest, string destMember, ResolutionContext context)
+        {
+            var lang = context.Items["lang"]?.ToString();
+            return lang == "ar" ? src.NameAr : src.NameEn;
+        }
+    }
 }
