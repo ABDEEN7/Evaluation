@@ -6587,3 +6587,177 @@ html[dir="rtl"] .corner-ribbon {
     font-weight: 700 !important;
     text-decoration: none !important;
 }
+
+
+
+
+/*STAT */
+.stats-ui-card {
+    background: #fff;
+    border: 1px solid #e8e8e8;
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.stats-section {
+    padding: 2rem;
+}
+
+    .stats-section:not(:last-child) {
+        border-bottom: 1px solid #eee;
+        background-color: #F6F6F6;
+    }
+
+.stats-header,
+.stats-history-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.stats-title,
+.stats-history-title {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    color: #3d3d3d;
+    font-weight: 700;
+    font-size: 15px;
+    justify-content: flex-start;
+}
+
+.stats-date {
+    display: flex;
+    align-items: center;
+    gap: .4rem;
+    margin-top: 1.25rem;
+    color: #888;
+    font-size: 14px;
+    justify-content: flex-start;
+}
+.stats-pill {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    padding: .5rem 1rem;
+    border-radius: 999px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.stats-pill-success {
+    background: #E8F8F1;
+    color: #1E9E68;
+}
+
+.stats-pill-info {
+    background: #EAF4FF;
+    color: #3789E6;
+}
+
+.stats-pill-danger {
+    background: #FCECEC;
+    color: #D9534F;
+}
+
+.stats-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+.stats-improve-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    margin-top: 1.25rem;
+    padding: .4rem 1rem;
+    background: #E8F8F1;
+    color: #1E9E68;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.stats-progress-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.stats-percent {
+    width: 50px;
+    text-align: center;
+    font-weight: 700;
+    color: #444;
+}
+
+.stats-progress {
+    flex: 1;
+    height: 8px;
+    background: #ECECEC;
+    border-radius: 50px;
+    overflow: hidden;
+}
+
+.stats-progress-fill {
+    height: 100%;
+    border-radius: 50px;
+}
+
+.stats-success-fill {
+    background: #1E9E68;
+}
+
+.stats-info-fill {
+    background: #4194B3;
+}
+
+.stats-danger-fill {
+    background: #D9534F;
+}
+
+.stats-date {
+    display: flex;
+    align-items: center;
+    gap: .4rem;
+    margin-top: 1.25rem;
+    color: #888;
+    font-size: 14px;
+    justify-content: flex-start;
+}
+
+.stats-history-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.stats-history-card {
+    background: #F6F6F6;
+    border-radius: 14px;
+    padding: 1.5rem;
+    border: 1px solid #eee;
+}
+
+@media (max-width: 768px) {
+    .stats-history-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .stats-section {
+        padding: 1.5rem;
+    }
+}
+
+
+
+.stats-status-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 1.25rem;
+}
