@@ -9,6 +9,8 @@ namespace Evaluation.SharedHelper.Models.Api.FormAnalysisDtos
 	public class OutputAnalysisResponseDto
 	{
 		public List<OutputAnalysisTypeDto> AnalysisTypes { get; set; } = new();
+		public string? SchoolNameAr { get; set; }
+		public string? SchoolNameEn { get; set; }
 	}
 
 	public class OutputAnalysisTypeDto

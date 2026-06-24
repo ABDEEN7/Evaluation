@@ -51,11 +51,14 @@
 
     function normalizeLevelName(name) {
         if (!name) return null;
-        const v = name.toString().toLowerCase();
+        const s = name.toString().trim();
+        // Ignore pure-numeric backend codes like "1", "2", "3"
+        if (/^\d+$/.test(s)) return null;
+        const v = s.toLowerCase();
         if (v.includes("primary")) return "primary";
         if (v.includes("middle") || v.includes("preparatory")) return "middle";
         if (v.includes("secondary")) return "secondary";
-        return name;
+        return null;
     }
 
     function lvlName(level) {
@@ -274,6 +277,7 @@
 
 /* Report text block inside table */
 .oa-report-text{font-size:11px;color:#5A5A72;margin-top:3px;padding:4px 8px;background:#F8F8FA;border-radius:4px;border-right:2px solid #D0D0DC;line-height:1.5}
+.oa-report-badge{display:inline-block;font-size:11px;font-weight:700;padding:3px 9px;border-radius:6px;background:#F0F2F5;color:#5A5A72;white-space:nowrap}
 
 /* diff colours */
 .pos{color:#0D7A4E;font-weight:800}.neg{color:#9A1E1E;font-weight:800}.neu{color:#9A9AB0;font-weight:800}
@@ -288,6 +292,19 @@
 
 /* Empty */
 .oa-empty{background:#FEF3E2;color:#8A5000;border:1px solid rgba(138,80,0,.2);border-radius:8px;padding:14px;font-size:13px}
+
+/* Student summary table */
+.oa-student-summary{background:#fff;border:1px solid #E4E4EA;border-radius:10px;padding:16px 20px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,.04);display:inline-flex;flex-direction:column;gap:10px;min-width:320px;max-width:480px}
+.oa-student-summary-title{font-size:13px;font-weight:700;color:#111118;margin-bottom:2px}
+.oa-student-table{width:100%;border-collapse:collapse;font-size:13px}
+.oa-student-table th{background:#F8F8FA;color:#5A5A72;font-weight:700;font-size:11px;padding:8px 14px;text-align:center;border-bottom:1px solid #E4E4EA;text-transform:uppercase;letter-spacing:.04em}
+.oa-student-table th.tl{text-align:right}
+.oa-student-table td{padding:9px 14px;text-align:center;border-bottom:1px solid #F0F2F5;color:#111118}
+.oa-student-table td.tl{text-align:right;color:#5A5A72}
+.oa-student-table tbody tr:last-child td{border-bottom:none}
+.oa-student-table tfoot td{background:#FEF9E4;font-weight:800;font-size:13px;border-top:2px solid #E4C92A;color:#6A5000;padding:10px 14px;text-align:center}
+.oa-student-table tfoot td.tl{text-align:right}
+
 
 /* ═══════════════════
    CHARTS SECTION
@@ -400,8 +417,14 @@
             </div>
             <div class="oa-school">
                 <div class="oa-school-label">${getText("lblSchoolName", "اسم المدرسة")}</div>
-                <div class="oa-school-name">-</div>
-            </div>
+               <div class="oa-school-name">${esc(
+                   apiResponse.schoolNameAr ||
+                   apiResponse.schoolNameEn ||
+                   apiResponse.SchoolNameAr ||   // case variation
+                   apiResponse.SchoolNameEn ||
+                   $(".school-name, [data-school-name]").first().text().trim() ||
+                   "—"
+               )}</div> </div>
         </div>
 
         <div class="oa-filters">
@@ -459,18 +482,27 @@
         const color = getTypeColor(type.backendName);
 
         // Normalise rows
-        const allRows = (type.outputAnalysisData || []).map(r => ({
-            ...r,
-            level: getRowLevel(r),
-            levelName: getRowLevelName(r),
-            grade: getRowGradeName(r),
-            subject: getRowSubjectName(r),
-            prev: Number(r.previousYearValue || 0),
-            last: Number(r.lastYearValue || 0),
-            diff: Number(r.difference || 0),
-            matrixName: getMatrixName(r),
-            reportText: getMatrixReportText(r)   // from matrix only
-        }));
+        // Deduplicate rows: same grade+subject+track+termCode may appear twice
+        // (once with full decimals, once truncated) — keep only the first occurrence
+        const seenKeys = new Set();
+        const allRows = (type.outputAnalysisData || []).reduce((acc, r) => {
+            const dedupeKey = `${r.grade}|${r.subjectCode || ""}|${r.track || ""}|${r.termCode || ""}`;
+            if (seenKeys.has(dedupeKey)) return acc;
+            seenKeys.add(dedupeKey);
+            acc.push({
+                ...r,
+                level: getRowLevel(r),
+                levelName: getRowLevelName(r),
+                grade: getRowGradeName(r),
+                subject: getRowSubjectName(r),
+                prev: Number(r.previousYearValue || 0),
+                last: Number(r.lastYearValue || 0),
+                diff: Number(r.difference || 0),
+                matrixName: getMatrixName(r),
+                reportText: getMatrixReportText(r)   // from matrix only
+            });
+            return acc;
+        }, []);
 
         const rows = getFilteredRows(allRows);
 
@@ -488,6 +520,10 @@
         // ── Level summary ────────────────────────────────────────────────────
         html += buildLevelSummary(rows);
 
+        // ── Student count summary table ──────────────────────────────────────
+        // Pass raw data (before dedup) — student counts are per-grade not per-subject
+        html += buildStudentSummary(type.outputAnalysisData || []);
+
         // ── Accordion grouped by Track → Grade ───────────────────────────────
         html += buildAccordion(rows, color, panelId);
 
@@ -498,8 +534,9 @@
 
         // Draw charts after DOM insertion
         drawBarChart(rows, panelId, color);
-        drawDonutChart(rows, panelId, color);
-        drawDiffChart(rows, panelId, color);
+        drawDonutChart(rows, panelId);
+        drawDiffChart(rows, panelId);
+        drawStudentChart(rows, panelId, color);
         drawHeatmap(rows, panelId);
 
         // Accordion toggle
@@ -514,27 +551,162 @@
         $(`#${panelId} .oa-acc-item:first-child .oa-acc-trigger`).trigger("click");
     }
 
+    // ─── Student count summary (shows total students per grade, both years) ────
+    // Called from renderAnalysisType — receives the raw outputAnalysisData array
+    // (before deduplication) so we can sum students correctly per grade.
+    function buildStudentSummary(rawRows) {
+        if (!rawRows || !rawRows.length) return "";
+
+        const byGrade = new Map();
+        rawRows.forEach(r => {
+            const gradeNum = Number(r.grade) || 0;
+            const gradeName = r.gradeNameAr || r.gradeNameEn || String(r.grade);
+            if (!byGrade.has(gradeNum))
+                byGrade.set(gradeNum, { name: gradeName, prev: null, last: null });
+            const g = byGrade.get(gradeNum);
+
+            if (g.prev === null && r.previousYearStudentCount != null)
+                g.prev = Number(r.previousYearStudentCount);
+            if (g.last === null && r.lastYearStudentCount != null)
+                g.last = Number(r.lastYearStudentCount);
+        });
+
+        const sorted = Array.from(byGrade.entries()).sort((a, b) => a[0] - b[0]);
+
+        const anyCount = sorted.some(([, g]) => g.prev !== null || g.last !== null);
+        if (!sorted.length || !anyCount) return "";
+        if (!sorted.length || !anyCount) return "";
+
+        const totalPrev = sorted.reduce((s, [, g]) => s + (g.prev || 0), 0);
+        const totalLast = sorted.reduce((s, [, g]) => s + (g.last || 0), 0);
+        const maxCount = Math.max(...sorted.map(([, g]) => Math.max(g.prev || 0, g.last || 0)), 1);
+
+        const diff = totalLast - totalPrev;
+        const diffCls = diff > 0 ? "pos" : diff < 0 ? "neg" : "neu";
+        const diffArrow = diff > 0 ? "▲" : diff < 0 ? "▼" : "–";
+
+        const gradeCards = sorted.map(([, g]) => {
+            const prevW = ((g.prev || 0) / maxCount * 100).toFixed(1);
+            const lastW = ((g.last || 0) / maxCount * 100).toFixed(1);
+            const d = (g.last || 0) - (g.prev || 0);
+            const dCls = d > 0 ? "pos" : d < 0 ? "neg" : "neu";
+            const dArr = d > 0 ? "▲" : d < 0 ? "▼" : "–";
+            return `
+        <div class="ss-grade-row">
+            <div class="ss-grade-name">${esc(g.name)}</div>
+            <div class="ss-bars">
+                <div class="ss-bar-wrap">
+                    <span class="ss-bar-label">${esc(DATA.years[0])}</span>
+                    <div class="ss-bar-track">
+                        <div class="ss-bar prev" style="width:${prevW}%"></div>
+                    </div>
+                    <span class="ss-bar-val">${g.prev ?? "—"}</span>
+                </div>
+                <div class="ss-bar-wrap">
+                    <span class="ss-bar-label">${esc(DATA.years[1])}</span>
+                    <div class="ss-bar-track">
+                        <div class="ss-bar last" style="width:${lastW}%"></div>
+                    </div>
+                    <span class="ss-bar-val">${g.last ?? "—"}</span>
+                </div>
+            </div>
+            <div class="ss-diff ${dCls}">${dArr} ${Math.abs(d)}</div>
+        </div>`;
+        }).join("");
+
+        return `
+<div class="oa-student-summary">
+    <div class="oa-student-summary-title">
+        إجمالي عدد الطلاب
+    </div>
+
+    <table class="oa-student-table">
+        <thead>
+            <tr>
+                <th class="tl">الصف</th>
+                <th>${esc(DATA.years[0])}</th>
+                <th>${esc(DATA.years[1])}</th>
+                <th>الفرق</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            ${sorted.map(([, g]) => {
+            const d = (g.last || 0) - (g.prev || 0);
+            const dCls = d > 0 ? "pos" : d < 0 ? "neg" : "neu";
+            const dArr = d > 0 ? "▲" : d < 0 ? "▼" : "–";
+
+            return `
+                <tr>
+                    <td class="tl">${esc(g.name)}</td>
+                    <td>${g.prev ?? "—"}</td>
+                    <td>${g.last ?? "—"}</td>
+                    <td class="${dCls}">
+                        ${dArr} ${Math.abs(d)}
+                    </td>
+                </tr>`;
+        }).join("")}
+        </tbody>
+
+        <tfoot>
+            <tr>
+                <td class="tl">الإجمالي</td>
+                <td>${totalPrev.toLocaleString("en-US")}</td>
+                <td>${totalLast.toLocaleString("en-US")}</td>
+                <td class="${diffCls}">
+                    ${diffArrow} ${Math.abs(diff).toLocaleString("en-US")}
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+</div>`;
+    }
+
     // ─── Level summary ────────────────────────────────────────────────────────
     function buildLevelSummary(rows) {
-        const levels = [
+        const levelDefs = [
             { key: "primary", label: "الابتدائية", cls: "primary" },
             { key: "middle", label: "الإعدادية", cls: "middle" },
             { key: "secondary", label: "الثانوية", cls: "secondary" }
         ];
-        return `<div class="oa-level-summary">` +
-            levels.map(lv => {
-                const lr = rows.filter(r => r.level === lv.key);
-                if (!lr.length) return `<div class="oa-level-card ${lv.cls}"><div class="lc-label">${lv.label}</div><div class="lc-val">—</div></div>`;
-                const avg = lr.reduce((a, r) => a + r.last, 0) / lr.length;
-                const diff = avg - lr.reduce((a, r) => a + r.prev, 0) / lr.length;
-                return `
-                <div class="oa-level-card ${lv.cls}">
-                    <div class="lc-label">${lv.label}</div>
-                    <div class="lc-val">${f2(avg)}%</div>
-                    <div class="lc-sub">${diff >= 0 ? "▲" : "▼"} ${Math.abs(diff).toFixed(2)}% مقارنةً بالعام السابق</div>
-                </div>`;
-            }).join("") +
-            `</div>`;
+
+        // Only keep levels that actually have data rows
+        const presentLevels = levelDefs.filter(lv => rows.some(r => r.level === lv.key));
+        if (!presentLevels.length) return "";
+
+        const levelCards = presentLevels.map(lv => {
+            const lr = rows.filter(r => r.level === lv.key);
+            const avg = lr.reduce((a, r) => a + r.last, 0) / lr.length;
+            const diff = avg - lr.reduce((a, r) => a + r.prev, 0) / lr.length;
+            const arrow = diff >= 0 ? "▲" : "▼";
+            const diffCls = diff < 0 ? "neg" : "";
+            return `
+            <div class="oa-level-card ${lv.cls}">
+                <div class="lc-label">${lv.label}</div>
+                <div class="lc-val">${f2(avg)}%</div>
+                <div class="lc-sub ${diffCls}">${arrow} ${Math.abs(diff).toFixed(2)}% مقارنةً بالعام السابق</div>
+            </div>`;
+        }).join("");
+
+        // Overall average — only when more than one level is present
+        let overallCard = "";
+        if (presentLevels.length > 1) {
+            const totalAvg = rows.reduce((a, r) => a + r.last, 0) / rows.length;
+            const totalDiff = totalAvg - rows.reduce((a, r) => a + r.prev, 0) / rows.length;
+            const arrow = totalDiff >= 0 ? "▲" : "▼";
+            const diffCls = totalDiff < 0 ? "neg" : "";
+            overallCard = `
+            <div class="oa-level-card" style="background:#F0F2F5;border-color:#D0D0DC;color:#111118">
+                <div class="lc-label" style="opacity:.6">المتوسط العام</div>
+                <div class="lc-val">${f2(totalAvg)}%</div>
+                <div class="lc-sub ${diffCls}" style="opacity:.8">${arrow} ${Math.abs(totalDiff).toFixed(2)}% مقارنةً بالعام السابق</div>
+            </div>`;
+        }
+
+        const colCount = presentLevels.length + (overallCard ? 1 : 0);
+        return `<div class="oa-level-summary" style="grid-template-columns:repeat(${colCount},1fr)">
+            ${levelCards}${overallCard}
+        </div>`;
     }
 
     // ─── Accordion: Track → Grade ─────────────────────────────────────────────
@@ -615,6 +787,10 @@
     function buildGradeTable(rows, color) {
         const avg = rows.reduce((a, r) => a + r.last, 0) / rows.length;
         const prevAvg = rows.reduce((a, r) => a + r.prev, 0) / rows.length;
+        const avgDiff = avg - prevAvg;
+
+        // Check if any row has student counts
+        const hasStudentCounts = rows.some(r => r.lastYearStudentCount || r.previousYearStudentCount);
 
         return `
 <div class="oa-table-wrap">
@@ -625,34 +801,40 @@
                 <th>${esc(DATA.years[0])}</th>
                 <th>${esc(DATA.years[1])}</th>
                 <th>الفرق</th>
-                <th>التقييم</th>
-                <th>عدد الطلاب</th>
+                <th>الحكم</th>
+                <th>التقرير</th>
+                ${hasStudentCounts ? `<th>عدد الطلاب<br><small style="font-weight:400;color:#9A9AB0">${esc(DATA.years[0])} / ${esc(DATA.years[1])}</small></th>` : ""}
             </tr>
         </thead>
         <tbody>
             ${rows.map(r => {
+            const matrixLabel = r.matrixName || judgeLabel(r.last);
             const reportText = r.reportText;
+            const diffVal = Number(r.diff || 0);
+            const prevCount = r.previousYearStudentCount;
+            const lastCount = r.lastYearStudentCount;
             return `
             <tr>
-                <td class="tl">
-                    <strong>${esc(r.subject)}</strong>
-                    ${reportText
-                    ? `<div class="oa-report-text">${esc(reportText)}</div>`
-                    : ""}
-                </td>
+                <td class="tl"><strong>${esc(r.subject)}</strong></td>
                 <td>${f2(r.prev)}</td>
                 <td><strong>${f2(r.last)}</strong></td>
                 <td>
-                    <span class="oa-mini-bar ${diffClass(r.diff)}">
-                        ${diffArrow(r.diff)} ${r.diff > 0 ? "+" : ""}${f2(r.diff)}
+                    <span class="oa-mini-bar ${diffClass(diffVal)}">
+                        ${diffArrow(diffVal)} ${diffVal > 0 ? "+" : ""}${f2(diffVal)}
                     </span>
                 </td>
                 <td>
-                    <span class="oa-badge ${judgeClass(r.last)}">
-                        ${esc(r.matrixName || judgeLabel(r.last))}
-                    </span>
+                    <span class="oa-badge ${judgeClass(r.last)}">${esc(matrixLabel)}</span>
                 </td>
-                <td style="color:#5A5A72;font-size:12px">${r.lastYearStudentCount || "—"}</td>
+                <td>
+                    ${reportText
+                    ? `<span class="oa-report-badge">${esc(reportText)}</span>`
+                    : `<span style="color:#C0C0CC">—</span>`}
+                </td>
+                ${hasStudentCounts ? `
+                <td style="font-size:12px;color:#5A5A72;white-space:nowrap">
+                    ${prevCount ? prevCount : "—"} / ${lastCount ? lastCount : "—"}
+                </td>` : ""}
             </tr>`;
         }).join("")}
             <tr class="avg-row">
@@ -660,27 +842,35 @@
                 <td>${f2(prevAvg)}</td>
                 <td><strong>${f2(avg)}%</strong></td>
                 <td>
-                    <span class="oa-mini-bar ${diffClass(avg - prevAvg)}">
-                        ${diffArrow(avg - prevAvg)} ${Math.abs(avg - prevAvg).toFixed(2)}%
+                    <span class="oa-mini-bar ${diffClass(avgDiff)}">
+                        ${diffArrow(avgDiff)} ${Math.abs(avgDiff).toFixed(2)}%
                     </span>
                 </td>
                 <td><span class="oa-badge ${judgeClass(avg)}">${judgeLabel(avg)}</span></td>
                 <td></td>
+                ${hasStudentCounts ? "<td></td>" : ""}
             </tr>
         </tbody>
     </table>
 </div>`;
     }
 
-    // ─── Charts section wrapper (appears BELOW all accordion tables) ──────────
+    // ─── Charts section wrapper ───────────────────────────────────────────────
     function buildChartsSection(rows, panelId, color) {
+        // Decide grouping axis: by track if any row has a track, otherwise by grade
+        const hasTracks = rows.some(r => r.track);
+        const axisLabel = hasTracks ? "المسار" : "الصف";
+
+        // Student count chart only when data exists
+        const hasStudents = rows.some(r => r.lastYearStudentCount || r.previousYearStudentCount);
+
         return `
 <div class="oa-charts-section">
     <div class="oa-charts-section-title">📊 الرسوم البيانية</div>
 
     <div class="oa-charts-grid">
         <div class="oa-chart-box">
-            <div class="oa-chart-title">المقارنة بين العامين — بالصف</div>
+            <div class="oa-chart-title">مقارنة النتائج بين العامين — بالـ${esc(axisLabel)}</div>
             <div class="oa-chart-sub">${esc(DATA.years[0])} مقابل ${esc(DATA.years[1])}</div>
             <div class="oa-chart-wrap tall"><canvas id="${panelId}_bar"></canvas></div>
             <div class="oa-legend" id="${panelId}_bar_legend"></div>
@@ -693,25 +883,41 @@
         </div>
     </div>
 
+    <div class="oa-chart-box" style="margin-bottom:16px">
+        <div class="oa-chart-title">اتجاه الفروق بين العامين — بالـ${esc(axisLabel)}</div>
+        <div class="oa-chart-sub">أخضر = تحسّن &nbsp;|&nbsp; أحمر = تراجع</div>
+        <div class="oa-chart-wrap diff"><canvas id="${panelId}_diff"></canvas></div>
+    </div>
+
+    ${hasStudents ? `
+    <div class="oa-chart-box" style="margin-bottom:16px">
+        <div class="oa-chart-title">عدد الطلاب — بالـ${esc(axisLabel)}</div>
+        <div class="oa-chart-sub">${esc(DATA.years[0])} مقابل ${esc(DATA.years[1])}</div>
+        <div class="oa-chart-wrap tall"><canvas id="${panelId}_students"></canvas></div>
+        <div class="oa-legend" id="${panelId}_students_legend"></div>
+    </div>` : ""}
+
     <div class="oa-heatmap-box">
         <div class="oa-chart-title">خريطة أداء المواد</div>
         <div class="oa-chart-sub">متوسط القيمة الفعلية لكل مادة — مرتبة تنازلياً</div>
         <div class="oa-heatmap" id="${panelId}_heatmap"></div>
     </div>
-
-    <div class="oa-chart-box">
-        <div class="oa-chart-title">اتجاه الفروق بين العامين — بالصف</div>
-        <div class="oa-chart-sub">الفرق بين السنة الأخيرة والسنة السابقة (أخضر = تحسّن ، أحمر = تراجع)</div>
-        <div class="oa-chart-wrap diff"><canvas id="${panelId}_diff"></canvas></div>
-    </div>
 </div>`;
     }
 
-    // ─── Chart: grouped bar (prev vs last by grade) ───────────────────────────
+    // ─── Determine grouping key for charts (track if exists, else grade) ──────
+    function chartGroupKey(rows) {
+        return rows.some(r => r.track)
+            ? r => r.track ? trackLabel(r.track) : r.grade
+            : r => r.grade;
+    }
+
+    // ─── Chart: grouped bar (prev vs last) ────────────────────────────────────
     function drawBarChart(rows, panelId, color) {
-        const byGrade = groupBy(rows, r => r.grade);
+        const keyFn = chartGroupKey(rows);
+        const grouped = groupBy(rows, keyFn);
         const labels = [], prevArr = [], lastArr = [];
-        for (const [g, rs] of byGrade) {
+        for (const [g, rs] of grouped) {
             labels.push(g);
             prevArr.push(+(rs.reduce((a, r) => a + r.prev, 0) / rs.length).toFixed(2));
             lastArr.push(+(rs.reduce((a, r) => a + r.last, 0) / rs.length).toFixed(2));
@@ -721,15 +927,30 @@
             data: {
                 labels,
                 datasets: [
-                    { label: DATA.years[0], data: prevArr, backgroundColor: "rgba(90,90,114,.3)", borderColor: "rgba(90,90,114,.6)", borderWidth: 1, borderRadius: 4 },
-                    { label: DATA.years[1], data: lastArr, backgroundColor: color.primary + "CC", borderColor: color.primary, borderWidth: 1, borderRadius: 4 }
+                    {
+                        label: DATA.years[0], data: prevArr,
+                        backgroundColor: "rgba(90,90,114,.25)", borderColor: "rgba(90,90,114,.55)",
+                        borderWidth: 1.5, borderRadius: 5
+                    },
+                    {
+                        label: DATA.years[1], data: lastArr,
+                        backgroundColor: color.primary + "CC", borderColor: color.primary,
+                        borderWidth: 1.5, borderRadius: 5
+                    }
                 ]
             },
             options: {
                 responsive: true, maintainAspectRatio: false,
-                plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ${ctx.parsed.y.toFixed(2)}%` } } },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ${ctx.parsed.y.toFixed(2)}%` } }
+                },
                 scales: {
-                    y: { beginAtZero: true, max: 100, grid: { color: "rgba(0,0,0,.05)" }, ticks: { callback: v => v + "%", font: { size: 11 } } },
+                    y: {
+                        beginAtZero: false, suggestedMin: 40, max: 100,
+                        grid: { color: "rgba(0,0,0,.05)" },
+                        ticks: { callback: v => v + "%", font: { size: 11 } }
+                    },
                     x: { grid: { display: false }, ticks: { font: { size: 11 } } }
                 }
             }
@@ -742,17 +963,33 @@
 
     // ─── Chart: donut (performance distribution) ──────────────────────────────
     function drawDonutChart(rows, panelId) {
-        const bins = { "ممتاز": 0, "جيد جداً": 0, "جيد": 0, "مقبول": 0, "ضعيف": 0 };
-        rows.forEach(r => { const l = judgeLabel(r.last); bins[l] = (bins[l] || 0) + 1; });
-        const labels = Object.keys(bins).filter(k => bins[k] > 0);
+        const ORDER = ["ممتاز", "جيد جداً", "جيد", "مقبول", "ضعيف"];
+        const BG = ["#0D7A4E", "#1A5FA0", "#8B1538", "#8A5000", "#9A1E1E"];
+        const bins = {};
+        rows.forEach(r => {
+            // Use matrixName if available, else fallback to judgeLabel
+            const lbl = r.matrixName || judgeLabel(r.last);
+            bins[lbl] = (bins[lbl] || 0) + 1;
+        });
+        const labels = Object.keys(bins);
         const data = labels.map(k => bins[k]);
-        const bg = ["#0D7A4E", "#1A5FA0", "#8B1538", "#8A5000", "#9A1E1E"];
+        // Colour by judgeClass mapping
+        const bg = labels.map(l => {
+            if (l === "ممتاز" || l === "مرتفع") return "#0D7A4E";
+            if (l === "جيد جداً") return "#1A5FA0";
+            if (l === "جيد" || l === "ثبات دون المستوى") return "#8B1538";
+            if (l === "مقبول") return "#8A5000";
+            return "#9A1E1E";
+        });
         makeChart(`${panelId}_donut`, {
             type: "doughnut",
             data: { labels, datasets: [{ data, backgroundColor: bg, borderWidth: 2, borderColor: "#fff" }] },
             options: {
                 responsive: true, maintainAspectRatio: false, cutout: "65%",
-                plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => `${ctx.label}: ${ctx.parsed}` } } }
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { callbacks: { label: ctx => `${ctx.label}: ${ctx.parsed} مادة` } }
+                }
             }
         });
         $(`#${panelId}_donut_legend`).html(
@@ -762,25 +999,87 @@
 
     // ─── Chart: diff bars ─────────────────────────────────────────────────────
     function drawDiffChart(rows, panelId) {
-        const byGrade = groupBy(rows, r => r.grade);
+        const keyFn = chartGroupKey(rows);
+        const grouped = groupBy(rows, keyFn);
         const labels = [], diffs = [];
-        for (const [g, rs] of byGrade) {
+        for (const [g, rs] of grouped) {
             labels.push(g);
             diffs.push(+(rs.reduce((a, r) => a + r.diff, 0) / rs.length).toFixed(2));
         }
         const colors = diffs.map(d => d >= 0 ? "#0D7A4E" : "#9A1E1E");
         makeChart(`${panelId}_diff`, {
             type: "bar",
-            data: { labels, datasets: [{ label: "الفرق", data: diffs, backgroundColor: colors.map(c => c + "99"), borderColor: colors, borderWidth: 2, borderRadius: 4 }] },
+            data: {
+                labels, datasets: [{
+                    label: "الفرق", data: diffs,
+                    backgroundColor: colors.map(c => c + "88"),
+                    borderColor: colors, borderWidth: 2, borderRadius: 5
+                }]
+            },
             options: {
                 responsive: true, maintainAspectRatio: false,
-                plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => `الفرق: ${ctx.parsed.y > 0 ? "+" : ""}${ctx.parsed.y.toFixed(2)}%` } } },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { callbacks: { label: ctx => `الفرق: ${ctx.parsed.y > 0 ? "+" : ""}${ctx.parsed.y.toFixed(2)}%` } }
+                },
                 scales: {
-                    y: { grid: { color: ctx => ctx.tick.value === 0 ? "rgba(0,0,0,.25)" : "rgba(0,0,0,.05)" }, ticks: { callback: v => (v > 0 ? "+" : "") + v + "%", font: { size: 11 } } },
+                    y: {
+                        grid: { color: ctx => ctx.tick.value === 0 ? "rgba(0,0,0,.2)" : "rgba(0,0,0,.04)" },
+                        ticks: { callback: v => (v > 0 ? "+" : "") + v + "%", font: { size: 11 } }
+                    },
                     x: { grid: { display: false }, ticks: { font: { size: 11 } } }
                 }
             }
         });
+    }
+
+    // ─── Chart: student counts ────────────────────────────────────────────────
+    function drawStudentChart(rows, panelId, color) {
+        if (!rows.some(r => r.lastYearStudentCount || r.previousYearStudentCount)) return;
+        const keyFn = chartGroupKey(rows);
+        const grouped = groupBy(rows, keyFn);
+        const labels = [], prevCounts = [], lastCounts = [];
+        for (const [g, rs] of grouped) {
+            labels.push(g);
+            prevCounts.push(rs.reduce((a, r) => a + Number(r.previousYearStudentCount || 0), 0));
+            lastCounts.push(rs.reduce((a, r) => a + Number(r.lastYearStudentCount || 0), 0));
+        }
+        makeChart(`${panelId}_students`, {
+            type: "bar",
+            data: {
+                labels,
+                datasets: [
+                    {
+                        label: DATA.years[0], data: prevCounts,
+                        backgroundColor: "rgba(90,90,114,.25)", borderColor: "rgba(90,90,114,.55)",
+                        borderWidth: 1.5, borderRadius: 5
+                    },
+                    {
+                        label: DATA.years[1], data: lastCounts,
+                        backgroundColor: color.primary + "BB", borderColor: color.primary,
+                        borderWidth: 1.5, borderRadius: 5
+                    }
+                ]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ${ctx.parsed.y} طالب` } }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true, grid: { color: "rgba(0,0,0,.05)" },
+                        ticks: { font: { size: 11 } }
+                    },
+                    x: { grid: { display: false }, ticks: { font: { size: 11 } } }
+                }
+            }
+        });
+        $(`#${panelId}_students_legend`).html(`
+            <div class="oa-legend-item"><div class="oa-legend-dot" style="background:rgba(90,90,114,.6)"></div>${esc(DATA.years[0])}</div>
+            <div class="oa-legend-item"><div class="oa-legend-dot" style="background:${color.primary}"></div>${esc(DATA.years[1])}</div>
+        `);
     }
 
     // ─── Heatmap cells ────────────────────────────────────────────────────────

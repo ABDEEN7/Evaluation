@@ -472,16 +472,42 @@ public class QNEDSService : ApiBase
 
 			foreach (var detail in details)
 			{
-				var dataMatrixValue = GetMatrixValue(
-					analysisType.DataFormEvalMatrix?.FormEvalMatrixValues,
-					detail.ActualValue);
+				FormEvalMatrixValue? dataMatrixValue;
+
+				if (analysisType.BackendName == "StudentsWithDisabilities")
+				{
+					dataMatrixValue = GetSupportPreparatoryMatrixValue(
+						analysisType.DataFormEvalMatrix?.FormEvalMatrixValues,
+						detail.ActualValue,
+						detail.Difference);
+				}
+				else
+				{
+					dataMatrixValue = GetMatrixValue(
+						analysisType.DataFormEvalMatrix?.FormEvalMatrixValues,
+						detail.ActualValue);
+				}
 
 				detail.FormEvalMatrixValueId = dataMatrixValue?.Id;
 				detail.Note = dataMatrixValue?.NameAr;
 				detail.MartixTextValue = dataMatrixValue?.ReportTextAr;
 			}
 
-			var avgActualValue = details.Average(x => x.ActualValue);
+			var totalStudents = details.Sum(x => x.LastYearStudentCount + x.PreviousYearStudentCount);
+
+			decimal avgActualValue;
+
+			if (totalStudents > 0)
+			{
+				avgActualValue = details.Sum(x =>
+					x.LastYearValue * x.LastYearStudentCount +
+					x.PreviousYearValue * x.PreviousYearStudentCount
+				) / totalStudents;
+			}
+			else
+			{
+				avgActualValue = details.Average(x => x.ActualValue);
+			}
 
 			var resultMatrixValue = GetMatrixValue(
 				analysisType.ResultFormEvalMatrix?.FormEvalMatrixValues,
@@ -539,6 +565,62 @@ public class QNEDSService : ApiBase
 	"GeneralSecondarySuccess"
 ];
 
+	private static int GetSupportPreparatoryMatrixCode(decimal actualValue, decimal difference)
+	{
+		if (actualValue == 0)
+			return 0; // No Data
+
+		if (actualValue < 50)
+			return 1; // Low Achievement Level
+
+		if (actualValue < 70)
+		{
+			if (difference < -5)
+				return 5; // Regression
+
+			if (difference <= 5)
+				return 3; // Stable Below Level
+
+			return 4; // Improvement Below Level
+		}
+
+		if (actualValue < 80)
+		{
+			if (difference < -5)
+				return 2; // Regression Below Level
+
+			if (difference <= 5)
+				return 3; // Stable Below Level
+
+			return 7; // Improvement
+		}
+
+		if (actualValue < 90)
+		{
+			if (difference < -5)
+				return 8; // Regression at High Level
+
+			return 9; // High
+		}
+
+		return 10; // Very High Achievement Level
+	}
+
+	private static FormEvalMatrixValue? GetSupportPreparatoryMatrixValue(
+	IEnumerable<FormEvalMatrixValue>? values,
+	decimal actualValue,
+	decimal difference)
+	{
+		if (values == null)
+			return null;
+
+		var matrixCode = GetSupportPreparatoryMatrixCode(actualValue, difference);
+
+		return values
+			.Where(x => x.IsActive && !x.IsDeleted)
+			.OrderBy(x => x.OrderNo)
+			.FirstOrDefault(x => x.ActualMatrixValue == matrixCode);
+	}
 	private static QnedsIntegrationJsonDto? Deserialize(string? json) =>
 		string.IsNullOrWhiteSpace(json)
 			? null
@@ -617,8 +699,9 @@ public class QNEDSService : ApiBase
 		Dictionary<string, int> PreviousAttendance);
 
 	private OutputAnalysisData MakeDetail(BuilderContext ctx, int grade, string? subjectCode,
-		string? track, string? termCode, decimal lastValue, decimal previousValue, string? note) => new()
-		{
+	string? track, string? termCode, decimal lastValue, decimal previousValue, string? note,
+	int lastStudentCount = 0, int previousStudentCount = 0) => new()
+	{
 			Id = Guid.NewGuid(),
 			AnalysisTypeId = ctx.AnalysisTypeId,
 			EvaluationRequestId = ctx.EvaluationRequestId,
@@ -632,9 +715,9 @@ public class QNEDSService : ApiBase
 			PreviousYearValue = previousValue,
 			Difference = lastValue - previousValue,
 			ActualValue = lastValue,
-			LastYearStudentCount = GetStudentCount(ctx.LastAttendance, grade, termCode),
-			PreviousYearStudentCount = GetStudentCount(ctx.PreviousAttendance, grade, termCode),
-			Note = note
+		LastYearStudentCount = lastStudentCount > 0 ? lastStudentCount : GetStudentCount(ctx.LastAttendance, grade, termCode),
+		PreviousYearStudentCount = previousStudentCount > 0 ? previousStudentCount : GetStudentCount(ctx.PreviousAttendance, grade, termCode),
+		Note = note
 		};
 
 	private List<OutputAnalysisData> BuildAchievement(
@@ -673,7 +756,9 @@ public class QNEDSService : ApiBase
 					termCode,
 					ToDecimal(x.Grade_Achvment_NoSev3_And_Present_NoActivity),
 					ToDecimal(prev?.Grade_Achvment_NoSev3_And_Present_NoActivity),
-					x.CourseTitle);
+					x.CourseTitle,
+					ToInt(x.No_of_Student_Grade_Without_Activity), 
+					ToInt(prev?.No_of_Student_Grade_Without_Activity));
 			})
 			.ToList() ?? [];
 	}
@@ -709,15 +794,13 @@ public class QNEDSService : ApiBase
 					out var prev);
 
 				return MakeDetail(
-					ctx,
-					grade,
-					subjectCode,
-					track,
-					termCode,
-					ToDecimal(x.Grade_Achvment_NoSev3_And_Present),
-					ToDecimal(prev?.Grade_Achvment_NoSev3_And_Present),
-					x.CourseTitle);
-			})
+							ctx, grade, subjectCode, track, termCode,
+							ToDecimal(x.Grade_Achvment_NoSev3_And_Present),
+							ToDecimal(prev?.Grade_Achvment_NoSev3_And_Present),
+							x.CourseTitle,
+							ToInt(x.Grade_NumberOf_Students_NoSev3_And_Present),
+							ToInt(prev?.Grade_NumberOf_Students_NoSev3_And_Present));
+									})
 			.ToList() ?? [];
 	}
 	private List<OutputAnalysisData> BuildAchievementTrackNoSubject(
@@ -778,12 +861,23 @@ public class QNEDSService : ApiBase
 				var subjectCode = x.CourseCode?.Trim();
 				var termCode = x.Timespan?.Trim();
 
-				lookup.TryGetValue($"{grade}|{subjectCode}|{termCode}", out var prev);
+				lookup.TryGetValue(
+					$"{grade}|{subjectCode}|{termCode}",
+					out var prev);
 
-				return MakeDetail(ctx, grade, subjectCode, null, termCode,
-					ToDecimal(x.Grade_Achvment_Sev3_And_Present_NoActivity),
-					ToDecimal(prev?.Grade_Achvment_Sev3_And_Present_NoActivity),
-					x.CourseTitle);
+				return MakeDetail(
+						ctx,
+						grade,
+						subjectCode,
+						null,
+						termCode,
+						ToDecimal(x.Grade_Achvment_Sev3_And_Present_NoActivity),
+						ToDecimal(prev?.Grade_Achvment_Sev3_And_Present_NoActivity),
+						x.CourseTitle,
+
+						GetStudentCount(ctx.LastAttendance, grade),
+						GetStudentCount(ctx.PreviousAttendance, grade)
+					);
 			})
 			.ToList() ?? [];
 	}
@@ -815,15 +909,13 @@ public class QNEDSService : ApiBase
 					out var prev);
 
 				return MakeDetail(
-					ctx,
-					grade,
-					x.CourseCode?.Trim(),
-					null,
-					x.TermCode?.Trim(),
-					ToDecimal(x.No_of_Student_Grading_Assignment_Below_70),
-					ToDecimal(prev?.No_of_Student_Grading_Assignment_Below_70),
-					$"Term: {x.TermCode?.Trim()}");
-			})
+								ctx, grade, x.CourseCode?.Trim(), null, x.TermCode?.Trim(),
+								ToDecimal(x.No_of_Student_Grading_Assignment_Below_70),
+								ToDecimal(prev?.No_of_Student_Grading_Assignment_Below_70),
+								$"Term: {x.TermCode?.Trim()}",
+								ToInt(x.No_of_Student_Grading_Assignment),
+								ToInt(prev?.No_of_Student_Grading_Assignment));
+										})
 			.ToList() ?? [];
 	}
 
@@ -939,8 +1031,15 @@ public class QNEDSService : ApiBase
 			.OrderBy(x => x.Scope!.OrderNo).ThenBy(x => x.OrderNo)
 			.ToListAsync();
 
+		var evaluationRequest = await uow.GetRepository<EvaluationRequest>()
+								.GetAllActiveNonDeleted(x => x.Id == evaluationRequestId)
+								.Include(x => x.OrgTree)
+								.FirstOrDefaultAsync();
+
 		return new OutputAnalysisResponseDto
 		{
+			SchoolNameAr = evaluationRequest?.OrgTree?.NameAr,
+			SchoolNameEn = evaluationRequest?.OrgTree?.NameEn,
 			AnalysisTypes = analysisTypes.Select(type =>
 			{
 				var final = finals.FirstOrDefault(x => x.AnalysisTypeId == type.Id);
@@ -1052,7 +1151,13 @@ public class QNEDSService : ApiBase
 			.GetAllActiveNonDeleted(x => x.EvaluationRequestId == evaluationRequestId)
 			.ToListAsync();
 
-		if (hasFinals && hasDetails)
+		bool hasFinals = finals.Any();
+		bool hasDetails = details.Any();
+
+		bool countsAreMissing = hasDetails && details.All(x =>
+			x.LastYearStudentCount == 0 && x.PreviousYearStudentCount == 0);
+
+		if (hasFinals && hasDetails && !countsAreMissing)
 			return;
 
 
@@ -1073,20 +1178,31 @@ public class QNEDSService : ApiBase
 			.GroupBy(keySelector)
 			.ToDictionary(g => g.Key, g => g.First())
 		?? [];
-
 	private static Dictionary<string, int> BuildAttendanceStudentCountLookup(
 		List<StudentDailyAttendanceByMonthDto>? rows,
 		List<int> allowedGrades) =>
 		rows?
 			.Where(x =>
 				allowedGrades.Contains(ToInt(x.Grade)) &&
-				string.Equals(x.AttendanceDescription?.Trim(), "Present", StringComparison.OrdinalIgnoreCase))
-			.GroupBy(x => $"{ToInt(x.Grade)}|{ToInt(x.Month)}")
-			.ToDictionary(g => g.Key, g => g.Sum(r => ToInt(r.Students)))
+				string.Equals(
+					x.AttendanceDescription?.Trim(),
+					"Present",
+					StringComparison.OrdinalIgnoreCase))
+			.GroupBy(x => ToInt(x.Grade).ToString())
+			.ToDictionary(
+				g => g.Key,
+				g => g.Max(r => ToInt(r.Students)))
 		?? [];
 
-	private static int GetStudentCount(Dictionary<string, int> lookup, int grade, string? termCode) =>
-		lookup.TryGetValue($"{grade}|{ToInt(termCode)}", out var count) ? count : 0;
+	private static int GetStudentCount(
+		Dictionary<string, int> lookup,
+		int grade,
+		string? termCode = null)
+	{
+		return lookup.TryGetValue(grade.ToString(), out var count)
+			? count
+			: 0;
+	}
 
 	private static List<int> ParseGrades(string? grades) =>
 		(grades ?? "")
