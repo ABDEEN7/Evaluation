@@ -1727,7 +1727,7 @@ input.auto-fill {
 }
 
 .table-card-seperate-styling .process .dropdown {
-    margin-top: 14px;
+/*    margin-top: 14px;*/
 }
 
 
@@ -4523,7 +4523,7 @@ input.auto-fill {
 }
 
 .table-card-seperate-styling .process .dropdown {
-    margin-top: 14px;
+/*    margin-top: 14px;*/
 }
 
 
@@ -6449,4 +6449,103 @@ html[dir="rtl"] #btn-back-top i {
 
 .border-top-card {
     border-top: 1px solid #dee2e6 !important;
+}
+
+
+/*ACTION BUTTON*/
+.plan-request-card {
+    position: relative;
+}
+
+    .plan-request-card:hover {
+        z-index: 1000;
+    }
+
+    .plan-request-card .dropdown-menu {
+        z-index: 1001;
+    }
+
+
+.dropdown-menu .dropdown-item:hover,
+.dropdown-menu .dropdown-item:focus {
+    background-color: #89153D;
+    color: #fff;
+}
+
+/* Open dropdown */
+.dropdown.show > .btn-primary,
+.btn-primary.dropdown-toggle.show {
+    background-color: rgba(13, 67, 97, 1);
+    border-color: rgba(13, 67, 97, 1);
+}
+
+/* Closed dropdown */
+.btn-primary.dropdown-toggle:not(.show) {
+    background-color: #89153D;
+    border-color: #89153D;
+}
+
+/* Remove focus styling after click */
+.btn-primary.dropdown-toggle:focus,
+.btn-primary.dropdown-toggle:focus-visible {
+    box-shadow: none;
+}
+
+
+
+
+
+
+
+
+
+
+
+.plan-request-card {
+    position: relative;
+    overflow: hidden;
+}
+
+.corner-ribbon {
+    position: absolute;
+    top: -24px;
+    right: -12px;
+    z-index: 100;
+    width: 90px;
+    height: 90px;
+    overflow: hidden;
+}
+
+    .corner-ribbon span {
+        position: absolute;
+        display: block;
+        width: 170px; 
+        padding: 6px 0;
+        background: #A63D40;
+        color: #fff;
+        text-align: center;
+        font-size: 12px;
+        font-weight: 700;
+        transform: rotate(45deg);
+        top: 20px;
+        right: -50px; 
+        box-shadow: 0 2px 6px rgba(0,0,0,.2);
+    }
+
+
+
+html[dir="rtl"] .corner-ribbon {
+    left: 0;
+    right: auto;
+}
+
+    html[dir="rtl"] .corner-ribbon span {
+        left: -50px;
+        right: auto;
+        transform: rotate(-45deg);
+    }
+
+/* Hide ribbon in table view */
+.application-request.table-card-seperate-styling tbody tr:not(.card):not(.card-row) .corner-ribbon {
+    display: none !important;
 }

@@ -78,40 +78,63 @@
         tabLabelKey: 'TabEvaluationOperations',
         columns: [
         {
-    data: "evaluationType",
+        data: "evaluationType",
         title: uiControlsSetup().GetUiControlText("lblEvaluationPlan"),
         className: "td-full mb-4",
-        render: function(data, type, row) {
+                render: function (data, type, row) {
 
-            const statusColor = row.statusColor || "#A63D40";
-            const statusText = `${row.status || ""}
-`;
+                    const statusColor = row.statusColor || "#A63D40";
+                    const statusText = `${row.status || ""}`;
 
-            return `
-            <div class="request-info">
+                    const daysLeft = getDaysUntil(row.evlDateFrom);
+                    let countdownBadge = "";
 
-                <div class="request-icon"
-                     style="background-color:${statusColor}; color:#000;">
-                    <i class="las la-certificate"></i>
+                    if (daysLeft !== null && daysLeft < 0) {
+                        countdownBadge = `
+            <div class="corner-ribbon">
+                <span>
+                   
+                    متأخر ${Math.abs(daysLeft)} يوم
+                </span>
+            </div>`;
+                    }
+                    else if (daysLeft !== null && daysLeft >= 0 && daysLeft <= 10) {
+                        countdownBadge = `
+            <div class="corner-ribbon">
+                <span>
+                   
+                    ${daysLeft} يوم متبقي
+                </span>
+            </div>`;
+                    }
+
+                    return `
+        <div class="request-info">
+
+            ${countdownBadge}
+
+            <div class="request-icon"
+                 style="background-color:${statusColor}; color:#000;">
+                <i class="las la-certificate"></i>
+            </div>
+
+            <div class="request-text">
+
+                <div class="request-header">
+                    ${data || ""}
                 </div>
 
-                <div class="request-text">
-
-                    <div class="request-header">
-                        ${data || ""}
-                    </div>
-
-                    <div class="request-status-text card-only-row"
-                         style="color:${statusColor};">
-                        ${statusText}
-                    </div>
-
+                <div class="request-status-text card-only-row"
+                     style="color:${statusColor};">
+                    ${statusText}
                 </div>
 
             </div>
-        `;
-        }
-            },
+
+        </div>
+    `;
+                }
+    },
     {
         data: null,
         title: uiControlsSetup().GetUiControlText("lblStatus"),
@@ -169,7 +192,7 @@
   {
         data: "evlDateFrom",
         title: uiControlsSetup().GetUiControlText("lblEvaluationDateFrom"),
-        className: "td-full td-date-range-block period-column",
+        className: "td-full",
         render: function(data, type, row) {
             if (!data) return "_";
 
@@ -266,17 +289,10 @@
 
             return `
             <div class="date-range-wrapper">
-
                 <div class="d-flex align-items-center gap-1 flex-wrap">
                     <i class="las la-calendar card-only-icon"></i>
                     ${dateRange}
                 </div>
-
-               <div class="period-status-wrapper">
-                    ${countdownBadge}
-                    ${nearNote}
-                </div>
-
             </div>`;
         }
     },
@@ -441,7 +457,7 @@
         if (isOverdue) {
             badge = `
             <span class="status-countdown-badge danger">
-                <i class="las la-exclamation-circle"></i>
+              
                 متأخر ${Math.abs(daysLeft)} يوم
             </span>`;
 
