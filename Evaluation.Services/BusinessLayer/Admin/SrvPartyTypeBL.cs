@@ -137,6 +137,7 @@ namespace Evaluation.Services.Models.Admin
                 obj.IsEmployeePartyType = message.IsEmployeePartyType;
                 obj.CanViewAllRequests = message.CanViewAllRequests;
                 obj.CanViewAllEvaluations = message.CanViewAllEvaluations;
+                obj.CanViewAllPlan = message.CanViewAllPlan;
                 obj.DepartmentId = message.DepartmentId;
                 obj.IsActive = message.IsActive;
 

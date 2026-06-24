@@ -77,36 +77,59 @@
         tabLabelSelector: '#tabEvaluationOperations .my-1',
         tabLabelKey: 'TabEvaluationOperations',
         columns: [
-            {
-                data: "evaluationType",
-                title: uiControlsSetup().GetUiControlText("lblEvaluationPlan"),
-                className: "td-full mb-4",
+        {
+        data: "evaluationType",
+        title: uiControlsSetup().GetUiControlText("lblEvaluationPlan"),
+        className: "td-full mb-4",
                 render: function (data, type, row) {
 
-            const statusColor = row.statusColor || "#A63D40";
-            const statusText = `${row.status || ""}
-`;
+                    const statusColor = row.statusColor || "#A63D40";
+                    const statusText = `${row.status || ""}`;
+
+                    const daysLeft = getDaysUntil(row.evlDateFrom);
+                    let countdownBadge = "";
+
+                    if (daysLeft !== null && daysLeft < 0) {
+                        countdownBadge = `
+            <div class="corner-ribbon">
+                <span>
+                   
+                    متأخر ${Math.abs(daysLeft)} يوم
+                </span>
+            </div>`;
+                    }
+                    else if (daysLeft !== null && daysLeft >= 0 && daysLeft <= 10) {
+                        countdownBadge = `
+            <div class="corner-ribbon">
+                <span>
+                   
+                    ${daysLeft} يوم متبقي
+                </span>
+            </div>`;
+                    }
 
                     return `
-            <div class="request-info">
+        <div class="request-info">
 
-                <div class="request-icon"
-                     style="background-color:${statusColor}; color:#000;">
-                    <i class="las la-certificate"></i>
+            ${countdownBadge}
+
+            <div class="request-icon"
+                 style="background-color:${statusColor}; color:#000;">
+                <i class="las la-certificate"></i>
+            </div>
+
+            <div class="request-text">
+
+                <div class="request-header">
+                    ${data || ""}
                 </div>
 
-                <div class="request-text">
-
-                    <div class="request-header">
-                        ${data || ""}
-                    </div>
-
-                    <div class="request-status-text card-only-row"
-                         style="color:${statusColor};">
-                        ${statusText}
-                    </div>
-
+                <div class="request-status-text card-only-row"
+                     style="color:${statusColor};">
+                    ${statusText}
                 </div>
+
+            </div>
 
             </div>
         `;
@@ -161,14 +184,16 @@
                          <span class="data-text">${data}</span>
                     
                 `;
-                }
-            },
-            {
-                data: "evlDateFrom",
-                title: uiControlsSetup().GetUiControlText("lblEvaluationDateFrom"),
-                className: "td-full td-date-range-block period-column",
-                render: function (data, type, row) {
-                    if (!data) return "_";
+        }
+    },
+         
+               
+  {
+        data: "evlDateFrom",
+        title: uiControlsSetup().GetUiControlText("lblEvaluationDateFrom"),
+        className: "td-full",
+        render: function(data, type, row) {
+            if (!data) return "_";
 
                     const daysLeft = getDaysUntil(data);
                     const isOverdue = daysLeft !== null && daysLeft < 0;
@@ -263,17 +288,10 @@
 
                     return `
             <div class="date-range-wrapper">
-
                 <div class="d-flex align-items-center gap-1 flex-wrap">
                     <i class="las la-calendar card-only-icon"></i>
                     ${dateRange}
                 </div>
-
-               <div class="period-status-wrapper">
-                    ${countdownBadge}
-                    ${nearNote}
-                </div>
-
             </div>`;
         }
     },
@@ -437,7 +455,7 @@
         if (isOverdue) {
             badge = `
             <span class="status-countdown-badge danger">
-                <i class="las la-exclamation-circle"></i>
+              
                 متأخر ${Math.abs(daysLeft)} يوم
             </span>`;
 
