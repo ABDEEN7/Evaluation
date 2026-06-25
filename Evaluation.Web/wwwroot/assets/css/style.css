@@ -6601,7 +6601,8 @@ html[dir="rtl"] .corner-ribbon {
 }
 
 .stats-section {
-    padding: 2rem;
+   margin-top: 1rem;
+   padding: 0 1rem;
 }
 
     .stats-section:not(:last-child) {
@@ -6623,7 +6624,7 @@ html[dir="rtl"] .corner-ribbon {
     gap: .5rem;
     color: #3d3d3d;
     font-weight: 700;
-    font-size: 15px;
+    font-size: 16px;
     justify-content: flex-start;
 }
 
@@ -6631,7 +6632,6 @@ html[dir="rtl"] .corner-ribbon {
     display: flex;
     align-items: center;
     gap: .4rem;
-    margin-top: 1.25rem;
     color: #888;
     font-size: 14px;
     justify-content: flex-start;
@@ -6647,7 +6647,7 @@ html[dir="rtl"] .corner-ribbon {
 }
 
 .stats-pill-success {
-    background: #E8F8F1;
+    background: #1E9E6820;
     color: #1E9E68;
 }
 
@@ -6672,9 +6672,8 @@ html[dir="rtl"] .corner-ribbon {
     display: inline-flex;
     align-items: center;
     gap: .5rem;
-    margin-top: 1.25rem;
     padding: .4rem 1rem;
-    background: #E8F8F1;
+    background: #1E9E6820;
     color: #1E9E68;
     border-radius: 999px;
     font-size: 13px;
@@ -6685,7 +6684,7 @@ html[dir="rtl"] .corner-ribbon {
     display: flex;
     align-items: center;
     gap: 1rem;
-    margin-top: 1.5rem;
+    margin-top: 1rem;
 }
 
 .stats-percent {
@@ -6698,7 +6697,7 @@ html[dir="rtl"] .corner-ribbon {
 .stats-progress {
     flex: 1;
     height: 8px;
-    background: #ECECEC;
+    background: #B3B3B3;
     border-radius: 50px;
     overflow: hidden;
 }
@@ -6724,7 +6723,6 @@ html[dir="rtl"] .corner-ribbon {
     display: flex;
     align-items: center;
     gap: .4rem;
-    margin-top: 1.25rem;
     color: #888;
     font-size: 14px;
     justify-content: flex-start;
@@ -6738,9 +6736,9 @@ html[dir="rtl"] .corner-ribbon {
 }
 
 .stats-history-card {
-    background: #F6F6F6;
+    background: #3d3d3d30;
     border-radius: 14px;
-    padding: 1.5rem;
+    padding: 1rem;
     border: 1px solid #eee;
 }
 
