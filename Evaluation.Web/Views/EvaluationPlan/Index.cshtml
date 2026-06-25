@@ -125,30 +125,39 @@
                 </div>
             </div>
 
-            <div class="d-flex align-items-center justify-content-between flex-wrap px-4 py-2 gap-3 modal-desc-breadcrumb">
+            <div class="d-flex align-items-start justify-content-between flex-wrap px-4 pt-4 gap-3 modal-desc-breadcrumb">
 
-                <nav aria-label="breadcrumb" class="m-0">
-                    <ol class="breadcrumb m-0">
-                        <li class="breadcrumb-item">
-                            <a href="#"
-                               id="evaluationRequeststatus"
-                               class="@ConstantKeys.EvaluationForm.BreadcrumbSchool modal-desc-breadcrumb-a">
-                            </a>
-                        </li>
-                        <li class="breadcrumb-item active d-flex align-items-center gap-1" aria-current="page">
-                            <span class="@ConstantKeys.EvaluationForm.BreadcrumbRequestNo"></span>
-                            <strong id="evaluationRequestNo"></strong>
-                        </li>
-                    </ol>
-                </nav>
+                <div class="d-flex flex-column align-items-start gap-2">
 
-                @* <div id="evaluationDateRangeContainer"
-                     class="d-flex align-items-center gap-2 flex-wrap">
-                </div> *@
+                    <nav aria-label="breadcrumb" class="m-0">
+                        <ol class="breadcrumb m-0">
+                            <li class="breadcrumb-item">
+                                <a href="#"
+                                   id="evaluationRequeststatus"
+                                   class="@ConstantKeys.EvaluationForm.BreadcrumbSchool modal-desc-breadcrumb-a">
+                                </a>
+                            </li>
+                            <li class="breadcrumb-item active d-flex align-items-center gap-1" aria-current="page">
+                                <span class="@ConstantKeys.EvaluationForm.BreadcrumbRequestNo"></span>
+                                <strong id="evaluationRequestNo"></strong>
+                            </li>
+                        </ol>
+                    </nav>
+
+                    <div id="evaluationDateRangeContainer"
+                         class="d-flex align-items-center gap-2 flex-wrap">
+                    </div>
+
+                </div>
+
+                <div id="evaluationDateBadgesContainer"
+                     class="d-flex align-items-center justify-content-end gap-2 flex-wrap">
+                </div>
+
             </div>
             <div class="modal-body py-0">
 
-                <div id="evaluationRequestDetailsModal_divTemplates" class="px-4 pt-3" style="direction:rtl;"></div>
+                <div id="evaluationRequestDetailsModal_divTemplates" class="py-4" style="direction:rtl;"></div>
 
                 <div class="card card-table mb-4">
                     <div class="card-body">
