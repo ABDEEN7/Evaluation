@@ -48,8 +48,8 @@ namespace Evaluation.Services.BusinessLayer.API
         .Select(c => new NavbarDTO
         {
             Id = c.Id,
-            Title = Lang == "ar" ? c.TitleAr : c.TitleEn,
-            Url = Lang == "ar" ? c.UrlAr : c.UrlEn,
+            Title = lang == "ar" ? c.TitleAr : c.TitleEn,
+            Url = lang == "ar" ? c.UrlAr : c.UrlEn,
             ParentId = c.ParentId,
             IsInternal = c.IsInternal,
             OrderNo = c.OrderNo,
