@@ -203,50 +203,48 @@
                     let countdownBadge = '';
                     let nearNote = '';
 
-                    if (isOverdue) {
+            if (isOverdue) {
 
-                        countdownBadge = `
-        <span class="status-countdown-badge info">
-            <i class="las la-exclamation-circle"></i>
-            متأخر ${Math.abs(daysLeft)} يوم
-        </span>`;
+                badge = `
+    <span class="status-countdown-badge info">
+        <i class="las la-clock"></i>
+        ${Math.abs(daysLeft)} ${uiControlsSetup().GetUiControlText("lblDaysOverdue")}
+    </span>`;
 
-                        nearNote = `
-        <span class="evaluation-near-note success">
-            <i class="las la-exclamation-triangle"></i>
-            تجاوز موعد التقييم
-        </span>`;
+                note = `
+    <span class="evaluation-near-note success">
+        <i class="las la-exclamation-triangle"></i>
+        ${uiControlsSetup().GetUiControlText("lblEvaluationDateExceeded")}
+    </span>`;
 
-                    }
-                    else if (isUrgent) {
+            } else if (isUrgent) {
 
-                        countdownBadge = `
-        <span class="status-countdown-badge info">
-            <i class="las la-clock"></i>
-            ${daysLeft} يوم متبقي
-        </span>`;
+                badge = `
+    <span class="status-countdown-badge info">
+        <i class="las la-clock"></i>
+        ${daysLeft} ${uiControlsSetup().GetUiControlText("lblDaysLeft")}
+    </span>`;
 
-                        nearNote = `
-        <span class="evaluation-near-note success">
-            <i class="las la-exclamation-triangle"></i>
-            هذه المدرسة على وشك التقييم
-        </span>`;
+                note = `
+    <span class="evaluation-near-note success">
+        <i class="las la-exclamation-triangle"></i>
+        ${uiControlsSetup().GetUiControlText("lblSchoolEvaluationSoon")}
+    </span>`;
 
-                    }
-                    else if (isWarning) {
+            } else if (isWarning) {
 
-                        countdownBadge = `
-        <span class="status-countdown-badge info">
-            <i class="las la-clock"></i>
-            ${daysLeft} يوم متبقي
-        </span>`;
+                badge = `
+    <span class="status-countdown-badge info">
+        <i class="las la-clock"></i>
+        ${daysLeft} ${uiControlsSetup().GetUiControlText("lblDaysLeft")}
+    </span>`;
 
-                        nearNote = `
-        <span class="evaluation-near-note success">
-            <i class="las la-exclamation-triangle"></i>
-            هذه المدرسة على وشك التقييم
-        </span>`;
-                    }
+                note = `
+    <span class="evaluation-near-note success">
+        <i class="las la-exclamation-triangle"></i>
+        ${uiControlsSetup().GetUiControlText("lblSchoolEvaluationSoon")}
+    </span>`;
+            }
 
                     const fmt = ["M/D/YYYY", "MM/DD/YYYY", "YYYY-MM-DD", "DD-MM-YYYY"];
                     const displayFrom = moment(data.split(' ')[0], fmt, false).format("DD-MM-YYYY");
@@ -452,63 +450,67 @@
         let badge = '';
         let note = '';
 
-        if (isOverdue) {
-            badge = `
-            <span class="status-countdown-badge danger">
-              
-                متأخر ${Math.abs(daysLeft)} يوم
-            </span>`;
+      if (isOverdue) {
+          badge = `
+    <span class="status-countdown-badge info">
+        متأخر ${Math.abs(daysLeft)} يوم
+           <i class="las la-clock"></i>
+    </span>`;
 
-            note = `
-            <span class="evaluation-near-note danger">
-                <i class="las la-exclamation-triangle"></i>
-                تجاوز موعد التقييم
-            </span>`;
+          note = `
+    <span class="evaluation-near-note success">
+        تجاوز موعد التقييم
+            <i class="las la-exclamation-triangle"></i>
+    </span>`;
 
-        } else if (isUrgent) {
-            badge = `
-            <span class="status-countdown-badge danger">
-                <i class="las la-clock"></i>
-                ${daysLeft} يوم متبقي
-            </span>`;
+      } else if (isUrgent) {
+          badge = `
+    <span class="status-countdown-badge danger">
+        ${daysLeft} يوم متبقي
+          <i class="las la-clock"></i>
+    </span>`;
 
-            note = `
-            <span class="evaluation-near-note danger">
-                <i class="las la-exclamation-triangle"></i>
-                هذه المدرسة على وشك التقييم
-            </span>`;
+          note = `
+    <span class="evaluation-near-note danger">
+       
+        هذه المدرسة على وشك التقييم
+         <i class="las la-exclamation-triangle"></i>
+    </span>`;
 
-        } else if (isWarning) {
-            badge = `
-            <span class="status-countdown-badge warning">
-                <i class="las la-clock"></i>
-                ${daysLeft} يوم متبقي
-            </span>`;
+      } else if (isWarning) {
+          badge = `
+    <span class="status-countdown-badge warning">
+      
+        ${daysLeft} يوم متبقي
+          <i class="las la-clock"></i>
+    </span>`;
 
-            note = `
-            <span class="evaluation-near-note warning">
-                <i class="las la-exclamation-triangle"></i>
-                هذه المدرسة على وشك التقييم
-            </span>`;
-        }
+          note = `
+    <span class="evaluation-near-note warning">
+  
+        هذه المدرسة على وشك التقييم
+              <i class="las la-exclamation-triangle"></i>
+    </span>`;
+      }
 
-        const dateRange = displayTo
-            ? `${displayFrom} <i class="las la-arrow-right mx-1 opacity-50"></i> ${displayTo}`
-            : displayFrom;
+      const dateRange = displayTo
+          ? `
+        <span class="period-label">${uiControlsSetup().GetUiControlText("lblFrom")}</span>
+        <span class="date-value">${displayFrom}</span>
 
-        $container.html(`
-        <div class="date-range-wrapper">
-            <div class="d-flex align-items-center gap-2 flex-wrap">
-                <i class="las la-calendar text-muted fs-14"></i>
-                <span class="modal-date-range-text">${dateRange}</span>
-            </div>
+        <span class="period-label ms-2">${uiControlsSetup().GetUiControlText("lblTo")}</span>
+        <span class="date-value">${displayTo}</span>
+      `
+          : displayFrom;
+      $container.html(`
+    <i class="las la-calendar text-muted"></i>
+    <span class="modal-date-range-text">${dateRange}</span>
+`);
 
-            <div class="d-flex flex-wrap gap-2 align-items-center">
-                ${badge}
-                ${note}
-            </div>
-        </div>
-    `);
+      $('#evaluationDateBadgesContainer').html(`
+    ${badge}
+    ${note}
+`);
     }
 
     function renderEvaluationPartiesSection(response, requestId) {

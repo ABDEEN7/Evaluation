@@ -5813,7 +5813,7 @@ table.dataTable tbody tr.child-row > td {
     min-height: 32px;
     padding: 0 12px;
     border-radius: 999px;
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 700;
     line-height: 1;
     white-space: nowrap;
@@ -5831,7 +5831,7 @@ table.dataTable tbody tr.child-row > td {
 
     .status-countdown-badge.info,
     .evaluation-near-note.info {
-        background: #8A1538 !important;
+        background: #A63D40 !important;
         color: #fff !important;
     }
 
@@ -5853,7 +5853,8 @@ table.dataTable tbody tr.child-row > td {
 
 .modal-date-range-text {
     white-space: nowrap;
-    font-size: 13px;
+    font-size: 15px;
+    font-weight: 700;
 }
 
 
@@ -6180,7 +6181,7 @@ table.dataTable tbody tr.child-row > td {
 
 .status-countdown-badge,
 .evaluation-near-note {
-    font-size: clamp(10px, 1vw, 13px) !important;
+    font-size: 14px !important;
 }
 
 
@@ -6761,3 +6762,10 @@ html[dir="rtl"] .corner-ribbon {
     justify-content: space-between;
     margin-top: 1.25rem;
 }
+
+
+.tabulator.tabulator-rtl .tabulator-header .tabulator-col:hover {
+    background-color: #0D4261 !important;
+}
+
+
