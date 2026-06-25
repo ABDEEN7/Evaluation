@@ -1,6 +1,5 @@
 ﻿// Manage Language
 const pathParts = window.location.pathname.split("/");
-const currentDepartment = "";
 let currentLang = pathParts[1];
 
 const loadMainNavbar = () => {
