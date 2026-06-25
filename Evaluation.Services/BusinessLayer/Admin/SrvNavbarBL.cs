@@ -186,6 +186,7 @@ namespace Evaluation.Services.Models.Admin
                 obj.Target = message.Target;
                 obj.IsActive = message.IsActive;
                 obj.IsAuthorized = message.IsAuthorized;
+                obj.DepartmentId = message.DepartmentId;
             if(message.IsAuthorized)
             {
                 var Permission = await uow.GetRepository<Permission>()
@@ -269,6 +270,7 @@ namespace Evaluation.Services.Models.Admin
                     obj.UrlEn = message.UrlEn;
                     obj.IsActive = message.IsActive;
                 obj.IsAuthorized = message.IsAuthorized;
+                obj.DepartmentId = message.DepartmentId;
                 if (message.IsAuthorized)
                 {
                     var Permission = await uow.GetRepository<Permission>()
