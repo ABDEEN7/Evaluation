@@ -22,8 +22,9 @@ namespace Evaluation.Services.BusinessLayer.API
         {
             _webGroupService = webGroupService;
         }
-        public async Task<List<NavbarDTO>> GetNavbarList(string? deprouting, string Lang = "ar")
+        public async Task<List<NavbarDTO>> GetNavbarList(string? deprouting)
         {
+            string lang = requestInfo.Lang?? "ar";
             var loggedIn = userInfo.UserId is not null;
 
             var query = serviceProvider.CreateScopedUow()

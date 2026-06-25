@@ -49,8 +49,7 @@ namespace Evaluation.API.Controllers
         [HttpGet()]
         public async Task<List<NavbarDTO>> GetNavbar(string? deprouting)
         {
-            var lang = _requestInfo.Lang;
-            var navbars = await _masterBl.GetApiService<WebsiteBL>().GetNavbarList(deprouting, lang);
+            var navbars = await _masterBl.GetApiService<WebsiteBL>().GetNavbarList(deprouting);
             return navbars;
         }
         [HttpGet()]
