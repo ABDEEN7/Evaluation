@@ -1,5 +1,6 @@
 ﻿using Evaluation.DAL.Models.Audit;
 using Evaluation.DAL.Models.BaseModule;
+using Evaluation.DAL.Models.DepartementEntites;
 using Evaluation.DAL.Models.PermissionEntity;
 using System;
 using System.Collections.Generic;
@@ -29,5 +30,7 @@ public class Navbar : EntityBase, IAuditLogEntity
 
     public Guid? PermissionId { get; set; }
     public Permission? Permission { get; set; }
+    public Guid? DepartmentId { get; set; }
+    public Department? Department { get; set; }
 
 }
