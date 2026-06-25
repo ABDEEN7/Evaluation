@@ -22,8 +22,9 @@ namespace Evaluation.Services.BusinessLayer.API
         {
             _webGroupService = webGroupService;
         }
-        public async Task<List<NavbarDTO>> GetNavbarList(string Lang = "ar")
+        public async Task<List<NavbarDTO>> GetNavbarList(string? deprouting)
         {
+            string lang = requestInfo.Lang?? "ar";
             var loggedIn = userInfo.UserId is not null;
 
             var query = serviceProvider.CreateScopedUow()
@@ -36,6 +37,10 @@ namespace Evaluation.Services.BusinessLayer.API
             {
                 query = query.Where(c => !c.IsAuthorized);
             }
+            else
+            {
+                query = query.Where(x => x.DepartmentId == null || deprouting == x.Department.RoutingPath);
+            }
 
             var flatNavbars = await query
         .OrderBy(c => c.OrderNo)
@@ -43,8 +48,8 @@ namespace Evaluation.Services.BusinessLayer.API
         .Select(c => new NavbarDTO
         {
             Id = c.Id,
-            Title = Lang == "ar" ? c.TitleAr : c.TitleEn,
-            Url = Lang == "ar" ? c.UrlAr : c.UrlEn,
+            Title = lang == "ar" ? c.TitleAr : c.TitleEn,
+            Url = lang == "ar" ? c.UrlAr : c.UrlEn,
             ParentId = c.ParentId,
             IsInternal = c.IsInternal,
             OrderNo = c.OrderNo,
@@ -143,7 +148,7 @@ namespace Evaluation.Services.BusinessLayer.API
 
             return rslt;
         }
-       
+
 
     }
 }
