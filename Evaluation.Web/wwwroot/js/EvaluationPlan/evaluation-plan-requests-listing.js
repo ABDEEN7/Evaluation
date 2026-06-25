@@ -221,8 +221,25 @@
         multiple: true
     });
     //Evaluation.Loaders.loadServiceStatus('planRequestStatusFilter');
-    planRequestsListing.reload();
+    //planRequestsListing.reload();
+    function waitForUiControls(callback, maxWait = 3000) {
+        const interval = 50;
+        let elapsed = 0;
+        const timer = setInterval(function () {
+            elapsed += interval;
+            if (uiControlsSetup().AnyUiBackendLabel('lblRequest')) {
+                clearInterval(timer);
+                callback();
+            } else if (elapsed >= maxWait) {
+                clearInterval(timer);
+                callback(); 
+            }
+        }, interval);
+    }
 
+    waitForUiControls(function () {
+        planRequestsListing.reload();
+    });
     async function toggleAddEvaluationPlanRequestButton() {
 
         $('#btnAddEvaluationPlanRequest').hide();

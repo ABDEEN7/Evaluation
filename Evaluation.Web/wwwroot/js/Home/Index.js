@@ -98,7 +98,7 @@ function loadWebGroup() {
 
             let webGroupDesc = $('#web-group-desc');
 
-            webGroupDesc.append(data.result.desc);
+            webGroupDesc.append(data.result?.desc ?? '');
         })
         .fail((jqXHR, textStatus, err) => {
             console.error('Get web group failed', textStatus, err);

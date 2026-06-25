@@ -247,6 +247,7 @@
 
             const services = Array.isArray(party.services) ? party.services : [];
             const { open, closed } = countOpenClosedInParty(party);
+            const showOutputsAnalysis = party?.evalPartyCategory?.toLowerCase() === "outputsanalysis";
 
             const grouped = services
                 .flatMap(s => Array.isArray(s?.requests) ? s.requests : [])
@@ -258,7 +259,7 @@
                     return acc;
                 }, {});
 
-            const badgesHtml = party.isSupportFiles ? '' : `
+            const badgesHtml = party.isSupportFiles || showOutputsAnalysis ? '' : `
                             <span class="badge bg-danger-light ms-auto me-2 fw-semibold br-0">
                                 <i class="las la-times fs-14"></i> ${escapeHtml(openText)}: ${open}
                             </span>
@@ -343,20 +344,26 @@
                   </div>
                 `
                 : ``;
-            const showFormAnalysis =
-                party?.evalPartyCategory?.toLowerCase() === "classroomobservation";
-            const formAnalysisHtml = showFormAnalysis
-                ? `
-              <div class="mb-3 text-end">
-                <a href="javascript:void(0)"
-                   class="btn btn-sm btn-outline-primary"
-                   onclick="openFormAnalysis('${requestId}')">
-                    <i class="las la-chart-bar"></i>
-                    ${uiControlsSetup().GetUiControlText('lblFormAnalysis')}
-                </a>
-            </div>
-                  `
-                : '';
+            const showFormAnalysis =party?.evalPartyCategory?.toLowerCase() === "classroomobservation";
+            const formAnalysisHtml = showFormAnalysis? `<div class="mb-3 text-end">
+                                        <a href="javascript:void(0)"
+                                           class="btn btn-sm btn-outline-primary"
+                                           onclick="openFormAnalysis('${requestId}')">
+                                            <i class="las la-chart-bar"></i>
+                                            ${uiControlsSetup().GetUiControlText('lblFormAnalysis')}
+                                        </a>
+                                    </div>`: '';
+
+            
+            const outputsAnalysisHtml = showOutputsAnalysis? `
+                                        <div class="text-end">
+                                            <a href="javascript:void(0)"
+                                               class="btn btn-sm btn-outline-success"
+                                               onclick="openOutputsAnalysis('${requestId}')">
+                                                <i class="las la-chart-line"></i>
+                                                ${uiControlsSetup().GetUiControlText('lblOutputsAnalysis')}
+                                            </a>
+                                        </div>`: '';
             const expanded = expandFirst && idx === 0;
             var filedivid = "Filediv_" + partyId;
             const filesHTML = `
@@ -426,6 +433,59 @@
               </div>
             `);
                
+            }
+            else if (showOutputsAnalysis) {
+
+                $accordion.append(`
+        <div class="accordion-item mb-3 rounded">
+
+            <h2 class="accordion-header" id="${headerId}" data-id="${escapeHtml(partyId)}">
+
+                <button class="accordion-button ${expanded ? "" : "collapsed"} d-flex align-items-center justify-content-between"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#${collapseId}"
+                        aria-expanded="${expanded ? "true" : "false"}"
+                        aria-controls="${collapseId}">
+
+                    <div class="d-flex align-items-center gap-2 fs-18">
+                        <i class="las la-chart-line text-danger fs-25"></i>
+                        <span class="fw-semibold">
+                            ${escapeHtml(title)}
+                        </span>
+                    </div>
+
+                    <span class="toggle-icon">
+                        <i class="la la-angle-up fs-22"></i>
+                    </span>
+
+                </button>
+
+            </h2>
+
+            <div id="${collapseId}"
+                 class="accordion-collapse collapse ${expanded ? "show" : ""}"
+                 aria-labelledby="${headerId}"
+                 data-bs-parent="#${escapeHtml(parentAccordionId)}">
+
+                <div class="accordion-body text-center">
+
+                    <button type="button"
+                            class="btn btn-success btn-lg"
+                            onclick="openOutputsAnalysis('${requestId}')">
+
+                        <i class="las la-chart-line me-1"></i>
+
+                        ${uiControlsSetup().GetUiControlText('lblOutputsAnalysis')}
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+    `);
             }
             else {
                 $accordion.append(`

@@ -6,9 +6,115 @@
     var type = ViewBag.type;
 
     Func<object, Microsoft.AspNetCore.Html.IHtmlContent> content = @<text>
+
+    
+    <div class="col-md-12">
+            <div class="stats-ui-card mb-4">
+
+                <div class="stats-section">
+                    <div class="stats-header">
+                        <div class="stats-title">
+                            <i class="las la-chart-bar"></i>
+                            <!-- <span class="@ConstantKeys.WebAppOrgDetails.lblOrgDetailsCurrentSituation"></span>-->
+                            <span>التقييم الحالي</span>
+                        </div>
+                    </div>
+
+                    <div class="stats-status-row">
+                        <div class="stats-pill stats-pill-success">
+                            <!--   <span id="current_evaluation_value@(suffix)"></span>-->
+                            <span>ممتاز</span>
+                            <span class="stats-dot"></span>
+                        </div>
+                        <div class="stats-improve-pill">
+                            <i class="las la-arrow-up"></i>
+                            تحسن كبير
+                        </div>
+                    </div>
+
+                    <div class="stats-progress-row">
+                        <div class="stats-progress">
+                            <div class="stats-progress-fill stats-success-fill" style="width: 95%;"></div>
+                        </div>
+                        <span class="stats-percent">95%</span>
+                    </div>
+
+                    <div class="stats-date">
+                        <!--  <span id="current_evaluation_date@(suffix)"></span>-->
+                        <i class="las la-calendar"></i>
+                        <span>10-02-2025</span>
+                    </div>
+                </div>
+
+                <div class="stats-section">
+                    <div class="stats-history-title">
+                        <i class="las la-history"></i>
+                        <span>آخر تقييمين</span>
+                    </div>
+
+                    <div class="stats-history-grid">
+
+                        <div class="stats-history-card">
+                            <div class="stats-history-top">
+                                <span>السابق — 1</span>
+
+                                <div class="stats-pill stats-pill-danger">
+                                    <span class="stats-dot"></span>
+                                    <span>ضعيف</span>
+                                </div>
+                            </div>
+
+                            <div class="stats-progress-row">
+
+                                <div class="stats-progress">
+                                    <div class="stats-progress-fill stats-danger-fill" style="width: 32%;"></div>
+                                </div>
+                                <span class="stats-percent">32%</span>
+                            </div>
+
+                            <div class="stats-date">
+                                <i class="las la-calendar"></i>
+                                <span>10-02-2024</span>
+
+                            </div>
+                        </div>
+
+                        <div class="stats-history-card">
+                            <div class="stats-history-top">
+                                <span>السابق — 2</span>
+
+                                <div class="stats-pill stats-pill-info">
+                                    <span class="stats-dot"></span>
+                                    <span>جيد</span>
+                                    <!--<span id="last_evaluation_value@(suffix)"></span>-->
+                                </div>
+                            </div>
+
+                            <div class="stats-progress-row">
+
+                                <div class="stats-progress">
+                                    <div class="stats-progress-fill stats-info-fill" style="width: 65%;"></div>
+                                </div>
+                                <span class="stats-percent">65%</span>
+                            </div>
+
+                            <div class="stats-date">
+                                <i class="las la-calendar"></i>
+                                <!--<span id="last_evaluation_date@(suffix)"></span>-->
+                                <span>10-02-2023</span>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+
     @if (type == "SCHOOL")
     {
-            <div class="col-md-6">
+            <div class="col-md-12">
                 <div class="card card-table mb-3">
                     <div class="card-body">
                         <h5 class="fw-bold mb-4 @ConstantKeys.WebAppOrgDetails.lblOrgDetailsBasicInformation"></h5>
@@ -85,7 +191,7 @@
     }
     else if (type == "EMPLOYEE")
     {
-            <div class="col-md-6">
+            <div class="col-md-12">
                 <div class="card card-table mb-3">
                     <div class="card-body">
                         <h5 class="fw-bold mb-4">معلومات أساسية</h5>
@@ -130,46 +236,9 @@
             </div>
     }
 
-        <div class="col-md-6">
-            <div class="card card-table  mb-4">
-                <div class="card-body colored-card">
-                    <div class="d-flex align-items-center gap-2 mb-4">
-                        <h5 class="fw-bold mb-0 @ConstantKeys.WebAppOrgDetails.lblOrgDetailsCurrentSituation"></h5>
-           
-                    </div>
-                    <div class="bg-success-light-no-color p-3 br-8">
-                        <div class="row m-3">
-                            <div class="col-md-8">
-                                <p class="@ConstantKeys.WebAppOrgDetails.lblOrgDetailsCurrentEvaluation">
-                                    <i class="las la-check-circle success-color"></i>
-                                </p>
-                            </div>
-                            <div class="col-md-4 justify-items-end"><p id="current_evaluation_date@(suffix)"></p></div>
 
 
-                            <p class="success-color-custom mx-3 my-1" id="current_evaluation_value@(suffix)"></p>
 
-                        </div>
-                    </div>
-
-                    <div class="bg-old-status-light-no-color p-3 br-8 mt-3">
-                        <div class="row m-3">
-                            <div class="col-md-8">
-                                <p class="@ConstantKeys.WebAppOrgDetails.lblOrgDetailsLastEvaluation">
-                                    <i class="las la-check-circle old-status-color"></i>
-                                </p>
-                            </div>
-                            <div class="col-md-4 justify-items-end"><p id="last_evaluation_date@(suffix)"></p></div>
-
-
-                            <p class="old-status-color-custom mx-3 my-1" id="last_evaluation_value@(suffix)"></p>
-
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        </div>
     @if (isModal)
     {
         <div class="accordion" id="customAccordion">
