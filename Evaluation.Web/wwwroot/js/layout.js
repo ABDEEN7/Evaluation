@@ -24,7 +24,7 @@ const loadMainNavbar = () => {
 
         }
     };
-    return jqClient(options).Get(`/website/getnavbar?pathParts=${pathParts}`);
+    return jqClient(options).Get(`/website/getnavbar?deprouting=${deprouting}`);
 };
 function createNavItem(item) {
     let dropdownClass = 'nav-item';

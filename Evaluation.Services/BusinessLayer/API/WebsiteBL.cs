@@ -22,7 +22,7 @@ namespace Evaluation.Services.BusinessLayer.API
         {
             _webGroupService = webGroupService;
         }
-        public async Task<List<NavbarDTO>> GetNavbarList(string pathParts, string Lang = "ar")
+        public async Task<List<NavbarDTO>> GetNavbarList(string? deprouting, string Lang = "ar")
         {
             var loggedIn = userInfo.UserId is not null;
 
@@ -38,7 +38,7 @@ namespace Evaluation.Services.BusinessLayer.API
             }
             else
             {
-                query = query.Where(x => x.DepartmentId == null || pathParts.Contains(x.Department.RoutingPath));
+                query = query.Where(x => x.DepartmentId == null || deprouting == x.Department.RoutingPath);
             }
 
             var flatNavbars = await query
