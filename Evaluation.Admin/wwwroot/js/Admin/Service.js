@@ -129,7 +129,7 @@ const loadData = (isSearch) => {
                 .concat('&DepartmentId=', DepartmentId)
                 .concat('&page=', currentPage));
     }
-    $("#ServiceParentSystemModuleId").prop("disabled", !$("#ServiceDepartmentId").val());
+    //$("#ServiceParentSystemModuleId").prop("disabled", !$("#ServiceDepartmentId").val());
     $("#ServiceSystemModuleId").prop("disabled", !$("#ServicesDepartmentId").val());
 
 };
@@ -563,6 +563,61 @@ $(window).scroll(function () {
             loadData();
         }
     }
+});
+
+function LoadSystemModuleParentDDL(departmentId) {
+    const options = {
+        success: function (result) {
+            if (result) {
+                if ($("#ServiceParentSystemModuleId").data('select2')) {
+                    $("#ServiceParentSystemModuleId").select2('destroy');
+                }
+
+                $("#ServiceParentSystemModuleId").empty();
+
+                result.forEach(item => {
+                    $("#ServiceParentSystemModuleId").append(
+                        $('<option>', {
+                            value: item.id,
+                            text: item.name,
+                            'data-backend-name': item.backendName
+                        })
+                    );
+                });
+
+                $("#ServiceParentSystemModuleId").select2({
+                    width: 'resolve',
+                    allowClear: true,
+                    placeholder: sharedFn().GetUiControlText('ServiceParentSystemModuleId'),
+                    dropdownCssClass: "manageselect2zindex"
+                });
+            }
+        }
+    };
+
+    jqClientAdvanced(options).Get("Service/GetSystemModule".concat('?departmentId=', departmentId));
+}
+
+$("#ServiceDepartmentId").on("change", function () {
+    currentPage = 0;
+    isLoading = false;
+
+    var departmentId = $(this).val();
+
+    $("#ServiceParentSystemModuleId").val('').trigger('change'); 
+
+    if (table && popupname == '') {
+        table.setData([]);
+    }
+
+    if (departmentId) {
+        $("#ServiceParentSystemModuleId").prop("disabled", false);
+        LoadSystemModuleParentDDL(departmentId); 
+    } else {
+        $("#ServiceParentSystemModuleId").prop("disabled", true);
+    }
+
+    loadData();
 });
 function LoadSystemModuleDDL(departmentId) {
     const options = {

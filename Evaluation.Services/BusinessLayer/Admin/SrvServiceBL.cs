@@ -682,10 +682,10 @@ namespace Evaluation.Services.Models.Admin
 
         }
 
-        public async Task<List<DropdownItem>> GetEvaluationField(Guid serviceid)
+        public async Task<List<DropdownItem>> GetEvaluationField(Guid systemModuleId)
         {
             var services = uow.GetRepository<Service>().GetAllActiveNonDeleted();
-            var systemModuleId = services.FirstOrDefault(x => x.Id == serviceid)?.SystemModuleId;
+            //var systemModuleId = services.FirstOrDefault(x => x.Id == serviceid)?.SystemModuleId;
             var initialServiceId = services.FirstOrDefault(x => x.SystemModuleId == systemModuleId && x.Initialservice)?.Id;
 
             var result = await uow.GetRepository<Field>()
@@ -694,8 +694,10 @@ namespace Evaluation.Services.Models.Admin
                 .Include(x => x.FieldType)
                 .Include(x => x.CreateBy)
                 .Include(x => x.FormGroup)
-                .Include(x => x.FormGroup!.FormGroupType)
+                .ThenInclude(x => x!.FormGroupType)
                .Where(x => x.ServiceId == initialServiceId && x.FormGroup!.FormGroupType!.BackendName == "FormGroup")
+
+
                 .OrderByDescending(x => x.CreateDate)
                 .Select(x => new DropdownItem
                 {
