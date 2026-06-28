@@ -159,7 +159,7 @@ public class SchoolRepository(IServiceScopeFactory serviceScopeFactory,
     public async Task<List<SchoolGenderDto>> GetSchoolGender()
     {
         using var scopeUow = serviceProvider.CreateScopedUow();
-        var gender =await
+        var gender = await
         scopeUow
         .GetRepository<SchoolGender>()
         .GetAllActiveNonDeleted()
@@ -198,7 +198,11 @@ public class SchoolRepository(IServiceScopeFactory serviceScopeFactory,
         if (request.SchoolIds != null && request.SchoolIds.Count > 0)
             filter = filter.And(c => request.SchoolIds.Contains(c.Id));
         if (!string.IsNullOrWhiteSpace(request.Name))
-            filter = filter.And(s => s.NameEn.Contains(request.Name) || s.NameAr.Contains(request.Name));
+        {
+            var normalizedName = System.Text.RegularExpressions.Regex
+        .Replace(request.Name.Trim(), @"\s+", " ").ToLower();
+            filter = filter.And(s => s.NameEn.ToLower().Contains(normalizedName) || s.NameAr.ToLower().Contains(normalizedName));
+        }
         if (request.EstablishmentDate.HasValue)
         {
             filter = filter.And(s =>

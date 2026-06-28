@@ -849,7 +849,9 @@
             return $el.length ? $el.val() : undefined;
         };
         state.filters = {
-            name: safeVal(fieldId, 'filterSchoolName'),
+            name: (safeVal(fieldId, 'filterSchoolName') || '')
+                .trim()
+                .replace(/\s+/g, ' '),
             lastEvalDate: safeVal(fieldId, 'filterLastEvalDate'),
             establishmentDate: safeVal(fieldId, 'filterCreatedDate'),
             establishmentDateTo: safeVal(fieldId, 'filterToCreatedDate'),
