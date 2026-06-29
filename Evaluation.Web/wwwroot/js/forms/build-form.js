@@ -707,7 +707,7 @@ async function initForm(formId, fieldId, readOnly, savedResults, evaluationReque
                                 <span class="row-index">
                                     <span class="row-index-num">${rIdx + 1}</span>
                                     ${hasSubItems
-                                ? `<button type="button" class="row-toggle" aria-expanded="false" aria-label="toggle sub items">&#9656;</button>`
+                            ? `<button type="button" class="row-toggle" aria-expanded="false" aria-label="toggle sub items"><i class="las la-angle-right"></i></button>`
                                 : ''}
                                 </span>
 
@@ -756,7 +756,7 @@ async function initForm(formId, fieldId, readOnly, savedResults, evaluationReque
                                 <span class="row-index">
                                     <span class="row-index-num">${rIdx + 1}</span>
                                     ${hasSubItems
-                                ? `<button type="button" class="row-toggle" aria-expanded="false" aria-label="toggle sub items">&#9656;</button>`
+                            ? `<button type="button" class="row-toggle" aria-expanded="false" aria-label="toggle sub items">›</button>`
                                 : ''}
                                 </span>
 
@@ -865,8 +865,11 @@ function bindFormEvents(fieldId) {
         const toggleBtn = rowDiv.querySelector('.row-toggle');
         if (!subContainer || !toggleBtn) return;
 
-        toggleBtn.addEventListener('click', () => {
+        const clickTarget = rowDiv.querySelector('.row-index');
+
+        clickTarget.addEventListener('click', () => {
             const expanded = subContainer.classList.toggle('expanded');
+
             toggleBtn.classList.toggle('is-open', expanded);
             toggleBtn.setAttribute('aria-expanded', String(expanded));
         });

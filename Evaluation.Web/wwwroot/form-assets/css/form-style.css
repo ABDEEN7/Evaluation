@@ -186,12 +186,7 @@ body {
     align-items: center;
 }
 
-.row-index {
-    font-size: 0.8rem;
-    font-weight: 700;
-    color: var(--muted);
-    text-align: center;
-}
+
 
 .row-name {
     font-family: 'Cairo', sans-serif;
@@ -203,6 +198,7 @@ body {
     padding: 8px 12px;
     outline: none;
     cursor: default;
+    margin: 0 !important;
 }
 
 
@@ -381,20 +377,41 @@ body {
     color: var(--muted);
 }
 
+.row-index {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    white-space: nowrap;
+}
+
+.row-index-num {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--muted);
+}
+
 .row-toggle {
     background: none;
     border: none;
     color: var(--accent-active);
-    font-size: 0.7rem;
+    font-size: 1.2rem;
     line-height: 1;
-    padding: 2px;
+    padding: 0;
     cursor: pointer;
-    transition: transform 0.2s;
+    transition: transform .2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
     .row-toggle.is-open {
         transform: rotate(90deg);
     }
+    .row-toggle i {
+        font-size: 32px;
+    }
+
 
 /* Select and note are now wrapped to hold a validation message under each */
 .row-select-wrap,
@@ -489,3 +506,77 @@ body {
 .row-item.child-row {
     grid-template-columns: 40px minmax(0, 1fr) 180px minmax(180px, 1fr);
 }
+
+
+
+
+
+
+.row-item.main-row.has-subitems {
+    align-items: center;
+}
+
+.row-item .row-index {
+    display: inline-flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 12px !important;
+    width: 70px !important;
+    min-width: 70px !important;
+    white-space: nowrap !important;
+    background-color: #A2947540 !important;
+    border-radius: 8px !important;
+    padding: 8px 0 !important;
+
+}
+
+.row-item.main-row.has-subitems .row-index {
+    cursor: pointer !important;
+}
+
+.row-item.main-row.has-subitems .row-index:hover {
+    background-color: #8A153840 !important;
+}
+
+
+.row-item.main-row.has-subitems .row-toggle {
+    pointer-events: none !important;
+}
+
+
+
+
+    .row-item .row-index-num {
+        font-size: 15px !important;
+        font-weight: 700 !important;
+    }
+
+.row-item .row-toggle {
+    background: none !important;
+    border: none !important;
+    color: var(--accent-active) !important;
+    font-size: 26px !important;
+    top: -2px;
+    padding: 0 !important;
+    cursor: pointer !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    position: relative;
+}
+
+    .row-item .row-toggle.is-open {
+        transform: rotate(90deg) !important;
+    }
+
+.row-item {
+    grid-template-columns: 70px minmax(0, 1fr) 180px minmax(180px, 1fr);
+}
+
+    .row-item.child-row {
+        grid-template-columns: 70px minmax(0, 1fr) 180px minmax(180px, 1fr);
+    }
+
+
+
