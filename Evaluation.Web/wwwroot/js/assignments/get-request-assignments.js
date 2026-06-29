@@ -908,6 +908,11 @@
     // ================== INIT ==================
 
     ns.init = async function (fieldId, evaluationRequestId = null, elementId = null) {
+        // ====== RESET STATE BEFORE EACH INIT ======
+        // هذا يضمن أن كل مرة يتم استدعاء init يتم إعادة ضبط كل شيء
+        resetStateInternal();
+
+        // ====== SET NEW STATE ======
         state.fieldId = fieldId;
         state.evaluationRequestId = evaluationRequestId;
 
@@ -915,6 +920,40 @@
             ? (elementId instanceof jQuery ? elementId : $(elementId))
             : $(document);
 
+        // ====== CLEAN UP OLD DOM ELEMENTS ======
+        // إزالة أي Select2 instances قديمة
+        if ($.fn.select2) {
+            // تنظيف على مستوى المستند
+            $(document).find('.multiCheckSelect-dynamic').each(function () {
+                if ($(this).hasClass('select2-hidden-accessible')) {
+                    $(this).select2('destroy');
+                }
+            });
+
+            // تنظيف داخل الـ root الجديد إن وجد
+            if (state.$root && state.$root.length) {
+                state.$root.find('.multiCheckSelect-dynamic').each(function () {
+                    if ($(this).hasClass('select2-hidden-accessible')) {
+                        $(this).select2('destroy');
+                    }
+                });
+            }
+        }
+
+        // ====== REMOVE OLD EVENT LISTENERS ======
+        // إزالة الـ event listeners القديمة لمنع التكرار
+        $(document).off('change', '.team-leader-radio');
+        $(document).off('change', '.party-type-select');
+        $(document).off('change', '.nda-checkbox');
+        $(document).off('change', id('selectAllMembers'));
+        $(document).off('change', `${id('userTable')} .row-select`);
+        $(document).off('change', '.selected-row-checkbox');
+        $(document).off('change', id('selectAllSelected'));
+        $(document).off('keyup', id('customSearch'));
+        $(document).off('click', id('deleteSelectedBtn'));
+        $(document).off('click', '.send-mail-btn');
+
+        // ====== CHECK DOM ELEMENTS ======
         const $teamFilter = $(id('teamFilter'));
         const $userTable = $(id('userTable'));
         const $selectedTeamTable = $(id('selectedTeamTable'));
@@ -931,8 +970,11 @@
             console.error('❌ عنصر selectedTeamTable غير موجود');
         }
 
+        // ====== HIDE ALERTS ======
         $('.bg-success-light').hide();
+        $(id('successAlert')).addClass('d-none');
 
+        // ====== LOAD DATA ======
         const teamsLoaded = await loadTeams();
 
         updateSelectedTeamTableHeader();
@@ -954,11 +996,34 @@
             await loadExistingAssignments(evaluationRequestId);
         }
 
+        // ====== INIT EVENT LISTENERS ======
         initEventListeners();
+
+        console.log('✅ Assignments initialized with fresh state for fieldId:', fieldId);
     };
 
-    // ================== PUBLIC API ==================
+    // ================== INTERNAL RESET FUNCTION ==================
 
+    function resetStateInternal() {
+        // إعادة ضبط جميع متغيرات الحالة
+        state.fieldId = null;
+        state.evaluationRequestId = null;
+        state.teams = [];
+        state.members = [];
+        state.allMembers = [];
+        state.selectedAssignments = [];
+        state.scopes = [];
+        state.pendingRemoval = new Set();
+        state.isNDA = false;
+        state.teamLeaderId = null;
+        state.ndaStatus = {};
+        state.existingAssignments = [];
+        state.$root = null;
+
+        console.log('🔄 State reset for new initialization');
+    }
+
+    // ================== PUBLIC API ==================
     ns.getState = function () {
         return state;
     };
@@ -966,6 +1031,34 @@
     ns.getSelectedAssignments = function () {
         return state.selectedAssignments;
     };
+    // ================== PUBLIC RESET ==================
 
+    ns.resetState = function () {
+        resetStateInternal();
+
+        // Clean up Select2 instances
+        if ($.fn.select2) {
+            $(document).find('.multiCheckSelect-dynamic').each(function () {
+                if ($(this).hasClass('select2-hidden-accessible')) {
+                    $(this).select2('destroy');
+                }
+            });
+        }
+
+        // Remove event listeners
+        $(document).off('change', '.team-leader-radio');
+        $(document).off('change', '.party-type-select');
+        $(document).off('change', '.nda-checkbox');
+        $(document).off('change', '#selectAllMembers');
+        $(document).off('change', '#userTable .row-select');
+        $(document).off('change', '.selected-row-checkbox');
+        $(document).off('change', '#selectAllSelected');
+        $(document).off('keyup', '#customSearch');
+        $(document).off('click', '#deleteSelectedBtn');
+        $(document).off('click', '.send-mail-btn');
+
+        console.log('🗑️ Assignments state and listeners cleaned up');
+    };
+   
 })(window.assignmentsLogic, jQuery);
 
