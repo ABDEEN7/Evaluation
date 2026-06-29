@@ -96,7 +96,7 @@ public class SchoolRepository(IServiceScopeFactory serviceScopeFactory,
         : er.FormEvalMatrixValue!.NameEn)
     .FirstOrDefault()
             });
-        var pageSize = Convert.ToInt32(systemSettingBL.GetSetting(ConstantKeys.SystemSettings.PageSizeForPlanSchools));
+        var pageSize = Convert.ToInt32(systemSettingBL.GetSetting(ConstantKeys.WebAppSettings.PAGE_SIZE_FOR_PLAN_SCHOOLS));
         return await query.GetPaginatedResult(request.PageNumber, pageSize);
     }
 

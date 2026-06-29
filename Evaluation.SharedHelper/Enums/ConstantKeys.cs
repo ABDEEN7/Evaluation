@@ -1,6 +1,4 @@
-﻿using Evaluation.DAL.Models.DepartementEntites;
-
-namespace Evaluation.SharedHelper.Enums;
+﻿namespace Evaluation.SharedHelper.Enums;
 
 #pragma warning disable S3218, S101
 public static class ConstantKeys
@@ -1138,6 +1136,7 @@ public static class ConstantKeys
         public static readonly string PAGE_SIZE_FOR_SCHOOL_EVALUATION_REQUESTS = "PageSizeForSchoolEvaluationRequests";
         public static readonly string PAGE_SIZE = "PAGE_SIZE";
         public static readonly string DefaultWebsiteBannerImage = "DefaultWebsiteBannerImage";
+        public static readonly string PAGE_SIZE_FOR_PLAN_SCHOOLS = "PageSizeForPlanSchools";
     }
 
     public static class WebHomePage
@@ -1534,7 +1533,6 @@ public static class ConstantKeys
         public static readonly string ADMIN_FILE_COUNT = "ADMIN_FILE_COUNT";
         public static readonly string ADMIN_PAGE_SIZE = "ADMIN_PAGE_SIZE";
         public static readonly string ResendEmailToSchool = "ResendEmailToSchool";
-        public static readonly string PageSizeForPlanSchools = "PageSizeForPlanSchools";
     }
     public static class EvalFormSettings
     {
