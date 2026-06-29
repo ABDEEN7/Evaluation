@@ -20,37 +20,33 @@ const sharedFn = (options) => {
     const InitialPageControls = (ControlItems,objdata=null) => {
         let divcontent = '<div class="row">';
         if (ControlItems) {
-            var formData = new FormData();
-            formData.append('request', JSON.stringify(ControlItems));
-            $.ajax({
-                url: `/UiControl/${deprouting}/UiControlList`,
+            const options = {
                 type: "POST",
                 dataType: "html",
-                processData: false,
-                contentType: false,
-                data: formData,
+                processData : false,
                 Mode: 'APP',
                 success: function (response) {
-                    if (response) {
-                        divcontent += response + "</div>";
-                        $formContent.empty();
-                        $formContent.append(divcontent);
-                        $formSection.show();
-                        $tblContentContainer.hide();
-                        if (typeof controlvalidationlist !== 'undefined') {
-                            initializeControl(controlvalidationlist, settingList, true);
-                            if (objdata != null) {
-                                BindData(controlvalidationlist, objdata);
-                            }
-                           
-                        }
-                    }
-                },
-                error: function (xhr, status, error) {
-                    console.error("UI Control load failed:", error);
-                }
-            });
+                        if (response) {
+                            divcontent += response + "</div>";
+                            $formContent.empty();
+                            $formContent.append(divcontent);
+                            $formSection.show();
+                            $tblContentContainer.hide();
+                            if (typeof controlvalidationlist !== 'undefined') {
+                                initializeControl(controlvalidationlist, settingList, true);
+                                if (objdata != null) {
+                                    BindData(controlvalidationlist, objdata);
+                                }
 
+                            }
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("UI Control load failed:", error);
+                    }
+            };
+
+            jqClient(options).Post(`/UiControl/${deprouting}/UiControlList`, ControlItems);
 
         }
 
@@ -1951,69 +1947,68 @@ const sharedFn = (options) => {
         $("#btn-clear_popup").html(getUiControlText("CLEAR_BUTTON"));
         let popupdivcontent = '<div class="row">';
         if (ControlItems) {
-            var formData = new FormData();
-            formData.append('request', JSON.stringify(ControlItems));
-            $.ajax({
-                url: `/UiControl/${deprouting}/UiControlList`,
+
+            const options = {
                 type: "POST",
                 dataType: "html",
                 processData: false,
-                contentType: false,
-                data: formData,
                 Mode: 'APP',
                 success: function (response) {
-                    if (response) {
-                        if (onlyTable == 0) {
-                            popupdivcontent = popupdivcontent + `${response}` + `</div>`;
+                        if (response) {
+                            if (onlyTable == 0) {
+                                popupdivcontent = popupdivcontent + `${response}` + `</div>`;
 
-                        }
+                            }
 
-                        if (popupdivcontent) {
+                            if (popupdivcontent) {
 
-                            if (tablecolumnlist) {
-                                popupdivcontent = popupdivcontent + '<div class="tabulator-wrapper"> <div id="divtable"></div> </div>';
-                                $('#ModalPopup .modal-body #PopupForm').html(popupdivcontent);
-                                table = tableUtil.createTabulator({
-                                    id: "divtable",
-                                    config: {
-                                        textDirection: txtDir,
-                                        pagination: "local",
-                                        paginationSize: 10,
-                                        placeholder: sharedFn().GetUiControlText('NO_DATA_FOUND'),
-                                        headerFilterPlaceholder: sharedFn().GetUiControlText('FILTER_COLUMN'),
-                                    },
-                                    isResponsiveLayout: false,
-                                    uniqueRowId: 'id',
-                                    sortColumn: "updateDate",
-                                    sortDir: "desc",
-                                    columns: tablecolumnlist,
-                                });
-                                if (window.hasOwnProperty("Loadtabledata")) {
-                                    Loadtabledata();
+                                if (tablecolumnlist) {
+                                    popupdivcontent = popupdivcontent + '<div class="tabulator-wrapper"> <div id="divtable"></div> </div>';
+                                    $('#ModalPopup .modal-body #PopupForm').html(popupdivcontent);
+                                    table = tableUtil.createTabulator({
+                                        id: "divtable",
+                                        config: {
+                                            textDirection: txtDir,
+                                            pagination: "local",
+                                            paginationSize: 10,
+                                            placeholder: sharedFn().GetUiControlText('NO_DATA_FOUND'),
+                                            headerFilterPlaceholder: sharedFn().GetUiControlText('FILTER_COLUMN'),
+                                        },
+                                        isResponsiveLayout: false,
+                                        uniqueRowId: 'id',
+                                        sortColumn: "updateDate",
+                                        sortDir: "desc",
+                                        columns: tablecolumnlist,
+                                    });
+                                    if (window.hasOwnProperty("Loadtabledata")) {
+                                        Loadtabledata();
+                                    }
+
+                                }
+                                else {
+                                    $('#ModalPopup .modal-body #PopupForm').html(popupdivcontent);
+                                }
+                                initializePopupControl(ControlItems, settingList);
+                                if (window.hasOwnProperty("SetDropDown")) {
+                                    SetDropDown();
                                 }
 
-                            }
-                            else {
-                                $('#ModalPopup .modal-body #PopupForm').html(popupdivcontent);
-                            }
-                            initializePopupControl(ControlItems, settingList);
-                            if (window.hasOwnProperty("SetDropDown")) {
-                                SetDropDown();
-                            }
+                                SetValueFromDropdown();
+                                SetValueToDropdown();
+                                SetPopupData(ControlItems, groupObject);
 
-                            SetValueFromDropdown();
-                            SetValueToDropdown();
-                            SetPopupData(ControlItems, groupObject);
+                                ValidateInput();
 
-                            ValidateInput();
-
+                            }
                         }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("UI Control load failed:", error);
                     }
-                },
-                error: function (xhr, status, error) {
-                    console.error("UI Control load failed:", error);
-                }
-            });
+            };
+          
+            jqClient(options).Post(`/UiControl/${deprouting}/UiControlList`, ControlItems);
+
         }
 
 

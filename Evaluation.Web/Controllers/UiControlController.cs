@@ -16,10 +16,8 @@ namespace Evaluation.Web.Controllers
 
 
         [HttpPost("UiControlList")]
-        public IActionResult UiControlList()
+        public IActionResult UiControlList([FromBody] List<UiControlItemDTO> model)
         {
-            var model = Request.Form["request"][0]?.StringToObject<List<UiControlItemDTO>>();
-
             return ViewComponent("UiControlList", model);
         }
 
