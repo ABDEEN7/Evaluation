@@ -28,6 +28,7 @@ namespace Evaluation.SharedHelper.Models.Admin
         public int? Level { get; set; }
         public int? LevelsUp { get; set; }
         public int? LevelsDown { get; set; }
+        public Guid? DepartmentId { get; set; }
 
     }
 }

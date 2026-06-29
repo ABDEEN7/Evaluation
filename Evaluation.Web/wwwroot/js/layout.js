@@ -23,7 +23,7 @@ const loadMainNavbar = () => {
 
         }
     };
-    return jqClient(options).Get('/website/getnavbar');
+    return jqClient(options).Get(`/website/getnavbar?deprouting=${deprouting}`);
 };
 function createNavItem(item) {
     let dropdownClass = 'nav-item';
@@ -38,7 +38,7 @@ function createNavItem(item) {
     if (isNavParent) {
         $a.append($("<i>").addClass("fa fa-chevron-down toggle-dropdown"));
     }
-        
+
 
     if (item.target) {
         $a.attr("target", item.target);
@@ -86,7 +86,7 @@ function removeParameterFromUrl(url, parameterKey) {
 
 
 $(document).ready(async function () {
-   
+
     loadMainNavbar().then(() => {
         document.querySelectorAll('.navmenu .toggle-dropdown').forEach(navmenu => {
             navmenu.addEventListener('click', function (e) {
@@ -97,7 +97,7 @@ $(document).ready(async function () {
             });
         });
     });
-    
+    loadDepartments();
 });
 
 

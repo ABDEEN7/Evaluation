@@ -47,14 +47,13 @@ namespace Evaluation.API.Controllers
             return Ok(new { result = GetAllDepartmentsForWebGroupList(webGroupPath) });
         }
         [HttpGet()]
-        public async Task<List<NavbarDTO>> GetNavbar()
+        public async Task<List<NavbarDTO>> GetNavbar(string? deprouting)
         {
-            var lang = _requestInfo.Lang;
-            var navbars = await _masterBl.GetApiService<WebsiteBL>().GetNavbarList(lang);
+            var navbars = await _masterBl.GetApiService<WebsiteBL>().GetNavbarList(deprouting);
             return navbars;
         }
         [HttpGet()]
-        public async Task<List<BannerDTO>> GetBanner([FromQuery] string webGroupPath )
+        public async Task<List<BannerDTO>> GetBanner([FromQuery] string webGroupPath)
         {
             var lang = _requestInfo.Lang;
 
