@@ -1534,6 +1534,7 @@ public static class ConstantKeys
         public static readonly string ADMIN_FILE_COUNT = "ADMIN_FILE_COUNT";
         public static readonly string ADMIN_PAGE_SIZE = "ADMIN_PAGE_SIZE";
         public static readonly string ResendEmailToSchool = "ResendEmailToSchool";
+        public static readonly string PageSizeForPlanSchools = "PageSizeForPlanSchools";
     }
     public static class EvalFormSettings
     {

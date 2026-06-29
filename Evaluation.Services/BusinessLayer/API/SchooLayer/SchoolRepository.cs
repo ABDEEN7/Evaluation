@@ -7,7 +7,9 @@ using Evaluation.DAL.Models.FormsModules;
 using Evaluation.DAL.Models.Org;
 using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
 using Evaluation.DAL.Repositories;
+using Evaluation.Services.BusinessLayer.API.SystemSettingLayer;
 using Evaluation.Services.Extensions;
+using Evaluation.Services.Models.Admin;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Consts;
 using Evaluation.SharedHelper.Dtos.SchoolDto;
@@ -30,6 +32,7 @@ public class SchoolRepository(IServiceScopeFactory serviceScopeFactory,
     IMapper mapper,
     UserInfo userInfo,
     IServiceProvider serviceProvider,
+    SystemSettingBL systemSettingBL,
     RequestInfo requestInfo
     ) : ApiBase(serviceScopeFactory, cacheDataProvider, unitOfWork, loggingServices, mapper, userInfo,
         serviceProvider, requestInfo)
@@ -45,7 +48,8 @@ public class SchoolRepository(IServiceScopeFactory serviceScopeFactory,
              .Include(x => x.SchoolType)
              .Include(x => x.SchoolLevel)
              .ThenInclude(x => x.EducationLevel);
-        return await query.GetPaginatedResult(request.PageNumber, request.PageSize = 10);
+
+        return await query.GetPaginatedResult(request.PageNumber, request.PageSize);
     }
     public async Task<PaginatedResult<ResponseOrgsPlans>> GetSchoolsAsync(
     SchoolRequest request,
@@ -92,8 +96,8 @@ public class SchoolRepository(IServiceScopeFactory serviceScopeFactory,
         : er.FormEvalMatrixValue!.NameEn)
     .FirstOrDefault()
             });
-
-        return await query.GetPaginatedResult(request.PageNumber, request.PageSize);
+        var pageSize = Convert.ToInt32(systemSettingBL.GetSetting(ConstantKeys.SystemSettings.PageSizeForPlanSchools));
+        return await query.GetPaginatedResult(request.PageNumber, pageSize);
     }
 
     public async Task<List<School>> GetSchoolsByDepartmentId(Guid depId)
