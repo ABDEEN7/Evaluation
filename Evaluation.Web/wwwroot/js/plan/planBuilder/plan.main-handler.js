@@ -357,7 +357,7 @@
 
         const params = new URLSearchParams({
             pageNumber: page,
-            pageSize: 9999 
+            pageSize: state.pageSize 
         });
 
         if (state.searchTerm) {
@@ -400,7 +400,7 @@
         const params = new URLSearchParams();
         schoolIds.forEach(id => params.append('schoolIds', id));
         params.append('pageNumber', 1);
-        params.append('pageSize', 9999); // جلب الكل ثم نقسّم client-side
+        params.append('pageSize', state.pageSize);
 
         showLoadingState(fieldId);
 
@@ -431,7 +431,7 @@
 
         const params = new URLSearchParams({
             pageNumber: 1,
-            pageSize: 9999 
+            pageSize: state.pageSize 
         });
 
         if (state.searchTerm) {
@@ -639,11 +639,11 @@
         const showOnly = $(element).is(':checked');
 
         if (showOnly) {
-            // فلتر من allSchools — فقط المحددة
+
             const selectedIds = new Set(state.selectedSchoolsMap?.keys() || []);
             const filtered = state.allSchools.filter(s => selectedIds.has(s.id));
 
-            // خزّن الـ allSchools الأصلية مؤقتاً
+            
             state._allSchoolsBackup = state.allSchools;
             state.allSchools = filtered;
             state.totalRecords = filtered.length;
