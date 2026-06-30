@@ -307,7 +307,7 @@ function renderRowName(fieldId, itemId, text, relatedItems) {
             ? `<span class="info-icon info-button"
                      title="عرض البنود المرتبطة"
                      onclick="openRelatedItemModal('${fieldId}', '${itemId}')"
-                     >ⓘ</span>`
+                     ><i class="las la-info-circle"></i></span>`
             : ''}
         </div>
     `;
@@ -455,7 +455,10 @@ const relatedItemPopup = (fieldId, rowsHtml, hasAnyNote) => `
                     <div>
                         <h4 class="modal-title fw-semibold mb-2">البنود المرتبطة</h4>
                     </div>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                     <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal" aria-label="Close">
+                        <i class="la la-close me-1 fs-14"></i><span class="close-text">Close</span>
+                    </button>
+
                 </div>
 
                 <div class="modal-body py-0">
@@ -623,7 +626,7 @@ async function initForm(formId, fieldId, readOnly, savedResults, evaluationReque
     const tableHtml = buildHorizontalTableHtml(matrixValues);
 
     const resultBannerHtml = `
-        <div id="${fieldId}-form-result-div" class="d-none bg-primary d-flex justify-content-between align-items-center py-2">
+        <div id="${fieldId}-form-result-div" class="d-none result-bg d-flex justify-content-between align-items-center py-2 px-4 mb-3">
             <div class="text-white">Result:</div>
             <div class="text-white" id="${fieldId}-form-result-value"></div>
         </div>
@@ -852,12 +855,29 @@ function bindFormEvents(fieldId) {
 
     // Eval-mode rows: change -> recalc, toggle -> expand/collapse
     root.querySelectorAll('.row-item.main-row:not(.rename-row) .row-select').forEach(sel => {
-        sel.addEventListener('change', () => calculateFE(formId, fieldId));
+
+        if (sel.selectedIndex > 0) {
+            sel.classList.add("selected");
+        }
+
+        sel.addEventListener('change', function () {
+            this.classList.toggle("selected", this.selectedIndex > 0);
+            calculateFE(formId, fieldId);
+        });
     });
 
     root.querySelectorAll('.row-item.child-row .row-select').forEach(sel => {
-        sel.addEventListener('change', () => calculateFE(formId, fieldId));
+
+        if (sel.selectedIndex > 0) {
+            sel.classList.add("selected");
+        }
+
+        sel.addEventListener('change', function () {
+            this.classList.toggle("selected", this.selectedIndex > 0);
+            calculateFE(formId, fieldId);
+        });
     });
+
 
     root.querySelectorAll('.row-item.main-row.has-subitems').forEach(rowDiv => {
         const itemId = rowDiv.dataset.itemId;
@@ -1405,19 +1425,22 @@ function buildHorizontalTable(data) {
 function buildHorizontalTableHtml(data) {
     const nameCellsHtml = data.map(item => `<th>${escapeAttr(item.name)}</th>`).join('');
     const rangeCellsHtml = data.map(item => `<td>${item.displayRange}</td>`).join('');
-
     return `
-        <table border="1" style="border-collapse: collapse;" class="table table-bordered table-hover align-middle w-100 dataTable no-footer">
-            <thead class="table-light">
-                <tr>
-                    <th>Name</th>
-                    ${nameCellsHtml}
-                </tr>
-            </thead>
+<div style="border-radius:20px; overflow:hidden;" class="mb-3">
+    <table class="table table-bordered table-hover align-middle text-center w-100 dataTable">
+        <thead class="table-light">
+            <tr>
+                <th>Name</th>
+                ${nameCellsHtml}
+            </tr>
+        </thead>
+        <tbody>
             <tr>
                 <td>Range</td>
                 ${rangeCellsHtml}
             </tr>
-        </table>
-    `;
+        </tbody>
+    </table>
+</div>
+`;
 }
