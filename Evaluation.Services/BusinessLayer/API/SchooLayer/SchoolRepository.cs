@@ -7,7 +7,9 @@ using Evaluation.DAL.Models.FormsModules;
 using Evaluation.DAL.Models.Org;
 using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
 using Evaluation.DAL.Repositories;
+using Evaluation.Services.BusinessLayer.API.SystemSettingLayer;
 using Evaluation.Services.Extensions;
+using Evaluation.Services.Models.Admin;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Consts;
 using Evaluation.SharedHelper.Dtos.SchoolDto;
@@ -30,6 +32,7 @@ public class SchoolRepository(IServiceScopeFactory serviceScopeFactory,
     IMapper mapper,
     UserInfo userInfo,
     IServiceProvider serviceProvider,
+    SystemSettingBL systemSettingBL,
     RequestInfo requestInfo
     ) : ApiBase(serviceScopeFactory, cacheDataProvider, unitOfWork, loggingServices, mapper, userInfo,
         serviceProvider, requestInfo)
@@ -45,7 +48,8 @@ public class SchoolRepository(IServiceScopeFactory serviceScopeFactory,
              .Include(x => x.SchoolType)
              .Include(x => x.SchoolLevel)
              .ThenInclude(x => x.EducationLevel);
-        return await query.GetPaginatedResult(request.PageNumber, request.PageSize = 10);
+
+        return await query.GetPaginatedResult(request.PageNumber, request.PageSize);
     }
     public async Task<PaginatedResult<ResponseOrgsPlans>> GetSchoolsAsync(
     SchoolRequest request,
@@ -92,8 +96,8 @@ public class SchoolRepository(IServiceScopeFactory serviceScopeFactory,
         : er.FormEvalMatrixValue!.NameEn)
     .FirstOrDefault()
             });
-
-        return await query.GetPaginatedResult(request.PageNumber, request.PageSize);
+        var pageSize = Convert.ToInt32(systemSettingBL.GetSetting(ConstantKeys.WebAppSettings.PAGE_SIZE_FOR_PLAN_SCHOOLS));
+        return await query.GetPaginatedResult(request.PageNumber, pageSize);
     }
 
     public async Task<List<School>> GetSchoolsByDepartmentId(Guid depId)
@@ -159,7 +163,7 @@ public class SchoolRepository(IServiceScopeFactory serviceScopeFactory,
     public async Task<List<SchoolGenderDto>> GetSchoolGender()
     {
         using var scopeUow = serviceProvider.CreateScopedUow();
-        var gender =await
+        var gender = await
         scopeUow
         .GetRepository<SchoolGender>()
         .GetAllActiveNonDeleted()
@@ -198,7 +202,11 @@ public class SchoolRepository(IServiceScopeFactory serviceScopeFactory,
         if (request.SchoolIds != null && request.SchoolIds.Count > 0)
             filter = filter.And(c => request.SchoolIds.Contains(c.Id));
         if (!string.IsNullOrWhiteSpace(request.Name))
-            filter = filter.And(s => s.NameEn.Contains(request.Name) || s.NameAr.Contains(request.Name));
+        {
+            var normalizedName = System.Text.RegularExpressions.Regex
+        .Replace(request.Name.Trim(), @"\s+", " ").ToLower();
+            filter = filter.And(s => s.NameEn.ToLower().Contains(normalizedName) || s.NameAr.ToLower().Contains(normalizedName));
+        }
         if (request.EstablishmentDate.HasValue)
         {
             filter = filter.And(s =>

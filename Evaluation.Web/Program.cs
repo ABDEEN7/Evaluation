@@ -1,8 +1,8 @@
+using Evaluation.SharedHelper.Models;
 using Evaluation.Web.Filters;
 using Evaluation.Web.Middlewares;
 using Evaluation.Web.Special;
 using Microsoft.AspNetCore.StaticFiles;
-using Evaluation.SharedHelper.Models;
 internal class Program
 {
     private static void Main(string[] args)

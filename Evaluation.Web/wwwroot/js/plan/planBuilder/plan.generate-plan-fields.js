@@ -154,6 +154,13 @@ const planUtility = window.planUtility;
             <span>${t('lblSelectedSchools') || 'المدارس المحددة'}:</span>
             <span id="${pid(fieldId, 'selectedSchoolsCounter')}">0</span>
         </div>
+        <div class="form-check form-switch ms-2">
+    <input class="form-check-input" type="checkbox"
+           id="${pid(fieldId, 'showSelectedOnly')}" >
+    <label class="form-check-label" for="${pid(fieldId, 'showSelectedOnly')}">
+        ${t('lblShowSelectedOnly') || 'المحدد فقط'}
+    </label>
+</div>
     </div>
 
     <div class="col-md-2">

@@ -50,11 +50,14 @@
 
     @await RenderSectionAsync("Styles", required: false)
 
+    <link href="~/css/loader-style.css" rel="stylesheet" />
+
     <script src='~/assets/js/jquery.min.js'></script>
 
 </head>
 
 <body>
+    <div id="cover-spin"></div>
     <!-- ======= Top Bar ======= -->
     @await Component.InvokeAsync("Navbar")
     <!-- ======= Header ======= -->

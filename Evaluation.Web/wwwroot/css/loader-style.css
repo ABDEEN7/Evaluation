@@ -1,0 +1,27 @@
+﻿#cover-spin {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(255,255,255,.7);
+    z-index: 99999;
+}
+
+    #cover-spin::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 100px;
+        height: 100px;
+        margin: -25px 0 0 -25px;
+        border: 10px solid #ddd;
+        border-top-color: #8a1538;
+        border-radius: 50%;
+        animation: spin .8s linear infinite;
+    }
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}

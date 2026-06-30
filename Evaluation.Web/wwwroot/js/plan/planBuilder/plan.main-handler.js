@@ -42,10 +42,11 @@
             pageSize: TABLE_CONFIG.pageSize || 10,
             currentPage: 1,
             totalRecords: 0,
+            allSchools: [],
             filters: {},
             searchTerm: '',
             selectedSchools: [],
-            selectedSchoolsMap: null // Map to track selected schools when editing
+            selectedSchoolsMap: null
         };
     }
 
@@ -67,7 +68,6 @@
         }
         const state = createInstanceState(fieldId);
         state.isReadOnly = isReadOnly;
-        //Store plan Id
         if (planObject && planObject.id) {
             state.planId = planObject.id;
         }
@@ -164,20 +164,6 @@
 
     /* ===================== POPULATE ===================== */
 
-    //const populatePlanTypes = (fieldId) => {
-    //    const $s = $p(fieldId, 'ddlPlanType');
-
-    //    if ($s.hasClass("select2-hidden-accessible")) {
-    //        $s.select2('destroy');
-    //    }
-    //    $s.empty().append(`<option value="">${t('lblChoosePlanType')}</option>`);
-
-    //    ns.planTypes.forEach(t =>
-    //        $s.append(`<option value="${t.id}" data-backendname="${t.backendName}">${t.name}</option>`)
-    //    );
-
-    //    $s.select2({ width: '100%', allowClear: true });
-    //};
     const populatePlanTypes = (fieldId, elementId = null) => {
         const parentElement = elementId ? $(`#${elementId}`) : null;
         const idPrefix = fieldId ? `${fieldId}_` : '';
@@ -199,7 +185,6 @@
         });
 
         const $modal = $s.closest('.modal');
-
         const dropdownParent =
             (parentElement && parentElement.length) ? parentElement :
                 ($modal.length ? $modal : $(document.body));
@@ -211,10 +196,8 @@
         });
     };
 
-
     const populateSemesters = (fieldId, elementId = null) => {
         const parentElement = elementId ? $(`#${elementId}`) : null;
-
         const $s = $p(fieldId, 'ddlSemester');
 
         if ($s.hasClass("select2-hidden-accessible")) {
@@ -249,9 +232,9 @@
         const $select = $p(fieldId, 'filterParentOrgTree');
         if (!$select.length) return;
         ns.parentSchool.forEach(parent => {
-            $select.append(`<option value="${parent.id}">${parent.nameEn}</option>`)
+            $select.append(`<option value="${parent.id}">${parent.nameEn}</option>`);
         });
-    }
+    };
     const populateFilterPreviousResult = (fieldId) => {
         const $select = $p(fieldId, 'filterPreviousResult');
         if (!$select.length) return;
@@ -261,12 +244,10 @@
     };
     const initializeFilterDatePickers = (fieldId) => {
         const dateFields = ['filterLastEvalDate', 'filterCreatedDate', 'filterNextEvalDate'];
-
         const isAr = document.documentElement.lang.toLowerCase().startsWith('ar');
 
         dateFields.forEach(field => {
             const $input = $p(fieldId, field);
-
             if ($input.length && typeof flatpickr !== 'undefined') {
                 flatpickr($input[0], {
                     locale: isAr ? "ar" : "default",
@@ -293,20 +274,16 @@
         });
     };
 
-
     /* ===================== RENDER ===================== */
 
     const renderNewPlan = (fieldId) => {
         const state = instances.get(fieldId);
-
         const form = ns.renderPlanForm(fieldId, null, state.isReadOnly);
         $p(fieldId, 'planFormContainer').find('.form-container').html(form);
-
 
         loadSchools(fieldId, 1);
         initCustomMode(fieldId);
     };
-
 
     const renderPlanWithData = (fieldId, plan, element) => {
         const state = instances.get(fieldId);
@@ -338,13 +315,12 @@
         }
         $p(fieldId, 'parentDate').val(vm.dateRange);
 
-        // ✅ MODIFIED: Create a Map of selected schools with their data AND extract IDs
         const selectedSchoolsMap = new Map();
-        const selectedSchoolIds = []; // NEW: Array to store school IDs
+        const selectedSchoolIds = [];
 
         vm.schools.forEach(s => {
-            const schoolId = s.id || s.schoolId || s.id;
-            selectedSchoolIds.push(schoolId); // NEW: Collect school IDs
+            const schoolId = s.id || s.schoolId;
+            selectedSchoolIds.push(schoolId);
             selectedSchoolsMap.set(schoolId, {
                 id: schoolId,
                 visitDate: s.visitDate || (s.startEvaluationDate && s.endEvaluationDate ?
@@ -355,10 +331,8 @@
             });
         });
 
-        // ✅ Store selected schools map in state
         state.selectedSchoolsMap = selectedSchoolsMap;
 
-        // ✅ MODIFIED: If readonly, load ONLY selected schools. Otherwise, load all schools
         if (state.isReadOnly && selectedSchoolIds.length > 0) {
             loadSelectedSchoolsOnly(fieldId, selectedSchoolIds, selectedSchoolsMap);
         } else {
@@ -368,52 +342,49 @@
         initializeDatePickers(fieldId, vm);
     };
 
-    /* ===================== SCHOOLS (Backend Only) ===================== */
-
+    /* ===================== SCHOOLS ===================== */
     const loadSchoolsWithSelection = (fieldId, page = 1, filters = {}, selectedSchoolsMap = null) => {
         const state = instances.get(fieldId);
-        state.currentPage = page;
         state.filters = filters;
 
-        // Build query parameters
+        if (state.allSchools.length > 0 && page !== 1) {
+            state.currentPage = page;
+            renderPageFromCache(fieldId);
+            return;
+        }
+
+        state.currentPage = 1;
+
         const params = new URLSearchParams({
             pageNumber: page,
-            pageSize: state.pageSize
+            pageSize: state.pageSize 
         });
 
-        // Add search term
         if (state.searchTerm) {
             params.append('search', state.searchTerm);
         }
 
-        // Add filters
         Object.keys(filters).forEach(k => {
             if (filters[k]) params.append(k, filters[k]);
         });
 
+        if (selectedSchoolsMap || state.selectedSchoolsMap) {
+            const map = selectedSchoolsMap || state.selectedSchoolsMap;
+            map.forEach((_, id) => params.append('prioritizeSchoolIds', id));
+        }
+
         showLoadingState(fieldId);
 
-        // Call API to get all schools
         jqClient().Get(`${API_ENDPOINTS.GET_SCHOOLS}?${params}`)
             .done(r => {
-                const schools = r.items || [];
-                state.totalRecords = r.totalCount || 0;
+                state.allSchools = r.items || [];
+                state.totalRecords = state.allSchools.length;
 
-                // Render table with selected schools map
-                const tbody = ns.renderSchoolTable(
-                    fieldId,
-                    schools,
-                    state.isReadOnly,
-                    selectedSchoolsMap || state.selectedSchoolsMap
-                );
+                if (selectedSchoolsMap) {
+                    state.selectedSchoolsMap = selectedSchoolsMap;
+                }
 
-                $p(fieldId, 'planTable').find('tbody').replaceWith(tbody);
-
-                // Render pagination
-                renderPagination(fieldId);
-
-                attachRowEvents(fieldId);
-                initChildPickerForTable(fieldId);
+                renderPageFromCache(fieldId);
             })
             .fail(err => {
                 console.error(`[PlanHandler] Failed to load schools`, err);
@@ -421,44 +392,25 @@
             });
     };
 
-    // ✅ NEW FUNCTION: Load only selected schools by IDs (for readonly mode)
+    
     const loadSelectedSchoolsOnly = (fieldId, schoolIds, selectedSchoolsMap) => {
         const state = instances.get(fieldId);
+        state.currentPage = 1;
 
-        // Build query parameters with school IDs
         const params = new URLSearchParams();
-
-        schoolIds.forEach(id => {
-            params.append('schoolIds', id);
-        });
-
-        params.append('page', 1);
-        params.append('pageSize', schoolIds.length);
+        schoolIds.forEach(id => params.append('schoolIds', id));
+        params.append('pageNumber', 1);
+        params.append('pageSize', state.pageSize);
 
         showLoadingState(fieldId);
 
-        // Call API to get only selected schools
         jqClient().Get(`${API_ENDPOINTS.GET_SCHOOLS}?${params}`)
             .done(r => {
-                const schools = r.items || [];
-                state.totalRecords = schools.length; // Set total to the number of selected schools
-                state.currentPage = 1;
+                state.allSchools = r.items || [];
+                state.totalRecords = state.allSchools.length;
+                state.selectedSchoolsMap = selectedSchoolsMap;
 
-                // Render table with all schools pre-selected
-                const tbody = ns.renderSchoolTable(
-                    fieldId,
-                    schools,
-                    state.isReadOnly,
-                    selectedSchoolsMap
-                );
-
-                $p(fieldId, 'planTable').find('tbody').replaceWith(tbody);
-
-                // Render pagination (will show 1 page with all selected schools)
-                renderPagination(fieldId);
-
-                attachRowEvents(fieldId);
-                initChildPickerForTable(fieldId);
+                renderPageFromCache(fieldId);
             })
             .fail(err => {
                 console.error(`[PlanHandler] Failed to load selected schools`, err);
@@ -468,50 +420,59 @@
 
     const loadSchools = (fieldId, page = 1, filters = {}) => {
         const state = instances.get(fieldId);
-        state.currentPage = page;
         state.filters = filters;
+        if (state.allSchools.length > 0 && page !== 1) {
+            state.currentPage = page;
+            renderPageFromCache(fieldId);
+            return;
+        }
 
-        // query parameters
+        state.currentPage = 1;
+
         const params = new URLSearchParams({
-            pageNumber: page,
-            pageSize: state.pageSize
+            pageNumber: 1,
+            pageSize: state.pageSize 
         });
 
-        // 
         if (state.searchTerm) {
             params.append('search', state.searchTerm);
         }
 
-        // ✅ إضافة الفلاتر
         Object.keys(filters).forEach(k => {
             if (filters[k]) params.append(k, filters[k]);
         });
 
         showLoadingState(fieldId);
-        // ✅ استدعاء API
+
         jqClient().Get(`${API_ENDPOINTS.GET_SCHOOLS}?${params}`)
             .done(r => {
-                const schools = r.items || [];
-                state.totalRecords = r.totalCount || 0;
-                const tbody = ns.renderSchoolTable(
-                    fieldId,
-                    schools,
-                    state.isReadOnly,
-                    state.selectedSchoolsMap // Pass the selection map if it exists
-                );
+                state.allSchools = r.items || [];
+                state.totalRecords = state.allSchools.length;
 
-                $p(fieldId, 'planTable').find('tbody').replaceWith(tbody);
-
-                // ✅ عرض Pagination
-                renderPagination(fieldId);
-
-                attachRowEvents(fieldId);
-                initChildPickerForTable(fieldId);
+                renderPageFromCache(fieldId);
             })
             .fail(err => {
                 console.error(`[PlanHandler] Failed to load schools`, err);
                 showErrorState(fieldId);
             });
+    };
+    const renderPageFromCache = (fieldId) => {
+        const state = instances.get(fieldId);
+        const start = (state.currentPage - 1) * state.pageSize;
+        const end = start + state.pageSize;
+        const pageSchools = state.allSchools.slice(start, end);
+
+        const tbody = ns.renderSchoolTable(
+            fieldId,
+            pageSchools,
+            state.isReadOnly,
+            state.selectedSchoolsMap
+        );
+
+        $p(fieldId, 'planTable').find('tbody').replaceWith(tbody);
+        renderPagination(fieldId);
+        attachRowEvents(fieldId);
+        initChildPickerForTable(fieldId);
     };
 
     const loadSchoolLevels = () =>
@@ -532,7 +493,8 @@
                     ns.depConfig = {};
                 }
             });
-    /* ===================== PAGINATION ===================== */
+
+    /* ===================== PAGINATION (Client-Side) ===================== */
 
     const renderPagination = (fieldId) => {
         const state = instances.get(fieldId);
@@ -554,18 +516,17 @@
                 .text(`${t('lblPrevious')}`)
                 .on('click', function (e) {
                     e.preventDefault();
-                    loadSchools(fieldId, state.currentPage - 1, state.filters);
+                    goToPage(fieldId, state.currentPage - 1);
                 });
             prevItem.append(prevLink);
             pagination.append(prevItem);
         }
 
-        // Page numbers (محدودة لـ 5 صفحات فقط للعرض)
         const startPage = Math.max(1, state.currentPage - 2);
         const endPage = Math.min(totalPages, state.currentPage + 2);
 
         if (startPage > 1) {
-            pagination.append(createPageItem(fieldId, 1, state.currentPage === 1, state.filters));
+            pagination.append(createPageItem(fieldId, 1, state.currentPage === 1));
             if (startPage > 2) {
                 pagination.append($('<li>').addClass('page-item disabled').append(
                     $('<span>').addClass('page-link').text('...')
@@ -574,7 +535,7 @@
         }
 
         for (let i = startPage; i <= endPage; i++) {
-            pagination.append(createPageItem(fieldId, i, state.currentPage === i, state.filters));
+            pagination.append(createPageItem(fieldId, i, state.currentPage === i));
         }
 
         if (endPage < totalPages) {
@@ -583,7 +544,7 @@
                     $('<span>').addClass('page-link').text('...')
                 ));
             }
-            pagination.append(createPageItem(fieldId, totalPages, state.currentPage === totalPages, state.filters));
+            pagination.append(createPageItem(fieldId, totalPages, state.currentPage === totalPages));
         }
 
         // Next button
@@ -595,7 +556,7 @@
                 .text(`${t('lblNext')}`)
                 .on('click', function (e) {
                     e.preventDefault();
-                    loadSchools(fieldId, state.currentPage + 1, state.filters);
+                    goToPage(fieldId, state.currentPage + 1);
                 });
             nextItem.append(nextLink);
             pagination.append(nextItem);
@@ -604,11 +565,16 @@
         $p(fieldId, 'dtPagination').html(pagination);
     };
 
-    const createPageItem = (fieldId, pageNum, isActive, filters) => {
+    
+    const goToPage = (fieldId, pageNum) => {
+        const state = instances.get(fieldId);
+        state.currentPage = pageNum;
+        renderPageFromCache(fieldId);
+    };
+
+    const createPageItem = (fieldId, pageNum, isActive) => {
         const pageItem = $('<li>').addClass('page-item');
-        if (isActive) {
-            pageItem.addClass('active');
-        }
+        if (isActive) pageItem.addClass('active');
 
         const pageLink = $('<a>')
             .addClass('page-link')
@@ -617,7 +583,7 @@
             .on('click', function (e) {
                 e.preventDefault();
                 if (!isActive) {
-                    loadSchools(fieldId, pageNum, filters);
+                    goToPage(fieldId, pageNum);
                 }
             });
 
@@ -634,7 +600,10 @@
             console.error(`[PlanHandler] Wrapper not found for ${fieldId}`);
             return;
         }
-
+        $wrapper.off('change', pid(fieldId, 'showSelectedOnly'))
+            .on('change', pid(fieldId, 'showSelectedOnly'), function () {
+                onShowSelectedOnly(fieldId, this);
+            });
         $wrapper.off('change', pid(fieldId, 'ddlPlanType'))
             .on('change', pid(fieldId, 'ddlPlanType'), function () {
                 onPlanTypeChange(fieldId, this);
@@ -659,12 +628,38 @@
             .on('click', pid(fieldId, 'clearFiltersBtn'), function () {
                 clearFilters(fieldId);
             });
+
         $wrapper.off('change', `#${pidRaw(fieldId, 'filterSchoolLevel')}`)
             .on('change', `#${pidRaw(fieldId, 'filterSchoolLevel')}`, function () {
                 populateFilterGrades(fieldId, $(this).val());
             });
     };
+    const onShowSelectedOnly = (fieldId, element) => {
+        const state = instances.get(fieldId);
+        const showOnly = $(element).is(':checked');
 
+        if (showOnly) {
+
+            const selectedIds = new Set(state.selectedSchoolsMap?.keys() || []);
+            const filtered = state.allSchools.filter(s => selectedIds.has(s.id));
+
+            
+            state._allSchoolsBackup = state.allSchools;
+            state.allSchools = filtered;
+            state.totalRecords = filtered.length;
+            state.currentPage = 1;
+        } else {
+            
+            if (state._allSchoolsBackup) {
+                state.allSchools = state._allSchoolsBackup;
+                state.totalRecords = state.allSchools.length;
+                state._allSchoolsBackup = null;
+            }
+            state.currentPage = 1;
+        }
+
+        renderPageFromCache(fieldId);
+    };
     const attachRowEvents = (fieldId) => {
         const $table = $p(fieldId, 'planTable');
         const state = instances.get(fieldId);
@@ -710,6 +705,7 @@
                 state.selectedSchools = Array.from(state.selectedSchoolsMap.values());
             }
         });
+
         const cfg = window.planUtility?.depConfig || {};
         if (fieldId === 'resendemail' && cfg.resendEmail === true) {
             $table.find('[data-action="resend-email"]').off('click').on('click', function (e) {
@@ -731,9 +727,8 @@
                         $btn.removeClass('disabled');
                     });
             });
-        };
+        }
     };
-
 
     /* ===================== HANDLERS ===================== */
 
@@ -761,7 +756,7 @@
 
         ns.initChildPicker(start, end);
     };
-    
+
     const initYearMode = (fieldId) => {
         const ay = ns.currentAcademicYear;
         if (ay?.start && ay?.end) {
@@ -770,7 +765,6 @@
             $p(fieldId, 'parentDate').val(`${start} to ${end}`).prop('disabled', true);
             ns.initChildPicker(ay.start, ay.end);
         } else {
-            // fallback to calendar year
             const y = new Date().getFullYear();
             const start = `${y}-01-01`;
             const end = `${y}-12-31`;
@@ -816,6 +810,7 @@
             }
         }
     };
+
     const updateSelectionCounter = (fieldId) => {
         const state = instances.get(fieldId);
         const count = state.selectedSchoolsMap ? state.selectedSchoolsMap.size : 0;
@@ -827,15 +822,15 @@
         }
     };
 
-    /* ===================== SEARCH & FILTER (Backend) ===================== */
+    /* ===================== SEARCH & FILTER ===================== */
 
     const onSearch = (fieldId, element) => {
         const state = instances.get(fieldId);
         state.searchTerm = $(element).val().trim();
+        state.allSchools = [];
 
         clearTimeout(state.searchTimeout);
         state.searchTimeout = setTimeout(() => {
-
             loadSchools(fieldId, 1, state.filters);
         }, 300);
     };
@@ -848,6 +843,7 @@
             const $el = $p(fieldId, name);
             return $el.length ? $el.val() : undefined;
         };
+
         state.filters = {
             name: safeVal(fieldId, 'filterSchoolName'),
             lastEvalDate: safeVal(fieldId, 'filterLastEvalDate'),
@@ -861,11 +857,11 @@
             grade: safeVal(fieldId, 'filterGrade')
         };
 
-
         Object.keys(state.filters).forEach(k => state.filters[k] === undefined && delete state.filters[k]);
 
-
+        state.allSchools = [];
         loadSchools(fieldId, 1, state.filters);
+
         const offcanvas = bootstrap.Offcanvas.getInstance($p(fieldId, 'filterOffcanvas')[0]);
         if (offcanvas) offcanvas.hide();
     };
@@ -925,6 +921,7 @@
                 state.selectedSchoolsMap.delete(schoolId);
             }
         });
+
         $p(fieldId, 'planTable').find('.selectRow:checked').each(function () {
             const $checkbox = $(this);
             const schoolId = $checkbox.data('school-id');
@@ -943,7 +940,6 @@
         });
 
         state.selectedSchools = Array.from(state.selectedSchoolsMap.values());
-
         updateSelectionCounter(fieldId);
     };
 
@@ -979,12 +975,12 @@
         collect,
         getInstance: (fieldId) => instances.get(fieldId)
     });
+
     /*=================== Convert to small letters ===================*/
     const toCamelCaseKeys = (obj) => {
         if (Array.isArray(obj)) {
             return obj.map(toCamelCaseKeys);
         }
-
         if (obj !== null && typeof obj === "object") {
             return Object.keys(obj).reduce((acc, key) => {
                 const camelKey = key.charAt(0).toLowerCase() + key.slice(1);
@@ -992,12 +988,11 @@
                 return acc;
             }, {});
         }
-
         return obj;
     };
+
     function toDateOnly(dateString) {
         if (!dateString) return null;
-
         return new Date(dateString).toISOString().split('T')[0];
     }
 

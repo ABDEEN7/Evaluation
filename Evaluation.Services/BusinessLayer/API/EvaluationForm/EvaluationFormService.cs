@@ -143,11 +143,11 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
     {
         return await uow.GetRepository<EvalForm>()
             .GetAllActiveNonDeleted()
-            .Include(x => x.EvaluationParties)
-            .Where(x => x.IsFinalEval)
-            .Where(x => x.EvaluationParties != null &&
-                        x.EvaluationParties.DepartmentId == requestInfo.DepId)
-            .AnyAsync(x => !evaluationId.HasValue || x.Id != evaluationId.Value);
+            .AnyAsync(x =>
+                x.IsFinalEval &&
+                x.EvaluationParties != null &&
+                x.EvaluationParties.DepartmentId == requestInfo.DepId &&
+                (!evaluationId.HasValue || x.Id != evaluationId.Value));
     }
 
     public async Task<TemplateFormDto> SaveEvaluationForm(TemplateFormDto message)
@@ -171,15 +171,13 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
         }
         if (message.IsFinalEval)
         {
-            if (!await CheckEvaluationForm(message.Id))
-            {
-                obj.IsFinalEval = message.IsFinalEval;
-                obj.FinalEvalMatrixId = message.FinalEvalMatrixId;
-            }
-            else
-            {
+            bool hasFinalEval = await CheckEvaluationForm();
+
+            if (hasFinalEval)
                 throw new BusinessException(ConstantKeys.ExceptionMessage.Max_Final_Evaluation_Forms_Exceeded);
-            }
+
+            obj.IsFinalEval = true;
+            obj.FinalEvalMatrixId = message.FinalEvalMatrixId;
         }
 
         if (message.IsFinalEval)
@@ -223,15 +221,17 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
             {
                 obj.CountOfColumnsValue = message.EvalCountOfColumnsValue is 0 ? 1 : message.EvalCountOfColumnsValue.Value;
             }
-            if (!await CheckEvaluationForm(message.Id))
+            if (message.IsFinalEval)
             {
-                obj.IsFinalEval = message.IsFinalEval;
-                obj.FinalEvalMatrixId = message.FinalEvalMatrixId;
+                bool hasAnotherFinalEval = await CheckEvaluationForm(message.Id);
+
+                if (hasAnotherFinalEval)
+                    throw new BusinessException(
+                        ConstantKeys.ExceptionMessage.Max_Final_Evaluation_Forms_Exceeded);
             }
-            else
-            {
-                throw new BusinessException(ConstantKeys.ExceptionMessage.Final_Evaluation_Form_Limit);
-            }
+
+            obj.IsFinalEval = message.IsFinalEval;
+            obj.FinalEvalMatrixId = message.FinalEvalMatrixId;
             if (message.IsFinalEval)
             {
                 obj.HasOneValue = true;
