@@ -487,6 +487,7 @@ namespace Evaluation.Services.BusinessLayer.API.Template;
 			result.Add(new PlaceholderDto
 			{
 				Key = "{{ParentScopesDetails}}",
+                PlaceholderType = PlaceholderType.SchoolPeriodicEvaluationCriteria,
 				Value = details
 			});
 		}

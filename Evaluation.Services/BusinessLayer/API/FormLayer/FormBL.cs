@@ -74,27 +74,27 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
 
         var formItemsValues = await formService.GetFormItemsValuesByEvaluationRequestId(EvaluationRequestId);
 
-        foreach (var item in formItems)
-        {
-            var relatedItemDtos = new List<RelatedItemDto>();
-
-            foreach (var relatedFromItem in item.RelatedFrom)
-            {
-                if (relatedFromItem.RelatedItemId != Guid.Empty)
-                {
-                    var formItemValue = await formService.GetFormItemValueByItemId(relatedFromItem.RelatedItemId);
-
-                    relatedItemDtos.Add(new RelatedItemDto()
-                    {
-                        Id = relatedFromItem.RelatedItemId,
-                        Note = formItemValue?.Note,
-                        Value = formItemValue?.ActualValue?.ToString(),
-                        Name = lang == "ar" ? relatedFromItem.RelatedItem!.NameAr : relatedFromItem.RelatedItem!.NameEn
-                    });
-                }
-            }
-            mappedData.Where(md => md.Id == item.Id).FirstOrDefault().RelatedItems = relatedItemDtos;
-        }
+        // foreach (var item in formItems)
+        // {
+        //     var relatedItemDtos = new List<RelatedItemDto>();
+        //
+        //     foreach (var relatedFromItem in item.RelatedFrom)
+        //     {
+        //         if (relatedFromItem.RelatedItemId != Guid.Empty)
+        //         {
+        //             var formItemValue = await formService.GetFormItemValueByItemId(relatedFromItem.RelatedItemId);
+        //
+        //             relatedItemDtos.Add(new RelatedItemDto()
+        //             {
+        //                 Id = relatedFromItem.RelatedItemId,
+        //                 Note = formItemValue?.Note,
+        //                 Value = formItemValue?.ActualValue?.ToString(),
+        //                 Name = lang == "ar" ? relatedFromItem.RelatedItem!.NameAr : relatedFromItem.RelatedItem!.NameEn
+        //             });
+        //         }
+        //     }
+        //     mappedData.Where(md => md.Id == item.Id).FirstOrDefault().RelatedItems = relatedItemDtos;
+        // }
 
         //return new FormDto() { EvalForm = mappedEvalForm , Items = mappedData};
 
