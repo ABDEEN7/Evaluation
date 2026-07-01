@@ -109,6 +109,7 @@ public static class ScopeTreeBuilder
                         return new FormItemDto
                         {
                             Id = x.Id,
+                            ScopeId = x.ScopeId,
                             Name = langCode.ToLower() == "ar" ? x.NameAr : x.NameEn,//TODO: Need to translate
                             OrderNo = x.OrderNo,
                             HasNote = x.HasNote,
@@ -117,6 +118,7 @@ public static class ScopeTreeBuilder
 
                             // Current item value
                             Value = currentItemValue?.ActualValue,
+                            Note = currentItemValue?.Note,
 
                             // Related items
                             RelatedItems = x.RelatedFrom?

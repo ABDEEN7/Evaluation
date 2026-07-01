@@ -42,7 +42,7 @@ public class TemplateBl(IServiceScopeFactory serviceScopeFactory, CacheDataProvi
 		using var scopedUow = serviceScopeFactory.CreateScopedUow();
 
 		var request = await scopedUow.GetRepository<EvaluationRequest>().GetAllQueryFiltered(x => x.Id == EvalRequestId)
-			.Include(x => x.Service).FirstOrDefaultAsync();
+			.Include(x => x.Service).Include(x => x.Plan).FirstOrDefaultAsync();
 		if (request == null)
 			throw new BusinessException(ConstantKeys.ExceptionMessage.InActiveData);
 
@@ -82,8 +82,9 @@ public class TemplateBl(IServiceScopeFactory serviceScopeFactory, CacheDataProvi
 
 		if (template.IsAttachment != true)
 			return await documentConversionService.HandleNonAttachmentSpire(placeholders, template, lang);
+		var criteriaContext = await BuildSchoolPeriodicEvaluationCriteriaContext(request);
 		var result =
-			await templateService.HandleAttachment(placeholders, template.AttachmentId!.Value, systemModuleId);
+			await templateService.HandleAttachment(placeholders, template.AttachmentId!.Value, systemModuleId, criteriaContext);
 		return documentConversionService.ConvertDocxToPdfSpire(result);
 	}
 
@@ -100,8 +101,26 @@ public class TemplateBl(IServiceScopeFactory serviceScopeFactory, CacheDataProvi
 
 		if (template.IsAttachment != true)
 			return await documentConversionService.HandleNonAttachmentAspose(placeholders, template, lang);
+		var criteriaContext = await BuildSchoolPeriodicEvaluationCriteriaContext(request);
 		var result =
-			await templateService.HandleAttachment(placeholders, template.AttachmentId!.Value, systemModuleId);
+			await templateService.HandleAttachment(placeholders, template.AttachmentId!.Value, systemModuleId, criteriaContext);
 		return documentConversionService.ConvertDocxToPdfAspose(result);
 	}
+	private async Task<SchoolPeriodicEvaluationCriteriaContext?> BuildSchoolPeriodicEvaluationCriteriaContext(EvaluationRequest request)
+	{
+		var finalForm = await serviceScopeFactory.CreateScopedUow().GetRepository<Evaluation.DAL.Models.FormsModules.EvalForm>()
+			.GetAllQueryFiltered(x => x.IsFinalEval == true)
+			.FirstOrDefaultAsync();
+
+		if (finalForm == null || request.Plan?.AcademicYearId == null)
+			return null;
+
+		return new SchoolPeriodicEvaluationCriteriaContext
+		{
+			FormId = finalForm.Id,
+			AcademicYearId = request.Plan.AcademicYearId.Value,
+			EvaluationRequestId = request.Id
+		};
+	}
+
 }

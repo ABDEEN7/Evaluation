@@ -1,4 +1,6 @@
+using System.Drawing;
 using System.Net.Mail;
+using System.Xml.Linq;
 using System.Text.RegularExpressions;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper;
@@ -7,7 +9,10 @@ using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Models;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using Evaluation.DAL.Dtos.Form;
+using Evaluation.Services.BusinessLayer.API.FormLayer;
 using Evaluation.Services.BusinessLayer.API.Template;
+using Evaluation.SharedHelper.Dtos.Form;
 using Xceed.Document.NET;
 using Xceed.Words.NET;
 using Evaluation.DAL.Models.FormBuilder;
@@ -37,7 +42,7 @@ namespace Evaluation.Services.BusinessLayer.API.Template;
             }
         }
 
-        public async Task<byte[]> GenerateAttachments(Guid templateId, List<PlaceholderDto> placeholders, Guid systemModuleId)
+        public async Task<byte[]> GenerateAttachments(Guid templateId, List<PlaceholderDto> placeholders, Guid systemModuleId, SchoolPeriodicEvaluationCriteriaContext? criteriaContext = null)
         {
             var scopedUow = serviceProvider.CreateScopedUow();
             var attachment = await scopedUow.GetRepository<WebsiteAttachment>().GetByIDActiveNonDeleted(templateId);
@@ -45,7 +50,7 @@ namespace Evaluation.Services.BusinessLayer.API.Template;
             if (attachment == null)
                 throw new BusinessException(ConstantKeys.ExceptionMessage.InActiveData);
 
-            return await HandleAttachment(placeholders, attachment.Id, systemModuleId);
+            return await HandleAttachment(placeholders, attachment.Id, systemModuleId, criteriaContext);
         }
 
         public async Task<Attachment> HandleAttachment(Guid attachmentId)
@@ -64,7 +69,7 @@ namespace Evaluation.Services.BusinessLayer.API.Template;
             return new Attachment(memoryStream, attachment.FileName);
         }
         
-        public async Task<byte[]> HandleAttachment(List<PlaceholderDto> placeholders, Guid attachmentId, Guid systemModuleId)
+        public async Task<byte[]> HandleAttachment(List<PlaceholderDto> placeholders, Guid attachmentId, Guid systemModuleId, SchoolPeriodicEvaluationCriteriaContext? criteriaContext = null)
         {
             var attachment = await serviceProvider.CreateScopedUow().GetRepository<WebsiteAttachment>().GetByIDActiveNonDeleted(attachmentId);
             if (attachment == null)
@@ -82,14 +87,14 @@ namespace Evaluation.Services.BusinessLayer.API.Template;
 
             using var stream = new MemoryStream(fileBytes);
             using var docx = Xceed.Words.NET.DocX.Load(stream);
-            await ReplacePlaceholders(docx, placeholders, width, height);
+            await ReplacePlaceholders(docx, placeholders, width, height, criteriaContext);
 
             using var output = new MemoryStream();
             docx.SaveAs(output);
             return output.ToArray();
         }
 
-        private async Task ReplacePlaceholders(DocX docx, List<PlaceholderDto> placeholders, int maxWidth, int maxHeight)
+        private async Task ReplacePlaceholders(DocX docx, List<PlaceholderDto> placeholders, int maxWidth, int maxHeight, SchoolPeriodicEvaluationCriteriaContext? criteriaContext)
         {
             foreach (var placeholder in placeholders.Where(placeholder => !string.IsNullOrWhiteSpace(placeholder.Key)))
             {
@@ -97,16 +102,16 @@ namespace Evaluation.Services.BusinessLayer.API.Template;
                 {
                     case PlaceholderType.Text:
                     case PlaceholderType.Untyped:
-                        placeholder.Key = placeholder.Key?.Trim('{', '}'); // Remove curly braces
+                        var textKey = NormalizePlaceholderKey(placeholder.Key); // Remove curly braces
                         docx.ReplaceText(new StringReplaceTextOptions
                         {
-                            SearchValue = $"{{{{{placeholder.Key}}}}}",
+                            SearchValue = $"{{{{{textKey}}}}}",
                             NewValue = placeholder.Value
                         });
                         break;
 
                 case PlaceholderType.Image:
-                    placeholder.Key = placeholder.Key?.Trim('{', '}');
+                    var imageKey = NormalizePlaceholderKey(placeholder.Key);
 
                     if (!string.IsNullOrWhiteSpace(placeholder.Value))
                     {
@@ -122,7 +127,7 @@ namespace Evaluation.Services.BusinessLayer.API.Template;
 
                             docx.ReplaceTextWithObject(new ObjectReplaceTextOptions
                             {
-                                SearchValue = $"{{{{{placeholder.Key}}}}}",
+                                SearchValue = $"{{{{{imageKey}}}}}",
                                 NewObject = picture,
                                 TrackChanges = false
                             });
@@ -136,11 +141,11 @@ namespace Evaluation.Services.BusinessLayer.API.Template;
                     }
                     break;
                 case PlaceholderType.HTMLTable:
-                        placeholder.Key = placeholder.Key?.Trim('{', '}'); // Remove curly braces
+                        var htmlTableKey = NormalizePlaceholderKey(placeholder.Key); // Remove curly braces
                         if (!string.IsNullOrWhiteSpace(placeholder.Value))
                         {
                             var data = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(placeholder.Value) ?? [];
-                            var childrenFieldIds = placeholders.FirstOrDefault(p => p.Key == placeholder.Key)?
+                            var childrenFieldIds = placeholders.FirstOrDefault(p => NormalizePlaceholderKey(p.Key) == htmlTableKey)?
                                 .ChildFieldId?.Split(',').Select(Guid.Parse).ToList() ?? [];
                             var childFields = await uow.GetRepository<Field>().GetAllActiveNonDeleted()
                                 .Include(f=>f.FieldType)
@@ -161,7 +166,7 @@ namespace Evaluation.Services.BusinessLayer.API.Template;
                                 {
                                     data[rowIndex].TryGetValue(field.Id.ToString(), out var value);
                                     var finalValue = await placeholderService.RetrieveValueAsync(field.FieldType!.BackendName,
-                                        field.DropDownTypeId, $"{value}", requestInfo.Lang,placeholder.Key);
+                                        field.DropDownTypeId, $"{value}", requestInfo.Lang, htmlTableKey);
                                     docxTable.Rows[rowIndex + 1].Cells[colIndex].Paragraphs.First().Append(finalValue);
                                     colIndex++;
                                 }
@@ -170,7 +175,7 @@ namespace Evaluation.Services.BusinessLayer.API.Template;
                             docxTable.AutoFit = AutoFit.Contents;
                             docx.ReplaceTextWithObject(new ObjectReplaceTextOptions
                             {
-                                SearchValue = $"{{{{{placeholder.Key}}}}}",
+                                SearchValue = $"{{{{{htmlTableKey}}}}}",
                                 NewObject = docxTable,
                                 TrackChanges = false
                             });
@@ -180,12 +185,10 @@ namespace Evaluation.Services.BusinessLayer.API.Template;
                         var tablePlaceholders = placeholders
                             .Where(x => x.PlaceholderType == PlaceholderType.Table)
                             .ToList();
-                        ProcessTablePlaceholdersAsync(docx, tablePlaceholders);
+                        ProcessTablePlaceholders(docx, tablePlaceholders);
                         break;
                     case PlaceholderType.SchoolPeriodicEvaluationCriteria:
-                        var schoolPeriodicEvaluationCriteriaPlaceholder = placeholders
-                            .FirstOrDefault(x => x.PlaceholderType == PlaceholderType.SchoolPeriodicEvaluationCriteria);
-                        ProcessSchoolPeriodicEvaluationCriteriaPlaceholdersAsync(docx, schoolPeriodicEvaluationCriteriaPlaceholder!);
+                        await ProcessSchoolPeriodicEvaluationCriteriaPlaceholderAsync(docx, placeholder, criteriaContext);
                         break;
                     default:
                         throw new ArgumentOutOfRangeException(nameof(placeholder.PlaceholderType), $"Unsupported placeholder type: {placeholder.PlaceholderType}");
@@ -193,14 +196,130 @@ namespace Evaluation.Services.BusinessLayer.API.Template;
             }
         }
 
-        private void ProcessSchoolPeriodicEvaluationCriteriaPlaceholdersAsync(DocX docx, PlaceholderDto schoolPeriodicEvaluationCriteriaPlaceholder)
+        private async Task ProcessSchoolPeriodicEvaluationCriteriaPlaceholderAsync(DocX docx, PlaceholderDto placeholder, SchoolPeriodicEvaluationCriteriaContext? context)
         {
-            //Need Guid FormId, Guid AcademicYearId, Guid EvaluationRequestId
-            //call GetFormItemsWithValues to fill {{ParentScopesDetails}} placeholder
-            throw new NotImplementedException();
+            if (context == null)
+                throw new BusinessException("School periodic evaluation criteria context is required.");
+            if (context.FormId == Guid.Empty || context.AcademicYearId == Guid.Empty || context.EvaluationRequestId == Guid.Empty)
+                throw new BusinessException("School periodic evaluation criteria context contains an empty identifier.");
+
+            var key = $"{{{{{NormalizePlaceholderKey(placeholder.Key)}}}}}";
+            var paragraph = docx.Paragraphs.FirstOrDefault(p => p.Text.Contains(key, StringComparison.Ordinal));
+            if (paragraph == null)
+                throw new BusinessException($"The placeholder {key} was not found in the document.");
+            if (!string.Equals(paragraph.Text.Trim(), key, StringComparison.Ordinal))
+                throw new BusinessException($"The placeholder {key} must be alone in its paragraph.");
+
+            var formResult = await serviceProvider.GetRequiredService<FormBL>()
+                .GetFormItemsWithValues(context.FormId, context.AcademicYearId, context.EvaluationRequestId);
+            if (formResult.IsFailed)
+                throw new BusinessException($"Failed to retrieve school periodic evaluation criteria: {string.Join("; ", formResult.Errors.Select(e => e.Message))}");
+
+            var font = GetTemplateFont(docx);
+            var rootIndex = 0;
+            foreach (var root in OrderedScopes(formResult.Value.Tree))
+            {
+                rootIndex++;
+                InsertRootScope(paragraph, root, Segment(root.OrderNo, rootIndex), font);
+            }
+
+            paragraph.Remove(false);
         }
 
-        private void ProcessTablePlaceholdersAsync(DocX docx, List<PlaceholderDto> tablePlaceholders)
+        private static string NormalizePlaceholderKey(string? key) => (key ?? string.Empty).Trim().Trim('{', '}');
+
+        private static IEnumerable<ScopeTreeDto> OrderedScopes(IEnumerable<ScopeTreeDto>? scopes) =>
+            (scopes ?? []).Select((x, i) => (Scope: x, Index: i + 1)).OrderBy(x => ValidOrder(x.Scope.OrderNo) ? x.Scope.OrderNo : x.Index).Select(x => x.Scope);
+
+        private static IEnumerable<FormItemDto> OrderedItems(IEnumerable<FormItemDto>? items) =>
+            (items ?? []).Select((x, i) => (Item: x, Index: i + 1)).OrderBy(x => ValidOrder(x.Item.OrderNo) ? x.Item.OrderNo : x.Index).Select(x => x.Item);
+
+        private static bool ValidOrder(int orderNo) => orderNo > 0;
+        private static string Segment(int orderNo, int index) => (ValidOrder(orderNo) ? orderNo : index).ToString();
+
+        private void InsertRootScope(Paragraph anchor, ScopeTreeDto scope, string number, string font)
+        {
+            var ordinal = ArabicOrdinal(int.TryParse(number, out var n) ? n : 1);
+            AddBefore(anchor, $"المعيار الرئيس {ordinal}: {scope.Name}", font, 15, true, Alignment.center, keepNext: true);
+            AddBefore(anchor, $"مستوى {scope.Name} \" {GetJudgement(GetScopeAverage(scope))} \"", font, 12, true, Alignment.center, keepNext: true);
+
+            var itemIndex = 0;
+            foreach (var item in OrderedItems(scope.Items))
+                InsertItem(anchor, item, $"{number}.{Segment(item.OrderNo, ++itemIndex)}", font);
+
+            var childIndex = 0;
+            foreach (var child in OrderedScopes(scope.Children))
+                InsertScopeWithNumber(anchor, child, $"{number}.{Segment(child.OrderNo, ++childIndex)}", font, 1);
+        }
+
+        private void InsertScopeWithNumber(Paragraph anchor, ScopeTreeDto scope, string number, string font, int depth)
+        {
+            if (depth == 1)
+            {
+                var p = AddBefore(anchor, $"{number} {scope.Name}", font, 11, true, Alignment.center, keepNext: true);
+                ApplyShading(p, ParseColor(scope.ColorCode) ?? Color.FromArgb(128, 0, 64));
+            }
+            else AddBefore(anchor, $"{number} {scope.Name}", font, 11, true, Alignment.right, keepNext: true);
+            var itemIndex = 0;
+            foreach (var item in OrderedItems(scope.Items)) InsertItem(anchor, item, $"{number}.{Segment(item.OrderNo, ++itemIndex)}", font);
+            var childIndex = 0;
+            foreach (var child in OrderedScopes(scope.Children)) InsertScopeWithNumber(anchor, child, $"{number}.{Segment(child.OrderNo, ++childIndex)}", font, depth + 1);
+        }
+
+        private void InsertItem(Paragraph anchor, FormItemDto item, string number, string font)
+        {
+            AddBefore(anchor, $"{number} {item.Name}", font, 10.5, true, Alignment.right, keepNext: true);
+            if (!string.IsNullOrWhiteSpace(item.Note))
+                AddBefore(anchor, $"‹ {item.Note}", font, 10, false, Alignment.both);
+            foreach (var related in item.RelatedItems ?? [])
+                if (!string.IsNullOrWhiteSpace(related.Note))
+                    AddBefore(anchor, $"‹ {related.Note}", font, 10, false, Alignment.both);
+        }
+
+        private Paragraph AddBefore(Paragraph anchor, string text, string font, double size, bool bold, Alignment alignment, bool keepNext = false)
+        {
+            var p = anchor.InsertParagraphBeforeSelf(text);
+            p.Font(font).FontSize(size).Alignment = alignment;
+            if (bold) p.Bold();
+            ApplyRtlProperties(p, keepNext);
+            return p;
+        }
+
+        private static void ApplyRtlProperties(Paragraph p, bool keepNext)
+        {
+            XNamespace w = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
+            var pPr = p.Xml.Element(w + "pPr") ?? new XElement(w + "pPr");
+            if (pPr.Parent == null) p.Xml.AddFirst(pPr);
+            void Add(string name) { if (pPr.Element(w + name) == null) pPr.Add(new XElement(w + name)); }
+            Add("bidi"); Add("keepLines"); Add("widowControl"); if (keepNext) Add("keepNext");
+            var rPr = p.Xml.Element(w + "r")?.Element(w + "rPr");
+            if (rPr == null) return;
+            if (rPr.Element(w + "rtl") == null) rPr.Add(new XElement(w + "rtl"));
+            if (rPr.Element(w + "cs") == null) rPr.Add(new XElement(w + "cs"));
+        }
+
+        private static void ApplyShading(Paragraph p, Color color)
+        {
+            XNamespace w = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
+            var pPr = p.Xml.Element(w + "pPr") ?? new XElement(w + "pPr");
+            if (pPr.Parent == null) p.Xml.AddFirst(pPr);
+            pPr.Add(new XElement(w + "shd", new XAttribute(w + "fill", $"{color.R:X2}{color.G:X2}{color.B:X2}")));
+            p.Color(Color.White);
+        }
+
+        private static Color? ParseColor(string? value)
+        {
+            if (string.IsNullOrWhiteSpace(value)) return null;
+            try { return ColorTranslator.FromHtml(value.StartsWith('#') ? value : "#" + value); }
+            catch { return null; }
+        }
+        private static string ArabicOrdinal(int n) => n switch { 1 => "الأول", 2 => "الثاني", 3 => "الثالث", 4 => "الرابع", 5 => "الخامس", 6 => "السادس", _ => n.ToString() };
+        private static string GetTemplateFont(DocX docx) => "Arial";
+        private decimal GetScopeAverage(ScopeTreeDto scope) { var items = GetAllItems(scope); return items.Where(x => x.Value.HasValue).Select(x => x.Value!.Value).DefaultIfEmpty(0).Average(); }
+        private static List<FormItemDto> GetAllItems(ScopeTreeDto scope) { var result = new List<FormItemDto>(); result.AddRange(scope.Items ?? []); foreach (var child in scope.Children ?? []) result.AddRange(GetAllItems(child)); return result; }
+        private static string GetJudgement(decimal value) => value switch { < 3m => "ضعيف", < 3.75m => "مقبول", < 4.25m => "جيد", < 4.75m => "جيد جداً", _ => "ممتاز" };
+
+        private void ProcessTablePlaceholders(DocX docx, List<PlaceholderDto> tablePlaceholders)
         {
             if (tablePlaceholders.Count == 0) return;
 

@@ -11,6 +11,7 @@ public class FormItemDto
     public int OrderNo { get; set; } = 0;
     public bool HasNote { get; set; }
     public bool NoteRequired { get; set; }
+    public string? Note { get; set; }
 
     public List<RelatedItemDto>? RelatedItems { get; set; }
     public List<FormItemConfigDto>? FormItemConfigs { get; set; }
