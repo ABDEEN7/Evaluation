@@ -182,11 +182,24 @@ namespace Evaluation.Services.BusinessLayer.API.Template;
                             .ToList();
                         ProcessTablePlaceholdersAsync(docx, tablePlaceholders);
                         break;
+                    case PlaceholderType.SchoolPeriodicEvaluationCriteria:
+                        var schoolPeriodicEvaluationCriteriaPlaceholder = placeholders
+                            .FirstOrDefault(x => x.PlaceholderType == PlaceholderType.SchoolPeriodicEvaluationCriteria);
+                        ProcessSchoolPeriodicEvaluationCriteriaPlaceholdersAsync(docx, schoolPeriodicEvaluationCriteriaPlaceholder!);
+                        break;
                     default:
                         throw new ArgumentOutOfRangeException(nameof(placeholder.PlaceholderType), $"Unsupported placeholder type: {placeholder.PlaceholderType}");
                 }
             }
         }
+
+        private void ProcessSchoolPeriodicEvaluationCriteriaPlaceholdersAsync(DocX docx, PlaceholderDto schoolPeriodicEvaluationCriteriaPlaceholder)
+        {
+            //Need Guid FormId, Guid AcademicYearId, Guid EvaluationRequestId
+            //call GetFormItemsWithValues to fill {{ParentScopesDetails}} placeholder
+            throw new NotImplementedException();
+        }
+
         private void ProcessTablePlaceholdersAsync(DocX docx, List<PlaceholderDto> tablePlaceholders)
         {
             if (tablePlaceholders.Count == 0) return;
