@@ -7,110 +7,6 @@
 
     Func<object, Microsoft.AspNetCore.Html.IHtmlContent> content = @<text>
 
-    
-    <div class="card col-md-6">
-            <div class="stats-ui-card">
-
-                <div class="stats-section">
-                    <div class="stats-header">
-                        <div class="stats-title">
-                            <i class="las la-chart-bar"></i>
-                            <!-- <span class="@ConstantKeys.WebAppOrgDetails.lblOrgDetailsCurrentSituation"></span>-->
-                            <span>التقييم الحالي</span>
-                        </div>
-                    </div>
-
-                    <div class="stats-status-row">
-                        <div class="stats-pill stats-pill-success">
-                            <!--   <span id="current_evaluation_value@(suffix)"></span>-->
-                            <span>ممتاز</span>
-                            <span class="stats-dot"></span>
-                        </div>
-                        <div class="stats-improve-pill">
-                            <i class="las la-arrow-up"></i>
-                            تحسن كبير
-                        </div>
-                    </div>
-
-                    <div class="stats-progress-row">
-                        <div class="stats-progress">
-                            <div class="stats-progress-fill stats-success-fill" style="width: 95%;"></div>
-                        </div>
-                        <span class="stats-percent">95%</span>
-                    </div>
-
-                    <div class="stats-date">
-                        <!--  <span id="current_evaluation_date@(suffix)"></span>-->
-                        <i class="las la-calendar"></i>
-                        <span>10-02-2025</span>
-                    </div>
-                </div>
-
-                <div class="stats-section">
-                    <div class="stats-history-title">
-                        <i class="las la-history"></i>
-                        <span>آخر تقييمين</span>
-                    </div>
-
-                    <div class="stats-history-grid">
-
-                        <div class="stats-history-card">
-                            <div class="stats-history-top">
-                                <span>السابق — 1</span>
-
-                                <div class="stats-pill stats-pill-danger">
-                                    <span class="stats-dot"></span>
-                                    <span>ضعيف</span>
-                                </div>
-                            </div>
-
-                            <div class="stats-progress-row">
-
-                                <div class="stats-progress">
-                                    <div class="stats-progress-fill stats-danger-fill" style="width: 32%;"></div>
-                                </div>
-                                <span class="stats-percent">32%</span>
-                            </div>
-
-                            <div class="stats-date">
-                                <i class="las la-calendar"></i>
-                                <span>10-02-2024</span>
-
-                            </div>
-                        </div>
-
-                        <div class="stats-history-card">
-                            <div class="stats-history-top">
-                                <span>السابق — 2</span>
-
-                                <div class="stats-pill stats-pill-info">
-                                    <span class="stats-dot"></span>
-                                    <span>جيد</span>
-                                    <!--<span id="last_evaluation_value@(suffix)"></span>-->
-                                </div>
-                            </div>
-
-                            <div class="stats-progress-row">
-
-                                <div class="stats-progress">
-                                    <div class="stats-progress-fill stats-info-fill" style="width: 65%;"></div>
-                                </div>
-                                <span class="stats-percent">65%</span>
-                            </div>
-
-                            <div class="stats-date">
-                                <i class="las la-calendar"></i>
-                                <!--<span id="last_evaluation_date@(suffix)"></span>-->
-                                <span>10-02-2023</span>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-
-            </div>
-        </div>
-
 
     @if (type == "SCHOOL")
     {
@@ -237,7 +133,109 @@
     }
 
 
+        
+        <div class="card col-md-6">
+            <div class="stats-ui-card">
 
+                <div class="stats-section">
+                    <div class="stats-header">
+                        <div class="stats-title">
+                            <i class="las la-chart-bar"></i>
+                            <!-- <span class="@ConstantKeys.WebAppOrgDetails.lblOrgDetailsCurrentSituation"></span>-->
+                            <span>التقييم الحالي</span>
+                        </div>
+                    </div>
+
+                    <div class="stats-status-row">
+                        <div class="stats-pill stats-pill-success">
+                            <!--   <span id="current_evaluation_value@(suffix)"></span>-->
+                            <span>ممتاز</span>
+                            <span class="stats-dot"></span>
+                        </div>
+                        <div class="stats-improve-pill">
+                            <i class="las la-arrow-up"></i>
+                            تحسن كبير
+                        </div>
+                    </div>
+
+                    <div class="stats-progress-row">
+                        <div class="stats-progress">
+                            <div class="stats-progress-fill stats-success-fill" style="width: 95%;"></div>
+                        </div>
+                        <span class="stats-percent">95%</span>
+                    </div>
+
+                    <div class="stats-date">
+                        <!--  <span id="current_evaluation_date@(suffix)"></span>-->
+                        <i class="las la-calendar"></i>
+                        <span>10-02-2025</span>
+                    </div>
+                </div>
+
+                <div class="stats-section">
+                    <div class="stats-history-title">
+                        <i class="las la-history"></i>
+                        <span>آخر تقييمين</span>
+                    </div>
+
+                    <div class="stats-history-grid">
+
+                        <div class="stats-history-card">
+                            <div class="stats-history-top">
+                                <span>السابق — 1</span>
+
+                                <div class="stats-pill stats-pill-danger">
+                                    <span class="stats-dot"></span>
+                                    <span>ضعيف</span>
+                                </div>
+                            </div>
+
+                            <div class="stats-progress-row">
+
+                                <div class="stats-progress">
+                                    <div class="stats-progress-fill stats-danger-fill" style="width: 32%;"></div>
+                                </div>
+                                <span class="stats-percent">32%</span>
+                            </div>
+
+                            <div class="stats-date">
+                                <i class="las la-calendar"></i>
+                                <span>10-02-2024</span>
+
+                            </div>
+                        </div>
+
+                        <div class="stats-history-card">
+                            <div class="stats-history-top">
+                                <span>السابق — 2</span>
+
+                                <div class="stats-pill stats-pill-info">
+                                    <span class="stats-dot"></span>
+                                    <span>جيد</span>
+                                    <!--<span id="last_evaluation_value@(suffix)"></span>-->
+                                </div>
+                            </div>
+
+                            <div class="stats-progress-row">
+
+                                <div class="stats-progress">
+                                    <div class="stats-progress-fill stats-info-fill" style="width: 65%;"></div>
+                                </div>
+                                <span class="stats-percent">65%</span>
+                            </div>
+
+                            <div class="stats-date">
+                                <i class="las la-calendar"></i>
+                                <!--<span id="last_evaluation_date@(suffix)"></span>-->
+                                <span>10-02-2023</span>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
 
     @if (isModal)
     {
