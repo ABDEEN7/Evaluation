@@ -172,7 +172,11 @@ function renderSelectAndNote(fieldId, itemId, hasNote, readOnly, matrixValues, c
 
         <div class="row-note-wrap">
             ${hasNote
-            ? `<input class="row-note" ${readOnly ? 'disabled' : ''} type="text" placeholder="اكتب ملاحظة هنا..." value="${escapeAttr(noteValue ?? '')}" />`
+        ? `<textarea class="row-note mt-0"
+          ${readOnly ? 'disabled' : ''}
+          rows="2"
+          placeholder="اكتب ملاحظة هنا..."
+          oninput="this.style.height='auto'; this.style.height=this.scrollHeight+'px';">${escapeAttr(noteValue ?? '')}</textarea>`
             : `<div class="row-note-placeholder"></div>`}
             <span class="validation-message" id="validation-${fieldId}-${itemId}-${ItemPropertyType.NOTE}"></span>
         </div>
@@ -307,7 +311,7 @@ function renderRowName(fieldId, itemId, text, relatedItems) {
             ? `<span class="info-icon info-button"
                      title="عرض البنود المرتبطة"
                      onclick="openRelatedItemModal('${fieldId}', '${itemId}')"
-                     >ⓘ</span>`
+                     ><i class="las la-info-circle"></i></span>`
             : ''}
         </div>
     `;
@@ -315,7 +319,7 @@ function renderRowName(fieldId, itemId, text, relatedItems) {
 
 function renderSubRowHtml(fieldId, sub, parentId, label, readOnly, matrixValues, savedValueId = null, savedNote = null) {
     return `
-        <div class="row-item child-row" data-item-id="${sub.id}" data-parent-id="${parentId}" data-weight="${sub.weightPercentage}">
+       <div class="row-item child-row level-2" data-item-id="${sub.id}" data-parent-id="${parentId}" data-weight="${sub.weightPercentage}">
             <span class="row-index">
                 <span class="row-index-num">${label}</span>
             </span>
@@ -446,40 +450,50 @@ const generateTableBodyHtmlForRelatedItems = (items, hasAnyNote) =>
         order: i + 1,
         hasAnyNote
     })).join('');
-
 const relatedItemPopup = (fieldId, rowsHtml, hasAnyNote) => `
     <div class="modal fade" id="${fieldId}-related-item-modal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-dialog modal-xl modal-dialog-centered p-2">
             <div class="modal-content">
-                <div class="modal-header align-items-start border-0">
+
+                <div class="modal-header align-items-start border-0 px-4">
                     <div>
                         <h4 class="modal-title fw-semibold mb-2">البنود المرتبطة</h4>
                     </div>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+
+                    <button type="button"
+                            class="btn btn-outline-secondary btn-sm"
+                            data-bs-dismiss="modal"
+                            aria-label="Close">
+                        <i class="la la-close me-1 fs-14"></i>
+                        <span class="close-text">Close</span>
+                    </button>
                 </div>
 
-                <div class="modal-body py-0">
-                    <div class="row">
-                        <table class="table table-bordered text-center align-middle">
-                            <thead class="table-grey">
+                <div class="modal-body pt-0 px-4 pb-4">
+
+                    <div style="border:1px solid #dee2e6; border-radius:12px; overflow:hidden;">
+                        <table class="table table-bordered table-hover text-center align-middle w-100 mb-0">
+                            <thead class="table-light">
                                 <tr>
-                                    <th>#</th>
+                                    <th style="width:70px;">#</th>
                                     <th>البند</th>
-                                    <th>القيمة</th>
+                                    <th style="width:140px;">القيمة</th>
                                     ${hasAnyNote ? '<th>ملاحظات</th>' : ''}
                                 </tr>
                             </thead>
+
                             <tbody>
                                 ${rowsHtml}
                             </tbody>
                         </table>
                     </div>
+
                 </div>
+
             </div>
         </div>
     </div>
 `;
-
 function openRelatedItemModal(fieldId, itemId) {
     const state = getFormState(fieldId);
     const relatedItems = state.relatedItemsMap?.get(itemId) ?? [];
@@ -623,7 +637,7 @@ async function initForm(formId, fieldId, readOnly, savedResults, evaluationReque
     const tableHtml = buildHorizontalTableHtml(matrixValues);
 
     const resultBannerHtml = `
-        <div id="${fieldId}-form-result-div" class="d-none bg-primary d-flex justify-content-between align-items-center py-2">
+        <div id="${fieldId}-form-result-div" class="d-none result-bg d-flex justify-content-between align-items-center py-2 px-4 mb-3">
             <div class="text-white">Result:</div>
             <div class="text-white" id="${fieldId}-form-result-value"></div>
         </div>
@@ -707,7 +721,7 @@ async function initForm(formId, fieldId, readOnly, savedResults, evaluationReque
                                 <span class="row-index">
                                     <span class="row-index-num">${rIdx + 1}</span>
                                     ${hasSubItems
-                                ? `<button type="button" class="row-toggle" aria-expanded="false" aria-label="toggle sub items">&#9656;</button>`
+                            ? `<button type="button" class="row-toggle" aria-expanded="false" aria-label="toggle sub items"><i class="las la-angle-right"></i></button>`
                                 : ''}
                                 </span>
 
@@ -756,7 +770,7 @@ async function initForm(formId, fieldId, readOnly, savedResults, evaluationReque
                                 <span class="row-index">
                                     <span class="row-index-num">${rIdx + 1}</span>
                                     ${hasSubItems
-                                ? `<button type="button" class="row-toggle" aria-expanded="false" aria-label="toggle sub items">&#9656;</button>`
+                            ? `<button type="button" class="row-toggle" aria-expanded="false" aria-label="toggle sub items">›</button>`
                                 : ''}
                                 </span>
 
@@ -852,12 +866,29 @@ function bindFormEvents(fieldId) {
 
     // Eval-mode rows: change -> recalc, toggle -> expand/collapse
     root.querySelectorAll('.row-item.main-row:not(.rename-row) .row-select').forEach(sel => {
-        sel.addEventListener('change', () => calculateFE(formId, fieldId));
+
+        if (sel.selectedIndex > 0) {
+            sel.classList.add("selected");
+        }
+
+        sel.addEventListener('change', function () {
+            this.classList.toggle("selected", this.selectedIndex > 0);
+            calculateFE(formId, fieldId);
+        });
     });
 
     root.querySelectorAll('.row-item.child-row .row-select').forEach(sel => {
-        sel.addEventListener('change', () => calculateFE(formId, fieldId));
+
+        if (sel.selectedIndex > 0) {
+            sel.classList.add("selected");
+        }
+
+        sel.addEventListener('change', function () {
+            this.classList.toggle("selected", this.selectedIndex > 0);
+            calculateFE(formId, fieldId);
+        });
     });
+
 
     root.querySelectorAll('.row-item.main-row.has-subitems').forEach(rowDiv => {
         const itemId = rowDiv.dataset.itemId;
@@ -865,8 +896,11 @@ function bindFormEvents(fieldId) {
         const toggleBtn = rowDiv.querySelector('.row-toggle');
         if (!subContainer || !toggleBtn) return;
 
-        toggleBtn.addEventListener('click', () => {
+        const clickTarget = rowDiv.querySelector('.row-index');
+
+        clickTarget.addEventListener('click', () => {
             const expanded = subContainer.classList.toggle('expanded');
+
             toggleBtn.classList.toggle('is-open', expanded);
             toggleBtn.setAttribute('aria-expanded', String(expanded));
         });
@@ -1402,19 +1436,22 @@ function buildHorizontalTable(data) {
 function buildHorizontalTableHtml(data) {
     const nameCellsHtml = data.map(item => `<th>${escapeAttr(item.name)}</th>`).join('');
     const rangeCellsHtml = data.map(item => `<td>${item.displayRange}</td>`).join('');
-
     return `
-        <table border="1" style="border-collapse: collapse;" class="table table-bordered table-hover align-middle w-100 dataTable no-footer">
-            <thead class="table-light">
-                <tr>
-                    <th>Name</th>
-                    ${nameCellsHtml}
-                </tr>
-            </thead>
+<div style="border-radius:20px; overflow:hidden;" class="mb-3">
+    <table class="table table-bordered table-hover align-middle text-center w-100 dataTable">
+        <thead class="table-light">
+            <tr>
+                <th>Name</th>
+                ${nameCellsHtml}
+            </tr>
+        </thead>
+        <tbody>
             <tr>
                 <td>Range</td>
                 ${rangeCellsHtml}
             </tr>
-        </table>
-    `;
+        </tbody>
+    </table>
+</div>
+`;
 }
