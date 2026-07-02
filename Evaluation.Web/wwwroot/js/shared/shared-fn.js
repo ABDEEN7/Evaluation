@@ -721,7 +721,7 @@ const sharedFn = (options) => {
                     let dropdownInitializer = jqDropdownInitializer({
                         dropdowns: AlldropdownList,
                         url: `/Home/GetDropDownValues`,
-                        lang: lang,
+                        lang: getCurrentLang(),
                     });
                     dropdownInitializer.InitParents(true);
                     dropdownInitializer.InitChildren(true);
