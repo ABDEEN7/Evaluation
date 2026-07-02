@@ -695,7 +695,7 @@ html[dir="rtl"] .table-bordered {
     height: 34px;
     border: none;
     border-radius: 8px;
-/*    background: #0D4261;*/
+    background: none;
 /*    color: #fff;*/
     display: inline-flex;
     align-items: center;
