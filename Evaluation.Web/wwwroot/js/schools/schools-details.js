@@ -275,43 +275,43 @@ const schoolDetailsModal = (function () {
 
     function schoolRequestsAccordionTemplate() {
         return `
-            <div class="accordion" id="customAccordion">
-            <div class="accordion-item mb-3 rounded">
-                <h2 class="accordion-header">
-                    <button class="accordion-button d-flex align-items-center justify-content-between"
-                            type="button" data-bs-toggle="collapse"
-                            data-bs-target="#schoolEvalRequests" aria-expanded="true">
-                        <div class="d-flex align-items-center gap-2 fs-18">
-                            <i class="la la-building text-primary fs-25"></i>
-                            <span class="fw-semibold @ConstantKeys.WebAppRequest.lblSchoolEvalRequests"></span>
-                        </div>
-                        <span class="toggle-icon"><i class="la la-angle-up fs-22"></i></span>
-                    </button>
-                </h2>
-                <div id="schoolEvalRequests" class="accordion-collapse collapse show">
-                    <div class="accordion-body">
-                        <div class="table-responsive" id="evalRequestsTableWrapper">
-                            <table id="evalRequestsTable" class="table table-striped table-bordered w-100 application-request card">
-                                <thead>
-                                    <tr>
-                                        <th class=" @ConstantKeys.WebAppRequest.lblRequestNumber"></th>
-                                        <th class=" @ConstantKeys.WebAppRequest.lblStatus"></th>
-                                        <th class=" @ConstantKeys.WebAppRequest.lblFromDate"></th>
-                                        <th class=" @ConstantKeys.WebAppRequest.lblToDate"></th>
-                                        <th class=" @ConstantKeys.WebAppRequest.lblEvaluationDate"></th>
-                                        <th class=" @ConstantKeys.WebAppRequest.lblNextEvaluationDate"></th>
-                                        <th class=" @ConstantKeys.WebAppRequest.lblEvaluationResult"></th>
-                                        <th class=""></th>
-                                    </tr>
-                                </thead>
-                                <tbody class="requeststableBody w-100"></tbody>
-                            </table>
-                        </div>
+        <div class="accordion" id="customAccordion">
+        <div class="accordion-item mb-3 rounded">
+            <h2 class="accordion-header">
+                <button class="accordion-button d-flex align-items-center justify-content-between"
+                        type="button" data-bs-toggle="collapse"
+                        data-bs-target="#schoolEvalRequests" aria-expanded="true">
+                    <div class="d-flex align-items-center gap-2 fs-18">
+                        <i class="la la-building text-primary fs-25"></i>
+                        <span class="fw-semibold">${label('lblSchoolEvalRequests')}</span>
+                    </div>
+                    <span class="toggle-icon"><i class="la la-angle-up fs-22"></i></span>
+                </button>
+            </h2>
+            <div id="schoolEvalRequests" class="accordion-collapse collapse show">
+                <div class="accordion-body">
+                    <div class="table-responsive" id="evalRequestsTableWrapper">
+                        <table id="evalRequestsTable" class="table table-striped table-bordered w-100 application-request card">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody class="requeststableBody w-100"></tbody>
+                        </table>
                     </div>
                 </div>
             </div>
         </div>
-        `;
+    </div>
+    `;
     }
 
     function buildContent(type, includeAccordion) {

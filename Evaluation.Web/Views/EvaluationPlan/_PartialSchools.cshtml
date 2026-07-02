@@ -157,9 +157,10 @@
 
 </div>
 @* @await Component.InvokeAsync("SchoolDetailsModal", new { modalId = "SCHOOL", title = "تفاصيل المدرسة", body = "" }) *@
+<div id="school-details-container"></div>
 
 
-@await Component.InvokeAsync("SchoolDetailsModal", new { modalId = "schoolDetailsPopup", title = "تفاصيل المدرسة", body = "", isModal = true, type = "SCHOOL" })
+
 <script>
     document.addEventListener("DOMContentLoaded", function () {
 
