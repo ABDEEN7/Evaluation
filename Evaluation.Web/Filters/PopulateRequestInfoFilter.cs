@@ -13,32 +13,24 @@ namespace Evaluation.Web.Filters
         public PopulateRequestInfoFilter(RequestInfo requestInfo, IConfiguration configuration)
         {
             this.requestInfo = requestInfo;
-
-            // Get default language and supported languages from configuration
-            defaultLanguage = configuration.GetValue<string>("defaultLanguage") ?? "en"; // Default to "en" if not set
+            defaultLanguage = configuration.GetValue<string>("defaultLanguage") ?? "en";
             supportedLanguages = configuration.GetValue<string>("supportedLanguages")?.Split(',').ToList()
-                ?? new List<string> { "en" }; // Default to English if not set
+                ?? new List<string> { "en" };
         }
 
-        public override void OnResultExecuted(ResultExecutedContext context)
+        public override void OnActionExecuting(ActionExecutingContext context)
         {
-            // Extract language from the URL path (assumed to be the first segment)
             var segments = context.HttpContext.Request.Path.Value.Split('/');
             if (segments.Length > 1)
             {
-                var lang = segments[1]; // The second segment is expected to be the language code
-                                        // Validate against supported languages
+                var lang = segments[1];
                 requestInfo.Lang = supportedLanguages.Contains(lang) ? lang : defaultLanguage;
             }
             else
             {
-                requestInfo.Lang = defaultLanguage; // Use the default language if not found
+                requestInfo.Lang = defaultLanguage;
             }
-
-            base.OnResultExecuted(context);
+            base.OnActionExecuting(context);
         }
-
-
-
     }
 }

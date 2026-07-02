@@ -6,6 +6,7 @@ namespace Evaluation.SharedHelper.Models.Admin
     {
 
         public Guid? scopeAcademicYearScopeParent { get; set; }
+        public Guid? ScopeAcademicYearScopeParentId { get; set; }
         public Guid DepartmentId { get; set; }
         public Guid ScopeId { get; set; }
         public Guid? Scope { get; set; }
