@@ -241,7 +241,7 @@ namespace Evaluation.Services.BusinessLayer.API.Template;
         private void InsertRootScope(Paragraph anchor, ScopeTreeDto scope, string number, string font)
         {
             var ordinal = ArabicOrdinal(int.TryParse(number, out var n) ? n : 1);
-            AddBefore(anchor, $"المعيار الرئيس {ordinal}: {scope.Name}", font, 15, true, Alignment.center, keepNext: true);
+            AddBefore(anchor, $"المعيار  {ordinal}: {scope.Name}", font, 15, true, Alignment.center, keepNext: true);
             AddBefore(anchor, $"مستوى {scope.Name} \" {GetJudgement(GetScopeAverage(scope))} \"", font, 12, true, Alignment.center, keepNext: true);
 
             var itemIndex = 0;
@@ -314,7 +314,7 @@ namespace Evaluation.Services.BusinessLayer.API.Template;
             try { return ColorTranslator.FromHtml(value.StartsWith('#') ? value : "#" + value); }
             catch { return null; }
         }
-        private static string ArabicOrdinal(int n) => n switch { 1 => "الأول", 2 => "الثاني", 3 => "الثالث", 4 => "الرابع", 5 => "الخامس", 6 => "السادس", _ => n.ToString() };
+        private static string ArabicOrdinal(int n) => n switch { 1 => "الأول", 2 => "الثاني", 3 => "الثالث", 4 => "الرابع", 5 => "الخامس", 6 => "السادس",7 => "السابع",8 => "الثامن",9 => "التاسع",10 => "العاشر", _ => n.ToString() };
         private static string GetTemplateFont(DocX docx) => "Arial";
         private decimal GetScopeAverage(ScopeTreeDto scope) { var items = GetAllItems(scope); return items.Where(x => x.Value.HasValue).Select(x => x.Value!.Value).DefaultIfEmpty(0).Average(); }
         private static List<FormItemDto> GetAllItems(ScopeTreeDto scope) { var result = new List<FormItemDto>(); result.AddRange(scope.Items ?? []); foreach (var child in scope.Children ?? []) result.AddRange(GetAllItems(child)); return result; }
