@@ -61,16 +61,16 @@ public class TemplateBl(IServiceScopeFactory serviceScopeFactory, CacheDataProvi
 
 		if (!useAspose)
 		{
-			return await GetDocumentFromHtmlSpire(templateId, result, lang, request.Service!.SystemModuleId);
+			return await GetDocumentFromHtmlSpire(templateId, result, lang, request);
 		}
 		else
 		{
-			return await GetDocumentFromHtmlAspose(templateId, result, lang, request.Service!.SystemModuleId);
+			return await GetDocumentFromHtmlAspose(templateId, result, lang, request);
 		}
 	}
 
 	private async Task<byte[]?> GetDocumentFromHtmlSpire(Guid templateId, List<PlaceholderDto> placeholders, string lang,
-		Guid systemModuleId)
+		EvaluationRequest request)
 	{
 
 		var template = (await serviceScopeFactory.CreateScopedUow().GetRepository<TemplateDocument>()
@@ -84,12 +84,12 @@ public class TemplateBl(IServiceScopeFactory serviceScopeFactory, CacheDataProvi
 			return await documentConversionService.HandleNonAttachmentSpire(placeholders, template, lang);
 		var criteriaContext = await BuildSchoolPeriodicEvaluationCriteriaContext(request);
 		var result =
-			await templateService.HandleAttachment(placeholders, template.AttachmentId!.Value, systemModuleId, criteriaContext);
+			await templateService.HandleAttachment(placeholders, template.AttachmentId!.Value, request.Service!.SystemModuleId, criteriaContext);
 		return documentConversionService.ConvertDocxToPdfSpire(result);
 	}
 
 	private async Task<byte[]?> GetDocumentFromHtmlAspose(Guid templateId, List<PlaceholderDto> placeholders, string lang,
-		Guid systemModuleId)
+		EvaluationRequest request)
 	{
 
 		var template = (await serviceScopeFactory.CreateScopedUow().GetRepository<TemplateDocument>()
@@ -103,7 +103,7 @@ public class TemplateBl(IServiceScopeFactory serviceScopeFactory, CacheDataProvi
 			return await documentConversionService.HandleNonAttachmentAspose(placeholders, template, lang);
 		var criteriaContext = await BuildSchoolPeriodicEvaluationCriteriaContext(request);
 		var result =
-			await templateService.HandleAttachment(placeholders, template.AttachmentId!.Value, systemModuleId, criteriaContext);
+			await templateService.HandleAttachment(placeholders, template.AttachmentId!.Value, request.Service!.SystemModuleId, criteriaContext);
 		return documentConversionService.ConvertDocxToPdfAspose(result);
 	}
 	private async Task<SchoolPeriodicEvaluationCriteriaContext?> BuildSchoolPeriodicEvaluationCriteriaContext(EvaluationRequest request)

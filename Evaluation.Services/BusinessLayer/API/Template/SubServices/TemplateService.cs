@@ -18,6 +18,7 @@ using Xceed.Words.NET;
 using Evaluation.DAL.Models.FormBuilder;
 using Evaluation.DAL.Models.Website;
 using Evaluation.DAL.Repositories;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Evaluation.Services.BusinessLayer.API.Template;
 
@@ -304,7 +305,7 @@ namespace Evaluation.Services.BusinessLayer.API.Template;
             var pPr = p.Xml.Element(w + "pPr") ?? new XElement(w + "pPr");
             if (pPr.Parent == null) p.Xml.AddFirst(pPr);
             pPr.Add(new XElement(w + "shd", new XAttribute(w + "fill", $"{color.R:X2}{color.G:X2}{color.B:X2}")));
-            p.Color(Color.White);
+            p.Color(Xceed.Drawing.Color.White);
         }
 
         private static Color? ParseColor(string? value)
