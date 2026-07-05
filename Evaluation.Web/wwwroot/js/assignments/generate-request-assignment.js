@@ -71,28 +71,30 @@ const assignmentsUtility = window.assignmentsUtility;
 
     function generateMembersHeader(fieldId) {
         return `
-            <div class="row align-items-center mb-3">
-                <div class="col-xl-4">
-                    <h4>${t('lblMembers')}</h4>
-                </div>
-                <div class="col-xl-8">
-                    <div class="row">
-                        <div class="col-md-4 mb-2">
-                            ${generateTeamFilter(fieldId)}
-                        </div>
-                        <div class="col-md-4 mb-2">
-                            ${generateSearchBox(fieldId)}
-                        </div>
+        <div class="row align-items-center mb-3">
+            <div class="col-xl-4">
+                <h5>${t('lblMembers')}</h5>
+            </div>
+
+            <div class="col-xl-8">
+                <div class="d-flex justify-content-end gap-2">
+                    <div style="width: 220px;">
+                        ${generateTeamFilter(fieldId)}
+                    </div>
+
+                    <div style="width: 220px;">
+                        ${generateSearchBox(fieldId)}
                     </div>
                 </div>
             </div>
-        `;
+        </div>
+    `;
     }
 
     function generateTeamFilter(fieldId) {
         return `
             <select id="${tid(fieldId, 'teamFilter')}"
-                    class="form-select form-select-lg">
+                    class="form-select form-select-md">
                 <option value="">
                     ${t('lblAllTeams')}
                 </option>
@@ -102,13 +104,10 @@ const assignmentsUtility = window.assignmentsUtility;
 
     function generateSearchBox(fieldId) {
         return `
-            <div class="input-group">
-                <span class="input-group-text bg-transparent">
-                    <i class="las la-search"></i>
-                </span>
+            <div class="input-group m-0 p-0">
                 <input type="text"
                        id="${tid(fieldId, 'customSearch')}"
-                       class="form-control"
+                       class="form-control custom-search"
                        placeholder="${t('phSearchHere')}">
             </div>
         `;
@@ -126,14 +125,19 @@ const assignmentsUtility = window.assignmentsUtility;
 
     function generateMembersTable(fieldId) {
         return `
-            <div class="table-responsive">
+            <div class="table-custom">
                 <table id="${tid(fieldId, 'userTable')}"
                        class="table table-bordered table-hover w-100">
                     <thead class="table-light">
                         <tr>
-                            <th style="width:50px;">
-                                ${generateCheckbox(tid(fieldId, 'selectAllMembers'))}
-                            </th>
+                          <th style="width:50px;" class="text-center">
+    <button type="button"
+            id="${tid(fieldId, 'addAllMembers')}"
+            class="team-add-btn bulk-add-btn"
+            title="Add all">
+        <i class="las la-plus"></i>
+    </button>
+</th>
                             <th>${t('lblMemberName')}</th>
                             <th>${t('lblJobTitle')}</th>
                         </tr>
@@ -187,7 +191,7 @@ const assignmentsUtility = window.assignmentsUtility;
 
     function generateSelectedTeamTable(fieldId) {
         return `
-            <div class="table-responsive">
+            <div class="table-custom">
                 <table id="${tid(fieldId, 'selectedTeamTable')}"
                        class="table table-bordered table-hover w-100">
                     <thead class="table-light">
@@ -238,7 +242,7 @@ const assignmentsUtility = window.assignmentsUtility;
         return `
             <label class="custom-checkbox1">
                 <input type="checkbox" id="${id}">
-                <span class="checkmark"></span>
+               
             </label>
         `;
     }
@@ -246,7 +250,7 @@ const assignmentsUtility = window.assignmentsUtility;
     function generateCheckBoxFormBuilder(id) {
         const label = $('<label>', { class: 'custom-checkbox1' });
         const input = $('<input>', { type: 'checkbox', id });
-        const span = $('<span>', { class: 'checkmark' });
+       
 
         label.append(input, span);
         return label;
