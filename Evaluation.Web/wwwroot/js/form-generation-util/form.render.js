@@ -597,7 +597,7 @@ window.serviceRequestForm = window.serviceRequestForm || {};
 
         // =============== ASSIGN TEAM ===============
         if (actionTypeName === ACTION_TYPE.ASSIGNT_TEAM) {
-
+            $('#assign_wrapper').remove();
             assignmentsUtility.generateAssignments('assign');
 
         }
