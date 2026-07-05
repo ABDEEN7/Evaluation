@@ -42,10 +42,11 @@ namespace Evaluation.Services.Models.Admin
                 AcademicYear = LanguageStatic.SelectLang(_requestInfo.Lang, x.AcademicYear.NameAr, x.AcademicYear.NameEn),
                 Scope = LanguageStatic.SelectLang(_requestInfo.Lang, x.Scope.NameAr, x.Scope.NameEn),
                 ScopeAcademicYearScopeParent = LanguageStatic.SelectLang(_requestInfo.Lang, x.ScopeParent.NameAr, x.ScopeParent.NameEn),
-                Department = LanguageStatic.SelectLang(_requestInfo.Lang, x.AcademicYear.NameAr, x.AcademicYear.NameEn),
+                Department = LanguageStatic.SelectLang(_requestInfo.Lang, x.Department!.NameAr, x.Department!.NameEn),
                 CreateBy =
                 LanguageStatic.SelectLang(_requestInfo.Lang, x.CreateBy.NameAr, x.CreateBy.NameEn),
                 UpdateDate = x.UpdateDate.ToString(),
+                UpdateBy =x.UpdateById != null ? LanguageStatic.SelectLang(_requestInfo.Lang,x.UpdateBy.NameAr,x.UpdateBy.NameEn) : LanguageStatic.SelectLang(_requestInfo.Lang, x.CreateBy.NameAr, x.CreateBy.NameEn),
                 IsActive = x.IsActive,
                 ScopeParentId = x.ScopeParentId,
                 ScopeId = x.ScopeId,
@@ -70,6 +71,14 @@ namespace Evaluation.Services.Models.Admin
             obj.ScopeParentId = message.ScopeAcademicYearScopeParentId;
             uow.GetRepository<ScopeAcademicYear>().Insert(obj);
             await uow.CommitAsync();
+            obj = await uow.GetRepository<ScopeAcademicYear>()
+                           .GetAllActiveNonDeleted()
+                           .Include(x => x.Department)
+                           .Include(x => x.Scope)
+                           .Include(x => x.ScopeParent)
+                           .Include(x => x.AcademicYear)
+                           .FirstAsync(x => x.Id == obj.Id);
+
             var result = mapper.Map<ScopeAcademicYearDTO>(obj, opts => opts.Items["Language"] = _requestInfo.Lang);
             result.ResponseStatus = DBResult.Inserted;
             return result;
@@ -88,6 +97,10 @@ namespace Evaluation.Services.Models.Admin
                 ScopeAcademicYear obj = await uow.GetRepository<ScopeAcademicYear>()
                                       .GetAllNonDeleted()
                                       .Include(x => x.CreateBy)
+                                      .Include(x => x.Department)
+                                      .Include(x => x.Scope)
+                                      .Include(x => x.ScopeParent)
+                                      .Include(x => x.AcademicYear)
                                       .Where(x => x.Id == message.Id)
                                       .FirstAsync();
 

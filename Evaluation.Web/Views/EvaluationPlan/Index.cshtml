@@ -177,10 +177,8 @@
                                 </h2>
                                 <div id="itemSchool" class="accordion-collapse collapse show">
                                     <div class="accordion-body">
-                                        <div id="school-details-container">
-                                 
-                                            @await Component.InvokeAsync("SchoolDetailsModal", new { modalId = "schoolDetailsPopupEvaluationRequestDetailsModal", title = "School Details", body = "Hello from modal body!", isModal = false, type = "SCHOOL" })
-                                        </div>
+                                        <div id="school-details-container"></div>
+
                                         <div id="NDAContainerDiv"></div>
                                     </div>
                                 </div>
@@ -723,8 +721,9 @@
     <script src="~/js/evaluationplan/createrequest.js"></script>
     <script src="~/lib/uuid/uuid.min.js"></script>
     <script src="~/lib/jstree/3.3.12/jstree.min.js"></script>
-
-    <script>
+    <script src="~/js/schools/schools-details.js"></script>
+    
+    <script>    
         $(document).ready(async function () {
 
             await webAppConfigsSetup().Init({
