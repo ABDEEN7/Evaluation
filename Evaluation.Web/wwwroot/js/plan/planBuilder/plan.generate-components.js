@@ -431,11 +431,10 @@
 
         const link = $('<a>')
             .attr('href', '#')
-            .addClass('text-dark')
+            .addClass('text-dark school-details-view-btn')
             .attr('type', 'button')
-            .attr('data-bs-toggle', 'modal')
-            .attr('data-bs-target', '#SCHOOL')
             .attr('data-id', school.id)
+            .attr('data-type', 'SCHOOL')
             .html('<i class="la la-eye"></i>');
 
         container.append(link);

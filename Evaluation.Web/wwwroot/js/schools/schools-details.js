@@ -315,8 +315,8 @@ const schoolDetailsModal = (function () {
     }
 
     function buildContent(type, includeAccordion) {
-        let html = statsCardTemplate();
-        html += type === 'SCHOOL' ? schoolTemplate() : employeeTemplate();
+        let html = type === 'SCHOOL' ? schoolTemplate() : employeeTemplate();
+        html += statsCardTemplate();
 
         // Accordion shows for both types, but only in modal context (isModal = true
         // in the old Razor version). Table binding still only runs for SCHOOL,
