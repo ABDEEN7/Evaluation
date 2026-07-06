@@ -122,13 +122,8 @@ namespace Evaluation.Services.Models.Admin
 
         }
 
-        public async Task<ScopeAcademicYearDTO> DeleteScopeAcademicYear(Guid? Id)
+        public async Task<GenericResponse> DeleteScopeAcademicYear(Guid? Id)
         {
-
-
-
-
-            var result = new ScopeAcademicYearDTO();
             if (Id is not null)
             {
                 ScopeAcademicYear obj = await uow.GetRepository<ScopeAcademicYear>()
@@ -138,12 +133,13 @@ namespace Evaluation.Services.Models.Admin
 
                 uow.GetRepository<ScopeAcademicYear>().Delete(obj);
                 await uow.CommitAsync();
-                result = mapper.Map<ScopeAcademicYearDTO>(obj, opts => opts.Items["Language"] = _requestInfo.Lang);
-                result.ResponseStatus = DBResult.Deleted;
+
             }
+            var result = new GenericResponse
+            {
+                ResponseStatus = DBResult.Deleted
+            };
             return result;
-
-
         }
         public async Task<bool> UpdateDepartmentOrder(List<OrderingDTO> message)
         {
