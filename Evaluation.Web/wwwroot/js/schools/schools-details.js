@@ -42,129 +42,124 @@ const schoolDetailsModal = (function () {
 
     function schoolTemplate() {
         return `
-            <div class="col-md-6">
-                <div class="card card-table">
-                    <div class="card-body">
-                        <h5 class="fw-bold mb-4 @ConstantKeys.WebAppOrgDetails.lblOrgDetailsBasicInformation"></h5>
-                        <div>
-                            <div class="row my-3">
-                                <div class="col-md-6">
-                                    <h6 class="fw-bold">
-                                        <span class="primary-bg">
-                                            <i class="las la-user color-primary"></i>
-                                        </span>
-
-                                        <span class="mx-2 @ConstantKeys.WebAppOrgDetails.lblOrgDetailsManager"></span>
-                                    </h6>
-                                </div>
-                                <div class="col-md-6">
-                                    <h6 class="text-light" id="managerName@(suffix)">
-                                    </h6>
-                                </div>
+        <div class="col-md-6">
+            <div class="card card-table">
+                <div class="card-body">
+                    <h5 class="fw-bold mb-4">${label('lblOrgDetailsBasicInformation')}</h5>
+                    <div>
+                        <div class="row my-3">
+                            <div class="col-md-6">
+                                <h6 class="fw-bold">
+                                    <span class="primary-bg">
+                                        <i class="las la-user color-primary"></i>
+                                    </span>
+                                    <span class="mx-2">${label('lblOrgDetailsManager')}</span>
+                                </h6>
                             </div>
-                            <div class="row mb-3">
-                                <div class="col-md-6">
-                                    <h6 class="fw-bold">
-                                        <span class="primary-bg">
-                                            <i class="las la-calendar-check color-primary"></i>
-                                        </span>
-
-                                        <span class="mx-2 @ConstantKeys.WebAppOrgDetails.lblOrgDetailsEstablishmentDate"></span>
-                                    </h6>
-                                </div>
-                                <div class="col-md-6 justify-items-end">
-                                    <h6 class="text-light" id="establishmentDate@(suffix)"></h6>
-                                </div>
+                            <div class="col-md-6">
+                                <h6 class="text-light" id="managerName"></h6>
                             </div>
-                            <div class="row mb-3">
-                                <div class="col-md-6">
-                                    <h6 class="fw-bold">
-                                        <span class="primary-bg">
-                                            <i class="las la-user-friends color-primary"></i>
-                                        </span>
-
-                                        <span class="mx-2 @ConstantKeys.WebAppOrgDetails.lblOrgDetailsLevels"></span>
-                                    </h6>
-                                </div>
-                                <div class="col-md-6 justify-items-end">
-                                    <h6 class="text-light" id="teachers@(suffix)"></h6>
-                                </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <h6 class="fw-bold">
+                                    <span class="primary-bg">
+                                        <i class="las la-calendar-check color-primary"></i>
+                                    </span>
+                                    <span class="mx-2">${label('lblOrgDetailsEstablishmentDate')}</span>
+                                </h6>
                             </div>
+                            <div class="col-md-6 justify-items-end">
+                                <h6 class="text-light" id="establishmentDate"></h6>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <h6 class="fw-bold">
+                                    <span class="primary-bg">
+                                        <i class="las la-user-friends color-primary"></i>
+                                    </span>
+                                    <span class="mx-2">${label('lblOrgDetailsLevels')}</span>
+                                </h6>
+                            </div>
+                            <div class="col-md-6 justify-items-end">
+                                <h6 class="text-light" id="teachers"></h6>
+                            </div>
+                        </div>
+                    </div>
+                    <hr class="my-4">
+                    <div class="d-flex gap-2 align-items-center mb-3">
+                        <span class="soft-gray-bg mp2">
+                            <i class="las la-phone-volume color-primary"></i>
+                        </span>
+                        <div><a id="phone" href="#" class="text-dark"></a></div>
+                    </div>
 
-                        </div>
-                        <hr class="my-4">
-                        <div class=" d-flex gap-2 align-items-center mb-3">
-                            <span class="soft-gray-bg mp2">
-                                <i class="las la-phone-volume color-primary"></i>
-                            </span>
-                            <div><a id="phone@(suffix)" href="#" class="text-dark"></a></div>
-                        </div>
+                    <div class="d-flex gap-2 align-items-center mb-3">
+                        <span class="soft-gray-bg mp2">
+                            <i class="las la-envelope color-primary"></i>
+                        </span>
+                        <div><a id="email" href="" class="text-dark"></a></div>
+                    </div>
 
-                        <div class=" d-flex gap-2 align-items-center mb-3">
-                            <span class="soft-gray-bg mp2">
-                                <i class="las la-envelope color-primary"></i>
-                            </span>
-                            <div><a id="email@(suffix)" href="" class="text-dark"></a></div>
-                        </div>
-
-                        <div class=" d-flex gap-2 align-items-center mb-3">
-                            <span class="soft-gray-bg mp2">
-                                <i class="las la-location-arrow color-primary"></i>
-                            </span>
-                            <div><p id="address@(suffix)" class="text-dark m-0"></p></div>
-                        </div>
+                    <div class="d-flex gap-2 align-items-center mb-3">
+                        <span class="soft-gray-bg mp2">
+                            <i class="las la-location-arrow color-primary"></i>
+                        </span>
+                        <div><p id="address" class="text-dark m-0"></p></div>
                     </div>
                 </div>
             </div>
-        `;
+        </div>
+    `;
     }
 
     function employeeTemplate() {
         return `
-          <div class="col-md-12">
-                <div class="card card-table mb-3">
-                    <div class="card-body">
-                        <h5 class="fw-bold mb-4">معلومات أساسية</h5>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <p class="text-light">الرقم الوظيفي</p>
-                                <h5 class="fw-bold" id="employeeNo@(suffix)"></h5>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <p class="text-light">تاريخ الميلاد</p>
-                                <h5 class="fw-bold" id="birthDate@(suffix)"></h5>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <p class="text-light">الجنسية</p>
-                                <h5 class="fw-bold" id="nationalityCode@(suffix)"></h5>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <p class="text-light">تاريخ الالتحاق</p>
-                                <h5 class="fw-bold" id="joinDate@(suffix)"></h5>
-                            </div>
+      <div class="col-md-12">
+            <div class="card card-table mb-3">
+                <div class="card-body">
+                    <h5 class="fw-bold mb-4">معلومات أساسية</h5>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <p class="text-light">الرقم الوظيفي</p>
+                            <h5 class="fw-bold" id="employeeNo"></h5>
                         </div>
+                        <div class="col-md-6 mb-3">
+                            <p class="text-light">تاريخ الميلاد</p>
+                            <h5 class="fw-bold" id="birthDate"></h5>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <p class="text-light">الجنسية</p>
+                            <h5 class="fw-bold" id="nationalityCode"></h5>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <p class="text-light">تاريخ الالتحاق</p>
+                            <h5 class="fw-bold" id="joinDate"></h5>
+                        </div>
+                    </div>
 
-                        <hr class="mt-0">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class=" d-flex gap-2 align-items-center mb-3">
-                                    <div class="social-icon"><i class="la la-phone-volume"></i></div>
-                                    <div><a id="jobTitle@(suffix)" href="#" class="text-dark"></a></div>
-                                </div>
-                                <div class=" d-flex gap-2 align-items-center mb-3">
-                                    <div class="social-icon"><i class="la la-envelope"></i></div>
-                                    <div><a id="email@(suffix)" href="" class="text-dark"></a></div>
-                                </div>
-                                <div class=" d-flex gap-2 align-items-center mb-3">
-                                    <div class="social-icon"><i class="la la-location-arrow"></i></div>
-                                    <div><p id="qID@(suffix) class="text-dark m-0"></p></div>
-                                </div>
+                    <hr class="mt-0">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="d-flex gap-2 align-items-center mb-3">
+                                <div class="social-icon"><i class="la la-phone-volume"></i></div>
+                                <div><a id="jobTitle" href="#" class="text-dark"></a></div>
+                            </div>
+                            <div class="d-flex gap-2 align-items-center mb-3">
+                                <div class="social-icon"><i class="la la-envelope"></i></div>
+                                <div><a id="email" href="" class="text-dark"></a></div>
+                            </div>
+                            <div class="d-flex gap-2 align-items-center mb-3">
+                                <div class="social-icon"><i class="la la-location-arrow"></i></div>
+                                <div><p id="qID" class="text-dark m-0"></p></div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        `;
+        </div>
+    `;
     }
 
     function statsCardTemplate() {
@@ -280,48 +275,48 @@ const schoolDetailsModal = (function () {
 
     function schoolRequestsAccordionTemplate() {
         return `
-            <div class="accordion" id="customAccordion">
-            <div class="accordion-item mb-3 rounded">
-                <h2 class="accordion-header">
-                    <button class="accordion-button d-flex align-items-center justify-content-between"
-                            type="button" data-bs-toggle="collapse"
-                            data-bs-target="#schoolEvalRequests" aria-expanded="true">
-                        <div class="d-flex align-items-center gap-2 fs-18">
-                            <i class="la la-building text-primary fs-25"></i>
-                            <span class="fw-semibold @ConstantKeys.WebAppRequest.lblSchoolEvalRequests"></span>
-                        </div>
-                        <span class="toggle-icon"><i class="la la-angle-up fs-22"></i></span>
-                    </button>
-                </h2>
-                <div id="schoolEvalRequests" class="accordion-collapse collapse show">
-                    <div class="accordion-body">
-                        <div class="table-responsive" id="evalRequestsTableWrapper">
-                            <table id="evalRequestsTable" class="table table-striped table-bordered w-100 application-request card">
-                                <thead>
-                                    <tr>
-                                        <th class=" @ConstantKeys.WebAppRequest.lblRequestNumber"></th>
-                                        <th class=" @ConstantKeys.WebAppRequest.lblStatus"></th>
-                                        <th class=" @ConstantKeys.WebAppRequest.lblFromDate"></th>
-                                        <th class=" @ConstantKeys.WebAppRequest.lblToDate"></th>
-                                        <th class=" @ConstantKeys.WebAppRequest.lblEvaluationDate"></th>
-                                        <th class=" @ConstantKeys.WebAppRequest.lblNextEvaluationDate"></th>
-                                        <th class=" @ConstantKeys.WebAppRequest.lblEvaluationResult"></th>
-                                        <th class=""></th>
-                                    </tr>
-                                </thead>
-                                <tbody class="requeststableBody w-100"></tbody>
-                            </table>
-                        </div>
+        <div class="accordion" id="customAccordion">
+        <div class="accordion-item mb-3 rounded">
+            <h2 class="accordion-header">
+                <button class="accordion-button d-flex align-items-center justify-content-between"
+                        type="button" data-bs-toggle="collapse"
+                        data-bs-target="#schoolEvalRequests" aria-expanded="true">
+                    <div class="d-flex align-items-center gap-2 fs-18">
+                        <i class="la la-building text-primary fs-25"></i>
+                        <span class="fw-semibold">${label('lblSchoolEvalRequests')}</span>
+                    </div>
+                    <span class="toggle-icon"><i class="la la-angle-up fs-22"></i></span>
+                </button>
+            </h2>
+            <div id="schoolEvalRequests" class="accordion-collapse collapse show">
+                <div class="accordion-body">
+                    <div class="table-responsive" id="evalRequestsTableWrapper">
+                        <table id="evalRequestsTable" class="table table-striped table-bordered w-100 application-request card">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody class="requeststableBody w-100"></tbody>
+                        </table>
                     </div>
                 </div>
             </div>
         </div>
-        `;
+    </div>
+    `;
     }
 
     function buildContent(type, includeAccordion) {
-        let html = statsCardTemplate();
-        html += type === 'SCHOOL' ? schoolTemplate() : employeeTemplate();
+        let html = type === 'SCHOOL' ? schoolTemplate() : employeeTemplate();
+        html += statsCardTemplate();
 
         // Accordion shows for both types, but only in modal context (isModal = true
         // in the old Razor version). Table binding still only runs for SCHOOL,
@@ -411,6 +406,8 @@ const schoolDetailsModal = (function () {
         evalRequestsList = evaluationListing.createListing({
             tableId: 'evalRequestsTable',
             ajaxUrl: `/EvaluationRequest/${departmentRoutePath}/GetEvaluationRequestsBySchoolId?Id=${orgId}`,
+            filterBtnId: 'filterSchoolBtnId',
+            clearFilterBtnId: 'clearFilterSchoolBtnId',
             enableCardView: false,
             columns: [
                 {
@@ -434,8 +431,8 @@ const schoolDetailsModal = (function () {
                     searchable: false,
                     render: function (data, type, row) {
                         return `<button class="btn btn-sm btn-primary" onclick="openEvaluationRequestDetails('${row.id}')">
-                                    ${label('lblEvaluationRequestDetails')}
-                                </button>`;
+                                ${label('lblEvaluationRequestDetails')}
+                            </button>`;
                     }
                 }
             ]

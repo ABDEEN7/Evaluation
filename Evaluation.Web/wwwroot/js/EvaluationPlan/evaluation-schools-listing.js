@@ -27,15 +27,15 @@
         tableViewBtnId: 'tblViewSchool',
         rowClass: 'plan-request-card',
         columns: [
-        {
-            data: currentLang == 'ar' ? "nameAr" : "nameEn",
-            title: uiControlsSetup().GetUiControlText("lblSchoolName"),
-            className: "td-full mb-3",
-            render: function(data, type, row) {
-                const safe = data || "";
+            {
+                data: currentLang == 'ar' ? "nameAr" : "nameEn",
+                title: uiControlsSetup().GetUiControlText("lblSchoolName"),
+                className: "td-full mb-3",
+                render: function (data, type, row) {
+                    const safe = data || "";
 
-                return `
-                    <div data-bs-toggle= 'modal' data-bs-target= '#schoolDetailsPopup' class="plan-title-row text-decoration-none text-primary fw-bold school-details-link" data-id="${row.id}">
+                    return `
+                    <div class="plan-title-row text-decoration-none text-primary fw-bold school-details-view-btn" data-id="${row.id}" data-type="SCHOOL">
                         <i class="las la-school card-only-icon title-icon"></i>
 
                         <span class="plan-text-wrap px-1">
@@ -44,66 +44,66 @@
                         </span>
                     </div>
                     `;
-            }
-        },
-        {
-            data: "code",
-            title: uiControlsSetup().GetUiControlText("lblSchoolCode"),
-            className: "td-full school-type-column",
-            render: function(data) {
-                return `
+                }
+            },
+            {
+                data: "code",
+                title: uiControlsSetup().GetUiControlText("lblSchoolCode"),
+                className: "td-full school-type-column",
+                render: function (data) {
+                    return `
                 <i class="las la-barcode card-only-icon me-1"></i>
                 <span class="card-only-label me-2">Code: </span>
                 <span>${data || "_"}</span>
             `;
-            }
-        },
-        {
-            data: "schoolTypeName",
-            title: uiControlsSetup().GetUiControlText("lblSchoolType"),
-            className: "td-full school-type-column",
-            render: function(data) {
-                return `
+                }
+            },
+            {
+                data: "schoolTypeName",
+                title: uiControlsSetup().GetUiControlText("lblSchoolType"),
+                className: "td-full school-type-column",
+                render: function (data) {
+                    return `
                 <i class="las la-graduation-cap card-only-icon me-1"></i>
                 <span class="card-only-label me-2">Sector: </span>
                 <span>${data || ""}</span>
             `;
-            }
-        },
-        {
-            data: "null",
-            title: uiControlsSetup().GetUiControlText("lblSchoolLevel"),
-            className: "td-full school-type-column",
-            render: function(data) {
-                return `
+                }
+            },
+            {
+                data: "null",
+                title: uiControlsSetup().GetUiControlText("lblSchoolLevel"),
+                className: "td-full school-type-column",
+                render: function (data) {
+                    return `
                 
                 <i class="las la-school card-only-icon me-1"></i>
                 <span class="card-only-label me-2">Level: </span>
-                <span>${ currentLang == 'ar' ? "ابتدائي, اعدادي" : "Primary, Preparatory"}</span>
+                <span>${currentLang == 'ar' ? "ابتدائي, اعدادي" : "Primary, Preparatory"}</span>
             `;
-            }
-        },
+                }
+            },
 
             //{
-             //   data: "nameAr",
-             //   title: uiControlsSetup().GetUiControlText("lblSchoolName"),
-             //   className: "td-left name",   
-             //   render: function (data, type, row) {
-             //       const safe = data || "";
-             //       return `<a href="javascript:void(0)" data-bs-toggle= 'modal' data-bs-target= '#schoolDetailsPopup' class="text-decoration-none text-primary fw-bold school-details-link" data-id="${row.id}">${safe}</a>`;
-              //  }
+            //   data: "nameAr",
+            //   title: uiControlsSetup().GetUiControlText("lblSchoolName"),
+            //   className: "td-left name",   
+            //   render: function (data, type, row) {
+            //       const safe = data || "";
+            //       return `<a href="javascript:void(0)" data-bs-toggle= 'modal' data-bs-target= '#schoolDetailsPopup' class="text-decoration-none text-primary fw-bold school-details-link" data-id="${row.id}">${safe}</a>`;
+            //  }
             //   },
 
 
-           // {
-           //     data: "code",
-           //     title: uiControlsSetup().GetUiControlText("lblSchoolCode"),
-           //     className: "td-left code"
-           // },
-           // {
-             //   data: "schoolTypeName",
-             //   title: uiControlsSetup().GetUiControlText("lblSchoolType"),
-             //   className: "td-left type"
+            // {
+            //     data: "code",
+            //     title: uiControlsSetup().GetUiControlText("lblSchoolCode"),
+            //     className: "td-left code"
+            // },
+            // {
+            //   data: "schoolTypeName",
+            //   title: uiControlsSetup().GetUiControlText("lblSchoolType"),
+            //   className: "td-left type"
             //},
             //{
             //    data: "levelName",
@@ -134,20 +134,9 @@
             //}
         ],
         onRowClick: function (rowData, event) {
-            $('#schoolDetailsPopup').data('schoolId', rowData.id);
-            const modal = new bootstrap.Modal(document.getElementById('schoolDetailsPopup'));
-            modal.show();
-        },
-        onDraw: function () {
-            $('#schoolTable').off('click', '.plan-request-card').on('click', '.plan-request-card', function (e) {
-                const id = $(this).data('id');
-                if (!id) return;
-                $('#schoolDetailsPopup').data('schoolId', id);
-                const modal = new bootstrap.Modal(document.getElementById('schoolDetailsPopup'));
-                modal.show();
-            });
+            schoolDetailsModal.open(rowData.id, 'SCHOOL');
         }
     });
 
-   // schoolsListing.reload();
+    // schoolsListing.reload();
 });
