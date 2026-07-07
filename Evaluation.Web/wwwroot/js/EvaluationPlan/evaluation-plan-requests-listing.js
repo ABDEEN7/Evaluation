@@ -257,6 +257,7 @@
         };
 
         jqClient(options)
-            .Get(`/ServiceRequest/${DepartmecntRouting}/CanCreateEvaluationPlanRequest`);
+            .Get(`/ServiceRequest/${DepartmentRouting}/CanCreateEvaluationPlanRequest`);
     }
 });
+window.toggleAddEvaluationPlanRequestButton = toggleAddEvaluationPlanRequestButton;

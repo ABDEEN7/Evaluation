@@ -184,7 +184,10 @@ window.serviceRequestForm = window.serviceRequestForm || {};
                         .off('shown.bs.modal.redraw')
                         .on('shown.bs.modal.redraw', function () {
                             if (window.Tabulator?.findTable) {
-                                Tabulator.findTable(`#${actionModalId} .tabulator`).forEach(t => t.redraw(true));
+                                const tables = Tabulator.findTable(`#${actionModalId} .tabulator`);
+                                if (tables) {
+                                    tables.forEach(t => t.redraw(true));
+                                }
                             }
                         });
 
