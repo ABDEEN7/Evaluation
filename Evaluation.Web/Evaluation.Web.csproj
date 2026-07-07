@@ -7,13 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="Views\Plan\FlatPicker_ar.js">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Evaluation.SharedHelper\Evaluation.SharedHelper.csproj" />
   </ItemGroup>
 
@@ -21,6 +14,10 @@
     <Folder Include="NewFolder\" />
     <Folder Include="wwwroot\assets\vendor\fullcalendar\" />
     <Folder Include="wwwroot\js\teammembers\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\vendor\flatpickr\js\FlatPicker_ar.js" />
   </ItemGroup>
 
   <ItemGroup>
