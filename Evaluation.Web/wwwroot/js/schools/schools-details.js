@@ -430,9 +430,11 @@ const schoolDetailsModal = (function () {
                     orderable: false,
                     searchable: false,
                     render: function (data, type, row) {
-                        return `<button class="btn btn-sm btn-primary" onclick="openEvaluationRequestDetails('${row.id}')">
-                                ${label('lblEvaluationRequestDetails')}
-                            </button>`;
+                        const lang = window.currentLang || 'en';
+                        const url = `/${lang}/evaluationplan/EvaluationSystem?Evlid=${row.id}`;
+                        return `<a href="${url}" class="btn btn-sm btn-primary">
+                    ${label('lblEvaluationRequestDetails')}
+                </a>`;
                     }
                 }
             ]
