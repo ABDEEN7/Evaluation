@@ -43,7 +43,7 @@ namespace Evaluation.Services.BusinessLayer.API.Template;
             }
         }
 
-        public async Task<byte[]> GenerateAttachments(Guid templateId, List<PlaceholderDto> placeholders, Guid systemModuleId, SchoolPeriodicEvaluationCriteriaContext? criteriaContext = null)
+        public async Task<byte[]> GenerateAttachments(Guid templateId, List<PlaceholderDto> placeholders, Guid systemModuleId)
         {
             var scopedUow = serviceProvider.CreateScopedUow();
             var attachment = await scopedUow.GetRepository<WebsiteAttachment>().GetByIDActiveNonDeleted(templateId);
@@ -51,7 +51,7 @@ namespace Evaluation.Services.BusinessLayer.API.Template;
             if (attachment == null)
                 throw new BusinessException(ConstantKeys.ExceptionMessage.InActiveData);
 
-            return await HandleAttachment(placeholders, attachment.Id, systemModuleId, criteriaContext);
+            return await HandleAttachment(placeholders, attachment.Id, systemModuleId);
         }
 
         public async Task<Attachment> HandleAttachment(Guid attachmentId)
@@ -70,7 +70,7 @@ namespace Evaluation.Services.BusinessLayer.API.Template;
             return new Attachment(memoryStream, attachment.FileName);
         }
         
-        public async Task<byte[]> HandleAttachment(List<PlaceholderDto> placeholders, Guid attachmentId, Guid systemModuleId, SchoolPeriodicEvaluationCriteriaContext? criteriaContext = null)
+        public async Task<byte[]> HandleAttachment(List<PlaceholderDto> placeholders, Guid attachmentId, Guid systemModuleId)
         {
             var attachment = await serviceProvider.CreateScopedUow().GetRepository<WebsiteAttachment>().GetByIDActiveNonDeleted(attachmentId);
             if (attachment == null)
@@ -88,14 +88,14 @@ namespace Evaluation.Services.BusinessLayer.API.Template;
 
             using var stream = new MemoryStream(fileBytes);
             using var docx = Xceed.Words.NET.DocX.Load(stream);
-            await ReplacePlaceholders(docx, placeholders, width, height, criteriaContext);
+            await ReplacePlaceholders(docx, placeholders, width, height);
 
             using var output = new MemoryStream();
             docx.SaveAs(output);
             return output.ToArray();
         }
 
-        private async Task ReplacePlaceholders(DocX docx, List<PlaceholderDto> placeholders, int maxWidth, int maxHeight, SchoolPeriodicEvaluationCriteriaContext? criteriaContext)
+        private async Task ReplacePlaceholders(DocX docx, List<PlaceholderDto> placeholders, int maxWidth, int maxHeight)
         {
             foreach (var placeholder in placeholders.Where(placeholder => !string.IsNullOrWhiteSpace(placeholder.Key)))
             {
@@ -189,21 +189,34 @@ namespace Evaluation.Services.BusinessLayer.API.Template;
                         ProcessTablePlaceholders(docx, tablePlaceholders);
                         break;
                     case PlaceholderType.SchoolPeriodicEvaluationCriteria:
-                        await ProcessSchoolPeriodicEvaluationCriteriaPlaceholderAsync(docx, placeholder, criteriaContext);
+                        await ProcessSchoolPeriodicEvaluationCriteriaPlaceholderAsync(docx, placeholder);
                         break;
+                    case PlaceholderType.SchoolPerformanceSummaryTable:
+                    {
+                        var key = NormalizePlaceholderKey(placeholder.Key);
+
+                        if (placeholder.SchoolPerformanceResult is { Count: > 0 })
+                        {
+                            var table = CreateSchoolPerformanceSummaryTable(docx, placeholder.SchoolPerformanceResult);
+
+                            docx.ReplaceTextWithObject(new ObjectReplaceTextOptions
+                            {
+                                SearchValue = $"{{{{{key}}}}}",
+                                NewObject = table,
+                                TrackChanges = false
+                            });
+                        }
+
+                        break;
+                    }
                     default:
                         throw new ArgumentOutOfRangeException(nameof(placeholder.PlaceholderType), $"Unsupported placeholder type: {placeholder.PlaceholderType}");
                 }
             }
         }
 
-        private async Task ProcessSchoolPeriodicEvaluationCriteriaPlaceholderAsync(DocX docx, PlaceholderDto placeholder, SchoolPeriodicEvaluationCriteriaContext? context)
+        private async Task ProcessSchoolPeriodicEvaluationCriteriaPlaceholderAsync(DocX docx, PlaceholderDto placeholder)
         {
-            if (context == null)
-                throw new BusinessException("School periodic evaluation criteria context is required.");
-            if (context.FormId == Guid.Empty || context.AcademicYearId == Guid.Empty || context.EvaluationRequestId == Guid.Empty)
-                throw new BusinessException("School periodic evaluation criteria context contains an empty identifier.");
-
             var key = $"{{{{{NormalizePlaceholderKey(placeholder.Key)}}}}}";
             var paragraph = docx.Paragraphs.FirstOrDefault(p => p.Text.Contains(key, StringComparison.Ordinal));
             if (paragraph == null)
@@ -211,14 +224,9 @@ namespace Evaluation.Services.BusinessLayer.API.Template;
             if (!string.Equals(paragraph.Text.Trim(), key, StringComparison.Ordinal))
                 throw new BusinessException($"The placeholder {key} must be alone in its paragraph.");
 
-            var formResult = await serviceProvider.GetRequiredService<FormBL>()
-                .GetFormItemsWithValues(context.FormId, context.AcademicYearId, context.EvaluationRequestId);
-            if (formResult.IsFailed)
-                throw new BusinessException($"Failed to retrieve school periodic evaluation criteria: {string.Join("; ", formResult.Errors.Select(e => e.Message))}");
-
             var font = GetTemplateFont(docx);
             var rootIndex = 0;
-            foreach (var root in OrderedScopes(formResult.Value.Tree))
+            foreach (var root in OrderedScopes(placeholder.Tree))
             {
                 rootIndex++;
                 InsertRootScope(paragraph, root, Segment(root.OrderNo, rootIndex), font);
@@ -417,6 +425,126 @@ namespace Evaluation.Services.BusinessLayer.API.Template;
                 para.RemoveText(0);
                 para.Append(updatedText);
             }
+        }
+        
+        private static Table CreateSchoolPerformanceSummaryTable(
+            DocX docx,
+            List<SchoolPerformanceResult> data)
+        {
+            // +2 = header row + final overall row
+            var table = docx.AddTable(data.Count + 2, 4);
+
+            table.Design = TableDesign.TableGrid;
+            table.AutoFit = AutoFit.Window;
+            table.Alignment = Alignment.center;
+
+            var headerColor = Color.FromArgb(115, 0, 57); // close to image color
+            var footerColor = Color.LightGray;
+
+            string[] headers =
+            {
+                "نسبة المعيار الرئيس",
+                "حكم المعيار الرئيس",
+                "الوزن النسبي للمعيار الرئيسي",
+                "المعايير الرئيسية"
+            };
+
+            for (int i = 0; i < headers.Length; i++)
+            {
+                var p = table.Rows[0].Cells[i].Paragraphs.First();
+                p.Append(headers[i])
+                    .Bold()
+                    .Color(Xceed.Drawing.Color.White)
+                    .FontSize(12)
+                    .Alignment = Alignment.center;
+
+                SetCellShading(table.Rows[0].Cells[i], headerColor);
+            }
+
+            for (int rowIndex = 0; rowIndex < data.Count; rowIndex++)
+            {
+                var item = data[rowIndex];
+                var row = table.Rows[rowIndex + 1];
+
+                SetCellText(row.Cells[0], $"%{Math.Round(item.Average)}");
+                SetCellText(row.Cells[1], item.CriteriaJudgement);
+                SetCellText(row.Cells[2], $"%{item.CriteriaWieght}");
+                SetCellText(row.Cells[3], item.CriteriaName);
+            }
+
+            var overallAverage = CalculateOverallAverage(data);
+            var overallJudgement = GetJudgement(overallAverage / 20); // adjust if your GetJudgement expects different scale
+
+            var footerRow = table.Rows[data.Count + 1];
+
+            SetCellText(footerRow.Cells[0], $"%{Math.Round(overallAverage)}");
+            SetCellText(footerRow.Cells[1], overallJudgement);
+
+            footerRow.MergeCells(2, 3);
+            SetCellText(footerRow.Cells[2], "الحكم العام");
+
+            for (int i = 0; i < footerRow.Cells.Count; i++)
+            {
+                SetCellShading(footerRow.Cells[i], footerColor);
+            }
+
+            return table;
+        }
+        
+        private static void SetCellText(Cell cell, string? text)
+        {
+            var p = cell.Paragraphs.First();
+            p.RemoveText(0);
+            p.Append(text ?? string.Empty)
+                .FontSize(12)
+                .Bold()
+                .Alignment = Alignment.center;
+
+            SetParagraphRtl(p);
+        }
+
+        private static void SetCellShading(Cell cell, Color color)
+        {
+            XNamespace w = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
+
+            var tcPr = cell.Xml.Element(w + "tcPr");
+            if (tcPr == null)
+            {
+                tcPr = new XElement(w + "tcPr");
+                cell.Xml.AddFirst(tcPr);
+            }
+
+            tcPr.Add(new XElement(w + "shd",
+                new XAttribute(w + "fill", $"{color.R:X2}{color.G:X2}{color.B:X2}")));
+        }
+
+        private static void SetParagraphRtl(Paragraph p)
+        {
+            XNamespace w = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
+
+            var pPr = p.Xml.Element(w + "pPr");
+            if (pPr == null)
+            {
+                pPr = new XElement(w + "pPr");
+                p.Xml.AddFirst(pPr);
+            }
+
+            if (pPr.Element(w + "bidi") == null)
+            {
+                pPr.Add(new XElement(w + "bidi"));
+            }
+        }
+        
+        private static decimal CalculateOverallAverage(List<SchoolPerformanceResult> data)
+        {
+            var totalWeight = data.Sum(x => x.CriteriaWieght);
+
+            if (totalWeight > 0)
+            {
+                return data.Sum(x => x.Average * x.CriteriaWieght) / totalWeight;
+            }
+
+            return data.Average(x => x.Average);
         }
 
 }

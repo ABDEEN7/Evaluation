@@ -459,36 +459,33 @@ namespace Evaluation.Services.BusinessLayer.API.Template;
 
 			var parentScopes = formResult.Value.Tree;
 
-			var summary = string.Join(Environment.NewLine,
+			var summary =
 				parentScopes.Select(scope =>
 				{
 					var avg = GetScopeAverage(scope);
-					return $"{scope.Name} | {GetJudgement(avg)} | {(avg * 20):0.##}%";
-				}));
 
-			var details = string.Join(Environment.NewLine + Environment.NewLine,
-				parentScopes.Select(scope =>
-				{
-					var avg = GetScopeAverage(scope);
-					var note = scopeNotes.FirstOrDefault(x => x.ScopeId == scope.Id);
+					return new SchoolPerformanceResult
+					{
+						CriteriaName = scope.Name,
+						CriteriaJudgement = GetJudgement(avg), //TODO read value from DB
+						CriteriaWieght = 0, //TODO ask Fattoh
+						Average = avg * 20 //TODO need calculation
+					};
 
-					return
-						$"{scope.Name} - {GetJudgement(avg)} ({(avg * 20):0.##}%)" + Environment.NewLine +
-						$"أهم جوانب القوة: {note?.PositivePoint ?? "-"}" + Environment.NewLine +
-						$"أهم الجوانب التي تحتاج إلى تحسين وتطوير: {note?.NegativePoint ?? "-"}";
-				}));
-
+				}).ToList();
+			
 			result.Add(new PlaceholderDto
 			{
 				Key = "{{ParentScopesSummary}}",
-				Value = summary
+				PlaceholderType = PlaceholderType.SchoolPerformanceSummaryTable,
+				SchoolPerformanceResult = summary
 			});
 
 			result.Add(new PlaceholderDto
 			{
 				Key = "{{ParentScopesDetails}}",
                 PlaceholderType = PlaceholderType.SchoolPeriodicEvaluationCriteria,
-				Value = details
+				Tree = formResult.Value.Tree
 			});
 		}
 		// ======================= Request Status =======================
