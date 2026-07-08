@@ -4,7 +4,9 @@ using Evaluation.DAL.Models.Calendars;
 using Evaluation.DAL.Models.DepartementEntites;
 using Evaluation.DAL.Models.FormsModules;
 using Evaluation.DAL.Repositories;
+using Evaluation.Services.BusinessLayer.API.DepartmentLayer;
 using Evaluation.Services.Special;
+using Evaluation.SharedHelper.Consts;
 using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Models;
@@ -22,10 +24,8 @@ namespace Evaluation.Services.Models.Admin
         }
 
 
-        public async Task<List<ScopeAcademicYearDTO>> GetScopeAcademicYearList(ScopeFormItemRequest request, int PageSize)
+        public async Task<List<GetScopeAcademicYearDTO>> GetScopeAcademicYearList(ScopeFormItemRequest request, int PageSize)
         {
-
-
             var list = uow.GetRepository<ScopeAcademicYear>()
                 .GetAllNonDeleted()
                 .Include(x => x.CreateBy)
@@ -36,11 +36,25 @@ namespace Evaluation.Services.Models.Admin
             {
                 list = list.Where(x => x.DepartmentId == request.DepartmentId);
             }
-
-            var result = mapper.Map<List<ScopeAcademicYearDTO>>(list, opts => opts.Items["Language"] = _requestInfo.Lang);
+            var result = await list.Select(x => new GetScopeAcademicYearDTO
+            {
+                Id = x.Id,
+                AcademicYear = LanguageStatic.SelectLang(_requestInfo.Lang, x.AcademicYear.NameAr, x.AcademicYear.NameEn),
+                Scope = LanguageStatic.SelectLang(_requestInfo.Lang, x.Scope.NameAr, x.Scope.NameEn),
+                ScopeAcademicYearScopeParent = LanguageStatic.SelectLang(_requestInfo.Lang, x.ScopeParent.NameAr, x.ScopeParent.NameEn),
+                Department = LanguageStatic.SelectLang(_requestInfo.Lang, x.Department!.NameAr, x.Department!.NameEn),
+                CreateBy =
+                LanguageStatic.SelectLang(_requestInfo.Lang, x.CreateBy.NameAr, x.CreateBy.NameEn),
+                UpdateDate = x.UpdateDate.ToString(),
+                UpdateBy =x.UpdateById != null ? LanguageStatic.SelectLang(_requestInfo.Lang,x.UpdateBy.NameAr,x.UpdateBy.NameEn) : LanguageStatic.SelectLang(_requestInfo.Lang, x.CreateBy.NameAr, x.CreateBy.NameEn),
+                IsActive = x.IsActive,
+                ScopeParentId = x.ScopeParentId,
+                ScopeId = x.ScopeId,
+                AcademicYearId = x.AcademicYearId,
+                DepartmentId = x.DepartmentId,
+                ScopeAcademicYearScopeParentId = x.ScopeParentId
+            }).ToListAsync();
             return result;
-
-
         }
 
         public async Task<ScopeAcademicYearDTO> SaveScopeAcademicYear(ScopeAcademicYearDTO message)
@@ -54,9 +68,17 @@ namespace Evaluation.Services.Models.Admin
             obj.DepartmentId = message.DepartmentId;
             obj.AcademicYearId = message.AcademicYearId;
             obj.IsActive = message.IsActive;
-
+            obj.ScopeParentId = message.ScopeAcademicYearScopeParentId;
             uow.GetRepository<ScopeAcademicYear>().Insert(obj);
             await uow.CommitAsync();
+            obj = await uow.GetRepository<ScopeAcademicYear>()
+                           .GetAllActiveNonDeleted()
+                           .Include(x => x.Department)
+                           .Include(x => x.Scope)
+                           .Include(x => x.ScopeParent)
+                           .Include(x => x.AcademicYear)
+                           .FirstAsync(x => x.Id == obj.Id);
+
             var result = mapper.Map<ScopeAcademicYearDTO>(obj, opts => opts.Items["Language"] = _requestInfo.Lang);
             result.ResponseStatus = DBResult.Inserted;
             return result;
@@ -75,6 +97,10 @@ namespace Evaluation.Services.Models.Admin
                 ScopeAcademicYear obj = await uow.GetRepository<ScopeAcademicYear>()
                                       .GetAllNonDeleted()
                                       .Include(x => x.CreateBy)
+                                      .Include(x => x.Department)
+                                      .Include(x => x.Scope)
+                                      .Include(x => x.ScopeParent)
+                                      .Include(x => x.AcademicYear)
                                       .Where(x => x.Id == message.Id)
                                       .FirstAsync();
 
@@ -83,6 +109,7 @@ namespace Evaluation.Services.Models.Admin
                 obj.DepartmentId = message.DepartmentId;
                 obj.AcademicYearId = message.AcademicYearId;
                 obj.IsActive = message.IsActive;
+                obj.ScopeParentId = message.ScopeAcademicYearScopeParentId;
 
                 uow.GetRepository<ScopeAcademicYear>().Update(obj);
                 await uow.CommitAsync();
@@ -95,13 +122,8 @@ namespace Evaluation.Services.Models.Admin
 
         }
 
-        public async Task<ScopeAcademicYearDTO> DeleteScopeAcademicYear(Guid? Id)
+        public async Task<GenericResponse> DeleteScopeAcademicYear(Guid? Id)
         {
-
-
-
-
-            var result = new ScopeAcademicYearDTO();
             if (Id is not null)
             {
                 ScopeAcademicYear obj = await uow.GetRepository<ScopeAcademicYear>()
@@ -111,12 +133,13 @@ namespace Evaluation.Services.Models.Admin
 
                 uow.GetRepository<ScopeAcademicYear>().Delete(obj);
                 await uow.CommitAsync();
-                result = mapper.Map<ScopeAcademicYearDTO>(obj, opts => opts.Items["Language"] = _requestInfo.Lang);
-                result.ResponseStatus = DBResult.Deleted;
+
             }
+            var result = new GenericResponse
+            {
+                ResponseStatus = DBResult.Deleted
+            };
             return result;
-
-
         }
         public async Task<bool> UpdateDepartmentOrder(List<OrderingDTO> message)
         {

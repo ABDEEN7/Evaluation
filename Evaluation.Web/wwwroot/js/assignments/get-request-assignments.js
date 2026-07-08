@@ -176,7 +176,9 @@
                     state.teamLeaderId = memberId;
                 }
 
-                $(`${id('userTable')} tr[data-id="${memberId}"] .row-select`).prop('checked', true);
+                $(`${id('userTable')} tr[data-id="${memberId}"] .team-add-btn`)
+                    .addClass('selected')
+                    .html('');
             }
 
             renderSelectedTeamTable();
@@ -228,12 +230,14 @@
         }
 
         let headerHTML = `
-            <th style="width:50px;">
-                <label class="custom-checkbox1">
-                    <input type="checkbox" id="${state.fieldId}_selectAllSelected">
-                    <span class="checkmark"></span>
-                </label>
-            </th>
+            <th style="width:50px;" class="text-center">
+    <button type="button"
+            id="${state.fieldId}_removeAllMembers"
+            class="team-remove-btn bulk-remove-btn"
+            title="Remove all">
+        <i class="las la-times"></i>
+    </button>
+</th>
             <th>${t('lblMemberName')}</th>
         `;
 
@@ -277,19 +281,20 @@
             const memberPosition = m.position || m.jobTitle || m.title || 'غير محدد';
 
             return `
-                <tr data-id="${m.id}">
+                <tr data-id="${m.id}" class="team-checkbox-container">
                     <td>
-                        <label class="custom-checkbox1 plus">
-                            <input type="checkbox" class="row-select"
-                                   ${checked ? 'checked' : ''}>
-                            <span class="checkmark"></span>
-                        </label>
+                        <button type="button"
+                                class="team-add-btn ${checked ? 'selected' : ''}">
+                       ${checked ? '' : '<i class="las la-plus"></i>'}
+                        </button>
                     </td>
                     <td><h6>${memberName}</h6></td>
                     <td><h6>${memberPosition}</h6></td>
                 </tr>
             `;
         }).join('');
+
+
 
         $tbody.html(rows);
         updateSelectAllCheckbox();
@@ -349,7 +354,7 @@
                             <input type="checkbox" class="nda-checkbox" 
                                    data-member-id="${member.id}" 
                                    ${ndaChecked}>
-                            <span class="checkmark"></span>
+                           
                         </label>
                     </td>
                 `;
@@ -360,20 +365,19 @@
 
             return `
     <tr data-selected-id="${member.id}">
-        <td>
-            <label class="custom-checkbox1 ${isPending ? 'minus' : 'plus'}">
-                <input type="checkbox" class="selected-row-checkbox" 
-                       ${isPending ? 'checked' : ''}>
-                <span class="checkmark"></span>
-            </label>
-        </td>
+      <td>
+    <button type="button"
+            class="team-remove-btn ${isPending ? 'selected' : ''}">
+        <i class="las ${isPending ? 'la-minus' : 'la-times'}"></i>
+    </button>
+</td>
         <td>
             <h6>${memberName}</h6>
             <small class="text-muted">${memberPosition}</small>
         </td>
         ${ndaCellHTML}
         <td>
-            <div class="mb-3 w-100">
+            <div class="w-100">
                 <select multiple class="form-control multiCheckSelect-dynamic" 
                         data-member-id="${member.id}">
                     ${state.scopes.map(scope => `
@@ -383,7 +387,7 @@
             </div>
         </td>
         <td>
-            <select class="form-select party-type-select" data-member-id="${member.id}">
+            <select class="form-select party-type-select mt-0" data-member-id="${member.id}">
                 ${partyTypeOptionsHTML}
             </select>
         </td>
@@ -395,7 +399,7 @@
                        value="${member.id}"
                        data-member-id="${member.id}"
                        ${isLeaderChecked}>
-                <span class="checkmark"></span>
+             
             </label>
         </td>
     </tr>
@@ -575,25 +579,28 @@
     // ================== UPDATE CHECKBOXES ==================
 
     function updateSelectAllCheckbox() {
-        const $selectAll = $(id('selectAllMembers'));
-        if (!$selectAll.length) return;
+        const $addAllBtn = $(id('addAllMembers'));
+        if (!$addAllBtn.length) return;
 
-        const $visibleCheckboxes = $(`${id('userTable')} tbody tr:visible .row-select`);
-        const allChecked = $visibleCheckboxes.length > 0 &&
-            $visibleCheckboxes.length === $visibleCheckboxes.filter(':checked').length;
+        const hasMembersToAdd =
+            $(`${id('userTable')} tbody tr[data-id] .team-add-btn:not(.selected)`).length > 0;
 
-        $selectAll.prop('checked', allChecked);
+        if (hasMembersToAdd) {
+            $addAllBtn.html('<i class="las la-plus"></i>');
+        } else {
+            $addAllBtn.html('');
+        }
     }
 
     function updateSelectedCheckboxHeader() {
-        const $selectAll = $(id('selectAllSelected'));
-        if (!$selectAll.length) return;
+        const $removeAllBtn = $(id('removeAllMembers'));
+        if (!$removeAllBtn.length) return;
 
-        const $checkboxes = $('.selected-row-checkbox');
-        const allChecked = $checkboxes.length > 0 &&
-            $checkboxes.length === $checkboxes.filter(':checked').length;
+        const hasSelectedMembers = state.selectedAssignments.length > 0;
 
-        $selectAll.prop('checked', allChecked);
+        $removeAllBtn.html(
+            hasSelectedMembers ? '<i class="las la-times"></i>' : ''
+        );
     }
 
     // ================== EVENT HANDLERS ==================
@@ -645,38 +652,68 @@
             });
 
         // Select All في جدول الأعضاء
-        $(document).off('change', id('selectAllMembers'))
-            .on('change', id('selectAllMembers'), function () {
-                const isChecked = this.checked;
-                $(`${id('userTable')} .row-select`).each(function () {
-                    if ($(this).prop('checked') !== isChecked) {
-                        $(this).prop('checked', isChecked).trigger('change');
-                    }
+        // Select All Members
+        $(document).off('click', id('addAllMembers'))
+            .on('click', id('addAllMembers'), function () {
+
+                const $availableRows = $(`${id('userTable')} tbody tr:visible[data-id]`)
+                    .filter(function () {
+                        return !$(this).find('.team-add-btn').hasClass('selected');
+                    });
+
+                $availableRows.each(function () {
+                    const $row = $(this);
+                    const memberId = $row.data('id');
+                    const member = state.members.find(m => m.id === memberId);
+
+                    if (!member) return;
+
+                    const userPartyTypes = member.userPartyTypes || [];
+                    if (userPartyTypes.length === 0) return;
+
+                    const autoSelectedPartyTypeId =
+                        userPartyTypes.length === 1
+                            ? userPartyTypes[0].partyType.id
+                            : null;
+
+                    state.selectedAssignments.push({
+                        ...member,
+                        scopes: (member.scopeIds || []).map(String),
+                        nda: null,
+                        partyTypeId: autoSelectedPartyTypeId,
+                        isLeader: false
+                    });
+
+                    if (!state.teamLeaderId)
+                        state.teamLeaderId = memberId;
+
+                    $row.find('.team-add-btn')
+                        .addClass('selected')
+                        .html('');
                 });
+
+                renderSelectedTeamTable();
+                updateSelectAllCheckbox();
             });
-
         
-        $(document).off('change', `${id('userTable')} .row-select`)
-            .on('change', `${id('userTable')} .row-select`, function () {
-                if (!this.checked) {
-                    this.checked = true;
-                    return;
-                }
+        $(document).off('click', `${id('userTable')} .team-add-btn`)
+            .on('click', `${id('userTable')} .team-add-btn`, function () {
 
-                const row = $(this).closest('tr');
+                const $btn = $(this);
+                const row = $btn.closest('tr');
                 const memberId = row.data('id');
                 const member = state.members.find(m => m.id === memberId);
 
                 if (!member) return;
 
-                const userPartyTypes = member.userPartyTypes || [];
-                if (userPartyTypes.length === 0) {
-                    this.checked = false;
-                    showError(`لا يمكن إضافة المستخدم لأنه لا يملك أي نوع طرف`);
+                if (state.selectedAssignments.find(m => m.id === memberId)) {
                     return;
                 }
 
-                if (state.selectedAssignments.find(m => m.id === memberId)) {
+                const userPartyTypes = member.userPartyTypes || [];
+
+                if (userPartyTypes.length === 0) {
+                    showError(`لا يمكن إضافة المستخدم لأنه لا يملك أي نوع طرف`);
                     return;
                 }
 
@@ -684,12 +721,11 @@
                     ? userPartyTypes[0].partyType.id
                     : null;
 
-                
                 const defaultScopes = (member.scopeIds || []).map(String);
 
                 state.selectedAssignments.push({
                     ...member,
-                    scopes: defaultScopes, 
+                    scopes: defaultScopes,
                     nda: null,
                     partyTypeId: autoSelectedPartyTypeId,
                     isLeader: false
@@ -699,63 +735,59 @@
                     state.teamLeaderId = memberId;
                 }
 
+                $btn.addClass('selected');
+                $btn.html('');
+
                 const memberName = member.name || member.fullName || member.memberName;
                 showSuccess('تم إضافة ' + memberName);
+
                 renderSelectedTeamTable();
                 updateSelectAllCheckbox();
             });
 
         // التعامل مع checkbox في الجدول السفلي
-        $(document).off('change', '.selected-row-checkbox')
-            .on('change', '.selected-row-checkbox', function () {
-                const $checkbox = $(this);
-                const $row = $checkbox.closest('tr');
-                const $label = $checkbox.closest('.custom-checkbox1');
+        $(document).off('click', '.team-remove-btn')
+            .on('click', '.team-remove-btn', function () {
+
+                const $btn = $(this);
+                const $row = $btn.closest('tr');
                 const memberId = $row.data('selected-id');
-                const isChecked = $checkbox.prop('checked');
 
-                if (isChecked) {
-                    state.pendingRemoval.add(memberId);
-                    $label.removeClass('plus').addClass('minus');
-                } else {
-                    state.pendingRemoval.delete(memberId);
+                const member = state.selectedAssignments.find(m => m.id === memberId);
 
-                    const member = state.selectedAssignments.find(m => m.id === memberId);
-                    state.selectedAssignments = state.selectedAssignments.filter(m => m.id !== memberId);
+                state.selectedAssignments = state.selectedAssignments.filter(m => m.id !== memberId);
+                state.pendingRemoval.delete(memberId);
 
-                    $(`${id('userTable')} tr[data-id="${memberId}"] .row-select`).prop('checked', false);
+                // Restore the + button in the top table
+                $(`${id('userTable')} tr[data-id="${memberId}"] .team-add-btn`)
+                    .removeClass('selected')
+                    .html('<i class="las la-plus"></i>');
 
-                    const memberName = member?.name || member?.fullName || member?.memberName;
-                    showSuccess('تم حذف ' + memberName);
+                const memberName = member?.name || member?.fullName || member?.memberName;
+                showSuccess('تم حذف ' + memberName);
 
-                    renderSelectedTeamTable();
-                }
-
+                renderSelectedTeamTable();
                 updateSelectAllCheckbox();
-                updateSelectedCheckboxHeader();
             });
-
         // Select All في جدول الفريق المحدد
-        $(document).off('change', id('selectAllSelected'))
-            .on('change', id('selectAllSelected'), function () {
-                const isChecked = this.checked;
+        $(document).off('click', id('removeAllMembers'))
+            .on('click', id('removeAllMembers'), function () {
 
-                $('.selected-row-checkbox').each(function () {
-                    const $checkbox = $(this);
-                    const $row = $checkbox.closest('tr');
-                    const $label = $checkbox.closest('.custom-checkbox1');
-                    const memberId = $row.data('selected-id');
+                state.selectedAssignments.forEach(member => {
 
-                    if (isChecked) {
-                        $checkbox.prop('checked', true);
-                        state.pendingRemoval.add(memberId);
-                        $label.removeClass('plus').addClass('minus');
-                    } else {
-                        $checkbox.prop('checked', false);
-                        state.pendingRemoval.delete(memberId);
-                        $label.removeClass('minus').addClass('plus');
-                    }
+                    $(`${id('userTable')} tr[data-id="${member.id}"] .team-add-btn`)
+                        .removeClass('selected')
+                        .html('<i class="las la-plus"></i>');
                 });
+
+                state.selectedAssignments = [];
+                state.pendingRemoval.clear();
+                state.teamLeaderId = null;
+
+                renderSelectedTeamTable();
+                renderMembersTable();
+
+                showSuccess('تم حذف جميع الأعضاء');
             });
 
         // البحث
@@ -774,6 +806,8 @@
                     }
                 });
             });
+
+        
 
         // زر حذف المحدد
         $(document).off('click', id('deleteSelectedBtn'))

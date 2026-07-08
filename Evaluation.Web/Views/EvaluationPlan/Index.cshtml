@@ -177,10 +177,8 @@
                                 </h2>
                                 <div id="itemSchool" class="accordion-collapse collapse show">
                                     <div class="accordion-body">
-                                        <div id="school-details-container">
-                                 
-                                            @await Component.InvokeAsync("SchoolDetailsModal", new { modalId = "schoolDetailsPopupEvaluationRequestDetailsModal", title = "School Details", body = "Hello from modal body!", isModal = false, type = "SCHOOL" })
-                                        </div>
+                                        <div id="school-details-container"></div>
+
                                         <div id="NDAContainerDiv"></div>
                                     </div>
                                 </div>
@@ -473,7 +471,7 @@
                 </button>
             </div>
             <div class="modal-body py-0">
-                <div class="col-md-12">
+              
                     <div class="card card-table mb-4">
                         <div class="card-body">
                             <h5 class="fw-bold text-primary mb-3 @ConstantKeys.EvaluationForm.ActionDetailsHeader">
@@ -481,30 +479,28 @@
                             </h5>
                             <form>
                                 <div class="row">
-                                    <div class="col-12">
-                                        <div id="progress-container"></div>
+                                        @* <div id="progress-container"></div> *@
                                         <div class="accordion" id="actionAccordion">
                                             <div id="Action-container-fields"></div>
                                         </div>
-                                    </div>
                                 </div>
-                                <div class="row mt-3">
+                                @* <div class="row mt-3">
                                     <div class="col-12">
                                         <div class="d-flex justify-content-end w-100 gap-2" id="actions-container"></div>
                                     </div>
-                                </div>
+                                </div> *@
                             </form>
                         </div>
                     </div>
-                </div>
+               
             </div>
             <div class="modal-footer border-0 pt-0">
-                <div>
+                @* <div>
                     <button type="button" class="btn btn-outline-primary mw-200 @ConstantKeys.EvaluationForm.ActionCloseBtn"
                             data-bs-dismiss="modal">
                         <i class="la la-window-close"></i>
                     </button>
-                </div>
+                </div> *@
                 <div id="Action-container-button" class="d-flex gap-2"></div>
             </div>
         </div>
@@ -721,12 +717,13 @@
     <script src="~/js/assignments/get-request-assignments.js"></script>
     <script src="~/js/assignments/submit-request-assignments.js"></script>
     <script src="~/js/assignments/force-assignment-status.js"></script>
-
+        
     <script src="~/js/evaluationplan/createrequest.js"></script>
     <script src="~/lib/uuid/uuid.min.js"></script>
     <script src="~/lib/jstree/3.3.12/jstree.min.js"></script>
-
-    <script>
+    <script src="~/js/schools/schools-details.js"></script>
+    
+    <script>    
         $(document).ready(async function () {
 
             await webAppConfigsSetup().Init({
@@ -742,13 +739,15 @@
                     '@nameof(ConstantKeys.WebSchools)',
                     '@nameof(ConstantKeys.Assignment)',
                     '@nameof(ConstantKeys.WebAppOrgDetails)',
+                    'Exceptions'
 
                 ],
                 pages: [
                     '@nameof(ConstantKeys.WebAppCommon)',
                     '@nameof(ConstantKeys.CreatePlan)',
                     '@nameof(ConstantKeys.EvaluationOperations)',
-                    '@nameof(ConstantKeys.EvaluationPlanRequests)'
+                    '@nameof(ConstantKeys.EvaluationPlanRequests)',
+                    'Exceptions'
                 ]
             }).then((result) => {
                  permissionsList = result.permissionsList;
@@ -811,7 +810,7 @@
             });
 
             await LoadUserDetails();
-            toggleAddEvaluationPlanRequestButton();
+            await toggleAddEvaluationPlanRequestButton();
             CheckAndResumeSessionTimer();
         });
 

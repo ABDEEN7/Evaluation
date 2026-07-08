@@ -24,6 +24,17 @@ function $p(selector) {
     const ns = window.planUtility;
 
     /**
+     * Localization helper - resolves UI control text with fallback
+     * @param {string} key - UI control key
+     * @param {string} [fallback=''] - Fallback text if key not found
+     * @returns {string} Resolved text or the key itself if not found
+     */
+    function t(key, fallback = '') {
+        const text = uiControlsSetup()?.GetUiControlText(key);
+        return text || key;
+    }
+
+    /**
      * Collects and validates evaluation plan data from the form
      * @param {string} fieldId - Field ID prefix
      * @returns {Object|null} Evaluation data object or null if validation fails
@@ -148,29 +159,29 @@ function $p(selector) {
         };
 
         if (!data.name || data.name.length < 3) {
-            createError(`${fieldId}_planTitle`, 'Plan title is required and must be at least 3 characters');
+            createError(`${fieldId}_planTitle`, t('lblPlanTitleRequired'));
         }
 
         if (!data.planTypeDepId) {
-            createError(`${fieldId}_ddlPlanType`, 'Plan Type Required');
+            createError(`${fieldId}_ddlPlanType`, t('lblPlanTypeRequired'));
         }
 
         if (!data.startDate || !data.endDate) {
-            createError(`${fieldId}_parentDate`, 'Date range is required');
+            createError(`${fieldId}_parentDate`, t('lblDateRangeRequired'));
         }
 
         if (!data.schools || data.schools.length === 0) {
-            createError(`${fieldId}_planTable`, 'At least one school must be selected');
+            createError(`${fieldId}_planTable`, t('lblAtLeastOneSchoolRequired'));
         }
 
         if (data.schools?.length > 0) {
             data.schools.forEach((school, index) => {
                 if (!school.startEvaluationDate || !school.endEvaluationDate) {
-                    createError(`${fieldId}_planTable`, `School ${index + 1}: Visit date is required`);
+                    createError(`${fieldId}_planTable`, `${t('lblSchool')} ${index + 1}: ${t('lblVisitDateRequired')}`);
                 }
 
                 if (!school.visitTypeId) {
-                    createError(`${fieldId}_planTable_error`, `School ${index + 1}: Visit type is required`);
+                    createError(`${fieldId}_planTable_error`, `${t('lblSchool')} ${index + 1}: ${t('lblVisitTypeRequired')}`);
                 }
             });
         }
@@ -186,7 +197,7 @@ function $p(selector) {
      * @param {Array} errors - Array of error messages
      */
     function displayErrors(fieldId, errors) {
-        alert('Please fix the following errors:\n\n' + errors.join('\n'));
+        alert(t('lblFixFollowingErrors') + '\n\n' + errors.join('\n'));
         console.error('Validation errors:', errors);
         var fieldScoure = `${fieldId}_`;
         if (errors.some(e => e.includes('title'))) {
@@ -217,7 +228,7 @@ function $p(selector) {
         const originalText = submitBtn.text();
 
         try {
-            submitBtn.prop('disabled', true).text('Saving...');
+            submitBtn.prop('disabled', true).text(t('lblSaving'));
 
             let endpoint = API_ENDPOINTS.INSERTORUPDATEPLAN;
             // let endpoint = API_ENDPOINTS.CREATE_PLAN;
@@ -236,15 +247,15 @@ function $p(selector) {
                 const modal = bootstrap.Modal.getInstance(document.getElementById('confirmation-modal'));
                 if (modal) modal.hide();
 
-                alert('Plan saved successfully');
+                alert(t('lblPlanSavedSuccessfully'));
                 window.location.href = '/Plan/Index';
             } else {
-                throw new Error(result.message || 'Failed to save the plan');
+                throw new Error(result.message || t('lblFailedToSavePlan'));
             }
 
         } catch (error) {
             console.error('Submission error:', error);
-            alert('An error occurred while saving the plan. Please try again.');
+            alert(t('lblSavePlanError'));
         } finally {
             submitBtn.prop('disabled', false).text(originalText);
         }
@@ -322,7 +333,7 @@ function $p(selector) {
         }
 
         const selectedCount = evaluationData.schools.length;
-        $('#confirmationMessage').text(`(${selectedCount}) school(s) selected for adding to the plan`);
+        $('#confirmationMessage').text(`(${selectedCount}) ${t('lblSchoolsSelectedForPlan')}`);
 
         const modal = new bootstrap.Modal(document.getElementById('confirmation-modal'));
         modal.show();

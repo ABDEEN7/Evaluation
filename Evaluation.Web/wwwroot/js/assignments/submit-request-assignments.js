@@ -1,6 +1,17 @@
 ﻿(function (window) {
     'use strict';
 
+    /**
+     * Localization helper - resolves UI control text with fallback
+     * @param {string} key - UI control key
+     * @param {string} [fallback=''] - Fallback text if key not found
+     * @returns {string} Resolved text or the key itself if not found
+     */
+    function t(key, fallback = '') {
+        const text = uiControlsSetup()?.GetUiControlText(key);
+        return text || key;
+    }
+
     // ================= HELPER FUNCTIONS =================
     function getTableIdFromFieldId(fieldId) {
         return `${fieldId}_selectedTeamTable`;
@@ -26,28 +37,28 @@
         const errors = [];
 
         if (!teamData || teamData.length === 0) {
-            errors.push('لا يوجد أعضاء في الفريق');
+            errors.push(t('lblNoTeamMembers'));
             return { isValid: false, errors };
         }
 
         const leaders = teamData.filter(m => m.IsLeader);
         if (leaders.length === 0) {
-            errors.push('يجب تحديد قائد للفريق');
+            errors.push(t('lblLeaderRequired'));
         } else if (leaders.length > 1) {
-            errors.push('يجب تحديد قائد واحد فقط للفريق');
+            errors.push(t('lblOnlyOneLeaderAllowed'));
         }
 
         teamData.forEach((member, index) => {
-            // ✅ UserId بدل MinistryUserId
+            
             if (!member.UserId) {
-                errors.push(`العضو رقم ${index + 1}: معرف المستخدم مطلوب`);
+                errors.push(`${t('lblMember')} ${index + 1}: ${t('lblUserIdRequired')}`);
             }
             if (!member.PartyTypeId) {
-                errors.push(`العضو رقم ${index + 1}: نوع الطرف مطلوب`);
+                errors.push(`${t('lblMember')} ${index + 1}: ${t('lblPartyTypeRequired')}`);
             }
-            // ✅ Scopes بدل EvalRequestAssignmentScopies
+            
             if (!member.Scopes || member.Scopes.length === 0) {
-                errors.push(`العضو رقم ${index + 1}: يجب تحديد مجال واحد على الأقل`);
+                errors.push(`${t('lblMember')} ${index + 1}: ${t('lblAtLeastOneScopeRequired')}`);
             }
         });
 
@@ -60,7 +71,7 @@
     // ================= PUBLIC API =================
 
     /**
-     * الحصول على بيانات الفريق بصيغة API باستخدام fieldId
+     * fieldId
      * Works with Select2 multi-select
      */
     window.getAssignmentsDataByFieldId = function (fieldId) {
@@ -73,10 +84,10 @@
                 return null;
             }
 
-            // التحقق من وجود عمود NDA
+            //checkNDA
             const hasNDA = hasNDAColumn($table);
 
-            // الحصول على جميع صفوف الأعضاء
+            //get all rows
             const $rows = $table.find('tbody tr[data-selected-id]');
 
             if ($rows.length === 0) {
@@ -86,14 +97,14 @@
 
             const assignments = [];
 
-            // استخراج بيانات كل عضو
+            //extract every users
             $rows.each(function () {
                 const $row = $(this);
 
-                // استخراج البيانات الأساسية
+                //extract data
                 const ministryUserId = $row.data('selected-id');
 
-                // استخراج PartyTypeId
+                // extract PartyTypeId
                 const $partyTypeSelect = $row.find('.party-type-select');
                 const partyTypeId = $partyTypeSelect.val();
 
@@ -134,36 +145,30 @@
         }
     };
 
-    /**
-     * التحقق من صحة البيانات
-     */
+    
     window.validateTeamByFieldId = function (fieldId) {
         const data = window.getAssignmentsDataByFieldId(fieldId);
         return validateTeamData(data);
     };
 
-    /**
-     * الحصول على البيانات مع التحقق
-     */
+    
     window.getValidatedTeamData = function (fieldId) {
         const data = window.getAssignmentsDataByFieldId(fieldId);
         const validation = validateTeamData(data);
 
         if (!validation.isValid) {
             console.error('❌ أخطاء في بيانات الفريق:', validation.errors);
-            alert('يرجى تصحيح الأخطاء التالية:\n' + validation.errors.join('\n'));
+            alert(t('lblFixFollowingErrors') + '\n' + validation.errors.join('\n'));
             return null;
         }
 
         return data;
     };
 
-    /**
-     * إرسال بيانات فريق التقييم
-     */
+    
     async function submitEvalRequestAssignment(data) {
         const submitBtn = $('#btn-submit');
-        submitBtn.prop('disabled', true).text('جاري الحفظ...');
+        submitBtn.prop('disabled', true).text(t('lblSaving'));
 
         try {
             let endpoint = API_ENDPOINTS.SUBMIT_EVALUATION_REQUEST_ASSIGNMENT;
@@ -175,20 +180,18 @@
                 return result;
             }
             else {
-                throw new Error(result.message || 'فشل في حفظ الفريق');
+                throw new Error(result.message || t('lblFailedToSaveTeam'));
             }
         } catch (error) {
             console.error('❌ خطأ في حفظ الفريق:', error);
-            alert('حدث خطأ أثناء حفظ الفريق');
+            alert(t('lblSaveTeamError'));
             throw error;
         } finally {
-            submitBtn.prop('disabled', false).text('حفظ');
+            submitBtn.prop('disabled', false).text(t('lblSave'));
         }
     }
 
-    /**
-     * حفظ الفريق
-     */
+    
     window.saveTeamByFieldId = async function (fieldId, evaluationRequestId = null) {
         try {
             const teamData = window.getValidatedTeamData(fieldId, evaluationRequestId);
@@ -206,16 +209,14 @@
         }
     };
 
-    /**
-     * حذف تعيين تقييم
-     */
+    
     window.deleteEvalRequestAssignment = async function (fieldId, evalRequestAssignmentId) {
         if (!evalRequestAssignmentId) {
             console.error('❌ معرف التعيين مطلوب');
             return false;
         }
 
-        if (!confirm('هل أنت متأكد من حذف هذا التعيين؟')) {
+        if (!confirm(t('lblConfirmDeleteAssignment'))) {
             return false;
         }
 
@@ -224,14 +225,14 @@
             const result = await jqClient().Delete(endpoint);
 
             if (result.success || result.isSuccess) {
-                alert('تم حذف التعيين بنجاح');
+                alert(t('lblAssignmentDeletedSuccessfully'));
                 return true;
             } else {
-                throw new Error(result.message || 'فشل في حذف التعيين');
+                throw new Error(result.message || t('lblFailedToDeleteAssignment'));
             }
         } catch (error) {
             console.error('❌ خطأ في حذف التعيين:', error);
-            alert('حدث خطأ أثناء حذف التعيين');
+            alert(t('lblDeleteAssignmentError'));
             return false;
         }
     };

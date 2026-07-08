@@ -184,7 +184,10 @@ window.serviceRequestForm = window.serviceRequestForm || {};
                         .off('shown.bs.modal.redraw')
                         .on('shown.bs.modal.redraw', function () {
                             if (window.Tabulator?.findTable) {
-                                Tabulator.findTable(`#${actionModalId} .tabulator`).forEach(t => t.redraw(true));
+                                const tables = Tabulator.findTable(`#${actionModalId} .tabulator`);
+                                if (tables) {
+                                    tables.forEach(t => t.redraw(true));
+                                }
                             }
                         });
 
@@ -597,7 +600,7 @@ window.serviceRequestForm = window.serviceRequestForm || {};
 
         // =============== ASSIGN TEAM ===============
         if (actionTypeName === ACTION_TYPE.ASSIGNT_TEAM) {
-
+            $('#assign_wrapper').remove();
             assignmentsUtility.generateAssignments('assign');
 
         }
