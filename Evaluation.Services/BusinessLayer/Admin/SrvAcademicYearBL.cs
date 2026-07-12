@@ -42,15 +42,23 @@ namespace Evaluation.Services.Models.Admin
         public async Task<List<AcademicYearDTO>> GetAcademicYearListByCureentDepartment()
         {
             var list = await uow.GetRepository<AcademicYear>()
-                .GetAllNonDeleted(x => x.DepartmentId == _requestInfo.DepId)
+                .GetAllNonDeleted(x => x.DepartmentId == _requestInfo.DepId && x.IsCurrent)
                 //.Include(x => x.CreateBy)
                 .OrderByDescending(x => x.CreateDate)
                 .ToListAsync();
 
             var result = mapper.Map<List<AcademicYearDTO>>(list, opts => opts.Items["Language"] = _requestInfo.Lang);
             return result;
-
-
+        }
+        public async Task<List<Guid>> GetIdsAcademicYearListByCureentDepartment()
+        {
+            var list = await uow.GetRepository<AcademicYear>()
+                .GetAllNonDeleted(x => x.DepartmentId == _requestInfo.DepId && x.IsCurrent)
+                //.Include(x => x.CreateBy)
+                .OrderByDescending(x => x.CreateDate)
+                .Select(x => x.Id)
+                .ToListAsync();
+            return list;
         }
         public async Task<AcademicYearDTO> GetCurrentAcademicYearListByCureentDepartment()
         {

@@ -1,5 +1,4 @@
-﻿
-let table = null, currentPage = 1, isLoading = true, popupname = "",
+﻿let table = null, currentPage = 1, isLoading = true, popupname = "",
     formItems = [];
 let lookupSources = {};
 const gridContainerId = "view-container",
@@ -58,6 +57,23 @@ function getlookup() {
         jqClient(options).Get(API_ROUTES.getFormItemLists(EvalformId));
     });
 }
+const CUSTOM_MANAGED_DROPDOWNS = ['EvalFormItemScopeId']; // adjust name if different
+
+function GetFormItemControlItemsForPopup() {
+    return FormItemcontrolvalidationlist.map(item => {
+        if (CUSTOM_MANAGED_DROPDOWNS.includes(item.uibackendName)) {
+            return {
+                ...item,
+                constraint: {
+                    ...item.constraint,
+                    controlJsonConfig: null // prevents generic dropdown auto-fetch
+                }
+            };
+        }
+        return item;
+    });
+}
+
 $btnAddbutton.click(function () {
     sharedFn().InitialPageControls(uiControlItems);
     //renderFormItemRelatedButton();
@@ -294,7 +310,7 @@ $("#btnAddParent").click(function () {
     var EvalformId = $("#Id").val();
     $("#evalformidvalue").val(EvalformId);
     var modaltitle = sharedFn().GetUiControlText('FormItemHeader');
-    sharedFn().OpenFormPopup(modaltitle, FormItemcontrolvalidationlist, null, null, null);
+    sharedFn().OpenFormPopup(modaltitle, GetFormItemControlItemsForPopup(), null, null, null);
 
 });
 //function renderFormItemRelatedButton() {
@@ -398,6 +414,46 @@ function SetPopupMode() {
         })
     }
 }
+function ReassignScopeDropdown() {
+    const options = {
+        success: function (result) {
+            if (result) {
+                var $dropdown = $('#EvalFormItemScopeId'); // confirm this matches the real uibackendName
+
+                if ($dropdown.hasClass("select2-hidden-accessible")) {
+                    $dropdown.select2('destroy');
+                }
+                $dropdown.empty();
+
+                $.each(result, function (i, item) {
+                    var text = item.name;
+                    $dropdown.append(new Option(text, item.id, false, false));
+                });
+
+                $dropdown.select2({
+                    allowClear: true,
+                    width: '100%',
+                    multiple: false,
+                    dropdownCssClass: "manageselect2zindex",
+                    dropdownParent: $("#ModalPopup"),
+                    placeholder: sharedFn().GetUiControlText('EvalFormItemScopeId'),
+                });
+
+                var raw = $dropdown.attr("data-value");
+                if (raw) {
+                    if (raw.includes(',')) {
+                        $dropdown.val(raw.split(',')).trigger("change.select2");
+                    } else {
+                        $dropdown.val(raw).trigger("change.select2");
+                    }
+                } else {
+                    $dropdown.val(null).trigger("change.select2");
+                }
+            }
+        }
+    };
+    jqClient(options).Get(API_ROUTES.getScopeList());
+}
 function SetDropDown() {
     if (popupname == "EvalFormItem") {
         var EvalformId = $("#Id").val();
@@ -446,6 +502,7 @@ function SetDropDown() {
             .on("change", "#EvalFormItemFormItemRelated", function () {
                 disableDropdown("#AnalysisTypeId", $(this).val()?.length > 0);
             });
+        ReassignScopeDropdown();
     }
 }
 
@@ -569,7 +626,7 @@ $(document).on("click", ".editParent", async function () {
     await getlookup();
 
     var modaltitle = sharedFn().GetUiControlText('FormItemHeader');
-    sharedFn().OpenFormPopup(modaltitle, FormItemcontrolvalidationlist, objdata, null, null);
+    sharedFn().OpenFormPopup(modaltitle, GetFormItemControlItemsForPopup(), objdata, null, null);
 
     $("#PopupId").val(id);
     $("#evalformidvalue").val($("#Id").val());

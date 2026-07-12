@@ -18,10 +18,10 @@ namespace Evaluation.Services.Mappers.Admin
             CreateMap<Scope, ScopesDTO>()
                 .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive))
                 .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => src.IsDeleted))
-                 .ForMember(dest => dest.UpdateBy, opt => opt.MapFrom<UserProfileResolver, Guid?>(src => src.UpdateById.HasValue ? src.UpdateById : src.CreateById))
+                .ForMember(dest => dest.UpdateBy, opt => opt.MapFrom<UserProfileResolver, Guid?>(src => src.UpdateById.HasValue ? src.UpdateById : src.CreateById))
                 .ForMember(dest => dest.UpdateDate, opt => opt.MapFrom(src => src.UpdateDate.HasValue ? src.UpdateDate.Value.ToString("yyyy-MM-dd hh:mm:ss tt") : src.CreateDate.ToString("yyyy-MM-dd hh:mm:ss tt")))
-                  .ForMember(dest => dest.ScopeType, opt => opt.MapFrom<ScopeTypeResolver, Guid?>(src => src.ScopeTypeId));
-
+                .ForMember(dest => dest.ScopeType, opt => opt.MapFrom<ScopeTypeResolver, Guid?>(src => src.ScopeTypeId))
+                .ForMember(dest => dest.Department, opt => opt.MapFrom<DepartmentResolver, Guid?>(src => src.ScopeType.DepartmentId));
         }
 
     }
@@ -40,7 +40,7 @@ namespace Evaluation.Services.Mappers.Admin
 
         public string Resolve(object source, object destination, Guid? sourceMember, string? destMember, ResolutionContext context)
         {
-            
+
 
             using var scope = _serviceProvider.CreateScope();
             var scopedUow = scope.ServiceProvider.GetRequiredService<UnitOfWork>();
