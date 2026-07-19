@@ -167,6 +167,7 @@ var formGenerateFieldUtility = window.formUtility;
                 //const allowRename = field.attributes?.find(c => c.name === 'allowRename');
                 const params = new URLSearchParams(window.location.search);
                 var evaluationRequestId = (params.get("Evlid")).replace("#", "");
+                var academicYearId = (params.get("AcademicYearId")).replace("#", "");
                 var serviceRequestId = null;
                 if (params.get("id"))
                  serviceRequestId = (params.get("id") ).replace("#", "");
@@ -178,7 +179,7 @@ var formGenerateFieldUtility = window.formUtility;
                 let allowEvaluateRenamedItems = evaluateRenamedItems != undefined && (!evaluateRenamedItems || evaluateRenamedItems.value == true || evaluateRenamedItems.value == "true");
 
 
-                const html = await initForm(formId, fieldId, readonly, controlValues, evaluationRequestId, serviceRequestId, allowRename, allowDelete, allowAdd, allowEvaluateRenamedItems);
+                const html = await initForm(formId, academicYearId, fieldId, readonly, controlValues, evaluationRequestId, serviceRequestId, allowRename, allowDelete, allowAdd, allowEvaluateRenamedItems);
 
                 container.html(html);
 

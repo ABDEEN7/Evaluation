@@ -344,11 +344,11 @@
             }
         },
         onRowClick: function (rowData) {
-            openEvaluationRequestDetails(rowData.id);
+            openEvaluationRequestDetails(rowData.id, rowData.academicYearId);
         }
     });
 
-    window.openEvaluationRequestDetails = function (requestId) {
+    window.openEvaluationRequestDetails = function (requestId, academicYearId) {
         const options = {
             success: function (response) {
 
@@ -384,6 +384,7 @@
                     }
                 );
                 formUtility.addQueryParameter('Evlid', requestId)
+                formUtility.addQueryParameter('AcademicYearId', academicYearId)
                 //formUtility.addQueryParameter('serviceId', response.serviceId)
                 if (response.isNdaApprovalPending) {
                     const container =
