@@ -41,7 +41,8 @@ public class EvaluationRequestProfile : Profile
 			.ForMember(d => d.NextEvaluationDate, opt => opt.MapFrom(src => src.NextEvaluationDate))
 			.ForMember(d => d.EvaluationResult, opt => opt.MapFrom<LocalizedEvaluationResultNameResolver>())
 			.ForMember(d => d.Status, opt => opt.MapFrom<LocalizedEvaluationRequestStatusNameResolver>())
-			.ForMember(d => d.Id, opt => opt.MapFrom(src => src.Id));
+			.ForMember(d => d.Id, opt => opt.MapFrom(src => src.Id))
+			.ForMember(d => d.AcademicYearId, opt => opt.MapFrom(src => src.Plan.AcademicYearId));
 
 	}
 

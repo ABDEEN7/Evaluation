@@ -59,11 +59,11 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 
 		IQueryable<EvaluationRequest> query = unitOfWork.GetRepository<EvaluationRequest>()
 					.GetAllActiveNonDeleted()
-					.Include(d => d.Plan)
 					.Include(d => d.OrgTree)
 					.Include(d => d.DepEvaluationType)
 					.Include(d => d.ServiceStatus)
-					 .Where(er =>
+                    .Include(d => d.Plan)
+                     .Where(er =>
 			(monthInts.Contains(er.FromDate.Year * 100 + er.FromDate.Month) ||
 			monthInts.Contains(er.ToDate.Year * 100 + er.ToDate.Month)) &&
 			er.DepEvaluationType.DepartmentId == requestInfo.DepId);
@@ -138,6 +138,8 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 			.AsSplitQuery()
 			.Where(x => x.Service != null && x.Service.SystemModuleId == module.Id);
 
+		var x = baseQuery.ToList();
+
 		baseQuery = await requestAccessService.ApplyEvaluationRequestAccess(baseQuery);
 
 		return baseQuery.Select(x => new EvaluationRequestDTO
@@ -161,7 +163,7 @@ public class EvaluationRequestService(IServiceScopeFactory serviceScopeFactory,
 			EvlDateTo = x.ToDate.ToString(dateFormat),
 			PlanId = x.PlanId,
 			PlanName = x.Plan != null ? x.Plan.PlanName : "",
-
+            AcademicYearId = x.Plan.AcademicYearId,
 			EvaluationType = x.DepEvaluationType != null
 				? (lang == "ar" ? x.DepEvaluationType.NameAr : x.DepEvaluationType.NameEn)
 				: "",
