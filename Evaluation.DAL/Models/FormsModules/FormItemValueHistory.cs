@@ -1,6 +1,5 @@
 ﻿using Evaluation.DAL.Models.Audit;
 using Evaluation.DAL.Models.BaseModule;
-using Evaluation.DAL.Models.EvalResult;
 using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
 using Evaluation.DAL.Models.ServiceRequestEntities;
 using Evaluation.DAL.Models.UserEntiy;
@@ -21,8 +20,8 @@ namespace Evaluation.DAL.Models.FormsModules
         public FormItem? FormItem { get; set; }
         public Guid UserId { get; set; }
         public MinistryUser? User { get; set; }
-        public Guid? DepEvalMatrixId { get; set; }   // Copy Matrid Id
-        public DepEvalMatrix? DepEvalMatrix { get; set; }
+        public Guid? FormEvalMatrixId { get; set; }   // Copy Matrid Id
+        public FormEvalMatrix? FormEvalMatrix { get; set; }
         public Guid? FormEvalMatrixValueId { get; set; }
         public FormEvalMatrixValue? FormEvalMatrixValue { get; set; }
         public string? DepEvalMatrixValueName { get; set; }   // Copy Text of Matrix Name

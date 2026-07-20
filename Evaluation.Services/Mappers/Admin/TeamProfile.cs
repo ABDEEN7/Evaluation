@@ -1,6 +1,4 @@
 ﻿using AutoMapper;
-using Evaluation.DAL.Models.EvalResult;
-using Evaluation.DAL.Models.Org;
 using Evaluation.DAL.Models.Planing.TeamsModule;
 using Evaluation.SharedHelper.Models.Admin;
 

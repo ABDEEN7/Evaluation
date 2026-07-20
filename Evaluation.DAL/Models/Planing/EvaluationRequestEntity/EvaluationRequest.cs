@@ -43,6 +43,9 @@ public class EvaluationRequest : EntityBase, IAuditLogEntity
     public decimal? FinalEvalValue { get; set; }
     public Guid? FinalReportId { get; set; }
 
+    public int? FollowUpDays { get; set; }  // Copy
+    public DateOnly? NextFollowUpDate { get; set; }
+
     public virtual ICollection<ServiceRequestFieldsValue>? ServiceRequestFieldsValues { get; set; }
     public virtual ICollection<EvaluationRequestAssignment>? EvaluationRequestAssignments { get; set; }
     public virtual ICollection<ServiceRequest>? ServiceRequest { get; set; }
