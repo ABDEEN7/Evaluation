@@ -1,5 +1,7 @@
 ﻿using Evaluation.DAL.Models.Audit;
 using Evaluation.DAL.Models.BaseModule;
+using Evaluation.DAL.Models.DepartementEntites;
+using Evaluation.DAL.Models.ServiceEnities;
 using Evaluation.DAL.Models.SystemSetting;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,8 +19,11 @@ public class EmailTemplate: EntityBase, IAuditLogEntity
     public EmailProfile? EmailProfile { get; set; }
 
     public Guid? ServiceId { get; set; }
-    //public Service? Service { get; set; }
+    public Service? Service { get; set; }
 
     public string? FielsFromRequest { get; set; }
     public string? FielsFromEvaluation { get; set; }
+    public Guid? DepartmentId { get; set; }
+    public Department? Department { get; set; }
+
 }
