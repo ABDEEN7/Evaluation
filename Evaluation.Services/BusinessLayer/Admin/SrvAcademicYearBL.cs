@@ -4,6 +4,7 @@ using Evaluation.DAL.Models.Calendars;
 using Evaluation.DAL.Models.FormsModules;
 using Evaluation.DAL.Repositories;
 using Evaluation.Services.Special;
+using Evaluation.SharedHelper.Consts;
 using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Models;
@@ -197,6 +198,21 @@ namespace Evaluation.Services.Models.Admin
             return result;
 
 
+        }
+        public async Task<List<ResponseDDLDto>> GetAcademicYearListByDepartmentId(Guid departmentId)
+        {
+            var result = await uow.GetRepository<AcademicYear>()
+                .GetAllNonDeleted(x => x.DepartmentId == departmentId)
+                //.Include(x => x.CreateBy)
+                .OrderByDescending(x => x.CreateDate)
+                .Select(
+                x => new ResponseDDLDto
+                {
+                    Id = x.Id,
+                    Name = LanguageStatic.SelectLang(_requestInfo.Lang, x.NameAr, x.NameEn)
+                })
+                .ToListAsync();
+            return result;
         }
 
     }
