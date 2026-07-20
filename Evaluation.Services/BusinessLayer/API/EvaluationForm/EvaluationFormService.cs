@@ -51,6 +51,7 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
         var items = await uow.GetRepository<FormItem>()
     .GetAllNonDeleted()
     .Where(x => x.EvalFormId == EvalformId)
+    .Include(x=>x.Scope)
     .Include(x => x.SubFormItems)
     .OrderByDescending(x => x.CreateDate)
     .ToListAsync();   // <-- SQL stops here
@@ -69,6 +70,7 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
             Weight = x.Weight,
             EvalFormId = x.EvalFormId,
             ScopeId = x.ScopeId,
+            Scope =requestInfo.Lang == "ar" ? x.Scope.NameAr : x.Scope.NameEn,
             IsActive = x.IsActive,
             HasNote = x.HasNote,
             NoteRequired = x.NoteRequired,

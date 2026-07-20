@@ -552,6 +552,9 @@ function renderFormItemTable() {
             <td>
                 ${p.nameEn}
             </td>
+            <td>
+                ${p.scope}
+            </td>
             <td style="display:none">
                 ${jsonString}
             </td>
