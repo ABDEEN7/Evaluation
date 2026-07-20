@@ -5,7 +5,6 @@ using Evaluation.DAL.Models.Authentication;
 using Evaluation.DAL.Models.BaseModule;
 using Evaluation.DAL.Models.Calendars;
 using Evaluation.DAL.Models.DepartementEntites;
-using Evaluation.DAL.Models.EvalResult;
 using Evaluation.DAL.Models.FormBuilder;
 using Evaluation.DAL.Models.FormsModules;
 using Evaluation.DAL.Models.IntegrationEntity;
@@ -103,8 +102,6 @@ public partial class EvaluationDbContext : DbContext
     public virtual DbSet<EvalFormType> EvalFormType { get; set; }
     public virtual DbSet<SubFormItem> SubFormItems { get; set; }
     public virtual DbSet<SubFormItemValue> SubFormItemValues { get; set; }
-    public virtual DbSet<DepEvalMatrix> DepEvalMatrixs { get; set; }
-    public virtual DbSet<OrgEvalResult> OrgEvalResults { get; set; }
     public virtual DbSet<UserTeam> UserTeams { get; set; }
     public virtual DbSet<RequestAssignmentScope> RequestAssignmentScopes { get; set; }
     public virtual DbSet<EvalAttachment> EvalAttachments { get; set; }
