@@ -927,7 +927,7 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
             .GetAllActiveNonDeleted(x => academicYearId.Contains(x.AcademicYearId));
         
         var leafScopes = await scopes
-            .Where(x => !scopes.Any(s => s.ScopeParentId == x.ScopeId && !academicYearId.Contains(s.AcademicYearId)))
+            .Where(x => !scopes.Any(s => s.ScopeParentId == x.ScopeId && academicYearId.Contains(s.AcademicYearId)))
             .Select(x => new ResponseDDLDto
             {
                 Id = x.ScopeId,
