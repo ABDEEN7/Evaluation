@@ -17,7 +17,54 @@ const gridContainerId = "view-container",
     $tblContentContainer = $('#' + tblContentContainerId),
     $btnAddContent = $('#' + btnAddContentId);
 
+$("#ScopeAcademicYearDepartmentId").on("change", function () {
+    currentPage = 0;
+    isLoading = false;
 
+    var departmentId = $(this).val();
+
+    $("#ScopeAcademicYearAcademicYearId").val('').trigger('change');
+
+    if (departmentId) {
+        $("#ScopeAcademicYearAcademicYearId").prop("disabled", false);
+        LoadAcademicYearDDL(departmentId);
+    } else {
+        $("#ScopeAcademicYearAcademicYearId").prop("disabled", true);
+    }
+
+    loadData();
+});
+function LoadAcademicYearDDL(departmentId) {
+    const options = {
+        success: function (result) {
+            if (result) {
+                if ($("#ScopeAcademicYearAcademicYearId").data('select2')) {
+                    $("#ScopeAcademicYearAcademicYearId").select2('destroy');
+                }
+
+                $("#ScopeAcademicYearAcademicYearId").empty();
+
+                result.forEach(item => {
+                    $("#ScopeAcademicYearAcademicYearId").append(
+                        $('<option>', {
+                            value: item.id,
+                            text: item.name
+                        })
+                    );
+                });
+
+                $("#ScopeAcademicYearAcademicYearId").select2({
+                    width: 'resolve',
+                    allowClear: true,
+                    placeholder: sharedFn().GetUiControlText('ScopeAcademicYearAcademicYearId'),
+                    dropdownCssClass: "manageselect2zindex"
+                });
+            }
+        }
+    };
+
+    jqClientAdvanced(options).Get("ScopeAcademicYear/GetAcademicYearByDepartmentId".concat('?departmentId=', departmentId));
+}
 const loadData = (reqData, isScroll) => {
     isLoading = true;
 

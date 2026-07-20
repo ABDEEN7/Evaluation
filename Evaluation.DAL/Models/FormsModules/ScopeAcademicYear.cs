@@ -8,7 +8,7 @@ namespace Evaluation.DAL.Models.FormsModules;
 
 public class ScopeAcademicYear : EntityBase, IAuditLogEntity
 {
-    public Guid DepartmentId { get; set; }
+    public Guid DepartmentId { get; set; } //TODO: Should delete due we have AcademicYearId
     public Department? Department { get; set; }
     public Guid ScopeId { get; set; }
     public Scope? Scope { get; set; }

@@ -105,6 +105,14 @@ namespace Evaluation.Admin.Controllers
             return Ok(result);
 
         }
+        [HttpGet]
+        [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.AdminPermission.EDIT_ADMIN_SCOPE_ACADEMIC_YEAR_SCOPE })]
+        public async Task<IActionResult> GetAcademicYearByDepartmentId(Guid departmentId)
+        {
+            var result = await masterBL.GetAdminService<SrvAcademicYearBL>().GetAcademicYearListByDepartmentId(departmentId);
+            return Ok(result);
 
+        }
+        
     }
 }

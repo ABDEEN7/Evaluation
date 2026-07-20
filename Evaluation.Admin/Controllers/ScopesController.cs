@@ -16,7 +16,7 @@ namespace Evaluation.Admin.Controllers
     [Authorize]
     public class ScopesController : Controller
     {
-        
+
         private readonly UserInfo userInfoSession;
         private readonly MasterBL masterBL;
         private readonly IHttpContextAccessor httpContextAccessor;
@@ -27,7 +27,7 @@ namespace Evaluation.Admin.Controllers
             this.userInfoSession = userInfoSession;
             this.masterBL = masterBL;
             this.httpContextAccessor = httpContextAccessor;
-           
+
         }
         [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.AdminPermission.VIEW_ADMIN_SCOPES })]
         public async Task<IActionResult> Index()
@@ -49,7 +49,7 @@ namespace Evaluation.Admin.Controllers
         [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.AdminPermission.VIEW_ADMIN_SCOPES })]
         public async Task<IActionResult> GetAllScopes(int Page = 1)
         {
-            var PageSize =  Convert.ToInt32(masterBL.GetAdminService<SrvSystemSettingBL>().GetSetting(ConstantKeys.AdminSettings.ADMIN_PAGE_SIZE));
+            var PageSize = Convert.ToInt32(masterBL.GetAdminService<SrvSystemSettingBL>().GetSetting(ConstantKeys.AdminSettings.ADMIN_PAGE_SIZE));
             var response = await masterBL.GetAdminService<SrvScopesBL>().GetScopesList(Page, PageSize);
             return Ok(response);
         }
@@ -59,32 +59,31 @@ namespace Evaluation.Admin.Controllers
         [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.AdminPermission.ADD_ADMIN_SCOPES })]
         public async Task<IActionResult> SaveScopes()
         {
-           
-                var request = Request.Form["request"][0]?.StringToObject<ScopesDTO>();
+
+            var request = Request.Form["request"][0]?.StringToObject<ScopesDTO>();
             var result = new ScopesDTO();
-                bool validateObject = await masterBL.GetAdminService<SrvBaseBL>().ValidateObject(request!, ConstantKeys.AdminPermission.ADD_ADMIN_SCOPES);
-                if (validateObject)
-                {
-                     result = await masterBL.GetAdminService<SrvScopesBL>().SaveScopes(request!);
-                    
-                }
-                return Ok(result);
-           
+            bool validateObject = await masterBL.GetAdminService<SrvBaseBL>().ValidateObject(request!, ConstantKeys.AdminPermission.ADD_ADMIN_SCOPES);
+            if (validateObject)
+            {
+                result = await masterBL.GetAdminService<SrvScopesBL>().SaveScopes(request!);
+
+            }
+            return Ok(result);
         }
         [HttpPost]
         [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.AdminPermission.EDIT_ADMIN_SCOPES })]
         public async Task<IActionResult> UpdateScopes()
         {
-           
-                var request = Request.Form["request"][0]?.StringToObject<ScopesDTO>();
+
+            var request = Request.Form["request"][0]?.StringToObject<ScopesDTO>();
             var result = new ScopesDTO();
-                bool validateObject = await masterBL.GetAdminService<SrvBaseBL>().ValidateObject(request!, ConstantKeys.AdminPermission.ADD_ADMIN_SCOPES);
-                if (validateObject)
-                {
-                     result = await masterBL.GetAdminService<SrvScopesBL>().UpdateScopes(request!);
-                }
-                return Ok(result);
-            
+            bool validateObject = await masterBL.GetAdminService<SrvBaseBL>().ValidateObject(request!, ConstantKeys.AdminPermission.ADD_ADMIN_SCOPES);
+            if (validateObject)
+            {
+                result = await masterBL.GetAdminService<SrvScopesBL>().UpdateScopes(request!);
+            }
+            return Ok(result);
+
         }
         [HttpPost]
         [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.AdminPermission.EDIT_ADMIN_SCOPES })]
@@ -101,11 +100,18 @@ namespace Evaluation.Admin.Controllers
         [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.AdminPermission.DELETE_ADMIN_SCOPES })]
         public async Task<IActionResult> DeleteScopes(Guid Id)
         {
-           
-                var result = await masterBL.GetAdminService<SrvScopesBL>().DeleteScopes(Id);
-                return Ok(result);
-           
+
+            var result = await masterBL.GetAdminService<SrvScopesBL>().DeleteScopes(Id);
+            return Ok(result);
+
         }
 
+        [HttpGet]
+        [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.AdminPermission.EDIT_ADMIN_SCOPES })]
+        public async Task<IActionResult> GetScopeTypeByDepartment(Guid departmentId)
+        {
+            var result = await masterBL.GetAdminService<SrvScopesBL>().GetScopeTypeByDepartmentId(departmentId);
+            return Ok(result);
+        }
     }
 }

@@ -3,6 +3,7 @@ using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.FormsModules;
 using Evaluation.DAL.Models.UserEntiy;
 using Evaluation.DAL.Repositories;
+using Evaluation.Services.Models.Admin;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Dtos.EvalFormDto;
 using Evaluation.SharedHelper.Enums;
@@ -16,7 +17,8 @@ namespace Evaluation.Services.BusinessLayer.API.EvaluationForm;
 
 public class EvaluationFormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider cacheDataProvider,
         UnitOfWork uow, LoggingServices loggingServices, IMapper mapper, UserInfo userInfo,
-        IServiceProvider serviceProvider, RequestInfo requestInfo, EvaluationFormService evaluationFormService)
+        IServiceProvider serviceProvider, RequestInfo requestInfo, EvaluationFormService evaluationFormService,
+        SrvAcademicYearBL srvAcademicYearBL)
         : ApiBase(serviceScopeFactory, cacheDataProvider, uow, loggingServices, mapper, userInfo, serviceProvider, requestInfo)
 {
     public async Task<PaginatedResult<TemplateFormDto>> GetEvaluationForm(SearchTemplateForm pagination)
@@ -230,6 +232,12 @@ public class EvaluationFormBL(IServiceScopeFactory serviceScopeFactory, CacheDat
     public async Task<ResponseDto> DeleteFormItemConfig(Guid formId)
     {
      var result = await evaluationFormService.DeleteFormItemConfig(formId);
+        return result;
+    }
+    public async Task<List<ResponseDDLDto>> GetLastScopeList()
+    {
+        var currentAcademicYear =await srvAcademicYearBL.GetIdsAcademicYearListByCureentDepartment();
+        var result = await evaluationFormService.GetLeafScopes(currentAcademicYear);
         return result;
     }
 }

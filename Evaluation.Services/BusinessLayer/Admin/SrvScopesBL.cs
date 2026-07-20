@@ -23,14 +23,11 @@ namespace Evaluation.Services.Models.Admin
 
         public async Task<List<ScopesDTO>> GetScopesList(int Page, int PageSize)
         {
-           
-
-            
-           
-
             var list = await uow.GetRepository<Scope>()
                 .GetAllNonDeleted()
                 .Include(x => x.CreateBy)
+                .Include(x=>x.ScopeType)
+                .ThenInclude(s=>s.Department)
                 .OrderBy(x=>x.OrderNo)
                 .ThenByDescending(x => x.CreateDate)
                  .Skip(Page*PageSize)
@@ -39,7 +36,6 @@ namespace Evaluation.Services.Models.Admin
 
             var result = mapper.Map<List<ScopesDTO>>(list, opts => opts.Items["Language"] = _requestInfo.Lang);
             return result;
-
 
         }
        
@@ -71,10 +67,7 @@ namespace Evaluation.Services.Models.Admin
         }
         public async Task<ScopesDTO> UpdateScopes(ScopesDTO message)
         {
-           
-            
-          
-               
+
                 var result = new ScopesDTO();
 
             if (message.Id is not null)

@@ -2,6 +2,7 @@
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.BaseModule;
 using Evaluation.DAL.Models.DepartementEntites;
+using Evaluation.DAL.Models.FormsModules;
 using Evaluation.DAL.Models.ServiceEnities;
 using Evaluation.DAL.Models.SystemSetting;
 using Evaluation.DAL.Models.UserEntiy;
@@ -11,6 +12,7 @@ using Evaluation.SharedHelper;
 using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Models;
+using Evaluation.SharedHelper.Models.Admin;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System.Linq.Expressions;
@@ -61,7 +63,7 @@ namespace Evaluation.Services.Models.Admin
                     .ForMember(dest => dest.UpdateDate, opt => opt.MapFrom(src => src.UpdateDate.HasValue ? src.UpdateDate.Value.ToString(mapperConfig.DateFormat) : src.CreateDate.ToString(mapperConfig.DateFormat))) // Convert DateTime to string
                     .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive)) // Default to true if null
                     .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => src.IsDeleted)) // Default to false if null
-                    .ForMember(dest => dest.CreateBy, opt => opt.MapFrom(src => (src.CreateBy!=null?(_requestInfo.Lang == "ar" ? src.CreateBy.NameAr : src.CreateBy.NameEn):""))) // Mapping for Arabic name
+                    .ForMember(dest => dest.CreateBy, opt => opt.MapFrom(src => (src.CreateBy != null ? (_requestInfo.Lang == "ar" ? src.CreateBy.NameAr : src.CreateBy.NameEn) : ""))) // Mapping for Arabic name
                    .ForMember(dest => dest.UpdateBy, opt => opt.MapFrom(src => src.UpdateById.HasValue
                         ? (userprofile.ContainsKey(src.UpdateById!.Value) ? userprofile[src.UpdateById!.Value] : null)
                         : (userprofile.ContainsKey(src.CreateById) ? userprofile[src.CreateById] : null)));
@@ -112,7 +114,7 @@ namespace Evaluation.Services.Models.Admin
                     .ForMember(dest => dest.UpdateDate, opt => opt.MapFrom(src => src.UpdateDate.HasValue ? src.UpdateDate.Value.ToString(mapperConfig.DateFormat) : src.CreateDate.ToString(mapperConfig.DateFormat))) // Convert DateTime to string
                     .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive))
                     .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => src.IsDeleted))
-                    .ForMember(dest => dest.CreateBy, opt => opt.MapFrom(src => (src.CreateBy!=null?(_requestInfo.Lang == "ar" ? src.CreateBy.NameAr : src.CreateBy.NameEn):"")))
+                    .ForMember(dest => dest.CreateBy, opt => opt.MapFrom(src => (src.CreateBy != null ? (_requestInfo.Lang == "ar" ? src.CreateBy.NameAr : src.CreateBy.NameEn) : "")))
                     .ForMember(dest => dest.UpdateBy, opt => opt.MapFrom(src => src.UpdateById != null
                         ? (userprofile.ContainsKey(src.UpdateById.Value) ? userprofile[src.UpdateById.Value] : null)
                         : (userprofile.ContainsKey(src.CreateById) ? userprofile[src.CreateById] : null)));
@@ -167,7 +169,7 @@ namespace Evaluation.Services.Models.Admin
                 throw new BusinessException(ConstantKeys.ExceptionMessage.TITLE_CANNOT_BE_UNICODE);
             }
         }
-      
+
         public async Task<string> GenerateBackendNameByTitle(string title)
         {
             string cleanText = Regex.Replace(title, "[^a-zA-Z]", "");
@@ -252,6 +254,22 @@ namespace Evaluation.Services.Models.Admin
                                    .Select(c => _requestInfo.Lang == "ar" ? c.ValueAr : c.ValueEn)
                                    .FirstOrDefaultAsync();
                 return result ?? string.Empty;
+            }
+        }
+        public async Task<List<DropDownCommonDto>> GetScopeTypeByDepartmentId(Guid departmentId)
+        {
+
+            using (var newuow = serviceProvider.CreateScopedUow())
+            {
+
+                var result = await newuow.GetRepository<ScopeType>()
+                                .GetAllNonDeleted()
+                                .Where(c => c.DepartmentId == departmentId)
+                                .Select(c =>new DropDownCommonDto {
+                                    Name =  _requestInfo.Lang == "ar" ? c.NameAr :c.NameEn ,
+                                    Id =  c.Id})
+                                   .ToListAsync();
+                return result;
             }
         }
 

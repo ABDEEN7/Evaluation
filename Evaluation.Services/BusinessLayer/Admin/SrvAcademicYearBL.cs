@@ -4,6 +4,7 @@ using Evaluation.DAL.Models.Calendars;
 using Evaluation.DAL.Models.FormsModules;
 using Evaluation.DAL.Repositories;
 using Evaluation.Services.Special;
+using Evaluation.SharedHelper.Consts;
 using Evaluation.SharedHelper.Enums;
 using Evaluation.SharedHelper.Exceptions;
 using Evaluation.SharedHelper.Models;
@@ -42,15 +43,23 @@ namespace Evaluation.Services.Models.Admin
         public async Task<List<AcademicYearDTO>> GetAcademicYearListByCureentDepartment()
         {
             var list = await uow.GetRepository<AcademicYear>()
-                .GetAllNonDeleted(x => x.DepartmentId == _requestInfo.DepId)
+                .GetAllNonDeleted(x => x.DepartmentId == _requestInfo.DepId && x.IsCurrent)
                 //.Include(x => x.CreateBy)
                 .OrderByDescending(x => x.CreateDate)
                 .ToListAsync();
 
             var result = mapper.Map<List<AcademicYearDTO>>(list, opts => opts.Items["Language"] = _requestInfo.Lang);
             return result;
-
-
+        }
+        public async Task<List<Guid>> GetIdsAcademicYearListByCureentDepartment()
+        {
+            var list = await uow.GetRepository<AcademicYear>()
+                .GetAllNonDeleted(x => x.DepartmentId == _requestInfo.DepId && x.IsCurrent)
+                //.Include(x => x.CreateBy)
+                .OrderByDescending(x => x.CreateDate)
+                .Select(x => x.Id)
+                .ToListAsync();
+            return list;
         }
         public async Task<AcademicYearDTO> GetCurrentAcademicYearListByCureentDepartment()
         {
@@ -189,6 +198,21 @@ namespace Evaluation.Services.Models.Admin
             return result;
 
 
+        }
+        public async Task<List<ResponseDDLDto>> GetAcademicYearListByDepartmentId(Guid departmentId)
+        {
+            var result = await uow.GetRepository<AcademicYear>()
+                .GetAllNonDeleted(x => x.DepartmentId == departmentId)
+                //.Include(x => x.CreateBy)
+                .OrderByDescending(x => x.CreateDate)
+                .Select(
+                x => new ResponseDDLDto
+                {
+                    Id = x.Id,
+                    Name = LanguageStatic.SelectLang(_requestInfo.Lang, x.NameAr, x.NameEn)
+                })
+                .ToListAsync();
+            return result;
         }
 
     }
