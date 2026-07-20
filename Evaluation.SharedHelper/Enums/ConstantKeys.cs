@@ -217,6 +217,8 @@ public static class ConstantKeys
         public static readonly string TemplateNotFound = "TemplateNotFound";
         public static readonly string NotRelatedUserPlan = "NotRelatedUserPlan";
         public static readonly string ShouldOnlyOneOfFormItemAndAnalysisTypeSelected = "ShouldOnlyOneOfFormItemAndAnalysisTypeSelected";
+        public static readonly string DuplicatedScopeWithSameDepartment = "DuplicatedScopeWithSameDepartment";
+        public static readonly string ScopeAndParentSame = "ScopeAndParentSame";
     }
 
     public static class AdminSettings
