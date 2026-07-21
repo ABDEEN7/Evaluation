@@ -438,7 +438,7 @@ namespace Evaluation.Services.BusinessLayer.API.Template;
             table.AutoFit = AutoFit.Window;
             table.Alignment = Alignment.center;
 
-            var headerColor = Color.FromArgb(115, 0, 57); // close to image color
+            var headerColor = Color.FromArgb(115, 0, 57);
             var footerColor = Color.LightGray;
 
             string[] headers =

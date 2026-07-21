@@ -405,6 +405,7 @@ namespace Evaluation.Services.BusinessLayer.API.Template;
                 new() { Key = "{{todayDate}}", Value = today.ToString("dd-MM-yyyy") },
                 new() { Key = "{{todayDateDay}}", Value = today.Day.ToString() },
                 new() { Key = "{{todayDateMonth}}", Value = today.ToString("MMMM") },
+                new() { Key = "{{Year}}", Value = today.Year.ToString() },
                 new() { Key = "{{todayDateYear}}", Value = today.Year.ToString() }
             };
 
