@@ -363,9 +363,15 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
 
 			evaluationRequest.FormEvalMatrixValueId = calculationResult.Value.Id;
 			evaluationRequest.EvalDays = calculationResult.Value.NextEvalDays;
+			evaluationRequest.FollowUpDays = calculationResult.Value.NextFollowUpDays;
 			evaluationRequest.EvaluationDate = DateOnly.FromDateTime(DateTime.Now);
-			evaluationRequest.NextEvaluationDate =
+
+            evaluationRequest.NextFollowUpDate =
+                DateOnly.FromDateTime(DateTime.Now.AddDays(calculationResult.Value.NextFollowUpDays));
+
+            evaluationRequest.NextEvaluationDate =
 				DateOnly.FromDateTime(DateTime.Now.AddDays(calculationResult.Value.NextEvalDays));
+
 			evaluationRequest.FinalEvalValue = calculationResult.Value.Value;
 
 			uow.GetRepository<EvaluationRequest>().Update(evaluationRequest);
@@ -502,6 +508,7 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
                 result.Id = evalMatrixValue.Select(v => v.Id).FirstOrDefault();
 
                 result.NextEvalDays = evalMatrixValue.Select(v => v.NextEvalDays).FirstOrDefault();
+                result.NextFollowUpDays = evalMatrixValue.Select(v => v.NextFollowUpDays).FirstOrDefault();
 
                 break;
             case CalcMethodsEnum.SUM:

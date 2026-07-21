@@ -2,7 +2,6 @@
 using Evaluation.DAL.Helper;
 using Evaluation.DAL.Models.Attachments;
 using Evaluation.DAL.Models.DepartementEntites;
-using Evaluation.DAL.Models.EvalResult;
 using Evaluation.DAL.Models.Org;
 using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
 using Evaluation.DAL.Models.ServiceRequestEntities;
@@ -139,10 +138,10 @@ namespace Evaluation.Services.Models.Admin
                 .AnyAsync(x => x.OrganizationTreeId == orgTreeId))
                 throw new BusinessException(ConstantKeys.ExceptionMessage.OrgTreeExistsDepartmentOrgTree);
 
-            if (await uow.GetRepository<OrgEvalResult>()
-                .GetAllNonDeleted()
-                .AnyAsync(x => x.OrgTreeId == orgTreeId))
-                throw new BusinessException(ConstantKeys.ExceptionMessage.OrgTreeExistsOrgEvalResult);
+            //if (await uow.GetRepository<OrgEvalResult>()
+            //    .GetAllNonDeleted()
+            //    .AnyAsync(x => x.OrgTreeId == orgTreeId))
+            //    throw new BusinessException(ConstantKeys.ExceptionMessage.OrgTreeExistsOrgEvalResult);
 
             if (await uow.GetRepository<EvalAttachment>()
                 .GetAllNonDeleted()

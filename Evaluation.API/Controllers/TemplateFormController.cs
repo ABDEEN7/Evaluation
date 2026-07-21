@@ -156,7 +156,7 @@ public class TemplateFormController : ControllerBase
         response.Add("CalcMethodsList", CalcMethodsList);
         return Ok(new ResponseEntity(response));
     }
-   
+
     [HttpGet]
     [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.VIEW_WEB_FORMITEMCONFIG })]
     public async Task<IActionResult> GetAllFormItemConfig(Guid? evalFormId)
@@ -183,5 +183,11 @@ public class TemplateFormController : ControllerBase
     public async Task<IActionResult> DeleteFormItemConfig(Guid formId)
     {
         return Ok(await _masterBl.GetApiService<EvaluationFormBL>().DeleteFormItemConfig(formId));
+    }
+    [HttpGet]
+    [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.WebPermissions.VIEW_WEB_FORMITEMS })]
+    public async Task<IActionResult> GetScopesForFormItem()
+    {
+        return Ok(await _masterBl.GetApiService<EvaluationFormBL>().GetLastScopeList());
     }
 }

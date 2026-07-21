@@ -47,4 +47,5 @@ const API_ROUTES = {
 
     // Lookups
     getFormItemLists: (id) => `/TemplateForm/${deprouting}/GetEvalFormItemLists?formId=${id}`,
+    getScopeList: () => `/TemplateForm/${deprouting}/GetScopesForFormItem`,
 };

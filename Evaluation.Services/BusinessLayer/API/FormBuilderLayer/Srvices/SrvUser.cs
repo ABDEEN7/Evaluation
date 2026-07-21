@@ -183,7 +183,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
         }
 
 
-        public async Task<List<Guid>> GetEmployeeUserPartyTypeIdsAsync(Guid userProfileId, Guid departementId)
+        public async Task<List<Guid>> GetEmployeeUserPartyTypeIdsAsync(Guid? userProfileId, Guid departementId)
         {
 			using var scope = serviceScopeFactory.CreateScopedUow();
 

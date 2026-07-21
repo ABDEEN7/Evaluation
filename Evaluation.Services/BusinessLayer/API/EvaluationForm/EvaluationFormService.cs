@@ -15,6 +15,7 @@ using FluentResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using SkiaSharp;
 using static Evaluation.SharedHelper.Enums.ConstantKeys;
 
 namespace Evaluation.Services.BusinessLayer.API;
@@ -921,5 +922,23 @@ public class EvaluationFormService(IServiceScopeFactory serviceScopeFactory,
             ResponseStatus = DBResult.Deleted,
             ResponseState = true
         };
+    }
+    public async Task<List<ResponseDDLDto>> GetLeafScopes(List<Guid> academicYearId)
+    {
+        var scopes = uow.GetRepository<ScopeAcademicYear>()
+            .GetAllActiveNonDeleted(x => academicYearId.Contains(x.AcademicYearId));
+        
+        var leafScopes = await scopes
+            .Where(x => !scopes.Any(s => s.ScopeParentId == x.ScopeId && academicYearId.Contains(s.AcademicYearId)))
+            .Select(x => new ResponseDDLDto
+            {
+                Id = x.ScopeId,
+                Name = requestInfo.Lang == "ar"
+                    ? x.Scope!.NameAr
+                    : x.Scope!.NameEn
+            })
+            .ToListAsync();
+
+        return leafScopes;
     }
 }

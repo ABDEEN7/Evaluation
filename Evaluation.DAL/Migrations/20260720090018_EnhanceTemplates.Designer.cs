@@ -4,6 +4,7 @@ using Evaluation.DAL.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Evaluation.DAL.Migrations
 {
     [DbContext(typeof(EvaluationDbContext))]
-    partial class EvaluationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260720090018_EnhanceTemplates")]
+    partial class EnhanceTemplates
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -2121,6 +2124,153 @@ namespace Evaluation.DAL.Migrations
                     b.ToTable("SystemModuleTypes");
                 });
 
+            modelBuilder.Entity("Evaluation.DAL.Models.EvalResult.DepEvalMatrix", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("AcademicYearId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("BackendName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("CreateById")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreateDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("getdate()");
+
+                    b.Property<Guid?>("DeleteById")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("DeleteDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<decimal?>("ItemValue")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("MaxValue")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("MinValue")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("NameAr")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NameEn")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("NextEvaluationDays")
+                        .HasColumnType("int");
+
+                    b.Property<int>("NextFollowUpDays")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("RequiredFollowUp")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid?>("UpdateById")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("UpdateDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AcademicYearId");
+
+                    b.HasIndex("CreateById");
+
+                    b.HasIndex("DeleteById");
+
+                    b.HasIndex("UpdateById");
+
+                    b.ToTable("DepEvalMatrixs");
+                });
+
+            modelBuilder.Entity("Evaluation.DAL.Models.EvalResult.OrgEvalResult", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("AcademicYearId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CreateById")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreateDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("getdate()");
+
+                    b.Property<Guid?>("DeleteById")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("DeleteDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("DepEvalMatrixId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("FinalEvalValue")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<Guid>("OrgTreeId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("UpdateById")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("UpdateDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AcademicYearId");
+
+                    b.HasIndex("CreateById");
+
+                    b.HasIndex("DeleteById");
+
+                    b.HasIndex("DepEvalMatrixId");
+
+                    b.HasIndex("OrgTreeId");
+
+                    b.HasIndex("UpdateById");
+
+                    b.ToTable("OrgEvalResults");
+                });
+
             modelBuilder.Entity("Evaluation.DAL.Models.Exception.ExceptionLog", b =>
                 {
                     b.Property<Guid>("Id")
@@ -3928,9 +4078,6 @@ namespace Evaluation.DAL.Migrations
                     b.Property<int>("OrderNo")
                         .HasColumnType("int");
 
-                    b.Property<bool>("RequiredFollowUp")
-                        .HasColumnType("bit");
-
                     b.Property<DateOnly>("Startdate")
                         .HasColumnType("date");
 
@@ -4017,9 +4164,6 @@ namespace Evaluation.DAL.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("NextEvalDays")
-                        .HasColumnType("int");
-
-                    b.Property<int>("NextFollowUpDays")
                         .HasColumnType("int");
 
                     b.Property<int>("OrderNo")
@@ -4316,13 +4460,13 @@ namespace Evaluation.DAL.Migrations
                     b.Property<DateTime?>("DeleteDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<Guid?>("DepEvalMatrixId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("DepEvalMatrixValueName")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid?>("EvaluationRequestId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("FormEvalMatrixId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid?>("FormEvalMatrixValueId")
@@ -4376,9 +4520,9 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("DeleteById");
 
-                    b.HasIndex("EvaluationRequestId");
+                    b.HasIndex("DepEvalMatrixId");
 
-                    b.HasIndex("FormEvalMatrixId");
+                    b.HasIndex("EvaluationRequestId");
 
                     b.HasIndex("FormEvalMatrixValueId");
 
@@ -4421,13 +4565,13 @@ namespace Evaluation.DAL.Migrations
                     b.Property<DateTime?>("DeleteDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<Guid?>("DepEvalMatrixId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("DepEvalMatrixValueName")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid?>("EvaluationRequestId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("FormEvalMatrixId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid?>("FormEvalMatrixValueId")
@@ -4487,9 +4631,9 @@ namespace Evaluation.DAL.Migrations
 
                     b.HasIndex("DeleteById");
 
-                    b.HasIndex("EvaluationRequestId");
+                    b.HasIndex("DepEvalMatrixId");
 
-                    b.HasIndex("FormEvalMatrixId");
+                    b.HasIndex("EvaluationRequestId");
 
                     b.HasIndex("FormEvalMatrixValueId");
 
@@ -7603,9 +7747,6 @@ namespace Evaluation.DAL.Migrations
                     b.Property<Guid?>("FinalReportId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int?>("FollowUpDays")
-                        .HasColumnType("int");
-
                     b.Property<Guid?>("FormEvalMatrixValueId")
                         .HasColumnType("uniqueidentifier");
 
@@ -7626,9 +7767,6 @@ namespace Evaluation.DAL.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateOnly?>("NextEvaluationDate")
-                        .HasColumnType("date");
-
-                    b.Property<DateOnly?>("NextFollowUpDate")
                         .HasColumnType("date");
 
                     b.Property<Guid>("OrgTreeId")
@@ -13193,6 +13331,88 @@ namespace Evaluation.DAL.Migrations
                     b.Navigation("UpdateBy");
                 });
 
+            modelBuilder.Entity("Evaluation.DAL.Models.EvalResult.DepEvalMatrix", b =>
+                {
+                    b.HasOne("Evaluation.DAL.Models.Calendars.AcademicYear", "AcademicYear")
+                        .WithMany()
+                        .HasForeignKey("AcademicYearId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "CreateBy")
+                        .WithMany()
+                        .HasForeignKey("CreateById")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "DeleteBy")
+                        .WithMany()
+                        .HasForeignKey("DeleteById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "UpdateBy")
+                        .WithMany()
+                        .HasForeignKey("UpdateById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("AcademicYear");
+
+                    b.Navigation("CreateBy");
+
+                    b.Navigation("DeleteBy");
+
+                    b.Navigation("UpdateBy");
+                });
+
+            modelBuilder.Entity("Evaluation.DAL.Models.EvalResult.OrgEvalResult", b =>
+                {
+                    b.HasOne("Evaluation.DAL.Models.Calendars.AcademicYear", "AcademicYear")
+                        .WithMany()
+                        .HasForeignKey("AcademicYearId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "CreateBy")
+                        .WithMany()
+                        .HasForeignKey("CreateById")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "DeleteBy")
+                        .WithMany()
+                        .HasForeignKey("DeleteById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Evaluation.DAL.Models.EvalResult.DepEvalMatrix", "DepEvalMatrix")
+                        .WithMany()
+                        .HasForeignKey("DepEvalMatrixId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Evaluation.DAL.Models.Org.OrgTree", "OrgTree")
+                        .WithMany()
+                        .HasForeignKey("OrgTreeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "UpdateBy")
+                        .WithMany()
+                        .HasForeignKey("UpdateById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("AcademicYear");
+
+                    b.Navigation("CreateBy");
+
+                    b.Navigation("DeleteBy");
+
+                    b.Navigation("DepEvalMatrix");
+
+                    b.Navigation("OrgTree");
+
+                    b.Navigation("UpdateBy");
+                });
+
             modelBuilder.Entity("Evaluation.DAL.Models.Exception.ExceptionLog", b =>
                 {
                     b.HasOne("Evaluation.DAL.Models.UserEntiy.MinistryUser", "CreateBy")
@@ -14358,14 +14578,14 @@ namespace Evaluation.DAL.Migrations
                         .HasForeignKey("DeleteById")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("Evaluation.DAL.Models.EvalResult.DepEvalMatrix", "DepEvalMatrix")
+                        .WithMany()
+                        .HasForeignKey("DepEvalMatrixId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("Evaluation.DAL.Models.Planing.EvaluationRequestEntity.EvaluationRequest", "EvaluationRequest")
                         .WithMany()
                         .HasForeignKey("EvaluationRequestId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Evaluation.DAL.Models.FormsModules.FormEvalMatrix", "FormEvalMatrix")
-                        .WithMany()
-                        .HasForeignKey("FormEvalMatrixId")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Models.FormsModules.FormEvalMatrixValue", "FormEvalMatrixValue")
@@ -14406,9 +14626,9 @@ namespace Evaluation.DAL.Migrations
 
                     b.Navigation("DeleteBy");
 
-                    b.Navigation("EvaluationRequest");
+                    b.Navigation("DepEvalMatrix");
 
-                    b.Navigation("FormEvalMatrix");
+                    b.Navigation("EvaluationRequest");
 
                     b.Navigation("FormEvalMatrixValue");
 
@@ -14441,14 +14661,14 @@ namespace Evaluation.DAL.Migrations
                         .HasForeignKey("DeleteById")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("Evaluation.DAL.Models.EvalResult.DepEvalMatrix", "DepEvalMatrix")
+                        .WithMany()
+                        .HasForeignKey("DepEvalMatrixId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("Evaluation.DAL.Models.Planing.EvaluationRequestEntity.EvaluationRequest", "EvaluationRequest")
                         .WithMany()
                         .HasForeignKey("EvaluationRequestId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("Evaluation.DAL.Models.FormsModules.FormEvalMatrix", "FormEvalMatrix")
-                        .WithMany()
-                        .HasForeignKey("FormEvalMatrixId")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Evaluation.DAL.Models.FormsModules.FormEvalMatrixValue", "FormEvalMatrixValue")
@@ -14495,9 +14715,9 @@ namespace Evaluation.DAL.Migrations
 
                     b.Navigation("DeleteBy");
 
-                    b.Navigation("EvaluationRequest");
+                    b.Navigation("DepEvalMatrix");
 
-                    b.Navigation("FormEvalMatrix");
+                    b.Navigation("EvaluationRequest");
 
                     b.Navigation("FormEvalMatrixValue");
 

@@ -1,10 +1,6 @@
 ﻿(function (global) {
     'use strict';
     // =================== LOCALIZATION Helper ===================
-    function t(key, fallback = '') {
-        const text = uiControlsSetup()?.GetUiControlText(key);
-        return text || key;
-    }
     const ns = global.planUtility;
     const {
         API_ENDPOINTS,
@@ -178,7 +174,7 @@
             try { $s.select2('destroy'); } catch { }
         }
 
-        $s.empty().append(`<option value="">${t('lblChoosePlanType')}</option>`);
+        $s.empty().append(`<option value="">${localization('lblChoosePlanType')}</option>`);
 
         (ns.planTypes || []).forEach(pt => {
             $s.append(`<option value="${pt.id}" data-backendname="${pt.backendName}">${pt.name}</option>`);
@@ -204,7 +200,7 @@
             $s.select2('destroy');
         }
 
-        $s.empty().append(`<option value="">${t('lblChooseSemester')}</option>`);
+        $s.empty().append(`<option value="">${localization('lblChooseSemester')}</option>`);
 
         ns.semesters.forEach(s =>
             $s.append(
@@ -513,7 +509,7 @@
             const prevLink = $('<a>')
                 .addClass('page-link')
                 .attr('href', '#')
-                .text(`${t('lblPrevious')}`)
+                .text(`${localization('lblPrevious')}`)
                 .on('click', function (e) {
                     e.preventDefault();
                     goToPage(fieldId, state.currentPage - 1);
@@ -553,7 +549,7 @@
             const nextLink = $('<a>')
                 .addClass('page-link')
                 .attr('href', '#')
-                .text(`${t('lblNext')}`)
+                .text(`${localization('lblNext')}`)
                 .on('click', function (e) {
                     e.preventDefault();
                     goToPage(fieldId, state.currentPage + 1);
@@ -718,10 +714,10 @@
 
                 jqClient().Post(API_ENDPOINTS.RESEND_EMAIL_SCHOOLS, { planId, schoolId })
                     .done(() => {
-                        toastr?.success(t('ResendEmailSuccess'));
+                        toastr?.success(localization('ResendEmailSuccess'));
                     })
                     .fail(() => {
-                        toastr?.error(t('ResendEmailFailed'));
+                        toastr?.error(localization('ResendEmailFailed'));
                     })
                     .always(() => {
                         $btn.removeClass('disabled');
