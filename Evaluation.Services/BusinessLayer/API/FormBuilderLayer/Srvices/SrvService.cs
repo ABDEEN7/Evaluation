@@ -197,8 +197,11 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 		Guid? planId = null,
 		bool checkActionCondition = true)
 		{
-			var userId = userInfo.UserId ?? Guid.Parse("C2536611-576B-4EB8-84F4-747F4ECE9A23");
-
+			var userId = userInfo.UserId;
+            if(userId == null)
+            {
+                throw new ArgumentNullException(nameof(userId));
+            }
 			if (departmentId == Guid.Empty)
 				throw new ArgumentException("departmentId cannot be empty.", nameof(departmentId));
 
@@ -228,8 +231,7 @@ namespace Evaluation.Services.BusinessLayer.API.FormBuilderLayer.Srvices
 
 			if (initialService.HasValue)
 				q = q.Where(s => s.Initialservice == initialService.Value);
-
-			var service = await q.FirstOrDefaultAsync();
+			var service = await q.OrderByDescending(x=>x.CreateDate).FirstOrDefaultAsync();
 
 			if (service == null)
 				throw new BusinessException(ExceptionMessage.ServiceNotFound);
