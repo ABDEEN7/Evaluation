@@ -100,14 +100,13 @@ namespace Evaluation.Admin.Controllers
             return Ok(result);
 
         }
-        [HttpPost]
-        [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.AdminPermission.DELETE_ADMIN_FORM_EVAL_MATRIX })]
-        public async Task<IActionResult> DeleteFormEvalMatrix(Guid Id)
+        [HttpGet]
+        [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.AdminPermission.ADD_ADMIN_FORM_EVAL_MATRIX })]
+        public async Task<IActionResult> HasRequiredFollowUp(Guid formEvalMatrixId)
         {
-
-            var result = await masterBL.GetAdminService<SrvFormEvalMatrixBL>().DeleteFormEvalMatrix(Id);
+            var result = await masterBL.GetAdminService<SrvFormEvalMatrixBL>().HasRequiredFollowUpAsync(formEvalMatrixId);
             return Ok(result);
-
         }
+        
     }
 }

@@ -1,10 +1,18 @@
 ﻿
 const dailogId = commonUtil.CONTENT_DAILOG_ID;
-let showMore = false, table = null, dialogElem = null;let currentPage = 0;let isSearch = false;let isLoading = true;
+let showMore = false, table = null, dialogElem = null;
+let currentPage = 0;
+let isSearch = false;
+let isLoading = true;
 
-const btnAddContentId = 'btn-add-content',    btnSubmitId = "btn-submit",
-    $formSection = $('#form-section'),    thumbnailId = "thumbnail";const gridContainerId = "view-container",
-    $tblContentContainer = $('#tbl-template-container'),    $thumbnail = $('#' + thumbnailId),
+const btnAddContentId = 'btn-add-content',
+    btnSubmitId = "btn-submit",
+    $formSection = $('#form-section'),
+    thumbnailId = "thumbnail";
+
+const gridContainerId = "view-container",
+    $tblContentContainer = $('#tbl-template-container'),
+    $thumbnail = $('#' + thumbnailId),
     $btnAddContent = $('#' + btnAddContentId);
 
 const loadData = (isSearch) => {
@@ -70,19 +78,86 @@ const deleteData = (id) => {
         jqClientAdvanced(options).Post("FormEvalMarixValue/DeleteFormEvalMarixValue".concat('?Id=', id));
 
     });
-};$(window).scroll(function () {    if ($(window).scrollTop() >= ($(document).height() - $(window).height()) * .60) {        if (!isLoading && currentPage > 0) {            loadData();        }    }});$(document).ready(function () {
-          table = tableUtil.createTabulator({        id: gridContainerId,        config: {            textDirection: txtDir,            paginationSize: 10,
+};
+
+
+
+$(window).scroll(function () {
+    if ($(window).scrollTop() >= ($(document).height() - $(window).height()) * .60) {
+        if (!isLoading && currentPage > 0) {
+            loadData();
+        }
+    }
+});
+
+$(document).ready(function () {
+  
+    
+    const applyFollowUpRequired = (hasRequiredFollowUp) => {
+        const $followUp = $('#EvalMatrixValueNextFollowUpDays');
+
+        if (hasRequiredFollowUp === true) {
+            $followUp.removeAttr('required');
+        } else {
+
+            $followUp.attr('required', 'required');
+        }
+        sharedFn().NewvalidateInput(
+            'EvalMatrixValueNextFollowUpDays',
+            sharedFn().GetUiControlText('ADMIN_CNTRL_REQUIRED'),
+            sharedFn().GetUiControlText('ADMIN_MSG_MAX_CHAR_LENGTH'),
+            sharedFn().GetUiControlText('ADMIN_MSG_MIN_CHAR_LENGTH')
+        );
+    };
+    const loadHasRequiredFollowUp = (formEvalMatrixId) => {
+        if (!formEvalMatrixId) {
+            // no matrix selected -> reset to a safe default (required)
+            applyFollowUpRequired(false);
+            return;
+        }
+
+        const options = {
+            success: function (data) {
+                applyFollowUpRequired(data === true);
+            },
+            error: function (xhr) {
+                commonUtil.serverError(xhr);
+            }
+        };
+
+        jqClientAdvanced(options).Get(
+            "FormEvalMatrix/HasRequiredFollowUp".concat(
+                '?formEvalMatrixId=', encodeURIComponent(formEvalMatrixId)
+            )
+        );
+    };
+
+    $('#FormEvalMarixValueFormEvalMatrixId').on('change', function () {
+        const formEvalMatrixId = $(this).val();
+        loadHasRequiredFollowUp(formEvalMatrixId);
+    });
+    table = tableUtil.createTabulator({
+        id: gridContainerId,
+        config: {
+            textDirection: txtDir,
+            paginationSize: 10,
             placeholder: sharedFn().GetUiControlText('NO_DATA_FOUND'),
-            headerFilterPlaceholder: sharedFn().GetUiControlText('FILTER_COLUMN'),            movableRows: true,        },
-        isResponsiveLayout: false,        uniqueRowId: 'id',
-        sortColumn: "updateDate",        sortDir: "desc",        columns: TableColumns,
+            headerFilterPlaceholder: sharedFn().GetUiControlText('FILTER_COLUMN'),
+            movableRows: true,
+        },
+        isResponsiveLayout: false,
+        uniqueRowId: 'id',
+        sortColumn: "updateDate",
+        sortDir: "desc",
+        columns: TableColumns,
         columnResized: function (column) {
 
             // Get the resized column width
             var columnField = column.getField();
             var columnWidth = column.getWidth();
             columnWidths[columnField] = columnWidth;
-        },        rowMoved: function (row) {
+        },
+        rowMoved: function (row) {
             var request = [];
             table.getData().map(function (d, index) {
 
@@ -101,13 +176,23 @@ const deleteData = (id) => {
             };
             jqClientAdvanced(options).PostFormData("FormEvalMarixValue/UpdateFormEvalMarixValueOrder", formData);
 
-        }    });
+        }
+
+    });
 
 
-    dialogElem = commonUtil.createDailog({ dailogId: dailogId });    loadData();        $(`#${btnAddContentId}`).click(function (e) {        sharedFn().ClearForm();        sharedFn().EditMode();
+    dialogElem = commonUtil.createDailog({ dailogId: dailogId });
+    loadData();
+
+    
+    $(`#${btnAddContentId}`).click(function (e) {
+        sharedFn().ClearForm();
+        sharedFn().EditMode();
         
     });
-        $("#btn-submit").click(function (e) {
+    
+    
+$("#btn-submit").click(function (e) {
         if (sharedFn().NewvalidateForm("form-control", sharedFn().GetUiControlText('ADMIN_CNTRL_REQUIRED'), sharedFn().GetUiControlText('ADMIN_MSG_MAX_CHAR_LENGTH'), sharedFn().GetUiControlText('ADMIN_MSG_MIN_CHAR_LENGTH'))) {
 
             commonUtil.btnProgress(btnSubmitId);
@@ -171,4 +256,6 @@ const deleteData = (id) => {
         }
 
     })
-})   
+
+
+})   
