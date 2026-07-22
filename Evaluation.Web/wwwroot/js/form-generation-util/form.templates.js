@@ -21,8 +21,9 @@ window.formUtility = window.formUtility || {};
         const params = new URLSearchParams(window.location.search);
         const rawRequestId = params.get("Evlid") || "";
         const requestId = rawRequestId.replace("#", "");
+        var DepartmentRouting = sharedUtility().extractDepartmentName();
 
-        let url = `/Templates/GetLetterDocument?requestId=${encodeURIComponent(requestId)}&templateId=${encodeURIComponent(templateId)}`;        try {
+        let url = `/Templates/${DepartmentRouting}/GetLetterDocument?requestId=${encodeURIComponent(requestId)}&templateId=${encodeURIComponent(templateId)}`;        try {
             if (typeof sharedUtility === "function" && sharedUtility().BaseApiUrl) {
                 let baseApi = sharedUtility().BaseApiUrl() || "";
                 baseApi = decodeURIComponent(baseApi).replace(/\/+$/, "");
