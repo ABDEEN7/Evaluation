@@ -14,5 +14,7 @@ namespace Evaluation.SharedHelper.Models.Admin
         public Guid SMSProfileId { get; set; }
 
         public string SMSProfile { get; set; } = null!;
+        public Guid? DepartmentId { get; set; } 
+        public Guid? ServiceId { get; set; } 
     }
 }

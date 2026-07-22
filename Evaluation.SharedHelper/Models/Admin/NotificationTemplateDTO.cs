@@ -10,6 +10,8 @@ namespace Evaluation.SharedHelper.Models.Admin
         public string BackendName { get; set; } = "";
         public Guid? SystemModuleId { get; set; }
         public string? SystemModule { get; set; }
-        
+        public Guid? DepartmentId { get; set; }
+        public Guid? ServiceId { get; set; }
+
     }
 }
