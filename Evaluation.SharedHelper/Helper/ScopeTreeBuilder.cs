@@ -114,6 +114,7 @@ public static class ScopeTreeBuilder
                             HasNote = x.HasNote,
                             NoteRequired = x.NoteRequired,
                             HasMultiEvaluation = x.HasMuliEvaluation,
+                            ScopeId = x.ScopeId,
 
                             // Current item value
                             Value = currentItemValue?.ActualValue,
