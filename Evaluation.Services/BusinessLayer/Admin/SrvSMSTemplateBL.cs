@@ -14,24 +14,24 @@ namespace Evaluation.Services.Models.Admin
 {
     public class SrvSMSTemplateBL : AdminBase
     {
-        public SrvSMSTemplateBL(IServiceProvider serviceProvider, UnitOfWork uow, LoggingServices loggingServices, IMapper mapper, UserInfo userInfo,IServiceScopeFactory serviceScopeFactory,RequestInfo requestInfo) : base(serviceProvider, uow, loggingServices, mapper, userInfo, serviceScopeFactory, requestInfo)
+        public SrvSMSTemplateBL(IServiceProvider serviceProvider, UnitOfWork uow, LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, IServiceScopeFactory serviceScopeFactory, RequestInfo requestInfo) : base(serviceProvider, uow, loggingServices, mapper, userInfo, serviceScopeFactory, requestInfo)
         {
-            
+
         }
 
 
         public async Task<List<SMSTemplateDTO>> GetSMSTemplateList(int Page, int PageSize)
         {
-           
 
-            
-            
+
+
+
 
             var list = await uow.GetRepository<SMSTemplate>()
                 .GetAllNonDeleted()
                 .Include(x => x.CreateBy)
                 .OrderByDescending(x => x.CreateDate)
-                 .Skip(Page*PageSize)
+                 .Skip(Page * PageSize)
                 .Take(PageSize)
                 .ToListAsync();
 
@@ -40,13 +40,13 @@ namespace Evaluation.Services.Models.Admin
 
 
         }
-       
+
         public async Task<SMSTemplateDTO> SaveSMSTemplate(SMSTemplateDTO message)
         {
-           
-           
-  
-            var BackendName= "SMS_TEMPLATE"+"_"+await GenerateBackendNameByTitle(message.TitleEn);
+
+
+
+            var BackendName = "SMS_TEMPLATE" + "_" + await GenerateBackendNameByTitle(message.TitleEn);
             var existBackendName = await uow
              .GetRepository<SMSTemplate>()
                   .GetAllNonDeleted(x => x.BackendName == BackendName)
@@ -61,34 +61,36 @@ namespace Evaluation.Services.Models.Admin
 
             SMSTemplate obj = new SMSTemplate();
 
-                obj.TitleAr = message.TitleAr;
-                obj.TitleEn = message.TitleEn;
-                obj.Messages = message.Messages;
-                obj.BackendName = BackendName;
-                obj.SMSProfileId = message.SMSProfileId;
+            obj.TitleAr = message.TitleAr;
+            obj.TitleEn = message.TitleEn;
+            obj.Messages = message.Messages;
+            obj.BackendName = BackendName;
+            obj.SMSProfileId = message.SMSProfileId;
             obj.SMSProfile = null;
             obj.IsActive = message.IsActive;
+            obj.ServiceId = message.ServiceId;
+            obj.DepartmentId = message.DepartmentId;
 
-                uow.GetRepository<SMSTemplate>().Insert(obj);
+            uow.GetRepository<SMSTemplate>().Insert(obj);
             //insert values to SMSTemplateDocument
-          
+
             await uow.CommitAsync();
             var result = mapper.Map<SMSTemplateDTO>(obj, opts => opts.Items["Language"] = _requestInfo.Lang);
             result.ResponseStatus = DBResult.Inserted;
-                return result;
-            
+            return result;
+
         }
         public async Task<SMSTemplateDTO> UpdateSMSTemplate(SMSTemplateDTO message)
         {
-           
-            
-          
-               
-                var result = new SMSTemplateDTO();
 
-                if (message.Id is not null)
-                {
-               
+
+
+
+            var result = new SMSTemplateDTO();
+
+            if (message.Id is not null)
+            {
+
 
                 SMSTemplate obj = await uow.GetRepository<SMSTemplate>()
                                       .GetAllNonDeleted()
@@ -102,32 +104,33 @@ namespace Evaluation.Services.Models.Admin
                 obj.BackendName = obj.BackendName;
                 obj.SMSProfileId = message.SMSProfileId;
                 obj.IsActive = message.IsActive;
-
+                obj.DepartmentId = message.DepartmentId;
+                obj.ServiceId = message.ServiceId;
                 uow.GetRepository<SMSTemplate>().Update(obj);
 
-                
+
                 await uow.CommitAsync();
                 result = mapper.Map<SMSTemplateDTO>(obj, opts => opts.Items["Language"] = _requestInfo.Lang);
                 result.ResponseStatus = DBResult.Updated;
-                }
+            }
 
-                return result;
-           
+            return result;
+
         }
-        
+
         public async Task<SMSTemplateDTO> DeleteSMSTemplate(Guid? Id)
         {
 
-           
 
-                
-                var result = new SMSTemplateDTO();
-                if (Id is not null)
-                {
-                    SMSTemplate obj = await uow.GetRepository<SMSTemplate>()
-                                      .GetAllNonDeleted()
-                                      .Where(x => x.Id == Id)
-                                      .FirstAsync();
+
+
+            var result = new SMSTemplateDTO();
+            if (Id is not null)
+            {
+                SMSTemplate obj = await uow.GetRepository<SMSTemplate>()
+                                  .GetAllNonDeleted()
+                                  .Where(x => x.Id == Id)
+                                  .FirstAsync();
                 var ActionStatusConfigNotification = await uow.GetRepository<ActionStatusConfigNotification>()
 .GetAllNonDeleted()
                       .Where(x => x.SMSTemplateId == obj.Id)
@@ -137,14 +140,14 @@ namespace Evaluation.Services.Models.Admin
                     throw new BusinessException(ConstantKeys.ExceptionMessage.SmsTemplateExistsActionStatusConfigNotification);
                 }
                 uow.GetRepository<SMSTemplate>().Delete(obj);
-                    await uow.CommitAsync();
+                await uow.CommitAsync();
                 result = mapper.Map<SMSTemplateDTO>(obj, opts => opts.Items["Language"] = _requestInfo.Lang);
                 result.ResponseStatus = DBResult.Deleted;
-                }
-                return result;
-           
+            }
+            return result;
+
 
         }
-       
+
     }
 }

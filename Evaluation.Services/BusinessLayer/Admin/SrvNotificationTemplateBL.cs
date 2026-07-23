@@ -69,6 +69,8 @@ namespace Evaluation.Services.Models.Admin
             obj.SystemModuleId = message.SystemModuleId;
             obj.BackendName = BackendName;
             obj.IsActive = message.IsActive;
+            obj.DepartmentId = message.DepartmentId;
+            obj.ServiceId = message.ServiceId;
 
             uow.GetRepository<NotificationTemplate>().Insert(obj);
                 await uow.CommitAsync();
@@ -101,6 +103,8 @@ namespace Evaluation.Services.Models.Admin
                 obj.BodyEn = message.BodyEn;
                 obj.SystemModuleId = message.SystemModuleId;
                 obj.BackendName = obj.BackendName;
+                obj.DepartmentId = obj.DepartmentId;
+                obj.ServiceId = obj.ServiceId;
                 obj.IsActive = message.IsActive;
 
                 uow.GetRepository<NotificationTemplate>().Update(obj);
