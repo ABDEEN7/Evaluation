@@ -64,7 +64,7 @@ namespace Evaluation.Admin.Controllers
             var files = Request.Form.Files;
             var result = new FormEvalMatrixDTO();
             var model = Request.Form["request"][0]?.StringToObject<FormEvalMatrixDTO>();
-           
+
             bool validateObject = await masterBL.GetAdminService<SrvBaseBL>().ValidateObject(model!, ConstantKeys.AdminPermission.ADD_ADMIN_FORM_EVAL_MATRIX);
             if (validateObject)
             {
@@ -81,7 +81,7 @@ namespace Evaluation.Admin.Controllers
             var files = Request.Form.Files;
             var result = new FormEvalMatrixDTO();
             var model = Request.Form["request"][0]?.StringToObject<FormEvalMatrixDTO>();
-          
+
             bool validateObject = await masterBL.GetAdminService<SrvBaseBL>().ValidateObject(model!, ConstantKeys.AdminPermission.ADD_ADMIN_FORM_EVAL_MATRIX);
             if (validateObject)
             {
@@ -100,6 +100,15 @@ namespace Evaluation.Admin.Controllers
             return Ok(result);
 
         }
+        [HttpPost]
+        [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.AdminPermission.DELETE_ADMIN_FORM_EVAL_MATRIX })]
+        public async Task<IActionResult> DeleteFormEvalMatrix(Guid Id)
+        {
+
+            var result = await masterBL.GetAdminService<SrvFormEvalMatrixBL>().DeleteFormEvalMatrix(Id);
+            return Ok(result);
+
+        }
         [HttpGet]
         [CheckRolePermisionFilter(true, PermisionNames: new[] { ConstantKeys.AdminPermission.ADD_ADMIN_FORM_EVAL_MATRIX })]
         public async Task<IActionResult> HasRequiredFollowUp(Guid formEvalMatrixId)
@@ -107,6 +116,6 @@ namespace Evaluation.Admin.Controllers
             var result = await masterBL.GetAdminService<SrvFormEvalMatrixBL>().HasRequiredFollowUpAsync(formEvalMatrixId);
             return Ok(result);
         }
-        
+
     }
 }
