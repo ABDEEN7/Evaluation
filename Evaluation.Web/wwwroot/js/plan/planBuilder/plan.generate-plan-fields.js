@@ -194,7 +194,6 @@ const planUtility = window.planUtility;
                     <thead class="table-light">
                         <tr>
                             <th style="width:50px;">
-                                <input type="checkbox" id="${pid(fieldId, 'selectAll')}">
                             </th>
                             <th>${localization('lblSchoolName')}</th>
                             <th>${localization('lblVisitDate')}</th>
