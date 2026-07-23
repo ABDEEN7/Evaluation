@@ -14,9 +14,9 @@ namespace Evaluation.Services.Models.Admin
 {
     public class SrvFormEvalMarixValueBL : AdminBase
     {
-        public SrvFormEvalMarixValueBL(IServiceProvider serviceProvider, UnitOfWork uow, LoggingServices loggingServices, IMapper mapper, UserInfo userInfo,IServiceScopeFactory serviceScopeFactory,RequestInfo requestInfo) : base(serviceProvider, uow, loggingServices, mapper, userInfo, serviceScopeFactory, requestInfo)
+        public SrvFormEvalMarixValueBL(IServiceProvider serviceProvider, UnitOfWork uow, LoggingServices loggingServices, IMapper mapper, UserInfo userInfo, IServiceScopeFactory serviceScopeFactory, RequestInfo requestInfo) : base(serviceProvider, uow, loggingServices, mapper, userInfo, serviceScopeFactory, requestInfo)
         {
-            
+
         }
 
 
@@ -25,62 +25,63 @@ namespace Evaluation.Services.Models.Admin
 
 
 
-           
+
 
             var list = await uow.GetRepository<FormEvalMatrixValue>()
                 .GetAllNonDeleted()
                 .Include(x => x.CreateBy)
                 .OrderBy(x => x.OrderNo)
                 .ThenByDescending(x => x.CreateDate)
-                 .Skip(Page*PageSize)
+                 .Skip(Page * PageSize)
                 .Take(PageSize)
                 .ToListAsync();
 
-            var result =  mapper.Map<List<FormEvalMarixValueDTO>>(list, opts => opts.Items["Language"] = _requestInfo.Lang);
+            var result = mapper.Map<List<FormEvalMarixValueDTO>>(list, opts => opts.Items["Language"] = _requestInfo.Lang);
             return result;
 
 
         }
-       
-      
+
+
         public async Task<FormEvalMarixValueDTO> SaveFormEvalMarixValue(FormEvalMarixValueDTO message)
         {
 
 
             FormEvalMatrixValue obj = new FormEvalMatrixValue();
 
-                obj.FormEvalMatrixId = message.FormEvalMatrixId;
-                obj.NameAr = message.NameAr;
-                obj.NameEn = message.NameEn;
-                obj.MinValue = message.MinValue;
-                obj.MaxValue = message.MaxValue;
-                obj.NextEvalDays = message.NextEvalDays;
-                obj.ActualMatrixValue = message.ActualMatrixValue;
-                obj.DescAr = message.DescAr;
-                obj.DescEn = message.DescEn;
-                obj.ColorCode = message.ColorCode;
-                obj.ReportTextAr = message.ReportTextAr;
-                obj.ReportTextEn = message.ReportTextEn;
-                obj.ReportDescAr = message.ReportDescAr;
-                obj.ReportDescEn = message.ReportDescEn;
-                obj.DisplayRange = message.DisplayRange;
-                obj.IsActive = message.IsActive;
+            obj.FormEvalMatrixId = message.FormEvalMatrixId;
+            obj.NameAr = message.NameAr;
+            obj.NameEn = message.NameEn;
+            obj.MinValue = message.MinValue;
+            obj.MaxValue = message.MaxValue;
+            obj.NextEvalDays = message.NextEvalDays;
+            obj.ActualMatrixValue = message.ActualMatrixValue;
+            obj.DescAr = message.DescAr;
+            obj.DescEn = message.DescEn;
+            obj.ColorCode = message.ColorCode;
+            obj.ReportTextAr = message.ReportTextAr;
+            obj.ReportTextEn = message.ReportTextEn;
+            obj.ReportDescAr = message.ReportDescAr;
+            obj.ReportDescEn = message.ReportDescEn;
+            obj.DisplayRange = message.DisplayRange;
+            obj.NextFollowUpDays = message.NextFollowUpDays;
+            obj.IsActive = message.IsActive;
 
-                uow.GetRepository<FormEvalMatrixValue>().Insert(obj);
-            
+            uow.GetRepository<FormEvalMatrixValue>().Insert(obj);
+
             await uow.CommitAsync();
             var result = mapper.Map<FormEvalMarixValueDTO>(obj, opts => opts.Items["Language"] = _requestInfo.Lang);
             result.ResponseStatus = DBResult.Inserted;
-                return result;
-           
-           
-            
+            return result;
+
+
+
         }
         public async Task<FormEvalMarixValueDTO> UpdateFormEvalMarixValue(FormEvalMarixValueDTO message)
         {
 
 
-           
+
 
             var result = new FormEvalMarixValueDTO();
 
@@ -106,6 +107,7 @@ namespace Evaluation.Services.Models.Admin
                 obj.ReportTextEn = message.ReportTextEn;
                 obj.ReportDescAr = message.ReportDescAr;
                 obj.ReportDescEn = message.ReportDescEn;
+                obj.NextFollowUpDays = message.NextFollowUpDays;
                 obj.IsActive = message.IsActive;
 
                 uow.GetRepository<FormEvalMatrixValue>().Update(obj);
@@ -114,8 +116,8 @@ namespace Evaluation.Services.Models.Admin
                 result = mapper.Map<FormEvalMarixValueDTO>(obj, opts => opts.Items["Language"] = _requestInfo.Lang);
                 result.ResponseStatus = DBResult.Updated;
             }
-                return result;
-           
+            return result;
+
         }
 
         public async Task<bool> UpdateFormEvalMarixValueOrder(List<OrderingDTO> message)
@@ -142,24 +144,24 @@ namespace Evaluation.Services.Models.Admin
 
 
 
-           
+
             var result = new FormEvalMarixValueDTO();
-                if (Id is not null)
-                {
+            if (Id is not null)
+            {
                 FormEvalMatrixValue obj = await uow.GetRepository<FormEvalMatrixValue>()
                                       .GetAllNonDeleted()
                                       .Where(x => x.Id == Id)
                                       .FirstAsync();
 
                 uow.GetRepository<FormEvalMatrixValue>().Delete(obj);
-                    await uow.CommitAsync();
+                await uow.CommitAsync();
                 result = mapper.Map<FormEvalMarixValueDTO>(obj, opts => opts.Items["Language"] = _requestInfo.Lang);
                 result.ResponseStatus = DBResult.Deleted;
-                }
-                return result;
-           
+            }
+            return result;
+
 
         }
-       
+
     }
 }
