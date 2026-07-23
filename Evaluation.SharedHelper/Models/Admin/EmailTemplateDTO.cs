@@ -16,6 +16,7 @@ namespace Evaluation.SharedHelper.Models.Admin
         public Guid[]? FielsFromRequest { get; set; }
         public Guid[]? FielsFromEvaluation { get; set; }
         public Guid? DepartmentId { get; set; }
+        public string? Department { get; set; }
 
     }
 }

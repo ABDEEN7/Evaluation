@@ -23,6 +23,7 @@ namespace Evaluation.Services.Mappers.Admin
              .ForMember(dest => dest.UpdateDate, opt => opt.MapFrom(src => src.UpdateDate.HasValue ? src.UpdateDate.Value.ToString("yyyy-MM-dd hh:mm:ss tt") : src.CreateDate.ToString("yyyy-MM-dd hh:mm:ss tt")))
                 .ForMember(dest => dest.EmailProfile, opt => opt.MapFrom<EmailProfilesResolver, Guid?>(src => src.EmailProfileId))
                 .ForMember(dest => dest.Service, opt => opt.MapFrom<ServiceResolver, Guid?>(src => src.ServiceId))
+                .ForMember(dest => dest.Department, opt => opt.MapFrom<DepartmentResolver, Guid?>(src => src.DepartmentId))
                 .ForMember(dest => dest.FielsFromRequest, opt => opt.MapFrom(src => src.FielsFromRequest != null
      ? src.FielsFromRequest
     .Split(",", StringSplitOptions.RemoveEmptyEntries)

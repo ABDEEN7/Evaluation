@@ -18,7 +18,9 @@ namespace Evaluation.Services.Mappers.Admin
                 .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => src.IsDeleted))
                 .ForMember(dest => dest.UpdateBy, opt => opt.MapFrom<UserProfileResolver, Guid?>(src => src.UpdateById.HasValue ? src.UpdateById : src.CreateById))
                 .ForMember(dest => dest.UpdateDate, opt => opt.MapFrom(src => src.UpdateDate.HasValue ? src.UpdateDate.Value.ToString("yyyy-MM-dd hh:mm:ss tt") : src.CreateDate.ToString("yyyy-MM-dd hh:mm:ss tt")))
-                .ForMember(dest => dest.SMSProfile, opt => opt.MapFrom<SMSProfileResolver, Guid?>(src => src.SMSProfileId));
+                .ForMember(dest => dest.SMSProfile, opt => opt.MapFrom<SMSProfileResolver, Guid?>(src => src.SMSProfileId))
+                .ForMember(dest => dest.Service, opt => opt.MapFrom<ServiceResolver, Guid?>(src => src.ServiceId))
+                .ForMember(dest => dest.Department, opt => opt.MapFrom<DepartmentResolver, Guid?>(src => src.DepartmentId));
 
         }
 
