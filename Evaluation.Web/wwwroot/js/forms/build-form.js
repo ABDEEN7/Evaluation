@@ -127,99 +127,56 @@ function buildFormData(tree, evalFormData) {
         }))
     });
 
-    // The tree depth before items appear varies per form/department:
-    //
-    //  D=1  root has items directly (e.g. "Criteria" node with items: [...])
-    //       → one aspect (title = root.name), one implicit domain (no label)
-    //
-    //  D=2  root → children with items directly (original shape)
-    //       → each child = one aspect, one implicit domain (no label)
-    //
-    //  D=3  root → child → grandchildren with items (new 3-level shape, e.g.
-    //       "Assembly Points" → "School Leadership" → "Visit and Follow-up Form",
-    //       "Teaching and Learning")
-    //       → each child = one aspect, each grandchild-with-items = one NAMED
-    //         domain within that aspect (label shown in the left domain column)
-    //
-    //  D=4+ further nesting: recurse, building named domain titles by joining
-    //       intermediate node names so no items are ever silently dropped.
-    //
-    // Output per aspect: { title, domains: [{ title: string|null, rows[] }] }
-    // domain.title = null → no label rendered (D=1 / D=2 implicit single domain)
-    // domain.title = string → shown as the left-column label in the UI (D=3+)
-
-    // True when node has at least one item directly on itself.
-    const hasDirectItems = (node) =>
-        Array.isArray(node.items) && node.items.length > 0;
-
-    // True when node has items anywhere in its subtree (including itself).
-    const hasAnyItems = (node) =>
-        hasDirectItems(node) ||
-        (node.children || []).some(hasAnyItems);
-
-    // Given a node that has NO direct items, return its named domains by
-    // walking its children. Each child-with-direct-items → one domain
-    // (title = child.name). Each child-without-direct-items → recurse and
-    // prefix the child name so nested titles remain meaningful.
-    const collectDomains = (node) => {
-        let domains = [];
-        (node.children || []).filter(hasAnyItems).forEach(child => {
-            if (hasDirectItems(child)) {
-                domains.push({ title: child.name, rows: child.items.map(mapRow) });
-            } else {
-                // Recurse: bring deeper domains up, preserving hierarchy in title.
-                collectDomains(child).forEach(d => {
-                    domains.push({
-                        title: d.title ? `${child.name} › ${d.title}` : child.name,
-                        rows: d.rows
-                    });
-                });
-            }
-        });
-        return domains;
-    };
-
-    // Build aspects for a single top-level criterion node.
-    const buildAspects = (criterionNode) => {
-        // D=1: items sit directly on the root → single aspect, single implicit domain.
-        // isDirect flags this aspect as "not a real aspect" - its title is
-        // just a copy of the criterion's own title, so the renderer skips
-        // the aspect-card wrapper/header entirely for it (see aspectCardsHtml
-        // below) instead of showing the same name twice (once on the
-        // criterion card, once on the aspect card).
-        if (hasDirectItems(criterionNode)) {
-            return [{
-                title: criterionNode.name,
-                isDirect: true,
-                domains: [{ title: null, rows: criterionNode.items.map(mapRow) }]
-            }];
+    // A scope (criterion or aspect node) is worth rendering only if it
+    // (or something under it) actually carries items. Nodes like "Arabic"
+    // or "Vision, Mission and Priorities" come back with empty children
+    // AND empty items - those are dropped rather than rendered as blank
+    // cards.
+    const nodeHasItems = (node) => {
+        if (Array.isArray(node.items) && node.items.length > 0) return true;
+        if (Array.isArray(node.children) && node.children.length > 0) {
+            return node.children.some(nodeHasItems);
         }
-
-        return (criterionNode.children || [])
-            .filter(hasAnyItems)
-            .map(child => {
-                if (hasDirectItems(child)) {
-                    // D=2: child has items directly → single implicit domain, no label.
-                    return {
-                        title: child.name,
-                        domains: [{ title: null, rows: child.items.map(mapRow) }]
-                    };
-                } else {
-                    // D=3+: child's content is deeper → child becomes the aspect
-                    // header and its descendants become named domain groups.
-                    return {
-                        title: child.name,
-                        domains: collectDomains(child)
-                    };
-                }
-            })
-            .filter(asp => asp.domains.length > 0);
+        return false;
     };
 
-    return tree.map(criterionNode => ({
-        title: criterionNode.name,
-        aspects: buildAspects(criterionNode)
-    }));
+    return tree
+        .filter(nodeHasItems)
+        .map(criterionNode => {
+            const children = criterionNode.children || [];
+
+            // Two-level case (the common one): items live on the
+            // criterion's children, each child becoming its own aspect.
+            // One-level case (e.g. "class observation"): the criterion
+            // node has no children at all, but carries items directly on
+            // itself - treat the criterion node itself as a single aspect
+            // so those rows still render instead of being dropped.
+            const aspects = children.length > 0
+                ? children
+                    .filter(nodeHasItems)
+                    .map(child => ({
+                        title: child.name,
+                        domainTitle: child.name,
+                        rows: (child.items || []).map(mapRow)
+                    }))
+                : (Array.isArray(criterionNode.items) && criterionNode.items.length > 0
+                    ? [{
+                        title: criterionNode.name,
+                        domainTitle: criterionNode.name,
+                        rows: criterionNode.items.map(mapRow)
+                    }]
+                    : []);
+
+            return {
+                title: criterionNode.name,
+                aspects
+            };
+        })
+        // A criterion node can pass nodeHasItems (via a deep descendant)
+        // yet still end up with zero renderable aspects here if every
+        // child got filtered out above - drop those too so no empty
+        // criterion-card is rendered.
+        .filter(crit => crit.aspects.length > 0);
 }
 
 
@@ -257,7 +214,11 @@ function renderSelectAndNote(fieldId, itemId, hasNote, readOnly, matrixValues, c
 
         <div class="row-note-wrap">
             ${hasNote
-            ? `<input class="row-note" ${readOnly ? 'disabled' : ''} type="text" placeholder="اكتب ملاحظة هنا..." value="${escapeAttr(noteValue ?? '')}" />`
+            ? `<textarea class="row-note mt-0"
+          ${readOnly ? 'disabled' : ''}
+          rows="2"
+          placeholder="اكتب ملاحظة هنا..."
+          oninput="this.style.height='auto'; this.style.height=this.scrollHeight+'px';">${escapeAttr(noteValue ?? '')}</textarea>`
             : `<div class="row-note-placeholder"></div>`}
             <span class="validation-message" id="validation-${fieldId}-${itemId}-${ItemPropertyType.NOTE}"></span>
         </div>
@@ -400,7 +361,7 @@ function renderRowName(fieldId, itemId, text, relatedItems) {
 
 function renderSubRowHtml(fieldId, sub, parentId, label, readOnly, matrixValues, savedValueId = null, savedNote = null) {
     return `
-        <div class="row-item child-row" data-item-id="${sub.id}" data-parent-id="${parentId}" data-weight="${sub.weightPercentage}">
+       <div class="row-item child-row level-2" data-item-id="${sub.id}" data-parent-id="${parentId}" data-weight="${sub.weightPercentage}">
             <span class="row-index">
                 <span class="row-index-num">${label}</span>
             </span>
@@ -531,43 +492,50 @@ const generateTableBodyHtmlForRelatedItems = (items, hasAnyNote) =>
         order: i + 1,
         hasAnyNote
     })).join('');
-
 const relatedItemPopup = (fieldId, rowsHtml, hasAnyNote) => `
     <div class="modal fade" id="${fieldId}-related-item-modal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-dialog modal-xl modal-dialog-centered p-2">
             <div class="modal-content">
-                <div class="modal-header align-items-start border-0">
+
+                <div class="modal-header align-items-start border-0 px-4">
                     <div>
                         <h4 class="modal-title fw-semibold mb-2">البنود المرتبطة</h4>
                     </div>
-                     <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal" aria-label="Close">
-                        <i class="la la-close me-1 fs-14"></i><span class="close-text">Close</span>
-                    </button>
 
+                    <button type="button"
+                            class="btn btn-outline-secondary btn-sm"
+                            data-bs-dismiss="modal"
+                            aria-label="Close">
+                        <i class="la la-close me-1 fs-14"></i>
+                        <span class="close-text">Close</span>
+                    </button>
                 </div>
 
-                <div class="modal-body py-0">
-                    <div class="row">
-                        <table class="table table-bordered text-center align-middle">
-                            <thead class="table-grey">
+                <div class="modal-body pt-0 px-4 pb-4">
+
+                    <div style="border:1px solid #dee2e6; border-radius:12px; overflow:hidden;">
+                        <table class="table table-bordered table-hover text-center align-middle w-100 mb-0">
+                            <thead class="table-light">
                                 <tr>
-                                    <th>#</th>
+                                    <th style="width:70px;">#</th>
                                     <th>البند</th>
-                                    <th>القيمة</th>
+                                    <th style="width:140px;">القيمة</th>
                                     ${hasAnyNote ? '<th>ملاحظات</th>' : ''}
                                 </tr>
                             </thead>
+
                             <tbody>
                                 ${rowsHtml}
                             </tbody>
                         </table>
                     </div>
+
                 </div>
+
             </div>
         </div>
     </div>
 `;
-
 function openRelatedItemModal(fieldId, itemId) {
     const state = getFormState(fieldId);
     const relatedItems = state.relatedItemsMap?.get(itemId) ?? [];
@@ -666,19 +634,16 @@ async function initForm(formId, academicYearId, fieldId, readOnly, savedResults,
 
     state.formData.forEach(crit => {
         crit.aspects.forEach(asp => {
-            // aspects now carry domains[], each with rows[] — walk them all.
-            asp.domains.forEach(domain => {
-                domain.rows.forEach(row => {
-                    if (row.hasNote) state.hasAnyNote = true;
-                    if (Array.isArray(row.relatedItems) && row.relatedItems.length > 0) {
-                        state.relatedItemsMap.set(row.id, row.relatedItems);
+            asp.rows.forEach(row => {
+                if (row.hasNote) state.hasAnyNote = true;
+                if (Array.isArray(row.relatedItems) && row.relatedItems.length > 0) {
+                    state.relatedItemsMap.set(row.id, row.relatedItems);
+                }
+                (row.subItems || []).forEach(sub => {
+                    if (sub.hasNote) state.hasAnyNote = true;
+                    if (Array.isArray(sub.relatedItems) && sub.relatedItems.length > 0) {
+                        state.relatedItemsMap.set(sub.id, sub.relatedItems);
                     }
-                    (row.subItems || []).forEach(sub => {
-                        if (sub.hasNote) state.hasAnyNote = true;
-                        if (Array.isArray(sub.relatedItems) && sub.relatedItems.length > 0) {
-                            state.relatedItemsMap.set(sub.id, sub.relatedItems);
-                        }
-                    });
                 });
             });
         });
@@ -723,37 +688,74 @@ async function initForm(formId, academicYearId, fieldId, readOnly, savedResults,
         const critBodyId = `${fieldId}-crit-body-${cIdx}`;
 
         const aspectCardsHtml = crit.aspects
-            // Keep only aspects that have at least one domain with rows.
-            .filter(asp => asp.domains?.some(d => d.rows?.length > 0))
+            .filter(asp => asp.rows && asp.rows.length > 0)
             .map((asp, aIdx) => {
                 const aId = `${fieldId}-asp-${cIdx}-${aIdx}`;
 
-                // domainsHtml accumulates one <div class="domain-row"> per
-                // domain in the aspect. For D=1/D=2 there is exactly one
-                // domain (no label shown); for D=3+ there are multiple,
-                // each showing its title in the left domain-title column.
-                //
-                // Rename mode (Branch A) always has a single implicit domain
-                // (rename forms are always D=2). The rows-area id is kept as
-                // "rows-${aId}" so the rename pool lookup in addNewRow /
-                // deleteRow / fillRenameControls works unchanged.
-                //
-                // Eval mode with multiple domains (Branch C, D=3) uses
-                // "rows-${aId}-dom-${dIdx}" so each domain has a unique id,
-                // while a single-domain aspect keeps "rows-${aId}" for
-                // backward compatibility with any external callers.
-                let domainsHtml = '';
+                let rowsAreaHtml = '';
                 let addButtonHtml = '';
 
-                // Helper: build the rows HTML for one flat list of rows.
-                // Used by branches B and C to avoid repeating the row
-                // rendering logic for each domain.
-                const buildRowsHtml = (rows, useDisplayName = false) =>
-                    rows.map((row, rIdx) => {
-                        const hasSubItems = Array.isArray(row.subItems) && row.subItems.length > 0;
+                // ── Branch A: rename mode (cases 3 & 4) ──────────────────
+                // state.isRename comes from evalForm.allowRename (server flag).
+                // evaluateRenamedItems overrides this to eval mode even when
+                // the form template is rename-capable, so check it first.
+                if (state.isRename && !evaluateRenamedItems) {
+                    asp.rows.forEach(row => {
+                        state.renameItemsById.set(row.id, { item: row, aspectKey: aId });
+                    });
+
+                    if (savedItems.length > 0) {
+                        // Case 3 / 4: render every row that appears in
+                        // savedResults upfront with its saved name; rows not
+                        // in savedResults stay in the pool (addNewRow).
+                        // Pool still populated in original order so Add New
+                        // continues to work for unsaved items.
+                        const savedIds = new Set(savedItems.map(s => s.id));
+                        const poolRows = asp.rows.filter(row => !savedIds.has(row.id));
+                        state.renamePools.set(aId, poolRows);
+
+                        const renderedRows = asp.rows
+                            .filter(row => savedIds.has(row.id))
+                            .map((row, idx) => {
+                                const saved = savedMap[row.id];
+                                // Prefill name from savedResults
+                                const rowWithSavedName = { ...row, text: saved?.name ?? '' };
+                                return renderRenameRowHtml(fieldId, aId, rowWithSavedName, idx + 1, state.allowDelete, state);
+                            }).join('');
+
+                        rowsAreaHtml = renderedRows;
+                    } else {
+                        // No savedResults — blank rename form (first open).
+                        // Only the first row renders; rest go into pool.
+                        const [firstRow, ...poolRows] = asp.rows;
+                        state.renamePools.set(aId, poolRows);
+                        if (firstRow) {
+                            rowsAreaHtml = renderRenameRowHtml(fieldId, aId, firstRow, 1, state.allowDelete, state);
+                        }
+                    }
+
+                    if (state.allowAdd && state.renamePools.get(aId)?.length > 0) {
+                        addButtonHtml = renderAddNewRowButton(fieldId, aId);
+                    }
+
+                    // ── Branch B: evaluate renamed items (cases 5 & 6) ───────
+                    // Row label = savedResults.name; selects render normally;
+                    // name cell is readonly display (no .item-name class).
+                } else if (evaluateRenamedItems) {
+                    // ✅ Only render rows that were actually renamed (exist in savedResults)
+                    const renamedRows = asp.rows.filter(row => savedMap[row.id]);
+
+                    rowsAreaHtml = renamedRows.map((row, rIdx) => {
                         const saved = savedMap[row.id];
+                        // Use saved name as the display label, fall back to
+                        // template name if this row has no saved entry yet.
+                        const displayName = saved?.name ?? row.text;
+                        const hasSubItems = Array.isArray(row.subItems) && row.subItems.length > 0;
+
+                        // savedMap.valueIds is always a flat array (one
+                        // entry per column) produced by the grouped savedMap
+                        // build above. Single-select → [valueId], multi → [id1, id2, ...].
                         const savedValueIdOrIds = saved?.valueIds?.length > 0 ? saved.valueIds : null;
-                        const displayName = useDisplayName ? (saved?.name ?? row.text) : row.text;
 
                         const mainRowHtml = `
                             <div class="row-item main-row${hasSubItems ? ' has-subitems' : ''}" data-item-id="${row.id}" data-weight="${row.weightPercentage}">
@@ -765,6 +767,55 @@ async function initForm(formId, academicYearId, fieldId, readOnly, savedResults,
                                 </span>
 
                                 ${renderRowName(fieldId, row.id, displayName, row.relatedItems)}
+
+                                ${renderSelectsAndNote(
+                                    fieldId, row.id, row.hasNote, readOnly, matrixValues,
+                                    state.hasMuliEvaluation, row.formItemConfigs,
+                                    state.evalForm?.evalCountOfColumnsValue || 1,
+                                    savedValueIdOrIds,
+                                    saved?.note ?? null
+                                )}
+                            </div>
+                        `;
+                        let subItemsHtml = '';
+                        if (hasSubItems) {
+                            const subRowsHtml = row.subItems.map((sub, sIdx) => {
+                                const savedSub = savedSubMap[sub.id];
+                                return renderSubRowHtml(
+                                    fieldId, sub, row.id, `${rIdx + 1}.${sIdx + 1}`, readOnly, matrixValues,
+                                    savedSub?.valueId ?? null,
+                                    savedSub?.note ?? null
+                                );
+                            }).join('');
+
+                            subItemsHtml = `
+                                <div class="subitems-container" data-parent-id="${row.id}">
+                                    ${subRowsHtml}
+                                </div>
+                            `;
+                        }
+
+                        return mainRowHtml + subItemsHtml;
+                    }).join('');
+
+                    // ── Branch C: regular eval (cases 1 & 2) ─────────────────
+                } else {
+                    rowsAreaHtml = asp.rows.map((row, rIdx) => {
+                        const hasSubItems = Array.isArray(row.subItems) && row.subItems.length > 0;
+                        const saved = savedMap[row.id];
+
+                        const savedValueIdOrIds = saved?.valueIds?.length > 0 ? saved.valueIds : null;
+
+                        const mainRowHtml = `
+                            <div class="row-item main-row${hasSubItems ? ' has-subitems' : ''}" data-item-id="${row.id}" data-weight="${row.weightPercentage}">
+                                <span class="row-index">
+                                    <span class="row-index-num">${rIdx + 1}</span>
+                                    ${hasSubItems
+                                ? `<button type="button" class="row-toggle" aria-expanded="false" aria-label="toggle sub items">›</button>`
+                                : ''}
+                                </span>
+
+                                ${renderRowName(fieldId, row.id, row.text, row.relatedItems)}
 
                                 ${renderSelectsAndNote(
                                     fieldId, row.id, row.hasNote, readOnly, matrixValues,
@@ -796,92 +847,6 @@ async function initForm(formId, academicYearId, fieldId, readOnly, savedResults,
 
                         return mainRowHtml + subItemsHtml;
                     }).join('');
-
-                // ── Branch A: rename mode (cases 3 & 4) ──────────────────
-                // Rename forms are always D=2 (one implicit domain per aspect).
-                // We flatten all domain rows (there will only be one domain)
-                // and treat them as a single pool, same as before.
-                if (state.isRename && !evaluateRenamedItems) {
-                    const allRows = asp.domains.flatMap(d => d.rows);
-
-                    allRows.forEach(row => {
-                        state.renameItemsById.set(row.id, { item: row, aspectKey: aId });
-                    });
-
-                    let rowsAreaHtml = '';
-                    if (savedItems.length > 0) {
-                        const savedIds = new Set(savedItems.map(s => s.id));
-                        const poolRows = allRows.filter(row => !savedIds.has(row.id));
-                        state.renamePools.set(aId, poolRows);
-
-                        rowsAreaHtml = allRows
-                            .filter(row => savedIds.has(row.id))
-                            .map((row, idx) => {
-                                const saved = savedMap[row.id];
-                                const rowWithSavedName = { ...row, text: saved?.name ?? '' };
-                                return renderRenameRowHtml(fieldId, aId, rowWithSavedName, idx + 1, state.allowDelete, state);
-                            }).join('');
-                    } else {
-                        const [firstRow, ...poolRows] = allRows;
-                        state.renamePools.set(aId, poolRows);
-                        if (firstRow) {
-                            rowsAreaHtml = renderRenameRowHtml(fieldId, aId, firstRow, 1, state.allowDelete, state);
-                        }
-                    }
-
-                    if (state.allowAdd && state.renamePools.get(aId)?.length > 0) {
-                        addButtonHtml = renderAddNewRowButton(fieldId, aId);
-                    }
-
-                    // Single implicit domain — no label, rows-area id = aId
-                    // so rename pool lookups keep working unchanged.
-                    domainsHtml = `
-                        <div class="domain-row">
-                            <div class="domain-title"></div>
-                            <div class="rows-area" id="rows-${aId}">${rowsAreaHtml}</div>
-                        </div>
-                    `;
-
-                    // ── Branch B: evaluate renamed items (cases 5 & 6) ───────
-                } else if (evaluateRenamedItems) {
-                    domainsHtml = asp.domains.map((domain, dIdx) => {
-                        const dId = asp.domains.length === 1 ? aId : `${aId}-dom-${dIdx}`;
-                        // Only render rows that were actually renamed (exist in savedResults).
-                        const renamedRows = domain.rows.filter(row => savedMap[row.id]);
-                        const rowsAreaHtml = buildRowsHtml(renamedRows, /* useDisplayName */ true);
-
-                        return `
-                            <div class="domain-row">
-                                <div class="domain-title">${domain.title ? escapeAttr(domain.title) : ''}</div>
-                                <div class="rows-area" id="rows-${dId}">${rowsAreaHtml}</div>
-                            </div>
-                        `;
-                    }).join('');
-
-                    // ── Branch C: regular eval (cases 1 & 2) ─────────────────
-                } else {
-                    domainsHtml = asp.domains.map((domain, dIdx) => {
-                        const dId = asp.domains.length === 1 ? aId : `${aId}-dom-${dIdx}`;
-                        const rowsAreaHtml = buildRowsHtml(domain.rows);
-
-                        return `
-                            <div class="domain-row">
-                                <div class="domain-title">${domain.title ? escapeAttr(domain.title) : ''}</div>
-                                <div class="rows-area" id="rows-${dId}">${rowsAreaHtml}</div>
-                            </div>
-                        `;
-                    }).join('');
-                }
-
-                // D=1 (asp.isDirect): this "aspect" is just the criterion's
-                // own items with no separate aspect concept above them - its
-                // title is a duplicate of the criterion title, so we skip the
-                // aspect-card wrapper/header entirely and let the rows sit
-                // straight inside the criterion body. The rows-area/domain
-                // divs (with their ids used by rename add/delete lookups)
-                // are still rendered as-is via domainsHtml.
-                if (asp.isDirect) {
-                    return `${domainsHtml}${addButtonHtml}`;
                 }
 
                 return `
@@ -891,7 +856,13 @@ async function initForm(formId, academicYearId, fieldId, readOnly, savedResults,
                             <input class="aspect-title-input" type="text" value="${escapeAttr(asp.title)}" readonly />
                         </div>
 
-                        ${domainsHtml}
+                        <div class="domain-row">
+                            <div class="domain-title">
+                                ${asp.domainTitle}
+                            </div>
+
+                            <div class="rows-area" id="rows-${aId}">${rowsAreaHtml}</div>
+                        </div>
 
                         ${addButtonHtml}
                     </div>

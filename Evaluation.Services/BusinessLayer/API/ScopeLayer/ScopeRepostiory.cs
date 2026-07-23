@@ -26,6 +26,7 @@ public class ScopeRepostiory(IServiceScopeFactory serviceScopeFactory,
             .GetAllNonDeleted()
             .Include(x => x.Scope)
             .ThenInclude(x => x.ScopeType)
+            .Include(x => x.ScopeParent)
             .Where(x=>x.AcademicYearId == academicYearId && x.DepartmentId == requestInfo.DepId)
             .ToListAsync();
 
