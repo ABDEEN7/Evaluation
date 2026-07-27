@@ -9,4 +9,5 @@ public class FormEvalMatrixDTO : EntityBaseDTO
     public string NameEn { get; set; } = null!;
     public DateOnly Startdate { get; set; }
     public DateOnly? EndDate { get; set; }
+    public bool RequiredFollowUp { get; set; }
 }

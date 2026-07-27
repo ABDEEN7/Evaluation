@@ -697,28 +697,7 @@
 
         const config = {
             locale: "en",
-            allowInput: true,
-            onDayCreate: function (dObj, dStr, fp, dayElem) {
-                if (isHoliday(dayElem.dateObj)) {
-                    dayElem.classList.add('blocked');
-                    // Make the day non-clickable
-                    dayElem.classList.add('flatpickr-disabled');
-                    // Remove the click event
-                    dayElem.style.pointerEvents = 'none';
-                }
-            },
-            onChange: function (selectedDates, dateStr, instance) {
-                // Double-check on change (for manual input via allowInput)
-                if (selectedDates.length > 0) {
-                    const startDate = selectedDates[0];
-                    const endDate = selectedDates[selectedDates.length - 1];
-
-                    if (isHoliday(startDate) || (selectedDates.length > 1 && isHoliday(endDate))) {
-                        instance.clear();
-                        alert('لا يمكن البدء أو الانتهاء في يوم عطلة');
-                    }
-                }
-            }
+            allowInput: true
         };
 
         if (mode === 'disabled') {
@@ -774,6 +753,14 @@
         else if (mode === 'custom') {
             config.mode = "range";
             config.dateFormat = "Y-m-d";
+
+            config.onDayCreate = function (dObj, dStr, fp, dayElem) {
+                if (isHoliday(dayElem.dateObj)) {
+                    dayElem.classList.add('blocked');
+                    dayElem.classList.add('flatpickr-disabled');
+                    dayElem.style.pointerEvents = 'none';
+                }
+            };
 
             if (minDate) config.minDate = minDate;
             if (maxDate) config.maxDate = maxDate;

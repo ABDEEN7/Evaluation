@@ -328,7 +328,7 @@
         });
 
         state.selectedSchoolsMap = selectedSchoolsMap;
-
+        updateSelectionCounter(fieldId);
         if (state.isReadOnly && selectedSchoolIds.length > 0) {
             loadSelectedSchoolsOnly(fieldId, selectedSchoolIds, selectedSchoolsMap);
         } else {

@@ -745,7 +745,7 @@
                 updateSelectAllCheckbox();
             });
 
-        // التعامل مع checkbox في الجدول السفلي
+        //down table
         $(document).off('click', '.team-remove-btn')
             .on('click', '.team-remove-btn', function () {
 
@@ -769,7 +769,7 @@
                 renderSelectedTeamTable();
                 updateSelectAllCheckbox();
             });
-        // Select All في جدول الفريق المحدد
+        // Select All memeber seleced
         $(document).off('click', id('removeAllMembers'))
             .on('click', id('removeAllMembers'), function () {
 
@@ -790,7 +790,7 @@
                 showSuccess('تم حذف جميع الأعضاء');
             });
 
-        // البحث
+        // search
         $(document).off('keyup', id('customSearch'))
             .on('keyup', id('customSearch'), function () {
                 const searchTerm = $(this).val().toLowerCase();
@@ -975,7 +975,6 @@
         }
 
         // ====== REMOVE OLD EVENT LISTENERS ======
-        // إزالة الـ event listeners القديمة لمنع التكرار
         $(document).off('change', '.team-leader-radio');
         $(document).off('change', '.party-type-select');
         $(document).off('change', '.nda-checkbox');
@@ -1039,7 +1038,6 @@
     // ================== INTERNAL RESET FUNCTION ==================
 
     function resetStateInternal() {
-        // إعادة ضبط جميع متغيرات الحالة
         state.fieldId = null;
         state.evaluationRequestId = null;
         state.teams = [];

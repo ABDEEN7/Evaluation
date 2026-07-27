@@ -17,6 +17,7 @@ namespace Evaluation.SharedHelper.Models.Admin
         public string? ColorCode { get; set; }
         public int OrderNo { get; set; } = 0;
         public int NextEvalDays { get; set; } = 0;
+        public int NextFollowUpDays { get; set; } = 0;
         public string? ReportTextAr { get; set; }
         public string? ReportTextEn { get; set; }
         public string? ReportDescAr { get; set; }

@@ -68,6 +68,7 @@ public class SrvFormEvalMatrixBL : AdminBase
         obj.Startdate = message.Startdate;
         obj.EndDate = message.EndDate;
         obj.DepartmentId = message.DepartmentId;
+        obj.RequiredFollowUp = message.RequiredFollowUp;
         obj.IsActive = message.IsActive;
 
         uow.GetRepository<FormEvalMatrix>().Insert(obj);
@@ -96,6 +97,7 @@ public class SrvFormEvalMatrixBL : AdminBase
             obj.Startdate = message.Startdate;
             obj.EndDate = message.EndDate;
             obj.DepartmentId = message.DepartmentId;
+            obj.RequiredFollowUp = message.RequiredFollowUp;
             obj.IsActive = message.IsActive;
 
             uow.GetRepository<FormEvalMatrix>().Update(obj);
@@ -157,5 +159,10 @@ public class SrvFormEvalMatrixBL : AdminBase
         return result;
 
     }
-
+    public async Task<bool> HasRequiredFollowUpAsync(Guid formEvalMatrixId)
+    {
+        return await uow.GetRepository<FormEvalMatrix>()
+            .GetAllActiveNonDeleted(x => x.Id == formEvalMatrixId).
+            AnyAsync(x => x.RequiredFollowUp);
+    }
 }

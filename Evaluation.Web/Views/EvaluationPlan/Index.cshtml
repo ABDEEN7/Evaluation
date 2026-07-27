@@ -771,14 +771,15 @@
             const reqId     = searchParams.get('id');
             const serviceId = searchParams.get('serviceId');
             const EvlId     = searchParams.get('Evlid');
+            const AcademicYearId     = searchParams.get('AcademicYearId');
             const planId    = searchParams.get('planId');
             const SerReqid  = searchParams.get('SerReqid');
 
-            const hasDeepLink = reqId || EvlId || SerReqid || planId;
+            const hasDeepLink = reqId || EvlId  || SerReqid || planId;
 
             if (hasDeepLink) {
                 if (reqId)     openPlanRequestDetails(reqId);
-                if (EvlId)     openEvaluationRequestDetails(EvlId);
+                if (EvlId)     openEvaluationRequestDetails(EvlId, AcademicYearId);
                 if (SerReqid)  openRequestDetails(SerReqid);
                 if (planId) {
                     if (IsCanUpdatePlan) {
@@ -798,7 +799,7 @@
             }
 
             $('#evaluationRequestDetailsModal').on('hidden.bs.modal', function () {
-                formUtility.removeQueryParameter(['Evlid', 'serviceId']);
+                formUtility.removeQueryParameter(['Evlid', 'serviceId', 'AcademicYearId']);
             });
             $('#planRequestModal').on('hidden.bs.modal', function () {
                 formUtility.removeQueryParameter(['id', 'serviceId']);

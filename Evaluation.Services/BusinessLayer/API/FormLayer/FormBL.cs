@@ -6,7 +6,7 @@ using Evaluation.DAL.Models.Planing.EvaluationRequestEntity;
 using Evaluation.DAL.Repositories;
 using Evaluation.Services.BusinessLayer.API.ScopeLayer;
 using Evaluation.Services.Enums;
-using Evaluation.Services.MappingProfiles;
+using Evaluation.Services.Extensions;
 using Evaluation.Services.Special;
 using Evaluation.SharedHelper.Dtos.EvalFormDto;
 using Evaluation.SharedHelper.Dtos.Form;
@@ -17,7 +17,6 @@ using Evaluation.SharedHelper.Models;
 using FluentResults;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.SqlServer.Server;
 using ValidationResult = Evaluation.SharedHelper.Dtos.Shared.ValidationResult;
 
 namespace Evaluation.Services.BusinessLayer.API.FormLayer;
@@ -55,7 +54,7 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
             formItems,
             formItemValues
             );
-
+        
         return new FormDto
         {
             EvalForm = mappedEvalForm,
@@ -355,8 +354,10 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
 		}
 
 		if (evalForm.IsFinalEval)
-		{
-			var calculationResult = await CalculateFormResult(formEvaluationDto);
+        {
+            using var scopedUow = serviceScopeFactory.CreateScopedUow();
+
+            var calculationResult = await CalculateFormResult(formEvaluationDto);
 
 			var evaluationRequest =
 				await _evaluationRequestService.GetEvaluationRequestByIdAsync(formEvaluationDto.EvaluationRequestId.Value);
@@ -374,7 +375,8 @@ public class FormBL(IServiceScopeFactory serviceScopeFactory, CacheDataProvider 
 
 			evaluationRequest.FinalEvalValue = calculationResult.Value.Value;
 
-			uow.GetRepository<EvaluationRequest>().Update(evaluationRequest);
+            scopedUow.GetRepository<EvaluationRequest>().Update(evaluationRequest);
+            await scopedUow.CommitAsync();
 		}
 
 		return Result.Ok(formEvaluationDto);

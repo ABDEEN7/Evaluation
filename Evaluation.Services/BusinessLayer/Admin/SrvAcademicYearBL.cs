@@ -30,6 +30,7 @@ namespace Evaluation.Services.Models.Admin
             var list = await uow.GetRepository<AcademicYear>()
                 .GetAllNonDeleted()
                 .Include(x => x.CreateBy)
+                .Include(x=>x.Department)
                 .OrderByDescending(x => x.CreateDate)
                  .Skip(Page * PageSize)
                 .Take(PageSize)

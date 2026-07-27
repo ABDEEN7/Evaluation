@@ -135,6 +135,7 @@ namespace Evaluation.Services.Models.Admin
     ? string.Join(",", message.FielsFromEvaluation.Select(g => g.ToString()))
     : string.Empty;
             obj.ServiceId = message.ServiceId;
+            obj.DepartmentId = message.DepartmentId;
                 obj.IsActive = message.IsActive;
 
                 uow.GetRepository<EmailTemplate>().Insert(obj);
@@ -207,6 +208,7 @@ namespace Evaluation.Services.Models.Admin
         ? string.Join(",", message.FielsFromEvaluation.Select(g => g.ToString()))
         : string.Empty;
                 obj.ServiceId = message.ServiceId;
+                obj.DepartmentId = message.DepartmentId;
                 obj.IsActive = message.IsActive;
 
                 uow.GetRepository<EmailTemplate>().Update(obj);
