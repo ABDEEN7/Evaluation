@@ -94,7 +94,19 @@ public static class ScopeTreeBuilder
             ScopeTypeName = langCode.ToLower() == "ar" ? scopeType.NameAr : scopeType.NameEn,//TODO: Need to translate
             OrderNo = scope.OrderNo,
             ColorCode = scope.ColorCode,
+            Strengths =
+                [
+                    "الدور الإيجابي للمتابعة الأكاديمية في ارتفاع التحصيل الأكاديمي.",
+                    "تطبيق معايير الصحة والسلامة بما يضمن سلامة المجتمع المدرسي.",
+                    "الدور الإيجابي للمدرسة في حصول المعلمين على الرخصة المهنية."
+                ],
 
+            Weaknesses =
+                [
+                    "تكثيف متابعة القيادة الأكاديمية لرفع مستوى الطلبة في الاختبارات الدولية.",
+                    "الاستفادة من برامج التطوير المهني في تنمية مهارات التفكير العليا.",
+                    "تكثيف المتابعة الإدارية للحالات السلوكية."
+                ],
             Items = itemsLookup.TryGetValue(scope.Id, out var items)
                 ? items
                     .OrderBy(x => x.OrderNo)

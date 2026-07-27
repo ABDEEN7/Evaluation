@@ -11,6 +11,8 @@ public class ScopeTreeDto
     public Guid ScopeTypeId { get; set; }
 
     public string? ColorCode { get; set; }
+    public List<string>? Strengths { get; set; }
+    public List<string>? Weaknesses { get; set; }
     public List<ScopeTreeDto> Children { get; set; } = new();
     public List<FormItemDto> Items { get; set; } = new();
 }
